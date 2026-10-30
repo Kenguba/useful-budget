@@ -1,0 +1,40 @@
+# GitHub Pages 方案：每 12 小时自动刷新数据、提交回仓库，并发布 Pages
+# 用法：把整个包推到一个 GitHub 仓库，仓库 Settings > Pages 里 Source 选 GitHub Actions 即可
+name: refresh-and-deploy
+on:
+  schedule:
+    - cron: "23 */12 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/refresh.py
+      - name: Commit data
+        run: |
+          git config user.name "skills-board-bot"
+          git config user.email "bot@localhost"
+          git add data/
+          git diff --cached --quiet || git commit -m "data: refresh $(date -u +%F)"
+          git push
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - uses: actions/deploy-pages@v4
