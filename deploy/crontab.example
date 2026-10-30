@@ -1,0 +1,2 @@
+# 裸机/VPS 方案二选一：cron 每 12 小时刷一次（把路径改成你的部署目录）
+# 17 */12 * * * cd /opt/skills-board && /usr/bin/python3 scripts/refresh.py >> refresh.log 2>&1
