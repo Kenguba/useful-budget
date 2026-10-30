@@ -1,0 +1,9 @@
+[Unit]
+Description=Global Skills Board (static server)
+After=network.target
+[Service]
+WorkingDirectory=/opt/skills-board
+ExecStart=/usr/bin/python3 server.py 8080
+Restart=always
+[Install]
+WantedBy=multi-user.target
