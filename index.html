@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全球 Skills 使用量排行榜</title>
+<style>
+:root{--ink:#12233d;--blue:#1c4f9c;--blue2:#2563eb;--gold:#f2b705;--bg:#f6f3ec;--card:#fff;--mut:#5b6b82;--line:#e5e0d2}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:20px 14px 60px}
+.kicker{color:var(--blue);font-weight:800;letter-spacing:.14em;font-size:13px;line-height:1.5}
+.kicker:before{content:"";display:inline-block;width:22px;height:5px;background:var(--gold);margin-right:8px;vertical-align:middle}
+h1{font-size:40px;line-height:1.15;margin:10px 0 8px;font-weight:900}
+h1 mark{background:linear-gradient(transparent 62%,#ffd94d 62%);color:inherit;padding:0 2px}
+.sub{font-weight:700;font-size:16px;line-height:1.6}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.pill{border:1.5px solid var(--blue);border-radius:999px;padding:6px 14px;font-size:13px;background:#fff}
+.pill.solid{background:var(--blue);color:#fff;font-weight:700}
+.pill.warn{border-color:#d9a400;background:#fff7dd}
+select,button{font-size:14px;border-radius:10px;border:1.5px solid var(--blue);padding:8px 12px;background:#fff;color:var(--ink)}
+button{background:var(--blue);color:#fff;font-weight:700;cursor:pointer}
+input[type=search]{flex:1;min-width:180px;font-size:14px;border-radius:10px;border:1.5px solid var(--line);padding:9px 12px;background:#fff}
+.bar{height:7px;border-radius:4px;background:linear-gradient(90deg,var(--blue) 55%,var(--gold) 55%);margin:14px 0 18px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.stat b{font-size:30px;color:var(--blue);display:block}
+.stat span{color:var(--mut);font-size:13px;line-height:1.5;display:block;margin-top:4px}
+section{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 16px;margin-top:16px}
+.sec-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:6px}
+.sec-head h2{margin:0;font-size:21px;line-height:1.35}
+.badge{background:var(--blue);color:#fff;border-radius:10px;padding:6px 9px;font-weight:800}
+.sec-head p{margin:0;color:var(--mut);font-size:12px;text-align:right;line-height:1.6}
+h3{font-size:16px;margin:16px 0 4px;color:var(--blue)}
+.item{display:flex;gap:12px;padding:11px 2px;border-bottom:1px dashed var(--line)}
+.item:last-child{border-bottom:none}
+.rank{flex:0 0 34px;height:34px;border-radius:50%;background:#eef2f8;color:var(--blue);font-weight:800;display:flex;align-items:center;justify-content:center}
+.rank.top{background:var(--gold);color:#3a2c00}
+.item .main{flex:1;min-width:0}
+.name{font-weight:800;font-size:16px;word-break:break-all}
+.name a{color:inherit;text-decoration:none}
+.meta{color:var(--mut);font-size:12px;margin-left:6px}
+.blurb{color:#33465e;font-size:14px;line-height:1.55;margin-top:2px}
+.num{font-weight:800;color:var(--blue);white-space:nowrap;text-align:right}
+.num small{display:block;color:var(--mut);font-weight:400;font-size:11px}
+code.cmd{display:block;background:#0f1c30;color:#dceaff;border-radius:10px;padding:9px 11px;font-size:12px;overflow-x:auto;white-space:nowrap;margin-top:7px;cursor:pointer}
+.grid2{display:grid;grid-template-columns:1fr;gap:0}
+@media(min-width:700px){.grid2{grid-template-columns:1fr 1fr;gap:0 28px}.stats{grid-template-columns:repeat(4,1fr)}}
+.hl{background:#fff7dd;border:1px solid #ecd27a;border-radius:14px;padding:12px 14px;line-height:1.9;font-size:14px}
+.note{color:var(--mut);font-size:13px;line-height:1.8}
+footer{color:var(--mut);font-size:12px;line-height:1.8;margin-top:22px;text-align:center}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="row" style="justify-content:space-between">
+    <div class="kicker">2026 · GLOBAL<br>AGENT SKILLS<br>USAGE<br>RANKING</div>
+    <div class="row">
+      <select id="dateSel" aria-label="期数"></select>
+      <button id="reloadBtn">刷新数据</button>
+    </div>
+  </div>
+  <h1>全球 <mark>Skills</mark> 使用量排行榜</h1>
+  <div class="sub">两张榜：谁被装得最多（3 个注册中心）+ 谁的源码最值得信（GitHub）</div>
+  <div class="row">
+    <span class="pill solid" id="datePill">数据截至 —</span>
+    <span class="pill">skills.sh · ClawHub · 腾讯 SkillHub · GitHub</span>
+  </div>
+  <div class="row">
+    <span class="pill warn">跨平台数字并列，不做相加</span>
+    <span class="pill">GitHub 无安装数 → 以星标单列</span>
+    <input type="search" id="q" placeholder="搜技能名，过滤所有榜单…">
+  </div>
+  <div class="bar"></div>
+  <div class="stats" id="stats"></div>
+  <div class="hl" id="highlights" style="margin-top:14px"></div>
+  <div id="sections"></div>
+  <footer>
+    数据来源：Best Skills（https://github.com/LinklyAI/best-skills，CC BY 4.0，每日 CSV）+ GitHub API 直查。<br>
+    跨平台口径不同，数字并列展示、从不相加；榜单为空 = 未测量，不是 0。自托管版：定时跑 scripts/refresh.py 更新 data/。
+  </footer>
+</div>
+<script>
+const fmt=n=>n==null?"—":Number(n).toLocaleString("en-US");
+const compact=n=>n==null?"—":(n>=1e6?(n/1e6).toFixed(2)+"M":n>=1e3?(n/1e3).toFixed(1)+"K":String(n));
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let DATES=[], board=null;
+function rankBadge(r){return `<div class="rank ${r<=3?"top":""}">${r}</div>`}
+function cmd(c){return c?`<code class="cmd" title="点按复制">${esc(c)}</code>`:""}
+function nameLink(name,url,meta){const n=url?`<a href="${esc(url)}" target="_blank" rel="noopener">${esc(name)}</a>`:esc(name);return `<span class="name">${n}</span>${meta?`<span class="meta">${esc(meta)}</span>`:""}`}
+function item(r,left,numHtml){return `<div class="item" data-skill="${esc((left.skill||left.repo||"").toLowerCase())}">${rankBadge(r)}<div class="main">${left.html}</div><div class="num">${numHtml||""}</div></div>`}
+function section(no,title,desc,inner){return `<section><div class="sec-head"><div style="display:flex;gap:10px;align-items:center"><span class="badge">${no}</span><h2>${title}</h2></div><p>${desc}</p></div>${inner}</section>`}
+function render(b){
+  board=b;
+  document.getElementById("datePill").textContent=`数据截至 ${b.date}（UTC）`;
+  const s=b.stats;
+  document.getElementById("stats").innerHTML=
+    `<div class="stat"><b>${esc(s.trackedSkills)}</b><span>在榜追踪技能</span></div>`+
+    `<div class="stat"><b>${s.dataSources}</b><span>数据源：3 注册中心 + GitHub</span></div>`+
+    `<div class="stat"><b>${s.boards}</b><span>张每日刷新榜单</span></div>`+
+    `<div class="stat"><b>${compact(s.maxInstalls)}</b><span>单技能最高安装量（${esc(s.maxInstallsSkill)}）</span></div>`;
+  document.getElementById("highlights").innerHTML=b.highlights.map(h=>`· ${esc(h)}`).join("<br>");
+  let h="";
+  // 01 installs + repos
+  let inner=b.installs.map(e=>{
+    const vals=[["skills.sh",e.installsSkillssh],["ClawHub",e.downloadsClawhub],["SkillHub",e.downloadsSkillhub]].filter(x=>x[1]!=null);
+    return item(e.rank,{skill:e.skill,html:`${nameLink(e.skill,e.url,e.category+" · "+e.platform)}<div class="blurb">${esc(e.blurb)}</div>${cmd(e.installCmd)}`},
+      vals.map(v=>`${fmt(v[1])}<small>${v[0]}</small>`).join(""));
+  }).join("");
+  inner+=`<h3>GitHub 星标榜 TOP 10</h3>`+b.repos.map(e=>item(e.rank,{skill:e.repo,html:`${nameLink(e.repo,e.url,e.maintainer)}<div class="blurb">${esc(e.blurb)}</div>`},
+    `${fmt(e.stars)} ★${e.starsDelta1d!=null?`<small>日增 +${fmt(e.starsDelta1d)}</small>`:""}`)).join("");
+  h+=section("01","安装量总榜 TOP 8","每行都写了「它到底干什么」· 三平台原生口径并列",inner);
+  // 02 platforms
+  const plat=(t,rows)=>`<h3>${t}</h3>`+rows.map(e=>item(e.rank,{skill:e.skill,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},fmt(e.value))).join("");
+  h+=section("02","三平台分区榜","各平台只跟自己比，不跨平台合并",`<div class="grid2"><div>${plat("skills.sh",b.platforms.skillssh)}</div><div>${plat("ClawHub",b.platforms.clawhub)}</div><div>${plat("腾讯 SkillHub",b.platforms.skillhub)}</div></div>`);
+  // 03 WIS
+  inner=b.wis.map(e=>item(e.rank,{skill:e.skill,html:`${nameLink(e.skill,e.url,e.category+" · "+e.platform)}<div class="blurb">${esc(e.blurb)}</div>${cmd(e.installCmd)}`},
+    `${e.wis}<small>WIS · 覆盖 ${esc(e.coverage)}</small>`)).join("");
+  h+=section("03","WIS 综合值得装榜 TOP 10","热度 × 动能 × 声量 × 维护 × 信任的综合分",inner);
+  // 04 momentum
+  const trend=b.trending.map(e=>item(e.rank,{skill:e.skill,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${e.growthPct>0?"+":""}${e.growthPct}%<small>7 日 · ${fmt(e.installs)}</small>`)).join("");
+  const buzz=b.buzz.map(e=>item(e.rank,{skill:e.skill,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${e.score}<small>X ${e.x}${e.xTruncated?"+":""} · GH ${e.gh} · HN ${e.hn}</small>`)).join("");
+  const rising=b.rising.map(e=>item(e.rank,{skill:e.skill,html:`${nameLink(e.skill,e.url,e.platform)}<div class="blurb">${esc(e.blurb)}</div>`},`${fmt(e.value)}<small>${esc(e.valueLabel)} · 上榜 ${e.ageDays} 天</small>`)).join("");
+  const active=b.active.map(e=>item(e.rank,{skill:e.skill,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>${cmd(e.installCmd)}`},`${esc(e.lastUpdate)}<small>${e.versions??"—"} 个版本</small>`)).join("");
+  h+=section("04","动能 · 声量 · 新星 · 维护","四张子榜：最近 7 天和 30 天在发生什么",`<div class="grid2"><div><h3>7 日动能</h3>${trend}</div><div><h3>社交声量</h3>${buzz}</div><div><h3>30 天新星</h3>${rising}</div><div><h3>最活跃维护</h3>${active}</div></div>`);
+  // 05 vendors + how to choose
+  inner=b.vendors.map(e=>item(e.rank,{skill:e.vendor,html:`${nameLink(e.vendor,"",e.platform)}<div class="blurb">${esc(e.note||"")} · ${fmt(e.skillsCount)} 个技能</div>`},fmt(e.total))).join("");
+  inner+=`<h3>装之前先问四件事</h3><div class="note">1. 谁做的？官方组织 / 知名开发者优先。&nbsp;2. 还在维护吗？看最活跃维护榜的最近更新与版本数。&nbsp;3. 热度是真的吗？安装量、星标、社交声量三个口径对得上才算。&nbsp;4. 覆盖几个平台？只在一个注册中心有数（覆盖 C）的，结论别下太满。</div>`;
+  const ex1=b.installs.find(e=>e.installCmd), ex2=b.active.find(e=>e.installCmd);
+  inner+=`<h3>安装命令示例</h3>${ex1?cmd(ex1.installCmd):""}${ex2&&ex2.installCmd!==ex1.installCmd?cmd(ex2.installCmd):""}`;
+  inner+=`<h3>三条避坑</h3><div class="note">· 跨平台数字不能相加：skills.sh 的安装、ClawHub 的下载、SkillHub 的安装不是一回事。<br>· 同名不同源是常态：认准厂商（vendor）和链接，别只看技能名。<br>· 装任何技能前先过一遍安全预审（如 skill-vetter），尤其是要执行命令的那种。</div>`;
+  h+=section("05","厂商榜 + 权威度四问","体量、质量、维护一起看",inner);
+  document.getElementById("sections").innerHTML=h;
+  document.querySelectorAll("code.cmd").forEach(c=>c.addEventListener("click",()=>{navigator.clipboard&&navigator.clipboard.writeText(c.textContent);c.style.opacity=.6;setTimeout(()=>c.style.opacity=1,300)}));
+  applyFilter();
+}
+function applyFilter(){const q=document.getElementById("q").value.trim().toLowerCase();document.querySelectorAll("[data-skill]").forEach(el=>{el.classList.toggle("hidden",!!q&&!el.dataset.skill.includes(q))})}
+async function load(date){
+  const url=date?`data/boards/${date}.json`:"data/board.json";
+  const r=await fetch(url+"?t="+Date.now()); render(await r.json());
+}
+(async()=>{
+  try{DATES=await (await fetch("data/dates.json?t="+Date.now())).json()}catch(e){DATES=[]}
+  const sel=document.getElementById("dateSel");
+  sel.innerHTML=DATES.map(d=>`<option value="${d}">${d} 期</option>`).join("");
+  sel.addEventListener("change",()=>load(sel.value));
+  document.getElementById("reloadBtn").addEventListener("click",()=>load(sel.value||null));
+  document.getElementById("q").addEventListener("input",applyFilter);
+  await load(DATES[0]||null);
+  if(DATES[0]) sel.value=DATES[0];
+})();
+</script>
+</body>
+</html>
