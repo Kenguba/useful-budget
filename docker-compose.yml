@@ -1,0 +1,11 @@
+services:
+  skills-board:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - REFRESH_HOURS=12
+      # - GITHUB_TOKEN=ghp_xxx   # 可选：提高 GitHub API 额度（未认证 60 次/小时也够用）
+    volumes:
+      - ./data:/app/data       # 快照落在宿主机，容器重建不丢历史期数
+    restart: unless-stopped
