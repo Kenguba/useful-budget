@@ -16,6 +16,81 @@
       return j.data;
     });
   }
+  function apiPost(path) {
+    return fetch(RELAY + path, { method: "POST", headers: { "Accept": "application/json" } })
+      .then(function (r) { return r.json(); });
+  }
+  function apiGetApi(path) {
+    return fetch(RELAY + path, { headers: { "Accept": "application/json" } })
+      .then(function (r) { return r.json(); });
+  }
+  function copyText(t) {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).catch(function () {});
+  }
+
+  /* ---- 资源获取弹窗（与原站 ResourceAccessDialog 同口径：access 直取 / delivery 临时交付轮询） ---- */
+  function openAccess(meta) {
+    var ov = document.getElementById("accessOv");
+    if (!ov) return;
+    var body = document.getElementById("accBody");
+    var titleEl = document.getElementById("accTitle");
+    if (titleEl) titleEl.textContent = meta.title || "获取资源";
+    ov.classList.add("open");
+    function show(html) { if (body) body.innerHTML = html; }
+    function ready(url, expires) {
+      show('<div class="acc-label">' + (meta.provider === "magnet" ? "磁力地址" : "资源地址") + "</div>" +
+        '<a class="acc-url" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(url) + "</a>" +
+        (expires ? '<p class="acc-tip">临时链接有效期至 ' + esc(fmtTime(expires)) + "</p>" : "") +
+        '<div class="acc-actions"><a class="btn-primary" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">打开' +
+        esc(panName(meta.provider)) + '</a><button class="btn-ghost" id="accCopy" type="button">复制链接</button></div>');
+      var cp = document.getElementById("accCopy");
+      if (cp) cp.onclick = function () {
+        copyText(url); cp.textContent = "已复制";
+        setTimeout(function () { cp.textContent = "复制链接"; }, 1500);
+      };
+    }
+    function fail(msg) {
+      show('<p class="acc-fail">' + esc(msg || "资源获取失败，请稍后重试") + '</p>' +
+        '<div class="acc-actions"><button class="btn-primary" id="accRetry" type="button">重试</button></div>');
+      var rt = document.getElementById("accRetry");
+      if (rt) rt.onclick = function () { openAccess(meta); };
+    }
+    show('<p class="acc-loading">正在获取网盘链接…</p>');
+    if (relayReady()) {
+      fetch(RELAY + "/api/resources/" + encodeURIComponent(meta.id) + "/click", { method: "POST" }).catch(function () {});
+    }
+    if (meta.provider === "magnet") {
+      var hash = String(meta.id).indexOf("magnet:") === 0 ? String(meta.id).slice(7) : String(meta.id);
+      ready("magnet:?xt=urn:btih:" + hash);
+      return;
+    }
+    if (!relayReady()) { fail("实时服务不可用，暂时无法获取"); return; }
+    apiPost("/api/resources/" + encodeURIComponent(meta.id) + "/access").then(function (j) {
+      if (j && j.code === 0 && j.data && j.data.url) { ready(j.data.url, j.data.expires_at); return; }
+      if (j && j.data && j.data.error === "RESOURCE_REQUIRES_DELIVERY") { deliver(); return; }
+      fail(j && j.message ? j.message : undefined);
+    }).catch(function () { fail(); });
+    function deliver() {
+      show('<p class="acc-loading">正在通过临时交付获取…</p>');
+      apiPost("/api/resources/" + encodeURIComponent(meta.id) + "/delivery").then(function (j) {
+        if (!j || j.code !== 0 || !j.data) { fail(j && j.message ? j.message : undefined); return; }
+        poll(j.data, 0);
+      }).catch(function () { fail(); });
+    }
+    function poll(rec, n) {
+      var url = rec.url || rec.delivery_url || rec.target_url || rec.share_url || "";
+      var st = String(rec.status || "");
+      if (/FAILED|EXPIRED|CANCEL/.test(st)) { fail(rec.error_message || "资源链接已经失效"); return; }
+      if (url && !/PENDING|PROCESSING|PREPARED|CREATED|QUEUED/.test(st)) { ready(url, rec.expires_at); return; }
+      if (n >= 30) { fail("获取超时，请稍后重试"); return; }
+      setTimeout(function () {
+        apiGetApi("/api/deliveries/" + encodeURIComponent(rec.id)).then(function (j) {
+          poll((j && j.data) || rec, n + 1);
+        }).catch(function () { poll(rec, n + 1); });
+      }, 2000);
+    }
+  }
+
   function absolutize(url) {
     if (typeof url === "string" && url.charAt(0) === "/") return ORIGIN + url;
     return url;
@@ -155,6 +230,14 @@
       };
       document.querySelector("#contactCard img").onclick = function () { window.open(pres.contact_image, "_blank"); };
     }
+
+    // 资源获取弹窗（全站共用）
+    document.body.insertAdjacentHTML("beforeend",
+      '<div class="overlay" id="accessOv"><div class="dialog">' +
+      '<button class="d-x" data-close>✕</button>' +
+      '<h3 id="accTitle">获取资源</h3><div class="d-body" id="accBody"></div>' +
+      "</div></div>");
+    bindClose("accessOv");
 
     // 公告弹窗（每会话一次）
     if (pres.popup_enabled && !sessionStorage.getItem("naspt_popup_seen")) {
@@ -598,7 +681,7 @@
         '<div class="res-meta">' + esc(panName(it.provider)) + "网盘 · " + fmtTime(it.discovered_at) +
         (invalid ? " · 已失效" : "") + "</div></div>" +
         (invalid ? '<span class="btn-pan" style="opacity:.45">已失效</span>'
-                 : '<a class="btn-pan" href="' + href + '"' + target + ">获取" + esc(panName(it.provider)) + "资源</a>") + "</div>";
+                 : '<button class="btn-pan" type="button" data-acc="' + esc(it.id) + '">获取' + esc(panName(it.provider)) + "资源</button>") + "</div>";
     }
     function paint() {
       var box = document.getElementById("streamResults");
@@ -627,6 +710,12 @@
       var desc = document.getElementById("searchDesc");
       if (desc) desc.textContent = done ? "共 " + items.length + " 条结果"
         : "正在搜索…已找到 " + items.length + " 条，结果将陆续显示";
+      Array.prototype.forEach.call(box.querySelectorAll("[data-acc]"), function (b) {
+        b.onclick = function () {
+          var it = byId[b.getAttribute("data-acc")];
+          if (it) openAccess({ id: it.id, provider: it.provider, mine: it.mine, title: dispText(it) });
+        };
+      });
     }
     function failover() {
       if (failed) return; failed = true;
@@ -691,8 +780,10 @@
         '<div class="card"><div class="res-meta" style="font-size:14px;line-height:2.1">' +
         "网盘类型：" + esc(panName(provider)) + "网盘<br>更新时间：" + esc(timeText || "") +
         "<br>资源状态：" + (valid === false ? "失效" : "有效") + "</div>" +
-        '<div style="margin-top:18px"><a class="btn-primary" style="display:inline-block" href="' + ORIGIN +
-        "/resource/" + esc(id) + '" target="_blank" rel="noopener">前往原站获取资源</a></div></div>';
+        '<div style="margin-top:18px"><button class="btn-primary" id="resGet" type="button">获取' + esc(panName(provider)) + '资源</button>' +
+        '<a href="' + ORIGIN + "/resource/" + esc(id) + '" target="_blank" rel="noopener" style="margin-left:14px;color:var(--blue)">原站页面</a></div></div>';
+      var rg = document.getElementById("resGet");
+      if (rg) rg.onclick = function () { openAccess({ id: id, provider: provider, title: title }); };
     }
     function fromSnapshot() {
       var found = null, provider = "";

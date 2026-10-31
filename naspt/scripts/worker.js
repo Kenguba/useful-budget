@@ -50,21 +50,32 @@ export default {
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: CORS });
     }
-    const isClickPost =
+    // /api/ 直通接口（搜索流、资源获取、临时交付、点击上报）：原样透传，绝不缓存
+    const isApiPost =
       request.method === "POST" &&
-      /^\/api\/public\/resources\/[^/]+\/click$/.test(url.pathname);
-    if (request.method !== "GET" && !isClickPost) {
+      /^\/api\/resources\/[^/]+\/(access|delivery|click)$/.test(url.pathname);
+    const isApiGet =
+      request.method === "GET" &&
+      (url.pathname === "/api/search/stream" ||
+        /^\/api\/deliveries\/[^/]+$/.test(url.pathname));
+    if (request.method !== "GET" && !isApiPost) {
       return new Response("Method Not Allowed", { status: 405, headers: CORS });
     }
-    if (isClickPost) {
-      // 点击上报：原样透传，不缓存
-      const up = await fetch(ORIGIN_API + url.pathname, {
-        method: "POST",
-        headers: { "User-Agent": "Mozilla/5.0", "Accept": "application/json" },
+    if (isApiPost || isApiGet) {
+      const up = await fetch(ORIGIN_API + url.pathname + url.search, {
+        method: request.method,
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+          "Accept": url.pathname === "/api/search/stream" ? "text/event-stream" : "application/json",
+          "Accept-Language": "zh-CN,zh;q=0.9",
+        },
       }).catch(() => null);
-      const h = new Headers(up ? up.headers : {});
+      if (!up) return new Response("Bad Gateway", { status: 502, headers: CORS });
+      const h = new Headers(up.headers);
       for (const [k, v] of Object.entries(CORS)) h.set(k, v);
-      return new Response(up ? up.body : null, { status: up ? up.status : 204, headers: h });
+      h.set("Cache-Control", "no-cache");
+      return new Response(up.body, { status: up.status, headers: h });
     }
 
     let target = null;
@@ -102,10 +113,17 @@ export default {
     async function refresh() {
       const fresh = await fetchUpstream(target);
       if (fresh.status === 200) {
-        const stored = new Response(fresh.clone().body, fresh);
-        stored.headers.set("Cache-Control", "public, max-age=" + (ttl + SWR));
-        stored.headers.set("x-cached-at", String(Date.now()));
-        ctx.waitUntil(cache.put(cacheKey, stored));
+        try {
+          const buf = await fresh.clone().arrayBuffer();
+          const stored = new Response(buf, fresh);
+          stored.headers.delete("Set-Cookie");
+          stored.headers.set("Cache-Control", "public, max-age=" + (ttl + SWR));
+          stored.headers.set("x-cached-at", String(Date.now()));
+          await cache.put(cacheKey, stored);
+          fresh.headers.set("x-relay-put", "ok");
+        } catch (e) {
+          fresh.headers.set("x-relay-put", "err:" + String(e && e.message || e).slice(0, 80));
+        }
       }
       return fresh;
     }
@@ -122,6 +140,7 @@ export default {
       const age = (Date.now() - at) / 1000;
       const out = new Response(cached.clone().body, cached);
       out.headers.delete("x-cached-at");
+      out.headers.set("x-relay-cache", age <= ttl ? "hit" : "stale");
       out.headers.set("Cache-Control", "public, max-age=" + Math.max(0, Math.floor(ttl - age)));
       if (age <= ttl) return out; // 新鲜：直接返回
       if (age <= ttl + SWR) {
@@ -140,6 +159,7 @@ export default {
 
     const fresh = await refresh();
     fresh.headers.delete("x-cached-at");
+    fresh.headers.set("x-relay-cache", "miss");
     return fresh;
   },
 };
