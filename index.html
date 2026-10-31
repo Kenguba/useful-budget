@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>use · 有用的都在这</title>
+<meta name="description" content="ken 的小站入口：便宜、有用的技能与资源导航">
+<style>
+:root{--ink:#12233d;--blue:#1c4f9c;--gold:#f2b705;--bg:#f6f3ec;--card:#fff;--mut:#5b6b82;--line:#e5e0d2}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:28px 14px 60px}
+.kicker{color:var(--blue);font-weight:800;letter-spacing:.14em;font-size:13px}
+.kicker:before{content:"";display:inline-block;width:22px;height:5px;background:var(--gold);margin-right:8px;vertical-align:middle}
+h1{font-size:38px;line-height:1.15;margin:10px 0 8px;font-weight:900}
+h1 mark{background:linear-gradient(transparent 62%,#ffd94d 62%);color:inherit;padding:0 2px}
+.sub{color:var(--mut);font-size:15px;line-height:1.6;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{display:block;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:18px;text-decoration:none;color:inherit;transition:border-color .15s}
+a.card:hover{border-color:var(--blue)}
+.card h2{font-size:19px;margin:0 0 6px;font-weight:800}
+.card p{margin:0;color:var(--mut);font-size:14px;line-height:1.6}
+.tag{display:inline-block;margin-top:12px;font-size:12px;font-weight:700;border-radius:999px;padding:4px 10px;background:#eef4ff;color:var(--blue)}
+.tag.soon{background:#f3efe4;color:var(--mut)}
+.card.off{opacity:.55;pointer-events:none}
+.foot{margin-top:28px;color:var(--mut);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">KEN · USE</div>
+  <h1>便宜、<mark>有用</mark>的，都在这</h1>
+  <p class="sub">这是入口页。每个项目住在自己的目录里，点卡片进去。</p>
+  <div class="grid">
+    <a class="card" href="skill-board/">
+      <h2>📊 全球 Skills 使用量排行榜</h2>
+      <p>谁被装得最多（skills.sh / ClawHub / 腾讯 SkillHub）+ 谁的源码最值得信（GitHub 星标），双榜合一，每期带「它到底干什么」。</p>
+      <span class="tag">已上线 · 每 12 小时自动更新</span>
+    </a>
+    <div class="card off">
+      <h2>🔗 AI 资源链接导航</h2>
+      <p>比价站、GPT 店铺、反重力、接码等常用链接的分类导航页。</p>
+      <span class="tag soon">筹备中</span>
+    </div>
+  </div>
+  <p class="foot">托管于 GitHub Pages · 仓库 Kenguba/use</p>
+</div>
+</body>
+</html>
