@@ -2,8 +2,8 @@
 
 ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pages 发布，入口为根目录导航页。
 
-- 仓库：https://github.com/Kenguba/use
-- 网站：https://kenguba.github.io/use/
+- 仓库：https://github.com/Kenguba/kenguba.github.io
+- 网站：https://kenguba.github.io/
 
 ## 目录规范
 
@@ -19,7 +19,7 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 
 ```
 <project>/           # 例：skill-board/
-  index.html         # 项目页面（通过 /use/<project>/ 访问）
+  index.html         # 项目页面（通过 /<project>/ 访问）
   data/              # 项目数据（如有）
   scripts/           # 项目脚本（如有）
   icons/             # 项目图标 / PWA 资源（如有）
@@ -41,6 +41,6 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 
 ## 约定
 
-- 链接与仓库名绑定：Pages 地址为 `kenguba.github.io/use/<project>/`，项目目录名即网址路径段，改目录名 = 改网址，慎重。
+- 链接与仓库名绑定：Pages 地址为 `kenguba.github.io/<project>/`，项目目录名即网址路径段，改目录名 = 改网址，慎重。
 - 数据文件与代码分开提交：自动刷新只提交 `data/` 变更，提交信息形如 `data: refresh YYYY-MM-DD`。
 - 本规范有变更时，先改本文件，再改实际结构，保持两者一致。
