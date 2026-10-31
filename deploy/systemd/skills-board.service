@@ -3,7 +3,7 @@ Description=Global Skills Board (static server)
 After=network.target
 [Service]
 WorkingDirectory=/opt/skills-board
-ExecStart=/usr/bin/python3 server.py 8080
+ExecStart=/usr/bin/python3 server.py 7890
 Restart=always
 [Install]
 WantedBy=multi-user.target

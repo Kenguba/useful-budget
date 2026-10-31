@@ -39,7 +39,7 @@
 
 ```bash
 python3 scripts/refresh.py     # 抓最新一期（需要联网，约 10 秒）
-python3 server.py 8080         # 打开 http://localhost:8080
+python3 server.py 7890         # 打开 http://localhost:7890
 ```
 
 手动补历史期：`python3 scripts/refresh.py --backfill 2026-10-25 2026-10-26`
@@ -50,7 +50,7 @@ python3 server.py 8080         # 打开 http://localhost:8080
 ### A. Docker（最省事，自带自动刷新）
 ```bash
 docker compose up -d --build
-# 打开 http://<服务器>:8080 ；data/ 挂载在宿主机，历史快照不丢
+# 打开 http://<服务器>:7890 ；data/ 挂载在宿主机，历史快照不丢
 ```
 可选：在 compose 里放开 `GITHUB_TOKEN`（未认证 60 次/小时也够一轮刷新用，
 观察名单只有 10 个仓；高频手动刷新才需要 token）。
