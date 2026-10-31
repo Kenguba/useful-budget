@@ -2,6 +2,8 @@
 # 用法：把整个包推到一个 GitHub 仓库，仓库 Settings > Pages 里 Source 选 GitHub Actions 即可
 name: refresh-and-deploy
 on:
+  push:
+  branches: [main]
   schedule:
     - cron: "23 */12 * * *"
   workflow_dispatch:
