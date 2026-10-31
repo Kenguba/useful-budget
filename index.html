@@ -21,7 +21,7 @@ select,button{font-size:14px;border-radius:10px;border:1.5px solid var(--blue);p
 button{background:var(--blue);color:#fff;font-weight:700;cursor:pointer}
 input[type=search]{flex:1;min-width:180px;font-size:14px;border-radius:10px;border:1.5px solid var(--line);padding:9px 12px;background:#fff}
 .bar{height:7px;border-radius:4px;background:linear-gradient(90deg,var(--blue) 55%,var(--gold) 55%);margin:14px 0 18px}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
 .stat b{font-size:30px;color:var(--blue);display:block}
 .stat span{color:var(--mut);font-size:13px;line-height:1.5;display:block;margin-top:4px}
@@ -43,11 +43,12 @@ h3{font-size:16px;margin:16px 0 4px;color:var(--blue)}
 .num{font-weight:800;color:var(--blue);white-space:nowrap;text-align:right}
 .num small{display:block;color:var(--mut);font-weight:400;font-size:11px}
 code.cmd{display:block;background:#0f1c30;color:#dceaff;border-radius:10px;padding:9px 11px;font-size:12px;overflow-x:auto;white-space:nowrap;margin-top:7px;cursor:pointer}
-.grid2{display:grid;grid-template-columns:1fr;gap:0}
-@media(min-width:700px){.grid2{grid-template-columns:1fr 1fr;gap:0 28px}.stats{grid-template-columns:repeat(4,1fr)}}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr);gap:0}.grid2>div,.stat{min-width:0}
+@media(min-width:820px){.grid2{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}.stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .hl{background:#fff7dd;border:1px solid #ecd27a;border-radius:14px;padding:12px 14px;line-height:1.9;font-size:14px}
 .note{color:var(--mut);font-size:13px;line-height:1.8}
 footer{color:var(--mut);font-size:12px;line-height:1.8;margin-top:22px;text-align:center}
+@media(max-width:819px){section{padding:16px 12px}.sec-head{flex-direction:column;align-items:stretch}.sec-head>div{min-width:0}.sec-head p{text-align:left}.item{display:grid;grid-template-columns:34px minmax(0,1fr);gap:8px 12px}.num{grid-column:2;text-align:left;white-space:normal;overflow-wrap:anywhere}.blurb{font-size:12px;overflow-wrap:anywhere}code.cmd{max-width:100%}}
 .hidden{display:none!important}
 </style>
 </head>
