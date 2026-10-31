@@ -4,4 +4,4 @@ set -e
 cd /app
 python3 scripts/refresh.py || true
 ( while true; do sleep "${REFRESH_HOURS:-12}h"; python3 scripts/refresh.py || true; done ) &
-exec python3 server.py "${PORT:-8080}"
+exec python3 server.py "${PORT:-7890}"

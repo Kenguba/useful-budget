@@ -2,8 +2,9 @@ services:
   skills-board:
     build: .
     ports:
-      - "8080:8080"
+      - "${PORT:-7890}:${PORT:-7890}"
     environment:
+      - PORT=${PORT:-7890}
       - REFRESH_HOURS=12
       # - GITHUB_TOKEN=ghp_xxx   # 可选：提高 GitHub API 额度（未认证 60 次/小时也够用）
     volumes:
