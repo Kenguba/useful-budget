@@ -4,6 +4,9 @@
 //   /api/public/*              -> https://naspt.vip/api/public/*（仅 GET）
 //   /app/android/latest.json   -> https://ik.naspt.vip/app/android/latest.json
 // 其余路径返回 404。部署后把 Worker 域名填回 assets/app.js 的 RELAY 常量。
+// 缓存：用 Cache API 做边缘缓存（原 fetch 的 cf.cacheTtl 对 Worker 返回不生效）。
+// 命中新鲜期直接返回；过期后先返回旧缓存、后台刷新（stale-while-revalidate），
+// 原站抽风时用旧缓存兜底，避免页面干等原站的 1.5~2.5 秒。
 
 const ORIGIN_API = "https://naspt.vip";
 const ORIGIN_APP = "https://ik.naspt.vip";
@@ -15,19 +18,59 @@ const CORS = {
   "Access-Control-Max-Age": "86400",
 };
 
+// 各路径新鲜期（秒）：榜单/配置类久一点，更新流短一点
+function ttlFor(pathname) {
+  if (pathname === "/api/public/site") return 600;
+  if (pathname === "/api/public/hot-searches") return 300;
+  if (pathname === "/api/public/discovery") return 300;
+  if (pathname === "/api/public/friend-link-settings") return 600;
+  if (pathname === "/app/android/latest.json") return 600;
+  return 120; // updates / resources 搜索与详情
+}
+const SWR = 600; // 过期后可先行返回旧缓存的窗口（秒）
+
+async function fetchUpstream(target) {
+  const upstream = await fetch(target, {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+      "Accept": "application/json",
+      "Accept-Language": "zh-CN,zh;q=0.9",
+    },
+  });
+  const headers = new Headers(upstream.headers);
+  for (const [k, v] of Object.entries(CORS)) headers.set(k, v);
+  return new Response(upstream.body, { status: upstream.status, headers });
+}
+
 export default {
-  async fetch(request) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: CORS });
     }
-    if (request.method !== "GET") {
+    const isClickPost =
+      request.method === "POST" &&
+      /^\/api\/public\/resources\/[^/]+\/click$/.test(url.pathname);
+    if (request.method !== "GET" && !isClickPost) {
       return new Response("Method Not Allowed", { status: 405, headers: CORS });
+    }
+    if (isClickPost) {
+      // 点击上报：原样透传，不缓存
+      const up = await fetch(ORIGIN_API + url.pathname, {
+        method: "POST",
+        headers: { "User-Agent": "Mozilla/5.0", "Accept": "application/json" },
+      }).catch(() => null);
+      const h = new Headers(up ? up.headers : {});
+      for (const [k, v] of Object.entries(CORS)) h.set(k, v);
+      return new Response(up ? up.body : null, { status: up ? up.status : 204, headers: h });
     }
 
     let target = null;
-    if (url.pathname.startsWith("/api/public/")) {
+    if (url.pathname === "/api/search/stream") {
+      target = ORIGIN_API + url.pathname + url.search;
+    } else if (url.pathname.startsWith("/api/public/")) {
       target = ORIGIN_API + url.pathname + url.search;
     } else if (url.pathname === "/app/android/latest.json") {
       target = ORIGIN_APP + url.pathname;
@@ -36,23 +79,67 @@ export default {
       return new Response("Not Found", { status: 404, headers: CORS });
     }
 
-    const upstream = await fetch(target, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
-        "Accept": "application/json",
-        "Accept-Language": "zh-CN,zh;q=0.9",
-      },
-      cf: { cacheTtl: 60, cacheEverything: true },
-    });
+    if (url.pathname === "/api/search/stream") {
+      // 搜索流式接口（SSE）：原样透传，绝不缓存、绝不缓冲
+      const up = await fetch(ORIGIN_API + url.pathname + url.search, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+          "Accept": "text/event-stream",
+          "Accept-Language": "zh-CN,zh;q=0.9",
+        },
+      });
+      const h = new Headers(up.headers);
+      for (const [k, v] of Object.entries(CORS)) h.set(k, v);
+      h.set("Cache-Control", "no-cache");
+      return new Response(up.body, { status: up.status, headers: h });
+    }
 
-    const headers = new Headers(upstream.headers);
-    for (const [k, v] of Object.entries(CORS)) headers.set(k, v);
-    headers.set("Cache-Control", "public, max-age=60");
+    const ttl = ttlFor(url.pathname);
+    const cache = caches.default;
+    const cacheKey = new Request(url.toString(), { method: "GET" });
 
-    return new Response(upstream.body, {
-      status: upstream.status,
-      headers,
-    });
+    async function refresh() {
+      const fresh = await fetchUpstream(target);
+      if (fresh.status === 200) {
+        const stored = new Response(fresh.clone().body, fresh);
+        stored.headers.set("Cache-Control", "public, max-age=" + (ttl + SWR));
+        stored.headers.set("x-cached-at", String(Date.now()));
+        ctx.waitUntil(cache.put(cacheKey, stored));
+      }
+      return fresh;
+    }
+
+    let cached = null;
+    try {
+      cached = await cache.match(cacheKey);
+    } catch (e) {
+      cached = null;
+    }
+
+    if (cached) {
+      const at = Number(cached.headers.get("x-cached-at") || 0);
+      const age = (Date.now() - at) / 1000;
+      const out = new Response(cached.clone().body, cached);
+      out.headers.delete("x-cached-at");
+      out.headers.set("Cache-Control", "public, max-age=" + Math.max(0, Math.floor(ttl - age)));
+      if (age <= ttl) return out; // 新鲜：直接返回
+      if (age <= ttl + SWR) {
+        ctx.waitUntil(refresh().catch(() => {})); // 先返回旧的，后台刷新
+        return out;
+      }
+      // 太旧：走下面的同步刷新，失败再兜底返回旧缓存
+      try {
+        const fresh = await refresh();
+        fresh.headers.delete("x-cached-at");
+        return fresh;
+      } catch (e) {
+        return out;
+      }
+    }
+
+    const fresh = await refresh();
+    fresh.headers.delete("x-cached-at");
+    return fresh;
   },
 };

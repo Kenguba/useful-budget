@@ -521,6 +521,7 @@
   function renderSearch() {
     var main = document.querySelector("#main .wrap") || document.getElementById("main");
     var q = new URLSearchParams(location.search).get("q") || "";
+    var prov0 = new URLSearchParams(location.search).get("provider") || "";
     var html = '<section class="hero" style="padding-top:36px">' + searchbarHtml(q) + "</section>";
     if (!q) {
       html += '<div class="section"><div class="card"><div class="card-head"><span class="ic ic-orange">🔥</span>' +
@@ -531,19 +532,18 @@
         }).join("") + "</div></div>";
       main.innerHTML = html; bindSearchbar(); return;
     }
+    // 快照结果（兜底用）：与实时同页渲染，实时可用时隐藏
     var hits = state.updates.filter(function (it) {
       return (it.title && it.title.indexOf(q) >= 0) || (it.note && it.note.indexOf(q) >= 0);
     });
     var discs = discItems().filter(function (it) { return it.name.indexOf(q) >= 0; });
-    html += '<div class="section"><div class="page-head" style="padding-top:6px"><h1 style="font-size:22px">“' +
-      esc(q) + '” 的搜索结果</h1><div class="desc" id="searchDesc">' + (state.live ? "正在搜索…" : "快照内共找到 " + (hits.length + discs.length) + " 条") + "</div></div>" +
-      '<div id="liveResults"></div><div id="snapResults">';
+    var snapHtml = "";
     if (!hits.length && !discs.length) {
-      html += '<div class="empty">快照内暂无相关资源，去<a href="' + ORIGIN + "/search?q=" +
+      snapHtml = '<div class="empty">快照内暂无相关资源，去<a href="' + ORIGIN + "/search?q=" +
         encodeURIComponent(q) + '" target="_blank" rel="noopener" style="color:var(--blue)">原站搜索</a>看看</div>';
     }
     discs.forEach(function (it) {
-      html += '<div class="res-row"><div class="res-main"><div class="res-title">' + esc(it.name) +
+      snapHtml += '<div class="res-row"><div class="res-main"><div class="res-title">' + esc(it.name) +
         '</div><div class="res-note">' + esc((it.summary || "").slice(0, 80)) + '</div>' +
         '<div class="res-meta">' + esc(it.metadata || "") + "</div></div>" +
         '<a class="btn-pan" href="' + ORIGIN + "/search?q=" + encodeURIComponent(it.name) +
@@ -553,34 +553,131 @@
       var chips = (it.links || []).map(function (l) {
         return '<a class="btn-pan" href="' + BASE + "resource/?id=" + esc(l.id) + '">获取' + esc(panName(l.provider)) + "资源</a>";
       }).join(" ");
-      html += '<div class="res-row"><div class="res-main"><div class="res-title">' + esc(it.title || "") +
+      snapHtml += '<div class="res-row"><div class="res-main"><div class="res-title">' + esc(it.title || "") +
         '</div><div class="res-note">' + esc(it.note || "") + '</div>' +
         '<div class="res-meta">' + fmtTime(it.updated_at) + "</div></div>" + chips + "</div>";
     });
-    html += "</div></div>";
-    main.innerHTML = html;
-    bindSearchbar();
-    if (state.live) {
-      var prov = new URLSearchParams(location.search).get("provider") || "";
-      apiGet("/resources?q=" + encodeURIComponent(q) + (prov ? "&provider=" + encodeURIComponent(prov) : "")).then(function (d) {
-        var rows = (d.items || []).map(function (it) {
-          return '<div class="res-row"><div class="res-main"><div class="res-title">' + esc(it.title || "") +
-            '</div><div class="res-note">' + esc(it.note || "") + '</div>' +
-            '<div class="res-meta">' + esc(panName(it.provider)) + "网盘 · " + fmtTime(it.updated_at || it.last_discovered_at) + "</div></div>" +
-            '<a class="btn-pan" href="' + BASE + "resource/?id=" + esc(it.id) + '">获取' + esc(panName(it.provider)) + "资源</a></div>";
-        }).join("");
-        var box = document.getElementById("liveResults");
-        if (!box) return;
-        box.innerHTML = rows || '<div class="empty">未找到相关资源</div>';
-        var snap = document.getElementById("snapResults");
-        if (snap) snap.style.display = "none";
-        var desc = document.getElementById("searchDesc");
-        if (desc) desc.textContent = "共找到 " + (d.total != null ? d.total : (d.items || []).length) + " 条结果";
-      }).catch(function () {
-        var desc = document.getElementById("searchDesc");
-        if (desc) desc.textContent = "实时搜索失败，以下为快照结果";
-      });
+
+    if (!state.live || !relayReady() || typeof EventSource === "undefined") {
+      html += '<div class="section"><div class="page-head" style="padding-top:6px"><h1 style="font-size:22px">“' +
+        esc(q) + '” 的搜索结果</h1><div class="desc">快照内共找到 ' + (hits.length + discs.length) + ' 条</div></div>' +
+        snapHtml + "</div>";
+      main.innerHTML = html; bindSearchbar(); return;
     }
+
+    /* ---- 实时流式搜索：与原站同口径 /api/search/stream（本站 + 外部聚合源陆续推送） ---- */
+    html += '<div class="section"><div class="page-head" style="padding-top:6px"><h1 style="font-size:22px">“' +
+      esc(q) + '” 的搜索结果</h1><div class="desc" id="searchDesc">正在搜索，结果将陆续显示…</div></div>' +
+      '<div class="filters" id="streamFilters" style="margin-bottom:14px"></div>' +
+      '<div id="streamSuggest"></div>' +
+      '<div id="streamResults"><div class="empty">正在搜索，请稍候…</div></div>' +
+      '<div id="snapResults" style="display:none">' + snapHtml + "</div></div>";
+    main.innerHTML = html; bindSearchbar();
+
+    var items = [], byId = {}, providers = [], curProv = prov0, done = false, failed = false;
+    function dispText(it) { return it.mine ? (it.note || it.title || "") : (it.title || it.note || ""); }
+    function hl(text) {
+      var t = esc(text), k = esc(q);
+      if (!k || t.indexOf(k) < 0) return t;
+      return t.split(k).join("<mark>" + k + "</mark>");
+    }
+    function rowHtml(it) {
+      var invalid = it.health_status === "INVALID";
+      var mainText = dispText(it);
+      var sub = (it.title && it.note && it.title !== it.note) ? it.note : "";
+      var tag = it.mine ? '<span class="res-tag res-tag-mine">本站</span>'
+        : (it.result_source && it.result_source !== "local" ? '<span class="res-tag res-tag-ext">外部</span>' : "");
+      var href, target = "";
+      if (it.provider === "magnet" && String(it.id).indexOf("magnet:") === 0) {
+        href = "magnet:?xt=urn:btih:" + it.id.slice(7); target = ' target="_blank" rel="noopener"';
+      } else {
+        href = BASE + "resource/?id=" + encodeURIComponent(it.id);
+      }
+      return '<div class="res-row"><div class="res-main"><div class="res-title">' + hl(mainText) + tag + "</div>" +
+        (sub ? '<div class="res-note">' + esc(sub) + "</div>" : "") +
+        '<div class="res-meta">' + esc(panName(it.provider)) + "网盘 · " + fmtTime(it.discovered_at) +
+        (invalid ? " · 已失效" : "") + "</div></div>" +
+        (invalid ? '<span class="btn-pan" style="opacity:.45">已失效</span>'
+                 : '<a class="btn-pan" href="' + href + '"' + target + ">获取" + esc(panName(it.provider)) + "资源</a>") + "</div>";
+    }
+    function paint() {
+      var box = document.getElementById("streamResults");
+      if (!box) return;
+      var counts = {};
+      items.forEach(function (it) { counts[it.provider] = (counts[it.provider] || 0) + 1; });
+      var provs = providers.length ? providers : Object.keys(counts);
+      var fhtml = '<div class="frow"><span class="flabel">网盘</span><button class="pill' + (curProv ? "" : " on") +
+        '" data-prov="">全部（' + items.length + "）</button>";
+      provs.forEach(function (p) {
+        fhtml += '<button class="pill' + (curProv === p ? " on" : "") + '" data-prov="' + esc(p) + '">' +
+          esc(panName(p)) + "（" + (counts[p] || 0) + "）</button>";
+      });
+      fhtml += "</div>";
+      var fbox = document.getElementById("streamFilters");
+      if (fbox) {
+        fbox.innerHTML = fhtml;
+        Array.prototype.forEach.call(fbox.querySelectorAll(".pill"), function (b) {
+          b.onclick = function () { curProv = b.getAttribute("data-prov") || ""; paint(); };
+        });
+      }
+      var list = curProv ? items.filter(function (it) { return it.provider === curProv; }) : items;
+      box.innerHTML = list.length ? list.map(rowHtml).join("")
+        : (done ? '<div class="empty">没有找到相关资源，可以精简关键词，或换个名称再试试。</div>'
+                : '<div class="empty">正在搜索，请稍候…</div>');
+      var desc = document.getElementById("searchDesc");
+      if (desc) desc.textContent = done ? "共 " + items.length + " 条结果"
+        : "正在搜索…已找到 " + items.length + " 条，结果将陆续显示";
+    }
+    function failover() {
+      if (failed) return; failed = true;
+      var snap = document.getElementById("snapResults");
+      var box = document.getElementById("streamResults");
+      var desc = document.getElementById("searchDesc");
+      if (!items.length) {
+        if (box) box.style.display = "none";
+        if (snap) snap.style.display = "";
+        if (desc) desc.textContent = "实时搜索暂时不可用，以下为快照结果";
+      }
+    }
+    var es;
+    try {
+      es = new EventSource(RELAY + "/api/search/stream?q=" + encodeURIComponent(q));
+    } catch (e) { failover(); return; }
+    var timer = setTimeout(function () { if (!done && !items.length) { try { es.close(); } catch (e) {} failover(); } }, 40000);
+    es.addEventListener("start", function (e) {
+      try { providers = JSON.parse(e.data).providers || []; } catch (err) {}
+      paint();
+    });
+    es.addEventListener("items", function (e) {
+      var d; try { d = JSON.parse(e.data); } catch (err) { return; }
+      (d.items || []).forEach(function (it) {
+        it.result_source = it.result_source || d.source;
+        var old = byId[it.id];
+        if (old) {
+          var keepLocal = old.result_source === "local" ? "local" : it.result_source;
+          items[items.indexOf(old)] = it; byId[it.id] = it; it.result_source = keepLocal === "local" ? old.result_source : it.result_source;
+        } else { byId[it.id] = it; items.push(it); }
+      });
+      paint();
+    });
+    es.addEventListener("suggestions", function (e) {
+      var d; try { d = JSON.parse(e.data); } catch (err) { return; }
+      var qs = (d.queries || []).filter(function (s) { return typeof s === "string"; }).slice(0, 3);
+      var box = document.getElementById("streamSuggest");
+      if (box && qs.length) {
+        box.innerHTML = '<div class="res-note" style="margin-bottom:12px">你是不是在找：' + qs.map(function (s) {
+          return '<a href="' + BASE + "search/?q=" + encodeURIComponent(s) + '" style="color:var(--blue)">' + esc(s) + "</a>";
+        }).join(" · ") + "</div>";
+      }
+    });
+    es.addEventListener("complete", function () {
+      done = true; clearTimeout(timer);
+      try { es.close(); } catch (e) {}
+      if (!items.length) failover(); else paint();
+    });
+    es.onerror = function () {
+      if (!done && !items.length) { clearTimeout(timer); try { es.close(); } catch (e) {} failover(); }
+    };
   }
 
   /* ---------------- 资源详情页 ---------------- */
@@ -697,32 +794,80 @@
   }
 
   /* ---------------- 启动 ---------------- */
+  // 外壳只依赖站点配置：先到先渲染；各页只等自己需要的数据，不再全站等齐 6 个接口。
   var page = document.body.getAttribute("data-page") || "home";
-  var appLive = relayReady()
-    ? fetch(RELAY + "/app/android/latest.json").then(function (r) { return r.json(); })
-        .catch(function () { return load("app"); })
-    : load("app").catch(function () { return {}; });
-  Promise.all([
-    liveOr("/site", "site", function () { state.live = true; }),
-    liveOr("/hot-searches?limit=50", "hot"),
-    liveOr("/updates?page=1&page_size=24", "updates"),
-    liveOr("/discovery?limit=40&source=tmdb", "discovery"),
-    liveOr("/friend-link-settings", "friend"),
-    appLive
-  ]).then(function (res) {
-    state.site = res[0] || {};
-    if (state.site.presentation) state.site.presentation.contact_image = absolutize(state.site.presentation.contact_image);
-    state.hot = res[1] || [];
-    state.updates = (res[2] && res[2].items) || [];
-    state.updatesTotal = (res[2] && res[2].total) || state.updates.length;
+  function absDiscovery(d) {
+    (d && d.items || []).forEach(function (it) { it.poster_url = absolutize(it.poster_url); });
+    return d || {};
+  }
+  function fillUpdates(u) {
+    state.updates = (u && u.items) || [];
+    state.updatesTotal = (u && u.total) || state.updates.length;
     state.updatesPage = 1;
-    state.discovery = res[3] || {};
-    (state.discovery.items || []).forEach(function (it) { it.poster_url = absolutize(it.poster_url); });
-    state.friend = res[4] || {};
-    state.appInfo = res[5] || {};
+  }
+  liveOr("/site", "site", function () { state.live = true; }).then(function (siteRes) {
+    state.site = siteRes || {};
+    if (state.site.presentation) state.site.presentation.contact_image = absolutize(state.site.presentation.contact_image);
     renderShell(page);
-    ({ home: renderHome, discover: renderDiscover, today: renderToday, hot: renderHot,
-       search: renderSearch, resource: renderResource, app: renderApp, apply: renderApply }[page] || renderHome)();
     document.title = document.title || "基德盘搜";
+    if (page === "home") {
+      Promise.all([
+        liveOr("/hot-searches?limit=50", "hot"),
+        liveOr("/updates?page=1&page_size=24", "updates"),
+        liveOr("/discovery?limit=40&source=tmdb", "discovery")
+      ]).then(function (res) {
+        state.hot = res[0] || [];
+        fillUpdates(res[1]);
+        state.discovery = absDiscovery(res[2]);
+        renderHome();
+      });
+    } else if (page === "discover") {
+      liveOr("/discovery?limit=40&source=tmdb", "discovery").then(function (d) {
+        state.discovery = absDiscovery(d);
+        renderDiscover();
+      });
+    } else if (page === "today") {
+      liveOr("/updates?page=1&page_size=24", "updates").then(function (u) {
+        fillUpdates(u);
+        renderToday();
+      });
+    } else if (page === "hot") {
+      liveOr("/hot-searches?limit=50", "hot").then(function (h) {
+        state.hot = h || [];
+        renderHot();
+      });
+    } else if (page === "search") {
+      Promise.all([
+        liveOr("/hot-searches?limit=50", "hot"),
+        liveOr("/updates?page=1&page_size=24", "updates"),
+        liveOr("/discovery?limit=40&source=tmdb", "discovery")
+      ]).then(function (res) {
+        state.hot = res[0] || [];
+        fillUpdates(res[1]);
+        state.discovery = absDiscovery(res[2]);
+        renderSearch();
+      });
+    } else if (page === "resource") {
+      load("updates").then(function (u) {
+        fillUpdates(u);
+        renderResource();
+      }).catch(function () { renderResource(); });
+    } else if (page === "app") {
+      var appLive = relayReady()
+        ? fetch(RELAY + "/app/android/latest.json").then(function (r) { return r.json(); })
+            .catch(function () { return load("app"); })
+        : load("app").catch(function () { return {}; });
+      appLive.then(function (a) {
+        state.appInfo = a || {};
+        renderApp();
+      });
+    } else if (page === "apply") {
+      liveOr("/friend-link-settings", "friend").then(function (f) {
+        state.friend = f || {};
+        renderApply();
+      });
+    } else {
+      renderHome();
+    }
   });
 })();
