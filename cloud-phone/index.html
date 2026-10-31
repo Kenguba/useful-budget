@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>云手机横向对比：30 家资费、底层与改机核查</title>
+<style>
+  :root{
+    --bg:#ffffff; --surface:#f4f2ec; --surface2:#ece9e0; --ink:#1c2429; --muted:#5c6a72;
+    --line:#d8d3c6; --accent:#b3401e; --accent-ink:#8f2f12; --teal:#0f5f57; --amber:#8a5a00;
+    --b:#0f5f57; --btend:#2e6f9e; --c:#8a3d00; --unknown:#6b7280; --na:#555555;
+    --card:#ffffff; --good:#0f5f57; --warn-bg:#fdf3e7; --warn-line:#e3b98a;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#14181a; --surface:#1d2326; --surface2:#242b2f; --ink:#e8e6df; --muted:#a8b2b6;
+      --line:#363f44; --accent:#f0784a; --accent-ink:#ff9a70; --card:#1b2124;
+      --warn-bg:#2a2118; --warn-line:#6b4d26; --b:#4db8a8; --btend:#7ab3dd; --c:#e8a15c;
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    line-height:1.65;font-size:16px}
+  a{color:var(--accent-ink)}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px 64px}
+  header.lead{padding:34px 0 8px;border-bottom:3px solid var(--ink)}
+  .dateline{color:var(--muted);font-size:13.5px;margin:0 0 8px}
+  h1{font-family:"Noto Serif SC","Songti SC",serif;font-size:34px;line-height:1.25;margin:0 0 10px;letter-spacing:.5px}
+  .lede{font-size:17px;max-width:860px;margin:0 0 6px}
+  .lede strong{color:var(--accent-ink)}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}
+  .stat{background:var(--surface);border:1px solid var(--line);padding:16px 16px 13px}
+  .stat b{display:block;font-size:32px;line-height:1.1;font-family:"Noto Serif SC",serif}
+  .stat span{font-size:13.5px;color:var(--muted)}
+  .stat.zero b{color:var(--accent-ink)}
+  .warn{background:var(--warn-bg);border:1px solid var(--warn-line);padding:14px 18px;margin:18px 0;font-size:14.5px}
+  .warn b{color:var(--accent-ink)}
+  h2{font-family:"Noto Serif SC","Songti SC",serif;font-size:24px;margin:38px 0 6px;padding-top:6px}
+  h2 .no{color:var(--accent-ink);font-size:15px;font-family:inherit;vertical-align:super}
+  h3{font-size:18px;margin:22px 0 6px}
+  .sub{color:var(--muted);font-size:14.5px;margin:0 0 14px;max-width:860px}
+  /* legend */
+  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+  /* GanGan spotlight */
+  .spot{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--accent);padding:22px 22px 18px;margin-top:14px}
+  .spot h2{margin-top:0}
+  .alert{border:1px solid var(--accent);background:var(--card);padding:14px 18px;margin:14px 0}
+  .alert b{color:var(--accent-ink)}
+  .kv{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 28px;font-size:14.5px;margin:14px 0}
+  .kv dt{color:var(--muted);font-size:13px}
+  .kv dd{margin:2px 0 0}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--card)}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:var(--surface2);font-weight:600}
+  td.num,th.num{text-align:right;white-space:nowrap}
+  .tblwrap{overflow-x:auto}
+  .chartbox{background:var(--card);border:1px solid var(--line);padding:18px;margin-top:14px}
+  .chartbox figcaption{font-size:13.5px;color:var(--muted);margin-top:8px}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  ul.tight{margin:6px 0;padding-left:20px;font-size:14.5px}
+  ul.tight li{margin:4px 0}
+  /* controls */
+  .controls{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 12px;border-bottom:1px solid var(--line);margin-top:8px}
+  .controls input[type="search"]{width:100%;max-width:420px;padding:10px 14px;font-size:15px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .chip{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 13px;border-radius:999px;font-size:14px;cursor:pointer}
+  .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .toggles{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;font-size:14px;color:var(--muted)}
+  .toggles label{display:flex;gap:7px;align-items:center;cursor:pointer}
+  .countline{font-size:13.5px;color:var(--muted);margin-top:10px}
+  /* cards */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px;align-items:start}
+  .card{background:var(--card);border:1px solid var(--line);padding:16px 17px 14px}
+  .card h3{margin:0 0 2px;font-size:18px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+  .card h3 .idx{color:var(--muted);font-size:13px;font-weight:400}
+  .badge{display:inline-block;font-size:12.5px;padding:3px 9px;border-radius:999px;color:#fff;background:var(--unknown);white-space:nowrap}
+  .badge.b{background:var(--b)} .badge.btend{background:var(--btend)} .badge.c{background:var(--c)} .badge.na{background:var(--na)}
+  .ev{font-size:12.5px;color:var(--muted);margin:2px 0 8px}
+  .card dl{margin:0;font-size:14px}
+  .card dt{color:var(--muted);font-size:12.5px;margin-top:9px;letter-spacing:.4px}
+  .card dd{margin:2px 0 0}
+  .price{font-size:15.5px;font-weight:600}
+  .price small{font-weight:400;color:var(--muted);font-size:12.5px}
+  .empty{border:1px dashed var(--line);padding:26px;text-align:center;color:var(--muted);margin-top:16px;display:none}
+  /* recommendations */
+  .recs{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px;align-items:start}
+  .rec{border:1px solid var(--line);padding:16px 18px;background:var(--card)}
+  .rec h3{margin-top:0}
+  .rec ol{margin:6px 0 0;padding-left:22px;font-size:14.5px}
+  .rec li{margin:7px 0}
+  .rec li b{font-size:15px}
+  .caveat{font-size:13.5px;color:var(--muted)}
+  /* self test */
+  .steps{counter-reset:step;list-style:none;padding:0;margin:14px 0}
+  .steps li{counter-increment:step;position:relative;padding:12px 0 12px 52px;border-bottom:1px solid var(--line);font-size:15px}
+  .steps li::before{content:counter(step);position:absolute;left:0;top:12px;width:34px;height:34px;border:1.5px solid var(--ink);border-radius:50%;text-align:center;line-height:32px;font-weight:700;font-family:"Noto Serif SC",serif}
+  .steps code{background:var(--surface2);padding:1px 6px;border-radius:4px;font-size:13.5px;word-break:break-all}
+  /* sources */
+  .sources{font-size:14px}
+  .sources li{margin:7px 0;word-break:break-all}
+  .sources .tag{color:var(--muted);font-size:13px}
+  footer{margin-top:44px;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:13.5px}
+  @media (max-width:900px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .recs{grid-template-columns:1fr}
+    .twocol{grid-template-columns:1fr}
+    h1{font-size:28px}
+  }
+  @media (max-width:600px){
+    .grid{grid-template-columns:1fr}
+    .kv{grid-template-columns:1fr}
+    .stats{grid-template-columns:repeat(2,1fr);gap:8px}
+    .stat b{font-size:26px}
+    body{font-size:15.5px}
+    .wrap{padding:0 15px 52px}
+    .controls{position:static}
+  }
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p style="margin:18px 0 0;font-size:13.5px"><a href="../" style="text-decoration:none">&larr; 返回导航 · use 有用的都在这</a></p>
+
+  <header class="lead">
+    <p class="dateline">调研日期口径：2026年10月31日（北京时间） · 30 家品牌 · 价格与架构以官网实测或官网原文为准</p>
+    <h1>云手机横向对比：资费、底层真假与改机能力</h1>
+    <p class="lede">用户原名单去重后 29 家，另加<strong>甘甘云手机</strong>，共 30 家。核心结论先说清楚：<strong>没有一家主流套餐能以公开证据确认为整机真机托管</strong>；市场主体是 ARM 服务器／板卡虚拟化，而自称“真机”多为营销话术，须用文末自测清单验证。</p>
+    <div class="stats" id="stats"></div>
+    <div class="warn"><b>可信度警告（全篇适用）：</b>2026 年网易号／搜狐号／什么值得买上大量“云手机横评”文案高度雷同（如多家共用同一组断连率／延迟数字），疑似 SEO 软文，只能作低权重旁证；关键价格／架构以官网 <b>verified live</b>（2026-10-31 在浏览器实地打开官网并操作核对）或官网原文为准。凡标注“横评”的数字，下单前都应在 App 内二次确认。</div>
+    <div class="legend" aria-label="图例">
+      <span><i style="background:var(--b)"></i>B · ARM 服务器／板卡虚拟化（拟真机）</span>
+      <span><i style="background:var(--btend)"></i>B 倾向 · 证据较弱</span>
+      <span><i style="background:var(--c)"></i>疑似 C · x86 转译存疑</span>
+      <span><i style="background:var(--unknown)"></i>无法确认</span>
+      <span><i style="background:var(--na)"></i>不适用（云电脑品类）</span>
+    </div>
+    <p class="legend">证据口径：<b>verified live</b> ＝ 2026-10-31 实地打开官网核对；<b>index</b> ＝ 搜索引擎索引到的页面摘要，未实地打开或页面为第三方；<b>未查到</b> ＝ 官网无／公开信息无，不编造。底层 B 类归类按报告分类口径，含仅横评口径者，卡片内逐项注明证据来源。</p>
+  </header>
+
+  <!-- ============ 甘甘云专章 ============ -->
+  <section class="spot" id="gangan" aria-labelledby="gangan-h">
+    <h2 id="gangan-h">追加核查：甘甘云手机 <span class="no">第 30 家 · 重点查“欢畅版”</span></h2>
+    <div class="alert" role="note">
+      <b>“欢畅版”核查结论——未查到公开信息／官网无，不编造其价格与配置。</b><br>
+      2026-10-31 实地打开甘甘云官网，其套餐区只有 VIP、GVIP、KVIP、XVIP 四档，<b>无“欢畅版”</b>；以“欢畅版＋甘甘”“甘甘云＋欢畅”检索全网公开索引亦<b>无任何结果</b>。仅供排查的可能情况（非结论）：App 内／渠道代理的内部命名、已下线旧档、或与他牌“畅玩版”命名混淆——如需坐实，须凭 App 内套餐截图或代理报价单再核对。以下官网现行四档可作对照基准。
+    </div>
+    <dl class="kv">
+      <div><dt>运营主体 / 官网</dt><dd>湖南威红科技有限公司 · <a href="https://www.ggyphone.com/">ggyphone.com</a>（verified live，2026-10-31）</dd></div>
+      <div><dt>备案与地址</dt><dd>湘ICP备2023039366号-5；长沙市开福区通泰街街道中山路 589 号开福万达广场 B 区 14012（隐私政策，生效 2025-09-07）</dd></div>
+      <div><dt>品牌起始</dt><dd>不早于 2023 年（官网页脚 Copyright@2023、备案口径），属年轻小品牌</dd></div>
+      <div><dt>客户端 / 应用</dt><dd>Android／iOS／Windows／H5 四端；App 包名 com.ganganyun.android，开发者湖南威红（好豆网索引，index）</dd></div>
+    </dl>
+
+    <h3>官网现行四档套餐（2026-10-31 在官网逐档切换时长实测，verified live）</h3>
+    <div class="tblwrap">
+    <table>
+      <thead><tr><th>套餐（官网，安卓 10 默认）</th><th>配置</th><th>安卓可选</th><th class="num">7 天价</th><th class="num">30 天价</th></tr></thead>
+      <tbody>
+        <tr><td><b>VIP</b></td><td>8 核／4G 内存／64G 存储</td><td>10／11／12</td><td class="num">¥7.50</td><td class="num"><b>¥23.90</b></td></tr>
+        <tr><td><b>GVIP</b></td><td>12 核／8G／128G</td><td>10／11／12</td><td class="num">¥16.50</td><td class="num">¥48.00</td></tr>
+        <tr><td><b>KVIP</b></td><td>16 核／12G／256G</td><td>10／11／12</td><td class="num">¥23.00</td><td class="num">¥65.00</td></tr>
+        <tr><td><b>XVIP</b></td><td>24 核／16G／512G</td><td>10／11／12／13</td><td class="num">¥38.00</td><td class="num">¥139.00</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="sub" style="margin-top:8px">90 天档官网可选，但本次未逐一取价。横评所称“月费 23.9 元”正对应 VIP 30 天价，可交叉；横评所称活动价 12.8／14.8 元官网未见，属活动／渠道口径；横评所称“安卓 8–15”与官网可选 10–13 冲突，以官网为准。官网自办资讯文曾称“甘甘 Pro 29 元／300 小时”，与套餐页不一致，属站内营销文，不采信。</p>
+
+    <figure class="chartbox" style="margin-left:0;margin-right:0">
+      <div id="gangan-chart" role="img" aria-label="甘甘云四档套餐 30 天价格柱状图：VIP 23.9 元，GVIP 48 元，KVIP 65 元，XVIP 139 元"></div>
+      <figcaption>甘甘云官网四档 30 天价（verified live，2026-10-31）。柱长自 0 起；XVIP 的 24 核标称远超任何单颗手机 SoC，逻辑上只能是服务器端 vCPU 切片，不是整机真机托管的证据。</figcaption>
+    </figure>
+
+    <div class="twocol">
+      <div>
+        <h3>定位与特点</h3>
+        <ul class="tight">
+          <li>官网主打<b>游戏挂机</b>：传奇类“一键批量群控扫图”、角色类多账号在线、养成类“24 小时离线自动推图／养号”、经营类多开群控囤资源、多屏监控、7×24 云托管。</li>
+          <li>横评（index，低权重）补充：一价全包（多开／群控／Root 含基础套餐）、适合 3–5 开轻度搬砖与回合制（梦幻西游／问道）、批量管理工具相对基础、十几台以上大规模群控非强项。</li>
+          <li>跨境／直播／办公定位：<b>官网无此宣传</b>；海外节点、ADB、自动化脚本接口：<b>未查到公开信息</b>。不推荐用于跨境。</li>
+        </ul>
+        <h3>技术底层：B 类倾向，证据弱；排除 A</h3>
+        <ul class="tight">
+          <li>官网<b>未公示任何芯片／架构</b>（无 RK3588／鲲鹏／骁龙命名）。</li>
+          <li>横评称“自研 ARM 架构”“ARM 真机方案”——后者为营销话术；且 GVIP／KVIP／XVIP 标称 12／16／24 核，远超单颗手机 SoC，逻辑上只能是服务器端 vCPU 切片，<b>不可能是整机真机托管</b>。</li>
+          <li>未查到任何用户 Device Info HW／AIDA64 实测帖（CPU abi、传感器、基带）可交叉。故只能凭“ARM”宣传归入 B 类倾向，置信度低于掌派／多多云等公示硬件者；亦无证据指其为 x86（C），最终须按文末自测清单验证（重点看 abi 与 SoC）。</li>
+        </ul>
+      </div>
+      <div>
+        <h3>改机／一键新机：官网与公开索引均未查到</h3>
+        <ul class="tight">
+          <li>未查到甘甘云提供一键新机、改机型／IMEI／MAC／序列号、虚拟定位的功能说明。检索中出现的“一键新机文档”实为<b>舟思云 zhousiysj.com，非甘甘，切勿误引</b>。</li>
+          <li>仅横评称其“独立 IP＋设备指纹隔离”（单类来源、无实测），伪装参数能力视为<b>未证实</b>；Root 亦仅横评口径。因此养号防检测能力不能按“可改机”评估，风控风险高于明确支持一键新机且参数联动的品牌。</li>
+        </ul>
+        <h3>口碑与风险</h3>
+        <ul class="tight">
+          <li>未查到公开的跑路／停服／涨价争议或退款投诉报道（2026-10-31 检索黑猫等无结果）——但这与品牌小、用户基数小、运营时间短（2023 起）有关，<b>不等于无风险</b>。</li>
+          <li>横评提及短板：多开数量大时性能波动、高负载场景个别投诉闪退、系统版本更新慢／新游适配一般。</li>
+          <li>建议只买 7 天／30 天档试用、勿预付长周期（官网 90 天档亦然），重要账号勿首选。</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub">甘甘云来源：官网 <a href="https://www.ggyphone.com/">ggyphone.com</a>（verified live）· 隐私政策 <a href="https://privacy.gangancloud.cn/">privacy.gangancloud.cn</a> · 下载页 <a href="https://www.ggyphone.com/downloads.html">ggyphone.com/downloads.html</a> · App 信息 <a href="https://www.haodou.com/soft/1311.html">haodou.com</a> · 横评（低权重）<a href="https://www.163.com/dy/article/LA90FQ380556P1NI.html">网易号</a>、<a href="https://post.smzdm.com/p/a2608wg7/">什么值得买</a>、<a href="https://www.163.com/dy/article/L4S8DLLD0552TVMU.html">网易号旗舰口径</a>。</p>
+  </section>
+
+  <!-- ============ 30 家总表 ============ -->
+  <section id="all" aria-labelledby="all-h">
+    <h2 id="all-h">30 家横向总表 <span class="no">可搜索、可按底层与证据筛选</span></h2>
+    <p class="sub">每家按同一套维度核查：运营主体／官网、最新资费（注明配置与口径）、底层判定、改机能力、口碑与风险。价格找不到官网价的，明确标注“官网无／仅横评或代理价”，不编造。达龙云为云电脑品类，列入总表以免混淆采购；VMOS 国内与海外版并入同一条目，分段标注。</p>
+
+    <div class="controls">
+      <input type="search" id="q" placeholder="搜索品牌名，如：川川、VMOS、章鱼…" aria-label="搜索品牌" />
+      <div class="chips" role="group" aria-label="按底层筛选" id="chips">
+        <button class="chip" data-cat="all" aria-pressed="true">全部 30 家</button>
+        <button class="chip" data-cat="b" aria-pressed="false">B · ARM 虚拟化</button>
+        <button class="chip" data-cat="btend" aria-pressed="false">B 倾向</button>
+        <button class="chip" data-cat="c" aria-pressed="false">疑似 C</button>
+        <button class="chip" data-cat="unknown" aria-pressed="false">无法确认</button>
+        <button class="chip" data-cat="na" aria-pressed="false">不适用</button>
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="fOfficial" /> 只看有官网价／官方文价格的</label>
+        <label><input type="checkbox" id="fMod" /> 只看含一键新机／改机说明的</label>
+      </div>
+      <p class="countline" id="countline"></p>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty">没有符合筛选条件的品牌，试试放宽筛选或换个关键词。</div>
+    <noscript><p>本页总表需启用 JavaScript 渲染；甘甘云专章、推荐与自测清单不受影响。</p></noscript>
+  </section>
+
+  <!-- ============ 推荐 ============ -->
+  <section aria-labelledby="rec-h">
+    <h2 id="rec-h">按用途推荐 <span class="no">各取前 3 · 理由与保留条件一并写明</span></h2>
+    <div class="recs">
+      <div class="rec">
+        <h3>游戏挂机最便宜</h3>
+        <ol>
+          <li><b>小滴云 — ¥13.9 起</b><br><span class="caveat">注意多为 10 台起批量口径；单台有 ¥38 口径冲突，个人价以 App 内为准。</span></li>
+          <li><b>章鱼云 — ¥0.56／天起</b>（官网 verified live）<br><span class="caveat">低价档性能／离线挂机弱（横评）；底层存疑，见总表。</span></li>
+          <li><b>甘甘云 VIP — ¥7.50／7 天、¥23.90／30 天</b>（官网 verified live）<br><span class="caveat">适合先短租验证；8 核／4G／64G、安卓 10–12。</span></li>
+        </ol>
+      </div>
+      <div class="rec">
+        <h3>养号防检测最稳（相对）</h3>
+        <ol>
+          <li><b>VMOS Cloud 高端云真机档</b><br><span class="caveat">独立设备环境／独享静态住宅 IP 80 国；“真机”档自称真实设备，未经用户实测帖交叉，列为“自称 A、待自测”，下单前务必自测。</span></li>
+          <li><b>多多云</b><br><span class="caveat">鲲鹏 ARM＋独立 IP／IMEI 口径；一键新机另付 ¥13／30 天。</span></li>
+          <li><b>傲晨云</b><br><span class="caveat">鲲鹏 ARM＋独立 IP 口径；价格为横评口径，官网未实测价。</span></li>
+        </ol>
+        <p class="caveat">甘甘云仅横评称独立 IP／指纹隔离、无实测佐证，<b>不列入防检测前三</b>。</p>
+      </div>
+      <div class="rec">
+        <h3>跨境海外</h3>
+        <ol>
+          <li><b>VMOS Cloud</b><br><span class="caveat">80 国独享静态住宅 IP、TikTok 场景；计时最低 5 分钟、日封顶 $1（官网价页 verified live，金额 JS 未完全渲染）。</span></li>
+          <li><b>雷电海外版 LDCloud</b><br><span class="caveat">台／新／美／泰／韩／荷等节点，安卓 10–15（官网套餐页，index）。</span></li>
+          <li><b>掌派云</b><br><span class="caveat">官网明列跨境电商场景；节点细节官网无。甘甘云未查到海外节点，不推荐跨境。</span></li>
+        </ol>
+      </div>
+      <div class="rec">
+        <h3>性价比月卡</h3>
+        <ol>
+          <li><b>甘甘云 VIP ¥23.90／30 天</b>（官网价）与 <b>VMOS 国内 ¥23.8／月起</b> 并列第一梯队<br><span class="caveat">甘甘：8 核／4G／64G、安卓 10–12，群控／Root 据横评含在套餐内——下单前在 App 二次确认。</span></li>
+          <li><b>川川云首购 ¥25／30 天</b>（官网活动页 verified live，2026-10-28~31）<br><span class="caveat">活动价波动大，注意首购限定。</span></li>
+          <li><b>多多云 ¥20／月起</b>（官网文口径）<br><span class="caveat">配置版本需核对；官网营销文价格版本多，下单以 App 为准。</span></li>
+        </ol>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:12px">一句话定位：游戏挂机主力＝红手指／雷电／川川／甘甘／VMOS／多多云；工作室群控养号＝双子星／云帅／傲晨／川川／甘甘（小规模）；真机敏感业务＝无一家可凭公开证据免自测，优先试 VMOS Cloud 高端云真机档并自测。</p>
+  </section>
+
+  <!-- ============ 自测 ============ -->
+  <section aria-labelledby="test-h">
+    <h2 id="test-h">用户自测真机方法清单 <span class="no">适用于甘甘及其余各家 · 开 1 台先测再续费</span></h2>
+    <p class="sub">自称“真机”多为营销话术。下面 8 步用免费工具核验，重点看 CPU 架构、传感器、IMEI／基带是否自洽；任何一步出现模拟器特征，都应按 x86 转译／模拟器对待。</p>
+    <ol class="steps">
+      <li><b>装 Device Info HW</b>：看 SoC 型号／GPU（Mali／Adreno 为真机类图形栈；出现 SwiftShader／VirGL／ANGLE 则可疑）、传感器列表是否齐全且数值随“摇晃云机／旋转”变化、摄像头／电池／基带版本是否为空或写死。</li>
+      <li><b>AIDA64／CPU-Z</b>：看 CPU ABI——须为 <code>arm64-v8a</code>；出现 <code>x86_64</code>、<code>houdini</code>、<code>ndk_translation</code> 字样＝转译／C 类；看内核、Build 指纹与机型是否自洽。</li>
+      <li><b>查系统属性（ADB 或终端）</b>：<code>getprop ro.hardware</code>（出现 goldfish／ranchu／vbox＝模拟器）、<code>ro.kernel.qemu</code>（=1 即模拟器）、<code>ro.product.cpu.abi</code>、<code>/proc/cpuinfo</code> 的 Hardware 字段。</li>
+      <li><b>安兔兔／鲁大师验机</b>：跑分量级与所购档位核数／内存是否匹配（如甘甘“24 核”在真机检测中不可能为单 SoC 24 核，重点看实际 SoC 与可用内存）；验机报告是否提示模拟器环境。</li>
+      <li><b>Momo／环境检测类 App ＋ 目标平台自身检测</b>：查 IMEI／MAC／Android ID 是否为空号段／全零／多台重复；一键新机前后对比参数是否“联动变化”——仅改型号而基带／指纹不变＝软改，易被风控关联。</li>
+      <li><b>传感器活体测试</b>：装 Sensor Test，云端无真实运动时陀螺仪／加速度应为微噪声而非恒定直线或全 0；GPS 定位与所购节点／IP 地理是否一致。</li>
+      <li><b>多台交叉比对</b>：同批开 ≥3 台，比对 IMEI 前缀、MAC、序列号、Build 时间、预装应用清单——批量雷同即机房模板镜像，养号风险高。</li>
+      <li><b>断网／关机保活与计费验证</b>：本地关机后云端任务是否继续；按甘甘官网 7 天档先行短租，晚高峰（20–23 点）测延迟／掉线，再决定 30／90 天。</li>
+    </ol>
+  </section>
+
+  <!-- ============ 未能核实 ============ -->
+  <section aria-labelledby="gap-h">
+    <h2 id="gap-h">未能核实 · 开放问题</h2>
+    <ul class="tight">
+      <li><b>甘甘云“欢畅版”</b>：官网无、全网索引无，无价格／配置可核（见专章）；需 App 内截图或代理单据才能续查。</li>
+      <li>甘甘云：芯片型号、ADB、虚拟定位、一键新机、独立 IP 真实性、海外节点——均未查到公开信息；横评数据（断连率 &lt;0.1%、延迟 25ms、15–20 开）无第三方原始实测帖，疑软文复用，未采为定论。</li>
+      <li>原 29 家中：游游峰、小七、八通、集智、泡泡、掌中宝、WA、小六等无官网价／架构公示者，价格与底层均无法确认，已在表中标注；云帅 2022 与 2026 价格口径冲突；章鱼云 x86 说法仅单源。</li>
+      <li>多家横评数字互相复制，无法排除厂商投放；所有“断连率／延迟”类数字未作排名依据。</li>
+    </ul>
+  </section>
+
+  <!-- ============ 来源 ============ -->
+  <section class="sources" aria-labelledby="src-h">
+    <h2 id="src-h">来源</h2>
+    <p class="sub">每家卡片内已标注证据口径（verified live／index／横评／应用宝／未查到）。以下为报告列示的可点来源；其余品牌的价格与架构口径见卡片内标注的来源站点，未另行附链。</p>
+    <ul>
+      <li>红手指官网 FAQ（index）：<a href="https://www.gc.com.cn/faq/product/">gc.com.cn/faq/product/</a> <span class="tag">价格 VIP ¥38／GVIP ¥58／KVIP ¥77、年卡 248 起</span></li>
+      <li>川川云活动页（verified live，2026-10-28~31）：<a href="https://www.ccynice.com/huodong.html">ccynice.com/huodong.html</a></li>
+      <li>掌派云官网（verified live）：<a href="https://palmpai.com/">palmpai.com</a> <span class="tag">自研蚁坞 ARM 服务器＋屯云 ARM 平台</span></li>
+      <li>章鱼云官网（verified live）：<a href="https://zy.16163.com/">zy.16163.com</a> <span class="tag">低至 ¥0.56／天、支持 ADB</span></li>
+      <li>VMOS Cloud 价格页（verified live）：<a href="https://www.vmoscloud.com/zh/price">vmoscloud.com/zh/price</a> <span class="tag">计时最低 5 分钟、日封顶 $1，金额 JS 未完全渲染</span></li>
+      <li>多多云官网：<a href="https://www.ddyun.com/">ddyun.com</a></li>
+      <li>雷电海外套餐页（index）：<a href="https://www.ldcloud.net/ch/features/packages">ldcloud.net/ch/features/packages</a></li>
+      <li>甘甘云官网（verified live）：<a href="https://www.ggyphone.com/">ggyphone.com</a> · 隐私政策 <a href="https://privacy.gangancloud.cn/">privacy.gangancloud.cn</a> · 下载页 <a href="https://www.ggyphone.com/downloads.html">ggyphone.com/downloads.html</a> · App 信息 <a href="https://www.haodou.com/soft/1311.html">haodou.com</a></li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>本页为 2026-10-31 调研口径的静态快照：价格、活动与套餐以各品牌官网／App 内实时页面为准，活动价（如川川首购、甘甘 7 天档）波动大，预付长周期前请先短租自测。底层判定中的“B 倾向”“疑似 C”均为公开证据不足时的保守归类，不是对厂商的定性结论。<br>托管于 GitHub Pages · 仓库 Kenguba/useful-budget · <a href="../">返回导航</a></p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var CAT = {b:"B · ARM虚拟化", btend:"B倾向 · ARM虚拟化", c:"疑似C · x86转译存疑", unknown:"无法确认", na:"不适用（云电脑）"};
+  var EV = {official:"官网价 · verified live", official2:"官网／官方文 · index", app:"应用宝／应用商店", review:"仅横评／榜单 · 低权重", none:"未查到公开价", conflict:"价格口径冲突，以 App 为准"};
+
+  var DATA = [
+    {n:"红手指", cat:"b", ev:"official2", mod:true,
+     body:"湖南微算互联（2015 年成立，2020 年百度全资）／gc.com.cn",
+     price:"VIP ¥38／月、GVIP ¥58／月、KVIP ¥77／月，年卡 ¥248 起 <small>官网 FAQ，index；分辨率 720×1280，安卓 6–13</small>",
+     arch:"B：官网称 ARM 云。",
+     modT:"GVIP 以上提供一键新机（可改机型／IMEI／MAC／序列号）。",
+     risk:"有公开退款投诉经市监调解退款记录（今日头条／湖南日报转投诉，index）。游戏挂机主力之一。"},
+    {n:"雷电云", aka:"雷电云手机 · 海外 LDCloud", cat:"b", ev:"app", mod:true,
+     body:"长沙雷电云网络科技（2021）／ldyuncs.com；海外 ldcloud.net",
+     price:"新用户月卡 ¥26 起 <small>应用宝</small>；海外套餐分 MVIP／XVIP 等，台／新／美／泰／韩／荷节点，安卓 10–15 <small>官网套餐页，index</small>；华为云商店标准型 8 核／6G／30G、安卓 14",
+     arch:"B：ARM（华为云商店标准型配置口径）。",
+     modT:"高阶套餐有一键新机（chinac 文，index）。",
+     risk:"Google Play 有掉线／退款难差评（index）。"},
+    {n:"游峰／游游峰", cat:"unknown", ev:"review", mod:false,
+     body:"未查到稳定官网",
+     price:"官网无稳定官网价；横评称低价、安卓 9 <small>index，低权重</small>",
+     arch:"无法确认（横评称无独立 IP）。",
+     modT:"未查到。",
+     risk:"横评称晚高峰排队、次月涨价、长挂黑屏（单一软文源，谨慎）。"},
+    {n:"Ace 云手机", cat:"btend", ev:"review", mod:true,
+     body:"应用宝在架",
+     price:"横评：安卓 10 VIP ¥19.5／月、3.2G／35G <small>index</small>",
+     arch:"B 倾向：自称 ARM 真实架构（youxibao 介绍，index）。",
+     modT:"自称支持一键新机／换机、ROOT、虚拟定位。",
+     risk:"横评称共享资源、增值包多（低权重）。"},
+    {n:"双子星云手机", cat:"b", ev:"app", mod:true,
+     body:"深圳市臂云科技／应用宝包名 com.gemini.cloud",
+     price:"月卡 ¥22 起 <small>应用宝</small>；星动约 ¥28／月、3.2G／32G <small>横评</small>",
+     arch:"B：ARM 原生（横评口径）。",
+     modT:"有一键换机（腾讯新闻 2022，index）。",
+     risk:"同价位配置偏小；与唔即云同主体。"},
+    {n:"沐桦云", aka:"沐桦云云机", cat:"unknown", ev:"none", mod:false,
+     body:"上海沐桦科技／muhuaphone.com",
+     price:"官网无公开价。",
+     arch:"无法确认（官网称弹性公有云资源）。",
+     modT:"未查到。",
+     risk:"公开信息极少。"},
+    {n:"达龙云", aka:"达龙云云机", cat:"na", ev:"none", mod:false,
+     body:"上海／深圳达龙／dalongyun.com",
+     price:"无安卓云手机标准套餐公开价——主业为云电脑／云游戏（腾讯投资）。",
+     arch:"不适用（x86 云电脑逻辑）。",
+     modT:"不适用。",
+     risk:"勿与云手机混淆采购。"},
+    {n:"川川云手机", cat:"b", ev:"official", mod:true,
+     body:"ccynice.com",
+     price:"首购 30 天 ¥25 起、365 天 ¥221 起 <small>官网活动页 verified live，2026-10-28~31</small>；千川 30 天曾 ¥16（10 月活动）",
+     arch:"B：横评称 ARM 原生；官网未公示芯片。",
+     modT:"横评称群控／Root 全含。",
+     risk:"活动价波动大，注意首购限定。"},
+    {n:"小七云手机", cat:"unknown", ev:"none", mod:false,
+     body:"未查到官网",
+     price:"未查到官网价。",
+     arch:"无法确认。",
+     modT:"未查到。",
+     risk:"仅榜单提及“轻量”。"},
+    {n:"傲晨云", cat:"b", ev:"review", mod:true,
+     body:"aochenyun.com",
+     price:"基础约 ¥18 起、标准 ¥28／月（8 核／4G／44G）<small>横评口径，官网未实测价</small>",
+     arch:"B：鲲鹏 ARM（横评／官网定位）。",
+     modT:"一键新机（横评口径）。",
+     risk:"触控偏慢反馈（横评）。养号防检测相对推荐之一（鲲鹏＋独立 IP 口径）。"},
+    {n:"唔即云", cat:"unknown", ev:"none", mod:false,
+     body:"深圳市臂云科技（与双子星同主体）／应用宝 com.gemini.cloud.wuji",
+     price:"未查到官网价。",
+     arch:"无法确认。",
+     modT:"未查到。",
+     risk:"品牌与双子星关系需以主体为准。"},
+    {n:"小滴云", aka:"小滴云云手机", cat:"btend", ev:"review", mod:true,
+     body:"雷电云旗下（博客园企业文，index）",
+     price:"¥13.9 起 <small>多为 10 台起批量口径</small>；单台有 ¥38 口径冲突",
+     arch:"B 倾向（雷电系 ARM）。",
+     modT:"支持一键新机（搜狐横评）。",
+     risk:"低价口径含批量前提，个人价以 App 内为准。"},
+    {n:"VMOS 云手机", aka:"国内版 ＋ VMOS Cloud 海外版", cat:"b", ev:"official2", mod:true,
+     body:"国内 shouji.vmos.cn；海外 vmoscloud.com",
+     price:"国内：安卓 10／A ¥23.8／月、H ¥28、H Pro ¥35 <small>转述官方价，index</small>，按时计费。<br>海外：标准机 $4.99／月起、高端云真机 $13.99／月起 <small>multilogin，index</small>；计时设备最低 5 分钟、日封顶 $1 <small>官网价页 verified live，金额 JS 未完全渲染</small>",
+     arch:"B（板卡型）：国内官网文公示 3588S／骁龙 865 处理器分档；海外分“标准云机／高端云真机／真机测试（三星、华为等真实机型）”，高端档自称 A、待自测。",
+     modT:"国内可 ROOT、一键新机、谷歌服务（官网文）；海外独立设备环境：一键随机机型／IMEI（官网 features，index）。",
+     risk:"换配置会清空数据（官方攻略提示）。跨境强：海外独享静态住宅 IP 80 国（官网价页 verified live）。"},
+    {n:"多多云手机", cat:"b", ev:"official2", mod:true,
+     body:"福建多多云科技／ddyun.com",
+     price:"基础 ¥20／月、旗舰 ¥25／月，按天 ¥1.8、按时 ¥0.08 <small>官网资讯文，index</small>；旧文 ¥37.9 口径已过时",
+     arch:"B：华为鲲鹏 ARM、GPU 加速（官网）。",
+     modT:"设备大师一键新机另付 ¥13／30 天（chinac 文）。",
+     risk:"官网营销文价格版本多，下单以 App 为准。"},
+    {n:"精灵云", aka:"云手机精灵", cat:"unknown", ev:"review", mod:true,
+     body:"官网未稳定查到",
+     price:"横评：惠享 V4 约 ¥28／月，8 核／4G、安卓 10 <small>index</small>",
+     arch:"无法确认。",
+     modT:"主打海量真实机型库（横评口径，本质改机型库）。",
+     risk:"跨境／团队功能弱（横评）。"},
+    {n:"八通云", cat:"unknown", ev:"none", mod:false,
+     body:"未查到官网",
+     price:"未查到官网价（榜单称按小时计费）。",
+     arch:"无法确认。",
+     modT:"未查到。",
+     risk:"稳定性一般（榜单口径）。"},
+    {n:"章鱼云手机", cat:"c", ev:"official", mod:false,
+     body:"网易系／zy.16163.com",
+     price:"低至 ¥0.56／天 <small>官网 verified live</small>；横评约 ¥10–12／月",
+     arch:"存疑：官网不公示架构；一篇横评称“大量 x86 转译”（单源）→ 列疑似 C／无法确认。",
+     modT:"官网明示支持 ADB 调试（verified live）；一键新机未查到明确说明。",
+     risk:"低价档性能／离线挂机弱（横评）。"},
+    {n:"集智云", cat:"unknown", ev:"none", mod:false,
+     body:"未查到云手机官网（同名多为物联网公司）",
+     price:"未查到。",
+     arch:"无法确认。",
+     modT:"未查到。",
+     risk:"疑为小众／已转型，谨慎预付。"},
+    {n:"掌派云手机", cat:"b", ev:"review", mod:false,
+     body:"长沙九维时空／palmpai.com",
+     price:"官网无价；横评 ¥23.9 起 <small>index</small>",
+     arch:"B（证据较强）：官网自研蚁坞 ARM 服务器＋屯云 ARM 平台（verified live）。",
+     modT:"官网称批量定制／一键同步；改机未查到。",
+     risk:"定位含跨境电商／云办公／云营销（官网）；节点细节官网无。"},
+    {n:"易舜云", cat:"unknown", ev:"none", mod:true,
+     body:"长沙易舜信息／ysyos.com",
+     price:"未查到官网价。",
+     arch:"无法确认。",
+     modT:"横评称一键换机（index，低权重）。",
+     risk:"配置透明度低（横评）。"},
+    {n:"泡泡云", cat:"unknown", ev:"none", mod:false,
+     body:"未查到官网",
+     price:"未查到官网价。",
+     arch:"无法确认。",
+     modT:"未查到。",
+     risk:"仅榜单提及“年轻化界面”。"},
+    {n:"桃心云", cat:"btend", ev:"review", mod:true,
+     body:"taoxyun.com（GitHub 榜单收录，index）",
+     price:"横评：入门 ¥13.9 起、主档约 ¥30–35／月（8 核／16G／128G）<small>index</small>",
+     arch:"B 倾向：横评称独立 ARM 硬件切片。",
+     modT:"横评称可改品牌型号／序列号、一键新机。",
+     risk:"AI 托管为卖点；群控规模上限小（横评）。"},
+    {n:"云帅云手机", cat:"b", ev:"conflict", mod:true,
+     body:"yuncap.com",
+     price:"标准 ¥28／专业 ¥36 <small>2022 对比稿</small>；2026 博客称 ¥35 起——价格口径冲突，以 App 为准；活动 VIP 曾 ¥9.9",
+     arch:"B：自称真实 ARM 硬件（官网，index）。",
+     modT:"一键新机／换机、ROOT、虚拟定位、Xposed、克隆云机（官网）。",
+     risk:"稳定性／掉线率约 1% 反馈（博客，index）。"},
+    {n:"WA 云机", aka:"Wa 云手机", cat:"unknown", ev:"none", mod:false,
+     body:"应用宝 com.walei.vephone",
+     price:"未查到官网价。",
+     arch:"无法确认。",
+     modT:"应用宝仅称多配置／24h 运行。",
+     risk:"公开信息极少，下载量小。"},
+    {n:"鸟人云手机", cat:"unknown", ev:"app", mod:true,
+     body:"长沙乐玩助手信息科技／应用宝",
+     price:"应用宝称“全网超低价”，无具体官网价。",
+     arch:"无法确认。",
+     modT:"支持虚拟定位、批量装卸、一键恢复（应用宝介绍）。",
+     risk:"体量小。"},
+    {n:"蘑菇云手机", cat:"unknown", ev:"review", mod:true,
+     body:"应用宝 com.mushroomcloud.app",
+     price:"横评：¥27／月（8 核／4G／128G）<small>index</small>",
+     arch:"无法确认。",
+     modT:"横评称一键换参数、虚拟定位。",
+     risk:"高峰延迟大（横评）。"},
+    {n:"小六云手机", cat:"unknown", ev:"none", mod:false,
+     body:"应用宝 com.mykj.six.cloud.phone",
+     price:"未查到官网价。",
+     arch:"无法确认。",
+     modT:"未查到。",
+     risk:"公开信息极少。"},
+    {n:"掌中宝云手机", cat:"unknown", ev:"none", mod:false,
+     body:"未查到可核实官网",
+     price:"未查到。",
+     arch:"无法确认。",
+     modT:"未查到。",
+     risk:"名称混淆多，谨慎。"},
+    {n:"爱云兔", cat:"b", ev:"review", mod:true,
+     body:"海马云系／aytpc.haimawan.com",
+     price:"基础约 ¥25–28／月 <small>横评口径</small>",
+     arch:"B：ARM 阵列服务器＋容器化安卓虚拟化（横评／海马云口径）。",
+     modT:"一键换新另付 ¥25／30 天（chinac 文）。",
+     risk:"多开／群控弱于头部（横评）。"},
+    {n:"甘甘云手机", aka:"甘甘云 · 欢畅版未查到，见专章", cat:"btend", ev:"official", mod:false,
+     body:"湖南威红科技有限公司／ggyphone.com（verified live）",
+     price:"VIP ¥23.90／30 天（8 核／4G／64G，安卓 10–12）、GVIP ¥48、KVIP ¥65、XVIP ¥139；7 天档 ¥7.50 起 <small>官网实测，2026-10-31</small>",
+     arch:"B 倾向，证据弱：官网未公示芯片；12／16／24 核标称排除整机真机；横评称“自研 ARM”无实测交叉。",
+     modT:"官网与公开索引均未查到一键新机／改机型／IMEI／MAC／虚拟定位；Root 仅横评口径。",
+     risk:"品牌年轻（2023 起）；未查到跑路／停服／退款投诉报道，但不等于无风险；只买 7／30 天档试用。"}
+  ];
+
+  /* ---- stats, computed from DATA ---- */
+  var counts = {b:0, btend:0, c:0, unknown:0, na:0};
+  DATA.forEach(function(d){ counts[d.cat]++; });
+  var bTotal = counts.b + counts.btend;
+  document.getElementById("stats").innerHTML =
+    '<div class="stat zero"><b>0 家</b><span>可确认为 (A) 整机真机托管的主流套餐</span></div>' +
+    '<div class="stat"><b>' + bTotal + ' 家</b><span>归入 B 类 ARM 虚拟化（含证据较弱的 B 倾向归类，卡片内逐项注明证据）</span></div>' +
+    '<div class="stat"><b>' + counts.unknown + ' 家</b><span>无法确认：无官网架构说明、无芯片命名、无用户指纹实测</span></div>' +
+    '<div class="stat"><b>' + counts.c + ' 家疑似 C · ' + counts.na + ' 家不适用</b><span>章鱼云单源称 x86 转译；达龙云为云电脑</span></div>';
+
+  /* ---- GanGan chart: single data source, zero baseline ---- */
+  (function(){
+    var vals = [
+      {label:"VIP", sub:"8核/4G/64G", v:23.90},
+      {label:"GVIP", sub:"12核/8G/128G", v:48.00},
+      {label:"KVIP", sub:"16核/12G/256G", v:65.00},
+      {label:"XVIP", sub:"24核/16G/512G", v:139.00}
+    ];
+    var max = 140, W = 640, H = 240, padL = 44, padB = 44, padT = 16, plotW = W - padL - 14, plotH = H - padT - padB;
+    var bw = 72, gap = (plotW - bw * vals.length) / (vals.length + 1);
+    var fg = getComputedStyle(document.body).color;
+    var muted = getComputedStyle(document.body).getPropertyValue("--muted") || "#888";
+    var accent = "#b3401e";
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="presentation" style="display:block">';
+    [0,35,70,105,140].forEach(function(t){
+      var y = padT + plotH - (t/max)*plotH;
+      s += '<line x1="' + padL + '" y1="' + y + '" x2="' + (W-14) + '" y2="' + y + '" stroke="currentColor" stroke-opacity="0.18"/>';
+      s += '<text x="' + (padL-6) + '" y="' + (y+4) + '" text-anchor="end" font-size="11" fill="' + muted + '">' + t + '</text>';
+    });
+    s += '<text x="' + (W-14) + '" y="' + (padT+2) + '" text-anchor="end" font-size="11" fill="' + muted + '">元 / 30天</text>';
+    vals.forEach(function(d,i){
+      var h = (d.v/max)*plotH;
+      var x = padL + gap + i*(bw+gap);
+      var y = padT + plotH - h;
+      s += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw + '" height="' + h.toFixed(1) + '" fill="' + accent + '"/>';
+      s += '<text x="' + (x+bw/2).toFixed(1) + '" y="' + (y-6).toFixed(1) + '" text-anchor="middle" font-size="13" font-weight="700" fill="' + fg + '">¥' + d.v.toFixed(2).replace(/\.00$/,"") + '</text>';
+      s += '<text x="' + (x+bw/2).toFixed(1) + '" y="' + (padT+plotH+18) + '" text-anchor="middle" font-size="13" font-weight="600" fill="' + fg + '">' + d.label + '</text>';
+      s += '<text x="' + (x+bw/2).toFixed(1) + '" y="' + (padT+plotH+34) + '" text-anchor="middle" font-size="11" fill="' + muted + '">' + d.sub + '</text>';
+    });
+    s += '<line x1="' + padL + '" y1="' + (padT+plotH) + '" x2="' + (W-14) + '" y2="' + (padT+plotH) + '" stroke="currentColor"/>';
+    s += '</svg>';
+    document.getElementById("gangan-chart").innerHTML = s;
+  })();
+
+  /* ---- cards ---- */
+  var grid = document.getElementById("grid");
+  function esc(s){ return s; } /* data is authored, HTML intentional in price field */
+  DATA.forEach(function(d, i){
+    var art = document.createElement("article");
+    art.className = "card";
+    art.dataset.cat = d.cat;
+    art.dataset.name = d.n + " " + (d.aka||"");
+    art.dataset.official = (d.ev === "official" || d.ev === "official2") ? "1" : "0";
+    art.dataset.mod = d.mod ? "1" : "0";
+    art.innerHTML =
+      '<h3><span class="idx">' + (i+1) + '.</span> ' + d.n + ' <span class="badge ' + d.cat + '">' + CAT[d.cat] + '</span></h3>' +
+      '<p class="ev">' + (d.aka ? d.aka + ' · ' : '') + EV[d.ev] + '</p>' +
+      '<dl>' +
+      '<dt>运营主体 / 官网</dt><dd>' + d.body + '</dd>' +
+      '<dt>资费</dt><dd class="price">' + d.price + '</dd>' +
+      '<dt>技术底层</dt><dd>' + d.arch + '</dd>' +
+      '<dt>改机 / 一键新机</dt><dd>' + d.modT + '</dd>' +
+      '<dt>口碑与风险</dt><dd>' + d.risk + '</dd>' +
+      '</dl>';
+    grid.appendChild(art);
+  });
+
+  /* ---- filtering ---- */
+  var cat = "all", q = "", fOff = false, fMod = false;
+  var countline = document.getElementById("countline");
+  var empty = document.getElementById("empty");
+  function apply(){
+    var shown = 0;
+    Array.prototype.forEach.call(grid.children, function(card){
+      var ok = (cat === "all" || card.dataset.cat === cat)
+        && (!fOff || card.dataset.official === "1")
+        && (!fMod || card.dataset.mod === "1")
+        && (!q || card.dataset.name.toLowerCase().indexOf(q) !== -1);
+      card.style.display = ok ? "" : "none";
+      if (ok) shown++;
+    });
+    countline.textContent = "显示 " + shown + " / " + DATA.length + " 家" +
+      (cat !== "all" ? " · " + CAT[cat] : "") +
+      (fOff ? " · 有官网价／官方文价格" : "") +
+      (fMod ? " · 含一键新机／改机说明" : "") +
+      (q ? " · 关键词“" + q + "”" : "");
+    empty.style.display = shown === 0 ? "block" : "none";
+  }
+  document.getElementById("chips").addEventListener("click", function(e){
+    var btn = e.target.closest(".chip");
+    if (!btn) return;
+    cat = btn.dataset.cat;
+    Array.prototype.forEach.call(this.querySelectorAll(".chip"), function(c){
+      c.setAttribute("aria-pressed", c === btn ? "true" : "false");
+    });
+    apply();
+  });
+  document.getElementById("q").addEventListener("input", function(){ q = this.value.trim().toLowerCase(); apply(); });
+  document.getElementById("fOfficial").addEventListener("change", function(){ fOff = this.checked; apply(); });
+  document.getElementById("fMod").addEventListener("change", function(){ fMod = this.checked; apply(); });
+  apply();
+})();
+</script>
+</body>
+</html>
