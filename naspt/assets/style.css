@@ -245,3 +245,9 @@ details.about summary{cursor:pointer;color:#374151;font-weight:600}
   .btn-search{padding:13px 22px}
   .footer-right{margin-left:0;text-align:left}
 }
+
+/* 流式搜索：关键词高亮与来源标签 */
+.res-title mark{background:#ffec99;border-radius:2px;padding:0 1px}
+.res-tag{display:inline-block;margin-left:8px;padding:0 7px;border-radius:999px;font-size:11px;line-height:18px;vertical-align:2px}
+.res-tag-mine{background:#e8f5e9;color:#2e7d32}
+.res-tag-ext{background:#eef2ff;color:#3f51b5}
