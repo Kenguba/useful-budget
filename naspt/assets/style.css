@@ -125,6 +125,46 @@ button{font-family:inherit;cursor:pointer}
 details.about{margin-top:8px;color:var(--mut);font-size:13.5px}
 details.about summary{cursor:pointer;color:#374151;font-weight:600}
 
+/* B 版顶栏紧凑搜索 */
+.top-search{flex:1;max-width:430px;display:flex;align-items:center;background:#F3F4F6;border:1px solid var(--line);border-radius:999px;padding:3px;margin:0 6px}
+.top-search input{flex:1;border:none;outline:none;background:transparent;font-size:14px;padding:7px 12px;min-width:0}
+.top-search button{flex:none;border:none;background:linear-gradient(90deg,var(--blue),var(--blue2));color:#fff;font-size:13.5px;font-weight:700;border-radius:999px;padding:7px 18px}
+.btn-green{background:#059669;color:#fff;border:none;font-size:15px;font-weight:700;padding:12px 34px;border-radius:10px}
+.btn-green:disabled{opacity:.45;cursor:not-allowed}
+.btn-outline{background:#fff;color:#374151;border:1px solid var(--line);font-size:15px;font-weight:600;padding:11px 26px;border-radius:10px;display:inline-block}
+.page-head .back{margin-left:auto;color:var(--mut);font-size:14px;white-space:nowrap}
+.page-head .back:hover{color:var(--blue)}
+.page-head-flex{display:flex;align-items:flex-start;gap:14px}
+/* 热搜网格 */
+.hot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 26px}
+.hot-cell{display:flex;align-items:center;gap:11px;padding:11px 2px;border-bottom:1px dashed #EEF0F3}
+.hot-cell .hc-main{flex:1;min-width:0}
+.hot-cell .hc-name{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hot-cell .hc-sub{color:var(--faint);font-size:12px;margin-top:2px}
+.hot-cell .hot-count{margin-left:0}
+/* 每日更新工具行 / 网格视图 */
+.today-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0 6px}
+.today-tools .t-search{flex:1;min-width:220px;display:flex;gap:8px}
+.today-tools .t-search input{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:14px;outline:none;background:#fff}
+.today-tools .t-search input:focus{border-color:var(--blue)}
+.btn-small{border:1px solid var(--line);background:#fff;color:#374151;font-size:14px;padding:10px 20px;border-radius:10px}
+.btn-small.blue{background:linear-gradient(90deg,var(--blue),var(--blue2));color:#fff;border:none;font-weight:700}
+.view-toggle{margin-left:auto;display:flex;gap:6px}
+.view-toggle button{border:1px solid var(--line);background:#fff;color:var(--mut);font-size:13.5px;padding:8px 14px;border-radius:9px}
+.view-toggle button.on{background:var(--blue-soft);color:var(--blue);border-color:var(--blue-soft2);font-weight:700}
+.today-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tg-card{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:18px 20px}
+.tg-card h3{margin:0 0 6px;font-size:16px}
+.tg-card .tg-note{color:var(--mut);font-size:13.5px;line-height:1.6;min-height:42px}
+.tg-card .tg-time{color:var(--faint);font-size:12.5px;margin:8px 0 12px}
+.more-row{display:flex;gap:16px;justify-content:center;align-items:center;margin:24px 0 4px}
+.more-row .next{color:var(--blue);font-size:14.5px;font-weight:600}
+/* 友链表单双列 */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}
+.form-grid .full{grid-column:1/-1}
+@media (max-width:860px){.hot-grid{grid-template-columns:1fr 1fr}.today-grid{grid-template-columns:1fr 1fr}.top-search{display:none}}
+@media (max-width:560px){.hot-grid{grid-template-columns:1fr}.today-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
+
 /* ---------- 子页面通用 ---------- */
 .page-head{padding:34px 0 4px}
 .page-head h1{font-size:27px;margin:0 0 6px;font-weight:800}

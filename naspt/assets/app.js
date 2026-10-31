@@ -71,9 +71,16 @@
     var navHtml = nav.map(function (n) {
       return '<a href="' + n.href + '"' + (n.key === active ? ' class="on"' : "") + ">" + n.label + "</a>";
     }).join("");
+    // 顶栏 B 版（热播榜/热搜榜/申请友链/搜索/资源页）：Logo 与导航间带紧凑搜索框
+    var variantB = ["discover", "hot", "apply", "search", "resource"].indexOf(active) >= 0;
+    var topSearch = variantB
+      ? '<form class="top-search" id="topSearch"><input id="topSearchInput" placeholder="搜索你想找的资源" autocomplete="off">' +
+        '<button type="submit">搜索</button></form>'
+      : "";
     var header =
       '<header class="topbar"><div class="topbar-in">' +
       '<a class="logo" href="' + BASE + 'index.html">' + logoGrid() + esc(name) + "</a>" +
+      topSearch +
       '<nav class="nav">' + navHtml +
       '<button class="btn-app" onclick="location.href=\'' + BASE + "app/'\">APP</button>" +
       '<button class="btn-ask" id="btnAsk">求片</button>' +
@@ -88,13 +95,19 @@
       '<div><div class="flogo">' + logoGrid() + esc(name) + "</div>" +
       '<div class="ftitle">' + esc((site.site && site.site.introduction) || "") + "</div></div>" +
       '<div class="footer-right">' + friendHtml +
-      "<div>本站资源均来自公开网络，仅供学习交流</div></div></div>" +
+      "<div>本站提供资源检索与分享导航，资源来自公开网络。</div></div></div>" +
       '<div class="footer-bottom"><a href="' + BASE + 'today/">每日更新</a>' +
       '<a href="' + BASE + 'friend-links/apply/">申请友情链接</a>' +
       '<span class="cp">© ' + year + " " + esc(name) + "</span></div>" +
       "</div></footer>";
     document.body.insertAdjacentHTML("afterbegin", header);
     document.body.insertAdjacentHTML("beforeend", footer);
+    var tsForm = document.getElementById("topSearch");
+    if (tsForm) tsForm.onsubmit = function (e) {
+      e.preventDefault();
+      var q = document.getElementById("topSearchInput").value.trim();
+      if (q) location.href = BASE + "search/?q=" + encodeURIComponent(q);
+    };
 
     // 右侧联系卡
     if (pres.contact_image) {
@@ -144,7 +157,7 @@
       '<textarea id="askResource" rows="3" maxlength="500" required placeholder="填写名称，也可补充年份、季度或版本"></textarea></div>' +
       '<div class="f-field"><label>邮箱 <span style="color:var(--faint);font-weight:400;font-size:12px">选填</span></label>' +
       '<input id="askEmail" type="email" maxlength="254" placeholder="可留空"></div>' +
-      '<div class="d-foot"><button type="submit" class="btn-primary" id="askSubmit" disabled>提交求片</button></div></form>' +
+      '<div class="d-foot"><button type="submit" class="btn-green" id="askSubmit" disabled>提交求片</button></div></form>' +
       "</div></div>";
     document.body.insertAdjacentHTML("beforeend", ask);
     bindClose("askOv");
@@ -228,25 +241,39 @@
       '<div class="upd-main"><div class="upd-title">' + esc(item.note || item.title) + "</div>" +
       '<div class="upd-time">' + fmtTime(item.updated_at) + "</div></div>" + btn + "</div>";
   }
-  function posterCard(item, chName) {
+  function posterCard(item) {
     var rankCls = item.rank <= 3 ? "rank top" : "rank";
-    var sub = [item.year, chName].filter(Boolean).join(" · ");
     return '<a class="poster" href="' + BASE + "search/?q=" + encodeURIComponent(item.name) + '">' +
       '<div class="ph"><img loading="lazy" src="' + esc(item.poster_url) + '" alt="' + esc(item.name) + '">' +
       '<span class="' + rankCls + '">' + item.rank + "</span></div>" +
-      '<div class="meta"><div class="t">' + esc(item.name) + '</div><div class="s">' + esc(sub) + "</div></div></a>";
+      '<div class="meta"><div class="t">' + esc(item.name) + '</div><div class="s">' + esc(item.metadata || "") + "</div></div></a>";
   }
-  function chName(id) {
-    for (var i = 0; i < CHANNELS.length; i++) if (CHANNELS[i].id === id) return CHANNELS[i].name;
-    return "";
+  function discItems() { return (state.discovery && state.discovery.items) || []; }
+  function typeOf(item) {
+    var parts = (item.metadata || "").split("·");
+    return parts.length >= 2 ? parts[1].trim() : "";
   }
-  function mergedDiscovery() {
-    var all = [];
-    CHANNELS.forEach(function (c) {
-      (state.discovery[c.id] || []).forEach(function (it) { all.push(it); });
+  function boardPills(el, items, cur, cb) {
+    el.innerHTML = items.map(function (it) {
+      return '<button class="pill' + (it.id === cur ? " on" : "") + '" data-id="' + it.id + '">' + it.name + "</button>";
+    }).join("");
+    Array.prototype.forEach.call(el.querySelectorAll(".pill"), function (b) {
+      b.onclick = function () { cb(b.dataset.id); };
     });
-    all.sort(function (a, b) { return a.rank - b.rank; });
-    return all;
+  }
+  var BOARD_CATS = [
+    { id: "rec", name: "推荐" }, { id: "电影", name: "电影" }, { id: "剧集", name: "剧集" },
+    { id: "动漫", name: "动漫" }, { id: "综艺", name: "综艺" }
+  ];
+  function boardFilter(cat, kind) {
+    var items = discItems();
+    var t = kind && kind !== "all" ? kind : (cat === "rec" ? "" : cat);
+    if (!t) return items;
+    return items.filter(function (it) { return typeOf(it) === t; });
+  }
+  function tmdbNoteHtml() {
+    return '<div class="tmdb-note">TMDB 影片资料来源 · This product uses the TMDB API but is not endorsed or certified by TMDB.</div>' +
+      '<details class="about"><summary>关于榜单与分类</summary><p>榜单内容不代表本站资源已收录；评分为 TMDB 用户评分。地区按作品产地归类，合拍作品可能出现在多个分类中。</p></details>';
   }
 
   /* ---------------- 首页 ---------------- */
@@ -284,62 +311,67 @@
       "</div></div>";
     // 热播榜
     html += '<div class="section"><div class="card" style="padding:24px 26px">' +
-      '<div class="board-head"><h2>热播榜</h2><a class="more" href="' + BASE + 'discover/">发现更多 →</a></div>' +
+      '<div class="board-head"><div><h2>热播榜</h2><div style="color:var(--mut);font-size:13px;margin-top:3px">从热门榜单，发现下一部好内容</div></div>' +
+      '<a class="more" href="' + BASE + 'discover/">发现更多 →</a></div>' +
       '<div class="filters">' +
       '<div class="frow"><span class="fl">影视分类</span><span id="fCat"></span></div>' +
       '<div class="frow"><span class="fl">内容</span><span id="fKind"></span></div>' +
       '<div class="frow"><span class="fl">排序</span><span id="fSort"></span></div></div>' +
       '<div class="poster-grid" id="boardGrid"></div>' +
-      '<div class="tmdb-note">This product uses the TMDB API but is not endorsed or certified by TMDB.</div>' +
-      '<details class="about"><summary>关于榜单与分类</summary><p>榜单按原站公开数据快照展示，分类含电影、剧集、动漫、综艺与短剧；海报来自原站公开接口。</p></details>' +
+      tmdbNoteHtml() +
       "</div></div>";
     main.innerHTML = html;
     bindSearchbar();
-    var cats = [{ id: "rec", name: "推荐" }].concat(CHANNELS);
-    var curCat = "rec";
-    function pills(el, items, cur, cb) {
-      el.innerHTML = items.map(function (it) {
-        return '<button class="pill' + (it.id === cur ? " on" : "") + '" data-id="' + it.id + '">' + it.name + "</button>";
-      }).join("");
-      Array.prototype.forEach.call(el.querySelectorAll(".pill"), function (b) {
-        b.onclick = function () { cb(b.dataset.id); };
-      });
-    }
+    var curCat = "rec", curKind = "all";
     function drawBoard() {
-      var items = curCat === "rec" ? mergedDiscovery() : (state.discovery[curCat] || []);
-      document.getElementById("boardGrid").innerHTML = items.slice(0, 16).map(function (it) {
-        return posterCard(it, chName(it.channel));
-      }).join("");
-      pills(document.getElementById("fCat"), cats, curCat, function (id) { curCat = id; drawBoard(); });
+      var items = boardFilter(curCat, curKind);
+      document.getElementById("boardGrid").innerHTML =
+        (items.slice(0, 16).map(function (it) { return posterCard(it); }).join("") ||
+         '<div style="color:var(--faint);font-size:14px;padding:12px 0">该分类暂无快照数据</div>');
+      boardPills(document.getElementById("fCat"), BOARD_CATS, curCat, function (id) { curCat = id; drawBoard(); });
+      boardPills(document.getElementById("fKind"),
+        [{ id: "all", name: "全部" }, { id: "电影", name: "电影" }, { id: "剧集", name: "剧集" }], curKind,
+        function (id) { curKind = id; drawBoard(); });
+      boardPills(document.getElementById("fSort"),
+        [{ id: "week", name: "本周热门" }, { id: "day", name: "今日热门" }], "week",
+        function () { drawBoard(); });
     }
-    pills(document.getElementById("fKind"),
-      [{ id: "all", name: "全部" }, { id: "movie", name: "电影" }, { id: "tv", name: "剧集" }], "all",
-      function (id) { curCat = id === "all" ? "rec" : id; drawBoard(); });
-    pills(document.getElementById("fSort"),
-      [{ id: "week", name: "本周热门" }, { id: "day", name: "今日热门" }], "week",
-      function () { drawBoard(); });
     drawBoard();
   }
 
   /* ---------------- 热播榜页 ---------------- */
   function renderDiscover() {
     var main = document.getElementById("main");
-    var cur = "movie";
+    var curCat = "rec", curKind = "all";
+    var items0 = discItems();
+    var updLine = "";
+    if (items0.length && items0[0].collected_at) {
+      var cd = new Date(items0[0].collected_at);
+      var bj = new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit" }).format(cd).replace(/\//g, "/");
+      updLine = '<div style="color:var(--faint);font-size:13px;margin-top:14px">更新于 ' + bj + " 00:00</div>";
+    }
     main.innerHTML =
-      '<div class="page-head"><h1>热播榜</h1><div class="desc">近期热门电影、剧集、动漫、综艺与短剧榜单</div></div>' +
-      '<div class="tabs" id="dTabs"></div><div class="poster-grid" id="dGrid" style="grid-template-columns:repeat(5,1fr)"></div>' +
-      '<div class="tmdb-note">This product uses the TMDB API but is not endorsed or certified by TMDB.</div>';
+      '<div class="page-head page-head-flex"><div><h1>发现</h1><div class="desc">近期值得关注的影视作品。</div></div>' +
+      '<a class="back" href="' + BASE + 'index.html">返回首页 →</a></div>' +
+      '<div class="card" style="padding:24px 26px;margin-top:14px">' +
+      '<div class="filters">' +
+      '<div class="frow"><span class="fl">影视分类</span><span id="dCat"></span></div>' +
+      '<div class="frow"><span class="fl">内容</span><span id="dKind"></span></div>' +
+      '<div class="frow"><span class="fl">排序</span><span id="dSort"></span></div></div>' +
+      '<div class="poster-grid" id="dGrid"></div>' +
+      tmdbNoteHtml() + updLine + "</div>";
     function draw() {
-      var tabs = document.getElementById("dTabs");
-      tabs.innerHTML = CHANNELS.map(function (c) {
-        return '<button class="pill' + (c.id === cur ? " on" : "") + '" data-id="' + c.id + '">' + c.name + "</button>";
-      }).join("");
-      Array.prototype.forEach.call(tabs.querySelectorAll(".pill"), function (b) {
-        b.onclick = function () { cur = b.dataset.id; draw(); };
-      });
-      document.getElementById("dGrid").innerHTML = (state.discovery[cur] || []).map(function (it) {
-        return posterCard(it, chName(it.channel));
-      }).join("");
+      var items = boardFilter(curCat, curKind);
+      document.getElementById("dGrid").innerHTML =
+        (items.map(function (it) { return posterCard(it); }).join("") ||
+         '<div style="color:var(--faint);font-size:14px;padding:12px 0">该分类暂无快照数据</div>');
+      boardPills(document.getElementById("dCat"), BOARD_CATS, curCat, function (id) { curCat = id; draw(); });
+      boardPills(document.getElementById("dKind"),
+        [{ id: "all", name: "全部" }, { id: "电影", name: "电影" }, { id: "剧集", name: "剧集" }], curKind,
+        function (id) { curKind = id; draw(); });
+      boardPills(document.getElementById("dSort"),
+        [{ id: "week", name: "本周热门" }, { id: "day", name: "今日热门" }], "week",
+        function () { draw(); });
     }
     draw();
   }
@@ -347,44 +379,85 @@
   /* ---------------- 每日更新页 ---------------- */
   function renderToday() {
     var main = document.getElementById("main");
-    var per = 24, page = 1;
-    var totalPages = Math.max(1, Math.ceil(state.updates.length / per));
+    var per = 24, shown = per, view = "list", kw = "", pan = "xunlei";
     main.innerHTML =
-      '<div class="page-head"><h1>每日更新</h1><div class="desc">新发布与追更内容（快照 ' +
-      state.updates.length + " 条 / 原站共 " + state.updatesTotal + " 条）</div></div>" +
-      '<div class="card" id="tList"></div><div class="pager" id="tPager"></div>';
-    function draw() {
-      var rows = state.updates.slice((page - 1) * per, page * per)
-        .map(function (it, i) { return updRow(it, (page - 1) * per + i); }).join("");
-      document.getElementById("tList").innerHTML = rows;
-      var p = '<button id="pgPrev"' + (page <= 1 ? " disabled" : "") + ">上一页</button>";
-      for (var i = 1; i <= totalPages; i++)
-        p += '<button data-p="' + i + '"' + (i === page ? ' class="on"' : "") + ">" + i + "</button>";
-      p += '<button id="pgNext"' + (page >= totalPages ? " disabled" : "") + ">下一页</button>";
-      var pg = document.getElementById("tPager");
-      pg.innerHTML = p;
-      Array.prototype.forEach.call(pg.querySelectorAll("[data-p]"), function (b) {
-        b.onclick = function () { page = +b.dataset.p; draw(); window.scrollTo(0, 0); };
+      '<div class="page-head page-head-flex"><div><h1>每日更新</h1><div class="desc">新发布与追更内容 · 共 ' +
+      state.updatesTotal + " 项</div></div>" +
+      '<div class="view-toggle"><button id="vList" class="on">条目视图</button><button id="vGrid">网格视图</button></div></div>' +
+      '<div class="today-tools"><div class="t-search"><input id="tKw" placeholder="搜索每日更新">' +
+      '<button class="btn-small blue" id="tSearchBtn">搜索</button><button class="btn-small" id="tRefresh">刷新</button></div></div>' +
+      '<div class="frow" style="margin:4px 0 14px"><span class="fl" style="color:var(--mut);font-size:13.5px;width:64px">网盘筛选</span><span id="tPan"></span></div>' +
+      '<div id="tBody"></div><div class="more-row" id="tMore"></div>';
+    function filtered() {
+      return state.updates.filter(function (it) {
+        if (kw && (it.note || "").indexOf(kw) < 0 && (it.title || "").indexOf(kw) < 0) return false;
+        if (pan && !(it.links || []).some(function (l) { return l.provider === pan; })) return false;
+        return true;
       });
-      var pv = document.getElementById("pgPrev"), nx = document.getElementById("pgNext");
-      if (pv) pv.onclick = function () { if (page > 1) { page--; draw(); window.scrollTo(0, 0); } };
-      if (nx) nx.onclick = function () { if (page < totalPages) { page++; draw(); window.scrollTo(0, 0); } };
     }
+    function tgCard(it) {
+      var links = it.links || [];
+      var pref = links.filter(function (l) { return l.provider === pan; })[0] || links[0];
+      var btn = pref ? '<a class="btn-pan" href="' + BASE + "resource/?id=" + esc(pref.id) + '">' + esc(panName(pref.provider)) + "</a>" : "";
+      return '<div class="tg-card"><h3>' + esc(it.title || "") + '</h3><div class="tg-note">' + esc(it.note || "") +
+        '</div><div class="tg-time">' + fmtTime(it.updated_at) + "</div>" + btn + "</div>";
+    }
+    function draw() {
+      var list = filtered();
+      var slice = list.slice(0, shown);
+      var body = document.getElementById("tBody");
+      if (view === "list") {
+        body.className = "card";
+        body.innerHTML = slice.map(function (it, i) { return updRow(it, i); }).join("") ||
+          '<div style="color:var(--faint);padding:16px 0">快照内无符合条件的更新</div>';
+      } else {
+        body.className = "today-grid";
+        body.innerHTML = slice.map(tgCard).join("") ||
+          '<div style="color:var(--faint);padding:16px 0">快照内无符合条件的更新</div>';
+      }
+      var more = document.getElementById("tMore");
+      if (shown < list.length) {
+        more.innerHTML = '<button class="btn-small" id="tLoadMore">加载更多</button>' +
+          '<a class="next" href="javascript:void(0)" id="tNext">下一页 →</a>';
+        document.getElementById("tLoadMore").onclick = function () { shown += per; draw(); };
+        document.getElementById("tNext").onclick = function () {
+          shown = Math.min(list.length, shown + per); draw();
+          document.getElementById("tBody").scrollIntoView();
+        };
+      } else {
+        more.innerHTML = list.length ? '<span style="color:var(--faint);font-size:13.5px">已展示快照内全部 ' + list.length + " 条</span>" : "";
+      }
+      boardPills(document.getElementById("tPan"),
+        [{ id: "xunlei", name: "迅雷" }, { id: "magnet", name: "磁力" }, { id: "", name: "全部" }], pan,
+        function (id) { pan = id; shown = per; draw(); });
+      document.getElementById("vList").className = view === "list" ? "on" : "";
+      document.getElementById("vGrid").className = view === "grid" ? "on" : "";
+    }
+    document.getElementById("vList").onclick = function () { view = "list"; draw(); };
+    document.getElementById("vGrid").onclick = function () { view = "grid"; draw(); };
+    document.getElementById("tSearchBtn").onclick = function () {
+      kw = document.getElementById("tKw").value.trim(); shown = per; draw();
+    };
+    document.getElementById("tRefresh").onclick = function () {
+      kw = ""; document.getElementById("tKw").value = ""; shown = per; draw();
+    };
     draw();
   }
 
   /* ---------------- 热搜榜页 ---------------- */
   function renderHot() {
     var main = document.getElementById("main");
-    var rows = state.hot.map(function (h, i) {
-      return '<div class="hot-row"><span class="hot-rank">' + (i + 1) + '</span>' +
-        '<span class="hot-name"><a href="' + BASE + "search/?q=" + encodeURIComponent(h.query) + '">' + esc(h.query) + "</a></span>" +
-        (i < 3 ? '<span class="tag-hot">热</span>' : "") +
-        '<span class="hot-count">' + (h.search_count != null ? h.search_count + " 次搜索" : "") + "</span></div>";
+    var cells = state.hot.map(function (h, i) {
+      var cnt = h.search_count != null ? Number(h.search_count).toLocaleString("en-US") + " 次搜索" : "";
+      return '<div class="hot-cell"><span class="hot-rank">' + (i + 1) + '</span>' +
+        '<div class="hc-main"><div class="hc-name"><a href="' + BASE + "search/?q=" + encodeURIComponent(h.query) + '">' + esc(h.query) + "</a></div>" +
+        '<div class="hc-sub">查看相关资源</div></div>' +
+        '<span class="hot-count">' + cnt + "</span></div>";
     }).join("");
     main.innerHTML =
-      '<div class="page-head"><h1>热搜榜</h1><div class="desc">站内近期搜索热度较高的影视与网盘资源</div></div>' +
-      '<div class="card">' + rows + "</div>";
+      '<div class="page-head page-head-flex"><div><h1>热搜榜</h1><div class="desc">查看站内用户最近搜索最多的内容。</div></div>' +
+      '<a class="back" href="' + BASE + 'index.html">返回首页 →</a></div>' +
+      '<div class="card" style="margin-top:14px"><div class="hot-grid">' + cells + "</div></div>";
   }
 
   /* ---------------- 搜索页 ---------------- */
@@ -404,7 +477,7 @@
     var hits = state.updates.filter(function (it) {
       return (it.title && it.title.indexOf(q) >= 0) || (it.note && it.note.indexOf(q) >= 0);
     });
-    var discs = mergedDiscovery().filter(function (it) { return it.name.indexOf(q) >= 0; });
+    var discs = discItems().filter(function (it) { return it.name.indexOf(q) >= 0; });
     html += '<div class="section"><div class="page-head" style="padding-top:6px"><h1 style="font-size:22px">“' +
       esc(q) + '” 的搜索结果</h1><div class="desc">快照内共找到 ' + (hits.length + discs.length) +
       ' 条；全站结果请到<a href="' + ORIGIN + "/search?q=" + encodeURIComponent(q) +
@@ -416,7 +489,7 @@
     discs.forEach(function (it) {
       html += '<div class="res-row"><div class="res-main"><div class="res-title">' + esc(it.name) +
         '</div><div class="res-note">' + esc((it.summary || "").slice(0, 80)) + '</div>' +
-        '<div class="res-meta">' + esc([it.year, chName(it.channel)].filter(Boolean).join(" · ")) + "</div></div>" +
+        '<div class="res-meta">' + esc(it.metadata || "") + "</div></div>" +
         '<a class="btn-pan" href="' + ORIGIN + "/search?q=" + encodeURIComponent(it.name) +
         '" target="_blank" rel="noopener">去原站搜索</a></div>';
     });
@@ -460,26 +533,36 @@
   function renderApp() {
     var main = document.getElementById("main");
     var app = state.appInfo || {};
-    var appUrl = location.origin + location.pathname;
-    var size = app.sizeBytes ? " · " + (app.sizeBytes / 1024).toFixed(0) + " KB" : "";
-    var ver = app.versionName ? " v" + app.versionName : "";
-    var apkBtn = app.apkUrl
-      ? '<a class="btn-primary" style="display:inline-block" href="' + esc(app.apkUrl) + '">下载安卓客户端' + ver + size + "</a>"
-      : '<button class="btn-primary" disabled style="opacity:.5">安装包暂不可用</button>';
+    var appUrl = location.href;
+    var sdkMap = { 26: "8.0", 27: "8.1", 28: "9", 29: "10", 30: "11", 31: "12", 32: "12L", 33: "13", 34: "14", 35: "15" };
+    var params = [];
+    if (app.versionName) params.push("v" + app.versionName);
+    if (app.sizeBytes) params.push((app.sizeBytes / 1024).toFixed(0) + " KB");
+    if (app.minSdk) params.push("Android " + (sdkMap[app.minSdk] || app.minSdk) + " 及以上");
+    var dlBtn = app.apkUrl
+      ? '<a class="btn-outline" href="' + esc(app.apkUrl) + '">下载安卓版 ↓</a>'
+      : '<button class="btn-outline" disabled style="opacity:.5">安装包暂不可用</button>';
     main.innerHTML =
-      '<div class="page-head"><h1>APP 下载</h1><div class="desc">下载安卓客户端，或将本站添加到苹果手机桌面。</div></div>' +
-      '<div class="card" style="max-width:680px;text-align:center;padding:30px 28px">' +
+      '<div class="page-head"><h1>APP 下载</h1><div class="desc">安卓客户端 · 苹果桌面版</div></div>' +
+      '<div class="cols" style="grid-template-columns:1fr 1fr;margin-top:18px">' +
+      '<div class="card"><h2 style="font-size:19px;margin:0 0 4px">安卓客户端</h2>' +
+      '<div style="color:var(--mut);font-size:13.5px">网盘直达 · 本地历史</div>' +
+      '<div style="color:var(--faint);font-size:13px;margin:12px 0 18px">' + esc(params.join(" · ")) + "</div>" +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn-primary" style="display:inline-block" href="' + ORIGIN + '/app" target="_blank" rel="noopener">打开 APP · 连接本站 →</a>' + dlBtn + "</div>" +
+      '<p style="color:var(--mut);font-size:13.5px;line-height:1.8;margin:16px 0 0">首次安装后，回到这里点「打开 APP」，确认连接本站。</p>' +
+      '<details class="about"><summary>打开或安装遇到问题？</summary><p>安装时按系统提示允许当前浏览器安装应用。<br>已安装但打不开，可「换一种方式打开」。<br>后续在 APP「设置 → 检查更新」升级，安装时需系统确认。</p></details></div>' +
+      '<div class="card"><h2 style="font-size:19px;margin:0 0 4px">苹果桌面版</h2>' +
+      '<div style="color:var(--mut);font-size:13.5px">本站图标 · 随网站更新</div>' +
+      '<div style="margin:12px 0 18px"><span class="tag-hot" style="font-size:12px;padding:4px 10px">网页版 · 无需自签</span></div>' +
+      '<a class="btn-primary" style="display:inline-block" href="' + ORIGIN + '/api/public/app/ios.mobileconfig">下载桌面版 ↓</a>' +
+      '<p style="color:var(--mut);font-size:13.5px;line-height:1.8;margin:16px 0 0">下载后打开「设置 → 已下载描述文件 → 安装」。</p>' +
+      '<details class="about"><summary>也可以直接添加到主屏幕</summary><p>用 Safari 或支持此功能的 Chrome 打开本站，在分享菜单中选择「添加到主屏幕」。<br>描述文件仅添加本站图标，系统可能显示「未签名」。<br>桌面版使用网页，网盘唤起以手机实际支持为准。</p></details></div>' +
+      "</div>" +
+      '<div class="card" style="max-width:520px;margin:24px auto 0;text-align:center;padding:28px">' +
       '<img src="https://api.qrserver.com/v1/create-qr-code/?size=168x168&data=' + encodeURIComponent(appUrl) +
       '" alt="本站 APP 下载页面二维码" style="width:168px;height:168px" onerror="this.style.display=\'none\'">' +
-      '<div style="color:var(--mut);font-size:13.5px;margin-top:10px">手机扫码打开本页</div></div>' +
-      '<div class="cols" style="grid-template-columns:1fr 1fr;max-width:880px;margin-top:24px">' +
-      '<div class="card"><h2 style="font-size:18px;margin:0 0 4px">🤖 安卓客户端</h2>' +
-      '<div class="desc" style="color:var(--mut);font-size:13px;margin-bottom:16px">网盘直达 · 本地历史</div>' + apkBtn + "</div>" +
-      '<div class="card"><h2 style="font-size:18px;margin:0 0 4px">🍎 苹果桌面版</h2>' +
-      '<div class="desc" style="color:var(--mut);font-size:13px;margin-bottom:10px">本站图标 · 随网站更新</div>' +
-      '<div style="margin-bottom:16px"><span class="tag-hot" style="font-size:12px;padding:4px 10px">网页版 · 无需自签</span></div>' +
-      '<a class="btn-primary" style="display:inline-block" href="' + ORIGIN + '/api/public/app/ios.mobileconfig">下载桌面版</a></div>' +
-      "</div>";
+      '<div style="font-weight:800;font-size:16px;margin-top:12px">用手机扫码打开</div>' +
+      '<div style="color:var(--mut);font-size:13.5px;margin-top:5px">在手机上下载，连接本站。</div></div>';
   }
 
   /* ---------------- 申请友链页 ---------------- */
@@ -504,12 +587,13 @@
       (s.requirements ? '<div class="card" style="margin-bottom:20px"><h2 style="font-size:17px;margin:0 0 10px">收录要求</h2>' +
         '<p style="margin:0;color:#374151;font-size:14.5px;line-height:1.9">' + esc(s.requirements) + "</p></div>" : "") +
       siteInfo +
-      '<form class="form-card" id="applyForm"><h2 style="font-size:17px;margin:0 0 18px">提交申请</h2>' +
+      '<form class="form-card" id="applyForm" style="max-width:820px"><h2 style="font-size:17px;margin:0 0 18px">提交申请</h2>' +
+      '<div class="form-grid">' +
       '<div class="f-field"><label>网站名称</label><input name="name" required maxlength="80"></div>' +
       '<div class="f-field"><label>网站网址</label><input name="url" type="url" required maxlength="2048" placeholder="https://"></div>' +
       '<div class="f-field"><label>图标网址（可选）</label><input name="logo_url" type="url" maxlength="2048"></div>' +
       '<div class="f-field"><label>联系方式（仅管理员可见）</label><input name="contact" maxlength="200"></div>' +
-      '<div class="f-field"><label>网站简介</label><textarea name="description" rows="3" maxlength="500"></textarea></div>' +
+      '<div class="f-field full"><label>网站简介</label><textarea name="description" rows="3" maxlength="500"></textarea></div></div>' +
       '<input name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">' +
       (s.footer_hint ? '<p style="color:var(--faint);font-size:13px;margin:4px 0 16px">' + esc(s.footer_hint) + "</p>" : "") +
       '<button class="btn-primary" type="submit">提交申请</button></form></div>';

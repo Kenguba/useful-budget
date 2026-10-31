@@ -62,9 +62,9 @@ def main():
     except Exception as e:  # noqa: BLE001
         print(f"[warn] site: {e}", file=sys.stderr)
 
-    # 热搜榜
+    # 热搜榜（热搜页展示 50 条，首页取前若干条）
     try:
-        hot = fetch("/hot-searches")
+        hot = fetch("/hot-searches?limit=50")
         write_json("hot.json", hot)
         done.append(f"hot({len(hot)})")
     except Exception as e:  # noqa: BLE001
@@ -84,18 +84,13 @@ def main():
     except Exception as e:  # noqa: BLE001
         print(f"[warn] updates: {e}", file=sys.stderr)
 
-    # 热播榜（分频道）
+    # 热播榜（原站前端同款口径：source=tmdb、limit=40，分类靠 metadata 类型前端过滤）
     try:
-        discovery = {}
-        for ch in CHANNELS:
-            data = fetch(f"/discovery?channel={ch}")
-            rows = data.get("items") or []
-            for row in rows:
-                row["poster_url"] = absolutize(row.get("poster_url"))
-            discovery[ch] = rows
+        discovery = fetch("/discovery?limit=40&source=tmdb")
+        for row in discovery.get("items") or []:
+            row["poster_url"] = absolutize(row.get("poster_url"))
         write_json("discovery.json", discovery)
-        done.append("discovery(" +
-                    ",".join(f"{k}:{len(v)}" for k, v in discovery.items()) + ")")
+        done.append(f"discovery(tmdb:{len(discovery.get('items') or [])})")
     except Exception as e:  # noqa: BLE001
         print(f"[warn] discovery: {e}", file=sys.stderr)
 
