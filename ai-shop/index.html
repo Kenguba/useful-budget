@@ -125,7 +125,7 @@ $('#sq').oninput=()=>{shopShown=300;renderShops();};
 $('#moreBtn').onclick=()=>{shopShown+=300;renderShops();};
 Promise.all([fetch('data/board.json').then(r=>r.json()),fetch('data/shops.json').then(r=>r.json())]).then(([b,s])=>{
   board=b; shops=s;
-  $('#meta').textContent='数据截至 '+b.updated_at+' · 共 '+b.groups.reduce((a,g)=>a+g.items.length,0)+' 条报价 · 来源：'+b.source;
+  $('#meta').textContent='数据截至 '+b.updated_at+'（北京时间） · 共 '+b.groups.reduce((a,g)=>a+g.items.length,0)+' 条报价 · 来源：'+b.source;
   const plats=['全部',...new Set(s.shops.map(x=>x.platform))];
   $('#chips').innerHTML=plats.map(p=>'<button data-p="'+esc(p)+'"'+(p==='全部'?' class="on"':'')+'>'+esc(p)+'</button>').join('');
   document.querySelectorAll('#chips button').forEach(btn=>btn.onclick=()=>{shopFilter=btn.dataset.p;shopShown=300;document.querySelectorAll('#chips button').forEach(x=>x.classList.toggle('on',x===btn));renderShops();});

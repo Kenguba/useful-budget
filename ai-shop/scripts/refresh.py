@@ -285,7 +285,9 @@ def main():
         dict(id='codex-sms', name='Codex 接码 — 单次', items=slim(top10(g6, None))),
         dict(id='grok-heavy', name='Grok Heavy（SuperGrok Heavy/Ultra）', items=slim(top10(g7, lambda t: '代充' if has(t, '代充', '直充') else '成品号'))),
     ]
-    board = dict(updated_at=time.strftime('%Y-%m-%d %H:%M', time.localtime()),
+    from datetime import datetime, timezone, timedelta
+    bj_now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M')
+    board = dict(updated_at=bj_now,
                  source='按商家遍历：AI价网全量商家库（2052 家）+ cardnav 全量商家库（966 家）+ PriceAI 最低价段',
                  groups=groups)
     os.makedirs(DATA, exist_ok=True)
