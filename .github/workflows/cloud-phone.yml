@@ -1,0 +1,35 @@
+name: Cloud Phone Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  phone:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - name: Check KVM and resources
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules || true
+          sudo udevadm trigger --name-match=kvm || true
+          ls -l /dev/kvm || echo NO_KVM
+          egrep -c '(vmx|svm)' /proc/cpuinfo || true
+          nproc; free -h; df -h / | tail -1
+      - name: Start docker-android and open tunnel
+        run: |
+          IMG=""
+          for t in emulator_11.0 emulator_14.0 latest; do
+            if docker pull budtmo/docker-android:$t; then IMG=budtmo/docker-android:$t; break; fi
+          done
+          echo "USING_IMAGE=$IMG"
+          docker run -d -p 6080:6080 -e EMULATOR_DEVICE="Samsung Galaxy S10" -e WEB_VNC=true --device /dev/kvm --name android "$IMG"
+          for i in $(seq 1 40); do curl -s -o /dev/null http://localhost:6080 && echo WEBUI_UP && break || sleep 10; done
+          docker ps
+          curl -sL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x cloudflared
+          nohup ./cloudflared tunnel --url http://localhost:6080 > tunnel.log 2>&1 &
+          sleep 20
+          grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' tunnel.log | head -1 || cat tunnel.log
+          echo "=== SESSION HOLD ==="
+          sleep 3000
