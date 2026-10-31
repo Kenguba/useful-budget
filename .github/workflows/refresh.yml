@@ -3,7 +3,7 @@
 name: refresh-and-deploy
 on:
   push:
-  branches: [main]
+    branches: [main]
   schedule:
     - cron: "23 */12 * * *"
   workflow_dispatch:
