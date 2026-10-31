@@ -23,12 +23,14 @@ jobs:
       - name: Refresh data
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 skill-board/scripts/refresh.py
+        run: |
+          python3 skill-board/scripts/refresh.py
+          python3 ai-shop/scripts/refresh.py
       - name: Commit data
         run: |
           git config user.name "skills-board-bot"
           git config user.email "bot@localhost"
-          git add skill-board/data/
+          git add skill-board/data/ ai-shop/data/
           git diff --cached --quiet || git commit -m "data: refresh $(date -u +%F)"
           git push
       - uses: actions/configure-pages@v5
