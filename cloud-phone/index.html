@@ -159,14 +159,15 @@
     </dl>
 
     <h3>官网现行四档套餐（2026-10-31 在官网逐档切换时长实测，verified live）</h3>
+    <p class="sub" id="gg-updated">甘甘官网价每周两次由脚本自动抓取官网更新（data/prices.json）；本表初始值为 2026-10-31 实测快照。</p>
     <div class="tblwrap">
     <table>
       <thead><tr><th>套餐（官网，安卓 10 默认）</th><th>配置</th><th>安卓可选</th><th class="num">7 天价</th><th class="num">30 天价</th></tr></thead>
       <tbody>
-        <tr><td><b>VIP</b></td><td>8 核／4G 内存／64G 存储</td><td>10／11／12</td><td class="num">¥7.50</td><td class="num"><b>¥23.90</b></td></tr>
-        <tr><td><b>GVIP</b></td><td>12 核／8G／128G</td><td>10／11／12</td><td class="num">¥16.50</td><td class="num">¥48.00</td></tr>
-        <tr><td><b>KVIP</b></td><td>16 核／12G／256G</td><td>10／11／12</td><td class="num">¥23.00</td><td class="num">¥65.00</td></tr>
-        <tr><td><b>XVIP</b></td><td>24 核／16G／512G</td><td>10／11／12／13</td><td class="num">¥38.00</td><td class="num">¥139.00</td></tr>
+        <tr><td><b>VIP</b></td><td>8 核／4G 内存／64G 存储</td><td>10／11／12</td><td class="num" data-gg="VIP:7">¥7.50</td><td class="num" data-gg="VIP:30"><b>¥23.90</b></td></tr>
+        <tr><td><b>GVIP</b></td><td>12 核／8G／128G</td><td>10／11／12</td><td class="num" data-gg="GVIP:7">¥16.50</td><td class="num" data-gg="GVIP:30">¥48.00</td></tr>
+        <tr><td><b>KVIP</b></td><td>16 核／12G／256G</td><td>10／11／12</td><td class="num" data-gg="KVIP:7">¥23.00</td><td class="num" data-gg="KVIP:30">¥65.00</td></tr>
+        <tr><td><b>XVIP</b></td><td>24 核／16G／512G</td><td>10／11／12／13</td><td class="num" data-gg="XVIP:7">¥38.00</td><td class="num" data-gg="XVIP:30">¥139.00</td></tr>
       </tbody>
     </table>
     </div>
@@ -321,10 +322,11 @@
   </section>
 
   <footer>
-    <p>本页为 2026-10-31 调研口径的静态快照：价格、活动与套餐以各品牌官网／App 内实时页面为准，活动价（如川川首购、甘甘 7 天档）波动大，预付长周期前请先短租自测。底层判定中的“B 倾向”“疑似 C”均为公开证据不足时的保守归类，不是对厂商的定性结论。<br>托管于 GitHub Pages · 仓库 Kenguba/useful-budget · <a href="../">返回导航</a></p>
+    <p>本页初始为 2026-10-31 调研快照，现行维护方式：甘甘云官网价每周两次由脚本自动抓取更新，其余 30 家由每周一全量复核更新；价格、活动与套餐以各品牌官网／App 内实时页面为准，活动价（如川川首购、甘甘 7 天档）波动大，预付长周期前请先短租自测。底层判定中的“B 倾向”“疑似 C”均为公开证据不足时的保守归类，不是对厂商的定性结论。<br>托管于 GitHub Pages · 仓库 Kenguba/useful-budget · <a href="../">返回导航</a></p>
   </footer>
 </div>
 
+<script src="data/prices.js"></script>
 <script>
 (function(){
   "use strict";
@@ -514,6 +516,26 @@
      risk:"品牌年轻（2023 起）；未查到跑路／停服／退款投诉报道，但不等于无风险；只买 7／30 天档试用。"}
   ];
 
+  /* ---- live Gangan prices from data/prices.js (script-refreshed twice a week) ---- */
+  var GG = (window.CP_PRICES && window.CP_PRICES.gangan && window.CP_PRICES.gangan.tiers) || null;
+  var GG_DATE = (window.CP_PRICES && window.CP_PRICES.updated_at) || null;
+  function ggPrice(tier, days){ return GG && GG[tier] && GG[tier].prices ? GG[tier].prices[days] : null; }
+  function fmtY(v){ var t = Number(v).toFixed(2); if (t.slice(-3) === ".00") t = t.slice(0, -3); return "¥" + t; }
+  if (GG) {
+    DATA.forEach(function(d){
+      if (d.n === "甘甘云手机") {
+        d.price = "VIP " + fmtY(ggPrice("VIP","30")) + "／30 天（8 核／4G／64G，安卓 10–12）、GVIP " + fmtY(ggPrice("GVIP","30")) + "、KVIP " + fmtY(ggPrice("KVIP","30")) + "、XVIP " + fmtY(ggPrice("XVIP","30")) + "；7 天档 " + fmtY(ggPrice("VIP","7")) + " 起；90 天 VIP " + fmtY(ggPrice("VIP","90")) + " <small>官网脚本抓取，" + (GG_DATE || "") + "</small>";
+      }
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-gg]"), function(td){
+      var parts = td.getAttribute("data-gg").split(":");
+      var v = ggPrice(parts[0], parts[1]);
+      if (v !== null && v !== undefined) td.innerHTML = (td.querySelector("b") ? "<b>" + fmtY(v) + "</b>" : fmtY(v));
+    });
+    var gu = document.getElementById("gg-updated");
+    if (gu) gu.textContent = "甘甘官网价最近一次脚本抓取：" + (GG_DATE || "") + "（每周两次自动抓取官网 data/prices.json；下单前以官网/App 实时为准）。";
+  }
+
   /* ---- stats, computed from DATA ---- */
   var counts = {b:0, btend:0, c:0, unknown:0, na:0};
   DATA.forEach(function(d){ counts[d.cat]++; });
@@ -532,13 +554,14 @@
       {label:"KVIP", sub:"16核/12G/256G", v:65.00},
       {label:"XVIP", sub:"24核/16G/512G", v:139.00}
     ];
-    var max = 140, W = 640, H = 240, padL = 44, padB = 44, padT = 16, plotW = W - padL - 14, plotH = H - padT - padB;
+    if (GG) { vals.forEach(function(d){ var v = ggPrice(d.label, "30"); if (v) d.v = v; }); }
+    var max = Math.max(140, Math.ceil(Math.max.apply(null, vals.map(function(d){ return d.v; })) / 35) * 35), W = 640, H = 240, padL = 44, padB = 44, padT = 16, plotW = W - padL - 14, plotH = H - padT - padB;
     var bw = 72, gap = (plotW - bw * vals.length) / (vals.length + 1);
     var fg = getComputedStyle(document.body).color;
     var muted = getComputedStyle(document.body).getPropertyValue("--muted") || "#888";
     var accent = "#b3401e";
     var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="presentation" style="display:block">';
-    [0,35,70,105,140].forEach(function(t){
+    [0,0.25,0.5,0.75,1].map(function(f){ return Math.round(max*f); }).forEach(function(t){
       var y = padT + plotH - (t/max)*plotH;
       s += '<line x1="' + padL + '" y1="' + y + '" x2="' + (W-14) + '" y2="' + y + '" stroke="currentColor" stroke-opacity="0.18"/>';
       s += '<text x="' + (padL-6) + '" y="' + (y+4) + '" text-anchor="end" font-size="11" fill="' + muted + '">' + t + '</text>';
