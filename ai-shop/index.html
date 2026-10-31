@@ -58,7 +58,7 @@ h1{font-size:32px;margin:10px 0 6px;font-weight:900}
 <div class="wrap">
   <div class="kicker">KEN · USE</div>
   <h1>🛒 AI账号商铺</h1>
-  <p class="sub">AI 账号比价（固定 7 分组 · 有货最低价 · 商品详情页直达）与店铺总目录。报价口径：AI价网单一源，与聊天里每日推送的多源口径不同，价格可能略高。</p>
+  <p class="sub">AI 账号比价（固定 7 分组 · 有货最低价 · 商品详情页直达）与店铺总目录。报价口径：按商家遍历——AI价网全量商家库（2052 家店的全部商品）+ cardnav 全量商家库 + PriceAI 最低价段合并，比聚合分类榜单更全。</p>
   <div class="tabs">
     <button id="tabBoard" class="on">报价单</button>
     <button id="tabShops">店铺目录</button>
@@ -79,7 +79,7 @@ h1{font-size:32px;margin:10px 0 6px;font-weight:900}
     <button class="more hide" id="moreBtn">显示更多</button>
   </section>
 
-  <p class="foot">数据每 12 小时由 GitHub Actions 跑 scripts/refresh.py 自动刷新（纯代码抓取 AI价网公开分类页）。只列有货；同标题铺货已合并为一家并标注家数。价格库存以聚合页为准，下单前以商品页实时状态为准。<br>托管于 GitHub Pages · 仓库 Kenguba/useful-budget</p>
+  <p class="foot">数据每 12 小时由 GitHub Actions 跑 scripts/refresh.py 自动刷新：遍历每家商家的全量商品库（AI价网 2052 家 + cardnav 966 家），按标题规则分入 7 组，再叠加 PriceAI 最低价段。只列有货；同标题铺货已合并为一家并标注家数。价格库存为聚合站最近一次遍历商家的快照，下单前以商品页实时状态为准。<br>托管于 GitHub Pages · 仓库 Kenguba/useful-budget</p>
 </div>
 <script>
 const $=s=>document.querySelector(s);
