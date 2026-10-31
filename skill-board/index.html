@@ -38,13 +38,13 @@ h3{font-size:15px;margin:16px 0 6px;color:var(--blue);font-weight:700}
 .rank{flex:0 0 32px;height:32px;border-radius:50%;background:#eef2f8;color:var(--blue);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
 .rank.top{background:var(--gold);color:#fff}
 .item .main{flex:1;min-width:0}
-.name{font-weight:750;font-size:15px;word-break:break-all}
+.name{font-weight:750;font-size:15px;word-break:break-word;overflow-wrap:anywhere}
 .name a{color:inherit;text-decoration:none}
 .name a:hover{color:var(--blue2)}
 .meta{color:var(--mut);font-size:12px;margin-left:6px;font-weight:normal}
-.blurb{color:#334155;font-size:13px;line-height:1.55;margin-top:2px}
-.num{font-weight:800;color:var(--blue);text-align:right;flex-shrink:0;max-width:48%}
-.num small{display:block;color:var(--mut);font-weight:400;font-size:11px;line-height:1.35;white-space:normal}
+.blurb{color:#334155;font-size:13px;line-height:1.55;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.num{font-weight:800;color:var(--blue);text-align:right;flex-shrink:0}
+.num small{display:block;color:var(--mut);font-weight:400;font-size:11px;line-height:1.35;white-space:nowrap}
 code.cmd{position:relative;display:block;background:#0f172a;color:#e2e8f0;border-radius:9px;padding:9px 12px;font-size:12px;overflow-x:auto;white-space:nowrap;margin-top:7px;cursor:pointer;border:1px solid rgba(255,255,255,.08);transition:background .15s;max-width:100%;box-sizing:border-box}
 code.cmd:hover{background:#1e293b}
 code.cmd.copied::after{content:"✓ 已复制";position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#10b981;color:#fff;font-size:11px;padding:2px 7px;border-radius:5px;font-weight:600}
@@ -136,8 +136,8 @@ function render(b){
   // 04 momentum
   const trend=b.trending.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${e.growthPct>0?"+":""}${e.growthPct}%<small>7 日 · ${fmt(e.installs)}</small>`)).join("");
   const buzz=b.buzz.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${e.score}<small>X ${e.x}${e.xTruncated?"+":""} · GH ${e.gh} · HN ${e.hn}</small>`)).join("");
-  const rising=b.rising.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,meta:e.platform,html:`${nameLink(e.skill,e.url,e.platform)}<div class="blurb">${esc(e.blurb)}</div>`},`${fmt(e.value)}<small>${esc(e.valueLabel)} · 上榜 ${e.ageDays} 天</small>`)).join("");
-  const active=b.active.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>${cmd(e.installCmd)}`},`${esc(e.lastUpdate)}<small>${e.versions??"—"} 个版本</small>`)).join("");
+  const rising=b.rising.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,meta:e.platform,html:`${nameLink(e.skill,e.url,e.platform)}<div class="blurb">${esc(e.blurb)}</div>`},`${fmt(e.value)}<small>安装 · 上榜 ${e.ageDays} 天</small>`)).join("");
+  const active=b.active.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${esc(e.lastUpdate)}<small>${e.versions??"—"} 个版本</small>`)).join("");
   h+=section("04","动能 · 声量 · 新星 · 维护","四张子榜：最近 7 天和 30 天在发生什么",`<div class="grid2"><div><h3>7 日动能</h3>${trend}</div><div><h3>社交声量</h3>${buzz}</div><div><h3>30 天新星</h3>${rising}</div><div><h3>最活跃维护</h3>${active}</div></div>`);
   // 05 vendors + how to choose
   inner=b.vendors.map(e=>item(e.rank,{skill:e.vendor,blurb:e.note,meta:e.platform,html:`${nameLink(e.vendor,"",e.platform)}<div class="blurb">${esc(e.note||"")} · ${fmt(e.skillsCount)} 个技能</div>`},fmt(e.total))).join("");
