@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI账号商铺 · AI 账号比价与店铺目录</title>
+<meta name="description" content="AI 账号全网比价：GPT 日抛/周限、Antigravity 反重力、Codex 接码、Grok Heavy 有货最低价 + 2700 家店铺目录，每 12 小时自动刷新">
+<style>
+:root{--ink:#12233d;--blue:#1c4f9c;--gold:#f2b705;--bg:#f6f3ec;--card:#fff;--mut:#5b6b82;--line:#e5e0d2;--red:#c0392b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:24px 14px 60px}
+.kicker{color:var(--blue);font-weight:800;letter-spacing:.14em;font-size:13px}
+.kicker:before{content:"";display:inline-block;width:22px;height:5px;background:var(--gold);margin-right:8px;vertical-align:middle}
+h1{font-size:32px;margin:10px 0 6px;font-weight:900}
+.sub{color:var(--mut);font-size:13px;line-height:1.6;margin:0 0 16px}
+.tabs{display:flex;gap:8px;margin:14px 0 6px}
+.tabs button{flex:0 0 auto;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-size:15px;font-weight:700;border-radius:10px;padding:9px 18px;cursor:pointer}
+.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.meta{color:var(--mut);font-size:12px;margin:6px 0 14px}
+.leaders{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;margin-bottom:18px}
+.leader{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px}
+.leader .g{font-size:11px;color:var(--mut);line-height:1.4;min-height:30px}
+.leader .p{font-size:20px;font-weight:900;color:var(--blue)}
+.leader .s{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search{width:100%;border:1.5px solid var(--line);border-radius:10px;background:var(--card);padding:11px 14px;font-size:15px;margin:4px 0 14px;color:var(--ink)}
+.group{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.group h2{font-size:17px;margin:0 0 4px;font-weight:800}
+.group .cnt{color:var(--mut);font-size:12px;margin-bottom:8px}
+.row{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line);align-items:flex-start}
+.row:first-of-type{border-top:none}
+.price{font-size:17px;font-weight:900;color:var(--blue);min-width:74px}
+.price small{font-size:11px;color:var(--mut);font-weight:400;display:block}
+.main{flex:1;min-width:0}
+.title{font-size:14px;line-height:1.45}
+.title a{color:var(--ink);text-decoration:none}
+.title a:hover{color:var(--blue);text-decoration:underline}
+.info{font-size:12px;color:var(--mut);margin-top:3px;line-height:1.5}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;background:#eef4ff;color:var(--blue);margin-right:5px}
+.tag.warn{background:#fdeeee;color:var(--red)}
+.tag.grey{background:#f3efe4;color:var(--mut)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 12px}
+.chips button{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer;color:var(--ink)}
+.chips button.on{border-color:var(--red);color:var(--red);font-weight:700}
+.shop{padding:10px 2px;border-top:1px solid var(--line)}
+.shop:first-of-type{border-top:none}
+.shop .nm{font-size:15px;font-weight:700}
+.shop .nm a{color:var(--ink);text-decoration:none}
+.shop .nm a:hover{color:var(--blue)}
+.shop .pf{font-size:12px;color:var(--mut);margin-top:2px}
+.only{float:right;font-size:12px;color:var(--mut)}
+.more{width:100%;padding:12px;border:1.5px solid var(--line);background:var(--card);border-radius:10px;font-size:14px;cursor:pointer;color:var(--ink)}
+.foot{margin-top:26px;color:var(--mut);font-size:12px;line-height:1.7}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">KEN · USE</div>
+  <h1>🛒 AI账号商铺</h1>
+  <p class="sub">AI 账号比价（固定 7 分组 · 有货最低价 · 商品详情页直达）与店铺总目录。报价口径：AI价网单一源，与聊天里每日推送的多源口径不同，价格可能略高。</p>
+  <div class="tabs">
+    <button id="tabBoard" class="on">报价单</button>
+    <button id="tabShops">店铺目录</button>
+  </div>
+  <div class="meta" id="meta">加载中…</div>
+
+  <section id="viewBoard">
+    <div class="leaders" id="leaders"></div>
+    <input class="search" id="q" placeholder="搜商品标题或店名，如 Superheavy、周限、反重力">
+    <div id="groups"></div>
+  </section>
+
+  <section id="viewShops" class="hide">
+    <input class="search" id="sq" placeholder="搜店名，如 海海星星AI">
+    <div class="chips" id="chips"></div>
+    <div class="meta" id="shopMeta"></div>
+    <div id="shopList"></div>
+    <button class="more hide" id="moreBtn">显示更多</button>
+  </section>
+
+  <p class="foot">数据每 12 小时由 GitHub Actions 跑 scripts/refresh.py 自动刷新（纯代码抓取 AI价网公开分类页）。只列有货；同标题铺货已合并为一家并标注家数。价格库存以聚合页为准，下单前以商品页实时状态为准。<br>托管于 GitHub Pages · 仓库 Kenguba/useful-budget</p>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtP=p=>('¥'+(Number.isInteger(p)?p:p.toFixed(2).replace(/0$/,'')));
+let board=null, shops=null, shopFilter='全部', shopShown=300;
+
+function stockTxt(it){
+  if(it.stock===null||it.stock===undefined) return '有货';
+  if(it.stock<=2) return '<span style="color:var(--red);font-weight:700">只剩 '+it.stock+' 个</span>';
+  return '库存 '+it.stock;
+}
+function renderBoard(){
+  const q=$('#q').value.trim().toLowerCase();
+  $('#leaders').innerHTML=board.groups.map(g=>{
+    const it=g.items[0];
+    return '<div class="leader"><div class="g">'+esc(g.name)+'</div>'+(it?'<div class="p">'+fmtP(it.price)+'</div><div class="s">'+esc(it.shop)+'</div>':'<div class="p">—</div>')+'</div>';
+  }).join('');
+  $('#groups').innerHTML=board.groups.map(g=>{
+    const items=g.items.filter(it=>!q||it.title.toLowerCase().includes(q)||it.shop.toLowerCase().includes(q));
+    if(q&&!items.length) return '';
+    return '<div class="group"><h2>'+esc(g.name)+'</h2><div class="cnt">有货最低 '+(g.items.length)+' 条'+(g.items.length<10?'（不足 10 条，如实显示）':'')+'</div>'+
+      items.map(it=>'<div class="row"><div class="price">'+fmtP(it.price)+'<small>'+esc(it.platform)+'</small></div><div class="main"><div class="title"><a href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div><div class="info">'+(it.kind?'<span class="tag">'+esc(it.kind)+'</span>':'')+(it.same_source>1?'<span class="tag grey">同源铺货共 '+it.same_source+' 家</span>':'')+esc(it.shop)+' · '+stockTxt(it)+'</div></div></div>').join('')+'</div>';
+  }).join('')||'<p class="sub">没有匹配的报价。</p>';
+}
+function renderShops(){
+  const q=$('#sq').value.trim().toLowerCase();
+  const list=shops.shops.filter(s=>(shopFilter==='全部'||s.platform===shopFilter)&&(!q||s.name.toLowerCase().includes(q)));
+  $('#shopMeta').textContent='共 '+list.length+' 家（目录快照 '+shops.updated_at+' · 同店多平台/多代码分别列）';
+  $('#shopList').innerHTML=list.slice(0,shopShown).map(s=>'<div class="shop">'+(s.url?'':'<span class="only">仅店名</span>')+'<div class="nm">'+(s.url?'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.name)+' ↗</a>':esc(s.name))+'</div><div class="pf">'+esc(s.platform)+(s.code?' · '+esc(s.code):'')+'</div></div>').join('');
+  $('#moreBtn').classList.toggle('hide',list.length<=shopShown);
+}
+function switchTab(shopsView){
+  $('#tabBoard').classList.toggle('on',!shopsView);
+  $('#tabShops').classList.toggle('on',shopsView);
+  $('#viewBoard').classList.toggle('hide',shopsView);
+  $('#viewShops').classList.toggle('hide',!shopsView);
+}
+$('#tabBoard').onclick=()=>switchTab(false);
+$('#tabShops').onclick=()=>switchTab(true);
+$('#q').oninput=renderBoard;
+$('#sq').oninput=()=>{shopShown=300;renderShops();};
+$('#moreBtn').onclick=()=>{shopShown+=300;renderShops();};
+Promise.all([fetch('data/board.json').then(r=>r.json()),fetch('data/shops.json').then(r=>r.json())]).then(([b,s])=>{
+  board=b; shops=s;
+  $('#meta').textContent='数据截至 '+b.updated_at+' · 共 '+b.groups.reduce((a,g)=>a+g.items.length,0)+' 条报价 · 来源：'+b.source;
+  const plats=['全部',...new Set(s.shops.map(x=>x.platform))];
+  $('#chips').innerHTML=plats.map(p=>'<button data-p="'+esc(p)+'"'+(p==='全部'?' class="on"':'')+'>'+esc(p)+'</button>').join('');
+  document.querySelectorAll('#chips button').forEach(btn=>btn.onclick=()=>{shopFilter=btn.dataset.p;shopShown=300;document.querySelectorAll('#chips button').forEach(x=>x.classList.toggle('on',x===btn));renderShops();});
+  renderBoard(); renderShops();
+}).catch(e=>{$('#meta').textContent='数据加载失败，请稍后刷新。';});
+</script>
+</body>
+</html>

@@ -38,6 +38,7 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 | 目录 | 内容 | 更新方式 |
 | --- | --- | --- |
 | `skill-board/` | 全球 Skills 使用量排行榜（安装量双榜 + GitHub 星标榜） | workflow 每 12 小时跑 `scripts/refresh.py` 自动刷新数据并发布；自带 PWA，可添加到手机主屏幕 |
+| `ai-shop/` | AI账号商铺（AI 账号比价 7 分组 + 店铺目录） | workflow 每 12 小时跑 `scripts/refresh.py` 自动刷新数据并发布 |
 
 ## 约定
 
