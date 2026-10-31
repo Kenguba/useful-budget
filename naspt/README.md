@@ -15,12 +15,13 @@
 | `resource/?id=` | 资源详情（快照内信息 + 去原站获取） |
 | `friend-links/apply/` | 申请友情链接 |
 
-## 数据
+## 数据（实时优先，快照兜底）
 
-- `data/` 为原站公开接口（`https://naspt.vip/api/public/*`）的快照：站点配置、每日更新（前 5 页 120 条）、热搜榜、热播榜 5 频道各 20 条。
-- 刷新：`python3 scripts/refresh.py`（零依赖；失败保留旧数据）。
+- 页面运行时经 Cloudflare Worker 中转（`scripts/worker.js`，部署名 `naspt-proxy`）实时请求原站公开接口 `https://naspt.vip/api/public/*`：站点配置、每日更新（可翻页到全部）、热搜榜 50 条、热播榜（TMDB 口径 39 条）、搜索（`/resources?q=`，支持网盘筛选）、资源详情、友链设置、APP 版本。
+- 中转地址写在 `assets/app.js` 的 `RELAY` 常量；中转不可用或请求失败时，自动回退到 `data/` 快照渲染。
+- `data/` 快照由 `python3 scripts/refresh.py` 生成（零依赖；失败保留旧数据），口径与实时一致。
 - 海报与联系二维码为原站公开图片地址直引，未入库二进制文件。
-- 原站接口未开放跨域，线上页面无法实时调原站搜索；搜索页在快照内检索，全站结果链接回原站。
+- 写接口（求片、友链申请）不经中转转发，复刻版为本地模拟提交。
 
 ## 说明
 
