@@ -15,7 +15,7 @@
     aliyun: "阿里", tianyi: "天翼", mobile: "移动", "115": "115", "123": "123",
     pikpak: "PikPak", ed2k: "ED2K", guangya: "光芽"
   };
-  var state = { site: null, hot: [], updates: [], updatesTotal: 0, discovery: {} };
+  var state = { site: null, hot: [], updates: [], updatesTotal: 0, discovery: {}, friend: {}, appInfo: {} };
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -132,25 +132,35 @@
       bindClose("popupOv", function () { sessionStorage.setItem("naspt_popup_seen", "1"); });
     }
 
-    // 求片弹窗
+    // 求片弹窗（字段与原站 ResourceRequestDialog 一致；原站提交 POST /public/resource-requests，复刻版跨域不可达，本地模拟成功态）
     var ask =
       '<div class="overlay" id="askOv"><div class="dialog">' +
-      '<button class="d-x" data-close>✕</button><h3>求片</h3>' +
-      '<form id="askForm"><div class="f-field"><label>资源名称 <span class="req">*</span></label>' +
-      '<input name="title" required placeholder="想找的电影 / 剧集 / 动漫名称"></div>' +
-      '<div class="f-field"><label>联系方式</label><input name="contact" placeholder="邮箱或微信，方便反馈结果"></div>' +
-      '<div class="f-field"><label>备注</label><textarea name="note" rows="3" placeholder="年份、版本、画质等补充信息"></textarea></div>' +
-      '<div class="d-foot"><button type="submit" class="btn-primary">提交求片</button></div></form>' +
+      '<button class="d-x" data-close>✕</button>' +
+      '<h3 style="text-align:left;margin-bottom:6px">求片</h3>' +
+      '<div style="color:var(--mut);font-size:13.5px;margin-bottom:18px">告诉我们你需要的资源。邮箱选填。</div>' +
+      '<div id="askDone" style="display:none"><p style="font-size:15px;margin:8px 0 4px">求片已提交，感谢你的反馈。</p>' +
+      '<div class="d-foot"><button class="btn-primary" data-close>完成</button></div></div>' +
+      '<form id="askForm"><div class="f-field"><label>需要的资源 <span style="color:var(--faint);font-weight:400;font-size:12px">必填</span></label>' +
+      '<textarea id="askResource" rows="3" maxlength="500" required placeholder="填写名称，也可补充年份、季度或版本"></textarea></div>' +
+      '<div class="f-field"><label>邮箱 <span style="color:var(--faint);font-weight:400;font-size:12px">选填</span></label>' +
+      '<input id="askEmail" type="email" maxlength="254" placeholder="可留空"></div>' +
+      '<div class="d-foot"><button type="submit" class="btn-primary" id="askSubmit" disabled>提交求片</button></div></form>' +
       "</div></div>";
     document.body.insertAdjacentHTML("beforeend", ask);
     bindClose("askOv");
     document.getElementById("btnAsk").onclick = function () {
+      document.getElementById("askDone").style.display = "none";
+      document.getElementById("askForm").style.display = "block";
       document.getElementById("askOv").classList.add("open");
     };
+    var askRes = document.getElementById("askResource");
+    askRes.addEventListener("input", function () {
+      document.getElementById("askSubmit").disabled = !askRes.value.trim();
+    });
     document.getElementById("askForm").onsubmit = function (e) {
       e.preventDefault();
-      document.getElementById("askOv").classList.remove("open");
-      toast("已提交求片，站长会尽快处理");
+      document.getElementById("askForm").style.display = "none";
+      document.getElementById("askDone").style.display = "block";
     };
   }
   function extractPopupLink(pres) {
@@ -449,31 +459,64 @@
   /* ---------------- APP 页 ---------------- */
   function renderApp() {
     var main = document.getElementById("main");
+    var app = state.appInfo || {};
+    var appUrl = location.origin + location.pathname;
+    var size = app.sizeBytes ? " · " + (app.sizeBytes / 1024).toFixed(0) + " KB" : "";
+    var ver = app.versionName ? " v" + app.versionName : "";
+    var apkBtn = app.apkUrl
+      ? '<a class="btn-primary" style="display:inline-block" href="' + esc(app.apkUrl) + '">下载安卓客户端' + ver + size + "</a>"
+      : '<button class="btn-primary" disabled style="opacity:.5">安装包暂不可用</button>';
     main.innerHTML =
-      '<div class="page-head"><h1>基德盘搜 APP</h1><div class="desc">把基德盘搜添加到手机主屏幕，打开更快</div></div>' +
-      '<div class="card" style="max-width:680px"><div class="d-body" style="line-height:2">' +
-      "本站为渐进式网页应用（PWA），无需下载安装包：<br>" +
-      "· 安卓：在浏览器菜单中选择「添加到主屏幕」<br>" +
-      "· iPhone：用 Safari 打开本站，点分享按钮，选择「添加到主屏幕」<br>" +
-      "添加后即可像普通 App 一样从桌面打开，搜索、追更、热播榜全都有。</div></div>";
+      '<div class="page-head"><h1>APP 下载</h1><div class="desc">下载安卓客户端，或将本站添加到苹果手机桌面。</div></div>' +
+      '<div class="card" style="max-width:680px;text-align:center;padding:30px 28px">' +
+      '<img src="https://api.qrserver.com/v1/create-qr-code/?size=168x168&data=' + encodeURIComponent(appUrl) +
+      '" alt="本站 APP 下载页面二维码" style="width:168px;height:168px" onerror="this.style.display=\'none\'">' +
+      '<div style="color:var(--mut);font-size:13.5px;margin-top:10px">手机扫码打开本页</div></div>' +
+      '<div class="cols" style="grid-template-columns:1fr 1fr;max-width:880px;margin-top:24px">' +
+      '<div class="card"><h2 style="font-size:18px;margin:0 0 4px">🤖 安卓客户端</h2>' +
+      '<div class="desc" style="color:var(--mut);font-size:13px;margin-bottom:16px">网盘直达 · 本地历史</div>' + apkBtn + "</div>" +
+      '<div class="card"><h2 style="font-size:18px;margin:0 0 4px">🍎 苹果桌面版</h2>' +
+      '<div class="desc" style="color:var(--mut);font-size:13px;margin-bottom:10px">本站图标 · 随网站更新</div>' +
+      '<div style="margin-bottom:16px"><span class="tag-hot" style="font-size:12px;padding:4px 10px">网页版 · 无需自签</span></div>' +
+      '<a class="btn-primary" style="display:inline-block" href="' + ORIGIN + '/api/public/app/ios.mobileconfig">下载桌面版</a></div>' +
+      "</div>";
   }
 
   /* ---------------- 申请友链页 ---------------- */
   function renderApply() {
     var main = document.getElementById("main");
+    var s = state.friend || {};
+    if (s.enabled === false) {
+      main.innerHTML = '<div style="padding-top:26px"><a href="' + BASE + 'index.html" style="color:var(--blue)">← 返回首页</a>' +
+        '<div class="page-head"><h1>' + esc(s.title || "申请友情链接") + '</h1></div><div class="empty">本站暂未开放友情链接申请。</div></div>';
+      return;
+    }
+    var siteInfo = "";
+    if (s.site_name || s.site_url) {
+      siteInfo = '<div class="card" style="margin-bottom:20px"><h2 style="font-size:17px;margin:0 0 10px">本站信息</h2>' +
+        '<div style="line-height:2;color:#374151;font-size:14.5px">名称：' + esc(s.site_name || "") + "<br>网址：" + esc(s.site_url || "") +
+        (s.site_description ? "<br>" + esc(s.site_description) : "") +
+        (s.contact ? "<br>联系：" + esc(s.contact) : "") + "</div></div>";
+    }
     main.innerHTML =
-      '<div class="page-head"><h1>申请友情链接</h1><div class="desc">提交后站长审核，通过后会出现在本站页脚友情链接中</div></div>' +
-      '<form class="form-card" id="applyForm">' +
-      '<div class="f-field"><label>网站名称 <span class="req">*</span></label><input name="name" required placeholder="例如：矩阵盘"></div>' +
-      '<div class="f-field"><label>网站地址 <span class="req">*</span></label><input name="url" required placeholder="https://example.com"></div>' +
-      '<div class="f-field"><label>Logo 地址</label><input name="logo" placeholder="https://example.com/logo.svg"><div class="hint">可选，建议 SVG 或 PNG</div></div>' +
-      '<div class="f-field"><label>联系方式</label><input name="contact" placeholder="邮箱或微信"></div>' +
-      '<div class="f-field"><label>网站简介</label><textarea name="intro" rows="3" placeholder="一句话介绍你的站点"></textarea></div>' +
-      '<button class="btn-primary" type="submit">提交申请</button></form>';
+      '<div style="padding-top:26px"><a href="' + BASE + 'index.html" style="color:var(--blue)">← 返回首页</a>' +
+      '<div class="page-head"><h1>' + esc(s.title || "申请友情链接") + "</h1></div>" +
+      (s.requirements ? '<div class="card" style="margin-bottom:20px"><h2 style="font-size:17px;margin:0 0 10px">收录要求</h2>' +
+        '<p style="margin:0;color:#374151;font-size:14.5px;line-height:1.9">' + esc(s.requirements) + "</p></div>" : "") +
+      siteInfo +
+      '<form class="form-card" id="applyForm"><h2 style="font-size:17px;margin:0 0 18px">提交申请</h2>' +
+      '<div class="f-field"><label>网站名称</label><input name="name" required maxlength="80"></div>' +
+      '<div class="f-field"><label>网站网址</label><input name="url" type="url" required maxlength="2048" placeholder="https://"></div>' +
+      '<div class="f-field"><label>图标网址（可选）</label><input name="logo_url" type="url" maxlength="2048"></div>' +
+      '<div class="f-field"><label>联系方式（仅管理员可见）</label><input name="contact" maxlength="200"></div>' +
+      '<div class="f-field"><label>网站简介</label><textarea name="description" rows="3" maxlength="500"></textarea></div>' +
+      '<input name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">' +
+      (s.footer_hint ? '<p style="color:var(--faint);font-size:13px;margin:4px 0 16px">' + esc(s.footer_hint) + "</p>" : "") +
+      '<button class="btn-primary" type="submit">提交申请</button></form></div>';
     document.getElementById("applyForm").onsubmit = function (e) {
       e.preventDefault();
-      toast("已提交申请，等待站长审核");
-      e.target.reset();
+      document.getElementById("applyForm").outerHTML =
+        '<div class="form-card" role="status" style="color:#374151;font-size:15px">申请已提交，等待管理员审核。通过后会在本站友情链接区展示。</div>';
     };
   }
 
@@ -483,13 +526,17 @@
     load("site").catch(function () { return {}; }),
     load("hot").catch(function () { return []; }),
     load("updates").catch(function () { return { items: [], total: 0 }; }),
-    load("discovery").catch(function () { return {}; })
+    load("discovery").catch(function () { return {}; }),
+    load("friend").catch(function () { return {}; }),
+    load("app").catch(function () { return {}; })
   ]).then(function (res) {
     state.site = res[0] || {};
     state.hot = res[1] || [];
     state.updates = (res[2] && res[2].items) || [];
     state.updatesTotal = (res[2] && res[2].total) || state.updates.length;
     state.discovery = res[3] || {};
+    state.friend = res[4] || {};
+    state.appInfo = res[5] || {};
     renderShell(page);
     ({ home: renderHome, discover: renderDiscover, today: renderToday, hot: renderHot,
        search: renderSearch, resource: renderResource, app: renderApp, apply: renderApply }[page] || renderHome)();

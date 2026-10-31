@@ -99,6 +99,26 @@ def main():
     except Exception as e:  # noqa: BLE001
         print(f"[warn] discovery: {e}", file=sys.stderr)
 
+    # 友链申请设置
+    try:
+        friend = fetch("/friend-link-settings")
+        write_json("friend.json", friend)
+        done.append("friend")
+    except Exception as e:  # noqa: BLE001
+        print(f"[warn] friend: {e}", file=sys.stderr)
+
+    # APP 版本信息（原站静态 JSON，不在 /api 下）
+    try:
+        req = urllib.request.Request(
+            "https://ik.naspt.vip/app/android/latest.json",
+            headers={"User-Agent": UA, "Accept": "application/json"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            app = json.loads(resp.read().decode("utf-8"))
+        write_json("app.json", app)
+        done.append(f"app(v{app.get('versionName', '?')})")
+    except Exception as e:  # noqa: BLE001
+        print(f"[warn] app: {e}", file=sys.stderr)
+
     write_json("meta.json", {
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "source": BASE,
