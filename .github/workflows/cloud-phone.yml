@@ -2,6 +2,11 @@ name: Cloud Phone Test
 
 on:
   workflow_dispatch:
+    inputs:
+      apk_url:
+        description: "APK URL to auto-install at boot"
+        required: false
+        default: "https://down.ziwan.cn/202611010432/e3f5cb8f68f9c84842147554170ba5be/ziwan_1.2.68.apk"
 
 jobs:
   phone:
@@ -14,18 +19,23 @@ jobs:
           sudo udevadm control --reload-rules || true
           sudo udevadm trigger --name-match=kvm || true
           ls -l /dev/kvm || echo NO_KVM
-          egrep -c '(vmx|svm)' /proc/cpuinfo || true
-          nproc; free -h; df -h / | tail -1
-      - name: Start docker-android and open tunnel
+          nproc; free -h
+      - name: Start docker-android, auto-install APK, open tunnel
         run: |
-          IMG=""
-          for t in emulator_11.0 emulator_14.0 latest; do
-            if docker pull budtmo/docker-android:$t; then IMG=budtmo/docker-android:$t; break; fi
+          docker pull budtmo/docker-android:emulator_11.0
+          docker run -d -p 6080:6080 -e EMULATOR_DEVICE="Samsung Galaxy S10" -e WEB_VNC=true --device /dev/kvm --name android budtmo/docker-android:emulator_11.0
+          for i in $(seq 1 60); do
+            B=$(docker exec android adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+            if [ "$B" = "1" ]; then echo ANDROID_BOOTED; break; fi
+            sleep 10
           done
-          echo "USING_IMAGE=$IMG"
-          docker run -d -p 6080:6080 -e EMULATOR_DEVICE="Samsung Galaxy S10" -e WEB_VNC=true --device /dev/kvm --name android "$IMG"
+          curl -sL -o /tmp/app.apk "${{ inputs.apk_url }}"
+          ls -l /tmp/app.apk; file /tmp/app.apk || true
+          docker cp /tmp/app.apk android:/tmp/app.apk
+          docker exec android adb install -r /tmp/app.apk 2>&1 | tee /tmp/install.log || true
+          echo "INSTALL_RESULT: $(tail -2 /tmp/install.log)"
+          docker exec android adb shell pm list packages | grep -i wan || echo PACKAGE_NOT_FOUND
           for i in $(seq 1 40); do curl -s -o /dev/null http://localhost:6080 && echo WEBUI_UP && break || sleep 10; done
-          docker ps
           curl -sL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
           chmod +x cloudflared
           nohup ./cloudflared tunnel --url http://localhost:6080 > tunnel.log 2>&1 &
