@@ -208,13 +208,13 @@ details.about summary{cursor:pointer;color:#374151;font-weight:600}
 .footer-bottom .cp{margin-left:auto}
 
 /* ---------- 右侧浮动联系卡 ---------- */
-.contact-card{position:fixed;right:22px;top:38%;z-index:40;background:#fff;border-radius:16px;box-shadow:0 10px 34px rgba(15,23,42,.14);
+.contact-card{position:fixed;right:22px;bottom:24px;z-index:40;background:#fff;border-radius:16px;box-shadow:0 10px 34px rgba(15,23,42,.14);
   padding:16px;width:172px;text-align:center}
 .contact-card .cc-t{font-size:14px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
 .contact-card .cc-x{border:none;background:none;color:var(--faint);font-size:15px;line-height:1;padding:2px}
 .contact-card img{width:128px;height:128px;object-fit:cover;border-radius:8px}
 .contact-card .cc-c{color:var(--mut);font-size:12.5px;margin-top:9px;line-height:1.6}
-.contact-mini{position:fixed;right:22px;top:38%;z-index:40;background:var(--blue);color:#fff;border:none;border-radius:999px;
+.contact-mini{position:fixed;right:22px;bottom:24px;z-index:40;background:var(--blue);color:#fff;border:none;border-radius:999px;
   padding:10px 16px;font-size:13px;font-weight:700;box-shadow:0 8px 24px rgba(37,99,235,.35);display:none}
 
 /* ---------- 公告弹窗 / 对话框 ---------- */
