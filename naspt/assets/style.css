@@ -257,6 +257,7 @@ details.about summary{cursor:pointer;color:#374151;font-weight:600}
 .acc-url{display:block;word-break:break-all;color:var(--blue);font-size:14px;line-height:1.6;margin-bottom:12px}
 .acc-actions{display:flex;gap:12px;align-items:center;margin-top:8px}
 .acc-actions .btn-primary{padding:10px 22px;font-size:14px;text-decoration:none;display:inline-block}
+.dialog .d-body .acc-actions a.btn-primary{color:#fff}
 .btn-ghost{background:#fff;border:1px solid #d1d5db;color:#374151;font-size:14px;font-weight:600;padding:9px 18px;border-radius:10px;cursor:pointer}
 .acc-tip{font-size:13px;color:#b45309;margin:4px 0 8px}
 .acc-fail{color:#b91c1c;font-size:14px}
