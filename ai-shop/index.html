@@ -196,7 +196,18 @@ function switchTab(shopsView){
 /* 同源店铺弹窗：单一状态源 + 打开/关闭生命周期（遮罩/Esc/焦点还原/inert/减少动态），样式与交互语言对齐 daymark 弹窗规范 */
 const srcOverlay=$('#srcOverlay'), srcSheet=$('#srcSheet'), pageWrap=document.querySelector('.wrap');
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-let srcIsOpen=false, srcOpener=null, srcCloseTimer=0;
+let srcIsOpen=false, srcOpener=null, srcCloseTimer=0, srcHist=false, srcScrollY=0;
+function lockScroll(){
+  srcScrollY=window.scrollY||0;
+  const b=document.body;
+  b.style.overflow='hidden'; b.style.position='fixed'; b.style.top=(-srcScrollY)+'px';
+  b.style.left='0'; b.style.right='0'; b.style.width='100%';
+}
+function unlockScroll(){
+  const b=document.body;
+  b.style.overflow=''; b.style.position=''; b.style.top=''; b.style.left=''; b.style.right=''; b.style.width='';
+  window.scrollTo(0,srcScrollY);
+}
 function openSrc(gi,ii,btn){
   const g=board&&board.groups[gi]; const it=g&&g.items[ii]; if(!it) return;
   const list=(it.sources&&it.sources.length)?it.sources:[{price:it.price,shop:it.shop,platform:it.platform,stock:it.stock,url:it.url}];
@@ -209,26 +220,29 @@ function openSrc(gi,ii,btn){
   note.style.display=extra>0?'':'none';
   clearTimeout(srcCloseTimer);
   srcOpener=btn||document.activeElement;
+  try{ history.pushState({museSrcPopup:1},''); srcHist=true; }catch(e){ srcHist=false; }
   srcOverlay.hidden=false;
   srcOverlay.setAttribute('aria-hidden','false');
   if('inert' in pageWrap) pageWrap.inert=true;
-  document.body.style.overflow='hidden';
+  lockScroll();
   srcSheet.scrollTop=0;
   void srcOverlay.offsetHeight;
   requestAnimationFrame(()=>{ if(srcOverlay.hidden) return; srcOverlay.classList.add('open'); srcIsOpen=true; const c=srcSheet.querySelector('.btn-close'); if(c) c.focus({preventScroll:true}); });
 }
-function closeSrc(){
+function closeSrc(fromPop){
   if(!srcIsOpen) return;
   srcIsOpen=false;
+  if(!fromPop&&srcHist){ srcHist=false; try{ history.back(); }catch(e){} }
   srcOverlay.classList.remove('open');
   srcOverlay.setAttribute('aria-hidden','true');
   if('inert' in pageWrap) pageWrap.inert=false;
-  document.body.style.overflow='';
+  unlockScroll();
   const back=srcOpener; srcOpener=null;
   if(back&&back.isConnected) back.focus({preventScroll:true});
   clearTimeout(srcCloseTimer);
   srcCloseTimer=setTimeout(()=>{ if(!srcIsOpen) srcOverlay.hidden=true; }, reducedMotion?0:440);
 }
+window.addEventListener('popstate',()=>{ if(srcIsOpen){ srcHist=false; closeSrc(true); } });
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-src]');
   if(b&&board){ const p=b.dataset.src.split(':'); openSrc(Number(p[0]),Number(p[1]),b); }
