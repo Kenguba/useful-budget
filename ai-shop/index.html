@@ -71,12 +71,12 @@ h1{font-size:32px;margin:10px 0 6px;font-weight:900}
 
   <section id="viewBoard">
     <div class="leaders" id="leaders"></div>
-    <input class="search" id="q" placeholder="搜商品标题或店名，如 Superheavy、周限、反重力">
+    <input class="search" id="q" placeholder="搜商品标题或店名，支持模糊搜索，如 xai 超市、aicdk">
     <div id="groups"></div>
   </section>
 
   <section id="viewShops" class="hide">
-    <input class="search" id="sq" placeholder="搜店名，如 海海星星AI">
+    <input class="search" id="sq" placeholder="搜店名，支持模糊搜索，如 海海星星、985ai">
     <div class="chips" id="chips"></div>
     <div class="meta" id="shopMeta"></div>
     <div id="shopList"></div>
@@ -96,18 +96,27 @@ function stockTxt(it){
   if(it.stock<=2) return '<span style="color:var(--red);font-weight:700">只剩 '+it.stock+' 个</span>';
   return '库存 '+it.stock;
 }
+function norm(s){return String(s??'').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');}
+function fuzzy(q){
+  const texts=Array.prototype.slice.call(arguments,1).join(' ');
+  const hay=norm(texts);
+  const nq=norm(q);
+  if(!nq) return true;
+  if(hay.includes(nq)) return true;
+  return q.toLowerCase().split(/\s+/).filter(Boolean).every(tok=>{const nt=norm(tok); return !nt||hay.includes(nt);});
+}
 function renderBoard(){
-  const q=$('#q').value.trim().toLowerCase();
+  const q=$('#q').value.trim();
   $('#leaders').innerHTML=board.groups.map(g=>{
     const it=g.items[0];
     return '<div class="leader" data-gid="'+esc(g.id)+'"><div class="g">'+esc(g.name)+'</div>'+(it?'<div class="p">'+fmtP(it.price)+'</div><div class="s">'+esc(it.shop)+'</div>':'<div class="p">—</div>')+'</div>';
   }).join('');
   $('#groups').innerHTML=board.groups.map(g=>{
-    const items=g.items.filter(it=>!q||it.title.toLowerCase().includes(q)||it.shop.toLowerCase().includes(q));
+    const items=g.items.filter(it=>!q||fuzzy(q,it.title,it.shop));
     if(q&&!items.length) return '';
     return '<div class="group" id="grp-'+esc(g.id)+'"><h2>'+esc(g.name)+'</h2><div class="cnt">有货最低 '+(g.items.length)+' 条'+(g.items.length<10?'（不足 10 条，如实显示）':'')+'</div>'+
       items.map(it=>'<div class="row"><div class="price">'+fmtP(it.price)+'<small>'+esc(it.platform)+'</small></div><div class="main"><div class="title"><a href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div><div class="info">'+(it.kind?'<span class="tag">'+esc(it.kind)+'</span>':'')+(it.same_source>1?'<span class="tag grey">同源铺货共 '+it.same_source+' 家</span>':'')+esc(it.shop)+' · '+stockTxt(it)+'</div></div></div>').join('')+'</div>';
-  }).join('')||'<p class="sub">没有匹配的报价。</p>';
+  }).join('')||'<p class="sub">'+(q?'没有匹配的报价。报价单只收录每组最低 10 条，找某家店请切到「店铺目录」搜。':'没有匹配的报价。')+'</p>';
   document.querySelectorAll('.leader').forEach(el=>{
     el.addEventListener('click',()=>{
       const t=document.getElementById('grp-'+el.dataset.gid);
@@ -119,7 +128,7 @@ function renderBoard(){
 }
 function renderShops(){
   const q=$('#sq').value.trim().toLowerCase();
-  const list=shops.shops.filter(s=>(shopFilter==='全部'||s.platform===shopFilter)&&(!q||s.name.toLowerCase().includes(q)));
+  const list=shops.shops.filter(s=>(shopFilter==='全部'||s.platform===shopFilter)&&(!q||fuzzy(q,s.name,s.platform,s.code)));
   $('#shopMeta').textContent='共 '+list.length+' 家（目录快照 '+shops.updated_at+' · 同店多平台/多代码分别列）';
   $('#shopList').innerHTML=list.slice(0,shopShown).map(s=>'<div class="shop">'+(s.url?'':'<span class="only">仅店名</span>')+'<div class="nm">'+(s.url?'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.name)+' ↗</a>':esc(s.name))+'</div><div class="pf">'+esc(s.platform)+(s.code?' · '+esc(s.code):'')+'</div></div>').join('');
   $('#moreBtn').classList.toggle('hide',list.length<=shopShown);
