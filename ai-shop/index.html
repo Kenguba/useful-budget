@@ -72,6 +72,7 @@ h1{font-size:32px;margin:10px 0 6px;font-weight:900}
   <section id="viewBoard">
     <div class="leaders" id="leaders"></div>
     <input class="search" id="q" placeholder="搜商品标题或店名，支持模糊搜索，如 xai 超市、aicdk">
+    <div id="shopMatches"></div>
     <div id="groups"></div>
   </section>
 
@@ -97,26 +98,31 @@ function stockTxt(it){
   return '库存 '+it.stock;
 }
 function norm(s){return String(s??'').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');}
+function subseq(needle,hay){let i=0; for(const ch of hay){if(ch===needle[i]) i++; if(i===needle.length) return true;} return i===needle.length;}
 function fuzzy(q){
   const texts=Array.prototype.slice.call(arguments,1).join(' ');
   const hay=norm(texts);
   const nq=norm(q);
   if(!nq) return true;
   if(hay.includes(nq)) return true;
-  return q.toLowerCase().split(/\s+/).filter(Boolean).every(tok=>{const nt=norm(tok); return !nt||hay.includes(nt);});
+  return q.toLowerCase().split(/\s+/).filter(Boolean).every(tok=>{const nt=norm(tok); return !nt||hay.includes(nt)||(nt.length>=3&&subseq(nt,hay));});
 }
 function renderBoard(){
   const q=$('#q').value.trim();
+  const sm=(q&&shops)?shops.shops.filter(s=>fuzzy(q,s.name,s.platform,s.code)):[];
+  $('#shopMatches').innerHTML=!q?'':'<div class="group"><h2>店铺目录匹配 '+sm.length+' 家</h2><div class="cnt">报价单只收录每组最低 30 条，不在其中的店只在这里和店铺目录出现。</div>'+
+    (sm.length?sm.slice(0,20).map(s=>'<div class="row"><div class="main"><div class="title">'+(s.url?'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.name)+' ↗</a>':esc(s.name))+'</div><div class="info">'+esc(s.platform)+(s.code?' · '+esc(s.code):'')+'</div></div></div>').join(''):'<p class="sub">目录 2691 家里也没有匹配，去「店铺目录」换个关键词再试。</p>')+
+    (sm.length>20?'<p class="sub">只显示前 20 家。</p>':'')+'<p><button class="more" id="gotoShops">在店铺目录查看全部 '+sm.length+' 家匹配 →</button></p></div>';
   $('#leaders').innerHTML=board.groups.map(g=>{
     const it=g.items[0];
     return '<div class="leader" data-gid="'+esc(g.id)+'"><div class="g">'+esc(g.name)+'</div>'+(it?'<div class="p">'+fmtP(it.price)+'</div><div class="s">'+esc(it.shop)+'</div>':'<div class="p">—</div>')+'</div>';
   }).join('');
   $('#groups').innerHTML=board.groups.map(g=>{
-    const items=g.items.filter(it=>!q||fuzzy(q,it.title,it.shop));
+    const items=g.items.filter(it=>!q||fuzzy(q,it.title,it.shop,it.platform));
     if(q&&!items.length) return '';
-    return '<div class="group" id="grp-'+esc(g.id)+'"><h2>'+esc(g.name)+'</h2><div class="cnt">有货最低 '+(g.items.length)+' 条'+(g.items.length<10?'（不足 10 条，如实显示）':'')+'</div>'+
+    return '<div class="group" id="grp-'+esc(g.id)+'"><h2>'+esc(g.name)+'</h2><div class="cnt">有货最低 '+(g.items.length)+' 条'+(g.items.length<30?'（不足 30 条，如实显示）':'')+'</div>'+
       items.map(it=>'<div class="row"><div class="price">'+fmtP(it.price)+'<small>'+esc(it.platform)+'</small></div><div class="main"><div class="title"><a href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div><div class="info">'+(it.kind?'<span class="tag">'+esc(it.kind)+'</span>':'')+(it.same_source>1?'<span class="tag grey">同源铺货共 '+it.same_source+' 家</span>':'')+esc(it.shop)+' · '+stockTxt(it)+'</div></div></div>').join('')+'</div>';
-  }).join('')||'<p class="sub">'+(q?'没有匹配的报价。报价单只收录每组最低 10 条，找某家店请切到「店铺目录」搜。':'没有匹配的报价。')+'</p>';
+  }).join('')||'<p class="sub">'+(q?'没有匹配的报价。报价单只收录每组最低 30 条，找某家店请切到「店铺目录」搜。':'没有匹配的报价。')+'</p>';
   document.querySelectorAll('.leader').forEach(el=>{
     el.addEventListener('click',()=>{
       const t=document.getElementById('grp-'+el.dataset.gid);
@@ -125,6 +131,8 @@ function renderBoard(){
       t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
     });
   });
+  const go=$('#gotoShops');
+  if(go) go.onclick=()=>{ $('#sq').value=$('#q').value; shopShown=300; switchTab(true); renderShops(); };
 }
 function renderShops(){
   const q=$('#sq').value.trim().toLowerCase();
@@ -134,6 +142,7 @@ function renderShops(){
   $('#moreBtn').classList.toggle('hide',list.length<=shopShown);
 }
 function switchTab(shopsView){
+  if(shopsView&&!$('#sq').value.trim()&&$('#q').value.trim()) $('#sq').value=$('#q').value;
   $('#tabBoard').classList.toggle('on',!shopsView);
   $('#tabShops').classList.toggle('on',shopsView);
   $('#viewBoard').classList.toggle('hide',shopsView);
