@@ -1,0 +1,40 @@
+# backend/ — 后端服务源码留档
+
+这里放的是 Cloudflare Workers 的**源码留档副本**（`.js.back` 后缀，表示后端代码的备份留档，不会被当作普通 js 执行）。
+
+- **真身在 Cloudflare 控制台**：每个 Worker 的代码直接写在 CF 的 Worker 配置里（在线编辑器 → Deploy 生效），本目录的副本不参与运行。
+- **本目录的用途**：在前端仓库这边就能快速查看后端代码；迁移时直接取用，不用去控制台翻。
+- **同步规则**：线上代码有任何改动 → 先在 Cloudflare 部署 → 再把源码同步回这里对应的 `.js.back`，保持两边一致。
+
+## 清单
+
+| 留档文件 | 对应 Worker | 域名 | 作用 | 留档对应版本 |
+| --- | --- | --- | --- | --- |
+| `backend-proxy.js.back` | `backend-proxy` | `api.xxxxx.asia` | 盘搜站的后端中转：给原站公开接口加跨域头、边缘缓存、搜索流与资源链接转发 | 8b6f1e92 |
+| `site-router.js.back` | `site-router` | `*.xxxxx.asia`（通配） | 按子域名前缀分发四个项目到 GitHub Pages 对应目录；pan 的接口请求同域转发给后端 | 17d3f1b8 |
+| `jpcard.js.back` | `jpcard` | `img.xxxxx.asia` | 日语教学图库供图：图片存 GitHub 三个仓库，三路容灾取图（jsDelivr → GitHub Raw → 镜像），边缘缓存 30 天 | 8737b21b |
+
+另外：旧中转 `naspt-proxy` 已无域名绑定，保留在账号里当备用，没有留档（代码与 backend-proxy 相同）。
+
+子域名与项目的对照（skill / ai / phone / pan）见仓库根 `README.md` 的「子域名」一节。
+
+## 迁移清单（换账号/换域名时照这个顺序配）
+
+1. **建 Worker**：在 Cloudflare 新建三个 Worker，分别把三份 `.js.back` 的代码贴入并 Deploy（贴的时候去掉文件头那段留档说明注释也行，不影响运行）。
+2. **配 DNS**（域名在 Cloudflare 托管）：
+   - 通配：`*` AAAA `100::`，代理开启；
+   - `api`、`img` 的解析随第 3 步的自定义域绑定自动生成，不用手填。
+3. **配绑定与路由**（顺序别错）：
+   - `backend-proxy` 绑自定义域 `api.xxxxx.asia`，另加精确路由 `api.xxxxx.asia/*`；
+   - `jpcard` 绑自定义域 `img.xxxxx.asia`，另加精确路由 `img.xxxxx.asia/*`；
+   - `site-router` 绑通配路由 `*.xxxxx.asia/*`。
+4. **逐项验证**：四个项目子域名首页、`pan` 首页与它的 `/api/public/hot-searches?limit=1`、`api` 的同一接口、`img` 根路径应返回 `JP-EDU Image Server is Active.`。
+
+### 为什么 api / img 必须另加精确路由（2026-11-02 的教训）
+
+通配路由 `*.xxxxx.asia/*` 会**盖掉**同域名下 Worker 自定义域的请求（自定义域不参与路由优先级排序）。只绑自定义域、不补精确路由时，api / img 会被 site-router 截走回 404。精确路由（写死完整主机名）优先级高于通配路由，补上后各归其位。规则一句话：**越具体，优先级越高。**
+
+## 约定
+
+- 本仓库公开，文档与注释里的真实域名一律打码写作 `xxxxx.asia`（如 `api.xxxxx.asia`）；功能代码里必须出现的真实地址不打码（打码即断站）。
+- 加新项目子域名：只改 site-router 代码里 `ROUTES` 表加一行并重新 Deploy，不用再动 DNS 和路由。
