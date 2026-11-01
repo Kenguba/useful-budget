@@ -6,7 +6,8 @@
 <title>AI账号商铺 · AI 账号比价与店铺目录</title>
 <meta name="description" content="AI 账号全网比价：GPT 日抛/周限、Antigravity 反重力、Codex 接码、Grok Heavy 有货最低价 + 2700 家店铺目录，每 12 小时自动刷新">
 <style>
-:root{--ink:#12233d;--blue:#1c4f9c;--gold:#f2b705;--bg:#f6f3ec;--card:#fff;--mut:#5b6b82;--line:#e5e0d2;--red:#c0392b}
+:root{--ink:#12233d;--blue:#1c4f9c;--gold:#f2b705;--bg:#f6f3ec;--card:#fff;--mut:#5b6b82;--line:#e5e0d2;--red:#c0392b;--ease:cubic-bezier(.2,.7,.2,1)}
+[hidden]{display:none!important}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
 .wrap{max-width:880px;margin:0 auto;padding:24px 14px 60px}
@@ -56,6 +57,36 @@ h1{font-size:32px;margin:10px 0 6px;font-weight:900}
 .more{width:100%;padding:12px;border:1.5px solid var(--line);background:var(--card);border-radius:10px;font-size:14px;cursor:pointer;color:var(--ink)}
 .foot{margin-top:26px;color:var(--mut);font-size:12px;line-height:1.7}
 .hide{display:none}
+button.tag{border:0;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.srcbtn{transition:background .2s,transform .15s}
+.srcbtn:hover{background:#eae3cf}
+.srcbtn:active{transform:scale(.96)}
+.srcbtn::after{content:"›";margin-left:3px;font-weight:900}
+.overlay{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;padding:0 12px calc(12px + env(safe-area-inset-bottom));visibility:hidden;opacity:0;transition:opacity .4s var(--ease),visibility .4s}
+.overlay.open{opacity:1;visibility:visible}
+.shade{position:absolute;inset:0;border:0;background:rgba(12,10,6,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);cursor:pointer}
+.sheet{position:relative;z-index:2;width:min(580px,100%);max-height:min(78vh,720px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;background:var(--card);border:1.5px solid var(--line);border-radius:26px;padding:20px 19px calc(16px + env(safe-area-inset-bottom));box-shadow:0 18px 40px rgba(18,35,61,.28);opacity:0;transform:translateY(60px) scale(.98);transition:transform .5s var(--ease),opacity .4s var(--ease)}
+.sheet::-webkit-scrollbar{display:none}
+.overlay.open .sheet{opacity:1;transform:translateY(0) scale(1)}
+.grab{width:39px;height:4px;border-radius:10px;background:#d8d2cb;margin:-6px auto 14px}
+.s-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.s-head strong{display:block;font-size:15px;font-weight:800;line-height:1.45}
+.s-head small{display:block;font-size:11px;color:var(--mut);margin-top:4px;line-height:1.5}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;padding:6px 10px;border-radius:99px;white-space:nowrap;background:var(--ink);color:#fff;flex:none}
+.src-list{margin-top:12px;border-top:1px solid var(--line)}
+.src-row{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);opacity:0;transform:translateY(8px);transition:opacity .35s var(--ease),transform .35s var(--ease);transition-delay:calc(var(--i)*30ms)}
+.overlay.open .src-row{opacity:1;transform:none}
+.src-row:active{background:#faf7ee}
+.src-row .sp{font-size:16px;font-weight:900;color:var(--blue);min-width:66px}
+.src-row .sm2{flex:1;min-width:0}
+.src-row .sn{display:block;font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.src-row .si{display:block;font-size:11px;color:var(--mut);margin-top:1px}
+.src-row .go{color:var(--mut);font-size:16px;flex:none}
+.lowtag{font-size:10px;font-weight:800;color:#8a6100;background:#fdf0c2;border-radius:99px;padding:2px 7px;margin-left:6px;vertical-align:1px}
+.src-note{font-size:11.5px;color:var(--mut);line-height:1.6;margin:12px 0 0}
+.btn-close{width:100%;border:0;border-radius:13px;padding:13px 10px;font-weight:700;font-size:14px;background:var(--ink);color:#fff;cursor:pointer;margin-top:14px;font-family:inherit}
+@media(min-width:640px){.overlay{align-items:center;padding-bottom:12px}}
+@media(prefers-reduced-motion:reduce){.overlay,.sheet,.src-row{transition-duration:.01ms!important;transition-delay:0ms!important}}
 </style>
 </head>
 <body>
@@ -84,7 +115,17 @@ h1{font-size:32px;margin:10px 0 6px;font-weight:900}
     <button class="more hide" id="moreBtn">显示更多</button>
   </section>
 
-  <p class="foot">数据每 12 小时由 GitHub Actions 跑 scripts/refresh.py 自动刷新：遍历每家商家的全量商品库（AI价网 2052 家 + cardnav 966 家），按标题规则分入 7 组，再叠加 PriceAI 最低价段。只列有货；同标题铺货已合并为一家并标注家数。价格库存为聚合站最近一次遍历商家的快照，下单前以商品页实时状态为准。<br>托管于 GitHub Pages · 仓库 Kenguba/useful-budget</p>
+  <p class="foot">数据每 12 小时由 GitHub Actions 跑 scripts/refresh.py 自动刷新：遍历每家商家的全量商品库（AI价网 2052 家 + cardnav 966 家），按标题规则分入 7 组，再叠加 PriceAI 最低价段。只列有货；同标题铺货已合并为一家并标注家数，点「同源铺货共 N 家」可弹窗查看全部同源店铺（按价排列，点任意一家直达商品页）。价格库存为聚合站最近一次遍历商家的快照，下单前以商品页实时状态为准。<br>托管于 GitHub Pages · 仓库 Kenguba/useful-budget</p>
+</div>
+<div class="overlay" id="srcOverlay" hidden aria-hidden="true">
+  <button class="shade" type="button" data-close aria-label="关闭同源店铺弹窗"></button>
+  <section class="sheet" id="srcSheet" role="dialog" aria-modal="true" aria-label="同源店铺">
+    <div class="grab" aria-hidden="true"></div>
+    <div class="s-head"><div><strong id="srcTitle"></strong><small>同源铺货 · 按价格从低到高 · 点任意一家直达它的商品页</small></div><span class="pill" id="srcPill"></span></div>
+    <div class="src-list" id="srcList"></div>
+    <p class="src-note" id="srcNote"></p>
+    <button class="btn-close" type="button" data-close>关闭</button>
+  </section>
 </div>
 <script>
 const $=s=>document.querySelector(s);
@@ -117,11 +158,15 @@ function renderBoard(){
     const it=g.items[0];
     return '<div class="leader" data-gid="'+esc(g.id)+'"><div class="g">'+esc(g.name)+'</div>'+(it?'<div class="p">'+fmtP(it.price)+'</div><div class="s">'+esc(it.shop)+'</div>':'<div class="p">—</div>')+'</div>';
   }).join('');
-  $('#groups').innerHTML=board.groups.map(g=>{
-    const items=g.items.filter(it=>!q||fuzzy(q,it.title,it.shop,it.platform));
-    if(q&&!items.length) return '';
-    return '<div class="group" id="grp-'+esc(g.id)+'"><h2>'+esc(g.name)+'</h2><div class="cnt">有货最低 '+(g.items.length)+' 条'+(g.items.length<30?'（不足 30 条，如实显示）':'')+'</div>'+
-      items.map(it=>'<div class="row"><div class="price">'+fmtP(it.price)+'<small>'+esc(it.platform)+'</small></div><div class="main"><div class="title"><a href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div><div class="info">'+(it.kind?'<span class="tag">'+esc(it.kind)+'</span>':'')+(it.same_source>1?'<span class="tag grey">同源铺货共 '+it.same_source+' 家</span>':'')+esc(it.shop)+' · '+stockTxt(it)+'</div></div></div>').join('')+'</div>';
+  $('#groups').innerHTML=board.groups.map((g,gi)=>{
+    let shown=0;
+    const rows=g.items.map((it,ii)=>{
+        if(q&&!fuzzy(q,it.title,it.shop,it.platform)) return '';
+        shown++;
+        return '<div class="row"><div class="price">'+fmtP(it.price)+'<small>'+esc(it.platform)+'</small></div><div class="main"><div class="title"><a href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div><div class="info">'+(it.kind?'<span class="tag">'+esc(it.kind)+'</span>':'')+(it.same_source>1?'<button type="button" class="tag grey srcbtn" data-src="'+gi+':'+ii+'" aria-haspopup="dialog">同源铺货共 '+it.same_source+' 家</button>':'')+esc(it.shop)+' · '+stockTxt(it)+'</div></div></div>';
+      }).join('');
+    if(q&&!shown) return '';
+    return '<div class="group" id="grp-'+esc(g.id)+'"><h2>'+esc(g.name)+'</h2><div class="cnt">有货最低 '+g.items.length+' 条'+(g.items.length<30?'（不足 30 条，如实显示）':'')+'</div>'+rows+'</div>';
   }).join('')||'<p class="sub">'+(q?'没有匹配的报价。报价单只收录每组最低 30 条，找某家店请切到「店铺目录」搜。':'没有匹配的报价。')+'</p>';
   document.querySelectorAll('.leader').forEach(el=>{
     el.addEventListener('click',()=>{
@@ -148,6 +193,57 @@ function switchTab(shopsView){
   $('#viewBoard').classList.toggle('hide',shopsView);
   $('#viewShops').classList.toggle('hide',!shopsView);
 }
+/* 同源店铺弹窗：单一状态源 + 打开/关闭生命周期（遮罩/Esc/焦点还原/inert/减少动态），样式与交互语言对齐 daymark 弹窗规范 */
+const srcOverlay=$('#srcOverlay'), srcSheet=$('#srcSheet'), pageWrap=document.querySelector('.wrap');
+const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let srcIsOpen=false, srcOpener=null, srcCloseTimer=0;
+function openSrc(gi,ii,btn){
+  const g=board&&board.groups[gi]; const it=g&&g.items[ii]; if(!it) return;
+  const list=(it.sources&&it.sources.length)?it.sources:[{price:it.price,shop:it.shop,platform:it.platform,stock:it.stock,url:it.url}];
+  $('#srcTitle').textContent=it.title;
+  $('#srcPill').textContent='共 '+it.same_source+' 家';
+  $('#srcList').innerHTML=list.map((s,i)=>'<a class="src-row" style="--i:'+Math.min(i,12)+'" href="'+esc(s.url)+'" target="_blank" rel="noopener"><span class="sp">'+fmtP(s.price)+'</span><span class="sm2"><span class="sn">'+esc(s.shop)+(i===0?'<span class="lowtag">最低价</span>':'')+'</span><span class="si">'+esc(s.platform||'')+' · '+stockTxt(s)+'</span></span><span class="go">›</span></a>').join('');
+  const extra=it.same_source-list.length;
+  const note=$('#srcNote');
+  note.textContent=extra>0?('已列出 '+list.length+' 家有独立商品链接的；其余 '+extra+' 家是聚合站的同源合并计数，没有单独链接。'):'';
+  note.style.display=extra>0?'':'none';
+  clearTimeout(srcCloseTimer);
+  srcOpener=btn||document.activeElement;
+  srcOverlay.hidden=false;
+  srcOverlay.setAttribute('aria-hidden','false');
+  if('inert' in pageWrap) pageWrap.inert=true;
+  document.body.style.overflow='hidden';
+  srcSheet.scrollTop=0;
+  void srcOverlay.offsetHeight;
+  requestAnimationFrame(()=>{ if(srcOverlay.hidden) return; srcOverlay.classList.add('open'); srcIsOpen=true; const c=srcSheet.querySelector('.btn-close'); if(c) c.focus({preventScroll:true}); });
+}
+function closeSrc(){
+  if(!srcIsOpen) return;
+  srcIsOpen=false;
+  srcOverlay.classList.remove('open');
+  srcOverlay.setAttribute('aria-hidden','true');
+  if('inert' in pageWrap) pageWrap.inert=false;
+  document.body.style.overflow='';
+  const back=srcOpener; srcOpener=null;
+  if(back&&back.isConnected) back.focus({preventScroll:true});
+  clearTimeout(srcCloseTimer);
+  srcCloseTimer=setTimeout(()=>{ if(!srcIsOpen) srcOverlay.hidden=true; }, reducedMotion?0:440);
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-src]');
+  if(b&&board){ const p=b.dataset.src.split(':'); openSrc(Number(p[0]),Number(p[1]),b); }
+});
+srcOverlay.addEventListener('click',e=>{ if(e.target.closest('[data-close]')) closeSrc(); });
+document.addEventListener('keydown',e=>{
+  if(!srcIsOpen) return;
+  if(e.key==='Escape'){ e.preventDefault(); closeSrc(); return; }
+  if(e.key!=='Tab') return;
+  const f=[...srcSheet.querySelectorAll('a[href],button:not([disabled])')].filter(n=>n.getClientRects().length);
+  if(!f.length){ e.preventDefault(); return; }
+  const first=f[0], last=f[f.length-1];
+  if(e.shiftKey&&document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey&&document.activeElement===last){ e.preventDefault(); first.focus(); }
+});
 $('#tabBoard').onclick=()=>switchTab(false);
 $('#tabShops').onclick=()=>switchTab(true);
 $('#q').oninput=renderBoard;
