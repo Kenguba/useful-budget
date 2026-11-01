@@ -5,7 +5,7 @@
 - AI价网全量商家商品库 aiprice.club/api/shop-products.json（2052 家店、每店全部分类与全部商品）
 - cardnav 同格式全量库 cardnav.xyz/api/shop-products.json（966 家店）
 两库按商品链接去重合并；再用 PriceAI 商品页（按价升序前 12 条）补最低价段。
-随后按固定 7 分组（ken 2026-10-31 拍板）用标题规则分类，取有货最低 10 条，
+随后按固定 7 分组（ken 2026-10-31 拍板）用标题规则分类，取有货最低 30 条，
 同标题铺货合并只取最低。链接均为商品详情页。
 店铺目录由 data/shops.csv 转 data/shops.json。
 
@@ -218,7 +218,7 @@ def norm_title(t):
     t = re.sub(r'[\s【】\[\]（）()·|｜/\\,，。、:：;；!！?？\-—_~`\'"“”‘’*#@]+', '', t)
     return t
 
-def top10(rows, kind):
+def top30(rows, kind):
     merged = {}
     for o in rows:
         if o['price'] is None or o['price'] <= 0:
@@ -234,7 +234,7 @@ def top10(rows, kind):
             if o['price'] < cur['price']:
                 keep = cur['same_source']
                 merged[k] = dict(o, same_source=keep)
-    out = sorted(merged.values(), key=lambda x: x['price'])[:10]
+    out = sorted(merged.values(), key=lambda x: x['price'])[:30]
     for o in out:
         o['kind'] = kind(o['title']) if kind else ''
     return out
@@ -277,13 +277,13 @@ def main():
     g7 = grok_group(rows) + [o for o in pai if grok_marker(o['title']) and has(o['title'], 'Heavy', 'HEAVY', 'Ultra', 'ULTRA') and not has(o['title'], '号池', '额度', '速刷')]
 
     groups = [
-        dict(id='gpt-unbound', name='GPT 日抛/Plus 成品号 — 未接马', items=slim(top10(g1, None))),
-        dict(id='gpt-bound', name='GPT 日抛/Plus 成品号 — 已接马', items=slim(top10(g2, None))),
-        dict(id='gpt-weekly', name='GPT 周限号', items=slim(top10(g3, lambda t: '已接马' if is_bound(t) else ('未接马' if has(t, '未接马', '未绑定') else '未注明')))),
-        dict(id='ag-cheapest', name='Antigravity 反重力 — 最便宜', items=slim(top10(g4, ag_type))),
-        dict(id='ag-verified', name='Antigravity 反重力 — 已过验证成品号', items=slim(top10(g5, ag_type))),
-        dict(id='codex-sms', name='Codex 接码 — 单次', items=slim(top10(g6, None))),
-        dict(id='grok-heavy', name='Grok Heavy（SuperGrok Heavy/Ultra）', items=slim(top10(g7, lambda t: '代充' if has(t, '代充', '直充') else '成品号'))),
+        dict(id='gpt-unbound', name='GPT 日抛/Plus 成品号 — 未接马', items=slim(top30(g1, None))),
+        dict(id='gpt-bound', name='GPT 日抛/Plus 成品号 — 已接马', items=slim(top30(g2, None))),
+        dict(id='gpt-weekly', name='GPT 周限号', items=slim(top30(g3, lambda t: '已接马' if is_bound(t) else ('未接马' if has(t, '未接马', '未绑定') else '未注明')))),
+        dict(id='ag-cheapest', name='Antigravity 反重力 — 最便宜', items=slim(top30(g4, ag_type))),
+        dict(id='ag-verified', name='Antigravity 反重力 — 已过验证成品号', items=slim(top30(g5, ag_type))),
+        dict(id='codex-sms', name='Codex 接码 — 单次', items=slim(top30(g6, None))),
+        dict(id='grok-heavy', name='Grok Heavy（SuperGrok Heavy/Ultra）', items=slim(top30(g7, lambda t: '代充' if has(t, '代充', '直充') else '成品号'))),
     ]
     from datetime import datetime, timezone, timedelta
     bj_now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M')
