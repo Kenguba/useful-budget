@@ -357,9 +357,13 @@
 
   /* ---------------- 搜索栏 ---------------- */
   function searchbarHtml(prefill) {
-    return '<form class="searchbar" id="searchForm"><div class="pan-select">' +
-      '<button type="button" class="pan-btn" id="panBtn"><span id="panLabel">全部网盘</span><span class="car">∨</span></button>' +
-      '<div class="pan-menu" id="panMenu"></div></div>' +
+    return '<form class="searchbar" id="searchForm"><div class="pan-select" id="panSelect">' +
+      '<button type="button" class="pan-btn" id="panBtn" aria-haspopup="true" aria-expanded="false">' +
+      '<span id="panLabel">全部网盘</span>' +
+      '<svg class="car" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true">' +
+      '<path d="M1 1L5 5L9 1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg></button>' +
+      '<div class="pan-menu" id="panMenu" role="menu"></div></div>' +
       '<input id="searchInput" placeholder="搜索你想找的资源" value="' + esc(prefill || "") + '" autocomplete="off">' +
       '<button class="btn-search" id="searchBtn" type="submit">搜索</button></form>';
   }
@@ -367,16 +371,72 @@
     var form = document.getElementById("searchForm");
     if (!form) return;
     var input = document.getElementById("searchInput");
+    var sel = document.getElementById("panSelect");
+    var btn = document.getElementById("panBtn");
     var menu = document.getElementById("panMenu");
     var label = document.getElementById("panLabel");
     var providers = [{ n: "全部网盘", id: "" }, { n: "迅雷", id: "xunlei" }, { n: "磁力", id: "magnet" }];
-    var curPan = "";
-    menu.innerHTML = providers.map(function (p) { return '<button type="button" data-id="' + p.id + '">' + p.n + "</button>"; }).join("");
-    document.getElementById("panBtn").onclick = function (e) { e.stopPropagation(); menu.classList.toggle("open"); };
-    document.addEventListener("click", function () { menu.classList.remove("open"); });
-    Array.prototype.forEach.call(menu.querySelectorAll("button"), function (b) {
-      b.onclick = function () { label.textContent = b.textContent; curPan = b.dataset.id; menu.classList.remove("open"); };
+    var urlProv = new URLSearchParams(location.search).get("provider") || "";
+    var curPan = providers.some(function (p) { return p.id === urlProv; }) ? urlProv : "";
+    var curItem = providers.filter(function (p) { return p.id === curPan; })[0] || providers[0];
+    if (label) label.textContent = curItem.n;
+
+    var chkSvg = '<svg class="pan-chk" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">' +
+      '<path d="M2 6.2L4.8 9L10 3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg>';
+
+    function renderMenu() {
+      if (!menu) return;
+      menu.innerHTML = providers.map(function (p) {
+        var act = p.id === curPan ? " active" : "";
+        return '<button type="button" class="pan-item' + act + '" data-id="' + p.id + '" role="menuitem">' +
+          '<span>' + esc(p.n) + '</span>' + chkSvg + "</button>";
+      }).join("");
+      Array.prototype.forEach.call(menu.querySelectorAll("button"), function (b) {
+        b.onclick = function (e) {
+          e.stopPropagation();
+          curPan = b.dataset.id;
+          var match = providers.filter(function (p) { return p.id === curPan; })[0];
+          if (label && match) label.textContent = match.n;
+          closeMenu();
+          renderMenu();
+        };
+      });
+    }
+
+    function openMenu() {
+      if (!sel) return;
+      sel.classList.add("open");
+      if (btn) btn.setAttribute("aria-expanded", "true");
+    }
+    function closeMenu() {
+      if (!sel) return;
+      sel.classList.remove("open");
+      if (btn) btn.setAttribute("aria-expanded", "false");
+    }
+
+    if (btn) {
+      btn.onclick = function (e) {
+        e.stopPropagation();
+        if (sel && sel.classList.contains("open")) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+      };
+    }
+    document.addEventListener("click", function (e) {
+      if (sel && !sel.contains(e.target)) closeMenu();
     });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && sel && sel.classList.contains("open")) {
+        closeMenu();
+        if (btn) btn.focus();
+      }
+    });
+
+    renderMenu();
+
     form.onsubmit = function (e) {
       e.preventDefault();
       var q = input.value.trim();
