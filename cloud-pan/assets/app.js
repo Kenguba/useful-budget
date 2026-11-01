@@ -185,27 +185,48 @@
       '<header class="topbar"><div class="topbar-in">' +
       '<a class="logo" href="' + BASE + 'index.html">' + logoGrid() + esc(name) + "</a>" +
       topSearch +
-      '<nav class="nav">' + navHtml +
-      '<button class="btn-app" onclick="location.href=\'' + BASE + "app/'\">APP</button>" +
+      '<nav class="nav" id="topNav">' + navHtml +
+      '<div class="caterpillar-bar" id="caterpillarBar"></div>' +
+      '<button class="btn-app' + (active === "app" ? " on" : "") + '" onclick="location.href=\'' + BASE + "app/'\">APP</button>" +
       '<button class="btn-ask" id="btnAsk">求片</button>' +
       "</nav></div></header>";
-    var friends = (site.friend_links || []).filter(function (f) { return f.enabled !== false; });
-    var friendHtml = friends.map(function (f) {
-      return '友情链接：<a href="' + esc(f.url) + '" target="_blank" rel="noopener">' + esc(f.name) + "</a>";
-    }).join("<br>");
-    var year = content.copyright_year || 2026;
-    var footer =
-      '<footer class="footer"><div class="footer-in"><div class="footer-top">' +
-      '<div><div class="flogo">' + logoGrid() + esc(name) + "</div>" +
-      '<div class="ftitle">' + esc((site.site && site.site.introduction) || "") + "</div></div>" +
-      '<div class="footer-right">' + friendHtml +
-      "<div>本站提供资源检索与分享导航，资源来自公开网络。</div></div></div>" +
-      '<div class="footer-bottom"><a href="' + BASE + 'today/">每日更新</a>' +
-      '<a href="' + BASE + 'friend-links/apply/">申请友情链接</a>' +
-      '<span class="cp">© ' + year + " " + esc(name) + "</span></div>" +
-      "</div></footer>";
     document.body.insertAdjacentHTML("afterbegin", header);
-    document.body.insertAdjacentHTML("beforeend", footer);
+    function initCaterpillar() {
+      var navEl = document.getElementById("topNav");
+      if (!navEl) return;
+      var bar = document.getElementById("caterpillarBar");
+      var links = navEl.querySelectorAll("a");
+      var activeLink = navEl.querySelector("a.on") || links[0];
+      function setBar(el, animate) {
+        if (!el || !bar) return;
+        var r = el.getBoundingClientRect(), nr = navEl.getBoundingClientRect();
+        var left = r.left - nr.left + 8;
+        var width = Math.max(20, r.width - 16);
+        if (!animate) {
+          bar.style.transition = "none";
+          bar.style.left = left + "px";
+          bar.style.width = width + "px";
+          bar.offsetHeight;
+          bar.style.transition = "";
+          return;
+        }
+        var curL = parseFloat(bar.style.left) || left;
+        var curW = parseFloat(bar.style.width) || width;
+        if (left > curL) {
+          bar.style.transition = "width .2s cubic-bezier(.2,1,.3,1), left .35s cubic-bezier(.25,1,.5,1)";
+          bar.style.width = (left - curL + width) + "px";
+          setTimeout(function () { bar.style.left = left + "px"; bar.style.width = width + "px"; }, 110);
+        } else {
+          bar.style.transition = "left .2s cubic-bezier(.2,1,.3,1), width .35s cubic-bezier(.25,1,.5,1)";
+          bar.style.left = left + "px";
+          bar.style.width = (curL - left + curW) + "px";
+          setTimeout(function () { bar.style.width = width + "px"; }, 110);
+        }
+      }
+      setBar(activeLink, false);
+      window.addEventListener("resize", function () { setBar(navEl.querySelector("a.on"), false); });
+    }
+    initCaterpillar();
     var tsForm = document.getElementById("topSearch");
     if (tsForm) tsForm.onsubmit = function (e) {
       e.preventDefault();
@@ -213,22 +234,44 @@
       if (q) location.href = BASE + "search/?q=" + encodeURIComponent(q);
     };
 
-    // 右侧联系卡
+    // 右侧联系卡（默认竖排可拖拽按钮，点击展开图1）
     if (pres.contact_image) {
       var cc =
-        '<div class="contact-card" id="contactCard"><div class="cc-t"><span>保持联系</span>' +
+        '<div class="contact-card" id="contactCard" style="display:none"><div class="cc-t"><span>保持联系</span>' +
         '<button class="cc-x" id="ccClose">✕</button></div>' +
         '<img src="' + esc(pres.contact_image) + '" alt="二维码">' +
         '<div class="cc-c">' + esc(pres.contact_caption || "扫码加入交流群") + "<br>点击放大查看</div></div>" +
         '<button class="contact-mini" id="contactMini">保持联系</button>';
       document.body.insertAdjacentHTML("beforeend", cc);
-      document.getElementById("ccClose").onclick = function () {
-        document.getElementById("contactCard").style.display = "none";
-        document.getElementById("contactMini").style.display = "block";
+      var mini = document.getElementById("contactMini"), card = document.getElementById("contactCard");
+      var sx, sy, sl, st, moved;
+      mini.onpointerdown = function (e) {
+        sx = e.clientX; sy = e.clientY;
+        var r = mini.getBoundingClientRect();
+        sl = r.left; st = r.top; moved = false;
+        try { mini.setPointerCapture(e.pointerId); } catch (_) {}
+        function onMove(ev) {
+          var dx = ev.clientX - sx, dy = ev.clientY - sy;
+          if (!moved && Math.hypot(dx, dy) > 4) moved = true;
+          if (moved) {
+            mini.style.left = Math.max(0, Math.min(window.innerWidth - mini.offsetWidth, sl + dx)) + "px";
+            mini.style.top = Math.max(0, Math.min(window.innerHeight - mini.offsetHeight, st + dy)) + "px";
+            mini.style.right = "auto"; mini.style.bottom = "auto";
+          }
+        }
+        function onUp(ev) {
+          try { mini.releasePointerCapture(ev.pointerId); } catch (_) {}
+          window.removeEventListener("pointermove", onMove);
+          window.removeEventListener("pointerup", onUp);
+          window.removeEventListener("pointercancel", onUp);
+          if (!moved) { card.style.display = "block"; mini.style.display = "none"; }
+        }
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp);
+        window.addEventListener("pointercancel", onUp);
       };
-      document.getElementById("contactMini").onclick = function () {
-        document.getElementById("contactCard").style.display = "block";
-        this.style.display = "none";
+      document.getElementById("ccClose").onclick = function () {
+        card.style.display = "none"; mini.style.display = "block";
       };
       document.querySelector("#contactCard img").onclick = function () { window.open(pres.contact_image, "_blank"); };
     }
@@ -398,7 +441,7 @@
       return '<a href="' + BASE + "search/?q=" + encodeURIComponent(h.query) + '">' + esc(h.query) + "</a>";
     }).join("");
     var html =
-      '<section class="hero"><h1>好内容，<span class="b">一搜就有。</span></h1>' +
+      '<section class="hero"><h1>好内容，<span class="b">一搜就有</span></h1>' +
       '<p class="sub">' + esc(pres.hero_subtitle || "夸克网盘搜索") + "</p>" +
       searchbarHtml("") +
       '<div class="hotline"><span class="lbl">大家都在搜</span>' + hotTop + "</div></section>";
@@ -464,8 +507,7 @@
       updLine = '<div style="color:var(--faint);font-size:13px;margin-top:14px">更新于 ' + bj + " 00:00</div>";
     }
     main.innerHTML =
-      '<div class="page-head page-head-flex"><div><h1>发现</h1><div class="desc">近期值得关注的影视作品。</div></div>' +
-      '<a class="back" href="' + BASE + 'index.html">返回首页 →</a></div>' +
+      '<div class="page-head"><h1>发现</h1><div class="desc">近期值得关注的影视作品。</div></div>' +
       '<div class="card" style="padding:24px 26px;margin-top:14px">' +
       '<div class="filters">' +
       '<div class="frow"><span class="fl">影视分类</span><span id="dCat"></span></div>' +
@@ -597,8 +639,7 @@
         '<span class="hot-count">' + cnt + "</span></div>";
     }).join("");
     main.innerHTML =
-      '<div class="page-head page-head-flex"><div><h1>热搜榜</h1><div class="desc">查看站内用户最近搜索最多的内容。</div></div>' +
-      '<a class="back" href="' + BASE + 'index.html">返回首页 →</a></div>' +
+      '<div class="page-head"><h1>热搜榜</h1><div class="desc">查看站内用户最近搜索最多的内容。</div></div>' +
       '<div class="card" style="margin-top:14px"><div class="hot-grid">' + cells + "</div></div>";
   }
 
@@ -716,6 +757,14 @@
         b.onclick = function () {
           var it = byId[b.getAttribute("data-acc")];
           if (it) openAccess({ id: it.id, provider: it.provider, mine: it.mine, title: dispText(it) });
+        };
+      });
+      Array.prototype.forEach.call(box.querySelectorAll(".res-row"), function (row) {
+        row.style.cursor = "pointer";
+        row.onclick = function (e) {
+          if (e.target.closest("button, a")) return;
+          var btn = row.querySelector("[data-acc], a.btn-pan");
+          if (btn) btn.click();
         };
       });
     }
