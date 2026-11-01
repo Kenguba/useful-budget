@@ -5,7 +5,7 @@
   var ORIGIN = "https://naspt.vip";
   /* 实时数据中转（Cloudflare Worker）：页面 -> Worker -> 原站公开接口。
      RELAY 未配置或请求失败时，自动回退到 data/ 快照。 */
-  var RELAY = "https://naspt-proxy.l69itjrdmpi1aa.workers.dev";
+  var RELAY = "https://api.jpedu.asia";
   function relayReady() { return RELAY && RELAY.indexOf("example.workers.dev") < 0; }
   function apiGet(path) {
     return fetch(RELAY + "/api/public" + path).then(function (r) {
