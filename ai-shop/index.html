@@ -198,14 +198,18 @@ function switchTab(shopsView){
 /* 同源店铺弹窗：单一状态源 + 打开/关闭生命周期（遮罩/Esc/焦点还原/inert/减少动态），样式与交互语言对齐 daymark 弹窗规范 */
 const srcOverlay=$('#srcOverlay'), srcSheet=$('#srcSheet'), pageWrap=document.querySelector('.wrap');
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-let srcIsOpen=false, srcOpener=null, srcCloseTimer=0, srcHist=false, srcScrollY=0;
+let srcIsOpen=false, srcOpener=null, srcCloseTimer=0, srcHist=false, srcScrollY=0, srcLocked=false, srcPrevSR=null;
 function lockScroll(){
+  if(srcLocked) return;
+  srcLocked=true;
   srcScrollY=window.scrollY||0;
   const b=document.body;
   b.style.overflow='hidden'; b.style.position='fixed'; b.style.top=(-srcScrollY)+'px';
   b.style.left='0'; b.style.right='0'; b.style.width='100%';
 }
 function unlockScroll(){
+  if(!srcLocked) return;
+  srcLocked=false;
   const b=document.body;
   b.style.overflow=''; b.style.position=''; b.style.top=''; b.style.left=''; b.style.right=''; b.style.width='';
   window.scrollTo(0,srcScrollY);
@@ -222,6 +226,7 @@ function openSrc(gi,ii,btn){
   note.style.display=extra>0?'':'none';
   clearTimeout(srcCloseTimer);
   srcOpener=btn||document.activeElement;
+  try{ srcPrevSR=history.scrollRestoration; history.scrollRestoration='manual'; }catch(e){ srcPrevSR=null; }
   try{ history.pushState({museSrcPopup:1},''); srcHist=true; }catch(e){ srcHist=false; }
   srcOverlay.hidden=false;
   srcOverlay.setAttribute('aria-hidden','false');
@@ -238,11 +243,16 @@ function closeSrc(fromPop){
   srcOverlay.classList.remove('open');
   srcOverlay.setAttribute('aria-hidden','true');
   if('inert' in pageWrap) pageWrap.inert=false;
-  unlockScroll();
   const back=srcOpener; srcOpener=null;
   if(back&&back.isConnected) back.focus({preventScroll:true});
   clearTimeout(srcCloseTimer);
-  srcCloseTimer=setTimeout(()=>{ if(!srcIsOpen) srcOverlay.hidden=true; }, reducedMotion?0:580);
+  /* 背景保持冻结，直到面板完全落下才在同一帧里解锁+还原位置+隐藏，避免返回时背景抢先重排闪一帧 */
+  srcCloseTimer=setTimeout(()=>{
+    if(srcIsOpen) return;
+    srcOverlay.hidden=true;
+    unlockScroll();
+    if(srcPrevSR!==null){ try{ history.scrollRestoration=srcPrevSR; }catch(e){} srcPrevSR=null; }
+  }, reducedMotion?0:580);
 }
 window.addEventListener('popstate',()=>{ if(srcIsOpen){ srcHist=false; closeSrc(true); } });
 document.addEventListener('click',e=>{
