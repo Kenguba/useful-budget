@@ -5,8 +5,10 @@
   var ORIGIN = "https://naspt.vip";
   /* 实时数据中转（Cloudflare Worker）：页面 -> Worker -> 原站公开接口。
      RELAY 未配置或请求失败时，自动回退到 data/ 快照。 */
-  var RELAY = "https://api.jpedu.asia";
-  function relayReady() { return RELAY && RELAY.indexOf("example.workers.dev") < 0; }
+  /* 接口地址来自 assets/config.js（部署时只改那个文件）。
+     RELAY 为空字符串表示同域请求（pan.jpedu.asia），属正常配置，不是未配置。 */
+  var RELAY = (typeof window.NASPT_RELAY === "string") ? window.NASPT_RELAY : "https://api.jpedu.asia";
+  function relayReady() { return typeof RELAY === "string" && RELAY.indexOf("example.workers.dev") < 0; }
   function apiGet(path) {
     return fetch(RELAY + "/api/public" + path).then(function (r) {
       if (!r.ok) throw new Error("api " + r.status);
