@@ -2,7 +2,12 @@
 # 用法：把整个包推到一个 GitHub 仓库，仓库 Settings > Pages 里 Source 选 GitHub Actions 即可
 name: refresh-and-deploy
 on:
-  workflow_dispatch:
+  schedule:
+      - cron: "23 */12 * * *"
+        push:
+            branches:
+                  - main
+                  workflow_dispatch:
 permissions:
   contents: write
   pages: write
