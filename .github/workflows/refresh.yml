@@ -3,11 +3,11 @@
 name: refresh-and-deploy
 on:
   schedule:
-      - cron: "23 */12 * * *"
-        push:
-            branches:
-                  - main
-                  workflow_dispatch:
+    - cron: "23 */12 * * *"
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 permissions:
   contents: write
   pages: write
