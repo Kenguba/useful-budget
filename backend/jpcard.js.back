@@ -1,0 +1,93 @@
+// ============================================================
+// 图片服务 jpcard 的源码留档副本（逐字抄自控制台）。
+// 真正运行的是部署在 Cloudflare（站长账号）上的 Worker「jpcard」
+// （版本 8737b21b，83 行），绑 img.xxxxx.asia，给日语教学图库供图：
+// 图片存 GitHub 三个仓库，Worker 三路容灾取图 + 边缘缓存 30 天。
+// 迁移时直接拿这一份部署；同步规则：线上改代码后同步回本文件。
+// 配套配置：自定义域 img.xxxxx.asia + 精确路由 img.xxxxx.asia/*
+// （精确路由为 2026-11-02 补的，用来压过通配路由，别漏）。
+// 注意：代码 CONFIG 里的 GitHub 用户名是功能配置，迁移换号时改那里。
+// ============================================================
+/**
+* 日语教学图库 - 全自动容灾分发脚本
+* 适用场景: 16GB+ 海量资源、多仓库分流、自动故障切换
+*/
+
+const CONFIG = {
+user: "wokal2024", // 你的 GitHub 用户名
+default_branch: "main", // 默认分支
+// 仓库映射: 前缀对应 GitHub 仓库名
+repos: {
+"r1": "jp-images", // 你的主库
+"r2": "jp-images-2", // 第二库 (需手动去 GitHub 创建)
+"r3": "jp-images-3" // 第三库
+}
+};
+
+export default {
+async fetch(request, env, ctx) {
+const url = new URL(request.url);
+let path = url.pathname;
+
+// 1. 根目录安全检查
+if (path === "/" || path === "") {
+return new Response("JP-EDU Image Server is Active.", {
+headers: { "Content-Type": "text/plain;charset=UTF-8"}
+});
+}
+
+// 去掉开头的斜杠
+if (path.startsWith("/")) path = path.slice(1);
+
+// 2. 智能路由逻辑: 识别 r1, r2, r3... 默认走 r1
+let repoName = CONFIG.repos["r1"]; // 默认走 r1
+const pathParts = path.split('/');
+const prefix = pathParts[0];
+
+if (CONFIG.repos[prefix]) {
+repoName = CONFIG.repos[prefix];
+// 如果你想保持路径一致，不需要修改 path
+}
+
+// 3. 构建自动容灾线路优先级
+// 线路 1: jsDelivr (国内最快)
+// 线路 2: GitHub Raw (最稳定，备用)
+// 线路 3: ghproxy (国内镜像，双重保险)
+const sourceUrls = [
+`https://cdn.jsdelivr.net/gh/${CONFIG.user}/${repoName}@${CONFIG.default_branch}/${path}`,
+`https://raw.githubusercontent.com/${CONFIG.user}/${repoName}/${CONFIG.default_branch}/${path}`,
+`https://ghproxy.net/https://raw.githubusercontent.com/${CONFIG.user}/${repoName}/${CONFIG.default_branch}/${path}`,
+];
+
+// 4. 自动尝试逻辑
+for (const sourceUrl of sourceUrls) {
+try {
+// 设置 5 秒超时，防止单条线路卡死
+const response = await fetch(sourceUrl, {
+signal: AbortSignal.timeout(5000),
+cf: {
+cacheEverything: true,
+cacheTtl: 2592000, // Cloudflare 边缘缓存 30 天
+}
+});
+
+if (response.ok) {
+// 成功拿货，注入长缓存头，优化学生访问速度
+const newResponse = new Response(response.body, response);
+newResponse.headers.set("Cache-Control", "public, max-age=2592000"); // 浏览器缓存 30 天
+newResponse.headers.set("X-Service-Status", "Auto-Failover-Enabled");
+return newResponse;
+}
+} catch (e) {
+// 当前线路报错，自动尝试下一条
+continue;
+}
+}
+
+// 5. 兜底报错
+return new Response("404: 图片搬运失败。请检查：1.路径是否正确 2.仓库是否为 Public 公开状态。", {
+status: 404,
+headers: { "Content-Type": "text/plain;charset=UTF-8"}
+});
+}
+};
