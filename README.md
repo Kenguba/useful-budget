@@ -53,7 +53,7 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 | `cloud-phone/` | `phone.xxxxx.asia` |
 | `cloud-pan/` | `pan.xxxxx.asia` |
 
-完整域名不写入本仓库（公开仓库，避免暴露站长域名）；解析与 Worker 配置在站长的 Cloudflare 账号里维护。分发服务 site-router 与盘搜后端 backend-proxy 的源码留档在 `cloud-pan/scripts/`（`site-router.js.back`、`backend-proxy.js.back`），迁移时直接取用，配套的通配 DNS/路由配置清单写在留档文件头。
+完整域名不写入本仓库（公开仓库，避免暴露站长域名）；解析与 Worker 配置在站长的 Cloudflare 账号里维护。全部后端 Worker 的源码留档统一放在仓库根目录的 `backend/` 里（`backend-proxy.js.back`、`site-router.js.back`、`jpcard.js.back`），迁移时直接取用，配套的通配 DNS/路由配置清单写在 site-router 留档的文件头。
 
 ## 约定
 
