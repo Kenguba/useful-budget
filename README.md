@@ -48,10 +48,10 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 
 | 项目 | 子域名 |
 | --- | --- |
-| `skill-board/` | `skill.<自有域名>` |
-| `ai-shop/` | `ai.<自有域名>` |
-| `cloud-phone/` | `phone.<自有域名>` |
-| `cloud-pan/` | `pan.<自有域名>` |
+| `skill-board/` | `skill.xxxxx.asia` |
+| `ai-shop/` | `ai.xxxxx.asia` |
+| `cloud-phone/` | `phone.xxxxx.asia` |
+| `cloud-pan/` | `pan.xxxxx.asia` |
 
 完整域名不写入本仓库（公开仓库，避免暴露站长域名）；解析与 Worker 配置在站长的 Cloudflare 账号里维护。
 
