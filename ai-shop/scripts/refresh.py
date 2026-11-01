@@ -220,12 +220,16 @@ def norm_title(t):
 
 def top30(rows, kind):
     merged = {}
+    srcs = {}
     for o in rows:
         if o['price'] is None or o['price'] <= 0:
             continue
         if o['stock'] is not None and (o['stock'] <= 0 or o['stock'] > 1000000):
             continue  # 缺货，或库存为无限占位数（数据噪声）
         k = norm_title(o['title'])
+        srcs.setdefault(k, []).append(dict(price=o['price'], shop=o['shop'],
+                                           platform=o['platform'], stock=o['stock'],
+                                           url=o['url']))
         cur = merged.get(k)
         if cur is None:
             merged[k] = dict(o, same_source=o.get('same_source', 1))
@@ -237,13 +241,29 @@ def top30(rows, kind):
     out = sorted(merged.values(), key=lambda x: x['price'])[:30]
     for o in out:
         o['kind'] = kind(o['title']) if kind else ''
+        seen, lst = set(), []
+        for s in sorted(srcs.get(norm_title(o['title']), []), key=lambda x: x['price']):
+            u = s['url'].split('?')[0]
+            if u in seen:
+                continue
+            seen.add(u)
+            lst.append(s)
+            if len(lst) >= 80:
+                break
+        o['sources'] = lst
     return out
 
 def slim(rows):
-    return [dict(price=o['price'], shop=o['shop'], platform=o['platform'],
+    out = []
+    for o in rows:
+        d = dict(price=o['price'], shop=o['shop'], platform=o['platform'],
                  stock=o['stock'], title=o['title'], url=o['url'],
                  kind=o.get('kind', ''), same_source=o.get('same_source', 1))
-            for o in rows]
+        src = o.get('sources') or []
+        if len(src) > 1:
+            d['sources'] = src
+        out.append(d)
+    return out
 
 def main():
     all_offers = {}
