@@ -282,8 +282,14 @@ details.about summary{cursor:pointer;color:#374151;font-weight:600}
   .nav a.nav-hide{display:none}
   .pan-btn{padding:8px 8px;font-size:13.5px;gap:4px}
   .btn-search{padding:13px 22px}
-  .wrap,.section,.announce{padding-left:12px;padding-right:12px}
-  .card{padding:18px 16px}
+  .wrap,.section,.announce{padding-left:8px;padding-right:8px}
+  .card{padding:16px 12px !important}
+  .poster-grid{gap:10px}
+  .hero{padding-left:12px;padding-right:12px}
+  .res-row{padding:14px 12px}
+  .form-card{padding:20px 16px}
+  .topbar-in{padding-left:10px;padding-right:10px}
+  .footer-in{padding-left:12px;padding-right:12px}
   .upd-row{gap:10px}
   .upd-title{font-size:14.5px}
   .btn-pan{padding:6px 10px;font-size:12.5px;white-space:nowrap}
