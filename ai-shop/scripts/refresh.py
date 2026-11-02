@@ -160,11 +160,25 @@ def ag_type(t):
         return '代充'
     return '成品号'
 
+AG_WORD = re.compile(r'anti[-\s]?gravity', re.I)
+AG_ARGON = re.compile(r'argon\s?4', re.I)
+AG_OPUS = re.compile(r'opus\s?5', re.I)
+
+def ag_hit(t):
+    """反重力命中（ken 2026-11-03 优先规则）：反重力 / antigravity（大小写、连字符、空格可变）/
+    argon 4（空格可有可无）任一命中即算；opus 5 须同时带 Gemini/谷歌/argon/antigravity 语境才算——
+    裸 opus5.5 在全量库里绝大多数是 Notion/Cursor 的「可用 Opus 5.5」模型卖点，与反重力无关，
+    裸放行会把 Notion 订阅冲进反重力组前排（2026-11-03 全量实测）。"""
+    if has(t, '反重力') or AG_WORD.search(t) or AG_ARGON.search(t):
+        return True
+    return bool(AG_OPUS.search(t) and (has(t, 'emini', 'EMINI', '谷歌', 'Google', 'google', 'GOOGLE')
+                                       or AG_WORD.search(t) or AG_ARGON.search(t)))
+
 def ag_groups(rows):
     g4, g5 = [], []
     for o in rows:
         t = o['title']
-        if not (has(t, '反重力') or 'ntigravity' in t):
+        if not ag_hit(t):
             continue
         if has(t, '不可使用反重力', '不可用反重力', '不包反重力', '不支持反重力', '无反重力'):
             continue
