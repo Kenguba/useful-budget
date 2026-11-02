@@ -181,6 +181,10 @@ details.about summary{cursor:pointer;color:#374151;font-weight:600}
 .tg-card .tg-time{color:var(--faint);font-size:12.5px;margin:8px 0 12px}
 .more-row{display:flex;gap:16px;justify-content:center;align-items:center;margin:24px 0 4px}
 .more-row .next{color:var(--blue);font-size:14.5px;font-weight:600}
+/* 触底加载（规范：列表一律滚动触底自动加载，见仓库 README） */
+.loadspin{text-align:center;color:var(--mut);font-size:13.5px;padding:10px 0 4px}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--blue);border-radius:50%;vertical-align:-3px;margin-right:7px;animation:pan-spin .7s linear infinite}
+@keyframes pan-spin{to{transform:rotate(360deg)}}
 /* 友链表单双列 */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}
 .form-grid .full{grid-column:1/-1}
@@ -262,12 +266,26 @@ details.about summary{cursor:pointer;color:#374151;font-weight:600}
   .nav a{padding:8px 8px;font-size:14px}
   .hero h1{font-size:31px}
   .contact-card{display:none}
+  /* 顶栏手机端换行：Logo 一行、导航第二行，禁止整栏横向溢出撑宽页面 */
+  .topbar-in{flex-wrap:wrap;height:auto;padding:8px 12px;gap:6px 10px}
+  .nav{margin-left:0;width:100%;flex-wrap:wrap;gap:2px}
+  .caterpillar-bar{display:none}
+  .logo{font-size:17px}
+  .btn-app,.btn-ask{margin-left:4px;padding:6px 13px;font-size:13px}
 }
 @media (max-width:560px){
   .poster-grid{grid-template-columns:repeat(3,1fr)}
   .nav a.nav-hide{display:none}
   .pan-btn{padding:8px 8px;font-size:13.5px;gap:4px}
   .btn-search{padding:13px 22px}
+  .wrap,.section,.announce{padding-left:12px;padding-right:12px}
+  .card{padding:18px 16px}
+  .upd-row{gap:10px}
+  .upd-title{font-size:14.5px}
+  .btn-pan{padding:6px 10px;font-size:12.5px;white-space:nowrap}
+  .page-head-flex{flex-wrap:wrap}
+  .today-tools .t-search{flex-wrap:wrap;min-width:0}
+  .today-tools .t-search input{min-width:0}
 }
 
 /* 流式搜索：关键词高亮与来源标签 */
