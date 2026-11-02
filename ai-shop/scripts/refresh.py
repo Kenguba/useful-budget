@@ -174,6 +174,21 @@ def ag_hit(t):
     return bool(AG_OPUS.search(t) and (has(t, 'emini', 'EMINI', '谷歌', 'Google', 'google', 'GOOGLE')
                                        or AG_WORD.search(t) or AG_ARGON.search(t)))
 
+AG_VERIFIED_PASS = re.compile(r'已过\s*(反重力)?\s*(antigravity)?\s*验证', re.I)
+
+def ag_verified(t):
+    """已过验证识别（ken 2026-11-03 补变体）：卖家写法多变——「已经过验证」多一个经字、
+    「已过Antigravity验证」中间隔着词、「带rt凭证」不是「带凭证」，旧词表都漏。
+    否定写法（没验证过/未过验证）与人机验证号一律排除（人机号不算已过验证）。"""
+    if has(t, '人机验证'):
+        return False
+    if has(t, '没验证过', '未过验证', '没过验证', '未验证', '没通过验证'):
+        return False
+    if has(t, '已过验证', '已经过验证', '已通过验证', '已验证', '验证通过',
+           '带凭证', '带rt凭证', '带RT凭证', '可直接登录', '已完成验证'):
+        return True
+    return bool(AG_VERIFIED_PASS.search(t))
+
 def ag_groups(rows):
     g4, g5 = [], []
     for o in rows:
@@ -189,7 +204,7 @@ def ag_groups(rows):
         if has(t, '验证') and not has(t, '已过验证', '成品号', '激活', '会员', '个月', 'Pro', 'pro'):
             continue
         g4.append(o)
-        if has(t, '已过验证', '带凭证', '可直接登录', '已验证') and not has(t, '人机验证'):
+        if ag_verified(t):
             g5.append(o)
     return g4, g5
 
