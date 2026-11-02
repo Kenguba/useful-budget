@@ -275,7 +275,13 @@ details.about summary{cursor:pointer;color:#374151;font-weight:600}
   .nav{margin-left:0;width:100%;flex-wrap:wrap;gap:2px}
   .caterpillar-bar{display:none}
   .logo{font-size:17px}
-  .btn-app,.btn-ask{margin-left:4px;padding:6px 13px;font-size:13px}
+  .btn-app{margin-left:4px;padding:6px 13px;font-size:13px}
+  /* 手机端隐藏「求片」按钮（ken 2026-11-03 定，全站外壳共用、一处生效） */
+  .btn-ask{display:none}
+  /* 「保持联系」浮钮手机端缩小并贴右边吸附 */
+  .contact-mini{right:0;bottom:110px;padding:9px 5px;font-size:11px;letter-spacing:1px;border-radius:10px 0 0 10px;opacity:.94}
+  .contact-card{right:8px;width:152px;padding:12px}
+  .contact-card img{width:112px;height:112px}
 }
 @media (max-width:560px){
   .poster-grid{grid-template-columns:repeat(3,1fr)}
