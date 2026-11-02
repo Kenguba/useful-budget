@@ -248,7 +248,7 @@ def claude_group(rows):
         out.append(o)
     return out
 
-def top30(rows, kind):
+def top30(rows, kind, limit=30):
     merged = {}
     srcs = {}
     for o in rows:
@@ -268,7 +268,7 @@ def top30(rows, kind):
             if o['price'] < cur['price']:
                 keep = cur['same_source']
                 merged[k] = dict(o, same_source=keep)
-    out = sorted(merged.values(), key=lambda x: x['price'])[:30]
+    out = sorted(merged.values(), key=lambda x: x['price'])[:limit]
     for o in out:
         o['kind'] = kind(o['title']) if kind else ''
         seen, lst = set(), []
@@ -329,40 +329,64 @@ def main():
     g7 = grok_group(rows) + [o for o in pai if grok_marker(o['title']) and has(o['title'], 'Heavy', 'HEAVY', 'Ultra', 'ULTRA') and not has(o['title'], '号池', '额度', '速刷')]
 
     groups = [
-        dict(id='gpt-unbound', name='GPT 日抛/Plus 成品号 — 未接马', items=slim(top30(g1, None))),
-        dict(id='gpt-bound', name='GPT 日抛/Plus 成品号 — 已接马', items=slim(top30(g2, None))),
-        dict(id='gpt-weekly', name='GPT 周限号', items=slim(top30(g3, lambda t: '已接马' if is_bound(t) else ('未接马' if has(t, '未接马', '未绑定') else '未注明')))),
-        dict(id='ag-cheapest', name='Antigravity 反重力 — 最便宜', items=slim(top30(g4, ag_type))),
-        dict(id='ag-verified', name='Antigravity 反重力 — 已过验证成品号', items=slim(top30(g5, ag_type))),
-        dict(id='codex-sms', name='Codex 接码 — 单次', items=slim(top30(g6, None))),
-        dict(id='grok-heavy', name='Grok Heavy（SuperGrok Heavy/Ultra）', items=slim(top30(g7, lambda t: '代充' if has(t, '代充', '直充') else '成品号'))),
-        dict(id='claude', name='Claude — 最便宜', items=slim(top30(claude_group(rows + pai), claude_kind))),
+        dict(id='gpt-unbound', name='GPT 日抛/Plus 成品号 — 未接马', items=slim(top30(g1, None, 45))),
+        dict(id='gpt-bound', name='GPT 日抛/Plus 成品号 — 已接马', items=slim(top30(g2, None, 45))),
+        dict(id='gpt-weekly', name='GPT 周限号', items=slim(top30(g3, lambda t: '已接马' if is_bound(t) else ('未接马' if has(t, '未接马', '未绑定') else '未注明'), 45))),
+        dict(id='ag-cheapest', name='Antigravity 反重力 — 最便宜', items=slim(top30(g4, ag_type, 45))),
+        dict(id='ag-verified', name='Antigravity 反重力 — 已过验证成品号', items=slim(top30(g5, ag_type, 45))),
+        dict(id='codex-sms', name='Codex 接码 — 单次', items=slim(top30(g6, None, 45))),
+        dict(id='grok-heavy', name='Grok Heavy（SuperGrok Heavy/Ultra）', items=slim(top30(g7, lambda t: '代充' if has(t, '代充', '直充') else '成品号', 45))),
+        dict(id='claude', name='Claude — 最便宜', items=slim(top30(claude_group(rows + pai), claude_kind, 45))),
     ]
     from datetime import datetime, timezone, timedelta
     bj_now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M')
     board = dict(updated_at=bj_now,
                  source='AI价网 + cardnav + PriceAI 按商家遍历合并',
                  groups=groups)
-    # 详情页售罄核验（ken 2026-11-02）：能直读详情页的自建站（aicdks）逐条核验，
-    # 页面显示售罄或库存 0 的剔除；读不到详情页的平台（wzyp 被验证挡、16688/catfk 无内容）不在此列。
-    def verify_aicdks(items):
-        kept = []
-        for it in items:
-            if 'aicdks.com' not in it['url']:
-                kept.append(it)
-                continue
-            try:
-                txt = strip_tags(fetch(it['url'], retries=0).decode('utf-8', 'ignore'))
+    # 详情页库存核验（ken 2026-11-02）：能读到详情页实时库存的平台逐条核验，
+    # 详情页库存为 0 / 已售罄的剔除，读到的实时库存同时回填展示；
+    # 读不到的平台（wzyp 被阿里云验证挡、catfk 连不上、/products/ 系 JS 空壳）不在此列，只能靠聚合库库存。
+    def detail_stock(it):
+        url = it['url']
+        try:
+            if '16688.com.cn' in url:
+                m = re.search(r'/goods/(G\d+)', url)
+                if not m:
+                    return None
+                req = urllib.request.Request(
+                    'https://www.16688.com.cn/shopApi/goods/detail',
+                    data=json.dumps({'goods_no': m.group(1)}).encode(),
+                    headers={**HEADERS, 'Content-Type': 'application/json'})
+                with urllib.request.urlopen(req, timeout=20) as r:
+                    d = json.loads(r.read().decode('utf-8', 'ignore'))
+                q = (d.get('data') or {}).get('stock_available_quantity')
+                return int(q) if isinstance(q, (int, float)) else None
+            if 'aicdks.com' in url or '/item/' in url:
+                txt = strip_tags(fetch(url, retries=0).decode('utf-8', 'ignore'))
+                if '售罄' in txt or '已售完' in txt:
+                    return 0
                 km = re.search(r'库存\s*[:：]?\s*(\d+)', txt)
-                if '售罄' in txt or '已售完' in txt or (km and int(km.group(1)) == 0):
-                    print(f'soldout-drop: {it["url"]}', file=sys.stderr)
-                    continue
-            except Exception:
-                pass
+                return int(km.group(1)) if km else None
+        except Exception:
+            return None
+        return None
+
+    def verify_detail_stock(items):
+        # 候选池为每组前 45 条：并发核验（单条慢不阻塞整体），剔除售罄后回填截断到 30 条
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=12) as ex:
+            stocks = list(ex.map(detail_stock, items))
+        kept = []
+        for it, st in zip(items, stocks):
+            if st == 0:
+                print(f'soldout-drop: {it["url"]}', file=sys.stderr)
+                continue
+            if st is not None:
+                it['stock'] = st
             kept.append(it)
-        return kept
+        return kept[:30]
     for g in groups:
-        g['items'] = verify_aicdks(g['items'])
+        g['items'] = verify_detail_stock(g['items'])
 
     # 防覆盖保险（ken 2026-11-02）：新数据总条数不足上一版一半时，判定上游大面积失败，
     # 直接报错退出、不覆盖旧 board.json，网站保持上一版好数据。
