@@ -106,7 +106,11 @@ button{font-family:inherit;cursor:pointer}
 .upd-title{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .upd-title a:hover{color:var(--blue)}
 .upd-time{color:var(--faint);font-size:12.5px;margin-top:2px}
-.btn-pan{flex:none;border:none;font-size:13px;font-weight:600;padding:7px 14px;border-radius:8px;background:var(--blue-soft);color:var(--blue)}
+.btn-pan{flex:none;border:none;font-size:13px;font-weight:600;padding:7px 14px;border-radius:8px;background:var(--blue-soft);color:var(--blue);display:inline-flex;align-items:center;justify-content:center}
+.pan-ico{width:16px;height:16px;border-radius:4px;margin-right:6px;object-fit:contain;flex:none}
+.pan-ico-em{font-size:15px;line-height:1;margin-right:6px;flex:none}
+.btn-primary .pan-ico{width:18px;height:18px;border-radius:5px}
+.btn-primary .pan-ico-em{font-size:17px}
 .btn-pan:hover{background:var(--blue-soft2)}
 .btn-pan.quark{background:#F0FDF4;color:#16A34A}
 .btn-pan.baidu{background:#EFF6FF;color:#2563EB}
@@ -283,6 +287,11 @@ details.about summary{cursor:pointer;color:#374151;font-weight:600}
   .upd-row{gap:10px}
   .upd-title{font-size:14.5px}
   .btn-pan{padding:6px 10px;font-size:12.5px;white-space:nowrap}
+  /* 手机端：有品牌图标的网盘按钮只显示图标，不显示文字 */
+  .btn-pan.has-ico{padding:7px 9px}
+  .btn-pan.has-ico .pan-txt{display:none}
+  .btn-pan.has-ico .pan-ico{width:23px;height:23px;margin-right:0;border-radius:6px}
+  .btn-pan.has-ico .pan-ico-em{font-size:21px;margin-right:0}
   .page-head-flex{flex-wrap:wrap}
   .today-tools .t-search{flex-wrap:wrap;min-width:0}
   .today-tools .t-search input{min-width:0}

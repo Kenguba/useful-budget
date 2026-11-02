@@ -121,6 +121,30 @@
     for (var i = 0; i < opts.length; i++) if (opts[i].id === id) return opts[i].name;
     return PAN_FALLBACK[id] || id;
   }
+  /* 网盘品牌图标（各家官方图标地址，已逐个核验可达且图案正确）：
+     桌面端图标+文字，手机端（≤560px）只显示图标，见 style.css 的 .btn-pan.has-ico 规则。
+     图标加载失败时自动摘掉 has-ico 回退纯文字，不会出现空按钮。 */
+  var PAN_ICONS = {
+    xunlei: "https://pan.xunlei.com/icon.png",
+    baidu: "https://www.baidu.com/favicon.ico",
+    quark: "https://pan.quark.cn/favicon.ico",
+    aliyun: "https://www.alipan.com/favicon.ico",
+    uc: "https://drive.uc.cn/favicon.ico",
+    "115": "https://115.com/favicon.ico",
+    "123": "https://statics.123957.com/static-by-custom/favicon.ico",
+    tianyi: "https://cloud.dlife.cn/web/main/logo.ico",
+    pikpak: "https://mypikpak.com/favicon-32x32.png",
+    guangya: "https://www.guangyapan.com/icon.png"
+  };
+  var PAN_ICON_EMOJI = { magnet: "🧲", ed2k: "🔗" };
+  function panHasIcon(id) { return !!(PAN_ICONS[id] || PAN_ICON_EMOJI[id]); }
+  function panBtnCls(id) { return "btn-pan" + (panHasIcon(id) ? " has-ico" : ""); }
+  function panBtnInner(id, text) {
+    var ico = "";
+    if (PAN_ICONS[id]) ico = '<img class="pan-ico" src="' + PAN_ICONS[id] + '" alt="" loading="lazy" onerror="this.parentNode.classList.remove(\'has-ico\');this.remove()">';
+    else if (PAN_ICON_EMOJI[id]) ico = '<span class="pan-ico-em" aria-hidden="true">' + PAN_ICON_EMOJI[id] + "</span>";
+    return ico + '<span class="pan-txt">' + esc(text) + "</span>";
+  }
   function fmtTime(iso) {
     if (!iso) return "";
     var d = new Date(iso);
@@ -450,7 +474,7 @@
     var links = item.links || [];
     var pref = links.filter(function (l) { return l.provider === "xunlei"; })[0] || links[0];
     var btn = pref
-      ? '<a class="btn-pan" href="' + BASE + "resource/?id=" + esc(pref.id) + '">获取' + esc(panName(pref.provider)) + "资源</a>"
+      ? '<a class="' + panBtnCls(pref.provider) + '" href="' + BASE + "resource/?id=" + esc(pref.id) + '" title="获取' + esc(panName(pref.provider)) + '资源">' + panBtnInner(pref.provider, "获取" + panName(pref.provider) + "资源") + "</a>"
       : "";
     var no = idx != null ? '<span class="upd-no">' + String(idx + 1).padStart(2, "0") + "</span>" : "";
     return '<div class="upd-row">' + no +
@@ -658,7 +682,7 @@
     function tgCard(it) {
       var links = it.links || [];
       var pref = links.filter(function (l) { return l.provider === pan; })[0] || links[0];
-      var btn = pref ? '<a class="btn-pan" href="' + BASE + "resource/?id=" + esc(pref.id) + '">' + esc(panName(pref.provider)) + "</a>" : "";
+      var btn = pref ? '<a class="' + panBtnCls(pref.provider) + '" href="' + BASE + "resource/?id=" + esc(pref.id) + '" title="' + esc(panName(pref.provider)) + '">' + panBtnInner(pref.provider, panName(pref.provider)) + "</a>" : "";
       return '<div class="tg-card"><h3>' + esc(it.title || "") + '</h3><div class="tg-note">' + esc(it.note || "") +
         '</div><div class="tg-time">' + fmtTime(it.updated_at) + "</div>" + btn + "</div>";
     }
@@ -762,7 +786,7 @@
     });
     hits.forEach(function (it) {
       var chips = (it.links || []).map(function (l) {
-        return '<a class="btn-pan" href="' + BASE + "resource/?id=" + esc(l.id) + '">获取' + esc(panName(l.provider)) + "资源</a>";
+        return '<a class="' + panBtnCls(l.provider) + '" href="' + BASE + "resource/?id=" + esc(l.id) + '" title="获取' + esc(panName(l.provider)) + '资源">' + panBtnInner(l.provider, "获取" + panName(l.provider) + "资源") + "</a>";
       }).join(" ");
       snapHtml += '<div class="res-row"><div class="res-main"><div class="res-title">' + esc(it.title || "") +
         '</div><div class="res-note">' + esc(it.note || "") + '</div>' +
@@ -809,7 +833,7 @@
         '<div class="res-meta">' + esc(panName(it.provider)) + "网盘 · " + fmtTime(it.discovered_at) +
         (invalid ? " · 已失效" : "") + "</div></div>" +
         (invalid ? '<span class="btn-pan" style="opacity:.45">已失效</span>'
-                 : '<button class="btn-pan" type="button" data-acc="' + esc(it.id) + '">获取' + esc(panName(it.provider)) + "资源</button>") + "</div>";
+                 : '<button class="' + panBtnCls(it.provider) + '" type="button" data-acc="' + esc(it.id) + '" title="获取' + esc(panName(it.provider)) + '资源">' + panBtnInner(it.provider, "获取" + panName(it.provider) + "资源") + "</button>") + "</div>";
     }
     function paint() {
       var box = document.getElementById("streamResults");
@@ -916,7 +940,7 @@
         '<div class="card"><div class="res-meta" style="font-size:14px;line-height:2.1">' +
         "网盘类型：" + esc(panName(provider)) + "网盘<br>更新时间：" + esc(timeText || "") +
         "<br>资源状态：" + (valid === false ? "失效" : "有效") + "</div>" +
-        '<div style="margin-top:18px"><button class="btn-primary" id="resGet" type="button">获取' + esc(panName(provider)) + '资源</button>' +
+        '<div style="margin-top:18px"><button class="btn-primary" id="resGet" type="button">' + panBtnInner(provider, "获取" + panName(provider) + "资源") + '</button>' +
         '<a href="' + ORIGIN + "/resource/" + esc(id) + '" target="_blank" rel="noopener" style="margin-left:14px;color:var(--blue)">原站页面</a></div></div>';
       var rg = document.getElementById("resGet");
       if (rg) rg.onclick = function () { openAccess({ id: id, provider: provider, title: title }); };
