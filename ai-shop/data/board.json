@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-03 05:09",
+ "updated_at": "2026-11-03 05:11",
  "source": "AI价网 + cardnav + PriceAI 按商家遍历合并",
  "groups": [
   {
@@ -7263,6 +7263,16 @@
      "same_source": 1
     },
     {
+     "price": 19.0,
+     "shop": "yh-mo源头批发",
+     "platform": "",
+     "stock": 42,
+     "title": "反重力pixel 6个月 pro成品号（JSON文件，带账号信息。随机地区，包首登）",
+     "url": "https://yh-mo.xyz/item/32",
+     "kind": "成品号",
+     "same_source": 1
+    },
+    {
      "price": 19.9,
      "shop": "Wenvo Shop",
      "platform": "",
@@ -7490,46 +7500,6 @@
      "url": "https://aicdks.com/product/108842",
      "kind": "成品号",
      "same_source": 1
-    },
-    {
-     "price": 23.0,
-     "shop": "小头",
-     "platform": "链动小铺",
-     "stock": 4,
-     "title": "opus5.5可用 gemini成品号包Antigravity反重力（大部分6个月，10%三个月）",
-     "url": "https://wzyp.cn/item/nu7hjb",
-     "kind": "成品号",
-     "same_source": 4,
-     "sources": [
-      {
-       "price": 23.0,
-       "shop": "小头",
-       "platform": "链动小铺",
-       "stock": 4,
-       "url": "https://wzyp.cn/item/nu7hjb"
-      },
-      {
-       "price": 23.0,
-       "shop": "AI CDK 商店",
-       "platform": "",
-       "stock": null,
-       "url": "https://aicdks.com/product/104714"
-      },
-      {
-       "price": 23.2,
-       "shop": "🐓PT-Plus",
-       "platform": "链动小铺",
-       "stock": 20,
-       "url": "https://wzyp.cn/item/e65ein"
-      },
-      {
-       "price": 27.3,
-       "shop": "黏人ai小狗",
-       "platform": "链动小铺",
-       "stock": 20,
-       "url": "https://wzyp.cn/item/x5vl1h"
-      }
-     ]
     }
    ]
   },
