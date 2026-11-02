@@ -1,34 +1,53 @@
 // ============================================================
-// AI 商铺刷新后端 ai-refresh 的源码留档副本。
+// AI 商铺后端 ai-refresh 的源码留档副本。
 // 真正运行的是部署在 Cloudflare（站长账号）上的 Worker
-// 「ai-refresh」，守在路由 ai.xxxxx.asia/api/refresh-board 上：
-// 页面点「刷新数据」先到它这里，5 分钟全局冷却（KV）过了才触发
-// GitHub Actions 的 refresh-and-deploy（workflow_dispatch）。
+// 「ai-refresh」，守在路由 ai.xxxxx.asia/api/* 上，三个接口：
+//   POST /api/refresh-board  手动全量刷新（5 分钟全局冷却）
+//   GET  /api/stock-check    进站库存现核（60 秒节流，结果存 KV）
+//   GET  /api/stock-status   给 GitHub 轻量任务读访客核对结果
 // 把副本放在仓库里，是为了迁移时直接拿这一份部署，不用去控制台翻。
 // 同步规则：线上代码有任何改动，先部署到 Cloudflare，再同步回本文件。
 //
 // （缺了会出事）
-// 1. KV 绑定：Worker 须绑 KV 命名空间 ai-refresh-kv，变量名 REFRESH_KV
-//    （只存一个键 last = 上次触发时间戳）；
+// 1. KV 绑定：Worker 须绑 KV 命名空间 ai-refresh-kv，变量名 REFRESH_KV。
+//    键：last = 上次全量触发时间戳；stock:<分组id> = 该组最近一次
+//    现核结果（含时间与对应 board 版本，10 分钟过期）；
+//    stock:lastcheck = 最近一次现核时间戳。
 // 2. 密钥：Worker secret GH_TOKEN = 细粒度 PAT，仅授权本仓库、
-//    Actions 读写；PAT 过期则触发失败（前端报「刷新服务暂不可用」）；
-// 3. 路由：ai 子域名下 /api/refresh-board 路径绑到本 Worker
-//    （该路径的请求不再走 site-router 的 Pages 转发）；
+//    Actions 读写；PAT 过期则触发失败（前端报「刷新服务暂不可用」）。
+// 3. 路由：ai 子域名下 /api/* 绑到本 Worker（这些路径的请求不再走
+//    site-router 的 Pages 转发）。
 // 4. 冷却兜底：KV 没额度/不可用时，代码自动改查 GitHub 最近一次
-//    workflow_dispatch 运行时间判冷却，不依赖 KV 也能防重复触发。
+//    workflow_dispatch 运行时间判冷却；KV 放行时触发前再用 GitHub
+//    记录复核一次（防 KV 写额度耗尽、last 停旧值骗过冷却）。
+// 5. 过期自愈：现核时顺带检查新鲜度——库存数据超 10 分钟没更新、
+//    或仓库无数据时，后台触发一次全量拉取（走同一冷却通道）。
+// 6. 现核口径与 refresh.py / stock_check.py 一致：只核可读平台
+//    （16688 接口 / aicdks / /item/ 系，wzyp 被 WAF 挡跳过）；
+//    「商品不存在」/404 返回 -1（找不到，消费端据此去除条目），
+//    售罄返回 0（同样去除），暂时读不到返回 null（保留原值）。
 // ============================================================
-// ai-shop 刷新后端：POST /api/refresh-board
-// 5 分钟全局冷却（KV 记录上次触发时间，谁点的都一样）；冷却外触发 GitHub Actions 的 refresh-and-deploy（workflow_dispatch）
-// 兜底（ken 2026-11-02 定）：KV 为主；KV 没额度/不可用时改用 GitHub 最近一次 workflow_dispatch 运行时间判冷却——
-// 读不到 KV 时直接查 GitHub；KV 读到的值放行时，真正触发前再用 GitHub 运行记录复核一次（防 KV 写不进、值停在旧时间骗过冷却）。
+// ai-shop 后端（Worker: ai-refresh）
+// POST /api/refresh-board  手动刷新：5 分钟全局冷却（KV）后触发 GitHub 全量刷新（refresh-and-deploy）；
+//                          KV 读不到时查 GitHub 运行记录兜底；KV 放行时触发前再用 GitHub 记录复核（ken 2026-11-02 定）。
+// GET  /api/stock-check?group=<分组id>
+//                          进站库存现核：按 board.json 里存的详情页链接逐条直查可读平台的实时库存
+//                          （16688 接口 / aicdks / /item/ 系；wzyp 被 WAF 挡跳过）；60 秒内共用上次结果（KV 节流）。
+//                          顺带过期检查：库存数据超 10 分钟没更新、或仓库无数据时，后台触发一次全量拉取（走冷却通道）。
+// GET  /api/stock-status   给 GitHub 轻量任务读：返回 KV 里最近访客核对的时间与各组结果，
+//                          服务器据此「采用最新核对」落盘，不重复核（5 分钟防抖锚定最新一次核对）。
 const REPO = 'Kenguba/useful-budget';
 const WORKFLOW = 'refresh.yml';
 const COOLDOWN_MS = 300 * 1000;
+const STOCK_TTL_MS = 60 * 1000;
+const STOCK_STALE_MS = 600 * 1000;
+const BOARD_URL = 'https://kenguba.github.io/useful-budget/ai-shop/data/board.json';
+const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36';
 
 function cors() {
   return {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   };
 }
@@ -46,9 +65,6 @@ function ghHeaders(env) {
     'User-Agent': 'ai-refresh-worker',
   };
 }
-function cooldownJson(last, now) {
-  return json({ ok: true, mode: 'cooldown', retry_after: Math.ceil((COOLDOWN_MS - (now - last)) / 1000) });
-}
 // 从 GitHub 运行记录取最近一次手动触发（workflow_dispatch）的时间；查不到返回 0
 async function lastFromGitHub(env) {
   try {
@@ -63,40 +79,183 @@ async function lastFromGitHub(env) {
     return 0;
   }
 }
+// 触发全量刷新（refresh-board POST 与过期自愈共用）：{mode:'cooldown',retry_after} | {mode:'started'} | {mode:'error',status}
+async function triggerFullRefresh(env) {
+  const now = Date.now();
+  let last = 0;
+  try {
+    last = parseInt((await env.REFRESH_KV.get('last')) || '0', 10) || 0;
+  } catch (e) {
+    // KV 没额度/不可用：转查 GitHub 运行记录兜底
+    last = await lastFromGitHub(env);
+  }
+  if (now - last < COOLDOWN_MS) {
+    return { mode: 'cooldown', retry_after: Math.ceil((COOLDOWN_MS - (now - last)) / 1000) };
+  }
+  // KV 放行也要用 GitHub 运行记录复核：KV 写额度耗尽时 last 会停在旧值，只看 KV 会重复触发
+  const ghLast = await lastFromGitHub(env);
+  if (now - ghLast < COOLDOWN_MS) {
+    try { await env.REFRESH_KV.put('last', String(ghLast)); } catch (e) {}
+    return { mode: 'cooldown', retry_after: Math.ceil((COOLDOWN_MS - (now - ghLast)) / 1000) };
+  }
+  const r = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW}/dispatches`, {
+    method: 'POST',
+    headers: ghHeaders(env),
+    body: JSON.stringify({ ref: 'main' }),
+  });
+  if (r.status !== 204) return { mode: 'error', status: r.status };
+  try { await env.REFRESH_KV.put('last', String(now)); } catch (e) {}
+  return { mode: 'started' };
+}
+
+async function fetchBoard() {
+  try {
+    const r = await fetch(BOARD_URL + '?v=' + Math.floor(Date.now() / 300000), { headers: { 'User-Agent': UA } });
+    if (!r.ok) return null;
+    return await r.json();
+  } catch (e) {
+    return null;
+  }
+}
+// 'YYYY-MM-DD HH:MM'（北京时间）→ ms
+function bjTs(s) {
+  if (!s) return 0;
+  const t = Date.parse(String(s).replace(' ', 'T') + '+08:00');
+  return isNaN(t) ? 0 : t;
+}
+// 库存数据过期（>10 分钟）或仓库无数据 → 后台全量拉取（走冷却通道，不阻塞当前响应）
+async function escalateIfStale(env, board) {
+  try {
+    let lastAct = 0;
+    try { lastAct = parseInt((await env.REFRESH_KV.get('stock:lastcheck')) || '0', 10) || 0; } catch (e) {}
+    const boardTs = board ? bjTs(board.stock_checked_at || board.updated_at) : 0;
+    const fresh = Math.max(lastAct, boardTs);
+    const empty = !board || !Array.isArray(board.groups) || board.groups.every(g => !g.items || !g.items.length);
+    if (empty || Date.now() - fresh > STOCK_STALE_MS) await triggerFullRefresh(env);
+  } catch (e) {}
+}
+
+function verifiable(url) {
+  try {
+    const u = new URL(url);
+    return u.hostname.includes('16688.com.cn') || u.hostname.includes('aicdks.com')
+      || (u.pathname.includes('/item/') && !u.hostname.includes('wzyp'));
+  } catch (e) {
+    return false;
+  }
+}
+function stripTags(s) {
+  return String(s || '')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ');
+}
+async function fetchTimeout(url, opts, ms) {
+  const c = new AbortController();
+  const t = setTimeout(() => c.abort(), ms || 9000);
+  try {
+    return await fetch(url, { ...(opts || {}), signal: c.signal });
+  } finally {
+    clearTimeout(t);
+  }
+}
+// 与 refresh.py 同口径：能读的详情页逐条核；读不到返回 null
+async function detailStock(url) {
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes('16688.com.cn')) {
+      const m = url.match(/\/goods\/(G\d+)/);
+      if (!m) return null;
+      const r = await fetchTimeout('https://www.16688.com.cn/shopApi/goods/detail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'User-Agent': UA },
+        body: JSON.stringify({ goods_no: m[1] }),
+      });
+      if (!r.ok) return null;
+      const d = await r.json();
+      // 明确「商品不存在」→ -1（找不到，与暂时读不到的 null 区分；消费端据此去除条目）
+      if (d && !d.data && String(d.msg || '').includes('不存在')) return -1;
+      const q = d && d.data ? d.data.stock_available_quantity : null;
+      return (typeof q === 'number' && isFinite(q)) ? Math.trunc(q) : null;
+    }
+    if (u.hostname.includes('aicdks.com') || (u.pathname.includes('/item/') && !u.hostname.includes('wzyp'))) {
+      const r = await fetchTimeout(url, { headers: { 'User-Agent': UA } });
+      if (r.status === 404) return -1;
+      if (!r.ok) return null;
+      const txt = stripTags(await r.text());
+      if (txt.includes('售罄') || txt.includes('已售完')) return 0;
+      const km = txt.match(/库存\s*[:：]?\s*(\d+)/);
+      return km ? parseInt(km[1], 10) : null;
+    }
+  } catch (e) {}
+  return null;
+}
+
+async function handleStockCheck(req, env, ctx) {
+  const group = new URL(req.url).searchParams.get('group') || '';
+  const board = await fetchBoard();
+  if (!board) {
+    ctx.waitUntil(escalateIfStale(env, null));
+    return json({ ok: false, error: 'board unavailable' }, 502);
+  }
+  const grp = (board.groups || []).find(g => g.id === group);
+  if (!grp) return json({ ok: false, error: 'unknown group' }, 404);
+  ctx.waitUntil(escalateIfStale(env, board));
+  const now = Date.now();
+  const key = 'stock:' + group;
+  try {
+    const c = await env.REFRESH_KV.get(key, 'json');
+    if (c && c.board_updated_at === board.updated_at && now - c.t < STOCK_TTL_MS) {
+      return json({ ok: true, group, board_updated_at: board.updated_at, checked_at: c.t, cached: true, results: c.results });
+    }
+  } catch (e) {}
+  const items = (grp.items || []).filter(it => it && verifiable(it.url));
+  const results = {};
+  await Promise.all(items.map(async it => { results[it.url] = await detailStock(it.url); }));
+  try {
+    await env.REFRESH_KV.put(key, JSON.stringify({ t: now, board_updated_at: board.updated_at, results }), { expirationTtl: 600 });
+  } catch (e) {}
+  try { await env.REFRESH_KV.put('stock:lastcheck', String(now)); } catch (e) {}
+  return json({ ok: true, group, board_updated_at: board.updated_at, checked_at: now, cached: false, results });
+}
+
+async function handleStockStatus(env) {
+  const board = await fetchBoard();
+  let lastcheck = 0;
+  try { lastcheck = parseInt((await env.REFRESH_KV.get('stock:lastcheck')) || '0', 10) || 0; } catch (e) {}
+  const groups = {};
+  if (board && Array.isArray(board.groups)) {
+    for (const g of board.groups) {
+      try {
+        const c = await env.REFRESH_KV.get('stock:' + g.id, 'json');
+        if (c) groups[g.id] = c;
+      } catch (e) {}
+    }
+  }
+  return json({ ok: true, lastcheck, board_updated_at: board ? board.updated_at : null, groups });
+}
 
 export default {
-  async fetch(req, env) {
+  async fetch(req, env, ctx) {
     const url = new URL(req.url);
-    if (url.pathname !== '/api/refresh-board') return new Response('not found', { status: 404 });
-    if (req.method === 'OPTIONS') return new Response(null, { headers: cors() });
-    if (req.method !== 'POST') return json({ ok: false, error: 'method not allowed' }, 405);
-
-    const now = Date.now();
-    let last = 0;
-    try {
-      last = parseInt((await env.REFRESH_KV.get('last')) || '0', 10) || 0;
-    } catch (e) {
-      // KV 没额度/不可用：转查 GitHub 运行记录兜底
-      last = await lastFromGitHub(env);
+    if (url.pathname === '/api/refresh-board') {
+      if (req.method === 'OPTIONS') return new Response(null, { headers: cors() });
+      if (req.method !== 'POST') return json({ ok: false, error: 'method not allowed' }, 405);
+      const r = await triggerFullRefresh(env);
+      if (r.mode === 'error') return json({ ok: false, error: 'dispatch failed', status: r.status }, 502);
+      return json({ ok: true, mode: r.mode, ...(r.retry_after ? { retry_after: r.retry_after } : {}) });
     }
-    if (now - last < COOLDOWN_MS) return cooldownJson(last, now);
-
-    // KV 放行也要在真正触发前用 GitHub 运行记录复核：KV 写额度耗尽时 last 会停在旧值，
-    // 只看 KV 会重复触发；GitHub 记录里有最近一次触发时间，以它为准。
-    const ghLast = await lastFromGitHub(env);
-    if (now - ghLast < COOLDOWN_MS) {
-      try { await env.REFRESH_KV.put('last', String(ghLast)); } catch (e) {}
-      return cooldownJson(ghLast, now);
+    if (url.pathname === '/api/stock-check') {
+      if (req.method === 'OPTIONS') return new Response(null, { headers: cors() });
+      if (req.method !== 'GET') return json({ ok: false, error: 'method not allowed' }, 405);
+      return handleStockCheck(req, env, ctx);
     }
-
-    const r = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW}/dispatches`, {
-      method: 'POST',
-      headers: ghHeaders(env),
-      body: JSON.stringify({ ref: 'main' }),
-    });
-    if (r.status !== 204) return json({ ok: false, error: 'dispatch failed', status: r.status }, 502);
-
-    try { await env.REFRESH_KV.put('last', String(now)); } catch (e) {}
-    return json({ ok: true, mode: 'started' });
+    if (url.pathname === '/api/stock-status') {
+      if (req.method === 'OPTIONS') return new Response(null, { headers: cors() });
+      if (req.method !== 'GET') return json({ ok: false, error: 'method not allowed' }, 405);
+      return handleStockStatus(env);
+    }
+    return new Response('not found', { status: 404 });
   },
 };
