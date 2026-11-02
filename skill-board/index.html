@@ -47,10 +47,10 @@ h3{font-size:clamp(14px,3.2vw,15px);margin:14px 0 6px;color:var(--blue);font-wei
 .num{font-weight:800;color:var(--blue);text-align:right;flex-shrink:0}
 .num small{display:block;color:var(--mut);font-weight:400;font-size:clamp(10px,2.4vw,11px);line-height:1.35;white-space:nowrap}
 .cmdwrap{position:relative;display:block;margin-top:6px}
-code.cmd{display:block;background:#0f172a;color:#e2e8f0;border-radius:8px;padding:7px 42px 7px 10px;font-size:11px;overflow-x:auto;white-space:nowrap;cursor:pointer;border:1px solid rgba(255,255,255,.08);transition:background .15s;max-width:100%;box-sizing:border-box;scrollbar-width:none}
+code.cmd{display:block;height:34px;line-height:34px;background:#0f172a;color:#e2e8f0;border-radius:8px;padding:0 34px 0 10px;font-size:11px;overflow-x:auto;white-space:nowrap;cursor:pointer;border:1px solid rgba(255,255,255,.08);transition:background .15s;max-width:100%;box-sizing:border-box;scrollbar-width:none}
 code.cmd::-webkit-scrollbar{display:none}
 code.cmd:hover{background:#1e293b}
-.copybtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:6px;color:#cbd5e1;cursor:pointer;padding:0}
+.copybtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:22px;height:22px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:6px;color:#cbd5e1;cursor:pointer;padding:0}
 .copybtn:hover{background:rgba(255,255,255,.2);color:#fff}
 .copybtn:active{background:rgba(255,255,255,.3)}
 #toast{position:fixed;top:14px;left:50%;transform:translate(-50%,-10px);background:#0f172a;color:#fff;padding:9px 20px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:999;box-shadow:0 6px 20px rgba(0,0,0,.28)}
@@ -110,10 +110,10 @@ const compact=n=>n==null?"—":(n>=1e6?(n/1e6).toFixed(2)+"M":n>=1e3?(n/1e3).toF
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let DATES=[], board=null;
 function rankBadge(r){return `<div class="rank ${r<=3?"top":""}">${r}</div>`}
-function cmd(c){return c?`<span class="cmdwrap" data-cmd="${esc(c)}"><code class="cmd" title="点按复制">${esc(c)}</code><button class="copybtn" type="button" aria-label="复制命令" title="复制"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></span>`:""}
+function cmd(c){return c?`<span class="cmdwrap" data-cmd="${esc(c)}"><code class="cmd" title="点按复制">${esc(c)}</code><button class="copybtn" type="button" aria-label="复制命令" title="复制"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></span>`:""}
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1600)}
 function doCopy(text){const done=()=>showToast("复制成功");const fb=()=>{const a=document.createElement("textarea");a.value=text;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy");done()}catch(e){showToast("复制失败，请长按命令手动复制")}a.remove()};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(fb)}else fb()}
-function fitCmds(){document.querySelectorAll("code.cmd").forEach(el=>{let s=11;el.style.fontSize=s+"px";while(el.scrollWidth>el.clientWidth&&s>8){s-=0.5;el.style.fontSize=s+"px"}})}
+function fitCmds(){document.querySelectorAll("code.cmd").forEach(el=>{let s=11;el.style.fontSize=s+"px";while(el.scrollWidth>el.clientWidth&&s>6){s-=0.5;el.style.fontSize=s+"px"}})}
 let _rzT;window.addEventListener("resize",()=>{clearTimeout(_rzT);_rzT=setTimeout(fitCmds,150)});
 function nameLink(name,url,meta){const n=url?`<a href="${esc(url)}" target="_blank" rel="noopener">${esc(name)}</a>`:esc(name);return `<span class="name">${n}</span>${meta?`<span class="meta">${esc(meta)}</span>`:""}`}
 function item(r,left,numHtml,cmdHtml){const s=((left.skill||left.repo||"")+" "+(left.blurb||"")+" "+(left.meta||"")).toLowerCase();return `<div class="item" data-skill="${esc(s)}"><div class="itemtop">${rankBadge(r)}<div class="main">${left.html}</div><div class="num">${numHtml||""}</div></div>${cmdHtml||""}</div>`}
