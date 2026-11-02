@@ -611,8 +611,8 @@
         return true;
       });
     }
-    function fetchPage(p, replace) {
-      if (!state.live) return;
+    function fetchPage(p, replace, done) {
+      if (!state.live) { if (done) done(); return; }
       var qs = "?page=" + p + "&page_size=" + per +
         (kw ? "&q=" + encodeURIComponent(kw) : "") +
         (pan ? "&provider=" + encodeURIComponent(pan) : "");
@@ -620,10 +620,40 @@
         total = d.total != null ? d.total : total;
         curPage = p;
         items = replace ? (d.items || []) : items.concat(d.items || []);
-        if (replace) shown = per;
+        if (replace) { shown = per; tLoadFailed = false; }
         document.getElementById("tTotal").textContent = total;
+        if (done) done();
         draw();
-      }).catch(function () { /* 保留现有列表 */ });
+      }).catch(function () { if (done) done(); /* 保留现有列表 */ });
+    }
+    /* 触底加载（借鉴 ai-shop 店铺目录的哨兵模式）：哨兵进入视口前 300px 自动加载下一批，
+       带加载中特效与在途锁，不再用「加载更多 / 下一页」按钮 */
+    var tLoading = false, tObserver = null, tLoadFailed = false;
+    function hasMoreNow() {
+      var list = state.live ? items : localFilter(items);
+      return shown < list.length || (state.live && items.length < total);
+    }
+    function loadMore() {
+      if (tLoading || !hasMoreNow()) return;
+      tLoading = true;
+      var spin = document.getElementById("tLoading");
+      if (spin) spin.style.display = "";
+      function finish() { tLoading = false; shown += per; draw(); }
+      if (state.live && shown >= items.length && items.length < total) {
+        var before = items.length;
+        fetchPage(curPage + 1, false, function () {
+          tLoading = false;
+          if (items.length > before) { shown += per; tLoadFailed = false; }
+          else tLoadFailed = true; /* 拉取失败不空转重试，draw 里给一次点击重试 */
+        });
+      } else {
+        setTimeout(finish, 300);
+      }
+    }
+    if (typeof IntersectionObserver !== "undefined") {
+      tObserver = new IntersectionObserver(function (es) {
+        if (es[0].isIntersecting) loadMore();
+      }, { rootMargin: "300px" });
     }
     function tgCard(it) {
       var links = it.links || [];
@@ -647,23 +677,18 @@
           '<div style="color:var(--faint);padding:16px 0">' + emptyTxt + "</div>";
       }
       var more = document.getElementById("tMore");
-      var hasMore = state.live ? items.length < total : shown < list.length;
-      if (hasMore || shown < list.length) {
-        more.innerHTML = '<button class="btn-small" id="tLoadMore">加载更多</button>' +
-          '<a class="next" href="javascript:void(0)" id="tNext">下一页 →</a>';
-        document.getElementById("tLoadMore").onclick = function () {
-          if (state.live && shown >= items.length && items.length < total) fetchPage(curPage + 1, false);
-          shown += per; draw();
-        };
-        document.getElementById("tNext").onclick = function () {
-          if (state.live) {
-            if (items.length < total) { fetchPage(curPage + 1, true); }
-          } else {
-            shown = Math.min(list.length, shown + per); draw();
-          }
-          document.getElementById("tBody").scrollIntoView();
-        };
+      if (hasMoreNow() && tLoadFailed) {
+        if (tObserver) tObserver.disconnect();
+        more.innerHTML = '<button class="btn-small" id="tRetry">加载失败，点此重试</button>';
+        document.getElementById("tRetry").onclick = function () { tLoadFailed = false; draw(); };
+      } else if (hasMoreNow()) {
+        more.innerHTML = '<div id="tSentinel" style="height:1px"></div>' +
+          '<div id="tLoading" class="loadspin" style="display:none"><span class="spinner"></span>加载中…</div>';
+        var sent = document.getElementById("tSentinel");
+        if (tObserver && sent) { tObserver.disconnect(); tObserver.observe(sent); }
+        else if (sent) loadMore(); /* 无 IntersectionObserver 时直接续载一批兜底 */
       } else {
+        if (tObserver) tObserver.disconnect();
         more.innerHTML = list.length ? '<span style="color:var(--faint);font-size:13.5px">已展示全部 ' + (state.live ? total : list.length) + " 条</span>" : "";
       }
       boardPills(document.getElementById("tPan"),
