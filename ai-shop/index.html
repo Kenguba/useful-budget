@@ -25,6 +25,7 @@ h1{font-size:32px;margin:10px 0 6px;font-weight:900}
 .group{scroll-margin-top:14px}
 @keyframes flashBg{0%{box-shadow:0 0 0 3px var(--gold)}100%{box-shadow:0 0 0 0 transparent}}
 .group.flash{animation:flashBg 1.4s ease-out}
+.row.flash{animation:flashBg 1.4s ease-out;border-radius:10px}
 .leader .g{font-size:11px;color:var(--mut);line-height:1.4;min-height:30px}
 .leader .p{font-size:20px;font-weight:900;color:var(--blue)}
 .leader .s{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -154,7 +155,7 @@ function renderBoard(){
   const q=$('#q').value.trim();
   const sm=(q&&shops)?shops.shops.filter(s=>fuzzy(q,s.name,s.platform,s.code)):[];
   $('#shopMatches').innerHTML=!q?'':'<div class="group"><h2>店铺目录匹配 '+sm.length+' 家</h2><div class="cnt">报价单只收录每组最低 30 条，不在其中的店只在这里和店铺目录出现。</div>'+
-    (sm.length?sm.slice(0,20).map(s=>'<div class="row"><div class="main"><div class="title">'+(s.url?'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.name)+' ↗</a>':esc(s.name))+'</div><div class="info">'+esc(s.platform)+(s.code?' · '+esc(s.code):'')+'</div></div></div>').join(''):'<p class="sub">目录 2691 家里也没有匹配，去「店铺目录」换个关键词再试。</p>')+
+    (sm.length?sm.slice(0,20).map(s=>'<div class="row"><div class="main"><div class="title">'+(s.url?'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.name)+' ↗</a>':esc(s.name))+'</div><div class="info">'+esc(s.platform)+(s.code?' · '+esc(s.code):'')+'</div></div></div>').join(''):'<p class="sub">目录 '+(shops&&shops.shops?shops.shops.length:'')+' 家里也没有匹配，去「店铺目录」换个关键词再试。</p>')+
     (sm.length>20?'<p class="sub">只显示前 20 家。</p>':'')+'<p><button class="more" id="gotoShops">在店铺目录查看全部 '+sm.length+' 家匹配 →</button></p></div>';
   $('#leaders').innerHTML=board.groups.map(g=>{
     const it=g.items[0];
@@ -165,7 +166,7 @@ function renderBoard(){
     const rows=g.items.map((it,ii)=>{
         if(q&&!fuzzy(q,it.title,it.shop,it.platform)) return '';
         shown++;
-        return '<div class="row"><div class="price">'+fmtP(it.price)+'<small>'+esc(it.platform)+'</small></div><div class="main"><div class="title"><a href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div><div class="info">'+(it.kind?'<span class="tag">'+esc(it.kind)+'</span>':'')+(it.same_source>1?'<button type="button" class="tag grey srcbtn" data-src="'+gi+':'+ii+'" aria-haspopup="dialog">同源铺货共 '+it.same_source+' 家</button>':'')+esc(it.shop)+' · '+stockTxt(it)+'</div></div></div>';
+        return '<div class="row" id="it-'+esc(g.id)+'-'+ii+'"><div class="price">'+fmtP(it.price)+'<small>'+esc(it.platform)+'</small></div><div class="main"><div class="title"><a data-anchor="it-'+esc(g.id)+'-'+ii+'" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div><div class="info">'+(it.kind?'<span class="tag">'+esc(it.kind)+'</span>':'')+(it.same_source>1?'<button type="button" class="tag grey srcbtn" data-src="'+gi+':'+ii+'" aria-haspopup="dialog">同源铺货共 '+it.same_source+' 家</button>':'')+esc(it.shop)+' · '+stockTxt(it)+'</div></div></div>';
       }).join('');
     if(q&&!shown) return '';
     return '<div class="group" id="grp-'+esc(g.id)+'"><h2>'+esc(g.name)+'</h2><div class="cnt">有货最低 '+g.items.length+' 条'+(g.items.length<30?'（不足 30 条，如实显示）':'')+'</div>'+rows+'</div>';
@@ -174,6 +175,7 @@ function renderBoard(){
     el.addEventListener('click',()=>{
       const t=document.getElementById('grp-'+el.dataset.gid);
       if(!t) return;
+      try{ history.pushState(null,'','#grp-'+el.dataset.gid); }catch(e){}
       t.scrollIntoView({behavior:'smooth',block:'start'});
       t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
     });
@@ -219,7 +221,7 @@ function openSrc(gi,ii,btn){
   const list=(it.sources&&it.sources.length)?it.sources:[{price:it.price,shop:it.shop,platform:it.platform,stock:it.stock,url:it.url}];
   $('#srcTitle').textContent=it.title;
   $('#srcPill').textContent='共 '+it.same_source+' 家';
-  $('#srcList').innerHTML=list.map((s,i)=>'<a class="src-row" style="--i:'+Math.min(i,12)+'" href="'+esc(s.url)+'" target="_blank" rel="noopener"><span class="sp">'+fmtP(s.price)+'</span><span class="sm2"><span class="sn">'+esc(s.shop)+(i===0?'<span class="lowtag">最低价</span>':'')+'</span><span class="si">'+esc(s.platform||'')+' · '+stockTxt(s)+'</span></span><span class="go">›</span></a>').join('');
+  $('#srcList').innerHTML=list.map((s,i)=>'<a class="src-row" style="--i:'+Math.min(i,12)+'" data-anchor="it-'+esc(g.id)+'-'+ii+'" href="'+esc(s.url)+'" target="_blank" rel="noopener"><span class="sp">'+fmtP(s.price)+'</span><span class="sm2"><span class="sn">'+esc(s.shop)+(i===0?'<span class="lowtag">最低价</span>':'')+'</span><span class="si">'+esc(s.platform||'')+' · '+stockTxt(s)+'</span></span><span class="go">›</span></a>').join('');
   const extra=it.same_source-list.length;
   const note=$('#srcNote');
   note.textContent=extra>0?('已列出 '+list.length+' 家有独立商品链接的；其余 '+extra+' 家是聚合站的同源合并计数，没有单独链接。'):'';
@@ -275,6 +277,22 @@ $('#tabShops').onclick=()=>switchTab(true);
 $('#q').oninput=renderBoard;
 $('#sq').oninput=()=>{shopShown=300;renderShops();};
 $('#moreBtn').onclick=()=>{shopShown+=300;renderShops();};
+// 锚点路由：点商品离开前先把 #it-<组>-<序号>（或 #grp-<组>）写入地址并留一条历史，
+// 从商品页返回时按锚点滚回那一条并高亮；带锚点的链接也可直接分享定位。
+document.addEventListener('click',e=>{
+  const a=e.target.closest('a[data-anchor]');
+  if(a){ try{ history.pushState(null,'','#'+a.dataset.anchor); }catch(err){} }
+});
+function jumpToHash(){
+  const id=(location.hash||'').slice(1);
+  if(!id) return;
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.scrollIntoView({block:'start'});
+  el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+}
+window.addEventListener('hashchange',jumpToHash);
+window.addEventListener('pageshow',()=>setTimeout(jumpToHash,60));
 Promise.all([fetch('data/board.json').then(r=>r.json()),fetch('data/shops.json').then(r=>r.json())]).then(([b,s])=>{
   board=b; shops=s;
   $('#meta').textContent='数据截至 '+b.updated_at+'（北京时间） · 共 '+b.groups.reduce((a,g)=>a+g.items.length,0)+' 条报价 · '+b.source;
@@ -282,6 +300,7 @@ Promise.all([fetch('data/board.json').then(r=>r.json()),fetch('data/shops.json')
   $('#chips').innerHTML=plats.map(p=>'<button data-p="'+esc(p)+'"'+(p==='全部'?' class="on"':'')+'>'+esc(p)+'</button>').join('');
   document.querySelectorAll('#chips button').forEach(btn=>btn.onclick=()=>{shopFilter=btn.dataset.p;shopShown=300;document.querySelectorAll('#chips button').forEach(x=>x.classList.toggle('on',x===btn));renderShops();});
   renderBoard(); renderShops();
+  setTimeout(jumpToHash,60);
 }).catch(e=>{$('#meta').textContent='数据加载失败，请稍后刷新。';});
 </script>
 </body>

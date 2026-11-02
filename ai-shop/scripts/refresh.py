@@ -310,7 +310,9 @@ def main():
                     all_offers[key] = o
         except Exception as e:
             print(f'{name} failed: {e}', file=sys.stderr)
-    rows = list(all_offers.values())
+    # 定点剔除（ken 2026-11-02 裁定）：异次元店铺 ¥1.85 为引流价（单源、库存未显示），从看板剔除
+    BLOCKED_URLS = {'https://fk.rupap.cn/item/10'}
+    rows = [o for o in list(all_offers.values()) if o['url'].split('?')[0] not in BLOCKED_URLS]
     print(f'merged unique products: {len(rows)}', file=sys.stderr)
 
     pai = []
@@ -318,7 +320,7 @@ def main():
                  'openai-phone-verification', 'super-grok-heavy'):
         r = fetch_priceai(slug)
         print(f'priceai {slug}: {len(r)} rows', file=sys.stderr)
-        pai += r
+        pai += [o for o in r if o['url'] not in BLOCKED_URLS]
 
     g1, g2, g3 = gpt_groups(rows + [o for o in pai if o['url']])
     # PriceAI 的 GPT 行 category 为空，已在 gpt_groups 内按标题判断；其余分组同理合并
