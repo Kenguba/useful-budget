@@ -106,7 +106,7 @@ def fetch_priceai(slug):
         print(f'priceai {slug} failed: {e}', file=sys.stderr)
         return []
 
-# ---------------- 分组口径（ken 2026-10-31 拍板，固定 7 组） ----------------
+# ---------------- 分组口径（ken 2026-10-31 拍板 7 组；2026-11-02 增 Claude 组，共 8 组） ----------------
 def has(t, *words):
     return any(w in t for w in words)
 
@@ -218,6 +218,36 @@ def norm_title(t):
     t = re.sub(r'[\s【】\[\]（）()·|｜/\\,，。、:：;；!！?？\-—_~`\'"“”‘’*#@]+', '', t)
     return t
 
+def claude_kind(t):
+    tier = 'Max 20x' if has(t, '20x', '20X') else 'Max 5x' if has(t, '5x', '5X') else 'Max' if has(t, 'Max', 'MAX') else 'Pro' if has(t, 'Pro', 'PRO') else ''
+    form = '代充' if has(t, '代充', '直充', '充值', '官冲', '卡冲') else '成品号'
+    return (tier + '·' if tier else '') + form
+
+def claude_group(rows):
+    out = []
+    for o in rows:
+        t = o['title']; c = o.get('category', '')
+        # Claude 必须是标题主角：标记词出现在标题前段（去掉开头符号后 15 字内），
+        # 或店铺分类本身就是 claude 类；仅在标题后段「支持/可用 Claude」的其他商品不算。
+        stripped = re.sub(r'^[^0-9A-Za-z\u4e00-\u9fff]+', '', t).lower()
+        pos = [x for x in (stripped.find('claude'), stripped.find('克劳德')) if x >= 0]
+        cat_ok = c in ('claude-pro', 'claude-max-5x', 'claude-max-20x') and has(t, 'Pro', 'PRO', 'Max', 'MAX')
+        if not ((pos and min(pos) <= 15) or cat_ok):
+            continue
+        if c in ('claude-free', 'api-gateway', 'phone-verification', 'kyc', 'outlook'):
+            continue
+        if has(t, '接码', '接马', '验证码', '短信', '邮箱', 'Outlook', 'Hotmail', '令牌',
+               'API', 'api', '中转', '号池', '卡密', '镜像', '教程', '方法', '普号', '免费',
+               'free', 'Free', 'FREE', '白号', 'KYC', 'kyc', '速刷', '按量', '余额', '注册号',
+               '拼车', '软件', '窗口', 'Notion', 'notion', 'Cursor', 'cursor', 'Perplexity',
+               'Kling', 'kling', '防封'):
+            continue
+        if not has(t, '成品号', '成品账号', '账号', '帐号', '代充', '直充', '充值', '订阅',
+                   '月卡', 'CDK', '兑换码', '礼品卡', '会员', '官冲', '卡冲'):
+            continue
+        out.append(o)
+    return out
+
 def top30(rows, kind):
     merged = {}
     srcs = {}
@@ -304,12 +334,34 @@ def main():
         dict(id='ag-verified', name='Antigravity 反重力 — 已过验证成品号', items=slim(top30(g5, ag_type))),
         dict(id='codex-sms', name='Codex 接码 — 单次', items=slim(top30(g6, None))),
         dict(id='grok-heavy', name='Grok Heavy（SuperGrok Heavy/Ultra）', items=slim(top30(g7, lambda t: '代充' if has(t, '代充', '直充') else '成品号'))),
+        dict(id='claude', name='Claude — 最便宜', items=slim(top30(claude_group(rows + pai), claude_kind))),
     ]
     from datetime import datetime, timezone, timedelta
     bj_now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M')
     board = dict(updated_at=bj_now,
                  source='AI价网 + cardnav + PriceAI 按商家遍历合并',
                  groups=groups)
+    # 详情页售罄核验（ken 2026-11-02）：能直读详情页的自建站（aicdks）逐条核验，
+    # 页面显示售罄或库存 0 的剔除；读不到详情页的平台（wzyp 被验证挡、16688/catfk 无内容）不在此列。
+    def verify_aicdks(items):
+        kept = []
+        for it in items:
+            if 'aicdks.com' not in it['url']:
+                kept.append(it)
+                continue
+            try:
+                txt = strip_tags(fetch(it['url'], retries=0).decode('utf-8', 'ignore'))
+                km = re.search(r'库存\s*[:：]?\s*(\d+)', txt)
+                if '售罄' in txt or '已售完' in txt or (km and int(km.group(1)) == 0):
+                    print(f'soldout-drop: {it["url"]}', file=sys.stderr)
+                    continue
+            except Exception:
+                pass
+            kept.append(it)
+        return kept
+    for g in groups:
+        g['items'] = verify_aicdks(g['items'])
+
     # 防覆盖保险（ken 2026-11-02）：新数据总条数不足上一版一半时，判定上游大面积失败，
     # 直接报错退出、不覆盖旧 board.json，网站保持上一版好数据。
     new_total = sum(len(g['items']) for g in groups)
@@ -333,6 +385,8 @@ def main():
         srows = list(csv.DictReader(io.open(csv_path, encoding='utf-8')))
         best = {}
         for r in srows:
+            if '失效' in (r.get('note') or ''):
+                continue
             key = (r['platform'], r['shop_code']) if r['shop_code'] else (r['platform'], 'name:' + r['shop_name'])
             cur = best.get(key)
             score = (2 if r['shop_url'] else 0) + (0 if '店名未记录' in r['shop_name'] else 1)
