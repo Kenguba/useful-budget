@@ -959,18 +959,21 @@ $("llmBtn").addEventListener("click",()=>{
   },400);
 });
 $("rtcBtn").addEventListener("click",()=>{
-  const box=$("rtcResult");$("rtcBtn").textContent="检测中…";box.innerHTML="";const found=new Set();
+  const box=$("rtcResult");const btn=$("rtcBtn");btn.textContent="检测中…";box.innerHTML="";const found=new Map();let done=false;
+  const render=()=>{if(done)return;done=true;btn.textContent="重新检测";
+    box.innerHTML=found.size?("发现候选地址：<br>"+[...found.values()].map(escapeHtml).join("<br>")+"<br>结论：浏览器暴露了本地 / 公网候选地址，VPN 场景下请留意泄露。"):"未发现候选地址（浏览器限制了 WebRTC / mDNS，或当前网络拦截了 STUN 服务器）。";};
   try{
-    const pc=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});
+    const pc=new RTCPeerConnection({iceServers:[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302","stun:stun.cloudflare.com:3478","stun:stun.nextcloud.com:443"]}]});
     pc.createDataChannel("x");
     pc.onicecandidate=e=>{
-      if(!e.candidate){pc.close();$("rtcBtn").textContent="重新检测";box.innerHTML=found.size?("发现候选地址：<br>"+[...found].map(escapeHtml).join("<br>")+"<br>结论：浏览器暴露了本地 / 公网候选地址，VPN 场景下请留意泄露。"):"未发现候选地址（浏览器已限制 mDNS / WebRTC）。";return}
-      const parts=e.candidate.candidate.split(" ");const addr=parts[4];
-      if(addr)found.add(addr+(addr.includes(".local")?"（mDNS 掩码）":""));
+      if(!e.candidate){try{pc.close()}catch(_){/*noop*/}render();return}
+      const parts=(e.candidate.candidate||"").split(" ");const addr=parts[4];const typ=parts[7]||"";
+      if(addr&&!found.has(addr))found.set(addr,addr+(addr.includes(".local")?"（本地 · mDNS 掩码）":typ==="srflx"?"（公网 · STUN 映射）":typ==="host"?"（本地）":""));
     };
-    pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(()=>{box.textContent="检测失败：浏览器拒绝创建 WebRTC 会话。"});
-    setTimeout(()=>{if($("rtcBtn").textContent==="检测中…"){$("rtcBtn").textContent="重新检测";if(!box.innerHTML)box.textContent="超时：未收集到候选地址。"}},4000);
-  }catch(err){box.textContent="当前浏览器不支持 WebRTC 检测。";$("rtcBtn").textContent="点击检测"}
+    pc.onicegatheringstatechange=()=>{if(pc.iceGatheringState==="complete"){try{pc.close()}catch(_){/*noop*/}render()}};
+    pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(()=>{if(!done){done=true;btn.textContent="重新检测";box.textContent="检测失败：浏览器拒绝创建 WebRTC 会话。"}});
+    setTimeout(render,9000);
+  }catch(err){box.textContent="当前浏览器不支持 WebRTC 检测。";btn.textContent="点击检测"}
 });
 $("fpUa").textContent=navigator.userAgent||"—";
 $("fpLang").textContent=(navigator.languages&&navigator.languages.join(", "))||navigator.language||"—";
