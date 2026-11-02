@@ -805,7 +805,7 @@ async function runQuery(ip,selfMode){
     };
     d.range=rangeFromCIDR(d.prefix,d.ip);
     d.cls=classify(d);applyType(d);render(d);
-    if(selfMode){$("myV4").textContent=d.ip;$("myV4").onclick=e=>{e.preventDefault();runQuery(d.ip,false)};fillAltFamily(d.ip)}
+    if(selfMode){setMyIp(d.ip,true);fillAltFamily(d.ip)}
     // 第二阶段：WHOIS / 路由历史 / BGP 邻居 / 黑名单 / 注册块
     const[overview,whoisJ,routing,neigh,prefixOv,bl,geo,proxy]=await settled([
       asn?ripe("as-overview",asn):Promise.resolve(null),
@@ -897,18 +897,33 @@ function applyType(d){
 }
 function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove("show"),1800)}
 function setBusy(b){state.busy=b;$("searchBtn").disabled=b;$("searchBtn").textContent=b?"检测中…":"Search";$("card").classList.toggle("loading",b)}
+const myIpState={v4:"",v6:"",primary6:false};
+function renderMyIp(){
+  const bind=(id,ip)=>{const el=$(id);el.textContent=ip||"";el.onclick=ip?e=>{e.preventDefault();runQuery(ip,false)}:null};
+  bind("myV4",myIpState.v4);bind("myV6",myIpState.v6);
+  $("v6Pref").textContent=(myIpState.v6&&myIpState.primary6)?"IPv6优先":"";
+}
+function setMyIp(ip,primary){
+  if(!ip)return;
+  if(ip.includes(":")){myIpState.v6=ip;if(primary)myIpState.primary6=true}
+  else if(/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)){myIpState.v4=ip;if(primary)myIpState.primary6=false}
+  renderMyIp();
+}
+async function fetchAltFamily(want6){
+  const eps=want6?["https://api6.ipify.org?format=json","https://ipv6.icanhazip.com","https://v6.ident.me"]:["https://api4.ipify.org?format=json","https://ipv4.icanhazip.com","https://v4.ident.me"];
+  for(const u of eps){
+    try{
+      const isJson=u.includes("ipify");
+      const r=isJson?await fetchJSON(u,3500):await fetchText(u,3500);
+      const ip=isJson?(r&&r.ip):(r||"").trim();
+      if(ip&&(want6?ip.includes(":"):(/^\d{1,3}(\.\d{1,3}){3}$/.test(ip))))return ip;
+    }catch(e){/* 换下一个端点 */}
+  }
+  return "";
+}
 function fillAltFamily(primary){
   const is6=primary.includes(":");
-  fetchJSON(is6?"https://api4.ipify.org?format=json":"https://api6.ipify.org?format=json",4000).then(j=>{
-    if(!j||!j.ip||j.ip===primary)return;
-    if(is6){
-      $("myV4").textContent=j.ip;$("myV4").onclick=e=>{e.preventDefault();runQuery(j.ip,false)};
-      $("myV6").textContent=primary;$("myV6").onclick=e=>{e.preventDefault();runQuery(primary,false)};
-      $("v6Pref").textContent="IPv6优先";
-    }else{
-      $("myV6").textContent=j.ip;$("myV6").onclick=e=>{e.preventDefault();runQuery(j.ip,false)};
-    }
-  }).catch(()=>{});
+  fetchAltFamily(!is6).then(ip=>{if(ip&&ip!==primary)setMyIp(ip,false)}).catch(()=>{});
 }
 
 /* ---------- 交互 ---------- */
@@ -988,7 +1003,7 @@ const q=new URLSearchParams(location.search);
 if(q.get("ip"))runQuery(q.get("ip"),false);else runQuery("",true);
 fetchText("https://www.cloudflare.com/cdn-cgi/trace",4000).then(t=>{
   const m=t.match(/^ip=(.+)$/m);
-  if(m&&m[1].includes(":")){$("myV6").textContent=m[1].trim();$("v6Pref").textContent="IPv6优先"}
+  if(m)setMyIp(m[1].trim(),false);
 }).catch(()=>{});
 
 </script>
