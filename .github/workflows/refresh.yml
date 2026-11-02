@@ -34,7 +34,7 @@ jobs:
         run: |
           git config user.name "skills-board-bot"
           git config user.email "bot@localhost"
-          git add skill-board/data/ ai-shop/data/ cloud-phone/data/
+          git add skill-board/data/ ai-shop/data/ cloud-phone/data/ ai-shop/index.html
           git diff --cached --quiet || git commit -m "data: refresh $(date -u +%F)"
           git push
       - uses: actions/configure-pages@v5
