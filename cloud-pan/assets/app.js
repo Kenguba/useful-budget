@@ -1,13 +1,13 @@
 /* 基德盘搜复刻 — 共享外壳 + 各页渲染（数据来自 data/ 快照） */
 (function () {
   "use strict";
-  var BASE = window.NASPT_BASE || "";
+  var BASE = window.PAN_BASE || "";
   var ORIGIN = "https://naspt.vip";
   /* 实时数据中转（Cloudflare Worker）：页面 -> Worker -> 原站公开接口。
      RELAY 未配置或请求失败时，自动回退到 data/ 快照。 */
   /* 接口地址来自 assets/config.js（部署时只改那个文件）。
      RELAY 为空字符串表示同域请求（pan.xxxxx.asia），属正常配置，不是未配置。 */
-  var RELAY = (typeof window.NASPT_RELAY === "string") ? window.NASPT_RELAY : "https://api.jpedu.asia";
+  var RELAY = (typeof window.PAN_RELAY === "string") ? window.PAN_RELAY : "https://api.jpedu.asia";
   function relayReady() { return typeof RELAY === "string" && RELAY.indexOf("example.workers.dev") < 0; }
   function apiGet(path) {
     return fetch(RELAY + "/api/public" + path).then(function (r) {
@@ -285,7 +285,7 @@
     bindClose("accessOv");
 
     // 公告弹窗（每会话一次）
-    if (pres.popup_enabled && !sessionStorage.getItem("naspt_popup_seen")) {
+    if (pres.popup_enabled && !sessionStorage.getItem("pan_popup_seen")) {
       var link = extractPopupLink(pres);
       var bodyHtml = esc(pres.popup_content || "").replace(/\n/g, "<br>");
       if (link) bodyHtml = bodyHtml.replace("点我进群", '<a href="' + esc(link) + '" target="_blank" rel="noopener">点我进群</a>');
@@ -297,7 +297,7 @@
         '<div class="d-foot"><button class="btn-primary" data-close>我知道了</button></div>' +
         "</div></div>";
       document.body.insertAdjacentHTML("beforeend", ov);
-      bindClose("popupOv", function () { sessionStorage.setItem("naspt_popup_seen", "1"); });
+      bindClose("popupOv", function () { sessionStorage.setItem("pan_popup_seen", "1"); });
     }
 
     // 求片弹窗（字段与原站 ResourceRequestDialog 一致；原站提交 POST /public/resource-requests，复刻版跨域不可达，本地模拟成功态）
