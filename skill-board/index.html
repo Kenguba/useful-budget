@@ -67,6 +67,7 @@ select#dateSel{min-width:150px}
 #datePill{display:inline-block;min-width:180px;text-align:center}
 .stat{min-height:96px}
 .skel{background:linear-gradient(90deg,#e9eef6 25%,#f7fafd 50%,#e9eef6 75%);background-size:800px 100%;animation:sksh 1.3s infinite linear;border-radius:6px}
+.skelbar{background-image:linear-gradient(90deg,#dfe7f5 25%,#f4f8ff 50%,#dfe7f5 75%)!important;background-size:800px 100%!important;animation:sksh 1.3s infinite linear;color:transparent!important}
 #highlights .skel{background:linear-gradient(90deg,rgba(146,64,14,.16) 25%,rgba(146,64,14,.05) 50%,rgba(146,64,14,.16) 75%);background-size:800px 100%}
 @keyframes sksh{0%{background-position:-400px 0}100%{background-position:400px 0}}
 </style>
@@ -84,14 +85,14 @@ select#dateSel{min-width:150px}
   <div class="row" style="justify-content:space-between">
     <div class="kicker">2026 - GLOBAL AGENT SKILLS USAGE RANKING</div>
     <div class="row">
-      <select id="dateSel" aria-label="期数"><option value="">····-··-·· 期</option></select>
+      <select id="dateSel" class="skelbar" aria-label="期数"><option value="">····-··-·· 期</option></select>
       <button id="reloadBtn">刷新数据</button>
     </div>
   </div>
   <h1>全球 <mark>Skills</mark> 使用量排行榜</h1>
   <div class="sub">两张榜：谁被装得最多（3 个注册中心）+ 谁的源码最值得信（GitHub）</div>
   <div class="row">
-    <span class="pill solid" id="datePill">数据截至 —</span>
+    <span class="pill solid skelbar" id="datePill">数据截至 ····-··-··（UTC）</span>
     <span class="pill">skills.sh · ClawHub · 腾讯 SkillHub · GitHub</span>
   </div>
   <div class="row">
@@ -126,7 +127,7 @@ function item(r,left,numHtml,cmdHtml){const s=((left.skill||left.repo||"")+" "+(
 function section(no,title,desc,inner){return `<section><div class="sec-head"><div style="display:flex;gap:10px;align-items:center"><span class="badge">${no}</span><h2>${title}</h2></div><p>${desc}</p></div>${inner}</section>`}
 function render(b){
   board=b;
-  document.getElementById("datePill").textContent=`数据截至 ${b.date}（UTC）`;
+  const dp=document.getElementById("datePill");dp.textContent=`数据截至 ${b.date}（UTC）`;dp.classList.remove("skelbar");
   const s=b.stats;
   document.getElementById("stats").innerHTML=
     `<div class="stat"><b>${esc(s.trackedSkills)}</b><span>在榜追踪技能</span></div>`+
@@ -185,7 +186,7 @@ async function load(date){
 (async()=>{
   try{DATES=await (await fetch("data/dates.json?t="+Date.now())).json()}catch(e){DATES=[]}
   const sel=document.getElementById("dateSel");
-  sel.innerHTML=DATES.map(d=>`<option value="${d}">${d} 期</option>`).join("");
+  sel.innerHTML=DATES.map(d=>`<option value="${d}">${d} 期</option>`).join("");sel.classList.remove("skelbar");
   sel.addEventListener("change",()=>load(sel.value));
   document.getElementById("reloadBtn").addEventListener("click",()=>load(sel.value||null));
   document.getElementById("q").addEventListener("input",applyFilter);
