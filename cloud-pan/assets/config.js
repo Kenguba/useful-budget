@@ -13,7 +13,7 @@
   };
   var DEFAULT_RELAY = "https://api.jpedu.asia";
   var host = location.hostname;
-  window.NASPT_RELAY = Object.prototype.hasOwnProperty.call(RELAY_BY_HOST, host)
+  window.PAN_RELAY = Object.prototype.hasOwnProperty.call(RELAY_BY_HOST, host)
     ? RELAY_BY_HOST[host]
     : DEFAULT_RELAY;
 })();
