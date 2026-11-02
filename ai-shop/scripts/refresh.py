@@ -12,7 +12,7 @@
 用法：python3 scripts/refresh.py
 产出：data/board.json、data/shops.json
 """
-import csv, html, io, json, os, re, sys, time, urllib.request
+import csv, html, io, json, os, re, sys, time, urllib.parse, urllib.request
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(BASE, 'data')
@@ -124,7 +124,7 @@ GPT_CATS = {'gpt-plus', 'gpt', 'gpt-go'}
 def gpt_groups(rows):
     g1, g2, g3 = [], [], []
     for o in rows:
-        t = o['title']
+        t = o.get('ctitle') or o['title']
         low = t.lower()
         if o['category'] and o['category'] not in GPT_CATS:
             continue
@@ -189,6 +189,9 @@ def codex_group(rows):
             continue
         if has(t, '邮箱', 'PayPal', 'paypal', '平台', '谷歌账号', 'Gmail', 'gmail'):
             continue
+        spec = o.get('spec') or ''
+        if spec and has(spec, '10次', '十次', '多次', '长效'):
+            continue  # 多次/长效规格不是单次接码（ken 2026-11-02 多规格处理）
         out.append(o)
     return out
 
@@ -217,6 +220,51 @@ def norm_title(t):
     t = html.unescape(t).lower()
     t = re.sub(r'[\s【】\[\]（）()·|｜/\\,，。、:：;；!！?？\-—_~`\'"“”‘’*#@]+', '', t)
     return t
+
+def split_spec(title):
+    """多规格商品：cardnav 把每个规格拆成一条，标题形如「基名 · 规格名」，
+    价格/库存都是该规格自己的；无后缀的基名条价格=最低规格价、库存=各规格总量，不可归属。"""
+    parts = re.split(r'\s+·\s+', title)
+    if len(parts) >= 2 and parts[-1].strip():
+        return ' · '.join(parts[:-1]), parts[-1].strip()
+    return title, ''
+
+SPEC_WEEKLY = ('周限', '周额度', '无5h', '无 5h', '无5小时', '无 5 小时', '没有5小时')
+SPEC_BOUND = ('已接码', '已接马', '已接🐎', '已绑定')
+SPEC_UNBOUND = ('未接', '未绑')
+
+def prepare_offers(rows):
+    """算每条的 spec 与分类用标题 ctitle：分类轴（日抛/周限、已接/未接）以规格为准，
+    基名里的同轴冲突词剔除后另附规格结论标签，排除词仍查全文（规格里的「非plus/资格」也要拦）。
+    同一商品链接下只要有带规格的条目，无规格基名条丢弃（价格/库存不可归属，挂哪组都是错的）。"""
+    fam = {}
+    for o in rows:
+        base, spec = split_spec(o['title'])
+        o['base_title'], o['spec'] = base, spec
+        fam.setdefault(urllib.parse.unquote(o['url'].split('?')[0]), set()).add(spec)
+    out = []
+    for o in rows:
+        spec = o['spec']
+        if not spec and any(s and s != '默认规格' for s in fam[urllib.parse.unquote(o['url'].split('?')[0])]):
+            continue
+        if spec and spec != '默认规格':
+            base, tags = o['base_title'], ''
+            sw = has(spec, *SPEC_WEEKLY); sd = '日抛' in spec
+            if sw or sd:
+                for w in ('周限', '周额度', '无5小时', '无 5 小时', '无5h', '无 5h', '没有5小时'):
+                    base = base.replace(w, '')
+                if sw:
+                    tags += ' 周限'
+            sb = has(spec, *SPEC_BOUND); su = has(spec, *SPEC_UNBOUND)
+            if sb or su:
+                for w in ('已接马', '未接马', '已接码', '未接码', '已绑定手机号', '未绑定手机号', '已接🐎', '未接🐎'):
+                    base = base.replace(w, '')
+                tags += ' 已接马' if (sb and not su) else (' 未接马' if su else '')
+            o['ctitle'] = spec + '｜' + base + tags
+        else:
+            o['ctitle'] = o['title']
+        out.append(o)
+    return out
 
 def claude_kind(t):
     tier = 'Max 20x' if has(t, '20x', '20X') else 'Max 5x' if has(t, '5x', '5X') else 'Max' if has(t, 'Max', 'MAX') else 'Pro' if has(t, 'Pro', 'PRO') else ''
@@ -270,7 +318,7 @@ def top30(rows, kind, limit=30):
                 merged[k] = dict(o, same_source=keep)
     out = sorted(merged.values(), key=lambda x: x['price'])[:limit]
     for o in out:
-        o['kind'] = kind(o['title']) if kind else ''
+        o['kind'] = kind(o.get('ctitle') or o['title']) if kind else ''
         seen, lst = set(), []
         for s in sorted(srcs.get(norm_title(o['title']), []), key=lambda x: x['price']):
             u = s['url'].split('?')[0]
@@ -303,10 +351,11 @@ def main():
             rows = load_shop_products(url)
             print(f'{name}: {len(rows)} products', file=sys.stderr)
             for o in rows:
-                key = o['url'].split('?')[0]
+                _b, _s = split_spec(o['title'])
+                key = (urllib.parse.unquote(o['url'].split('?')[0]), norm_title(_s))
                 cur = all_offers.get(key)
                 if cur is None or (o['ts'] or 0) > (cur['ts'] or 0):
-                    o['url'] = key
+                    o['url'] = o['url'].split('?')[0]
                     all_offers[key] = o
         except Exception as e:
             print(f'{name} failed: {e}', file=sys.stderr)
@@ -322,6 +371,8 @@ def main():
         print(f'priceai {slug}: {len(r)} rows', file=sys.stderr)
         pai += [o for o in r if o['url'] not in BLOCKED_URLS]
 
+    rows = prepare_offers(rows)
+    pai = prepare_offers(pai)
     g1, g2, g3 = gpt_groups(rows + [o for o in pai if o['url']])
     # PriceAI 的 GPT 行 category 为空，已在 gpt_groups 内按标题判断；其余分组同理合并
     g4, g5 = ag_groups(rows + pai)
