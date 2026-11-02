@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全球 Skills 使用量排行榜</title>
+<style>
+:root{--ink:#0f172a;--blue:#1e40af;--blue2:#3b82f6;--gold:#d97706;--bg:#f8fafc;--card:#fff;--mut:#64748b;--line:#e2e8f0;--ring:rgba(59,130,246,.15)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:clamp(14px,3vw,20px) clamp(10px,3vw,16px) 64px}
+.kicker{color:var(--blue);font-weight:800;letter-spacing:.12em;font-size:12px;line-height:1.4}
+.kicker:before{content:"";display:inline-block;width:18px;height:4px;border-radius:2px;background:var(--gold);margin-right:8px;vertical-align:middle}
+h1{font-size:clamp(24px,5.5vw,38px);line-height:1.2;margin:10px 0 8px;font-weight:850;letter-spacing:-.02em}
+h1 mark{background:linear-gradient(transparent 65%,#fde68a 65%);color:inherit;padding:0 3px;border-radius:3px}
+.sub{font-weight:600;font-size:clamp(13px,3vw,15px);line-height:1.55;color:var(--mut)}
+.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.pill{border:1px solid var(--line);border-radius:999px;padding:5px clamp(9px,2.5vw,13px);font-size:clamp(11px,2.8vw,12px);background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.02)}
+.pill.solid{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+.pill.warn{border-color:#fde68a;background:#fefce8;color:#92400e}
+select,button{font-size:clamp(13px,3vw,14px);border-radius:10px;border:1px solid var(--line);padding:7px 11px;background:#fff;color:var(--ink);outline:none;transition:border-color .15s}
+select:focus,input[type=search]:focus{border-color:var(--blue2);box-shadow:0 0 0 3px var(--ring)}
+button{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700;cursor:pointer;transition:transform .1s,opacity .15s}
+button:hover{opacity:.92}button:active{transform:scale(.98)}button:disabled{opacity:.5;cursor:not-allowed}
+input[type=search]{flex:1;min-width:180px;font-size:clamp(13px,3vw,14px);border-radius:10px;border:1px solid var(--line);padding:7px 11px;background:#fff;outline:none;transition:border-color .15s}
+.bar{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--blue) 55%,var(--gold) 55%);margin:12px 0 16px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:clamp(11px,2.5vw,16px);box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.stat b{font-size:clamp(22px,5.5vw,28px);color:var(--blue);display:block}
+.stat span{color:var(--mut);font-size:clamp(11px,2.8vw,13px);line-height:1.45;display:block;margin-top:3px}
+section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:clamp(13px,3vw,18px) clamp(11px,3vw,16px);margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.03);overflow:hidden}
+.sec-head{display:flex;justify-content:space-between;gap:6px 12px;align-items:baseline;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:6px}
+.sec-head h2{margin:0;font-size:clamp(17px,4vw,20px);line-height:1.35}
+.badge{background:var(--blue);color:#fff;border-radius:8px;padding:4px 7px;font-size:11px;font-weight:800}
+.sec-head p{margin:0;color:var(--mut);font-size:12px;line-height:1.5}
+h3{font-size:clamp(14px,3.2vw,15px);margin:14px 0 6px;color:var(--blue);font-weight:700}
+.item{padding:clamp(8px,2vw,11px) 2px;border-bottom:1px dashed var(--line);transition:background .15s}
+.itemtop{display:flex;gap:clamp(8px,2vw,12px)}
+.item:last-child{border-bottom:none}
+.rank{flex:0 0 clamp(28px,6.5vw,32px);height:clamp(28px,6.5vw,32px);border-radius:50%;background:#eef2f8;color:var(--blue);font-weight:800;font-size:clamp(12px,2.8vw,13px);display:flex;align-items:center;justify-content:center}
+.rank.top{background:var(--gold);color:#fff}
+.item .main{flex:1;min-width:0}
+.name{font-weight:750;font-size:clamp(14px,3vw,15px);word-break:break-word;overflow-wrap:anywhere}
+.name a{color:inherit;text-decoration:none}
+.name a:hover{color:var(--blue2)}
+.meta{color:var(--mut);font-size:11px;margin-left:5px;font-weight:normal}
+.blurb{color:#334155;font-size:clamp(12px,2.8vw,13px);line-height:1.5;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.num{font-weight:800;color:var(--blue);text-align:right;flex-shrink:0}
+.num small{display:block;color:var(--mut);font-weight:400;font-size:clamp(10px,2.4vw,11px);line-height:1.35;white-space:nowrap}
+.cmdwrap{position:relative;display:block;margin-top:6px}
+code.cmd{display:block;background:#0f172a;color:#e2e8f0;border-radius:8px;padding:7px 42px 7px 10px;font-size:11px;overflow-x:auto;white-space:nowrap;cursor:pointer;border:1px solid rgba(255,255,255,.08);transition:background .15s;max-width:100%;box-sizing:border-box;scrollbar-width:none}
+code.cmd::-webkit-scrollbar{display:none}
+code.cmd:hover{background:#1e293b}
+.copybtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:6px;color:#cbd5e1;cursor:pointer;padding:0}
+.copybtn:hover{background:rgba(255,255,255,.2);color:#fff}
+.copybtn:active{background:rgba(255,255,255,.3)}
+#toast{position:fixed;top:14px;left:50%;transform:translate(-50%,-10px);background:#0f172a;color:#fff;padding:9px 20px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:999;box-shadow:0 6px 20px rgba(0,0,0,.28)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.grid2,.grid3{display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+.grid2>div,.grid3>div{min-width:0}
+@media(min-width:700px){.grid2{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}.grid3{grid-template-columns:repeat(3,minmax(0,1fr));gap:0 20px}.stats{grid-template-columns:repeat(4,1fr)}}
+.hl{background:#fefce8;border:1px solid #fde68a;border-radius:14px;padding:12px 14px;line-height:1.8;font-size:13px;color:#78350f}
+.note{color:var(--mut);font-size:13px;line-height:1.8}
+.empty-tip{text-align:center;padding:40px 16px;color:var(--mut);font-size:14px}
+footer{color:var(--mut);font-size:12px;line-height:1.8;margin-top:24px;text-align:center}
+.hidden{display:none!important}
+</style>
+<meta name="theme-color" content="#1c4f9c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Skills 榜">
+</head>
+<body>
+<div class="wrap">
+  <div class="row" style="justify-content:space-between">
+    <div class="kicker">2026 · GLOBAL AGENT SKILLS USAGE RANKING</div>
+    <div class="row">
+      <select id="dateSel" aria-label="期数"></select>
+      <button id="reloadBtn">刷新数据</button>
+    </div>
+  </div>
+  <h1>全球 <mark>Skills</mark> 使用量排行榜</h1>
+  <div class="sub">两张榜：谁被装得最多（3 个注册中心）+ 谁的源码最值得信（GitHub）</div>
+  <div class="row">
+    <span class="pill solid" id="datePill">数据截至 —</span>
+    <span class="pill">skills.sh · ClawHub · 腾讯 SkillHub · GitHub</span>
+  </div>
+  <div class="row">
+    <span class="pill warn">跨平台数字并列，不做相加</span>
+    <span class="pill">GitHub 无安装数 → 以星标单列</span>
+    <input type="search" id="q" placeholder="搜技能名，过滤所有榜单…">
+  </div>
+  <div class="bar"></div>
+  <div class="stats" id="stats"></div>
+  <div class="hl" id="highlights" style="margin-top:14px"></div>
+  <div id="sections"></div>
+  <div id="emptyTip" class="empty-tip hidden">未找到包含该关键词的技能或说明</div>
+  <footer>
+    数据来源：Best Skills（https://github.com/LinklyAI/best-skills，CC BY 4.0，每日 CSV）+ GitHub API 直查。<br>
+    跨平台口径不同，数字并列展示、从不相加；榜单为空 = 未测量，不是 0。自托管版：定时跑 scripts/refresh.py 更新 data/。
+  </footer>
+</div>
+<div id="toast" role="status">复制成功</div>
+<script>
+const fmt=n=>n==null?"—":Number(n).toLocaleString("en-US");
+const compact=n=>n==null?"—":(n>=1e6?(n/1e6).toFixed(2)+"M":n>=1e3?(n/1e3).toFixed(1)+"K":String(n));
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let DATES=[], board=null;
+function rankBadge(r){return `<div class="rank ${r<=3?"top":""}">${r}</div>`}
+function cmd(c){return c?`<span class="cmdwrap" data-cmd="${esc(c)}"><code class="cmd" title="点按复制">${esc(c)}</code><button class="copybtn" type="button" aria-label="复制命令" title="复制"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></span>`:""}
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1600)}
+function doCopy(text){const done=()=>showToast("复制成功");const fb=()=>{const a=document.createElement("textarea");a.value=text;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy");done()}catch(e){showToast("复制失败，请长按命令手动复制")}a.remove()};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(fb)}else fb()}
+function fitCmds(){document.querySelectorAll("code.cmd").forEach(el=>{let s=11;el.style.fontSize=s+"px";while(el.scrollWidth>el.clientWidth&&s>8){s-=0.5;el.style.fontSize=s+"px"}})}
+let _rzT;window.addEventListener("resize",()=>{clearTimeout(_rzT);_rzT=setTimeout(fitCmds,150)});
+function nameLink(name,url,meta){const n=url?`<a href="${esc(url)}" target="_blank" rel="noopener">${esc(name)}</a>`:esc(name);return `<span class="name">${n}</span>${meta?`<span class="meta">${esc(meta)}</span>`:""}`}
+function item(r,left,numHtml,cmdHtml){const s=((left.skill||left.repo||"")+" "+(left.blurb||"")+" "+(left.meta||"")).toLowerCase();return `<div class="item" data-skill="${esc(s)}"><div class="itemtop">${rankBadge(r)}<div class="main">${left.html}</div><div class="num">${numHtml||""}</div></div>${cmdHtml||""}</div>`}
+function section(no,title,desc,inner){return `<section><div class="sec-head"><div style="display:flex;gap:10px;align-items:center"><span class="badge">${no}</span><h2>${title}</h2></div><p>${desc}</p></div>${inner}</section>`}
+function render(b){
+  board=b;
+  document.getElementById("datePill").textContent=`数据截至 ${b.date}（UTC）`;
+  const s=b.stats;
+  document.getElementById("stats").innerHTML=
+    `<div class="stat"><b>${esc(s.trackedSkills)}</b><span>在榜追踪技能</span></div>`+
+    `<div class="stat"><b>${s.dataSources}</b><span>数据源：3 注册中心 + GitHub</span></div>`+
+    `<div class="stat"><b>${s.boards}</b><span>张每日刷新榜单</span></div>`+
+    `<div class="stat"><b>${compact(s.maxInstalls)}</b><span>单技能最高安装量（${esc(s.maxInstallsSkill)}）</span></div>`;
+  document.getElementById("highlights").innerHTML=b.highlights.map(h=>`· ${esc(h)}`).join("<br>");
+  let h="";
+  // 01 installs + repos
+  let inner=b.installs.map(e=>{
+    const vals=[["skills.sh",e.installsSkillssh],["ClawHub",e.downloadsClawhub],["SkillHub",e.downloadsSkillhub]].filter(x=>x[1]!=null);
+    return item(e.rank,{skill:e.skill,blurb:e.blurb,meta:e.category+" · "+e.platform,html:`${nameLink(e.skill,e.url,e.category+" · "+e.platform)}<div class="blurb">${esc(e.blurb)}</div>`},
+      vals.map(v=>`${fmt(v[1])}<small>${v[0]}</small>`).join(""),cmd(e.installCmd));
+  }).join("");
+  inner+=`<h3>GitHub 星标榜 TOP 10</h3>`+b.repos.map(e=>item(e.rank,{skill:e.repo,blurb:e.blurb,meta:e.maintainer,html:`${nameLink(e.repo,e.url,e.maintainer)}<div class="blurb">${esc(e.blurb)}</div>`},
+    `${fmt(e.stars)} ★${e.starsDelta1d!=null?`<small>日增 +${fmt(e.starsDelta1d)}</small>`:""}`)).join("");
+  h+=section("01","安装量总榜 TOP 8","每行都写了「它到底干什么」· 三平台原生口径并列",inner);
+  // 02 platforms
+  const plat=(t,rows)=>`<h3>${t}</h3>`+rows.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},fmt(e.value))).join("");
+  h+=section("02","三平台分区榜","各平台只跟自己比，不跨平台合并",`<div class="grid3"><div>${plat("skills.sh",b.platforms.skillssh)}</div><div>${plat("ClawHub",b.platforms.clawhub)}</div><div>${plat("腾讯 SkillHub",b.platforms.skillhub)}</div></div>`);
+  // 03 WIS
+  inner=b.wis.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,meta:e.category+" · "+e.platform,html:`${nameLink(e.skill,e.url,e.category+" · "+e.platform)}<div class="blurb">${esc(e.blurb)}</div>`},
+    `${e.wis}<small>WIS · 覆盖 ${esc(e.coverage)}</small>`,cmd(e.installCmd))).join("");
+  h+=section("03","WIS 综合值得装榜 TOP 10","热度 × 动能 × 声量 × 维护 × 信任的综合分",inner);
+  // 04 momentum
+  const trend=b.trending.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${e.growthPct!=null?(e.growthPct>0?"+":"")+e.growthPct+"%":"—"}<small>7 日 · ${fmt(e.installs)}</small>`)).join("");
+  const buzz=b.buzz.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${e.score}<small>X ${e.x}${e.xTruncated?"+":""} · GH ${e.gh} · HN ${e.hn}</small>`)).join("");
+  const rising=b.rising.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,meta:e.platform,html:`${nameLink(e.skill,e.url,e.platform)}<div class="blurb">${esc(e.blurb)}</div>`},`${fmt(e.value)}<small>安装 · 上榜 ${e.ageDays} 天</small>`)).join("");
+  const active=b.active.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${esc(e.lastUpdate)}<small>${e.versions??"—"} 个版本</small>`)).join("");
+  h+=section("04","动能 · 声量 · 新星 · 维护","四张子榜：最近 7 天和 30 天在发生什么",`<div class="grid2"><div><h3>7 日动能</h3>${trend}</div><div><h3>社交声量</h3>${buzz}</div><div><h3>30 天新星</h3>${rising}</div><div><h3>最活跃维护</h3>${active}</div></div>`);
+  // 05 vendors + how to choose
+  inner=b.vendors.map(e=>item(e.rank,{skill:e.vendor,blurb:e.note,meta:e.platform,html:`${nameLink(e.vendor,"",e.platform)}<div class="blurb">${esc(e.note||"")} · ${fmt(e.skillsCount)} 个技能</div>`},fmt(e.total))).join("");
+  inner+=`<h3>装之前先问四件事</h3><div class="note">1. 谁做的？官方组织 / 知名开发者优先。&nbsp;2. 还在维护吗？看最活跃维护榜的最近更新与版本数。&nbsp;3. 热度是真的吗？安装量、星标、社交声量三个口径对得上才算。&nbsp;4. 覆盖几个平台？只在一个注册中心有数（覆盖 C）的，结论别下太满。</div>`;
+  const ex1=b.installs.find(e=>e.installCmd), ex2=b.active.find(e=>e.installCmd);
+  inner+=`<h3>安装命令示例</h3>${ex1?cmd(ex1.installCmd):""}${ex2&&ex2.installCmd!==ex1.installCmd?cmd(ex2.installCmd):""}`;
+  inner+=`<h3>三条避坑</h3><div class="note">· 跨平台数字不能相加：skills.sh 的安装、ClawHub 的下载、SkillHub 的安装不是一回事。<br>· 同名不同源是常态：认准厂商（vendor）和链接，别只看技能名。<br>· 装任何技能前先过一遍安全预审（如 skill-vetter），尤其是要执行命令的那种。</div>`;
+  h+=section("05","厂商榜 + 权威度四问","体量、质量、维护一起看",inner);
+  document.getElementById("sections").innerHTML=h;
+  document.querySelectorAll(".cmdwrap").forEach(w=>{const t=w.dataset.cmd;w.querySelector("code.cmd").addEventListener("click",()=>doCopy(t));w.querySelector(".copybtn").addEventListener("click",ev=>{ev.stopPropagation();doCopy(t)})});
+  fitCmds();
+  applyFilter();
+}
+function applyFilter(){
+  const q=document.getElementById("q").value.trim().toLowerCase();let total=0;
+  document.querySelectorAll("section").forEach(sec=>{
+    const items=sec.querySelectorAll("[data-skill]");let vis=0;
+    items.forEach(el=>{const m=!q||el.dataset.skill.includes(q);el.classList.toggle("hidden",!m);if(m)vis++});
+    if(items.length>0){sec.classList.toggle("hidden",!!q&&vis===0);total+=vis}
+  });
+  const tip=document.getElementById("emptyTip");if(tip)tip.classList.toggle("hidden",!q||total>0);
+}
+async function load(date){
+  const btn=document.getElementById("reloadBtn");if(btn){btn.disabled=true;btn.textContent="加载中…"}
+  try{const r=await fetch((date?`data/boards/${date}.json`:"data/board.json")+"?t="+Date.now());if(!r.ok)throw new Error();render(await r.json())}catch(e){console.error(e)}finally{if(btn){btn.disabled=false;btn.textContent="刷新数据"}}
+}
+(async()=>{
+  try{DATES=await (await fetch("data/dates.json?t="+Date.now())).json()}catch(e){DATES=[]}
+  const sel=document.getElementById("dateSel");
+  sel.innerHTML=DATES.map(d=>`<option value="${d}">${d} 期</option>`).join("");
+  sel.addEventListener("change",()=>load(sel.value));
+  document.getElementById("reloadBtn").addEventListener("click",()=>load(sel.value||null));
+  document.getElementById("q").addEventListener("input",applyFilter);
+  await load(DATES[0]||null);
+  if(DATES[0]) sel.value=DATES[0];
+})();
+</script>
+<script>
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{})); }
+</script>
+</body>
+</html>
