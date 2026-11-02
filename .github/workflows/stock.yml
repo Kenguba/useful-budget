@@ -1,0 +1,50 @@
+# AI商铺 · 库存轻量核对：每 5 分钟只核对已上榜商品的详情页库存，不做全量抓取
+# 与 refresh-and-deploy 共用 concurrency group pages 串行，避免提交冲突；
+# 提交带 [skip ci]，防止触发 refresh-and-deploy 的 push 全量刷新；本 workflow 自带 Pages 部署。
+name: stock-check
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  stock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify listed stocks
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 ai-shop/scripts/stock_check.py
+      - name: Commit stock updates
+        id: commit
+        run: |
+          git config user.name "skills-board-bot"
+          git config user.email "bot@localhost"
+          git add ai-shop/data/board.json ai-shop/index.html
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "stock: verify $(date -u +%FT%TZ) [skip ci]"
+            git push origin HEAD:main || (git pull --rebase origin main && git push origin HEAD:main)
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/configure-pages@v5
+        if: steps.commit.outputs.changed == 'true'
+        with:
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.commit.outputs.changed == 'true'
+        with:
+          path: .
+      - uses: actions/deploy-pages@v4
+        if: steps.commit.outputs.changed == 'true'
