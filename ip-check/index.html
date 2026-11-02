@@ -154,7 +154,7 @@ input{font-family:inherit}
 
 .sec-title{font-size:17px;font-weight:700;padding:14px 4px 4px}
 .loc-row{display:flex;align-items:center;gap:12px;padding:7.5px 0;font-size:15.5px}
-.loc-row .src{color:#6d7680;width:104px;flex:none;font-size:14.5px}
+.loc-row .src{color:#6d7680;width:96px;flex:none;font-size:14.5px}
 .loc-row .flag{font-size:17px;line-height:1}
 .loc-row .place{color:var(--ink-2)}
 .tag{
@@ -180,9 +180,11 @@ input{font-family:inherit}
   box-shadow:0 4px 12px rgba(111,191,46,.4);
 }
 .gauge-badge:after{
-  content:"";position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
+  content:"";position:absolute;left:var(--tri-x,50%);bottom:-6px;transform:translateX(-50%);
   border:7px solid transparent;border-top-color:var(--badge-c,var(--badge-green));border-bottom:none;
 }
+.flag-img{width:22px;height:16px;object-fit:cover;border-radius:3px;flex:none;box-shadow:0 0 0 1px rgba(0,0,0,.07);vertical-align:-3px}
+.hist-meta .flag-img{width:19px;height:14px}
 .gauge-marker{
   position:absolute;top:12px;width:3px;height:17px;background:#fff;border-radius:2px;
   transform:translateX(-50%);left:28%;transition:left .95s var(--ease);
@@ -555,6 +557,7 @@ input{font-family:inherit}
 const $=id=>document.getElementById(id);
 const state={data:null,ipVisible:true,numVisible:false,busy:false,querySeq:0};
 function flagEmoji(cc){if(!cc||cc.length!==2)return"🌐";return String.fromCodePoint(...[...cc.toUpperCase()].map(c=>127397+c.charCodeAt(0)))}
+function flagImg(cc){if(!cc||!/^[A-Za-z]{2}$/.test(cc))return"";const c=cc.toLowerCase();return "<img class='flag-img' src='https://flagcdn.com/w80/"+c+".png' srcset='https://flagcdn.com/w160/"+c+".png 2x' alt='' loading='lazy' onerror='this.style.display=\"none\"'>"}
 function isIPv4(ip){return /^\d{1,3}(\.\d{1,3}){3}$/.test(ip)}
 function ipToNum(ip){if(!isIPv4(ip))return null;return ip.split(".").reduce((a,o)=>a*256+Number(o),0)}
 function ipToBig(ip){
@@ -679,13 +682,20 @@ function render(d){
   $("ratioHuman").style.width=pure+"%";
   $("ratioHumanTxt").textContent="纯净 "+pure+"%";
   $("ratioBotTxt").textContent="风险 "+d.score+"%";
-  $("locList").innerHTML=d.locRows.map(r=>"<div class='loc-row'><span class='src'>"+escapeHtml(r.src)+"</span><span class='flag'>"+flagEmoji(r.cc)+"</span><span class='place'>"+escapeHtml(r.place)+"</span></div>").join("");
+  $("locList").innerHTML=d.locRows.map(r=>"<div class='loc-row'><span class='src'>"+escapeHtml(r.src)+"</span>"+flagImg(r.cc)+"<span class='place'>"+escapeHtml(r.place)+"</span></div>").join("");
   const srcTag=$("fSource");srcTag.textContent=d.native==null?"查询中":(d.native?"原生IP":"广播IP");srcTag.className="tag"+(d.native?" green":"");
   const attrTag=$("fAttr");attrTag.textContent=d.attr;attrTag.className="tag"+(d.attr==="住宅IP"?" green":"");
   const badge=$("gaugeBadge");
   badge.textContent=d.score+"% "+scoreLabel(d.score);
   document.querySelector(".gauge").style.setProperty("--badge-c",badgeColor(d.score));
   badge.style.left=d.score+"%";$("gaugeMarker").style.left=d.score+"%";
+  requestAnimationFrame(()=>{
+    const g=document.querySelector(".gauge");if(!g)return;
+    const gw=g.clientWidth,bw=badge.offsetWidth,markerX=gw*d.score/100;
+    const cx=Math.max(bw/2+2,Math.min(gw-bw/2-2,markerX));
+    badge.style.left=cx+"px";
+    badge.style.setProperty("--tri-x",(markerX-(cx-bw/2))+"px");
+  });
   $("fHost").textContent=d.host||"查询中…";
   $("fTime").textContent=fmtTime(new Date());
   [...$("fConf").children].forEach((el,i)=>el.className=i<(d.conf||0)?"on":"");
@@ -714,7 +724,7 @@ function render(d){
 }
 function histItem(h){
   const meta=[];
-  if(h.place)meta.push("<span>"+flagEmoji(h.cc||"")+" "+escapeHtml(h.place)+"</span>");
+  if(h.place)meta.push("<span>"+flagImg(h.cc||"")+" "+escapeHtml(h.place)+"</span>");
   if(h.first)meta.push("<span>首次出现：<b>"+escapeHtml(h.first)+"</b></span>");
   if(h.last)meta.push("<span>最近活跃：<b>"+escapeHtml(h.last)+"</b></span>");
   if(h.extra)meta.push("<span>"+escapeHtml(h.extra)+"</span>");
@@ -948,6 +958,7 @@ $("fpLang").textContent=(navigator.languages&&navigator.languages.join(", "))||n
 try{$("fpTz").textContent=Intl.DateTimeFormat().resolvedOptions().timeZone||"—"}catch(e){$("fpTz").textContent="—"}
 $("fpScreen").textContent=screen.width+" × "+screen.height+" · "+window.devicePixelRatio+"x";
 $("fpPlat").textContent=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.platform||"—";
+let rszT;window.addEventListener("resize",()=>{clearTimeout(rszT);rszT=setTimeout(()=>{if(!state.data)return;const badge=$("gaugeBadge");const g=document.querySelector(".gauge");if(!g)return;const gw=g.clientWidth,bw=badge.offsetWidth,markerX=gw*state.data.score/100;const cx=Math.max(bw/2+2,Math.min(gw-bw/2-2,markerX));badge.style.left=cx+"px";badge.style.setProperty("--tri-x",(markerX-(cx-bw/2))+"px")},150)});
 
 /* ---------- 初始化：直接实时检测本机出口 ---------- */
 $("myV4").textContent="检测中…";
