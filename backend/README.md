@@ -14,7 +14,7 @@
 | `site-router.js.back` | `site-router` | `*.xxxxx.asia`（通配） | 按子域名前缀分发四个项目到 GitHub Pages 对应目录；pan 的接口请求同域转发给后端 | 17d3f1b8 |
 | `jpcard.js.back` | `jpcard` | `img.xxxxx.asia` | 日语教学图库供图：图片存 GitHub 三个仓库，三路容灾取图（jsDelivr → GitHub Raw → 镜像），边缘缓存 30 天 | 8737b21b |
 
-另外：旧中转 `naspt-proxy` 已无域名绑定，保留在账号里当备用，没有留档（代码与 backend-proxy 相同）。
+另外：旧中转 `pan-proxy`（Cloudflare 控制台里仍是原名 `naspt-proxy`，待登录后重建改名）已无域名绑定，保留在账号里当备用，没有留档（代码与 backend-proxy 相同）。
 
 子域名与项目的对照（skill / ai / phone / pan）见仓库根 `README.md` 的「子域名」一节。
 
