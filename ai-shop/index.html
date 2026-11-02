@@ -26,6 +26,9 @@ h1{font-size:32px;margin:10px 0 6px;font-weight:900}
 @keyframes flashBg{0%{box-shadow:0 0 0 3px var(--gold)}100%{box-shadow:0 0 0 0 transparent}}
 .group.flash{animation:flashBg 1.4s ease-out}
 .row.flash{animation:flashBg 1.4s ease-out;border-radius:10px}
+.loadspin{text-align:center;color:var(--mut);padding:16px 0 22px;font-size:13px}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--blue);border-radius:50%;vertical-align:-3px;margin-right:7px;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .leader .g{font-size:11px;color:var(--mut);line-height:1.4;min-height:30px}
 .leader .p{font-size:20px;font-weight:900;color:var(--blue)}
 .leader .s{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -115,10 +118,10 @@ button.tag{border:0;font-family:inherit;cursor:pointer;-webkit-tap-highlight-col
     <div class="chips" id="chips"></div>
     <div class="meta" id="shopMeta"></div>
     <div id="shopList"></div>
-    <button class="more hide" id="moreBtn">显示更多</button>
+    <div id="shopSentinel"></div>
+    <div id="shopLoading" class="loadspin hide"><span class="spinner"></span>加载中…</div>
   </section>
 
-  <p class="foot">数据每小时由 GitHub Actions 跑 scripts/refresh.py 自动刷新：遍历每家商家的全量商品库（AI价网 2052 家 + cardnav 966 家），按标题规则分入 8 组，再叠加 PriceAI 最低价段。只列有货；同标题铺货已合并为一家并标注家数，点「同源铺货共 N 家」可弹窗查看全部同源店铺（按价排列，点任意一家直达商品页）。价格库存为聚合站最近一次遍历商家的快照，下单前以商品页实时状态为准。<br>托管于 GitHub Pages · 仓库 Kenguba/useful-budget</p>
 </div>
 <div class="overlay" id="srcOverlay" hidden aria-hidden="true">
   <button class="shade" type="button" data-close aria-label="关闭同源店铺弹窗"></button>
@@ -134,7 +137,7 @@ button.tag{border:0;font-family:inherit;cursor:pointer;-webkit-tap-highlight-col
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmtP=p=>('¥'+(Number.isInteger(p)?p:p.toFixed(2).replace(/0$/,'')));
-let board=null, shops=null, shopFilter='全部', shopShown=300;
+let board=null, shops=null, shopFilter='全部', shopShown=300, shopListTotal=0, shopLoading=false;
 
 function stockTxt(it){
   if(it.stock===null||it.stock===undefined) return '有货';
@@ -187,8 +190,8 @@ function renderShops(){
   const q=$('#sq').value.trim().toLowerCase();
   const list=shops.shops.filter(s=>(shopFilter==='全部'||s.platform===shopFilter)&&(!q||fuzzy(q,s.name,s.platform,s.code)));
   $('#shopMeta').textContent='共 '+list.length+' 家（目录快照 '+shops.updated_at+' · 同店多平台/多代码分别列）';
+  shopListTotal=list.length;
   $('#shopList').innerHTML=list.slice(0,shopShown).map(s=>'<div class="shop">'+(s.url?'':'<span class="only">仅店名</span>')+'<div class="nm">'+(s.url?'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.name)+' ↗</a>':esc(s.name))+'</div><div class="pf">'+esc(s.platform)+(s.code?' · '+esc(s.code):'')+'</div></div>').join('');
-  $('#moreBtn').classList.toggle('hide',list.length<=shopShown);
 }
 function switchTab(shopsView){
   if(shopsView&&!$('#sq').value.trim()&&$('#q').value.trim()) $('#sq').value=$('#q').value;
@@ -276,7 +279,15 @@ $('#tabBoard').onclick=()=>switchTab(false);
 $('#tabShops').onclick=()=>switchTab(true);
 $('#q').oninput=renderBoard;
 $('#sq').oninput=()=>{shopShown=300;renderShops();};
-$('#moreBtn').onclick=()=>{shopShown+=300;renderShops();};
+// 触底加载：哨兵进入视口附近时自动加载下一批，带加载特效
+new IntersectionObserver(es=>{
+  if(!es[0].isIntersecting||shopLoading||!shops) return;
+  if($('#viewShops').classList.contains('hide')) return;
+  if(shopShown>=shopListTotal) return;
+  shopLoading=true;
+  $('#shopLoading').classList.remove('hide');
+  setTimeout(()=>{ shopShown+=300; renderShops(); $('#shopLoading').classList.add('hide'); shopLoading=false; },350);
+},{rootMargin:'300px'}).observe($('#shopSentinel'));
 // 锚点路由：点商品离开前先把 #it-<组>-<序号>（或 #grp-<组>）写入地址并留一条历史，
 // 从商品页返回时按锚点滚回那一条并高亮；带锚点的链接也可直接分享定位。
 document.addEventListener('click',e=>{
