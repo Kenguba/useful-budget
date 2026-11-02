@@ -59,4 +59,5 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 
 - 链接与仓库名绑定：Pages 地址为 `kenguba.github.io/useful-budget/<project>/`，项目目录名即网址路径段，改目录名 = 改网址，慎重。
 - 数据文件与代码分开提交：自动刷新只提交 `data/` 变更，提交信息形如 `data: refresh YYYY-MM-DD`。
+- 脚本一致性：仓库内脚本必须与线上实际运行的版本保持一致。项目脚本（如各项目 `scripts/refresh.py`）以仓库 main 为准，本地镜像/工作副本改完必须推送，禁止只改本地；后端 Worker 以 Cloudflare 已部署版为准，先部署、再把源码同步回 `backend/` 留档。发现不一致时以线上为准，并立即对齐。
 - 本规范有变更时，先改本文件，再改实际结构，保持两者一致。
