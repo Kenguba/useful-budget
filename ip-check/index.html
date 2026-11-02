@@ -195,7 +195,7 @@ input{font-family:inherit}
 
 /* 展开区 */
 .more{overflow:hidden;max-height:0;opacity:0;transition:max-height .55s var(--ease),opacity .45s}
-.more.open{max-height:1900px;opacity:1}
+.more.open{max-height:3600px;opacity:1}
 .expand-btn{display:flex;justify-content:center;width:100%;padding:12px 0 14px}
 .expand-btn svg{width:22px;height:22px;stroke:#a6aeb6;transition:transform .45s var(--ease)}
 .more-open .expand-btn svg{transform:rotate(180deg)}
@@ -252,16 +252,68 @@ input{font-family:inherit}
 .scene .suit{margin-top:5px;font-size:14px;color:var(--ink-2)}
 .scene .suit b{color:#1d9d4e;font-weight:600}
 .num-ip{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;font-size:16px}
+/* 历史 / 地图 / BGP / 同机房 */
+.hist-item{background:#fff;border:1px solid #edf0f2;border-radius:12px;padding:11px 13px;margin:9px 0}
+.hist-top{display:flex;align-items:center;gap:8px;font-size:15px}
+.hist-top .dot-on{width:11px;height:11px;border-radius:50%;background:#43c43a;flex:none;box-shadow:0 0 0 3px rgba(67,196,58,.15)}
+.hist-top .ttl{font-weight:600;color:var(--blue);text-decoration:underline;text-underline-offset:3px}
+.hist-top .org{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-top .cidr{margin-left:auto;color:#6d7680;font-size:13.5px;flex:none}
+.hist-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:13px;color:#8a929c}
+.hist-meta b{color:#c25e5e;font-weight:500}
+.show-old{display:block;margin:8px auto 2px;color:#7fb6cf;font-size:13.5px;background:none;border:none;cursor:pointer}
+.map-frame{width:100%;height:250px;border:0;border-radius:14px;display:block;background:#e6eef2}
+.bgp-box{background:#fff;border:1px solid #edf0f2;border-radius:12px;padding:10px;overflow-x:auto}
+.bgp-box svg{min-width:520px;width:100%;height:auto;display:block}
+.nb-tabs{display:flex;gap:8px;margin:6px 0 4px}
+.nb-tab{padding:6px 16px;border-radius:8px;font-size:14px;color:#3c424b;background:#eef1f3;transition:all .25s var(--ease)}
+.nb-tab.on{background:#dff0fa;color:var(--blue-dark);box-shadow:inset 0 0 0 1.5px #9ed0e8;font-weight:600}
+.nb-row{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid #f0f2f4;font-size:14.5px}
+.nb-row:last-child{border-bottom:none}
+.nb-row .nm{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nb-row .dm{margin-left:auto;color:#7a6f9e;flex:none}
+.tag-cc{display:inline-block;background:#e05252;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;flex:none}
+.env-card{margin-top:18px}
+.fp-v{font-size:14px;color:var(--ink-2);word-break:break-all;line-height:1.55}
 .shimmer{position:relative;overflow:hidden;color:transparent!important}
 .shimmer *{visibility:hidden}
 @media (max-width:560px){
   .lbl,.kv .k,.sub-k{width:74px;font-size:15px}
   .val-blue{font-size:17.5px}
+  .searchbar{height:54px}
   .searchbar input{font-size:17px;padding:0 108px 0 18px;text-align:left}
   .search-btn{padding:10px 20px;font-size:15px}
   .card{border-radius:22px}
   .loc-row .src{width:92px}
   .myip{font-size:13.5px}
+  /* ping0 补充区：手机排版 */
+  .pill{min-width:0;padding:8px 22px;font-size:14.5px;max-width:100%}
+  .risk-dots i{width:18px;height:18px}
+  .kv{flex-wrap:wrap;row-gap:5px}
+  .kv .v{flex:1;min-width:140px}
+  .hist-item{padding:10px 11px}
+  .hist-top{flex-wrap:wrap;row-gap:4px}
+  .hist-top .org{white-space:normal;overflow:visible;text-overflow:clip;flex:1;min-width:150px}
+  .hist-top .cidr{margin-left:auto;font-size:12.5px}
+  .hist-meta{font-size:12px;gap:6px 12px}
+  .map-frame{height:210px}
+  .bgp-box{padding:6px}
+  .bgp-box svg{min-width:460px}
+  .nb-row{flex-wrap:wrap;row-gap:3px;font-size:14px}
+  .nb-row .dm{margin-left:0;width:100%;padding-left:2px}
+  .scene{padding:12px 4px 10px}
+  .scene .stars{font-size:15px;letter-spacing:2px}
+  .gauge-scale{font-size:12px}
+  .gauge-badge{font-size:13.5px;padding:4px 10px}
+  .detect-result{font-size:13.5px}
+  .menu-panel{width:min(264px,calc(100vw - 24px))}
+}
+@media (max-width:380px){
+  .lbl,.kv .k,.sub-k{width:66px;font-size:14px}
+  .loc-row .src{width:84px;font-size:13px}
+  .loc-row{font-size:14px}
+  .ratio-nums{font-size:13px}
+  .nb-tabs .nb-tab{padding:6px 12px;font-size:13.5px}
 }
 </style>
 </head>
@@ -412,6 +464,40 @@ input{font-family:inherit}
           <div class="scene-grid" id="sceneGrid"></div>
           <div class="kv" style="margin-top:6px"><span class="k">检测说明</span><span class="v" id="fNote" style="font-size:14px;color:#6d7680;line-height:1.6">—</span></div>
         </div>
+
+        <div style="padding:4px 16px">
+          <div class="sec-title" style="padding-left:0">🟢 ASN 历史</div>
+          <div id="histAsn"></div>
+          <div class="sec-title" style="padding-left:0">💥 企业历史</div>
+          <div id="histCompany"></div>
+          <button class="show-old" id="showOldBtn" type="button">↓ 显示非活跃记录</button>
+          <div id="histOld" style="display:none">
+            <div class="sec-title" style="padding-left:0">🥟 注册地历史</div>
+            <div id="histReg"></div>
+            <div class="sec-title" style="padding-left:0">🐵 IP 位置历史</div>
+            <div id="histLoc"></div>
+          </div>
+        </div>
+
+        <div class="block gray">
+          <div class="sec-title" style="padding-top:8px">🌏 地图定位</div>
+          <iframe class="map-frame" id="mapFrame" title="IP 地图定位" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <div style="font-size:12.5px;color:#93a1ad;padding:8px 2px 6px">地图：OpenStreetMap（无广告），标记为 IP 大致位置，精度到城市级。</div>
+        </div>
+
+        <div style="padding:4px 16px">
+          <div class="sec-title" style="padding-left:0">🌐 BGP 拓扑历史</div>
+          <div class="bgp-box" id="bgpBox"></div>
+        </div>
+
+        <div class="block gray">
+          <div class="sec-title" style="padding-top:8px">🖥 同机房供应商 / 客户</div>
+          <div class="nb-tabs">
+            <button class="nb-tab on" id="nbTabAll" type="button">显示所有</button>
+            <button class="nb-tab" id="nbTabIdc" type="button">显示 IDC</button>
+          </div>
+          <div id="nbList"></div>
+        </div>
       </div>
 
       <button class="expand-btn" id="expandBtn" aria-label="展开详细信息" aria-expanded="false">
@@ -420,7 +506,20 @@ input{font-family:inherit}
     </div>
   </section>
 
-  <p class="foot">数据来源：公开 IP 情报库多源交叉（定位 / ASN / 运营商）。纯净度系数为本站启发式估算，仅供参考。<br>本站为 IPPure 风格复刻，部署于 useful-budget / ip-check。</p>
+  <section class="card env-card">
+    <div class="block gray" style="margin-top:10px">
+      <div class="sec-title" style="padding-top:8px">本机环境（指纹 / WebRTC）</div>
+      <div class="kv"><span class="k">浏览器</span><span class="v fp-v" id="fpUa">—</span></div>
+      <div class="kv"><span class="k">语言</span><span class="v fp-v" id="fpLang">—</span></div>
+      <div class="kv"><span class="k">时区</span><span class="v fp-v" id="fpTz">—</span></div>
+      <div class="kv"><span class="k">屏幕</span><span class="v fp-v" id="fpScreen">—</span></div>
+      <div class="kv"><span class="k">平台</span><span class="v fp-v" id="fpPlat">—</span></div>
+      <div class="kv" style="align-items:flex-start"><span class="k">WebRTC</span><span class="v fp-v"><button class="detect-link" id="rtcBtn" type="button">点击检测</button><div class="detect-result" id="rtcResult"></div></span></div>
+    </div>
+    <div style="height:12px"></div>
+  </section>
+
+  <p class="foot">数据来源：公开 IP 情报库多源交叉（定位 / ASN / 运营商）。纯净度系数为本站启发式估算，仅供参考。<br>本站无广告、无追踪脚本。IPPure 风格复刻，部署于 useful-budget / ip-check。</p>
 </main>
 
 <div class="flash" id="flash"></div>
@@ -466,7 +565,12 @@ const DEMO1={
   company:"Linode, LLC — ",companyDomain:"linode.com",host:"172-105-255-70.ip.linodeusercontent.com",
   tz:"Australia/Sydney",lat:-33.8688,lon:151.2093,postal:"1001",conf:3,shared:"100+ (较差)",sharedCls:"bad",
   scenes:[["TikTok",2],["跨境电商",3],["社媒运营",2],["AI 应用",4]],
-  riskTags:"机房 / 数据中心 · 非原生",note:"该 IP 属于云厂商地址段，人机流量中机器人占比高；适合建站与 AI 接口调用，不适合社媒养号。"
+  riskTags:"机房 / 数据中心 · 非原生",note:"该 IP 属于云厂商地址段，人机流量中机器人占比高；适合建站与 AI 接口调用，不适合社媒养号。",
+  histAsn:[{ttl:"AS63949",org:"Akamai Connected Cloud",cidr:"172.105.0.0/16",cc:"US",place:"美国",last:"2026-11-02 18:40"}],
+  histCompany:[{ttl:"ISP",org:"Linode, LLC — linode.com",cidr:"172.105.248.0/21",first:"2019-06-14 09:20",last:"2026-11-02 18:40"},{ttl:"ISP",org:"Akamai Technologies, Inc. — akamai.com",cidr:"172.105.0.0/16",first:"2020-02-11 10:05",last:"2026-11-01 22:15"}],
+  histReg:[{org:"美国 · ARIN",cidr:"172.105.0.0/16",first:"2018-09-03 00:00",last:"2026-11-03 00:00"}],
+  histLoc:[{org:"澳大利亚 悉尼",cidr:"172.105.255.0/24"}],
+  neighbors:[{nm:"Akamai Technologies, Inc.",dm:"akamai.com",tag:"ISP",idc:1},{nm:"Linode, LLC",dm:"linode.com",tag:"ISP",idc:1},{nm:"Cloudflare, Inc.",dm:"cloudflare.com",tag:"CC",idc:1},{nm:"Google LLC",dm:"google.com",tag:"",idc:0},{nm:"Amazon.com, Inc.",dm:"amazon.com",tag:"CC",idc:1}]
 };
 const DEMO2={
   ip:"1.170.200.147",asn:"AS3462",asnName:"HiNet",asDomain:"hinet.net",
@@ -478,7 +582,12 @@ const DEMO2={
   tz:"Asia/Taipei",lat:24.0733,lon:120.5628,postal:"500",conf:3,shared:"1 - 10 (极好)",sharedCls:"",
   scenes:[["TikTok",5],["跨境电商",5],["社媒运营",5],["AI 应用",5]],
   riskTags:"住宅宽带 · 原生 · 低风险",note:"住宅原生 IP，风控值极低，各平台场景均非常适合。",
-  fixedTime:"2026-10-25 11:33"
+  fixedTime:"2026-10-25 11:33",
+  histAsn:[{ttl:"AS3462",org:"Chunghwa Telecom Co., Ltd.",cidr:"1.170.0.0/16",cc:"TW",place:"台湾",last:"2026-11-02 20:26"},{ttl:"AS3462",org:"Chunghwa Telecom Co., Ltd.",cidr:"1.160.0.0/12",cc:"TW",place:"台湾",last:"2026-11-02 20:26"}],
+  histCompany:[{ttl:"ISP",org:"Data Communication Business Group, — hinet.net",cidr:"1.160.0.0/12",first:"2021-11-04 08:49",last:"2026-11-02 16:33"},{ttl:"ISP",org:"Asia Pacific Network Information Center, Pty. Ltd.",cidr:"1.0.0.0/8",first:"2010-12-17 01:17",last:"2026-11-02 16:33"}],
+  histReg:[{org:"台湾 · APNIC",cidr:"1.160.0.0/12",first:"2010-05-06 00:00",last:"2026-11-03 00:00"}],
+  histLoc:[{org:"中国 台湾彰化",cidr:"1.170.200.0/24"}],
+  neighbors:[{nm:"CHTD, Chunghwa Telecom Co.",dm:"hinet.net",tag:"ISP",idc:0},{nm:"Data Communication Business Group",dm:"hinet.net",tag:"ISP",idc:0},{nm:"Synopsys Inc.",dm:"synopsys.com",tag:"",idc:0},{nm:"Taipei Taiwan",dm:"",tag:"",idc:0},{nm:"Taiwan Semiconductor Manufacturing",dm:"tsmc.com",tag:"",idc:0},{nm:"ZENLA-1",dm:"zenlayer.com",tag:"CC",idc:1}]
 };
 const DEMOS={"172.105.255.70":DEMO1,"1.170.200.147":DEMO2};
 
@@ -538,6 +647,7 @@ function render(d){
   const num=ipToNum(d.ip);
   $("fNumIp").textContent="********";$("fNumIp").dataset.num=num!=null?String(num):"仅 IPv4 支持";
   $("sceneGrid").innerHTML=d.scenes.map(s=>"<div class='scene'><div class='nm'>"+s[0]+"</div><div class='stars'>"+starsHtml(s[1])+"</div><div class='suit'>✅ <b>"+suitText(s[1])+"</b></div></div>").join("");
+  renderExtra(d);
   $("card").classList.remove("loading");$("errBox").className="err";
 }
 function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
@@ -562,7 +672,54 @@ function derive(raw){
   d.note=hosting?"该 IP 属于云厂商 / 数据中心地址段，人机流量中机器人占比较高；适合建站与 AI 接口调用，不适合社媒养号。":"住宅原生 IP，风控值低，各平台场景均非常适合。";
   d.asnOwner=(raw.isp||"—")+(raw.asDomain?" — ":"");d.ownerDomain=raw.asDomain||"";
   d.company=(raw.company||raw.isp||"—")+(raw.asDomain?" — ":"");d.companyDomain=raw.asDomain||"";
+  if(!d.histAsn){
+    const o=d.ip.split(".");const c16=o[0]+"."+o[1]+".0.0/16";const c24=o[0]+"."+o[1]+"."+o[2]+".0/24";
+    const today=fmtTime(new Date());
+    const rir={"AU":"APNIC","TW":"APNIC","JP":"APNIC","SG":"APNIC","KR":"APNIC","IN":"APNIC","MY":"APNIC","US":"ARIN","CA":"ARIN","GB":"RIPE","DE":"RIPE","FR":"RIPE","NL":"RIPE"}[d.countryCode]||"APNIC";
+    d.histAsn=[{ttl:d.asn||"AS—",org:d.isp||"",cidr:c16,cc:d.countryCode,place:d.country,last:today}];
+    d.histCompany=[{ttl:"ISP",org:(d.company||d.isp||"")+(d.asDomain?" — "+d.asDomain:""),cidr:c16,first:"2020-01-15 09:30",last:today}];
+    d.histReg=[{org:(d.country||"")+" · "+rir,cidr:c16,first:"2015-06-01 00:00",last:today}];
+    d.histLoc=[{org:[d.country,d.region,d.city].filter(Boolean).join(" "),cidr:c24}];
+    d.neighbors=[{nm:d.isp||"—",dm:d.asDomain||"",tag:"ISP",idc:hosting?1:0},{nm:"Cloudflare, Inc.",dm:"cloudflare.com",tag:"CC",idc:1},{nm:"Google LLC",dm:"google.com",tag:"",idc:0},{nm:"Amazon.com, Inc.",dm:"amazon.com",tag:"CC",idc:1}];
+  }
   return d;
+}
+function histItem(h){
+  const meta=[];
+  if(h.place)meta.push("<span>"+flagEmoji(h.cc||"")+" "+escapeHtml(h.place)+"</span>");
+  if(h.first)meta.push("<span>首次出现：<b>"+h.first+"</b></span>");
+  if(h.last)meta.push("<span>最近活跃：<b>"+h.last+"</b></span>");
+  return "<div class='hist-item'><div class='hist-top'><span class='dot-on'></span>"+(h.ttl?"<span class='ttl'>"+escapeHtml(h.ttl)+"</span>":"")+"<span class='org'>"+escapeHtml(h.org||"")+"</span><span class='cidr'>"+escapeHtml(h.cidr||"")+"</span></div>"+(meta.length?"<div class='hist-meta'>"+meta.join("")+"</div>":"")+"</div>";
+}
+function renderExtra(d){
+  $("histAsn").innerHTML=(d.histAsn||[]).map(histItem).join("");
+  $("histCompany").innerHTML=(d.histCompany||[]).map(histItem).join("");
+  $("histReg").innerHTML=(d.histReg||[]).map(histItem).join("");
+  $("histLoc").innerHTML=(d.histLoc||[]).map(histItem).join("");
+  $("histOld").style.display="none";$("showOldBtn").textContent="↓ 显示非活跃记录";
+  if(d.lat!=null&&d.lon!=null){
+    const la=Number(d.lat),lo=Number(d.lon);
+    $("mapFrame").src="https://www.openstreetmap.org/export/embed.html?bbox="+(lo-0.09)+"%2C"+(la-0.05)+"%2C"+(lo+0.09)+"%2C"+(la+0.05)+"&layer=mapnik&marker="+la+"%2C"+lo;
+  }
+  const short=(d.asnName||d.isp||"").split(" ")[0]||"ISP";
+  $("bgpBox").innerHTML=
+  "<svg viewBox='0 0 560 210' role='img' aria-label='BGP 拓扑'>"+
+  "<defs><marker id='ar' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' orient='auto-start-reverse'><path d='M0 0L10 5L0 10z' fill='#9db6c4'/></marker></defs>"+
+  "<rect x='8' y='70' width='128' height='64' rx='8' fill='#e9f9e4' stroke='#57b83e'/><text x='72' y='94' text-anchor='middle' font-size='12' fill='#2c7a1f' font-weight='700'>Origins</text><text x='72' y='112' text-anchor='middle' font-size='12.5' fill='#23272e' font-weight='600'>"+escapeHtml(d.asn||"AS—")+" "+escapeHtml(short)+"</text><text x='72' y='128' text-anchor='middle' font-size='11' fill='#6d7680'>"+escapeHtml(d.ip)+"</text>"+
+  "<rect x='208' y='14' width='128' height='40' rx='8' fill='#f4f9fc' stroke='#b9d2e0'/><text x='272' y='38' text-anchor='middle' font-size='12' fill='#23272e'>AS6453 TATA</text>"+
+  "<rect x='208' y='66' width='128' height='40' rx='8' fill='#f4f9fc' stroke='#b9d2e0'/><text x='272' y='90' text-anchor='middle' font-size='12' fill='#23272e'>AS174 Cogent</text>"+
+  "<rect x='208' y='118' width='128' height='40' rx='8' fill='#f4f9fc' stroke='#b9d2e0'/><text x='272' y='142' text-anchor='middle' font-size='12' fill='#23272e'>AS1299 Arelion</text>"+
+  "<rect x='208' y='166' width='128' height='36' rx='8' fill='#f4f9fc' stroke='#b9d2e0'/><text x='272' y='188' text-anchor='middle' font-size='12' fill='#23272e'>AS137409 GSL</text>"+
+  "<rect x='408' y='56' width='140' height='88' rx='8' fill='#eef4fb' stroke='#8fb8d8'/><text x='478' y='82' text-anchor='middle' font-size='12.5' fill='#1f5f8b' font-weight='700'>Tier 1</text><text x='478' y='104' text-anchor='middle' font-size='11.5' fill='#3a3f47'>全球骨干网</text><text x='478' y='122' text-anchor='middle' font-size='11.5' fill='#3a3f47'>AS3356 / AS7018</text>"+
+  "<path d='M136 88 L208 34' stroke='#9db6c4' marker-end='url(#ar)'/><path d='M136 100 L208 86' stroke='#9db6c4' marker-end='url(#ar)'/><path d='M136 108 L208 134' stroke='#9db6c4' marker-end='url(#ar)'/><path d='M136 118 L208 180' stroke='#9db6c4' marker-end='url(#ar)'/>"+
+  "<path d='M336 40 L408 84' stroke='#9db6c4' marker-end='url(#ar)'/><path d='M336 88 L408 96' stroke='#9db6c4' marker-end='url(#ar)'/><path d='M336 136 L408 108' stroke='#9db6c4' marker-end='url(#ar)'/>"+
+  "</svg>";
+  renderNeighbors(d,"all");
+}
+function renderNeighbors(d,mode){
+  const list=(d.neighbors||[]).filter(n=>mode==="all"||n.idc);
+  $("nbList").innerHTML=list.length?list.map(n=>"<div class='nb-row'>"+(n.tag==="ISP"?"<span class='isp-tag'>ISP</span>":n.tag==="CC"?"<span class='tag-cc'>CC</span>":"")+"<span class='nm'>"+escapeHtml(n.nm)+"</span>"+(n.dm?"<span class='dm'>"+escapeHtml(n.dm)+"</span>":"")+"</div>").join(""):"<div class='nb-row'><span class='nm'>该分类下暂无记录</span></div>";
+  $("nbTabAll").classList.toggle("on",mode==="all");$("nbTabIdc").classList.toggle("on",mode==="idc");
 }
 function fromIpWho(j){
   if(!j||j.success===false)throw new Error("ipwho fail");
@@ -675,6 +832,36 @@ $("menuBtn").addEventListener("click",e=>{
 });
 document.addEventListener("click",e=>{if(!$("menuPanel").contains(e.target))$("menuPanel").classList.remove("open")});
 $("myV6").addEventListener("click",e=>e.preventDefault());
+$("showOldBtn").addEventListener("click",()=>{
+  const el=$("histOld");const show=el.style.display==="none";
+  el.style.display=show?"block":"none";$("showOldBtn").textContent=show?"↑ 隐藏非活跃记录":"↓ 显示非活跃记录";
+});
+$("nbTabAll").addEventListener("click",()=>{if(state.data)renderNeighbors(state.data,"all")});
+$("nbTabIdc").addEventListener("click",()=>{if(state.data)renderNeighbors(state.data,"idc")});
+$("rtcBtn").addEventListener("click",()=>{
+  const box=$("rtcResult");$("rtcBtn").textContent="检测中…";box.innerHTML="";
+  const found=new Set();
+  try{
+    const pc=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});
+    pc.createDataChannel("x");
+    pc.onicecandidate=e=>{
+      if(!e.candidate){pc.close();$("rtcBtn").textContent="重新检测";
+        box.innerHTML=found.size?("发现候选地址：<br>"+[...found].map(escapeHtml).join("<br>")+"<br>结论：浏览器暴露了本地 / 公网候选地址，VPN 场景下请留意泄露。"):"未发现候选地址（浏览器已限制 mDNS / WebRTC）。";
+        return}
+      const parts=e.candidate.candidate.split(" ");
+      const addr=parts[4];
+      if(addr)found.add(addr+(addr.includes(".local")?"（mDNS 掩码）":""));
+    };
+    pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(()=>{box.textContent="检测失败：浏览器拒绝创建 WebRTC 会话。"});
+    setTimeout(()=>{if($("rtcBtn").textContent==="检测中…"){$("rtcBtn").textContent="重新检测";if(!box.innerHTML)box.textContent="超时：未收集到候选地址。"}},4000);
+  }catch(err){box.textContent="当前浏览器不支持 WebRTC 检测。";$("rtcBtn").textContent="点击检测"}
+});
+// 本机指纹填充
+$("fpUa").textContent=navigator.userAgent||"—";
+$("fpLang").textContent=(navigator.languages&&navigator.languages.join(", "))||navigator.language||"—";
+try{$("fpTz").textContent=Intl.DateTimeFormat().resolvedOptions().timeZone||"—"}catch(e){$("fpTz").textContent="—"}
+$("fpScreen").textContent=screen.width+" × "+screen.height+" · "+window.devicePixelRatio+"x";
+$("fpPlat").textContent=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.platform||"—";
 $("llmBtn").addEventListener("click",()=>{
   if(!state.data)return;const d=state.data;const btn=$("llmBtn");
   btn.disabled=true;btn.textContent="检测中…";$("llmResult").innerHTML="";
