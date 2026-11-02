@@ -807,14 +807,15 @@ async function runQuery(ip,selfMode){
     d.cls=classify(d);applyType(d);render(d);
     if(selfMode){$("myV4").textContent=d.ip;$("myV4").onclick=e=>{e.preventDefault();runQuery(d.ip,false)};fillAltFamily(d.ip)}
     // 第二阶段：WHOIS / 路由历史 / BGP 邻居 / 黑名单 / 注册块
-    const[overview,whoisJ,routing,neigh,prefixOv,bl,geo]=await settled([
+    const[overview,whoisJ,routing,neigh,prefixOv,bl,geo,proxy]=await settled([
       asn?ripe("as-overview",asn):Promise.resolve(null),
       ripe("whois",targetIp),
       ripe("routing-history",targetIp,12000),
       asn?ripe("asn-neighbours",asn,12000):Promise.resolve(null),
       ripe("prefix-overview",d.prefix||targetIp),
       dnsbl(targetIp),
-      ripe("geoloc",targetIp)
+      ripe("geoloc",targetIp),
+      fetchJSON("https://ip.jpedu.asia/api/geo?ip="+encodeURIComponent(targetIp),9000)
     ]);
     if(seq!==state.querySeq)return;
     if(overview&&overview.holder){d.asnHolder=overview.holder;d.asnName=overview.holder.replace(/^[A-Z0-9-]+ - /,"")}
@@ -858,6 +859,20 @@ async function runQuery(ip,selfMode){
         if(ans)d.host=ans.data.replace(/\.$/,"");
       }catch(e){}
       if(seq!==state.querySeq)return;
+    }
+    if(proxy&&proxy.sources){
+      const bySrc={};srcs.filter(Boolean).forEach(s=>{bySrc[s.src]=s});
+      const prow=(label,o)=>o?{src:label,cc:o.cc||"",place:[o.country||o.cc,o.region,o.city].filter(Boolean).join(", ")}:null;
+      const rows=[
+        prow("Cloudflare",proxy.sources.cloudflare),
+        prow("IP2Location",proxy.sources.ip2location),
+        prow("DB-IP",proxy.sources.dbip),
+        prow("MaxMind",proxy.sources.maxmind),
+        bySrc["ipinfo.io"]?{src:"IPInfo.io",cc:bySrc["ipinfo.io"].cc,place:[bySrc["ipinfo.io"].country||bySrc["ipinfo.io"].cc,bySrc["ipinfo.io"].region,bySrc["ipinfo.io"].city].filter(Boolean).join(", ")}:null,
+        bySrc["ipwho.is"]?{src:"ipwho.is",cc:bySrc["ipwho.is"].cc,place:[bySrc["ipwho.is"].country,bySrc["ipwho.is"].region,bySrc["ipwho.is"].city].filter(Boolean).join(", ")}:null,
+        bySrc["ipapi.co"]?{src:"ipapi.co",cc:bySrc["ipapi.co"].cc,place:[bySrc["ipapi.co"].country,bySrc["ipapi.co"].region,bySrc["ipapi.co"].city].filter(Boolean).join(", ")}:null
+      ].filter(Boolean);
+      if(rows.length){d.locRows=rows;d.conf=rows.filter(r=>r.cc&&r.cc===d.cc).length}
     }
     d.native=d.whoisCountry&&d.cc?(d.whoisCountry===d.cc):null;
     d.cls=classify(d);applyType(d);
