@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI账号商铺 · AI 账号比价与店铺目录</title>
+<meta name="description" content="AI 账号全网比价：GPT 日抛/周限、Antigravity 反重力、Codex 接码、Grok Heavy 有货最低价 + 2700 家店铺目录，每 12 小时自动刷新">
+<style>
+:root{--ink:#12233d;--blue:#1c4f9c;--gold:#f2b705;--bg:#f6f3ec;--card:#fff;--mut:#5b6b82;--line:#e5e0d2;--red:#c0392b;--ease:cubic-bezier(.2,.7,.2,1)}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:24px 14px 60px}
+.kicker{color:var(--blue);font-weight:800;letter-spacing:.14em;font-size:13px}
+.kicker:before{content:"";display:inline-block;width:22px;height:5px;background:var(--gold);margin-right:8px;vertical-align:middle}
+h1{font-size:32px;margin:10px 0 6px;font-weight:900}
+.sub{color:var(--mut);font-size:13px;line-height:1.6;margin:0 0 16px}
+.tabs{display:flex;gap:8px;margin:14px 0 6px}
+.tabs button{flex:0 0 auto;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-size:15px;font-weight:700;border-radius:10px;padding:9px 18px;cursor:pointer}
+.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.meta{color:var(--mut);font-size:12px;margin:6px 0 14px}
+.metarow{display:flex;align-items:center;gap:10px;margin:6px 0 14px}
+.metarow .meta{margin:0;flex:1;min-width:0}
+#refreshBtn{flex:0 0 auto;background:#2563eb;color:#fff;border:0;border-radius:10px;padding:8px 18px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+#refreshBtn:disabled{opacity:.55;cursor:default}
+#toast{position:fixed;top:14px;left:50%;transform:translate(-50%,-10px);background:#0f172a;color:#fff;padding:9px 20px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:999;box-shadow:0 6px 20px rgba(0,0,0,.28)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.tag.soldout{background:var(--red);color:#fff}
+.leaders{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;margin-bottom:18px}
+.leader{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer}
+.leader:active{border-color:var(--blue)}
+.group{scroll-margin-top:14px}
+.loadspin{text-align:center;color:var(--mut);padding:16px 0 22px;font-size:13px}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--blue);border-radius:50%;vertical-align:-3px;margin-right:7px;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.leader .g{font-size:11px;color:var(--mut);line-height:1.4;min-height:30px}
+.leader .p{font-size:20px;font-weight:900;color:var(--blue)}
+.leader .s{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search{width:100%;border:1.5px solid var(--line);border-radius:10px;background:var(--card);padding:11px 14px;font-size:15px;margin:4px 0 14px;color:var(--ink)}
+.group{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.group h2{font-size:17px;margin:0 0 4px;font-weight:800}
+.group .cnt{color:var(--mut);font-size:12px;margin-bottom:8px}
+.row{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line);align-items:flex-start}
+.row:first-of-type{border-top:none}
+.price{font-size:17px;font-weight:900;color:var(--blue);min-width:74px}
+.price small{font-size:11px;color:var(--mut);font-weight:400;display:block}
+.main{flex:1;min-width:0}
+.title{font-size:14px;line-height:1.45}
+.title a{color:var(--ink);text-decoration:none}
+.title a:hover{color:var(--blue);text-decoration:underline}
+.info{font-size:12px;color:var(--mut);margin-top:3px;line-height:1.5}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;background:#eef4ff;color:var(--blue);margin-right:5px}
+.tag.warn{background:#fdeeee;color:var(--red)}
+.tag.grey{background:#f3efe4;color:var(--mut)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 12px}
+.chips button{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer;color:var(--ink)}
+.chips button.on{border-color:var(--red);color:var(--red);font-weight:700}
+.shop{padding:10px 2px;border-top:1px solid var(--line)}
+.shop:first-of-type{border-top:none}
+.shop .nm{font-size:15px;font-weight:700}
+.shop .nm a{color:var(--ink);text-decoration:none}
+.shop .nm a:hover{color:var(--blue)}
+.shop .pf{font-size:12px;color:var(--mut);margin-top:2px}
+.only{float:right;font-size:12px;color:var(--mut)}
+.more{width:100%;padding:12px;border:1.5px solid var(--line);background:var(--card);border-radius:10px;font-size:14px;cursor:pointer;color:var(--ink)}
+.foot{margin-top:26px;color:var(--mut);font-size:12px;line-height:1.7}
+.hide{display:none}
+button.tag{border:0;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.srcbtn{transition:background .2s,transform .15s}
+.srcbtn:hover{background:#eae3cf}
+.srcbtn:active{transform:scale(.96)}
+.srcbtn::after{content:"›";margin-left:3px;font-weight:900}
+.overlay{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;padding:0 12px calc(12px + env(safe-area-inset-bottom));visibility:hidden;transition:visibility 0s linear .6s}
+.overlay.open{visibility:visible;transition-delay:0s}
+.shade{position:absolute;inset:0;border:0;background:rgba(12,10,6,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);cursor:pointer;opacity:0;transition:opacity .3s var(--ease) .25s}
+.overlay.open .shade{opacity:1;transition-delay:0s}
+.sheet{position:relative;z-index:2;width:min(580px,100%);max-height:min(78vh,720px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;background:var(--card);border:1.5px solid var(--line);border-radius:26px;padding:20px 19px calc(16px + env(safe-area-inset-bottom));box-shadow:0 18px 40px rgba(18,35,61,.28);transform:translateY(110%);transition:transform .5s var(--ease)}
+.sheet::-webkit-scrollbar{display:none}
+.overlay.open .sheet{transform:translateY(0);transition:transform .5s var(--ease) .15s}
+.grab{width:39px;height:4px;border-radius:10px;background:#d8d2cb;margin:-6px auto 14px}
+.s-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.s-head strong{display:block;font-size:15px;font-weight:800;line-height:1.45}
+.s-head small{display:block;font-size:11px;color:var(--mut);margin-top:4px;line-height:1.5}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;padding:6px 10px;border-radius:99px;white-space:nowrap;background:var(--ink);color:#fff;flex:none}
+.src-list{margin-top:12px;border-top:1px solid var(--line)}
+.src-row{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink)}
+@keyframes srcIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.overlay.open .src-row{animation:srcIn .35s var(--ease) both;animation-delay:calc(var(--i)*30ms + .1s)}
+.src-row:active{background:#faf7ee}
+.src-row .sp{font-size:16px;font-weight:900;color:var(--blue);min-width:66px}
+.src-row .sm2{flex:1;min-width:0}
+.src-row .sn{display:block;font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.src-row .si{display:block;font-size:11px;color:var(--mut);margin-top:1px}
+.src-row .go{color:var(--mut);font-size:16px;flex:none}
+.lowtag{font-size:10px;font-weight:800;color:#8a6100;background:#fdf0c2;border-radius:99px;padding:2px 7px;margin-left:6px;vertical-align:1px}
+.src-note{font-size:11.5px;color:var(--mut);line-height:1.6;margin:12px 0 0}
+.btn-close{width:100%;border:0;border-radius:13px;padding:13px 10px;font-weight:700;font-size:14px;background:var(--ink);color:#fff;cursor:pointer;margin-top:14px;font-family:inherit}
+@media(min-width:640px){.overlay{align-items:center;padding-bottom:12px}}
+@media(prefers-reduced-motion:reduce){.overlay,.sheet,.src-row,.shade{transition-duration:.01ms!important;transition-delay:0ms!important;animation-duration:.01ms!important;animation-delay:0ms!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">KEN · USE</div>
+  <h1>🛒 AI账号商铺</h1>
+  <p class="sub">AI 账号比价（7 分组 · 有货最低价 · 详情页直达）与店铺总目录。</p>
+  <div class="tabs">
+    <button id="tabBoard" class="on">报价单</button>
+    <button id="tabShops">店铺目录</button>
+  </div>
+  <div class="metarow"><div class="meta" id="meta">加载中…</div><button id="refreshBtn" type="button">刷新数据</button></div>
+
+  <input class="search" id="q" placeholder="搜商品标题或店名，支持模糊搜索，如 xai 超市、aicdk">
+  <section id="viewBoard">
+    <div class="leaders" id="leaders"></div>
+    <div id="shopMatches"></div>
+    <div id="groups"></div>
+  </section>
+
+  <section id="viewShops" class="hide">
+    <div class="chips" id="chips"></div>
+    <div class="meta" id="shopMeta"></div>
+    <div id="shopList"></div>
+    <div id="shopSentinel"></div>
+    <div id="shopLoading" class="loadspin hide"><span class="spinner"></span>加载中…</div>
+  </section>
+
+</div>
+<div class="overlay" id="srcOverlay" hidden aria-hidden="true">
+  <button class="shade" type="button" data-close aria-label="关闭同源店铺弹窗"></button>
+  <section class="sheet" id="srcSheet" role="dialog" aria-modal="true" aria-label="同源店铺">
+    <div class="grab" aria-hidden="true"></div>
+    <div class="s-head"><div><strong id="srcTitle"></strong><small>同源铺货 · 按价格从低到高 · 点任意一家直达它的商品页</small></div><span class="pill" id="srcPill"></span></div>
+    <div class="src-list" id="srcList"></div>
+    <p class="src-note" id="srcNote"></p>
+    <button class="btn-close" type="button" data-close>关闭</button>
+  </section>
+</div>
+<div id="toast" role="status">已刷新</div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtP=p=>('¥'+(Number.isInteger(p)?p:p.toFixed(2).replace(/0$/,'')));
+let board=null, shops=null, shopFilter='全部', shopShown=300, shopListTotal=0, shopLoading=false;
+
+function stockTxt(it){
+  if(it.stock===null||it.stock===undefined) return '有货';
+  if(it.stock===0) return '库存 0';
+  if(it.stock<=2) return '<span style="color:var(--red);font-weight:700">只剩 '+it.stock+' 个</span>';
+  return '库存 '+it.stock;
+}
+function norm(s){return String(s??'').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');}
+function subseq(needle,hay){let i=0; for(const ch of hay){if(ch===needle[i]) i++; if(i===needle.length) return true;} return i===needle.length;}
+function fuzzy(q){
+  const texts=Array.prototype.slice.call(arguments,1).join(' ');
+  const hay=norm(texts);
+  const nq=norm(q);
+  if(!nq) return true;
+  if(hay.includes(nq)) return true;
+  return q.toLowerCase().split(/\s+/).filter(Boolean).every(tok=>{const nt=norm(tok); return !nt||hay.includes(nt)||(nt.length>=3&&subseq(nt,hay));});
+}
+function renderBoard(){
+  const q=$('#q').value.trim();
+  const sm=(q&&shops)?shops.shops.filter(s=>fuzzy(q,s.name,s.platform,s.code)):[];
+  $('#shopMatches').innerHTML=!q?'':'<div class="group"><h2>店铺目录匹配 '+sm.length+' 家</h2><div class="cnt">报价单只收录每组最低 30 条，不在其中的店只在这里和店铺目录出现。</div>'+
+    (sm.length?sm.slice(0,20).map(s=>'<div class="row"><div class="main"><div class="title">'+(s.url?'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.name)+' ↗</a>':esc(s.name))+'</div><div class="info">'+esc(s.platform)+(s.code?' · '+esc(s.code):'')+'</div></div></div>').join(''):'<p class="sub">目录 '+(shops&&shops.shops?shops.shops.length:'')+' 家里也没有匹配，去「店铺目录」换个关键词再试。</p>')+
+    (sm.length>20?'<p class="sub">只显示前 20 家。</p>':'')+'<p><button class="more" id="gotoShops">在店铺目录查看全部 '+sm.length+' 家匹配 →</button></p></div>';
+  $('#leaders').innerHTML=board.groups.map(g=>{
+    const it=g.items[0];
+    return '<div class="leader" data-gid="'+esc(g.id)+'"><div class="g">'+esc(g.name)+'</div>'+(it?'<div class="p">'+fmtP(it.price)+'</div><div class="s">'+esc(it.shop)+'</div>':'<div class="p">—</div>')+'</div>';
+  }).join('');
+  $('#groups').innerHTML=board.groups.map((g,gi)=>{
+    let shown=0;
+    const rows=g.items.map((it,ii)=>{
+        if(q&&!fuzzy(q,it.title,it.shop,it.platform)) return '';
+        shown++;
+        return '<div class="row" id="it-'+esc(g.id)+'-'+ii+'"><div class="price">'+fmtP(it.price)+'<small>'+esc(it.platform)+'</small></div><div class="main"><div class="title"><a data-anchor="it-'+esc(g.id)+'-'+ii+'" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div><div class="info">'+(it.stock===0?'<span class="tag soldout">已售罄</span>':'')+(it.kind?'<span class="tag">'+esc(it.kind)+'</span>':'')+(it.same_source>1?'<button type="button" class="tag grey srcbtn" data-src="'+gi+':'+ii+'" aria-haspopup="dialog">同源铺货共 '+it.same_source+' 家</button>':'')+esc(it.shop)+' · '+stockTxt(it)+'</div></div></div>';
+      }).join('');
+    if(q&&!shown) return '';
+    return '<div class="group" id="grp-'+esc(g.id)+'"><h2>'+esc(g.name)+'</h2><div class="cnt">有货最低 '+g.items.length+' 条'+(g.items.length<30?'（不足 30 条，如实显示）':'')+'</div>'+rows+'</div>';
+  }).join('')||'<p class="sub">'+(q?'没有匹配的报价。报价单只收录每组最低 30 条，找某家店请切到「店铺目录」搜。':'没有匹配的报价。')+'</p>';
+  document.querySelectorAll('.leader').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const t=document.getElementById('grp-'+el.dataset.gid);
+      if(!t) return;
+      try{ history.pushState(null,'','#grp-'+el.dataset.gid); }catch(e){}
+      t.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  });
+  const go=$('#gotoShops');
+  if(go) go.onclick=()=>{ shopShown=300; switchTab(true); renderShops(); };
+}
+function renderShops(){
+  const q=$('#q').value.trim().toLowerCase();
+  const list=shops.shops.filter(s=>(shopFilter==='全部'||s.platform===shopFilter)&&(!q||fuzzy(q,s.name,s.platform,s.code)));
+  $('#shopMeta').textContent='共 '+list.length+' 家（目录快照 '+shops.updated_at+' · 同店多平台/多代码分别列）';
+  shopListTotal=list.length;
+  $('#shopList').innerHTML=list.slice(0,shopShown).map(s=>'<div class="shop">'+(s.url?'':'<span class="only">仅店名</span>')+'<div class="nm">'+(s.url?'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.name)+' ↗</a>':esc(s.name))+'</div><div class="pf">'+esc(s.platform)+(s.code?' · '+esc(s.code):'')+'</div></div>').join('');
+}
+function switchTab(shopsView){
+  $('#q').placeholder=shopsView?'搜店名，支持模糊搜索，如 海海星星、985ai':'搜商品标题或店名，支持模糊搜索，如 xai 超市、aicdk';
+  $('#tabBoard').classList.toggle('on',!shopsView);
+  $('#tabShops').classList.toggle('on',shopsView);
+  $('#viewBoard').classList.toggle('hide',shopsView);
+  $('#viewShops').classList.toggle('hide',!shopsView);
+}
+/* 同源店铺弹窗：单一状态源 + 打开/关闭生命周期（遮罩/Esc/焦点还原/inert/减少动态），样式与交互语言对齐 daymark 弹窗规范 */
+const srcOverlay=$('#srcOverlay'), srcSheet=$('#srcSheet'), pageWrap=document.querySelector('.wrap');
+const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let srcIsOpen=false, srcOpener=null, srcCloseTimer=0, srcHist=false, srcScrollY=0, srcLocked=false, srcPrevSR=null;
+function lockScroll(){
+  if(srcLocked) return;
+  srcLocked=true;
+  srcScrollY=window.scrollY||0;
+  const b=document.body;
+  b.style.overflow='hidden'; b.style.position='fixed'; b.style.top=(-srcScrollY)+'px';
+  b.style.left='0'; b.style.right='0'; b.style.width='100%';
+}
+function unlockScroll(){
+  if(!srcLocked) return;
+  srcLocked=false;
+  const b=document.body;
+  b.style.overflow=''; b.style.position=''; b.style.top=''; b.style.left=''; b.style.right=''; b.style.width='';
+  window.scrollTo(0,srcScrollY);
+}
+function openSrc(gi,ii,btn){
+  const g=board&&board.groups[gi]; const it=g&&g.items[ii]; if(!it) return;
+  const list=(it.sources&&it.sources.length)?it.sources:[{price:it.price,shop:it.shop,platform:it.platform,stock:it.stock,url:it.url}];
+  $('#srcTitle').textContent=it.title;
+  $('#srcPill').textContent='共 '+it.same_source+' 家';
+  $('#srcList').innerHTML=list.map((s,i)=>'<a class="src-row" style="--i:'+Math.min(i,12)+'" data-anchor="it-'+esc(g.id)+'-'+ii+'" href="'+esc(s.url)+'" target="_blank" rel="noopener"><span class="sp">'+fmtP(s.price)+'</span><span class="sm2"><span class="sn">'+esc(s.shop)+(i===0?'<span class="lowtag">最低价</span>':'')+'</span><span class="si">'+esc(s.platform||'')+' · '+stockTxt(s)+'</span></span><span class="go">›</span></a>').join('');
+  const extra=it.same_source-list.length;
+  const note=$('#srcNote');
+  note.textContent=extra>0?('已列出 '+list.length+' 家有独立商品链接的；其余 '+extra+' 家是聚合站的同源合并计数，没有单独链接。'):'';
+  note.style.display=extra>0?'':'none';
+  clearTimeout(srcCloseTimer);
+  srcOpener=btn||document.activeElement;
+  try{ srcPrevSR=history.scrollRestoration; history.scrollRestoration='manual'; }catch(e){ srcPrevSR=null; }
+  try{ history.pushState({museSrcPopup:1},''); srcHist=true; }catch(e){ srcHist=false; }
+  srcOverlay.hidden=false;
+  srcOverlay.setAttribute('aria-hidden','false');
+  if('inert' in pageWrap) pageWrap.inert=true;
+  lockScroll();
+  srcSheet.scrollTop=0;
+  void srcOverlay.offsetHeight;
+  requestAnimationFrame(()=>{ if(srcOverlay.hidden) return; srcOverlay.classList.add('open'); srcIsOpen=true; const c=srcSheet.querySelector('.btn-close'); if(c) c.focus({preventScroll:true}); });
+}
+function closeSrc(fromPop){
+  if(!srcIsOpen) return;
+  srcIsOpen=false;
+  if(!fromPop&&srcHist){ srcHist=false; try{ history.back(); }catch(e){} }
+  srcOverlay.classList.remove('open');
+  srcOverlay.setAttribute('aria-hidden','true');
+  if('inert' in pageWrap) pageWrap.inert=false;
+  const back=srcOpener; srcOpener=null;
+  if(back&&back.isConnected) back.focus({preventScroll:true});
+  clearTimeout(srcCloseTimer);
+  /* 背景保持冻结，直到面板完全落下才在同一帧里解锁+还原位置+隐藏，避免返回时背景抢先重排闪一帧 */
+  srcCloseTimer=setTimeout(()=>{
+    if(srcIsOpen) return;
+    srcOverlay.hidden=true;
+    unlockScroll();
+    if(srcPrevSR!==null){ try{ history.scrollRestoration=srcPrevSR; }catch(e){} srcPrevSR=null; }
+  }, reducedMotion?0:580);
+}
+window.addEventListener('popstate',()=>{ if(srcIsOpen){ srcHist=false; closeSrc(true); } });
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-src]');
+  if(b&&board){ const p=b.dataset.src.split(':'); openSrc(Number(p[0]),Number(p[1]),b); }
+});
+srcOverlay.addEventListener('click',e=>{ if(e.target.closest('[data-close]')) closeSrc(); });
+document.addEventListener('keydown',e=>{
+  if(!srcIsOpen) return;
+  if(e.key==='Escape'){ e.preventDefault(); closeSrc(); return; }
+  if(e.key!=='Tab') return;
+  const f=[...srcSheet.querySelectorAll('a[href],button:not([disabled])')].filter(n=>n.getClientRects().length);
+  if(!f.length){ e.preventDefault(); return; }
+  const first=f[0], last=f[f.length-1];
+  if(e.shiftKey&&document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey&&document.activeElement===last){ e.preventDefault(); first.focus(); }
+});
+$('#tabBoard').onclick=()=>switchTab(false);
+$('#tabShops').onclick=()=>switchTab(true);
+$('#q').oninput=()=>{ if($('#viewShops').classList.contains('hide')) renderBoard(); else { shopShown=300; renderShops(); } };
+// 触底加载：哨兵进入视口附近时自动加载下一批，带加载特效
+new IntersectionObserver(es=>{
+  if(!es[0].isIntersecting||shopLoading||!shops) return;
+  if($('#viewShops').classList.contains('hide')) return;
+  if(shopShown>=shopListTotal) return;
+  shopLoading=true;
+  $('#shopLoading').classList.remove('hide');
+  setTimeout(()=>{ shopShown+=300; renderShops(); $('#shopLoading').classList.add('hide'); shopLoading=false; },350);
+},{rootMargin:'300px'}).observe($('#shopSentinel'));
+// 锚点路由：点商品离开前先把 #it-<组>-<序号>（或 #grp-<组>）写入地址并留一条历史，
+// 从商品页返回时按锚点滚回那一条并高亮；带锚点的链接也可直接分享定位。
+document.addEventListener('click',e=>{
+  const a=e.target.closest('a[data-anchor]');
+  if(a){ try{ history.pushState(null,'','#'+a.dataset.anchor); }catch(err){} }
+});
+function jumpToHash(){
+  const id=(location.hash||'').slice(1);
+  if(!id) return;
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.scrollIntoView({block:'start'});
+}
+window.addEventListener('hashchange',jumpToHash);
+window.addEventListener('pageshow',()=>setTimeout(jumpToHash,60));
+const REFRESH_API='https://ai.jpedu.asia/api/refresh-board';
+function showToast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),1800)}
+async function reloadData(){const [b,s]=await Promise.all([fetch('data/board.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json()),fetch('data/shops.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json())]);board=b;shops=s;$('#meta').textContent='数据截至 '+b.updated_at+'（北京时间） · 共 '+b.groups.reduce((a,g)=>a+g.items.length,0)+' 条报价 · '+b.source;renderBoard();renderShops();}
+$('#refreshBtn').onclick=async()=>{const btn=$('#refreshBtn');const oldMeta=board?board.updated_at:null;btn.disabled=true;btn.textContent='刷新中…';try{const r=await fetch(REFRESH_API,{method:'POST'});const j=await r.json().catch(()=>({}));if(j&&j.mode==='cooldown'){await reloadData();showToast('5 分钟内已刷新过，已加载最新快照');}else if(j&&j.ok){showToast('正在刷新，稍等片刻');let done=false;for(let i=0;i<20;i++){await new Promise(res=>setTimeout(res,8000));try{const nb=await fetch('data/board.json?t='+Date.now(),{cache:'no-store'}).then(x=>x.json());if(nb.updated_at&&nb.updated_at!==oldMeta){await reloadData();showToast('已刷新到最新数据');done=true;break;}}catch(e){}}if(!done)showToast('刷新超时，请稍后再点一次');}else{showToast('刷新服务暂不可用');}}catch(e){showToast('刷新服务暂不可用');}btn.disabled=false;btn.textContent='刷新数据';};
+Promise.all([fetch('data/board.json').then(r=>r.json()),fetch('data/shops.json').then(r=>r.json())]).then(([b,s])=>{
+  board=b; shops=s;
+  $('#meta').textContent='数据截至 '+b.updated_at+'（北京时间） · 共 '+b.groups.reduce((a,g)=>a+g.items.length,0)+' 条报价 · '+b.source;
+  const plats=['全部',...new Set(s.shops.map(x=>x.platform))];
+  $('#chips').innerHTML=plats.map(p=>'<button data-p="'+esc(p)+'"'+(p==='全部'?' class="on"':'')+'>'+esc(p)+'</button>').join('');
+  document.querySelectorAll('#chips button').forEach(btn=>btn.onclick=()=>{shopFilter=btn.dataset.p;shopShown=300;document.querySelectorAll('#chips button').forEach(x=>x.classList.toggle('on',x===btn));renderShops();});
+  renderBoard(); renderShops();
+  setTimeout(jumpToHash,60);
+}).catch(e=>{$('#meta').textContent='数据加载失败，请稍后刷新。';});
+</script>
+</body>
+</html>
