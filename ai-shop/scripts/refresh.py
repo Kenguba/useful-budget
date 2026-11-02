@@ -310,6 +310,19 @@ def main():
     board = dict(updated_at=bj_now,
                  source='AI价网 + cardnav + PriceAI 按商家遍历合并',
                  groups=groups)
+    # 防覆盖保险（ken 2026-11-02）：新数据总条数不足上一版一半时，判定上游大面积失败，
+    # 直接报错退出、不覆盖旧 board.json，网站保持上一版好数据。
+    new_total = sum(len(g['items']) for g in groups)
+    board_path = os.path.join(DATA, 'board.json')
+    if os.path.exists(board_path):
+        try:
+            with open(board_path, encoding='utf-8') as f:
+                old_total = sum(len(g.get('items', [])) for g in json.load(f).get('groups', []))
+        except Exception:
+            old_total = 0
+        if old_total > 0 and new_total < old_total * 0.5:
+            print(f'GUARD: new total {new_total} < 50% of previous {old_total}; refusing to overwrite board.json', file=sys.stderr)
+            sys.exit(1)
     os.makedirs(DATA, exist_ok=True)
     with open(os.path.join(DATA, 'board.json'), 'w', encoding='utf-8') as f:
         json.dump(board, f, ensure_ascii=False, indent=1)
