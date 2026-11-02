@@ -95,7 +95,7 @@ button.tag{border:0;font-family:inherit;cursor:pointer;-webkit-tap-highlight-col
 <div class="wrap">
   <div class="kicker">KEN · USE</div>
   <h1>🛒 AI账号商铺</h1>
-  <p class="sub">AI 账号比价（固定 7 分组 · 有货最低价 · 商品详情页直达）与店铺总目录。报价口径：按商家遍历——AI价网全量商家库（2052 家店的全部商品）+ cardnav 全量商家库 + PriceAI 最低价段合并，比聚合分类榜单更全。</p>
+  <p class="sub">AI 账号比价（7 分组 · 有货最低价 · 详情页直达）与店铺总目录。按商家逐家遍历全量商品合并报价，比聚合榜单更全。</p>
   <div class="tabs">
     <button id="tabBoard" class="on">报价单</button>
     <button id="tabShops">店铺目录</button>
@@ -277,7 +277,7 @@ $('#sq').oninput=()=>{shopShown=300;renderShops();};
 $('#moreBtn').onclick=()=>{shopShown+=300;renderShops();};
 Promise.all([fetch('data/board.json').then(r=>r.json()),fetch('data/shops.json').then(r=>r.json())]).then(([b,s])=>{
   board=b; shops=s;
-  $('#meta').textContent='数据截至 '+b.updated_at+'（北京时间） · 共 '+b.groups.reduce((a,g)=>a+g.items.length,0)+' 条报价 · 来源：'+b.source;
+  $('#meta').textContent='数据截至 '+b.updated_at+'（北京时间） · 共 '+b.groups.reduce((a,g)=>a+g.items.length,0)+' 条报价 · '+b.source;
   const plats=['全部',...new Set(s.shops.map(x=>x.platform))];
   $('#chips').innerHTML=plats.map(p=>'<button data-p="'+esc(p)+'"'+(p==='全部'?' class="on"':'')+'>'+esc(p)+'</button>').join('');
   document.querySelectorAll('#chips button').forEach(btn=>btn.onclick=()=>{shopFilter=btn.dataset.p;shopShown=300;document.querySelectorAll('#chips button').forEach(x=>x.classList.toggle('on',x===btn));renderShops();});
