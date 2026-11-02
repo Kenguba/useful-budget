@@ -14,6 +14,11 @@
 - 读到的库存回填 board.json（0 就写 0，页面显示「已售罄」红标、原位不动），
   同步 sources 里同链接条目的库存；updated_at 不动（价格数据版本，归全量抓取管），
   另记 stock_checked_at。无变化不写任何文件（workflow 侧就不产生提交）。
+- 落盘合并（ken 2026-11-02 追加「合并上一版、除非过期的」）：写盘前先取仓库里
+  最新一版 board 当底，只把本轮核到的库存合并进去，没核到的保留底版的值；
+  若底版的 updated_at 已变（期间有新全量数据落地），本轮结果算过期，整轮作废
+  不写，等下一轮在新版上重核——绝不把旧版结果贴到新版上，也不复活已被
+  新版淘汰的条目。
 - 安全阀：自己核的部分里成功读到的不足三成、且没有可采用的访客结果时，
   视为网络异常，报错退出、不写文件，免得坏网络把好数据冲掉。
 
@@ -140,6 +145,17 @@ def apply_stock(it, st, counter):
             src['stock'] = st
 
 
+def fetch_latest_board():
+    """写盘前取仓库里最新一版 board.json 当合并底版；取不到返回 None（用本地版）。"""
+    url = os.environ.get(
+        'BOARD_RAW_URL',
+        'https://raw.githubusercontent.com/Kenguba/useful-budget/main/ai-shop/data/board.json')
+    try:
+        return json.loads(fetch(url, timeout=15).decode('utf-8', 'ignore'))
+    except Exception:
+        return None
+
+
 def main():
     interval = load_interval()
     now = time.time()
@@ -169,16 +185,19 @@ def main():
             if entry.get('board_updated_at') == board.get('updated_at') \
                     and now - t < interval * 60 and entry.get('results'):
                 adopted[gid] = entry['results']
-    changed = [0]
+    verified = {}
     own_groups = []
     for g in board.get('groups', []):
         res = adopted.get(g.get('id'))
         if res is not None:
+            n = 0
             for it in g.get('items', []):
-                if it.get('url') in res:
-                    apply_stock(it, res[it['url']], changed)
+                v = res.get(it.get('url'))
+                if isinstance(v, (int, float)):
+                    verified[it['url']] = int(v)
+                    n += 1
             print(f"group {g.get('id')}: adopted visitor check "
-                  f'({len(res)} results)')
+                  f'({n} usable results)')
         else:
             own_groups.append(g)
     if adopted:
@@ -197,19 +216,36 @@ def main():
                   file=sys.stderr)
             sys.exit(1)
         for it, st in zip(targets, stocks):
-            apply_stock(it, st, changed)
+            if st is not None:
+                verified[it['url']] = st
 
-    if not changed[0]:
-        print('no stock changes')
+    if not verified:
+        print('nothing verified; no write')
         return
-    board['stock_checked_at'] = datetime.now(BJ).strftime('%Y-%m-%d %H:%M')
+
+    # 落盘合并：以仓库最新一版 board 为底，只合并本轮核到的库存；
+    # 底版版本已变（期间有新全量数据）则本轮结果过期，整轮作废不写。
+    base = fetch_latest_board() or board
+    if base.get('updated_at') != board.get('updated_at'):
+        print(f"board version changed during run ({board.get('updated_at')} "
+              f"-> {base.get('updated_at')}); results expired, discard")
+        return
+    changed = [0]
+    for g in base.get('groups', []):
+        for it in g.get('items', []):
+            if it.get('url') in verified:
+                apply_stock(it, verified[it['url']], changed)
+    if not changed[0]:
+        print('no stock changes vs latest board')
+        return
+    base['stock_checked_at'] = datetime.now(BJ).strftime('%Y-%m-%d %H:%M')
     with open(board_path, 'w', encoding='utf-8') as f:
-        json.dump(board, f, ensure_ascii=False, indent=1)
+        json.dump(base, f, ensure_ascii=False, indent=1)
     # 内嵌块同步（与 refresh.py 同一段逻辑）：首屏快照与 board.json 保持同版
     page_path = os.path.join(BASE, 'index.html')
     with open(page_path, encoding='utf-8') as f:
         page = f.read()
-    inline_json = json.dumps(board, ensure_ascii=False, separators=(',', ':')) \
+    inline_json = json.dumps(base, ensure_ascii=False, separators=(',', ':')) \
         .replace('<', '\\u003c').replace(' ', '\\u2028').replace(' ', '\\u2029')
     block = '<!--INLINE-BOARD-START--><script>window.INLINE_BOARD=' + inline_json \
         + ';</script><!--INLINE-BOARD-END-->'
