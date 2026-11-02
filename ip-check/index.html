@@ -226,7 +226,7 @@ input{font-family:inherit}
 .isp-tag{display:inline-block;background:#3fbb2a;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;vertical-align:2px;margin-right:8px;letter-spacing:.03em}
 .kv .v a{color:#7a6f9e;text-decoration:underline;text-underline-offset:2px}
 .pill{
-  display:inline-block;color:#fff;font-size:15px;font-weight:500;padding:8px 34px;border-radius:999px;
+  display:inline-block;color:#fff;font-size:15px;font-weight:500;padding:8px 34px;border-radius:999px;white-space:nowrap;
   background:linear-gradient(180deg,#0a8f08,#067d06);box-shadow:0 3px 8px rgba(6,125,6,.25);
   min-width:180px;text-align:center;transition:transform .2s var(--ease);
 }
@@ -289,7 +289,7 @@ input{font-family:inherit}
 .risk-dots i{width:19px;height:19px;flex:none}
 .scene{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:98px;gap:2px}
 .detect-result{overflow-wrap:anywhere;word-break:break-word}
-/* 大模型检测小表格 */
+/* 模型检测小表格 */
 .llm-table{margin:10px 0 4px;border:1px solid #edf0f2;border-radius:14px;overflow:hidden;background:#fff}
 .llm-row{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:10px;padding:10px 14px}
 .llm-row + .llm-row{border-top:1px solid #f0f2f4}
@@ -481,7 +481,7 @@ input{font-family:inherit}
         </div>
 
         <div style="padding:4px 16px">
-          <div class="kv" style="align-items:center"><span class="k">大模型检测</span><span class="v"><button class="detect-link" id="llmBtn" type="button">点击检测</button></span></div>
+          <div class="kv" style="align-items:center"><span class="k">模型检测</span><span class="v"><button class="detect-link" id="llmBtn" type="button">点击检测</button></span></div>
           <div class="llm-table" id="llmTable" style="display:none"></div>
           <div class="detect-result" id="llmResult"></div>
           <div class="kv" style="align-items:center"><span class="k">IP地址(数字)</span><span class="v"><span class="num-ip" id="fNumIp">********</span>
@@ -586,11 +586,16 @@ function rangeFromCIDR(cidr,ip){
   if(isIPv4(ip)){const o=ip.split(".");return o[0]+"."+o[1]+"."+o[2]+".0 - "+o[0]+"."+o[1]+"."+o[2]+".255"}
   return"—";
 }
+function prefixExp(cidr){
+  if(!cidr||!cidr.includes("/"))return -1;
+  const p=Number(cidr.split("/")[1]);if(isNaN(p))return -1;
+  const bits=cidr.includes(":")?128:32;
+  return (p<0||p>bits)?-1:bits-p;
+}
 function prefixSize(cidr){
-  if(!cidr||!cidr.includes("/"))return"";
-  const p=Number(cidr.split("/")[1]);if(isNaN(p)||p<0||p>32)return"";
-  const n=Math.pow(2,32-p);
-  return n.toLocaleString("en-US")+" 个地址";
+  const exp=prefixExp(cidr);if(exp<0)return"";
+  if(exp>24)return "2^"+exp+" 个地址";
+  return Math.pow(2,exp).toLocaleString("en-US")+" 个地址";
 }
 function fmtTime(d){const z=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())+" "+z(d.getHours())+":"+z(d.getMinutes())}
 function fmtDT(s){if(!s)return"";return String(s).replace("T"," ").slice(0,16)}
@@ -715,7 +720,7 @@ function render(d){
   const lit=d.score<=10?1:d.score<=25?2:d.score<=40?3:d.score<=60?4:5;
   [...$("fRiskDots").children].forEach((el,i)=>el.className=i<lit?"":"off");
   const natPill=$("fNative");natPill.textContent=d.native==null?"查询中":(d.native?"原生 IP":"非原生 IP");natPill.className="pill"+(d.native?"":" warn");
-  const shPill=$("fShared");shPill.textContent=d.prefix?(d.prefix+" · "+prefixSize(d.prefix)):"—";shPill.className="pill "+(d.prefix&&Number(d.prefix.split("/")[1])>=20?"":"warn");
+  const shPill=$("fShared");shPill.textContent=d.prefix?(d.prefix+" · "+prefixSize(d.prefix)):"—";shPill.className="pill "+(d.prefix&&prefixExp(d.prefix)>=16?"warn":"");
   $("fRisk").textContent=d.riskTags||"查询中…";
   $("fNote").textContent=d.note||"正在汇总实时信号…";
   $("llmResult").innerHTML="";$("llmBtn").textContent="点击检测";$("llmBtn").disabled=false;
@@ -879,7 +884,7 @@ async function runQuery(ip,selfMode){
     const sc=computeScore(d,d.cls,bl);d.score=sc.score;
     const blTxt=bl?(bl.checked?("DNSBL 实时查询 "+bl.checked+" 个名单："+(bl.hits?("命中 "+bl.names.join(", ")):"0 命中")):"DNSBL 查询被名单方拒绝（公共解析器限制）"):"";
     d.riskTags=[d.cls.type==="hosting"?"机房 / 数据中心":d.cls.type==="residential"?"住宅宽带":"商业宽带",d.native==null?"注册地未知":d.native?"原生":"非原生（注册地 "+(d.whoisCountry||"?")+" ≠ 定位 "+(d.cc||"?")+")",bl&&bl.hits?"黑名单命中 "+bl.hits:""].filter(Boolean).join(" · ");
-    d.note="纯净度 = 本站按实时信号透明计算："+sc.why.join("；")+"。"+blTxt+"。定位为 "+loc.total+" 个数据源共识（"+loc.agree+" 个一致）。类型依据组织名 / WHOIS / 反向解析实时判定；场景星级为按类型与分数给出的建议，非平台官方数据。";
+    d.note="纯净度 = 本站按实时信号透明计算："+sc.why.join("；")+"。"+blTxt+"。定位为 "+(d.locRows&&d.locRows.length?d.locRows.length:loc.total)+" 个数据源共识（"+(d.locRows?d.conf:loc.agree)+" 个一致）。类型依据组织名 / WHOIS / 反向解析实时判定；场景星级按 IP 类型、定位国家与各厂商支持情况给出，非平台官方数据。";
     render(d);
   }catch(e){
     $("errBox").textContent="查询失败：实时数据源暂不可达，请稍后重试。";$("errBox").className="err show";
@@ -889,11 +894,17 @@ function applyType(d){
   const t=d.cls?d.cls.type:"business";
   d.attr=t==="hosting"?"机房IP":t==="residential"?"住宅IP":"商宽IP";
   d.ipType=t==="hosting"?"数据中心 IP":t==="residential"?"家庭宽带 IP":"商业宽带 IP";
-  const sub=d.cls&&d.cls.vpn?1:0;
-  if(t==="residential")d.scenes=[["TikTok",5],["跨境电商",5],["社媒运营",5],["AI 应用",5]];
-  else if(t==="business")d.scenes=[["TikTok",4],["跨境电商",5],["社媒运营",4],["AI 应用",5]];
-  else d.scenes=[["TikTok",2],["跨境电商",3],["社媒运营",2],["AI 应用",4]];
-  if(sub)d.scenes=d.scenes.map(s=>[s[0],Math.max(1,s[1]-1)]);
+  const cc=(d.cc||"").toUpperCase();
+  const llmOk=VENDORS.filter(v=>(LLM_LISTS[v.name]||[]).includes(cc)).length;
+  let tk,ec,sm;
+  if(t==="residential"){tk=5;ec=5;sm=5}
+  else if(t==="business"){tk=4;ec=5;sm=4}
+  else{tk=2;ec=3;sm=2}
+  const ai=llmOk>=4?(t==="hosting"?4:5):llmOk>=2?3:llmOk===1?2:1;
+  if(cc==="CN"||cc==="HK")tk=1;
+  if(cc==="CN"){sm=1;if(ec>3)ec=3}
+  d.scenes=[["TikTok",tk],["跨境电商",ec],["社媒运营",sm],["AI 应用",ai]];
+  if(d.cls&&d.cls.vpn)d.scenes=d.scenes.map(s=>[s[0],Math.max(1,s[1]-1)]);
 }
 function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove("show"),1800)}
 function setBusy(b){state.busy=b;$("searchBtn").disabled=b;$("searchBtn").textContent=b?"检测中…":"Search";$("card").classList.toggle("loading",b)}
