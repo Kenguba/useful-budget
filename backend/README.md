@@ -11,7 +11,7 @@
 | 留档文件 | 对应 Worker | 域名 | 作用 | 留档对应版本 |
 | --- | --- | --- | --- | --- |
 | `backend-proxy.js.back` | `backend-proxy` | `api.xxxxx.asia` | 盘搜站的后端中转：给原站公开接口加跨域头、边缘缓存、搜索流与资源链接转发 | 8b6f1e92 |
-| `site-router.js.back` | `site-router` | `*.xxxxx.asia`（通配） | 按子域名前缀分发四个项目到 GitHub Pages 对应目录；pan 的接口请求同域转发给后端 | 17d3f1b8 |
+| `site-router.js.back` | `site-router` | `*.xxxxx.asia`（通配）+ `xxxxx.asia`（主域名） | 按子域名前缀分发四个项目到 GitHub Pages 对应目录；pan 的接口请求同域转发给后端；主域名（无前缀）转发到仓库根导航页（总体预览页） | 2026-11-03 更新 |
 | `jpcard.js.back` | `jpcard` | `img.xxxxx.asia` | 日语教学图库供图：图片存 GitHub 三个仓库，三路容灾取图（jsDelivr → GitHub Raw → 镜像），边缘缓存 30 天 | 8737b21b |
 | `ai-refresh.js.back` | `ai-refresh` | `ai.xxxxx.asia/api/*`（路由） | AI 商铺后端：手动全量刷新（5 分钟冷却、KV 为主 + GitHub 运行记录兜底）、进站库存现核 stock-check（60 秒节流）、访客核对结果 stock-status 供服务器采用、库存数据超 10 分钟自动触发全量拉取 | 2026-11-02 建 |
 
@@ -24,13 +24,14 @@
 1. **建 Worker**：在 Cloudflare 新建四个 Worker，分别把四份 `.js.back` 的代码贴入并 Deploy（贴的时候去掉文件头那段留档说明注释也行，不影响运行）。
 2. **配 DNS**（域名在 Cloudflare 托管）：
    - 通配：`*` AAAA `100::`，代理开启；
+   - 主域名：`@` AAAA `100::`，代理开启（通配 `*` 不覆盖主域名，必须单独加这一条，缺了主域名会报错打不开）；
    - `api`、`img` 的解析随第 3 步的自定义域绑定自动生成，不用手填。
 3. **配绑定与路由**（顺序别错）：
    - `backend-proxy` 绑自定义域 `api.xxxxx.asia`，另加精确路由 `api.xxxxx.asia/*`；
    - `jpcard` 绑自定义域 `img.xxxxx.asia`，另加精确路由 `img.xxxxx.asia/*`；
-   - `site-router` 绑通配路由 `*.xxxxx.asia/*`；
+   - `site-router` 绑通配路由 `*.xxxxx.asia/*`，另绑主域名路由 `xxxxx.asia/*`（通配同样不覆盖主域名，须单独加，指向同一个 `site-router`）；
    - `ai-refresh` 另加路由 `ai.xxxxx.asia/api/*`，并绑 KV 命名空间（变量名 `REFRESH_KV`，键含 last、stock:<分组>、stock:lastcheck）与 secret `GH_TOKEN`（细粒度 PAT，仅本仓库 Actions 读写），细则见其留档文件头。
-4. **逐项验证**：四个项目子域名首页、`pan` 首页与它的 `/api/public/hot-searches?limit=1`、`api` 的同一接口、`img` 根路径应返回 `JP-EDU Image Server is Active.`；`ai` 的 `/api/refresh-board` 用 GET 访问应返回 405、POST 返回 `{ok:true,...}` JSON。
+4. **逐项验证**：主域名 `https://xxxxx.asia/` 应打开根导航页（总体预览页「便宜、有用的，都在这」）；四个项目子域名首页、`pan` 首页与它的 `/api/public/hot-searches?limit=1`、`api` 的同一接口、`img` 根路径应返回 `JP-EDU Image Server is Active.`；`ai` 的 `/api/refresh-board` 用 GET 访问应返回 405、POST 返回 `{ok:true,...}` JSON。
 
 ### 为什么 api / img 必须另加精确路由（2026-11-02 的教训）
 
@@ -40,3 +41,4 @@
 
 - 本仓库公开，文档与注释里的真实域名一律打码写作 `xxxxx.asia`（如 `api.xxxxx.asia`）；功能代码里必须出现的真实地址不打码（打码即断站）。
 - 加新项目子域名：只改 site-router 代码里 `ROUTES` 表加一行并重新 Deploy，不用再动 DNS 和路由。
+- 主域名固定为总体预览页（根导航页 `index.html`），不给单个项目占用；换域名时主域名的 DNS 与路由按迁移清单第 2、3 步单独配。

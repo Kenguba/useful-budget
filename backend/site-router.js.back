@@ -1,14 +1,17 @@
 // ============================================================
 // 子域名分发服务 site-router 的源码留档副本。
 // 真正运行的是部署在 Cloudflare（站长账号）上的 Worker
-// 「site-router」（版本 17d3f1b8），守在通配路由 *.xxxxx.asia/* 上，
-// 按子域名前缀把四个项目分发到 GitHub Pages 对应目录。
+// 「site-router」（版本 2026-11-03 更新），守在通配路由 *.xxxxx.asia/*
+// 与主域名路由 xxxxx.asia/* 上，按子域名前缀把四个项目分发到
+// GitHub Pages 对应目录；主域名（无前缀）分发到仓库根导航页（总体预览页）。
 // 把副本放在仓库里，是为了迁移时直接拿这一份部署，不用去控制台翻。
 // 同步规则：线上代码有任何改动，先部署到 Cloudflare，再同步回本文件。
 //
 // （缺了会出事）
 // 1. 通配 DNS：*.xxxxx.asia AAAA 100::，代理开启；
 // 2. 通配路由：给本 Worker 绑 *.xxxxx.asia/*；
+// 2b. 主域名单独配（通配不覆盖主域名，缺一不可）：
+//     DNS 加 @ AAAA 100::（代理开启）+ 路由 xxxxx.asia/* 给本 Worker；
 // 3. 精确路由护住老服务：api 子域名 -> backend-proxy、img 子域名 -> jpcard
 // 各有一条精确路由（优先级高于通配）。没有这一步，通配会把
 // api/img 的自定义域请求截走回 404（2026-11-02 踩过一次）。
@@ -26,6 +29,15 @@ async fetch(request) {
 const url = new URL(request.url);
 const labels = url.hostname.split(".");
 const sub = labels.slice(0, -2).join("."); // 前缀键，可多级，如 "a.b"
+// 主域名（无前缀）= 总体预览页：转发到 GitHub Pages 仓库根目录（导航页）
+if (sub === "") {
+let q = url.pathname;
+if (q !== "/useful-budget" && !q.startsWith("/useful-budget/")) {
+q = "/useful-budget" + (q === "/" ? "/" : q);
+}
+return fetch("https://kenguba.github.io" + q + url.search, request);
+}
+
 const dir = ROUTES[sub];
 if (!dir) return new Response("Not Found", { status: 404});
 
