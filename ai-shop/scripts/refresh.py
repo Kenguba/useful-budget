@@ -404,6 +404,25 @@ def main():
     os.makedirs(DATA, exist_ok=True)
     with open(os.path.join(DATA, 'board.json'), 'w', encoding='utf-8') as f:
         json.dump(board, f, ensure_ascii=False, indent=1)
+
+    # 把最新报价内嵌进 index.html：页面一打开就渲染价格/库存，不必等 board.json 下载（ken 2026-11-02「立马就给出」）。
+    # 只替换 INLINE-BOARD 标记之间的内容，其余页面内容不动；失败不影响 board.json 已落盘的结果。
+    try:
+        index_path = os.path.join(BASE, 'index.html')
+        with open(index_path, encoding='utf-8') as f:
+            page = f.read()
+        inline_json = json.dumps(board, ensure_ascii=False, separators=(',', ':')).replace('<', '\\u003c').replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
+        block = '<!--INLINE-BOARD-START--><script>window.INLINE_BOARD=' + inline_json + ';</script><!--INLINE-BOARD-END-->'
+        new_page, n = re.subn(r'<!--INLINE-BOARD-START-->.*?<!--INLINE-BOARD-END-->', lambda m: block, page, flags=re.S)
+        if n == 0:
+            i = page.rfind('<script>')
+            new_page = (page[:i] + block + '\n' + page[i:]) if i >= 0 else page
+        if new_page != page:
+            with open(index_path, 'w', encoding='utf-8') as f:
+                f.write(new_page)
+            print('inline board injected into index.html', file=sys.stderr)
+    except Exception as e:
+        print(f'inline inject skipped: {e}', file=sys.stderr)
     print('leaders:', [(g['name'][:12], g['items'][0]['price'] if g['items'] else None) for g in groups], file=sys.stderr)
 
     csv_path = os.path.join(DATA, 'shops.csv')
