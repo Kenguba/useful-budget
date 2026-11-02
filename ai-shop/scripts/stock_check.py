@@ -11,21 +11,24 @@
 - 其余分组才自己逐条直查详情页（与 refresh.py 同口径）：
   16688 走接口 shopApi/goods/detail；aicdks 与 /item/ 系读详情页文本；
   wzyp 详情页被 WAF 挡，跳过，保留聚合快照库存。
-- 读到的库存回填 board.json（0 就写 0，页面显示「已售罄」红标、原位不动），
-  同步 sources 里同链接条目的库存；updated_at 不动（价格数据版本，归全量抓取管），
-  另记 stock_checked_at。无变化不写任何文件（workflow 侧就不产生提交）。
+- 读到的库存回填 board.json，同步 sources 里同链接条目的库存；核到 0（售罄）
+  或明确找不到（商品不存在/404）的条目直接从 board 里去除（ken 2026-11-02 定：
+  找不到、没库存的可以去除；暂时读不到的不动、保留原值）。
+  updated_at 不动（价格数据版本，归全量抓取管），另记 stock_checked_at。
+  无变化不写任何文件（workflow 侧就不产生提交）。
 - 落盘合并（ken 2026-11-02 追加「合并上一版、除非过期的」）：写盘前先取仓库里
   最新一版 board 当底，只把本轮核到的库存合并进去，没核到的保留底版的值；
   若底版的 updated_at 已变（期间有新全量数据落地），本轮结果算过期，整轮作废
   不写，等下一轮在新版上重核——绝不把旧版结果贴到新版上，也不复活已被
-  新版淘汰的条目。
+  新版淘汰的条目。对比永远针对整份发布的 JSON：每次合并产出的就是唯一一份
+  当前数据，下一轮再有新数据时，拿这份合并后的数据继续对比合并。
 - 安全阀：自己核的部分里成功读到的不足三成、且没有可采用的访客结果时，
   视为网络异常，报错退出、不写文件，免得坏网络把好数据冲掉。
 
 用法：python3 scripts/stock_check.py（路径按脚本位置算）
 产出（有变化时）：data/board.json、index.html（内嵌块同步）
 """
-import html, json, os, re, sys, time, urllib.request
+import html, json, os, re, sys, time, urllib.error, urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone, timedelta
 
@@ -100,8 +103,12 @@ def own_last_run():
     return 0
 
 
+NOT_FOUND = -1  # 明确「找不到」（商品不存在 / 详情页 404）：与读不到（None）区分
+
+
 def detail_stock(it):
-    """与 refresh.py 同口径：能读的详情页逐条核；读不到返回 None（保留原值）。"""
+    """与 refresh.py 同口径：能读的详情页逐条核。
+    返回：库存数（0=售罄）；NOT_FOUND=明确找不到；None=暂时读不到（保留原值）。"""
     url = it['url']
     try:
         if 'wzyp.cn' in url:
@@ -116,6 +123,8 @@ def detail_stock(it):
                 headers={**HEADERS, 'Content-Type': 'application/json'})
             with urllib.request.urlopen(req, timeout=20) as r:
                 d = json.loads(r.read().decode('utf-8', 'ignore'))
+            if not d.get('data') and '不存在' in str(d.get('msg') or ''):
+                return NOT_FOUND
             q = (d.get('data') or {}).get('stock_available_quantity')
             return int(q) if isinstance(q, (int, float)) else None
         if 'aicdks.com' in url or '/item/' in url:
@@ -124,6 +133,8 @@ def detail_stock(it):
                 return 0
             km = re.search(r'库存\s*[:：]?\s*(\d+)', txt)
             return int(km.group(1)) if km else None
+    except urllib.error.HTTPError as e:
+        return NOT_FOUND if e.code == 404 else None
     except Exception:
         return None
     return None
@@ -231,13 +242,25 @@ def main():
               f"-> {base.get('updated_at')}); results expired, discard")
         return
     changed = [0]
+    removed = 0
     for g in base.get('groups', []):
+        kept = []
         for it in g.get('items', []):
-            if it.get('url') in verified:
-                apply_stock(it, verified[it['url']], changed)
+            v = verified.get(it.get('url'))
+            if v is not None and v <= 0:
+                # 找不到（-1）或没库存（0）：直接去除（ken 2026-11-02 定）
+                changed[0] += 1
+                removed += 1
+                continue
+            if v is not None:
+                apply_stock(it, v, changed)
+            kept.append(it)
+        g['items'] = kept
     if not changed[0]:
         print('no stock changes vs latest board')
         return
+    if removed:
+        print(f'removed {removed} items (not found / out of stock)')
     base['stock_checked_at'] = datetime.now(BJ).strftime('%Y-%m-%d %H:%M')
     with open(board_path, 'w', encoding='utf-8') as f:
         json.dump(base, f, ensure_ascii=False, indent=1)
