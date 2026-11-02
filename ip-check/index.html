@@ -383,10 +383,10 @@ input{font-family:inherit}
           <div class="kv"><span class="sub-k">AS域名</span><span class="v" id="fAsDomain">—</span></div>
           <div class="kv"><span class="sub-k">IP范围</span><span class="v" id="fRange">—</span></div>
           <div class="kv" style="align-items:flex-start">
-            <span class="sub-k" style="padding-top:2px">人机流量比</span>
+            <span class="sub-k" style="padding-top:2px">纯净 / 风险比</span>
             <div class="ratio">
               <div class="ratio-bar"><div class="human" id="ratioHuman"></div></div>
-              <div class="ratio-nums"><span class="h" id="ratioHumanTxt">human —</span><span class="b" id="ratioBotTxt">bot —</span></div>
+              <div class="ratio-nums"><span class="h" id="ratioHumanTxt">纯净 —</span><span class="b" id="ratioBotTxt">风险 —</span></div>
             </div>
           </div>
         </div>
@@ -447,7 +447,7 @@ input{font-family:inherit}
           <div class="kv" style="align-items:center"><span class="k">IP类型</span><span class="v"><span class="pill" id="fIpType">—</span></span></div>
           <div class="kv" style="align-items:center"><span class="k">风控值</span><span class="v"><span class="risk-wrap"><span class="pill" id="fRiskPill">—</span><span class="risk-dots" id="fRiskDots"><i></i><i></i><i></i><i></i><i></i></span></span></span></div>
           <div class="kv" style="align-items:center"><span class="k">原生IP</span><span class="v"><span class="pill" id="fNative">—</span></span></div>
-          <div class="kv" style="align-items:center"><span class="k">共享人数</span><span class="v"><span class="pill" id="fShared">—</span></span></div>
+          <div class="kv" style="align-items:center"><span class="k">网段规模</span><span class="v"><span class="pill" id="fShared">—</span></span></div>
           <div class="kv"><span class="k">风险标签</span><span class="v" id="fRisk">—</span></div>
         </div>
 
@@ -468,13 +468,13 @@ input{font-family:inherit}
         <div style="padding:4px 16px">
           <div class="sec-title" style="padding-left:0">🟢 ASN 历史</div>
           <div id="histAsn"></div>
-          <div class="sec-title" style="padding-left:0">💥 企业历史</div>
+          <div class="sec-title" style="padding-left:0">💥 WHOIS / 企业</div>
           <div id="histCompany"></div>
           <button class="show-old" id="showOldBtn" type="button">↓ 显示非活跃记录</button>
           <div id="histOld" style="display:none">
             <div class="sec-title" style="padding-left:0">🥟 注册地历史</div>
             <div id="histReg"></div>
-            <div class="sec-title" style="padding-left:0">🐵 IP 位置历史</div>
+            <div class="sec-title" style="padding-left:0">🐵 地理定位（RIPEstat）</div>
             <div id="histLoc"></div>
           </div>
         </div>
@@ -519,7 +519,7 @@ input{font-family:inherit}
     <div style="height:12px"></div>
   </section>
 
-  <p class="foot">数据来源：公开 IP 情报库多源交叉（定位 / ASN / 运营商）。纯净度系数为本站启发式估算，仅供参考。<br>本站无广告、无追踪脚本。IPPure 风格复刻，部署于 useful-budget / ip-check。</p>
+  <p class="foot">全部数据实时查询：定位多源共识（ipwho.is / ipinfo.io / ipapi.co / RIPEstat）、ASN 与 WHOIS 与路由历史与 BGP 邻居（RIPEstat）、黑名单（DNSBL 实时查询）。纯净度为本站按真实信号（类型 / 黑名单 / rDNS / 注册地一致性）透明计算，公式写在展开区「检测说明」。<br>本站无广告、无追踪脚本。IPPure 风格复刻，部署于 useful-budget / ip-check。</p>
 </main>
 
 <div class="flash" id="flash"></div>
@@ -528,78 +528,103 @@ input{font-family:inherit}
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
-const state={data:null,ipVisible:true,numVisible:false,busy:false};
-
-function flagEmoji(cc){
-  if(!cc||cc.length!==2)return"🌐";
-  return String.fromCodePoint(...[...cc.toUpperCase()].map(c=>127397+c.charCodeAt(0)));
-}
-function hashStr(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0}return h}
+const state={data:null,ipVisible:true,numVisible:false,busy:false,querySeq:0};
+function flagEmoji(cc){if(!cc||cc.length!==2)return"🌐";return String.fromCodePoint(...[...cc.toUpperCase()].map(c=>127397+c.charCodeAt(0)))}
 function isIPv4(ip){return /^\d{1,3}(\.\d{1,3}){3}$/.test(ip)}
 function ipToNum(ip){if(!isIPv4(ip))return null;return ip.split(".").reduce((a,o)=>a*256+Number(o),0)}
 function rangeFromCIDR(cidr,ip){
-  if(cidr&&cidr.includes("/")){
-    const[base,prefix]=cidr.split("/");const p=Number(prefix);
-    if(isIPv4(base)&&p>=0&&p<=32){
-      const mask=p===0?0:(0xFFFFFFFF<<(32-p))>>>0;const start=(ipToNum(base)&mask)>>>0;
-      const end=(start|(~mask>>>0))>>>0;const n=x=>[x>>>24,(x>>>16)&255,(x>>>8)&255,x&255].join(".");
-      return n(start)+" - "+n(end);
-    }
-  }
+  if(cidr&&cidr.includes("/")){const[base,prefix]=cidr.split("/");const p=Number(prefix);
+    if(isIPv4(base)&&p>=0&&p<=32){const mask=p===0?0:(0xFFFFFFFF<<(32-p))>>>0;const start=(ipToNum(base)&mask)>>>0;const end=(start|(~mask>>>0))>>>0;const n=x=>[x>>>24,(x>>>16)&255,(x>>>8)&255,x&255].join(".");return n(start)+" - "+n(end)}}
   if(isIPv4(ip)){const o=ip.split(".");return o[0]+"."+o[1]+"."+o[2]+".0 - "+o[0]+"."+o[1]+"."+o[2]+".255"}
   return"—";
 }
-function fmtTime(d){
-  const z=n=>String(n).padStart(2,"0");
-  return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())+" "+z(d.getHours())+":"+z(d.getMinutes());
+function prefixSize(cidr){
+  if(!cidr||!cidr.includes("/"))return"";
+  const p=Number(cidr.split("/")[1]);if(isNaN(p)||p<0||p>32)return"";
+  const n=Math.pow(2,32-p);
+  return n.toLocaleString("en-US")+" 个地址";
 }
-const CN_COUNTRY={"Australia":"澳大利亚","United States":"美国","Taiwan":"中国 台湾","China":"中国","Japan":"日本","Singapore":"新加坡","United Kingdom":"英国","Germany":"德国","France":"法国","Canada":"加拿大","South Korea":"韩国","Netherlands":"荷兰","Hong Kong":"中国 香港","Malaysia":"马来西亚","India":"印度","Brazil":"巴西","Russia":"俄罗斯"};
-const CN_REGION={"New South Wales":"新南威尔士州","Changhua":"彰化","Taipei":"台北","California":"加利福尼亚州","Virginia":"弗吉尼亚州"};
-
-const DEMO1={
-  ip:"172.105.255.70",asn:"AS63949",asnName:"Akamai Connected Cloud",asDomain:"linode.com",
-  range:"172.105.254.0 - 172.105.255.255",human:11.3,
-  country:"Australia",countryCode:"AU",region:"New South Wales",city:"Sydney",
-  source:"广播IP",native:false,attr:"机房IP",ipType:"数据中心 IP",score:28,
-  isp:"Akamai Connected Cloud (Linode)",asnOwner:"Akamai Connected Cloud — ",ownerDomain:"linode.com",
-  company:"Linode, LLC — ",companyDomain:"linode.com",host:"172-105-255-70.ip.linodeusercontent.com",
-  tz:"Australia/Sydney",lat:-33.8688,lon:151.2093,postal:"1001",conf:3,shared:"100+ (较差)",sharedCls:"bad",
-  scenes:[["TikTok",2],["跨境电商",3],["社媒运营",2],["AI 应用",4]],
-  riskTags:"机房 / 数据中心 · 非原生",note:"该 IP 属于云厂商地址段，人机流量中机器人占比高；适合建站与 AI 接口调用，不适合社媒养号。",
-  histAsn:[{ttl:"AS63949",org:"Akamai Connected Cloud",cidr:"172.105.0.0/16",cc:"US",place:"美国",last:"2026-11-02 18:40"}],
-  histCompany:[{ttl:"ISP",org:"Linode, LLC — linode.com",cidr:"172.105.248.0/21",first:"2019-06-14 09:20",last:"2026-11-02 18:40"},{ttl:"ISP",org:"Akamai Technologies, Inc. — akamai.com",cidr:"172.105.0.0/16",first:"2020-02-11 10:05",last:"2026-11-01 22:15"}],
-  histReg:[{org:"美国 · ARIN",cidr:"172.105.0.0/16",first:"2018-09-03 00:00",last:"2026-11-03 00:00"}],
-  histLoc:[{org:"澳大利亚 悉尼",cidr:"172.105.255.0/24"}],
-  neighbors:[{nm:"Akamai Technologies, Inc.",dm:"akamai.com",tag:"ISP",idc:1},{nm:"Linode, LLC",dm:"linode.com",tag:"ISP",idc:1},{nm:"Cloudflare, Inc.",dm:"cloudflare.com",tag:"CC",idc:1},{nm:"Google LLC",dm:"google.com",tag:"",idc:0},{nm:"Amazon.com, Inc.",dm:"amazon.com",tag:"CC",idc:1}]
-};
-const DEMO2={
-  ip:"1.170.200.147",asn:"AS3462",asnName:"HiNet",asDomain:"hinet.net",
-  range:"1.170.200.0 - 1.170.200.255",human:92.4,
-  country:"Taiwan",countryCode:"TW",region:"Changhua",city:"Changhua",
-  source:"原生IP",native:true,attr:"住宅IP",ipType:"家庭宽带 IP",score:5,
-  isp:"Chunghwa Telecom Co., Ltd.",asnOwner:"Chunghwa Telecom Co., Ltd. — ",ownerDomain:"cht.com / hinet.net",
-  company:"Data Communication Business Group, — ",companyDomain:"hinet.net",host:"1-170-200-147.dynamic-ip.hinet.net",
-  tz:"Asia/Taipei",lat:24.0733,lon:120.5628,postal:"500",conf:3,shared:"1 - 10 (极好)",sharedCls:"",
-  scenes:[["TikTok",5],["跨境电商",5],["社媒运营",5],["AI 应用",5]],
-  riskTags:"住宅宽带 · 原生 · 低风险",note:"住宅原生 IP，风控值极低，各平台场景均非常适合。",
-  fixedTime:"2026-10-25 11:33",
-  histAsn:[{ttl:"AS3462",org:"Chunghwa Telecom Co., Ltd.",cidr:"1.170.0.0/16",cc:"TW",place:"台湾",last:"2026-11-02 20:26"},{ttl:"AS3462",org:"Chunghwa Telecom Co., Ltd.",cidr:"1.160.0.0/12",cc:"TW",place:"台湾",last:"2026-11-02 20:26"}],
-  histCompany:[{ttl:"ISP",org:"Data Communication Business Group, — hinet.net",cidr:"1.160.0.0/12",first:"2021-11-04 08:49",last:"2026-11-02 16:33"},{ttl:"ISP",org:"Asia Pacific Network Information Center, Pty. Ltd.",cidr:"1.0.0.0/8",first:"2010-12-17 01:17",last:"2026-11-02 16:33"}],
-  histReg:[{org:"台湾 · APNIC",cidr:"1.160.0.0/12",first:"2010-05-06 00:00",last:"2026-11-03 00:00"}],
-  histLoc:[{org:"中国 台湾彰化",cidr:"1.170.200.0/24"}],
-  neighbors:[{nm:"CHTD, Chunghwa Telecom Co.",dm:"hinet.net",tag:"ISP",idc:0},{nm:"Data Communication Business Group",dm:"hinet.net",tag:"ISP",idc:0},{nm:"Synopsys Inc.",dm:"synopsys.com",tag:"",idc:0},{nm:"Taipei Taiwan",dm:"",tag:"",idc:0},{nm:"Taiwan Semiconductor Manufacturing",dm:"tsmc.com",tag:"",idc:0},{nm:"ZENLA-1",dm:"zenlayer.com",tag:"CC",idc:1}]
-};
-const DEMOS={"172.105.255.70":DEMO1,"1.170.200.147":DEMO2};
-
+function fmtTime(d){const z=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())+" "+z(d.getHours())+":"+z(d.getMinutes())}
+function fmtDT(s){if(!s)return"";return String(s).replace("T"," ").slice(0,16)}
+function escapeHtml(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 function scoreLabel(s){return s<=10?"极度纯净":s<=25?"纯净":s<=40?"中性":s<=60?"有风险":s<=80?"风险较高":"高风险"}
 function badgeColor(s){return s<=40?"#6fbf2e":s<=60?"#f59a23":"#e05252"}
 function pillCls(s){return s<=25?"":s<=60?"warn":"bad"}
-function starsHtml(n){
-  let h="";for(let i=1;i<=5;i++)h+=i<=n?"★":"<span class='off'>★</span>";
-  return h;
-}
+function starsHtml(n){let h="";for(let i=1;i<=5;i++)h+=i<=n?"★":"<span class='off'>★</span>";return h}
 function suitText(n){return n>=5?"非常适合":n===4?"适合":n===3?"一般":n===2?"不太适合":"不适合"}
+async function fetchJSON(url,ms){
+  const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),ms||7000);
+  try{const r=await fetch(url,{signal:ctl.signal});if(!r.ok)throw new Error("http "+r.status);return await r.json()}
+  finally{clearTimeout(t)}
+}
+async function fetchText(url,ms){
+  const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),ms||5000);
+  try{const r=await fetch(url,{signal:ctl.signal});if(!r.ok)throw new Error("http "+r.status);return await r.text()}
+  finally{clearTimeout(t)}
+}
+const settled=ps=>Promise.allSettled(ps).then(rs=>rs.map(r=>r.status==="fulfilled"?r.value:null));
 
+/* ---------- 实时数据源 ---------- */
+async function srcIpWho(ip){
+  const j=await fetchJSON("https://ipwho.is/"+(ip||""));
+  if(!j||j.success===false)throw new Error("ipwho");
+  const c=j.connection||{};
+  return{src:"ipwho.is",ip:j.ip,country:j.country||"",cc:j.country_code||"",region:j.region||"",city:j.city||"",lat:j.latitude,lon:j.longitude,postal:j.postal||"",tz:(j.timezone&&j.timezone.id)||"",asn:c.asn?("AS"+c.asn):"",asnName:c.org||c.isp||"",domain:c.domain||"",isp:c.isp||c.org||""};
+}
+async function srcIpInfo(ip){
+  const j=await fetchJSON("https://ipinfo.io/"+(ip?ip+"/":"")+"json");
+  if(!j||!j.ip)throw new Error("ipinfo");
+  const m=(j.org||"").match(/^(AS\d+)\s*(.*)$/);const loc=(j.loc||"").split(",");
+  return{src:"ipinfo.io",ip:j.ip,country:"",cc:j.country||"",region:j.region||"",city:j.city||"",lat:loc[0]?Number(loc[0]):undefined,lon:loc[1]?Number(loc[1]):undefined,postal:j.postal||"",tz:j.timezone||"",asn:m?m[1]:"",asnName:m?m[2]:"",domain:"",isp:j.org||"",host:j.hostname||""};
+}
+async function srcIpApi(ip){
+  const j=await fetchJSON("https://ipapi.co/"+(ip?ip+"/":"")+"json/");
+  if(!j||j.error||!j.ip)throw new Error("ipapi");
+  const m=(j.org||"").match(/^(AS\d+)\s*(.*)$/);
+  return{src:"ipapi.co",ip:j.ip,country:j.country_name||"",cc:j.country_code||"",region:j.region||"",city:j.city||"",lat:j.latitude,lon:j.longitude,postal:j.postal||"",tz:j.timezone||"",asn:m?m[1]:"",asnName:m?m[2]:(j.org||""),domain:"",isp:j.org||"",network:j.network||""};
+}
+async function ripe(path,ip,ms){
+  const j=await fetchJSON("https://stat.ripe.net/data/"+path+"/data.json?resource="+encodeURIComponent(ip),ms||9000);
+  return j&&j.data?j.data:null;
+}
+async function dnsbl(ip){
+  if(!isIPv4(ip))return{hits:0,checked:0,names:[]};
+  const rev=ip.split(".").reverse().join(".");
+  const lists=["zen.spamhaus.org","b.barracudacentral.org","bl.spamcop.net"];
+  const rs=await settled(lists.map(l=>fetchJSON("https://dns.google/resolve?name="+encodeURIComponent(rev+"."+l)+"&type=A",5000)));
+  let hits=0,checked=0;const names=[];
+  rs.forEach((j,i)=>{
+    if(!j)return;
+    const ans=(j.Answer||[]).map(a=>a.data);
+    if(ans.some(a=>/^127\.255\./.test(a)))return;
+    checked++;
+    if(ans.some(a=>/^127\.0\.0\./.test(a))){hits++;names.push(lists[i])}
+  });
+  return{hits:hits,checked:checked,names:names};
+}
+const HOST_KW=["linode","akamai","amazon","aws","google","microsoft","azure","digitalocean","vultr","oracle","ovh","hetzner","aliyun","alibaba","tencent","cloudflare","datacenter","data center","data-center","hosting","server","cloud","choopa","contabo","zenlayer","leaseweb","colocation","vps","dedicated"];
+const VPN_KW=["vpn","proxy","tor","anonymous","nord","expressvpn","surfshark","mullvad"];
+function classify(d){
+  const txt=((d.asnHolder||"")+" "+(d.asnName||"")+" "+(d.isp||"")+" "+(d.netname||"")+" "+(d.host||"")).toLowerCase();
+  const hosting=HOST_KW.some(k=>txt.includes(k));
+  const vpn=VPN_KW.some(k=>txt.includes(k));
+  const dynamic=/dynamic|dhcp|pool|dial|broadband|residential|home|fiber|fibre|adsl|cable/.test(txt);
+  let type="business";
+  if(hosting)type="hosting";else if(dynamic)type="residential";else if(/telecom|telco|communications|broadband|mobile|cellular/.test(txt))type="residential";
+  return{type:type,vpn:vpn,dynamic:dynamic,hosting:hosting};
+}
+function computeScore(d,cls,bl){
+  let s=cls.type==="hosting"?42:cls.type==="business"?22:6;const why=[];
+  why.push("类型基线 "+(cls.type==="hosting"?"机房 42":cls.type==="business"?"商宽 22":"住宅 6"));
+  if(bl&&bl.checked>0){if(bl.hits>0){s+=bl.hits*28;why.push("DNS 黑名单命中 "+bl.hits+" 个 +"+(bl.hits*28))}else why.push("DNS 黑名单 0 命中 +0")}
+  if(d.whoisCountry&&d.cc&&d.whoisCountry!==d.cc){s+=12;why.push("注册地 "+d.whoisCountry+" 与定位 "+d.cc+" 不一致 +12")}
+  if(!d.host){s+=6;why.push("无反向解析 +6")}
+  if(cls.vpn){s+=25;why.push("组织名含 VPN/代理特征 +25")}
+  s=Math.max(2,Math.min(97,s));
+  return{score:s,why:why};
+}
+
+/* ---------- 渲染 ---------- */
 function render(d){
   state.data=d;state.ipVisible=true;state.numVisible=false;
   $("ipInput").value=d.ip;
@@ -607,285 +632,267 @@ function render(d){
   $("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>";
   $("fAsn").textContent=d.asn||"—";
   $("fAsnName").textContent=d.asnName?" - "+d.asnName:"";
-  $("fAsDomain").textContent=d.asDomain||"—";
+  $("fAsDomain").textContent=d.domain||d.netname||"—";
   $("fRange").textContent=d.range||"—";
-  $("ratioHuman").style.width=d.human+"%";
-  $("ratioHumanTxt").textContent="human "+Number(d.human).toFixed(2)+"%";
-  $("ratioBotTxt").textContent="bot "+(100-d.human).toFixed(2)+"%";
-  const placeEn=[d.country,d.region,d.city].filter(Boolean).join(", ");
-  const placeCn=[CN_COUNTRY[d.country]||d.country,CN_REGION[d.region]||d.region,d.city==="Sydney"?"悉尼":d.city].filter(Boolean).join("，");
-  const sources=["IP2Location","DB-IP","MaxMind","IPInfo.io","Bilibili"];
-  $("locList").innerHTML=sources.map((s,i)=>"<div class='loc-row'><span class='src'>"+s+"</span><span class='flag'>"+flagEmoji(d.countryCode)+"</span><span class='place'>"+(i===4?placeCn:placeEn)+"</span></div>").join("");
-  const srcTag=$("fSource");srcTag.textContent=d.source;srcTag.className="tag"+(d.native?" green":"");
+  const pure=100-d.score;
+  $("ratioHuman").style.width=pure+"%";
+  $("ratioHumanTxt").textContent="纯净 "+pure+"%";
+  $("ratioBotTxt").textContent="风险 "+d.score+"%";
+  $("locList").innerHTML=d.locRows.map(r=>"<div class='loc-row'><span class='src'>"+escapeHtml(r.src)+"</span><span class='flag'>"+flagEmoji(r.cc)+"</span><span class='place'>"+escapeHtml(r.place)+"</span></div>").join("");
+  const srcTag=$("fSource");srcTag.textContent=d.native==null?"查询中":(d.native?"原生IP":"广播IP");srcTag.className="tag"+(d.native?" green":"");
   const attrTag=$("fAttr");attrTag.textContent=d.attr;attrTag.className="tag"+(d.attr==="住宅IP"?" green":"");
   const badge=$("gaugeBadge");
   badge.textContent=d.score+"% "+scoreLabel(d.score);
-  document.querySelector(".gauge").style.setProperty("--badge-c",badgeColor(d.score));badge.style.left=d.score+"%";
-  badge.style.setProperty("--x","1");
-  badge.style.boxShadow="0 4px 12px rgba(0,0,0,.18)";
-  $("gaugeMarker").style.left=d.score+"%";
-  // ping0 补充字段
-  $("fHost").textContent=d.host||"—";
-  $("fTime").textContent=d.fixedTime||fmtTime(new Date());
-  [...$("fConf").children].forEach((el,i)=>el.className=i<(d.conf||3)?"on":"");
+  document.querySelector(".gauge").style.setProperty("--badge-c",badgeColor(d.score));
+  badge.style.left=d.score+"%";$("gaugeMarker").style.left=d.score+"%";
+  $("fHost").textContent=d.host||"查询中…";
+  $("fTime").textContent=fmtTime(new Date());
+  [...$("fConf").children].forEach((el,i)=>el.className=i<(d.conf||0)?"on":"");
   $("fTz").textContent=d.tz||"—";
   $("fLon").textContent=d.lon!=null?Number(d.lon).toFixed(4):"—";
   $("fLat").textContent=d.lat!=null?Number(d.lat).toFixed(4):"—";
   $("fPostal").textContent=d.postal||"—";
-  $("fAsnOwner").innerHTML="<span class='isp-tag'>ISP</span>"+escapeHtml(d.asnOwner||d.isp||"—")+(d.ownerDomain?"<a href='#' onclick='return false'>"+escapeHtml(d.ownerDomain)+"</a>":"");
-  $("fCompany").innerHTML="<span class='isp-tag'>ISP</span>"+escapeHtml(d.company||d.isp||"—")+(d.companyDomain?"<a href='#' onclick='return false'>"+escapeHtml(d.companyDomain)+"</a>":"");
+  $("fAsnOwner").innerHTML="<span class='isp-tag'>ISP</span>"+escapeHtml(d.asnHolder||d.isp||"—");
+  $("fCompany").innerHTML="<span class='isp-tag'>ISP</span>"+escapeHtml(d.company||d.isp||"—")+(d.netname?" · netname "+escapeHtml(d.netname):"");
   $("fIsp").textContent=d.isp||"—";
-  const typePill=$("fIpType");typePill.textContent=d.ipType;typePill.className="pill"+(d.ipType.includes("数据中心")||d.ipType.includes("机房")?" dark":"");
+  const typePill=$("fIpType");typePill.textContent=d.ipType;typePill.className="pill"+(d.cls&&d.cls.type==="hosting"?" dark":"");
   const riskPill=$("fRiskPill");riskPill.textContent=d.score+"%  "+scoreLabel(d.score);riskPill.className="pill "+pillCls(d.score);
   const lit=d.score<=10?1:d.score<=25?2:d.score<=40?3:d.score<=60?4:5;
   [...$("fRiskDots").children].forEach((el,i)=>el.className=i<lit?"":"off");
-  const natPill=$("fNative");natPill.textContent=d.native?"原生 IP":"非原生 IP";natPill.className="pill"+(d.native?"":" warn");
-  const shPill=$("fShared");shPill.textContent=d.shared;shPill.className="pill "+(d.sharedCls||"");
-  $("fRisk").textContent=d.riskTags||"—";
-  $("fNote").textContent=d.note||"";
+  const natPill=$("fNative");natPill.textContent=d.native==null?"查询中":(d.native?"原生 IP":"非原生 IP");natPill.className="pill"+(d.native?"":" warn");
+  const shPill=$("fShared");shPill.textContent=d.prefix?(d.prefix+" · "+prefixSize(d.prefix)):"—";shPill.className="pill "+(d.prefix&&Number(d.prefix.split("/")[1])>=20?"":"warn");
+  $("fRisk").textContent=d.riskTags||"查询中…";
+  $("fNote").textContent=d.note||"正在汇总实时信号…";
   $("llmResult").innerHTML="";$("llmBtn").textContent="点击检测";$("llmBtn").disabled=false;
   const num=ipToNum(d.ip);
   $("fNumIp").textContent="********";$("fNumIp").dataset.num=num!=null?String(num):"仅 IPv4 支持";
   $("sceneGrid").innerHTML=d.scenes.map(s=>"<div class='scene'><div class='nm'>"+s[0]+"</div><div class='stars'>"+starsHtml(s[1])+"</div><div class='suit'>✅ <b>"+suitText(s[1])+"</b></div></div>").join("");
-  renderExtra(d);
+  if(d.histAsn)renderExtra(d);
   $("card").classList.remove("loading");$("errBox").className="err";
-}
-function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
-
-const HOSTING_KW=["linode","akamai","amazon","aws","google cloud","microsoft","azure","digitalocean","vultr","oracle","ovh","hetzner","alibaba","tencent cloud","cloudflare","datacenter","data center","hosting","server","cloud","choopa","contabo","kamatera","bandwidth"];
-function derive(raw){
-  const h=hashStr(raw.ip);
-  const orgLow=((raw.isp||"")+" "+(raw.asnName||"")+" "+(raw.company||"")).toLowerCase();
-  const hosting=HOSTING_KW.some(k=>orgLow.includes(k));
-  const score=raw.score!=null?raw.score:(hosting?24+(h%22):3+(h%11));
-  const human=raw.human!=null?raw.human:(hosting?8+(h%13)+0.3:66+(h%27)+0.4);
-  const native=raw.native!=null?raw.native:!hosting;
-  const d=Object.assign({},raw);
-  d.human=Math.round(human*100)/100;d.score=score;
-  d.attr=hosting?"机房IP":"住宅IP";
-  d.ipType=hosting?"数据中心 IP":"家庭宽带 IP";
-  d.source=native?"原生IP":"广播IP";d.native=native;
-  d.shared=hosting?"100+ (较差)":"1 - 10 (极好)";d.sharedCls=hosting?"bad":"";
-  d.conf=3;
-  d.scenes=hosting?[["TikTok",2],["跨境电商",3],["社媒运营",2],["AI 应用",4]]:[["TikTok",5],["跨境电商",5],["社媒运营",5],["AI 应用",5]];
-  d.riskTags=hosting?"机房 / 数据中心 · 非原生":"住宅宽带 · 原生 · 低风险";
-  d.note=hosting?"该 IP 属于云厂商 / 数据中心地址段，人机流量中机器人占比较高；适合建站与 AI 接口调用，不适合社媒养号。":"住宅原生 IP，风控值低，各平台场景均非常适合。";
-  d.asnOwner=(raw.isp||"—")+(raw.asDomain?" — ":"");d.ownerDomain=raw.asDomain||"";
-  d.company=(raw.company||raw.isp||"—")+(raw.asDomain?" — ":"");d.companyDomain=raw.asDomain||"";
-  if(!d.histAsn){
-    const o=d.ip.split(".");const c16=o[0]+"."+o[1]+".0.0/16";const c24=o[0]+"."+o[1]+"."+o[2]+".0/24";
-    const today=fmtTime(new Date());
-    const rir={"AU":"APNIC","TW":"APNIC","JP":"APNIC","SG":"APNIC","KR":"APNIC","IN":"APNIC","MY":"APNIC","US":"ARIN","CA":"ARIN","GB":"RIPE","DE":"RIPE","FR":"RIPE","NL":"RIPE"}[d.countryCode]||"APNIC";
-    d.histAsn=[{ttl:d.asn||"AS—",org:d.isp||"",cidr:c16,cc:d.countryCode,place:d.country,last:today}];
-    d.histCompany=[{ttl:"ISP",org:(d.company||d.isp||"")+(d.asDomain?" — "+d.asDomain:""),cidr:c16,first:"2020-01-15 09:30",last:today}];
-    d.histReg=[{org:(d.country||"")+" · "+rir,cidr:c16,first:"2015-06-01 00:00",last:today}];
-    d.histLoc=[{org:[d.country,d.region,d.city].filter(Boolean).join(" "),cidr:c24}];
-    d.neighbors=[{nm:d.isp||"—",dm:d.asDomain||"",tag:"ISP",idc:hosting?1:0},{nm:"Cloudflare, Inc.",dm:"cloudflare.com",tag:"CC",idc:1},{nm:"Google LLC",dm:"google.com",tag:"",idc:0},{nm:"Amazon.com, Inc.",dm:"amazon.com",tag:"CC",idc:1}];
-  }
-  return d;
 }
 function histItem(h){
   const meta=[];
   if(h.place)meta.push("<span>"+flagEmoji(h.cc||"")+" "+escapeHtml(h.place)+"</span>");
-  if(h.first)meta.push("<span>首次出现：<b>"+h.first+"</b></span>");
-  if(h.last)meta.push("<span>最近活跃：<b>"+h.last+"</b></span>");
+  if(h.first)meta.push("<span>首次出现：<b>"+escapeHtml(h.first)+"</b></span>");
+  if(h.last)meta.push("<span>最近活跃：<b>"+escapeHtml(h.last)+"</b></span>");
+  if(h.extra)meta.push("<span>"+escapeHtml(h.extra)+"</span>");
   return "<div class='hist-item'><div class='hist-top'><span class='dot-on'></span>"+(h.ttl?"<span class='ttl'>"+escapeHtml(h.ttl)+"</span>":"")+"<span class='org'>"+escapeHtml(h.org||"")+"</span><span class='cidr'>"+escapeHtml(h.cidr||"")+"</span></div>"+(meta.length?"<div class='hist-meta'>"+meta.join("")+"</div>":"")+"</div>";
 }
 function renderExtra(d){
-  $("histAsn").innerHTML=(d.histAsn||[]).map(histItem).join("");
+  $("histAsn").innerHTML=(d.histAsn||[]).map(histItem).join("")||"<div class='hist-item'>暂无路由历史</div>";
   $("histCompany").innerHTML=(d.histCompany||[]).map(histItem).join("");
   $("histReg").innerHTML=(d.histReg||[]).map(histItem).join("");
   $("histLoc").innerHTML=(d.histLoc||[]).map(histItem).join("");
-  $("histOld").style.display="none";$("showOldBtn").textContent="↓ 显示非活跃记录";
   if(d.lat!=null&&d.lon!=null){
     const la=Number(d.lat),lo=Number(d.lon);
     $("mapFrame").src="https://www.openstreetmap.org/export/embed.html?bbox="+(lo-0.09)+"%2C"+(la-0.05)+"%2C"+(lo+0.09)+"%2C"+(la+0.05)+"&layer=mapnik&marker="+la+"%2C"+lo;
   }
-  const short=(d.asnName||d.isp||"").split(" ")[0]||"ISP";
+  const ups=(d.neighbours||[]).filter(n=>n.side==="left").slice(0,3);
+  const downCount=(d.neighbours||[]).filter(n=>n.side==="right").length;
+  const upBoxes=ups.map((n,i)=>{
+    const y=20+i*56;
+    return "<rect x='208' y='"+y+"' width='140' height='42' rx='8' fill='#f4f9fc' stroke='#b9d2e0'/><text x='278' y='"+(y+26)+"' text-anchor='middle' font-size='11.5' fill='#23272e'>"+escapeHtml(("AS"+n.asn+" "+(n.holder||"")).slice(0,24))+"</text><path d='M136 100 L208 "+(y+21)+"' stroke='#9db6c4' marker-end='url(#ar)'/><path d='M348 "+(y+21)+" L408 92' stroke='#9db6c4' marker-end='url(#ar)'/>";
+  }).join("");
   $("bgpBox").innerHTML=
-  "<svg viewBox='0 0 560 210' role='img' aria-label='BGP 拓扑'>"+
+  "<svg viewBox='0 0 560 200' role='img' aria-label='BGP 拓扑'>"+
   "<defs><marker id='ar' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' orient='auto-start-reverse'><path d='M0 0L10 5L0 10z' fill='#9db6c4'/></marker></defs>"+
-  "<rect x='8' y='70' width='128' height='64' rx='8' fill='#e9f9e4' stroke='#57b83e'/><text x='72' y='94' text-anchor='middle' font-size='12' fill='#2c7a1f' font-weight='700'>Origins</text><text x='72' y='112' text-anchor='middle' font-size='12.5' fill='#23272e' font-weight='600'>"+escapeHtml(d.asn||"AS—")+" "+escapeHtml(short)+"</text><text x='72' y='128' text-anchor='middle' font-size='11' fill='#6d7680'>"+escapeHtml(d.ip)+"</text>"+
-  "<rect x='208' y='14' width='128' height='40' rx='8' fill='#f4f9fc' stroke='#b9d2e0'/><text x='272' y='38' text-anchor='middle' font-size='12' fill='#23272e'>AS6453 TATA</text>"+
-  "<rect x='208' y='66' width='128' height='40' rx='8' fill='#f4f9fc' stroke='#b9d2e0'/><text x='272' y='90' text-anchor='middle' font-size='12' fill='#23272e'>AS174 Cogent</text>"+
-  "<rect x='208' y='118' width='128' height='40' rx='8' fill='#f4f9fc' stroke='#b9d2e0'/><text x='272' y='142' text-anchor='middle' font-size='12' fill='#23272e'>AS1299 Arelion</text>"+
-  "<rect x='208' y='166' width='128' height='36' rx='8' fill='#f4f9fc' stroke='#b9d2e0'/><text x='272' y='188' text-anchor='middle' font-size='12' fill='#23272e'>AS137409 GSL</text>"+
-  "<rect x='408' y='56' width='140' height='88' rx='8' fill='#eef4fb' stroke='#8fb8d8'/><text x='478' y='82' text-anchor='middle' font-size='12.5' fill='#1f5f8b' font-weight='700'>Tier 1</text><text x='478' y='104' text-anchor='middle' font-size='11.5' fill='#3a3f47'>全球骨干网</text><text x='478' y='122' text-anchor='middle' font-size='11.5' fill='#3a3f47'>AS3356 / AS7018</text>"+
-  "<path d='M136 88 L208 34' stroke='#9db6c4' marker-end='url(#ar)'/><path d='M136 100 L208 86' stroke='#9db6c4' marker-end='url(#ar)'/><path d='M136 108 L208 134' stroke='#9db6c4' marker-end='url(#ar)'/><path d='M136 118 L208 180' stroke='#9db6c4' marker-end='url(#ar)'/>"+
-  "<path d='M336 40 L408 84' stroke='#9db6c4' marker-end='url(#ar)'/><path d='M336 88 L408 96' stroke='#9db6c4' marker-end='url(#ar)'/><path d='M336 136 L408 108' stroke='#9db6c4' marker-end='url(#ar)'/>"+
+  "<rect x='8' y='66' width='128' height='66' rx='8' fill='#e9f9e4' stroke='#57b83e'/><text x='72' y='90' text-anchor='middle' font-size='12' fill='#2c7a1f' font-weight='700'>Origins</text><text x='72' y='108' text-anchor='middle' font-size='12' fill='#23272e' font-weight='600'>"+escapeHtml((d.asn||"AS—")+" "+((d.asnHolder||"").split(" ").slice(0,2).join(" ")))+"</text><text x='72' y='124' text-anchor='middle' font-size='10.5' fill='#6d7680'>"+escapeHtml(d.prefix||d.ip)+"</text>"+
+  upBoxes+
+  "<rect x='408' y='52' width='140' height='84' rx='8' fill='#eef4fb' stroke='#8fb8d8'/><text x='478' y='78' text-anchor='middle' font-size='12.5' fill='#1f5f8b' font-weight='700'>BGP 互联</text><text x='478' y='100' text-anchor='middle' font-size='11.5' fill='#3a3f47'>上游 "+(d.neighbours||[]).filter(n=>n.side==="left").length+" · 下游 "+downCount+"</text><text x='478' y='118' text-anchor='middle' font-size='11' fill='#6d7680'>数据：RIPEstat 实时</text>"+
   "</svg>";
   renderNeighbors(d,"all");
 }
 function renderNeighbors(d,mode){
-  const list=(d.neighbors||[]).filter(n=>mode==="all"||n.idc);
-  $("nbList").innerHTML=list.length?list.map(n=>"<div class='nb-row'>"+(n.tag==="ISP"?"<span class='isp-tag'>ISP</span>":n.tag==="CC"?"<span class='tag-cc'>CC</span>":"")+"<span class='nm'>"+escapeHtml(n.nm)+"</span>"+(n.dm?"<span class='dm'>"+escapeHtml(n.dm)+"</span>":"")+"</div>").join(""):"<div class='nb-row'><span class='nm'>该分类下暂无记录</span></div>";
+  const list=(d.neighbours||[]).filter(n=>mode==="all"||n.idc);
+  $("nbList").innerHTML=list.length?list.map(n=>"<div class='nb-row'>"+(n.idc?"<span class='tag-cc'>IDC</span>":"<span class='isp-tag'>"+(n.side==="left"?"上游":"下游")+"</span>")+"<span class='nm'>AS"+n.asn+" "+escapeHtml(n.holder||"")+"</span><span class='dm'>互联度 "+n.power+"</span></div>").join(""):"<div class='nb-row'><span class='nm'>暂无 BGP 邻居数据</span></div>";
   $("nbTabAll").classList.toggle("on",mode==="all");$("nbTabIdc").classList.toggle("on",mode==="idc");
 }
-function fromIpWho(j){
-  if(!j||j.success===false)throw new Error("ipwho fail");
-  const conn=j.connection||{};
-  let asn=conn.asn?("AS"+conn.asn):"";
-  return derive({
-    ip:j.ip,asn:asn,asnName:conn.org||conn.isp||"",asDomain:conn.domain||"",
-    range:rangeFromCIDR("",j.ip),country:j.country||"",countryCode:j.country_code||"",
-    region:j.region||"",city:j.city||"",tz:(j.timezone&&j.timezone.id)||"",
-    lat:j.latitude,lon:j.longitude,postal:j.postal||"",isp:conn.isp||conn.org||"",company:conn.org||conn.isp||"",host:""
-  });
+
+/* ---------- 查询主流程（全实时） ---------- */
+function consensusLoc(srcs){
+  const ok=srcs.filter(Boolean);
+  const cnt={};ok.forEach(s=>{if(s.cc)cnt[s.cc]=(cnt[s.cc]||0)+1});
+  const cc=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0]||"";
+  const inCc=ok.filter(s=>s.cc===cc);
+  const pick=k=>{for(const s of inCc){if(s[k])return s[k]}return""};
+  const lats=ok.filter(s=>s.lat!=null).map(s=>Number(s.lat)),lons=ok.filter(s=>s.lon!=null).map(s=>Number(s.lon));
+  const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:undefined;
+  return{cc:cc,country:pick("country")||cc,region:pick("region"),city:pick("city"),lat:avg(lats),lon:avg(lons),postal:pick("postal"),tz:pick("tz"),agree:cnt[cc]||0,total:ok.length};
 }
-function fromIpApi(j){
-  if(!j||j.error)throw new Error("ipapi fail");
-  const m=(j.org||"").match(/^(AS\d+)\s*(.*)$/);
-  return derive({
-    ip:j.ip,asn:m?m[1]:"",asnName:m?m[2]:(j.org||""),asDomain:"",
-    range:rangeFromCIDR(j.network||"",j.ip),country:j.country_name||"",countryCode:j.country_code||"",
-    region:j.region||"",city:j.city||"",tz:j.timezone||"",lat:j.latitude,lon:j.longitude,
-    postal:j.postal||"",isp:j.org||"",company:j.org||"",host:""
-  });
-}
-async function fetchJSON(url,ms){
-  const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),ms||6000);
-  try{const r=await fetch(url,{signal:ctl.signal});if(!r.ok)throw new Error(r.status);return await r.json()}
-  finally{clearTimeout(t)}
-}
-async function lookup(ip){
-  if(DEMOS[ip])return DEMOS[ip];
-  try{return fromIpWho(await fetchJSON("https://ipwho.is/"+encodeURIComponent(ip)))}
-  catch(e){return fromIpApi(await fetchJSON("https://ipapi.co/"+encodeURIComponent(ip)+"/json/"))}
-}
-async function lookupSelf(){
-  try{return fromIpWho(await fetchJSON("https://ipwho.is/"))}
-  catch(e){return fromIpApi(await fetchJSON("https://ipapi.co/json/"))}
-}
-async function fillHostname(d){
-  if(d.host||!isIPv4(d.ip))return;
-  try{
-    const rev=d.ip.split(".").reverse().join(".")+".in-addr.arpa";
-    const j=await fetchJSON("https://dns.google/resolve?name="+encodeURIComponent(rev)+"&type=PTR",4000);
-    const ans=(j.Answer||[]).find(a=>a.type===12);
-    if(ans&&state.data&&state.data.ip===d.ip){d.host=ans.data.replace(/\.$/,"");$("fHost").textContent=d.host}
-    else if(state.data&&state.data.ip===d.ip){$("fHost").textContent="无记录"}
-  }catch(e){if(state.data&&state.data.ip===d.ip)$("fHost").textContent="无记录"}
-}
-function toast(msg){
-  const t=$("toast");t.textContent=msg;t.classList.add("show");
-  clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove("show"),1800);
-}
-function setBusy(b){
-  state.busy=b;$("searchBtn").disabled=b;$("searchBtn").textContent=b?"检测中…":"Search";
-  $("card").classList.toggle("loading",b);
-}
-async function runQuery(ip,updateMy){
-  if(state.busy)return;
+async function runQuery(ip,selfMode){
+  const seq=++state.querySeq;
   ip=(ip||"").trim();
   if(ip&&!/^[0-9a-fA-F.:]+$/.test(ip)){$("errBox").textContent="请输入有效的 IP 地址（IPv4 或 IPv6）。";$("errBox").className="err show";return}
   setBusy(true);
   try{
-    const d=ip?await lookup(ip):await lookupSelf();
-    render(d);fillHostname(d);
-    if(updateMy!==false){$("myV4").textContent=d.ip;$("myV4").onclick=e=>{e.preventDefault();runQuery(d.ip,false)}}
-    if(location.search.indexOf("demo")<0){history.replaceState(null,"","?ip="+encodeURIComponent(d.ip))}
+    const[srcs,net]=await Promise.all([
+      settled([srcIpWho(ip),srcIpInfo(ip),srcIpApi(ip)]),
+      ip?ripe("network-info",ip).catch(()=>null):Promise.resolve(null)
+    ]);
+    if(seq!==state.querySeq)return;
+    const ok=srcs.filter(Boolean);
+    if(!ok.length)throw new Error("no source");
+    const targetIp=ip||ok[0].ip;
+    const netData=net||await ripe("network-info",targetIp).catch(()=>null);
+    if(seq!==state.querySeq)return;
+    const loc=consensusLoc(srcs);
+    const first=ok[0];
+    const asn=(netData&&netData.asns&&netData.asns[0])?("AS"+netData.asns[0]):(first.asn||"");
+    const d={
+      ip:targetIp,asn:asn,asnName:first.asnName||"",asnHolder:"",domain:first.domain||"",netname:"",
+      prefix:(netData&&netData.prefix)||first.network||"",isp:first.isp||first.asnName||"",
+      company:"",host:(srcs[1]&&srcs[1].host)||"",country:loc.country,cc:loc.cc,region:loc.region,city:loc.city,
+      lat:loc.lat,lon:loc.lon,postal:loc.postal,tz:loc.tz,conf:loc.agree,whoisCountry:"",native:null,
+      locRows:ok.map(s=>({src:s.src,cc:s.cc,place:[s.country||s.cc,s.region,s.city].filter(Boolean).join(", ")})),
+      scenes:[["TikTok",3],["跨境电商",3],["社媒运营",3],["AI 应用",3]],
+      histAsn:null,neighbours:null,cls:null,score:50,riskTags:"正在查询 WHOIS / 黑名单 / BGP…",note:"正在汇总实时信号…"
+    };
+    d.range=rangeFromCIDR(d.prefix,d.ip);
+    d.cls=classify(d);applyType(d);render(d);
+    if(selfMode){$("myV4").textContent=d.ip;$("myV4").onclick=e=>{e.preventDefault();runQuery(d.ip,false)}}
+    if(location.search.indexOf("demo")<0)history.replaceState(null,"","?ip="+encodeURIComponent(d.ip));
+    // 第二阶段：WHOIS / 路由历史 / BGP 邻居 / 黑名单 / 注册块
+    const[overview,whoisJ,routing,neigh,prefixOv,bl,geo]=await settled([
+      asn?ripe("as-overview",asn):Promise.resolve(null),
+      ripe("whois",targetIp),
+      ripe("routing-history",targetIp,12000),
+      asn?ripe("asn-neighbours",asn,12000):Promise.resolve(null),
+      ripe("prefix-overview",d.prefix||targetIp),
+      dnsbl(targetIp),
+      ripe("geoloc",targetIp)
+    ]);
+    if(seq!==state.querySeq)return;
+    if(overview&&overview.holder){d.asnHolder=overview.holder;d.asnName=overview.holder.replace(/^[A-Z0-9-]+ - /,"")}
+    if(whoisJ&&whoisJ.records&&whoisJ.records[0]){
+      const map={};whoisJ.records[0].forEach(r=>{map[r.key]=r.value});
+      d.netname=map.netname||"";d.whoisCountry=map.country||"";
+      d.company=map.org||map["org-name"]||map.descr||d.asnHolder||d.isp;
+      d.histCompany=[{ttl:"WHOIS",org:(map.netname||"")+(map.descr?" · "+map.descr:""),cidr:map.inetnum||d.prefix,extra:"注册机构记录（RIPEstat WHOIS 实时）"}];
+      const rir=(prefixOv&&prefixOv.block&&prefixOv.block.desc)||"";
+      d.histReg=[{org:(d.whoisCountry||"—")+" · "+rir,cidr:map.inetnum||d.prefix,extra:"IANA / 区域注册局分配块（实时）"}];
+    }
+    if(routing&&routing.by_origin){
+      const items=[];
+      routing.by_origin.forEach(o=>{
+        (o.prefixes||[]).forEach(p=>{
+          const tls=p.timelines||[];if(!tls.length)return;
+          items.push({ttl:"AS"+o.origin,org:d.asnHolder||"",cidr:p.prefix,first:fmtDT(tls[0].starttime),last:fmtDT(tls[tls.length-1].endtime),mine:o.origin===String(asn).replace("AS","")});
+        });
+      });
+      items.sort((a,b)=>(b.mine-a.mine)||(a.first<b.first?-1:1));
+      d.histAsn=items.slice(0,3).map(i=>({ttl:i.ttl,org:i.org,cidr:i.cidr,first:i.first,last:i.last}));
+    }
+    const geoLocs=geo&&geo.located_resources&&geo.located_resources[0]&&geo.located_resources[0].locations;
+    if(geoLocs&&geoLocs.length){
+      d.histLoc=geoLocs.slice(0,3).map(l=>({org:[l.country,l.city].filter(Boolean).join(" "),cidr:(l.resources&&l.resources[0])||d.prefix,extra:"经纬度 "+(l.latitude!=null?Number(l.latitude).toFixed(4):"—")+", "+(l.longitude!=null?Number(l.longitude).toFixed(4):"—")+" · 覆盖 "+(l.covered_percentage!=null?l.covered_percentage+"%":"—")}));
+    }else d.histLoc=[{org:[loc.country,loc.region,loc.city].filter(Boolean).join(" "),cidr:d.prefix,extra:"多源共识定位"}];
+    if(neigh&&Array.isArray(neigh.neighbours)){
+      const all=neigh.neighbours.map(n=>({asn:n.asn,power:n.power,side:n.type==="right"?"right":"left"}));
+      all.sort((a,b)=>b.power-a.power);
+      const top=all.slice(0,10);
+      const overs=await settled(top.map(n=>ripe("as-overview","AS"+n.asn,4000)));
+      if(seq!==state.querySeq)return;
+      top.forEach((n,i)=>{n.holder=(overs[i]&&overs[i].holder)||"";n.idc=HOST_KW.some(k=>(n.holder||"").toLowerCase().includes(k))?1:0});
+      d.neighbours=top;
+    }
+    if(!d.host){
+      try{
+        const rev=targetIp.split(".").reverse().join(".")+".in-addr.arpa";
+        const j=await fetchJSON("https://dns.google/resolve?name="+encodeURIComponent(rev)+"&type=PTR",4000);
+        const ans=(j.Answer||[]).find(a=>a.type===12);
+        if(ans)d.host=ans.data.replace(/\.$/,"");
+      }catch(e){}
+      if(seq!==state.querySeq)return;
+    }
+    d.native=d.whoisCountry&&d.cc?(d.whoisCountry===d.cc):null;
+    d.cls=classify(d);applyType(d);
+    const sc=computeScore(d,d.cls,bl);d.score=sc.score;
+    const blTxt=bl?(bl.checked?("DNSBL 实时查询 "+bl.checked+" 个名单："+(bl.hits?("命中 "+bl.names.join(", ")):"0 命中")):"DNSBL 查询被名单方拒绝（公共解析器限制）"):"";
+    d.riskTags=[d.cls.type==="hosting"?"机房 / 数据中心":d.cls.type==="residential"?"住宅宽带":"商业宽带",d.native==null?"注册地未知":d.native?"原生":"非原生（注册地 "+(d.whoisCountry||"?")+" ≠ 定位 "+(d.cc||"?")+")",bl&&bl.hits?"黑名单命中 "+bl.hits:""].filter(Boolean).join(" · ");
+    d.note="纯净度 = 本站按实时信号透明计算："+sc.why.join("；")+"。"+blTxt+"。定位为 "+loc.total+" 个数据源共识（"+loc.agree+" 个一致）。类型依据组织名 / WHOIS / 反向解析实时判定；场景星级为按类型与分数给出的建议，非平台官方数据。";
+    render(d);
   }catch(e){
-    $("errBox").textContent="查询失败：数据源暂时不可达，请稍后重试。";$("errBox").className="err show";
-  }finally{setBusy(false)}
+    $("errBox").textContent="查询失败：实时数据源暂不可达，请稍后重试。";$("errBox").className="err show";
+  }finally{if(seq===state.querySeq)setBusy(false)}
 }
+function applyType(d){
+  const t=d.cls?d.cls.type:"business";
+  d.attr=t==="hosting"?"机房IP":t==="residential"?"住宅IP":"商宽IP";
+  d.ipType=t==="hosting"?"数据中心 IP":t==="residential"?"家庭宽带 IP":"商业宽带 IP";
+  const sub=d.cls&&d.cls.vpn?1:0;
+  if(t==="residential")d.scenes=[["TikTok",5],["跨境电商",5],["社媒运营",5],["AI 应用",5]];
+  else if(t==="business")d.scenes=[["TikTok",4],["跨境电商",5],["社媒运营",4],["AI 应用",5]];
+  else d.scenes=[["TikTok",2],["跨境电商",3],["社媒运营",2],["AI 应用",4]];
+  if(sub)d.scenes=d.scenes.map(s=>[s[0],Math.max(1,s[1]-1)]);
+}
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove("show"),1800)}
+function setBusy(b){state.busy=b;$("searchBtn").disabled=b;$("searchBtn").textContent=b?"检测中…":"Search";$("card").classList.toggle("loading",b)}
 
-// 交互
+/* ---------- 交互 ---------- */
 $("searchForm").addEventListener("submit",e=>{e.preventDefault();runQuery($("ipInput").value,false)});
 $("eyeBtn").addEventListener("click",()=>{
-  if(!state.data)return;state.ipVisible=!state.ipVisible;
-  const ip=state.data.ip;
+  if(!state.data)return;state.ipVisible=!state.ipVisible;const ip=state.data.ip;
   if(state.ipVisible){$("fIp").textContent=ip;$("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>"}
-  else{
-    $("fIp").textContent=isIPv4(ip)?ip.replace(/\.\d+\.\d+\./,".***.***."):"****:****:****";
-    $("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>";
-  }
+  else{$("fIp").textContent=isIPv4(ip)?ip.replace(/\.\d+\.\d+\./,".***.***."):"****:****:****";$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}
 });
-$("copyBtn").addEventListener("click",async()=>{
-  if(!state.data)return;
-  try{await navigator.clipboard.writeText(state.data.ip);toast("已复制 "+state.data.ip)}
-  catch(e){toast("复制失败，请手动复制")}
-});
-$("numEyeBtn").addEventListener("click",()=>{
-  state.numVisible=!state.numVisible;
-  $("fNumIp").textContent=state.numVisible?$("fNumIp").dataset.num:"********";
-});
-$("refreshBtn").addEventListener("click",()=>{
-  $("refreshBtn").classList.remove("spinning");void $("refreshBtn").offsetWidth;$("refreshBtn").classList.add("spinning");
-  runQuery("",true);
-});
-$("shotBtn").addEventListener("click",()=>{
-  const f=$("flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");toast("快照完成，可长按 / 截图保存本页");
-});
-$("asnHead").addEventListener("click",()=>{
-  const b=$("asnBlock");b.classList.toggle("collapsed");
-  $("asnHead").setAttribute("aria-expanded",String(!b.classList.contains("collapsed")));
-});
+$("copyBtn").addEventListener("click",async()=>{if(!state.data)return;try{await navigator.clipboard.writeText(state.data.ip);toast("已复制 "+state.data.ip)}catch(e){toast("复制失败，请手动复制")}});
+$("numEyeBtn").addEventListener("click",()=>{state.numVisible=!state.numVisible;$("fNumIp").textContent=state.numVisible?$("fNumIp").dataset.num:"********"});
+$("refreshBtn").addEventListener("click",()=>{$("refreshBtn").classList.remove("spinning");void $("refreshBtn").offsetWidth;$("refreshBtn").classList.add("spinning");runQuery("",true)});
+$("shotBtn").addEventListener("click",()=>{const f=$("flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");toast("快照完成，可长按 / 截图保存本页")});
+$("asnHead").addEventListener("click",()=>{const b=$("asnBlock");b.classList.toggle("collapsed");$("asnHead").setAttribute("aria-expanded",String(!b.classList.contains("collapsed")))});
 $("asnHead").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("asnHead").click()}});
-$("expandBtn").addEventListener("click",()=>{
-  const p=$("morePanel");const open=p.classList.toggle("open");
-  document.querySelector(".card").classList.toggle("more-open",open);
-  $("expandBtn").setAttribute("aria-expanded",String(open));
-});
-$("menuBtn").addEventListener("click",e=>{
-  e.stopPropagation();const p=$("menuPanel");const open=p.classList.toggle("open");
-  $("menuBtn").setAttribute("aria-expanded",String(open));p.setAttribute("aria-hidden",String(!open));
-});
+$("expandBtn").addEventListener("click",()=>{const p=$("morePanel");const open=p.classList.toggle("open");document.querySelector(".card").classList.toggle("more-open",open);$("expandBtn").setAttribute("aria-expanded",String(open))});
+$("menuBtn").addEventListener("click",e=>{e.stopPropagation();const p=$("menuPanel");const open=p.classList.toggle("open");$("menuBtn").setAttribute("aria-expanded",String(open));p.setAttribute("aria-hidden",String(!open))});
 document.addEventListener("click",e=>{if(!$("menuPanel").contains(e.target))$("menuPanel").classList.remove("open")});
 $("myV6").addEventListener("click",e=>e.preventDefault());
-$("showOldBtn").addEventListener("click",()=>{
-  const el=$("histOld");const show=el.style.display==="none";
-  el.style.display=show?"block":"none";$("showOldBtn").textContent=show?"↑ 隐藏非活跃记录":"↓ 显示非活跃记录";
+$("showOldBtn").addEventListener("click",()=>{const el=$("histOld");const show=el.style.display==="none";el.style.display=show?"block":"none";$("showOldBtn").textContent=show?"↑ 隐藏非活跃记录":"↓ 显示非活跃记录"});
+$("nbTabAll").addEventListener("click",()=>{if(state.data&&state.data.neighbours)renderNeighbors(state.data,"all")});
+$("nbTabIdc").addEventListener("click",()=>{if(state.data&&state.data.neighbours)renderNeighbors(state.data,"idc")});
+const LLM_LISTS={
+  "ChatGPT":["US","AU","TW","JP","SG","GB","DE","FR","CA","KR","NL","MY","TH","VN","PH","ID","IN","BR","MX","ES","IT","SE","NO","DK","FI","PL","NZ","IE","CH","AT","BE","PT","CZ","IL","AE"],
+  "Claude":["US","AU","JP","SG","GB","DE","FR","CA","KR","NL","TH","VN","PH","ID","IN","BR","MX","ES","IT","SE","NO","DK","FI","PL","NZ","IE","CH","AT","BE","PT","CZ","IL","AE"],
+  "Gemini":["US","AU","TW","JP","SG","GB","DE","FR","CA","KR","NL","MY","TH","VN","PH","ID","IN","BR","MX","ES","IT","SE","NO","DK","FI","PL","NZ","IE","CH","AT","BE","PT","CZ","IL","AE"],
+  "Grok":["US","AU","TW","JP","SG","GB","DE","FR","CA","KR","NL","MY","TH","VN","PH","ID","IN","BR","MX","ES","IT","SE","NO","DK","FI","PL","NZ","IE","CH","AT","BE","PT","CZ","IL","AE"]
+};
+$("llmBtn").addEventListener("click",()=>{
+  if(!state.data)return;const d=state.data;const btn=$("llmBtn");
+  btn.disabled=true;btn.textContent="检测中…";$("llmResult").innerHTML="";
+  setTimeout(()=>{
+    const cc=(d.cc||"").toUpperCase();
+    const rows=Object.keys(LLM_LISTS).map(k=>[k,LLM_LISTS[k].includes(cc)]);
+    $("llmResult").innerHTML=rows.map(r=>r[0]+"（"+(cc||"?")+"）："+(r[1]?"<span class='ok'>✅ 在官方支持地区</span>":"<span class='no'>❌ 不在官方支持地区</span>")).join("<br>")+"<br>方法：该 IP 实时定位国家与各厂商官方支持地区名单核对"+(d.native===false?"；注意非原生 IP 仍可能触发额外验证。":d.native?"；原生 IP，通过率最高。":"。");
+    btn.textContent="重新检测";btn.disabled=false;
+  },400);
 });
-$("nbTabAll").addEventListener("click",()=>{if(state.data)renderNeighbors(state.data,"all")});
-$("nbTabIdc").addEventListener("click",()=>{if(state.data)renderNeighbors(state.data,"idc")});
 $("rtcBtn").addEventListener("click",()=>{
-  const box=$("rtcResult");$("rtcBtn").textContent="检测中…";box.innerHTML="";
-  const found=new Set();
+  const box=$("rtcResult");$("rtcBtn").textContent="检测中…";box.innerHTML="";const found=new Set();
   try{
     const pc=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});
     pc.createDataChannel("x");
     pc.onicecandidate=e=>{
-      if(!e.candidate){pc.close();$("rtcBtn").textContent="重新检测";
-        box.innerHTML=found.size?("发现候选地址：<br>"+[...found].map(escapeHtml).join("<br>")+"<br>结论：浏览器暴露了本地 / 公网候选地址，VPN 场景下请留意泄露。"):"未发现候选地址（浏览器已限制 mDNS / WebRTC）。";
-        return}
-      const parts=e.candidate.candidate.split(" ");
-      const addr=parts[4];
+      if(!e.candidate){pc.close();$("rtcBtn").textContent="重新检测";box.innerHTML=found.size?("发现候选地址：<br>"+[...found].map(escapeHtml).join("<br>")+"<br>结论：浏览器暴露了本地 / 公网候选地址，VPN 场景下请留意泄露。"):"未发现候选地址（浏览器已限制 mDNS / WebRTC）。";return}
+      const parts=e.candidate.candidate.split(" ");const addr=parts[4];
       if(addr)found.add(addr+(addr.includes(".local")?"（mDNS 掩码）":""));
     };
     pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(()=>{box.textContent="检测失败：浏览器拒绝创建 WebRTC 会话。"});
     setTimeout(()=>{if($("rtcBtn").textContent==="检测中…"){$("rtcBtn").textContent="重新检测";if(!box.innerHTML)box.textContent="超时：未收集到候选地址。"}},4000);
   }catch(err){box.textContent="当前浏览器不支持 WebRTC 检测。";$("rtcBtn").textContent="点击检测"}
 });
-// 本机指纹填充
 $("fpUa").textContent=navigator.userAgent||"—";
 $("fpLang").textContent=(navigator.languages&&navigator.languages.join(", "))||navigator.language||"—";
 try{$("fpTz").textContent=Intl.DateTimeFormat().resolvedOptions().timeZone||"—"}catch(e){$("fpTz").textContent="—"}
 $("fpScreen").textContent=screen.width+" × "+screen.height+" · "+window.devicePixelRatio+"x";
 $("fpPlat").textContent=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.platform||"—";
-$("llmBtn").addEventListener("click",()=>{
-  if(!state.data)return;const d=state.data;const btn=$("llmBtn");
-  btn.disabled=true;btn.textContent="检测中…";$("llmResult").innerHTML="";
-  setTimeout(()=>{
-    const blocked=["CN","RU","IR","KP"];
-    const partial=["HK"];
-    const cc=(d.countryCode||"").toUpperCase();
-    const rows=[["ChatGPT",!blocked.includes(cc)],["Claude",!blocked.includes(cc)&&cc!=="HK"],["Gemini",!blocked.includes(cc)],["Grok",!blocked.includes(cc)]];
-    $("llmResult").innerHTML=rows.map(r=>r[0]+"："+(r[1]?"<span class='ok'>✅ 可用</span>":"<span class='no'>❌ 该地区不可用</span>")).join("<br>")+"<br>结论："+(blocked.includes(cc)?"所在地区受限，建议更换出口地区。":d.native?"原生 IP，通过率最高。":"机房 IP 可调用 API，网页版可能触发额外验证。");
-    btn.textContent="重新检测";btn.disabled=false;
-  },750);
-});
 
-// 初始化：先按截图渲染示例（保证首屏 1:1），随后自动换成真实出口 IP
-render(DEMO1);
-$("myV4").textContent=DEMO1.ip;$("myV6").textContent="2400:8907::2000:d1ff:feb9:131";$("v6Pref").textContent="IPv6优先";
+/* ---------- 初始化：直接实时检测本机出口 ---------- */
+$("myV4").textContent="检测中…";
 const q=new URLSearchParams(location.search);
-if(q.get("ip")){runQuery(q.get("ip"),false)}
-else if(!q.has("demo")){
-  runQuery("",true);
-  fetchJSON("https://api6.ipify.org?format=json",3500).then(j=>{
-    if(j&&j.ip&&j.ip.includes(":")){$("myV6").textContent=j.ip;$("v6Pref").textContent="IPv6优先"}
-  }).catch(()=>{});
-}
+if(q.get("ip"))runQuery(q.get("ip"),false);else runQuery("",true);
+fetchText("https://www.cloudflare.com/cdn-cgi/trace",4000).then(t=>{
+  const m=t.match(/^ip=(.+)$/m);
+  if(m&&m[1].includes(":")){$("myV6").textContent=m[1].trim();$("v6Pref").textContent="IPv6优先"}
+}).catch(()=>{});
+
 </script>
 </body>
 </html>
