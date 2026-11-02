@@ -862,7 +862,7 @@ async function runQuery(ip,selfMode){
     }
     if(proxy&&proxy.sources){
       const bySrc={};srcs.filter(Boolean).forEach(s=>{bySrc[s.src]=s});
-      const prow=(label,o)=>o?{src:label,cc:o.cc||"",place:[o.country||o.cc,o.region,o.city].filter(Boolean).join(", ")}:null;
+      const prow=(label,o)=>{if(!o)return null;const place=[o.country||o.cc,o.region,o.city].filter(Boolean).join(", ");return place?{src:label,cc:o.cc||"",place:place}:null};
       const rows=[
         prow("Cloudflare",proxy.sources.cloudflare),
         prow("IP2Location",proxy.sources.ip2location),
