@@ -189,6 +189,30 @@ def ag_verified(t):
         return True
     return bool(AG_VERIFIED_PASS.search(t))
 
+AG_FIN_NEG = ('没验证过', '未过验证', '没过验证', '未验证', '没通过验证')
+AG_FIN_BLOCK = ('半成品', '人机',
+                '代开通', '代过', '代办', '代刷', '代实名', '代注册',
+                '助手', '工具', '软件', '插件', '脚本', '捕获', '提取器')
+AG_FIN_MARK = ('成品号', '成品账号', '成品', '已开通', '开箱即用', '设置好', '已设置',
+               '可直接登录', '直接登录', '直登')
+AG_RT = re.compile(r'(?<![A-Za-z])RT(?![A-Za-z])')
+
+def ag_finished_verified(t):
+    """成品号默认已过验证（ken 2026-11-03 精修版）：反重力成品号本身就是已过验证的账号，
+    标题没写「已过验证」也进已过验证组；精修排除三类——卖家明说没过/未过的、
+    人机号与半成品号、工具/服务/纯令牌类（卖软件、代开通代过、只卖 RT 的不是成品号）。
+    另：ag_type 靠兜底标成成品号、无任何成品标记的标题不默认放行，避免把杂项放进来。"""
+    if ag_type(t) != '成品号':
+        return False
+    if has(t, *AG_FIN_NEG) or has(t, *AG_FIN_BLOCK):
+        return False
+    if not has(t, *AG_FIN_MARK):
+        return False
+    if (AG_RT.search(t) or has(t, '令牌', 'token', 'Token')) \
+            and not has(t, '成品', '账号', '帐号', '账密', '会员', '谷歌号'):
+        return False  # 纯令牌：卖的是 RT/令牌本身，不是账号
+    return True
+
 def ag_groups(rows):
     g4, g5 = [], []
     for o in rows:
@@ -204,7 +228,7 @@ def ag_groups(rows):
         if has(t, '验证') and not has(t, '已过验证', '成品号', '激活', '会员', '个月', 'Pro', 'pro'):
             continue
         g4.append(o)
-        if ag_verified(t):
+        if ag_verified(t) or ag_finished_verified(t):
             g5.append(o)
     return g4, g5
 
