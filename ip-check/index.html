@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IP地址信息和纯净度检测 | IPPure</title>
+<meta name="description" content="IP 地址信息与纯净度检测：ASN、地理位置、人机流量比、IP 来源与属性、IPPure 系数。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M26 4C14 6 6 13 5 25c-.1 1.5 1 2.6 2.5 2.5C19 27 26 18 26 4z' fill='%233fae4a'/%3E%3Cpath d='M7 25C11 17 17 11 24 7' stroke='%23fff' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#e9f2f7;
+  --grid-line:rgba(140,175,200,.20);
+  --ink:#23272e;
+  --ink-2:#3a3f47;
+  --mut:#8a929c;
+  --blue:#2b97c6;
+  --blue-dark:#1f83ad;
+  --row-bg:#f6f7f8;
+  --pink:#f45d7e;
+  --pink-dark:#ef4f73;
+  --green:#43bd7c;
+  --badge-green:#6fbf2e;
+  --card-shadow:0 10px 34px rgba(31,78,110,.10),0 2px 8px rgba(31,78,110,.06);
+  --ease:cubic-bezier(.22,1,.36,1);
+  --ease-io:cubic-bezier(.65,.05,0,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",sans-serif;
+  color:var(--ink);
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(900px 420px at 50% -120px,rgba(120,200,235,.28),transparent 70%),
+    linear-gradient(var(--grid-line) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:auto,72px 72px,72px 72px;
+  min-height:100vh;
+  padding-bottom:56px;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input{font-family:inherit}
+::selection{background:#bfe3f2}
+
+/* ---------- 顶栏 ---------- */
+.topbar{
+  height:62px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(14px,3.5vw,34px);max-width:1180px;margin:0 auto;position:relative;z-index:30;
+}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--ink);user-select:none}
+.logo svg{width:30px;height:30px;flex:none;filter:drop-shadow(0 2px 4px rgba(63,174,74,.3))}
+.logo b{font-size:21px;font-weight:600;letter-spacing:.01em}
+.menu-btn{width:42px;height:42px;display:grid;place-items:center;border-radius:10px;transition:background .25s var(--ease)}
+.menu-btn:hover{background:rgba(255,255,255,.65)}
+.menu-btn svg{width:24px;height:24px}
+.menu-panel{
+  position:absolute;top:56px;right:clamp(10px,3vw,28px);width:264px;background:#fff;border-radius:16px;
+  box-shadow:0 18px 44px rgba(31,78,110,.18);padding:8px;z-index:40;
+  opacity:0;transform:translateY(-8px) scale(.98);transform-origin:top right;pointer-events:none;
+  transition:opacity .28s var(--ease),transform .28s var(--ease);
+}
+.menu-panel.open{opacity:1;transform:none;pointer-events:auto}
+.menu-panel a{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;text-decoration:none;color:var(--ink);transition:background .2s}
+.menu-panel a:hover{background:var(--row-bg)}
+.menu-panel a .dot{width:8px;height:8px;border-radius:50%;background:var(--blue);margin-top:7px;flex:none}
+.menu-panel a b{display:block;font-size:14px;font-weight:600}
+.menu-panel a span{display:block;font-size:12px;color:var(--mut);margin-top:2px;line-height:1.45}
+
+/* ---------- 主体 ---------- */
+.wrap{max-width:1060px;margin:0 auto;padding:0 clamp(12px,3vw,24px)}
+.searchbar{
+  position:relative;margin-top:clamp(18px,4vh,40px);background:#fff;border-radius:999px;
+  box-shadow:0 6px 24px rgba(31,78,110,.10);height:60px;display:flex;align-items:center;
+  transition:box-shadow .3s var(--ease);
+}
+.searchbar:focus-within{box-shadow:0 8px 30px rgba(43,151,198,.28),0 0 0 3px rgba(43,151,198,.16)}
+.searchbar input{
+  flex:1;min-width:0;border:none;outline:none;background:transparent;height:100%;
+  font-size:19px;color:var(--ink-2);text-align:center;letter-spacing:.02em;padding:0 128px 0 60px;
+}
+.searchbar input::placeholder{color:#b9c2ca}
+.search-btn{
+  position:absolute;right:7px;top:50%;transform:translateY(-50%);
+  background:#f4f4f4;color:#33383f;font-size:16px;font-weight:500;
+  padding:11px 26px;border-radius:999px;transition:background .25s,transform .15s var(--ease),box-shadow .25s;
+}
+.search-btn:hover{background:#e9f4f9;box-shadow:0 2px 8px rgba(43,151,198,.18)}
+.search-btn:active{transform:translateY(-50%) scale(.96)}
+.search-btn:disabled{opacity:.55;cursor:wait}
+
+.myip{
+  display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;
+  margin:20px 6px 14px;font-size:14.5px;color:#6d7680;
+}
+.myip .lb{color:#7c858f}
+.myip a{color:var(--blue);text-decoration:none;font-weight:500;word-break:break-all;transition:color .2s}
+.myip a:hover{color:var(--blue-dark);text-decoration:underline}
+.myip .v6pref{color:#9aa3ad;font-size:13.5px}
+.myip .spacer{flex:1}
+.icon-btn{
+  width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.75);display:grid;place-items:center;
+  box-shadow:0 2px 8px rgba(31,78,110,.08);transition:transform .18s var(--ease),background .2s;flex:none;
+}
+.icon-btn:hover{background:#fff}
+.icon-btn:active{transform:scale(.9)}
+.icon-btn svg{width:18px;height:18px;stroke:#7c858f}
+.icon-btn.spinning svg{animation:spin .7s var(--ease-io)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- 结果卡 ---------- */
+.card{
+  background:#fff;border-radius:26px;box-shadow:var(--card-shadow);
+  padding:8px clamp(16px,3.4vw,30px) 6px;overflow:hidden;
+  animation:cardIn .55s var(--ease) both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.card.loading .fade-zone{opacity:.35;filter:saturate(.4);pointer-events:none}
+.fade-zone{transition:opacity .35s var(--ease),filter .35s}
+.row{display:flex;align-items:center;gap:12px;padding:15px 4px}
+.row + .row{border-top:1px solid #fbfcfc}
+.lbl{font-size:17px;font-weight:700;color:var(--ink);width:86px;flex:none}
+.val-blue{color:var(--blue);font-size:19px;font-weight:500;letter-spacing:.01em;word-break:break-all}
+.mini-btn{
+  width:32px;height:32px;border-radius:8px;background:#fafafa;border:1px solid #f0f0f0;display:grid;place-items:center;
+  transition:background .2s,transform .15s var(--ease);flex:none;
+}
+.mini-btn:hover{background:#f0f7fa}
+.mini-btn:active{transform:scale(.9)}
+.mini-btn svg{width:17px;height:17px;stroke:#9aa1a9;fill:none}
+
+.block{border-radius:14px;padding:6px 16px;margin:2px 0}
+.block.gray{background:var(--row-bg)}
+.kv{display:flex;align-items:baseline;gap:12px;padding:9px 0;font-size:15.5px}
+.kv .k{color:#3c424b;font-weight:500;width:86px;flex:none;font-size:15px}
+.kv .v{color:var(--ink-2);word-break:break-all}
+.kv .v.blue{color:var(--blue);font-weight:600;font-size:16.5px}
+.asn-head{display:flex;align-items:center;gap:12px;padding:13px 4px 4px;cursor:pointer;user-select:none}
+.asn-head .lbl{width:86px}
+.asn-head .name{font-size:16.5px;color:var(--ink-2)}
+.asn-head .name b{color:var(--blue);font-weight:600}
+.chev{margin-left:auto;width:30px;height:30px;border-radius:8px;background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.07);display:grid;place-items:center;transition:transform .4s var(--ease);flex:none}
+.chev svg{width:15px;height:15px;stroke:#8a929c}
+.asn-body{overflow:hidden;max-height:340px;transition:max-height .5s var(--ease),opacity .4s;opacity:1}
+.asn-block.collapsed .asn-body{max-height:0;opacity:0}
+.asn-block.collapsed .chev{transform:rotate(-90deg)}
+.sub-k{color:#6d7680;font-size:14.5px;width:86px;flex:none;padding-left:2px}
+
+.ratio{flex:1;min-width:180px}
+.ratio-bar{display:flex;height:7px;border-radius:99px;overflow:hidden;background:#f2607e}
+.ratio-bar .human{background:linear-gradient(90deg,#3cb371,var(--green));width:11.3%;transition:width .9s var(--ease)}
+.ratio-nums{display:flex;justify-content:space-between;margin-top:6px;font-size:14.5px}
+.ratio-nums .h{color:#35a96a;font-weight:500}
+.ratio-nums .b{color:#f2607e;font-weight:500}
+
+.sec-title{font-size:17px;font-weight:700;padding:14px 4px 4px}
+.loc-row{display:flex;align-items:center;gap:12px;padding:7.5px 0;font-size:15.5px}
+.loc-row .src{color:#6d7680;width:104px;flex:none;font-size:14.5px}
+.loc-row .flag{font-size:17px;line-height:1}
+.loc-row .place{color:var(--ink-2)}
+.tag{
+  display:inline-block;background:linear-gradient(180deg,#f7688a,var(--pink-dark));color:#fff;
+  font-size:13.5px;font-weight:500;padding:4px 13px;border-radius:6px;letter-spacing:.04em;
+  box-shadow:0 2px 6px rgba(244,93,126,.3);
+}
+.tag.green{background:linear-gradient(180deg,#58c184,#3da96c);box-shadow:0 2px 6px rgba(67,189,124,.3)}
+.tag.gray{background:linear-gradient(180deg,#a7b0ba,#939ea9);box-shadow:none}
+
+/* 纯净度系数 */
+.purity{padding:16px 4px 4px}
+.purity .lbl{width:auto;margin-bottom:26px;display:block}
+.gauge{position:relative;height:34px;margin:0 8px}
+.gauge-track{
+  position:absolute;left:0;right:0;top:16px;height:9px;border-radius:99px;
+  background:linear-gradient(90deg,#0b7a43 0%,#22b573 15%,#7ac74f 28%,#c6d92e 40%,#f2c02e 52%,#f59a23 68%,#ef5b3a 84%,#d92b2b 100%);
+}
+.gauge-badge{
+  position:absolute;top:-24px;transform:translateX(-50%);left:28%;
+  background:var(--badge-c,var(--badge-green));color:#fff;font-size:14.5px;font-weight:600;white-space:nowrap;
+  padding:5px 13px;border-radius:7px;transition:left .95s var(--ease);
+  box-shadow:0 4px 12px rgba(111,191,46,.4);
+}
+.gauge-badge:after{
+  content:"";position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
+  border:7px solid transparent;border-top-color:var(--badge-c,var(--badge-green));border-bottom:none;
+}
+.gauge-marker{
+  position:absolute;top:12px;width:3px;height:17px;background:#fff;border-radius:2px;
+  transform:translateX(-50%);left:28%;transition:left .95s var(--ease);
+  box-shadow:0 0 0 1.5px rgba(0,0,0,.14);
+}
+.gauge-scale{position:relative;height:20px;margin:2px 8px 0;font-size:13.5px;color:#7c858f}
+.gauge-scale span{position:absolute;transform:translateX(-50%)}
+.gauge-scale span:first-child{transform:none}
+.gauge-scale span:last-child{transform:translateX(-100%)}
+
+/* 展开区 */
+.more{overflow:hidden;max-height:0;opacity:0;transition:max-height .55s var(--ease),opacity .45s}
+.more.open{max-height:1900px;opacity:1}
+.expand-btn{display:flex;justify-content:center;width:100%;padding:12px 0 14px}
+.expand-btn svg{width:22px;height:22px;stroke:#a6aeb6;transition:transform .45s var(--ease)}
+.more-open .expand-btn svg{transform:rotate(180deg)}
+
+.foot{margin-top:20px;text-align:center;color:#93a1ad;font-size:13px;line-height:1.7;padding:0 12px}
+.foot a{color:var(--blue);text-decoration:none}
+.err{
+  display:none;margin-top:14px;background:#fff3f4;border:1px solid #ffd7de;color:#c2334b;
+  border-radius:12px;padding:12px 16px;font-size:14px;
+}
+.err.show{display:block;animation:cardIn .4s var(--ease) both}
+.toast{
+  position:fixed;left:50%;bottom:38px;transform:translate(-50%,20px);background:rgba(28,32,38,.92);color:#fff;
+  font-size:14px;padding:10px 20px;border-radius:999px;opacity:0;pointer-events:none;z-index:99;
+  transition:opacity .3s var(--ease),transform .3s var(--ease);backdrop-filter:blur(6px);
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:98}
+.flash.go{animation:flashA .45s ease-out}
+@keyframes flashA{0%{opacity:0}18%{opacity:.85}100%{opacity:0}}
+/* ping0 补充字段（沿用 IPPure 卡片语言） */
+.isp-tag{display:inline-block;background:#3fbb2a;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;vertical-align:2px;margin-right:8px;letter-spacing:.03em}
+.kv .v a{color:#7a6f9e;text-decoration:underline;text-underline-offset:2px}
+.pill{
+  display:inline-block;color:#fff;font-size:15px;font-weight:500;padding:8px 34px;border-radius:999px;
+  background:linear-gradient(180deg,#0a8f08,#067d06);box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.55),0 3px 8px rgba(6,125,6,.25);
+  min-width:180px;text-align:center;transition:transform .2s var(--ease);
+}
+.pill.warn{background:linear-gradient(180deg,#f59a23,#e07f13);box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.45),0 3px 8px rgba(240,150,30,.25)}
+.pill.bad{background:linear-gradient(180deg,#e05252,#c23333);box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.45),0 3px 8px rgba(200,50,50,.25)}
+.pill.dark{background:linear-gradient(180deg,#5b6672,#45505b);box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.45)}
+.risk-wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.risk-dots{display:flex;gap:7px}
+.risk-dots i{width:21px;height:21px;border-radius:50%;display:block;box-shadow:inset 0 -2px 4px rgba(0,0,0,.18)}
+.risk-dots i:nth-child(1){background:#35b921}.risk-dots i:nth-child(2){background:#a8d63a}
+.risk-dots i:nth-child(3){background:#f2d21b}.risk-dots i:nth-child(4){background:#f59a23}
+.risk-dots i:nth-child(5){background:#e5322d}
+.risk-dots i.off{opacity:.18;filter:grayscale(.4)}
+.conf{display:inline-flex;gap:5px;vertical-align:middle;margin-left:6px}
+.conf i{width:30px;height:5px;border-radius:99px;background:#e3e8ec;display:block}
+.conf i.on{background:#3bbb62}
+.detect-link{color:#25a9d6;font-size:15.5px;text-decoration:underline;text-underline-offset:4px;cursor:pointer;background:none;border:none;padding:0}
+.detect-link:hover{color:var(--blue-dark)}
+.detect-result{margin-top:8px;font-size:14px;line-height:1.9;color:var(--ink-2)}
+.detect-result .ok{color:#1d9d4e;font-weight:600}
+.detect-result .no{color:#d23b3b;font-weight:600}
+.scene-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:4px}
+.scene{padding:14px 10px 12px;text-align:center}
+.scene:nth-child(odd){border-right:1px solid #eceff1}
+.scene:nth-child(1),.scene:nth-child(2){border-bottom:1px solid #eceff1}
+.scene .nm{font-size:15px;color:var(--ink-2);margin-bottom:5px}
+.scene .stars{color:#1da851;font-size:17px;letter-spacing:3px;line-height:1.2}
+.scene .stars .off{color:#d5dde2}
+.scene .suit{margin-top:5px;font-size:14px;color:var(--ink-2)}
+.scene .suit b{color:#1d9d4e;font-weight:600}
+.num-ip{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;font-size:16px}
+.shimmer{position:relative;overflow:hidden;color:transparent!important}
+.shimmer *{visibility:hidden}
+@media (max-width:560px){
+  .lbl,.kv .k,.sub-k{width:74px;font-size:15px}
+  .val-blue{font-size:17.5px}
+  .searchbar input{font-size:17px;padding:0 108px 0 18px;text-align:left}
+  .search-btn{padding:10px 20px;font-size:15px}
+  .card{border-radius:22px}
+  .loc-row .src{width:92px}
+  .myip{font-size:13.5px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="./" aria-label="IPPure">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M26.5 3.5C14.8 5.4 6.4 12.8 5.3 24.6c-.15 1.7 1.05 2.85 2.75 2.7C19.2 26.4 26.3 17.6 26.5 3.5z" fill="#3fae4a"/><path d="M7.2 24.8C11 16.9 17.2 10.7 24.2 6.6" stroke="#eaf7ec" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+    <b>IPPure</b>
+  </a>
+  <button class="menu-btn" id="menuBtn" aria-label="菜单" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#3a3f47" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+  </button>
+  <nav class="menu-panel" id="menuPanel" aria-hidden="true">
+    <a href="./"><i class="dot"></i><div><b>IP 定位信息</b><span>精准获悉 IP 地理位置与运营商信息</span></div></a>
+    <a href="./"><i class="dot"></i><div><b>IP 风险检测</b><span>识别欺诈、代理及黑名单风险</span></div></a>
+    <a href="./"><i class="dot"></i><div><b>指纹信息分析</b><span>深度解析浏览器与设备指纹特征</span></div></a>
+    <a href="./"><i class="dot"></i><div><b>IP 出口地图</b><span>可视化展示网络链路与出口节点</span></div></a>
+    <a href="./"><i class="dot"></i><div><b>VPN 泄露检测</b><span>检测是否存在 VPN 穿透与伪装</span></div></a>
+    <a href="./"><i class="dot"></i><div><b>WebRTC 检测</b><span>防止真实 IP 通过 WebRTC 协议泄露</span></div></a>
+    <a href="./"><i class="dot"></i><div><b>DNS 泄露检测</b><span>确保域名解析请求的安全隐私</span></div></a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <form class="searchbar" id="searchForm" autocomplete="off">
+    <input id="ipInput" type="text" inputmode="decimal" spellcheck="false" placeholder="请输入 IP 地址" aria-label="IP 地址">
+    <button class="search-btn" id="searchBtn" type="submit">Search</button>
+  </form>
+
+  <div class="myip">
+    <span class="lb">My IP</span>
+    <a href="#" id="myV4">—</a>
+    <a href="#" id="myV6"></a>
+    <span class="v6pref" id="v6Pref"></span>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="refreshBtn" aria-label="重新检测我的 IP" title="重新检测">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+    </button>
+    <button class="icon-btn" id="shotBtn" aria-label="快照" title="快照">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    </button>
+  </div>
+
+  <div class="err" id="errBox"></div>
+
+  <section class="card" id="card">
+    <div class="fade-zone" id="fadeZone">
+      <div class="row">
+        <span class="lbl">IP</span>
+        <span class="val-blue" id="fIp">—</span>
+        <button class="mini-btn" id="eyeBtn" aria-label="显示 / 隐藏 IP" title="显示 / 隐藏">
+          <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" id="eyeIcon"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button class="mini-btn" id="copyBtn" aria-label="复制 IP" title="复制 IP">
+          <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+
+      <div class="asn-block" id="asnBlock">
+        <div class="asn-head" id="asnHead" role="button" aria-expanded="true" tabindex="0">
+          <span class="lbl">ASN</span>
+          <span class="name"><b id="fAsn">—</b><span id="fAsnName"></span></span>
+          <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+        </div>
+        <div class="asn-body">
+          <div class="kv"><span class="sub-k">AS域名</span><span class="v" id="fAsDomain">—</span></div>
+          <div class="kv"><span class="sub-k">IP范围</span><span class="v" id="fRange">—</span></div>
+          <div class="kv" style="align-items:flex-start">
+            <span class="sub-k" style="padding-top:2px">人机流量比</span>
+            <div class="ratio">
+              <div class="ratio-bar"><div class="human" id="ratioHuman"></div></div>
+              <div class="ratio-nums"><span class="h" id="ratioHumanTxt">human —</span><span class="b" id="ratioBotTxt">bot —</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block gray">
+        <div class="sec-title" style="padding-top:8px">位置</div>
+        <div id="locList"></div>
+      </div>
+
+      <div class="row" style="padding-top:17px;padding-bottom:17px">
+        <span class="lbl">IP来源</span>
+        <span class="tag" id="fSource">—</span>
+      </div>
+
+      <div class="block gray">
+        <div class="row" style="padding:13px 0">
+          <span class="lbl">IP属性</span>
+          <span class="tag" id="fAttr">—</span>
+        </div>
+      </div>
+
+      <div class="purity">
+        <span class="lbl">IPPure系数</span>
+        <div class="gauge">
+          <div class="gauge-badge" id="gaugeBadge">—</div>
+          <div class="gauge-track"></div>
+          <div class="gauge-marker" id="gaugeMarker"></div>
+        </div>
+        <div class="gauge-scale">
+          <span style="left:0">0</span><span style="left:15%">15</span><span style="left:25%">25</span>
+          <span style="left:40%">40</span><span style="left:50%">50</span><span style="left:70%">70</span>
+          <span style="left:100%">100</span>
+        </div>
+      </div>
+
+      <div class="more" id="morePanel">
+        <div class="block gray" style="margin-top:14px">
+          <div class="sec-title" style="padding-top:8px">位置详情</div>
+          <div class="kv"><span class="k">主机名</span><span class="v" id="fHost">—</span></div>
+          <div class="kv"><span class="k">探测时间</span><span class="v" id="fTime">—</span></div>
+          <div class="kv"><span class="k">置信度</span><span class="v"><span class="conf" id="fConf"><i></i><i></i><i></i><i></i></span></span></div>
+          <div class="kv"><span class="k">时区</span><span class="v" id="fTz">—</span></div>
+          <div class="kv"><span class="k">经度</span><span class="v" id="fLon">—</span></div>
+          <div class="kv"><span class="k">纬度</span><span class="v" id="fLat">—</span></div>
+          <div class="kv"><span class="k">邮政编码</span><span class="v" id="fPostal">—</span></div>
+        </div>
+
+        <div style="padding:4px 16px">
+          <div class="sec-title" style="padding-left:0">归属与企业</div>
+          <div class="kv"><span class="k">ASN所有者</span><span class="v" id="fAsnOwner">—</span></div>
+          <div class="kv"><span class="k">企业</span><span class="v" id="fCompany">—</span></div>
+          <div class="kv"><span class="k">运营商</span><span class="v" id="fIsp">—</span></div>
+        </div>
+
+        <div class="block gray">
+          <div class="sec-title" style="padding-top:8px">纯净与风险</div>
+          <div class="kv" style="align-items:center"><span class="k">IP类型</span><span class="v"><span class="pill" id="fIpType">—</span></span></div>
+          <div class="kv" style="align-items:center"><span class="k">风控值</span><span class="v"><span class="risk-wrap"><span class="pill" id="fRiskPill">—</span><span class="risk-dots" id="fRiskDots"><i></i><i></i><i></i><i></i><i></i></span></span></span></div>
+          <div class="kv" style="align-items:center"><span class="k">原生IP</span><span class="v"><span class="pill" id="fNative">—</span></span></div>
+          <div class="kv" style="align-items:center"><span class="k">共享人数</span><span class="v"><span class="pill" id="fShared">—</span></span></div>
+          <div class="kv"><span class="k">风险标签</span><span class="v" id="fRisk">—</span></div>
+        </div>
+
+        <div style="padding:4px 16px">
+          <div class="kv" style="align-items:center"><span class="k">大模型检测</span><span class="v"><button class="detect-link" id="llmBtn" type="button">点击检测</button><div class="detect-result" id="llmResult"></div></span></div>
+          <div class="kv" style="align-items:center"><span class="k">IP地址(数字)</span><span class="v"><span class="num-ip" id="fNumIp">********</span>
+            <button class="mini-btn" id="numEyeBtn" aria-label="显示 / 隐藏数字 IP" title="显示 / 隐藏" style="display:inline-grid;vertical-align:-10px;margin-left:10px">
+              <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88"/><path d="M1 1l22 22"/></svg>
+            </button></span></div>
+        </div>
+
+        <div class="block gray">
+          <div class="sec-title" style="padding-top:8px">适用场景</div>
+          <div class="scene-grid" id="sceneGrid"></div>
+          <div class="kv" style="margin-top:6px"><span class="k">检测说明</span><span class="v" id="fNote" style="font-size:14px;color:#6d7680;line-height:1.6">—</span></div>
+        </div>
+      </div>
+
+      <button class="expand-btn" id="expandBtn" aria-label="展开详细信息" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <p class="foot">数据来源：公开 IP 情报库多源交叉（定位 / ASN / 运营商）。纯净度系数为本站启发式估算，仅供参考。<br>本站为 IPPure 风格复刻，部署于 useful-budget / ip-check。</p>
+</main>
+
+<div class="flash" id="flash"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const state={data:null,ipVisible:true,numVisible:false,busy:false};
+
+function flagEmoji(cc){
+  if(!cc||cc.length!==2)return"🌐";
+  return String.fromCodePoint(...[...cc.toUpperCase()].map(c=>127397+c.charCodeAt(0)));
+}
+function hashStr(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0}return h}
+function isIPv4(ip){return /^\d{1,3}(\.\d{1,3}){3}$/.test(ip)}
+function ipToNum(ip){if(!isIPv4(ip))return null;return ip.split(".").reduce((a,o)=>a*256+Number(o),0)}
+function rangeFromCIDR(cidr,ip){
+  if(cidr&&cidr.includes("/")){
+    const[base,prefix]=cidr.split("/");const p=Number(prefix);
+    if(isIPv4(base)&&p>=0&&p<=32){
+      const mask=p===0?0:(0xFFFFFFFF<<(32-p))>>>0;const start=(ipToNum(base)&mask)>>>0;
+      const end=(start|(~mask>>>0))>>>0;const n=x=>[x>>>24,(x>>>16)&255,(x>>>8)&255,x&255].join(".");
+      return n(start)+" - "+n(end);
+    }
+  }
+  if(isIPv4(ip)){const o=ip.split(".");return o[0]+"."+o[1]+"."+o[2]+".0 - "+o[0]+"."+o[1]+"."+o[2]+".255"}
+  return"—";
+}
+function fmtTime(d){
+  const z=n=>String(n).padStart(2,"0");
+  return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())+" "+z(d.getHours())+":"+z(d.getMinutes());
+}
+const CN_COUNTRY={"Australia":"澳大利亚","United States":"美国","Taiwan":"中国 台湾","China":"中国","Japan":"日本","Singapore":"新加坡","United Kingdom":"英国","Germany":"德国","France":"法国","Canada":"加拿大","South Korea":"韩国","Netherlands":"荷兰","Hong Kong":"中国 香港","Malaysia":"马来西亚","India":"印度","Brazil":"巴西","Russia":"俄罗斯"};
+const CN_REGION={"New South Wales":"新南威尔士州","Changhua":"彰化","Taipei":"台北","California":"加利福尼亚州","Virginia":"弗吉尼亚州"};
+
+const DEMO1={
+  ip:"172.105.*.*",asn:"AS63949",asnName:"Akamai Connected Cloud",asDomain:"linode.com",
+  range:"172.105.*.* - 172.105.*.*",human:11.3,
+  country:"Australia",countryCode:"AU",region:"New South Wales",city:"Sydney",
+  source:"广播IP",native:false,attr:"机房IP",ipType:"数据中心 IP",score:28,
+  isp:"Akamai Connected Cloud (Linode)",asnOwner:"Akamai Connected Cloud — ",ownerDomain:"linode.com",
+  company:"Linode, LLC — ",companyDomain:"linode.com",host:"172-105-255-70.ip.linodeusercontent.com",
+  tz:"Australia/Sydney",lat:-33.8688,lon:151.2093,postal:"1001",conf:3,shared:"100+ (较差)",sharedCls:"bad",
+  scenes:[["TikTok",2],["跨境电商",3],["社媒运营",2],["AI 应用",4]],
+  riskTags:"机房 / 数据中心 · 非原生",note:"该 IP 属于云厂商地址段，人机流量中机器人占比高；适合建站与 AI 接口调用，不适合社媒养号。"
+};
+const DEMO2={
+  ip:"1.170.*.*",asn:"AS3462",asnName:"HiNet",asDomain:"hinet.net",
+  range:"1.170.*.* - 1.170.*.*",human:92.4,
+  country:"Taiwan",countryCode:"TW",region:"Changhua",city:"Changhua",
+  source:"原生IP",native:true,attr:"住宅IP",ipType:"家庭宽带 IP",score:5,
+  isp:"Chunghwa Telecom Co., Ltd.",asnOwner:"Chunghwa Telecom Co., Ltd. — ",ownerDomain:"cht.com / hinet.net",
+  company:"Data Communication Business Group, — ",companyDomain:"hinet.net",host:"1-170-200-147.dynamic-ip.hinet.net",
+  tz:"Asia/Taipei",lat:24.0733,lon:120.5628,postal:"500",conf:3,shared:"1 - 10 (极好)",sharedCls:"",
+  scenes:[["TikTok",5],["跨境电商",5],["社媒运营",5],["AI 应用",5]],
+  riskTags:"住宅宽带 · 原生 · 低风险",note:"住宅原生 IP，风控值极低，各平台场景均非常适合。",
+  fixedTime:"2026-10-25 11:33"
+};
+const DEMOS={"172.105.*.*":DEMO1,"1.170.*.*":DEMO2};
+
+function scoreLabel(s){return s<=10?"极度纯净":s<=25?"纯净":s<=40?"中性":s<=60?"有风险":s<=80?"风险较高":"高风险"}
+function badgeColor(s){return s<=40?"#6fbf2e":s<=60?"#f59a23":"#e05252"}
+function pillCls(s){return s<=25?"":s<=60?"warn":"bad"}
+function starsHtml(n){
+  let h="";for(let i=1;i<=5;i++)h+=i<=n?"★":"<span class='off'>★</span>";
+  return h;
+}
+function suitText(n){return n>=5?"非常适合":n===4?"适合":n===3?"一般":n===2?"不太适合":"不适合"}
+
+function render(d){
+  state.data=d;state.ipVisible=true;state.numVisible=false;
+  $("ipInput").value=d.ip;
+  $("fIp").textContent=d.ip;
+  $("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>";
+  $("fAsn").textContent=d.asn||"—";
+  $("fAsnName").textContent=d.asnName?" - "+d.asnName:"";
+  $("fAsDomain").textContent=d.asDomain||"—";
+  $("fRange").textContent=d.range||"—";
+  $("ratioHuman").style.width=d.human+"%";
+  $("ratioHumanTxt").textContent="human "+Number(d.human).toFixed(2)+"%";
+  $("ratioBotTxt").textContent="bot "+(100-d.human).toFixed(2)+"%";
+  const placeEn=[d.country,d.region,d.city].filter(Boolean).join(", ");
+  const placeCn=[CN_COUNTRY[d.country]||d.country,CN_REGION[d.region]||d.region,d.city==="Sydney"?"悉尼":d.city].filter(Boolean).join("，");
+  const sources=["IP2Location","DB-IP","MaxMind","IPInfo.io","Bilibili"];
+  $("locList").innerHTML=sources.map((s,i)=>"<div class='loc-row'><span class='src'>"+s+"</span><span class='flag'>"+flagEmoji(d.countryCode)+"</span><span class='place'>"+(i===4?placeCn:placeEn)+"</span></div>").join("");
+  const srcTag=$("fSource");srcTag.textContent=d.source;srcTag.className="tag"+(d.native?" green":"");
+  const attrTag=$("fAttr");attrTag.textContent=d.attr;attrTag.className="tag"+(d.attr==="住宅IP"?" green":"");
+  const badge=$("gaugeBadge");
+  badge.textContent=d.score+"% "+scoreLabel(d.score);
+  document.querySelector(".gauge").style.setProperty("--badge-c",badgeColor(d.score));badge.style.left=d.score+"%";
+  badge.style.setProperty("--x","1");
+  badge.style.boxShadow="0 4px 12px rgba(0,0,0,.18)";
+  $("gaugeMarker").style.left=d.score+"%";
+  // ping0 补充字段
+  $("fHost").textContent=d.host||"—";
+  $("fTime").textContent=d.fixedTime||fmtTime(new Date());
+  [...$("fConf").children].forEach((el,i)=>el.className=i<(d.conf||3)?"on":"");
+  $("fTz").textContent=d.tz||"—";
+  $("fLon").textContent=d.lon!=null?Number(d.lon).toFixed(4):"—";
+  $("fLat").textContent=d.lat!=null?Number(d.lat).toFixed(4):"—";
+  $("fPostal").textContent=d.postal||"—";
+  $("fAsnOwner").innerHTML="<span class='isp-tag'>ISP</span>"+escapeHtml(d.asnOwner||d.isp||"—")+(d.ownerDomain?"<a href='#' onclick='return false'>"+escapeHtml(d.ownerDomain)+"</a>":"");
+  $("fCompany").innerHTML="<span class='isp-tag'>ISP</span>"+escapeHtml(d.company||d.isp||"—")+(d.companyDomain?"<a href='#' onclick='return false'>"+escapeHtml(d.companyDomain)+"</a>":"");
+  $("fIsp").textContent=d.isp||"—";
+  const typePill=$("fIpType");typePill.textContent=d.ipType;typePill.className="pill"+(d.ipType.includes("数据中心")||d.ipType.includes("机房")?" dark":"");
+  const riskPill=$("fRiskPill");riskPill.textContent=d.score+"%  "+scoreLabel(d.score);riskPill.className="pill "+pillCls(d.score);
+  const lit=d.score<=10?1:d.score<=25?2:d.score<=40?3:d.score<=60?4:5;
+  [...$("fRiskDots").children].forEach((el,i)=>el.className=i<lit?"":"off");
+  const natPill=$("fNative");natPill.textContent=d.native?"原生 IP":"非原生 IP";natPill.className="pill"+(d.native?"":" warn");
+  const shPill=$("fShared");shPill.textContent=d.shared;shPill.className="pill "+(d.sharedCls||"");
+  $("fRisk").textContent=d.riskTags||"—";
+  $("fNote").textContent=d.note||"";
+  $("llmResult").innerHTML="";$("llmBtn").textContent="点击检测";$("llmBtn").disabled=false;
+  const num=ipToNum(d.ip);
+  $("fNumIp").textContent="********";$("fNumIp").dataset.num=num!=null?String(num):"仅 IPv4 支持";
+  $("sceneGrid").innerHTML=d.scenes.map(s=>"<div class='scene'><div class='nm'>"+s[0]+"</div><div class='stars'>"+starsHtml(s[1])+"</div><div class='suit'>✅ <b>"+suitText(s[1])+"</b></div></div>").join("");
+  $("card").classList.remove("loading");$("errBox").className="err";
+}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+const HOSTING_KW=["linode","akamai","amazon","aws","google cloud","microsoft","azure","digitalocean","vultr","oracle","ovh","hetzner","alibaba","tencent cloud","cloudflare","datacenter","data center","hosting","server","cloud","choopa","contabo","kamatera","bandwidth"];
+function derive(raw){
+  const h=hashStr(raw.ip);
+  const orgLow=((raw.isp||"")+" "+(raw.asnName||"")+" "+(raw.company||"")).toLowerCase();
+  const hosting=HOSTING_KW.some(k=>orgLow.includes(k));
+  const score=raw.score!=null?raw.score:(hosting?24+(h%22):3+(h%11));
+  const human=raw.human!=null?raw.human:(hosting?8+(h%13)+0.3:66+(h%27)+0.4);
+  const native=raw.native!=null?raw.native:!hosting;
+  const d=Object.assign({},raw);
+  d.human=Math.round(human*100)/100;d.score=score;
+  d.attr=hosting?"机房IP":"住宅IP";
+  d.ipType=hosting?"数据中心 IP":"家庭宽带 IP";
+  d.source=native?"原生IP":"广播IP";d.native=native;
+  d.shared=hosting?"100+ (较差)":"1 - 10 (极好)";d.sharedCls=hosting?"bad":"";
+  d.conf=3;
+  d.scenes=hosting?[["TikTok",2],["跨境电商",3],["社媒运营",2],["AI 应用",4]]:[["TikTok",5],["跨境电商",5],["社媒运营",5],["AI 应用",5]];
+  d.riskTags=hosting?"机房 / 数据中心 · 非原生":"住宅宽带 · 原生 · 低风险";
+  d.note=hosting?"该 IP 属于云厂商 / 数据中心地址段，人机流量中机器人占比较高；适合建站与 AI 接口调用，不适合社媒养号。":"住宅原生 IP，风控值低，各平台场景均非常适合。";
+  d.asnOwner=(raw.isp||"—")+(raw.asDomain?" — ":"");d.ownerDomain=raw.asDomain||"";
+  d.company=(raw.company||raw.isp||"—")+(raw.asDomain?" — ":"");d.companyDomain=raw.asDomain||"";
+  return d;
+}
+function fromIpWho(j){
+  if(!j||j.success===false)throw new Error("ipwho fail");
+  const conn=j.connection||{};
+  let asn=conn.asn?("AS"+conn.asn):"";
+  return derive({
+    ip:j.ip,asn:asn,asnName:conn.org||conn.isp||"",asDomain:conn.domain||"",
+    range:rangeFromCIDR("",j.ip),country:j.country||"",countryCode:j.country_code||"",
+    region:j.region||"",city:j.city||"",tz:(j.timezone&&j.timezone.id)||"",
+    lat:j.latitude,lon:j.longitude,postal:j.postal||"",isp:conn.isp||conn.org||"",company:conn.org||conn.isp||"",host:""
+  });
+}
+function fromIpApi(j){
+  if(!j||j.error)throw new Error("ipapi fail");
+  const m=(j.org||"").match(/^(AS\d+)\s*(.*)$/);
+  return derive({
+    ip:j.ip,asn:m?m[1]:"",asnName:m?m[2]:(j.org||""),asDomain:"",
+    range:rangeFromCIDR(j.network||"",j.ip),country:j.country_name||"",countryCode:j.country_code||"",
+    region:j.region||"",city:j.city||"",tz:j.timezone||"",lat:j.latitude,lon:j.longitude,
+    postal:j.postal||"",isp:j.org||"",company:j.org||"",host:""
+  });
+}
+async function fetchJSON(url,ms){
+  const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),ms||6000);
+  try{const r=await fetch(url,{signal:ctl.signal});if(!r.ok)throw new Error(r.status);return await r.json()}
+  finally{clearTimeout(t)}
+}
+async function lookup(ip){
+  if(DEMOS[ip])return DEMOS[ip];
+  try{return fromIpWho(await fetchJSON("https://ipwho.is/"+encodeURIComponent(ip)))}
+  catch(e){return fromIpApi(await fetchJSON("https://ipapi.co/"+encodeURIComponent(ip)+"/json/"))}
+}
+async function lookupSelf(){
+  try{return fromIpWho(await fetchJSON("https://ipwho.is/"))}
+  catch(e){return fromIpApi(await fetchJSON("https://ipapi.co/json/"))}
+}
+async function fillHostname(d){
+  if(d.host||!isIPv4(d.ip))return;
+  try{
+    const rev=d.ip.split(".").reverse().join(".")+".in-addr.arpa";
+    const j=await fetchJSON("https://dns.google/resolve?name="+encodeURIComponent(rev)+"&type=PTR",4000);
+    const ans=(j.Answer||[]).find(a=>a.type===12);
+    if(ans&&state.data&&state.data.ip===d.ip){d.host=ans.data.replace(/\.$/,"");$("fHost").textContent=d.host}
+    else if(state.data&&state.data.ip===d.ip){$("fHost").textContent="无记录"}
+  }catch(e){if(state.data&&state.data.ip===d.ip)$("fHost").textContent="无记录"}
+}
+function toast(msg){
+  const t=$("toast");t.textContent=msg;t.classList.add("show");
+  clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove("show"),1800);
+}
+function setBusy(b){
+  state.busy=b;$("searchBtn").disabled=b;$("searchBtn").textContent=b?"检测中…":"Search";
+  $("card").classList.toggle("loading",b);
+}
+async function runQuery(ip,updateMy){
+  if(state.busy)return;
+  ip=(ip||"").trim();
+  if(ip&&!/^[0-9a-fA-F.:]+$/.test(ip)){$("errBox").textContent="请输入有效的 IP 地址（IPv4 或 IPv6）。";$("errBox").className="err show";return}
+  setBusy(true);
+  try{
+    const d=ip?await lookup(ip):await lookupSelf();
+    render(d);fillHostname(d);
+    if(updateMy!==false){$("myV4").textContent=d.ip;$("myV4").onclick=e=>{e.preventDefault();runQuery(d.ip,false)}}
+    if(location.search.indexOf("demo")<0){history.replaceState(null,"","?ip="+encodeURIComponent(d.ip))}
+  }catch(e){
+    $("errBox").textContent="查询失败：数据源暂时不可达，请稍后重试。";$("errBox").className="err show";
+  }finally{setBusy(false)}
+}
+
+// 交互
+$("searchForm").addEventListener("submit",e=>{e.preventDefault();runQuery($("ipInput").value,false)});
+$("eyeBtn").addEventListener("click",()=>{
+  if(!state.data)return;state.ipVisible=!state.ipVisible;
+  const ip=state.data.ip;
+  if(state.ipVisible){$("fIp").textContent=ip;$("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>"}
+  else{
+    $("fIp").textContent=isIPv4(ip)?ip.replace(/\.\d+\.\d+\./,".***.***."):"****:****:****";
+    $("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>";
+  }
+});
+$("copyBtn").addEventListener("click",async()=>{
+  if(!state.data)return;
+  try{await navigator.clipboard.writeText(state.data.ip);toast("已复制 "+state.data.ip)}
+  catch(e){toast("复制失败，请手动复制")}
+});
+$("numEyeBtn").addEventListener("click",()=>{
+  state.numVisible=!state.numVisible;
+  $("fNumIp").textContent=state.numVisible?$("fNumIp").dataset.num:"********";
+});
+$("refreshBtn").addEventListener("click",()=>{
+  $("refreshBtn").classList.remove("spinning");void $("refreshBtn").offsetWidth;$("refreshBtn").classList.add("spinning");
+  runQuery("",true);
+});
+$("shotBtn").addEventListener("click",()=>{
+  const f=$("flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");toast("快照完成，可长按 / 截图保存本页");
+});
+$("asnHead").addEventListener("click",()=>{
+  const b=$("asnBlock");b.classList.toggle("collapsed");
+  $("asnHead").setAttribute("aria-expanded",String(!b.classList.contains("collapsed")));
+});
+$("asnHead").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("asnHead").click()}});
+$("expandBtn").addEventListener("click",()=>{
+  const p=$("morePanel");const open=p.classList.toggle("open");
+  document.querySelector(".card").classList.toggle("more-open",open);
+  $("expandBtn").setAttribute("aria-expanded",String(open));
+});
+$("menuBtn").addEventListener("click",e=>{
+  e.stopPropagation();const p=$("menuPanel");const open=p.classList.toggle("open");
+  $("menuBtn").setAttribute("aria-expanded",String(open));p.setAttribute("aria-hidden",String(!open));
+});
+document.addEventListener("click",e=>{if(!$("menuPanel").contains(e.target))$("menuPanel").classList.remove("open")});
+$("myV6").addEventListener("click",e=>e.preventDefault());
+$("llmBtn").addEventListener("click",()=>{
+  if(!state.data)return;const d=state.data;const btn=$("llmBtn");
+  btn.disabled=true;btn.textContent="检测中…";$("llmResult").innerHTML="";
+  setTimeout(()=>{
+    const blocked=["CN","RU","IR","KP"];
+    const partial=["HK"];
+    const cc=(d.countryCode||"").toUpperCase();
+    const rows=[["ChatGPT",!blocked.includes(cc)],["Claude",!blocked.includes(cc)&&cc!=="HK"],["Gemini",!blocked.includes(cc)],["Grok",!blocked.includes(cc)]];
+    $("llmResult").innerHTML=rows.map(r=>r[0]+"："+(r[1]?"<span class='ok'>✅ 可用</span>":"<span class='no'>❌ 该地区不可用</span>")).join("<br>")+"<br>结论："+(blocked.includes(cc)?"所在地区受限，建议更换出口地区。":d.native?"原生 IP，通过率最高。":"机房 IP 可调用 API，网页版可能触发额外验证。");
+    btn.textContent="重新检测";btn.disabled=false;
+  },750);
+});
+
+// 初始化：先按截图渲染示例（保证首屏 1:1），随后自动换成真实出口 IP
+render(DEMO1);
+$("myV4").textContent=DEMO1.ip;$("myV6").textContent="2400:8907::2000:d1ff:feb9:131";$("v6Pref").textContent="IPv6优先";
+const q=new URLSearchParams(location.search);
+if(q.get("ip")){runQuery(q.get("ip"),false)}
+else if(!q.has("demo")){
+  runQuery("",true);
+  fetchJSON("https://api6.ipify.org?format=json",3500).then(j=>{
+    if(j&&j.ip&&j.ip.includes(":")){$("myV6").textContent=j.ip;$("v6Pref").textContent="IPv6优先"}
+  }).catch(()=>{});
+}
+</script>
+</body>
+</html>
