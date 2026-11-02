@@ -13,6 +13,7 @@
 | `backend-proxy.js.back` | `backend-proxy` | `api.xxxxx.asia` | 盘搜站的后端中转：给原站公开接口加跨域头、边缘缓存、搜索流与资源链接转发 | 8b6f1e92 |
 | `site-router.js.back` | `site-router` | `*.xxxxx.asia`（通配） | 按子域名前缀分发四个项目到 GitHub Pages 对应目录；pan 的接口请求同域转发给后端 | 17d3f1b8 |
 | `jpcard.js.back` | `jpcard` | `img.xxxxx.asia` | 日语教学图库供图：图片存 GitHub 三个仓库，三路容灾取图（jsDelivr → GitHub Raw → 镜像），边缘缓存 30 天 | 8737b21b |
+| `ai-refresh.js.back` | `ai-refresh` | `ai.xxxxx.asia/api/refresh-board`（路由） | AI 商铺「刷新数据」后端：5 分钟全局冷却（KV）后调 GitHub workflow_dispatch 触发刷新；KV 不可用时查 GitHub 运行记录兜底 | 2026-11-02 建 |
 
 另外：旧中转 `pan-proxy` 已无域名绑定，保留在账号里当备用，没有留档（代码与 backend-proxy 相同）。
 
@@ -20,15 +21,16 @@
 
 ## 迁移清单（换账号/换域名时照这个顺序配）
 
-1. **建 Worker**：在 Cloudflare 新建三个 Worker，分别把三份 `.js.back` 的代码贴入并 Deploy（贴的时候去掉文件头那段留档说明注释也行，不影响运行）。
+1. **建 Worker**：在 Cloudflare 新建四个 Worker，分别把四份 `.js.back` 的代码贴入并 Deploy（贴的时候去掉文件头那段留档说明注释也行，不影响运行）。
 2. **配 DNS**（域名在 Cloudflare 托管）：
    - 通配：`*` AAAA `100::`，代理开启；
    - `api`、`img` 的解析随第 3 步的自定义域绑定自动生成，不用手填。
 3. **配绑定与路由**（顺序别错）：
    - `backend-proxy` 绑自定义域 `api.xxxxx.asia`，另加精确路由 `api.xxxxx.asia/*`；
    - `jpcard` 绑自定义域 `img.xxxxx.asia`，另加精确路由 `img.xxxxx.asia/*`；
-   - `site-router` 绑通配路由 `*.xxxxx.asia/*`。
-4. **逐项验证**：四个项目子域名首页、`pan` 首页与它的 `/api/public/hot-searches?limit=1`、`api` 的同一接口、`img` 根路径应返回 `JP-EDU Image Server is Active.`。
+   - `site-router` 绑通配路由 `*.xxxxx.asia/*`；
+   - `ai-refresh` 另加路由 `ai.xxxxx.asia/api/refresh-board`，并绑 KV 命名空间（变量名 `REFRESH_KV`）与 secret `GH_TOKEN`（细粒度 PAT，仅本仓库 Actions 读写），细则见其留档文件头。
+4. **逐项验证**：四个项目子域名首页、`pan` 首页与它的 `/api/public/hot-searches?limit=1`、`api` 的同一接口、`img` 根路径应返回 `JP-EDU Image Server is Active.`；`ai` 的 `/api/refresh-board` 用 GET 访问应返回 405、POST 返回 `{ok:true,...}` JSON。
 
 ### 为什么 api / img 必须另加精确路由（2026-11-02 的教训）
 

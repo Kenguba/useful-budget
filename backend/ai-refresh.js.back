@@ -1,0 +1,102 @@
+// ============================================================
+// AI 商铺刷新后端 ai-refresh 的源码留档副本。
+// 真正运行的是部署在 Cloudflare（站长账号）上的 Worker
+// 「ai-refresh」，守在路由 ai.xxxxx.asia/api/refresh-board 上：
+// 页面点「刷新数据」先到它这里，5 分钟全局冷却（KV）过了才触发
+// GitHub Actions 的 refresh-and-deploy（workflow_dispatch）。
+// 把副本放在仓库里，是为了迁移时直接拿这一份部署，不用去控制台翻。
+// 同步规则：线上代码有任何改动，先部署到 Cloudflare，再同步回本文件。
+//
+// （缺了会出事）
+// 1. KV 绑定：Worker 须绑 KV 命名空间 ai-refresh-kv，变量名 REFRESH_KV
+//    （只存一个键 last = 上次触发时间戳）；
+// 2. 密钥：Worker secret GH_TOKEN = 细粒度 PAT，仅授权本仓库、
+//    Actions 读写；PAT 过期则触发失败（前端报「刷新服务暂不可用」）；
+// 3. 路由：ai 子域名下 /api/refresh-board 路径绑到本 Worker
+//    （该路径的请求不再走 site-router 的 Pages 转发）；
+// 4. 冷却兜底：KV 没额度/不可用时，代码自动改查 GitHub 最近一次
+//    workflow_dispatch 运行时间判冷却，不依赖 KV 也能防重复触发。
+// ============================================================
+// ai-shop 刷新后端：POST /api/refresh-board
+// 5 分钟全局冷却（KV 记录上次触发时间，谁点的都一样）；冷却外触发 GitHub Actions 的 refresh-and-deploy（workflow_dispatch）
+// 兜底（ken 2026-11-02 定）：KV 为主；KV 没额度/不可用时改用 GitHub 最近一次 workflow_dispatch 运行时间判冷却——
+// 读不到 KV 时直接查 GitHub；KV 读到的值放行时，真正触发前再用 GitHub 运行记录复核一次（防 KV 写不进、值停在旧时间骗过冷却）。
+const REPO = 'Kenguba/useful-budget';
+const WORKFLOW = 'refresh.yml';
+const COOLDOWN_MS = 300 * 1000;
+
+function cors() {
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
+}
+function json(obj, status = 200) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...cors() },
+  });
+}
+function ghHeaders(env) {
+  return {
+    'Authorization': 'Bearer ' + env.GH_TOKEN,
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    'User-Agent': 'ai-refresh-worker',
+  };
+}
+function cooldownJson(last, now) {
+  return json({ ok: true, mode: 'cooldown', retry_after: Math.ceil((COOLDOWN_MS - (now - last)) / 1000) });
+}
+// 从 GitHub 运行记录取最近一次手动触发（workflow_dispatch）的时间；查不到返回 0
+async function lastFromGitHub(env) {
+  try {
+    const r = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW}/runs?event=workflow_dispatch&per_page=1`, {
+      headers: ghHeaders(env),
+    });
+    if (!r.ok) return 0;
+    const d = await r.json();
+    const run = (d.workflow_runs || [])[0];
+    return run ? (Date.parse(run.created_at) || 0) : 0;
+  } catch (e) {
+    return 0;
+  }
+}
+
+export default {
+  async fetch(req, env) {
+    const url = new URL(req.url);
+    if (url.pathname !== '/api/refresh-board') return new Response('not found', { status: 404 });
+    if (req.method === 'OPTIONS') return new Response(null, { headers: cors() });
+    if (req.method !== 'POST') return json({ ok: false, error: 'method not allowed' }, 405);
+
+    const now = Date.now();
+    let last = 0;
+    try {
+      last = parseInt((await env.REFRESH_KV.get('last')) || '0', 10) || 0;
+    } catch (e) {
+      // KV 没额度/不可用：转查 GitHub 运行记录兜底
+      last = await lastFromGitHub(env);
+    }
+    if (now - last < COOLDOWN_MS) return cooldownJson(last, now);
+
+    // KV 放行也要在真正触发前用 GitHub 运行记录复核：KV 写额度耗尽时 last 会停在旧值，
+    // 只看 KV 会重复触发；GitHub 记录里有最近一次触发时间，以它为准。
+    const ghLast = await lastFromGitHub(env);
+    if (now - ghLast < COOLDOWN_MS) {
+      try { await env.REFRESH_KV.put('last', String(ghLast)); } catch (e) {}
+      return cooldownJson(ghLast, now);
+    }
+
+    const r = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW}/dispatches`, {
+      method: 'POST',
+      headers: ghHeaders(env),
+      body: JSON.stringify({ ref: 'main' }),
+    });
+    if (r.status !== 204) return json({ ok: false, error: 'dispatch failed', status: r.status }, 502);
+
+    try { await env.REFRESH_KV.put('last', String(now)); } catch (e) {}
+    return json({ ok: true, mode: 'started' });
+  },
+};
