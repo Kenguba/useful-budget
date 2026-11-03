@@ -1009,7 +1009,52 @@ const NUM_EYE_OFF='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="r
 function syncNumEye(){$("numEyeBtn").innerHTML=state.numVisible?NUM_EYE_ON:NUM_EYE_OFF}
 $("numEyeBtn").addEventListener("click",()=>{state.numVisible=!state.numVisible;$("fNumIp").textContent=state.numVisible?$("fNumIp").dataset.num:"********";syncNumEye()});
 $("refreshBtn").addEventListener("click",()=>{$("refreshBtn").classList.remove("spinning");void $("refreshBtn").offsetWidth;$("refreshBtn").classList.add("spinning");runQuery("",true)});
-$("shotBtn").addEventListener("click",()=>{const f=$("flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");toast("快照完成，可长按 / 截图保存本页")});
+function showSnap(data){
+  let ov=$("snapOv");
+  if(!ov){
+    ov=document.createElement("div");ov.id="snapOv";
+    ov.style.cssText="position:fixed;inset:0;background:rgba(10,20,30,.9);z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px;box-sizing:border-box";
+    ov.innerHTML="<img id='snapImg' style='max-width:100%;max-height:76vh;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.45)' alt='IP 检测快照'><div style='color:#fff;font-size:14.5px'>长按图片保存到相册</div><div style='display:flex;gap:10px'><a id='snapDl' download='ip-info.png' style='background:#fff;color:#123;border-radius:999px;padding:9px 22px;font-size:14.5px;font-weight:600;text-decoration:none'>下载图片</a><button id='snapClose' type='button' style='background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:999px;padding:9px 22px;font-size:14.5px'>关闭</button></div>";
+    document.body.appendChild(ov);
+    ov.querySelector("#snapClose").addEventListener("click",()=>ov.style.display="none");
+    ov.addEventListener("click",e=>{if(e.target===ov)ov.style.display="none"});
+  }
+  ov.querySelector("#snapImg").src=data;ov.querySelector("#snapDl").href=data;ov.style.display="flex";
+}
+async function snapshot(){
+  const btn=$("shotBtn");if(btn.dataset.busy)return;btn.dataset.busy="1";
+  try{
+    toast("正在生成快照…");
+    const cards=[$("card"),document.querySelector(".scene-card"),document.querySelector(".env-card")].filter(Boolean);
+    const wrap=document.createElement("div");
+    wrap.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
+    wrap.style.cssText="display:flex;flex-direction:column;gap:18px;width:"+cards[0].offsetWidth+"px;background:#e9f4fa;padding:16px;box-sizing:border-box;position:absolute;left:-99999px;top:0";
+    const pairs=[];
+    cards.forEach(c=>{const cl=c.cloneNode(true);pairs.push([c,cl]);wrap.appendChild(cl)});
+    document.body.appendChild(wrap);
+    const walk=(o,n)=>{const cs=getComputedStyle(o);let t="";for(let i=0;i<cs.length;i++){const k=cs[i];t+=k+":"+cs.getPropertyValue(k)+";"}n.style.cssText=t;const oc=o.children,nc=n.children;for(let i=0;i<oc.length&&i<nc.length;i++)walk(oc[i],nc[i])};
+    pairs.forEach(pr=>walk(pr[0],pr[1]));
+    wrap.querySelectorAll("svg").forEach(sv=>{if(!sv.getAttribute("xmlns"))sv.setAttribute("xmlns","http://www.w3.org/2000/svg")});
+    const imgs=wrap.querySelectorAll("img");
+    await Promise.all([...imgs].map(async im=>{try{const r=await fetch(im.src,{mode:"cors"});const b=await r.blob();im.src=await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>res(im.src);fr.readAsDataURL(b)})}catch(e){}}));
+    const W=wrap.offsetWidth,H=wrap.offsetHeight;
+    const xml=new XMLSerializer().serializeToString(wrap);
+    const svg="<svg xmlns='http://www.w3.org/2000/svg' width='"+W+"' height='"+H+"'><foreignObject width='100%' height='100%'>"+xml+"</foreignObject></svg>";
+    const url=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml;charset=utf-8"}));
+    const img=new Image();
+    await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url});
+    const scale=2,cv=document.createElement("canvas");cv.width=W*scale;cv.height=H*scale;
+    const cx=cv.getContext("2d");cx.fillStyle="#e9f4fa";cx.fillRect(0,0,cv.width,cv.height);cx.scale(scale,scale);cx.drawImage(img,0,0);
+    URL.revokeObjectURL(url);
+    const data=cv.toDataURL("image/png");
+    wrap.remove();
+    showSnap(data);
+  }catch(e){
+    toast("当前浏览器无法直接生成图片，请用系统截图保存本页");
+  }
+  delete btn.dataset.busy;
+}
+$("shotBtn").addEventListener("click",()=>{const f=$("flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");snapshot()});
 $("asnHead").addEventListener("click",()=>{const b=$("asnBlock");b.classList.toggle("collapsed");$("asnHead").setAttribute("aria-expanded",String(!b.classList.contains("collapsed")))});
 $("asnHead").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("asnHead").click()}});
 $("expandBtn").addEventListener("click",()=>{const p=$("morePanel");const open=p.classList.toggle("open");document.querySelector(".card").classList.toggle("more-open",open);$("expandBtn").setAttribute("aria-expanded",String(open))});
