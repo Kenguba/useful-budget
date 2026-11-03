@@ -873,6 +873,7 @@ async function runQuery(ip,selfMode){
     };
     d.range=rangeFromCIDR(d.prefix,d.ip);
     d.cls=classify(d);applyType(d);render(d);
+    if(seq===state.querySeq)setBusy(false);
     if(selfMode){setMyIp(d.ip,true);fillAltFamily(d.ip)}
     // 第二阶段：WHOIS / 路由历史 / BGP 邻居 / 黑名单 / 注册块
     const geoP=fetchJSON("https://ip.jpedu.asia/api/geo?ip="+encodeURIComponent(targetIp)+"&d="+new Date().toISOString().slice(0,10),15000).catch(()=>null);
