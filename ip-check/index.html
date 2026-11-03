@@ -103,7 +103,7 @@ input{font-family:inherit}
 .myip-row .pref{color:#9aa3ad;font-size:12.5px;flex:none}
 .myip-row a.none{color:#a7b0b8;font-weight:400;pointer-events:none}
 .myip-row{padding-top:3px;padding-bottom:3px;padding-right:8px;border-radius:9px}
-.myip-row.on{background:#f2f6f8}
+.myip-row.on{background:#f2f6f8;align-self:flex-start;padding-right:10px}
 .myip-row .row-eye{margin-left:auto;width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.75);display:grid;place-items:center;flex:none;box-shadow:0 1px 4px rgba(31,78,110,.08)}
 .myip .spacer{flex:1}
 .icon-btn{
@@ -128,7 +128,8 @@ input{font-family:inherit}
 .row{display:flex;align-items:center;gap:12px;padding:15px 4px}
 .row + .row{border-top:1px solid #fbfcfc}
 .lbl{font-size:17px;font-weight:700;color:var(--ink);width:86px;flex:none}
-.val-blue{color:var(--blue);font-size:19px;font-weight:500;letter-spacing:.01em;word-break:break-all;cursor:pointer}
+.ip-row{gap:6px}
+.val-blue{color:var(--blue);font-size:19px;font-weight:500;letter-spacing:.01em;white-space:nowrap;cursor:pointer}
 .mini-btn{
   width:32px;height:32px;border-radius:8px;background:#fafafa;border:1px solid #f0f0f0;display:grid;place-items:center;
   transition:background .2s,transform .15s var(--ease);flex:none;
@@ -401,17 +402,17 @@ input{font-family:inherit}
 
   <section class="card" id="card">
     <div class="fade-zone" id="fadeZone">
-      <div class="row">
+      <div class="row ip-row">
         <span class="lbl">IP</span>
         <span class="val-blue" id="fIp" title="点击复制">—</span>
+        <button class="mini-btn" id="eyeBtn" aria-label="显示 / 隐藏 IP" title="显示 / 隐藏">
+          <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" id="eyeIcon"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
         <button class="mini-btn" id="shotBtn" aria-label="快照" title="快照">
           <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
         </button>
         <button class="mini-btn" id="refreshBtn" aria-label="重新检测我的 IP" title="重新检测">
           <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
-        </button>
-        <button class="mini-btn" id="eyeBtn" aria-label="显示 / 隐藏 IP" title="显示 / 隐藏">
-          <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" id="eyeIcon"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
       </div>
 
@@ -699,7 +700,7 @@ function render(d){
   $("fAsnName").textContent=d.asnName?" - "+d.asnName:"";
   const asnLen=($("fAsn").textContent+$("fAsnName").textContent).length;
   document.querySelector(".asn-head .name").style.fontSize=asnLen>40?"14.5px":asnLen>30?"15.5px":"16.5px";
-  syncMyIpHi();
+  syncMyIpHi();fitIpFont();
   $("fAsDomain").textContent=d.domain||d.netname||"—";
   $("fRange").textContent=d.range||"—";
   const pure=100-d.score;
@@ -962,6 +963,8 @@ $("eyeBtn").addEventListener("click",()=>{
   if(state.ipVisible){$("fIp").classList.remove("masked");$("fIp").textContent=ip;$("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>"}
   else{$("fIp").classList.add("masked");$("fIp").textContent=isIPv4(ip)?ip.replace(/\.\d+\.\d+\./,".***.***."):"****:****:****";$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}
 });
+function fitIpFont(){const el=$("fIp");if(!el||!state.data)return;let fs=19;el.style.fontSize=fs+"px";const row=el.parentElement;const others=[...row.children].filter(c=>c!==el).reduce((w,c)=>w+c.offsetWidth,0);const avail=row.clientWidth-others-30;while(el.scrollWidth>avail&&fs>10){fs-=0.5;el.style.fontSize=fs+"px"}}
+window.addEventListener("resize",()=>{if(state.data)fitIpFont()});
 $("fIp").addEventListener("click",async()=>{if(!state.data)return;try{await navigator.clipboard.writeText(state.data.ip);toast("已复制 "+state.data.ip)}catch(e){toast("复制失败，请手动复制")}});
 const NUM_EYE_ON='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const NUM_EYE_OFF='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88"/><path d="M1 1l22 22"/></svg>';
