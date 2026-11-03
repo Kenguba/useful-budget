@@ -885,7 +885,7 @@ async function runQuery(ip,selfMode){
     const sc=computeScore(d,d.cls,bl);d.score=sc.score;
     const blTxt=bl?(bl.checked?("DNSBL 实时查询 "+bl.checked+" 个名单："+(bl.hits?("命中 "+bl.names.join(", ")):"0 命中")):"DNSBL 查询被名单方拒绝（公共解析器限制）"):"";
     d.riskTags=[d.cls.type==="hosting"?"机房 / 数据中心":d.cls.type==="residential"?"住宅宽带":"商业宽带",d.native==null?"注册地未知":d.native?"原生":"非原生（注册地 "+(d.whoisCountry||"?")+" ≠ 定位 "+(d.cc||"?")+")",bl&&bl.hits?"黑名单命中 "+bl.hits:""].filter(Boolean).join(" · ");
-    d.note="纯净度按实时信号计算："+sc.why.join("；")+"。定位 "+(d.locRows&&d.locRows.length?d.locRows.length:loc.total)+" 源共识（"+(d.locRows?d.conf:loc.agree)+" 个一致）。";
+    d.note="纯净度按实时信号计算："+sc.why.join("；")+"。定位 "+(d.locRows&&d.locRows.length?d.locRows.length:loc.total)+" 源共识（"+(d.locRows?d.conf:loc.agree)+" 个一致）";
     d._why=sc.why;
     render(d,true);
     // 第三阶段（不阻塞主结果）：ASN 历史 / BGP 邻居最后加载，到齐后补进详情
@@ -931,7 +931,7 @@ async function runQuery(ip,selfMode){
       ].filter(Boolean);
       if(rows.length){d.locRows=rows;d.conf=rows.filter(r=>r.cc&&r.cc===d.cc).length}
     }
-      if(d._why)d.note="纯净度按实时信号计算："+d._why.join("；")+"。定位 "+(d.locRows?d.locRows.length:0)+" 源共识（"+(d.conf||0)+" 个一致）。";
+      if(d._why)d.note="纯净度按实时信号计算："+d._why.join("；")+"。定位 "+(d.locRows?d.locRows.length:0)+" 源共识（"+(d.conf||0)+" 个一致）";
       renderDetails(d);
     });
   }catch(e){
