@@ -89,15 +89,13 @@ input{font-family:inherit}
 .search-btn:active{transform:translateY(-50%) scale(.96)}
 .search-btn:disabled{opacity:.55;cursor:wait}
 
-.myip{
-  display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;
-  margin:20px 6px 14px;font-size:14.5px;color:#6d7680;
-}
+.myip-bar{display:flex;align-items:center;gap:12px;margin:20px 6px 14px}
+.myip-btns{display:flex;gap:10px;flex:none}
 .myip .lb{color:#7c858f}
 .myip a{color:var(--blue);text-decoration:none;font-weight:500;word-break:break-all;transition:color .2s}
 .myip a:hover{color:var(--blue-dark);text-decoration:underline}
 .myip .v6pref{color:#9aa3ad;font-size:13.5px}
-.myip-list{margin:-8px 6px 14px;display:flex;flex-direction:column;gap:3px}
+.myip-list{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
 .myip-row{display:flex;align-items:center;gap:8px;font-size:14.5px;padding-left:2px}
 .myip-row .fam{font-size:11px;font-weight:700;color:#8a939c;border:1px solid #cfd8de;border-radius:5px;padding:1px 5px;flex:none;line-height:1.5;background:rgba(255,255,255,.55)}
 .myip-row a{color:var(--blue);text-decoration:none;font-weight:500;word-break:break-all}
@@ -322,7 +320,6 @@ input{font-family:inherit}
   .search-btn{padding:10px 20px;font-size:15px}
   .card{border-radius:22px}
   :root{--lc:74px}
-  .myip{font-size:13.5px}
   /* ping0 补充区：手机排版 */
   .pill{padding:8px 14px;font-size:14.5px;min-width:min(230px,100%)}
   .pill.long{font-size:13px;padding:8px 13px}
@@ -386,19 +383,20 @@ input{font-family:inherit}
     <button class="search-btn" id="searchBtn" type="submit">Search</button>
   </form>
 
-  <div class="myip">
-    <span class="spacer"></span>
+
+  <div class="myip-bar">
+    <div class="myip-list">
+    <div class="myip-row" id="rowV6"><span class="fam">IPv6</span><a href="#" id="myV6">检测中…</a><span class="pref" id="v6Pref"></span></div>
+    <div class="myip-row" id="rowV4"><span class="fam">IPv4</span><a href="#" id="myV4">—</a><span class="pref" id="v4Pref"></span></div>
+  </div>
+    <div class="myip-btns">
     <button class="icon-btn" id="refreshBtn" aria-label="重新检测我的 IP" title="重新检测">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
     </button>
     <button class="icon-btn" id="shotBtn" aria-label="快照" title="快照">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
     </button>
-  </div>
-
-  <div class="myip-list">
-    <div class="myip-row" id="rowV6"><span class="fam">IPv6</span><a href="#" id="myV6">检测中…</a><span class="pref" id="v6Pref"></span></div>
-    <div class="myip-row" id="rowV4"><span class="fam">IPv4</span><a href="#" id="myV4">—</a><span class="pref" id="v4Pref"></span></div>
+    </div>
   </div>
 
   <div class="err" id="errBox"></div>
