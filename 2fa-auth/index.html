@@ -9,26 +9,29 @@
 <style>
 /* ============ 1. Design Tokens - extracted from 2fa.fun ============ */
 :root{
-  --bg-gradient-start:#eef2ff;
-  --bg-gradient-end:#f8fafc;
-  --card-bg:rgba(255,255,255,.5);
-  --card-bg-solid:rgba(255,255,255,.72);
-  --sidebar-bg:rgba(255,255,255,.6);
-  --text-primary:#0f172a;
-  --text-secondary:#1e293b;
-  --text-muted:#334155;
+  --bg-gradient-start:#f4f6fc;
+  --bg-gradient-end:#eef1fa;
+  --card-bg:#ffffff;
+  --card-bg-solid:#ffffff;
+  --sidebar-bg:#ffffff;
+  --text-primary:#132a5f;
+  --text-secondary:#2a3a5f;
+  --text-muted:#98a5c3;
+  --label-color:#8b5cf6;
+  --instr-color:#9483d8;
+  --ta-border:#5b8def;
   --border-light:rgba(255,255,255,.7);
   --border-card:rgba(255,255,255,.25);
   --shadow-color:rgba(0,0,0,.05);
   --blur-amount:16px;
-  --accent:#2563eb;
-  --accent-2:#4f46e5;
-  --accent-violet:#a78bfa;
-  --accent-soft:rgba(37,99,235,.15);
-  --accent-glow:rgba(37,99,235,.3);
-  --input-bg:rgba(255,255,255,.25);
-  --input-bg-focus:rgba(255,255,255,.35);
-  --input-border:rgba(255,255,255,.35);
+  --accent:#2f6bff;
+  --accent-2:#6d4dff;
+  --accent-violet:#9b5cf6;
+  --accent-soft:rgba(47,107,255,.12);
+  --accent-glow:rgba(47,107,255,.28);
+  --input-bg:#f7f9ff;
+  --input-bg-focus:#ffffff;
+  --input-border:#e2e8f5;
   --success:#16a34a;
   --success-bg:#dcfce7;
   --danger:#e11d48;
@@ -53,6 +56,9 @@ body.dark{
   --accent:#60a5fa;
   --accent-soft:rgba(96,165,250,.2);
   --accent-glow:rgba(96,165,250,.4);
+  --label-color:#a78bfa;
+  --instr-color:#b9aef0;
+  --ta-border:rgba(255,255,255,.14);
   --input-bg:rgba(255,255,255,.06);
   --input-bg-focus:rgba(255,255,255,.1);
   --input-border:rgba(255,255,255,.14);
@@ -75,6 +81,7 @@ svg{display:block;flex:none}
 
 /* background glow orbs - gives the glass blur something to blur */
 .bg-orbs{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+body:not(.dark) .orb{display:none}
 .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;animation:orbFloat 18s ease-in-out infinite alternate}
 .orb-1{width:480px;height:480px;left:-120px;top:-140px;background:#c7d2fe}
 .orb-2{width:420px;height:420px;right:-100px;top:12%;background:#ddd6fe;animation-delay:-6s}
@@ -165,7 +172,7 @@ body.dark .theme-toggle-btn .icon-moon{display:block}
 .main-content{flex:1;overflow-y:auto;padding:1.5rem 2rem;scroll-behavior:smooth}
 .glass-card{
   background:var(--card-bg);backdrop-filter:blur(var(--blur-amount));-webkit-backdrop-filter:blur(var(--blur-amount));
-  border:1px solid var(--border-card);border-radius:var(--radius-card);
+  border:1px solid #e6ebf7;border-radius:var(--radius-card);
   box-shadow:0 20px 35px -8px rgba(0,0,0,.1),0 5px 12px -4px rgba(0,0,0,.05);
   padding:1.5rem;max-width:1060px;margin:0 auto;
   animation:cardIn .55s var(--ease-out) both;
@@ -173,20 +180,20 @@ body.dark .theme-toggle-btn .icon-moon{display:block}
 @keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .main-title{
   font-size:1.8rem;font-weight:700;margin-bottom:.5rem;line-height:1.25;
-  background:linear-gradient(135deg,var(--text-primary),var(--accent));
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  color:var(--text-primary);
 }
-.form-label{display:block;font-size:.875rem;font-weight:500;margin-bottom:.35rem;color:var(--text-secondary)}
+.form-label{display:block;font-size:.875rem;font-weight:500;margin-bottom:.35rem;color:var(--label-color)}
 .textarea-wrap{position:relative}
 .form-control{
   width:100%;background:var(--input-bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  border:1px solid var(--input-border);color:var(--text-primary);
+  border:1.5px solid var(--ta-border);color:var(--text-primary);
+  background:var(--card-bg-solid);
   border-radius:var(--radius-inner);padding:.85rem 2.6rem .85rem 1.2rem;
   font-size:.95rem;line-height:1.6;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   resize:vertical;min-height:150px;outline:none;width:100%;
   transition:border-color .2s var(--ease),box-shadow .2s var(--ease),background .2s var(--ease);
 }
-.form-control::placeholder{color:var(--text-muted);opacity:.75;font-family:'Inter',system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.form-control::placeholder{color:#b7c3dc;opacity:1;font-family:'Inter',system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
 .form-control:focus{background:var(--input-bg-focus);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .form-control.masked{-webkit-text-security:disc;text-security:disc}
 .form-control.error{border-color:var(--danger);box-shadow:0 0 0 3px rgba(225,29,72,.15);animation:shake .35s var(--ease)}
@@ -267,9 +274,9 @@ body.dark .divider{border-top-color:rgba(255,255,255,.12)}
 
 /* ============ 7. Instructions ============ */
 .instructions{background:var(--card-bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:1.3rem;padding:1.25rem;margin-top:1.5rem}
-.instructions h3{font-size:1.05rem;font-weight:600;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;color:var(--text-primary)}
-.instructions h3 svg{color:#818cf8}
-.instructions p,.instructions li{font-size:.875rem;color:var(--text-secondary);line-height:1.7}
+.instructions h3{font-size:1.05rem;font-weight:600;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;color:var(--accent)}
+.instructions h3 svg{color:var(--accent)}
+.instructions p,.instructions li{font-size:.875rem;color:var(--instr-color);line-height:1.7}
 .instructions p{margin-bottom:.75rem}
 .instructions ol{list-style:decimal inside;margin:.25rem 0 .25rem .5rem}
 .instructions ol li{margin:.15rem 0}
