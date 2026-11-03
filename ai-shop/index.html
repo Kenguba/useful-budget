@@ -1590,6 +1590,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC"
 
 .site-list-brand-icon svg{width:25px;height:25px;display:block}
 .site-list-brand-icon svg.ic-gem{width:31px;height:31px}
+/* 目录行：左右宽度 flex 自适应，店名不换行，右侧太长横向滚动（不显示滚动条） */
+.shop .nm{flex:none;word-break:normal}
+.shop .nm a{white-space:nowrap}
+.shop .pf{flex:0 1 auto;min-width:0;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.shop .pf::-webkit-scrollbar{display:none}
 [data-dark="true"] .site-list-brand-icon{color:var(--orb-color-2)}
 
 /* 店铺目录 */
@@ -1602,7 +1607,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC"
 .status-row .refresh-btn{flex-shrink:1;white-space:nowrap}
 /* 店铺匹配块：行左右间距与标题对齐，长代码串可断行不溢出 */
 #shopMatches .real-offer-row{padding-left:15px;padding-right:15px}
-#shopMatches .offer-shop-title{word-break:break-all}
+#shopMatches .offer-shop-title{flex:0 1 auto;min-width:0;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+#shopMatches .offer-shop-title::-webkit-scrollbar{display:none}
 #chips{display:flex;gap:7px;margin:0 0 12px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 #chips::-webkit-scrollbar{display:none}
 #shopMeta{font-size:12px;color:var(--text-secondary);margin:0 0 10px;line-height:1.5}
