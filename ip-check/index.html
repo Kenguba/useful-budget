@@ -415,8 +415,8 @@ input{font-family:inherit}
 
   <div class="myip-bar">
     <div class="myip-list">
-    <div class="myip-row" id="rowV6"><span class="fam">IPv6</span><a href="#" id="myV6">检测中…</a></div>
-    <div class="myip-row" id="rowV4"><span class="fam">IPv4</span><a href="#" id="myV4">—</a></div>
+    <div class="myip-row" id="rowV4"><span class="fam">IPv4</span><a href="#" id="myV4">检测中…</a></div>
+    <div class="myip-row" id="rowV6"><span class="fam">IPv6</span><a href="#" id="myV6">—</a></div>
   </div>
   </div>
 
@@ -1138,7 +1138,7 @@ function paintNote(d){
     return "<div class='note-row'><span>"+lab+"</span><b>"+val+"</b></div>";
   });
   const n=d.locRows?d.locRows.length:0;
-  rows.push("<div class='note-row'><span>定位共识</span><b>"+n+" 源（"+(d.conf||0)+" 个一致）</b></div>");
+  rows.push("<div class='note-row'><span>定位共识</span><b>"+n+" 源 · "+(d.conf||0)+" 个一致</b></div>");
   el.innerHTML="<div class='note-cap'>纯净度按实时信号计算</div>"+rows.join("");
 }
 function paintLlm(d){
@@ -1197,7 +1197,7 @@ async function bootSelf(){
   if(v4){runQuery(v4,true);return}
   if(!errSticky)showErr("未检测到 IPv4 地址，卡片未做检测；可手动输入 IP 查询");
   else setBusy(false);
-  fetchAltFamily(true).then(ip=>{if(ip)setMyIp(ip,false)}).catch(()=>{});
+  fetchAltFamily(true).then(ip=>{if(ip)setMyIp(ip,true)}).catch(()=>{});
 }
 const q=new URLSearchParams(location.search);
 const qip=(q.get("ip")||"").trim();
