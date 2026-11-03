@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-03 23:13",
+ "updated_at": "2026-11-03 23:21",
  "source": "AI价网 + cardnav + PriceAI 按商家遍历合并",
  "groups": [
   {
@@ -83,7 +83,7 @@
        "price": 18.5,
        "shop": "一梦AI货源 招代理 对接马yimeng",
        "platform": "16688",
-       "stock": 3,
+       "stock": 2,
        "url": "https://16688.com.cn/goods/G41758117"
       },
       {
@@ -2194,7 +2194,7 @@
        "price": 19.01,
        "shop": "阿秋AI",
        "platform": "16688",
-       "stock": 66,
+       "stock": 65,
        "url": "https://16688.com.cn/goods/G14175655"
       },
       {
@@ -2259,7 +2259,7 @@
      "title": "【自营】Plus 已接马 仅反代 自助复活 质保一小时",
      "url": "https://wzyp.cn/item/nkqqrq",
      "kind": "",
-     "same_source": 38,
+     "same_source": 39,
      "sources": [
       {
        "price": 11.0,
@@ -3137,41 +3137,22 @@
      "same_source": 1
     },
     {
-     "price": 17.6,
-     "shop": "爪爪AI专卖(对接实力号商)",
+     "price": 17.51,
+     "shop": "G成品号，找代理分销码q00y6z3f",
      "platform": "链动小铺",
-     "stock": 1,
-     "title": "【自营】，G plus rt 已接马,默认cpa，确保首登",
-     "url": "https://wzyp.cn/item/18p26b",
-     "kind": "",
-     "same_source": 2,
-     "sources": [
-      {
-       "price": 17.6,
-       "shop": "爪爪AI专卖(对接实力号商)",
-       "platform": "链动小铺",
-       "stock": 1,
-       "url": "https://wzyp.cn/item/18p26b"
-      },
-      {
-       "price": 19.2,
-       "shop": "yuyu的G小店",
-       "platform": "链动小铺",
-       "stock": 1,
-       "url": "https://wzyp.cn/item/2gwecz"
-      }
-     ]
-    },
-    {
-     "price": 18.15,
-     "shop": "牟利ai",
-     "platform": "链动小铺",
-     "stock": 137,
+     "stock": 78,
      "title": "Plus独享账号|· 比较稳定但是日期不确定介意勿拍 |· 已接马|· 账密+2FA|·购物30分钟内质保",
-     "url": "https://wzyp.cn/item/6c3lrr",
+     "url": "https://wzyp.cn/item/ruuup3",
      "kind": "",
-     "same_source": 45,
+     "same_source": 48,
      "sources": [
+      {
+       "price": 17.51,
+       "shop": "G成品号，找代理分销码q00y6z3f",
+       "platform": "链动小铺",
+       "stock": 78,
+       "url": "https://wzyp.cn/item/ruuup3"
+      },
       {
        "price": 18.15,
        "shop": "牟利ai",
@@ -3185,13 +3166,6 @@
        "platform": "",
        "stock": null,
        "url": "https://aicdks.com/product/104014"
-      },
-      {
-       "price": 18.54,
-       "shop": "G成品号，找代理分销码q00y6z3f",
-       "platform": "链动小铺",
-       "stock": 81,
-       "url": "https://wzyp.cn/item/ruuup3"
       },
       {
        "price": 18.9,
@@ -3483,6 +3457,32 @@
      ]
     },
     {
+     "price": 17.6,
+     "shop": "爪爪AI专卖(对接实力号商)",
+     "platform": "链动小铺",
+     "stock": 1,
+     "title": "【自营】，G plus rt 已接马,默认cpa，确保首登",
+     "url": "https://wzyp.cn/item/18p26b",
+     "kind": "",
+     "same_source": 2,
+     "sources": [
+      {
+       "price": 17.6,
+       "shop": "爪爪AI专卖(对接实力号商)",
+       "platform": "链动小铺",
+       "stock": 1,
+       "url": "https://wzyp.cn/item/18p26b"
+      },
+      {
+       "price": 19.2,
+       "shop": "yuyu的G小店",
+       "platform": "链动小铺",
+       "stock": 1,
+       "url": "https://wzyp.cn/item/2gwecz"
+      }
+     ]
+    },
+    {
      "price": 18.19,
      "shop": "精选好货AI",
      "platform": "链动小铺",
@@ -3636,7 +3636,23 @@
      "title": "已接马 Plus｜质保2小时｜独享成品号｜家宽现搓｜可自动401找回｜带RT｜仅反代使用",
      "url": "https://wzyp.cn/item/l5yi59",
      "kind": "",
-     "same_source": 1
+     "same_source": 2,
+     "sources": [
+      {
+       "price": 18.57,
+       "shop": "一梦低价货源",
+       "platform": "链动小铺",
+       "stock": 12,
+       "url": "https://wzyp.cn/item/l5yi59"
+      },
+      {
+       "price": 19.25,
+       "shop": "还没想好",
+       "platform": "链动小铺",
+       "stock": 11,
+       "url": "https://wzyp.cn/item/2kkqq4"
+      }
+     ]
     },
     {
      "price": 18.9,
@@ -11044,7 +11060,7 @@
      "price": 700.0,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": null,
+     "stock": 11,
      "title": "Supergro Heavy月卡谷歌内购成品号，质保订阅24小时，可开发票",
      "url": "https://aicdks.com/product/105428",
      "kind": "成品号",
@@ -11064,7 +11080,7 @@
      "price": 700.0,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": 2,
+     "stock": null,
      "title": "【官方充值】卡充GroK Ultra 200$【质保30天订阅",
      "url": "https://aicdks.com/product/110683",
      "kind": "成品号",
@@ -11613,7 +11629,7 @@
      "price": 135.0,
      "shop": "派大星（5000人群）",
      "platform": "16688",
-     "stock": 18,
+     "stock": 12,
      "title": "【IOS渠道】Claude Pro 官充 月卡【质保订阅30天】",
      "url": "https://www.16688.com.cn/goods/G26143891",
      "kind": "Pro·成品号",
