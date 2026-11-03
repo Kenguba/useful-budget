@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>IP地址信息和纯净度检测 | IPPure</title>
-<meta name="description" content="IP 地址信息与纯净度检测：ASN、地理位置、人机流量比、IP 来源与属性、IPPure 系数。">
+<meta name="description" content="IP 地址信息与纯净度检测：ASN、地理位置、人机流量比、IP 来源与属性、IPPure 系数">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M26 4C14 6 6 13 5 25c-.1 1.5 1 2.6 2.5 2.5C19 27 26 18 26 4z' fill='%233fae4a'/%3E%3Cpath d='M7 25C11 17 17 11 24 7' stroke='%23fff' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
 <style>
 :root{
@@ -517,7 +517,7 @@ input{font-family:inherit}
         <div class="block gray">
           <div class="sec-title" style="padding-top:8px">🌏 地图定位</div>
           <iframe class="map-frame" id="mapFrame" title="IP 地图定位" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-          <div style="font-size:12.5px;color:#93a1ad;padding:8px 0 6px">地图：OpenStreetMap（无广告），标记为 IP 大致位置，精度到城市级。</div>
+          <div style="font-size:12.5px;color:#93a1ad;padding:8px 0 6px">地图：OpenStreetMap（无广告），标记为 IP 大致位置，精度到城市级</div>
         </div>
 
         <div style="padding:4px 16px">
@@ -817,7 +817,7 @@ async function runQuery(ip,selfMode){
   const seq=++state.querySeq;
   state.asnFs=null;state.ipVisible=true;state.numVisible=true;
   ip=(ip||"").trim();
-  if(ip&&!/^[0-9a-fA-F.:]+$/.test(ip)){$("errBox").textContent="请输入有效的 IP 地址（IPv4 或 IPv6）。";$("errBox").className="err show";return}
+  if(ip&&!/^[0-9a-fA-F.:]+$/.test(ip)){$("errBox").textContent="请输入有效的 IP 地址（IPv4 或 IPv6）";$("errBox").className="err show";return}
   setBusy(true);
   try{
     const[srcs,net]=await Promise.all([
@@ -885,7 +885,7 @@ async function runQuery(ip,selfMode){
     const sc=computeScore(d,d.cls,bl);d.score=sc.score;
     const blTxt=bl?(bl.checked?("DNSBL 实时查询 "+bl.checked+" 个名单："+(bl.hits?("命中 "+bl.names.join(", ")):"0 命中")):"DNSBL 查询被名单方拒绝（公共解析器限制）"):"";
     d.riskTags=[d.cls.type==="hosting"?"机房 / 数据中心":d.cls.type==="residential"?"住宅宽带":"商业宽带",d.native==null?"注册地未知":d.native?"原生":"非原生（注册地 "+(d.whoisCountry||"?")+" ≠ 定位 "+(d.cc||"?")+")",bl&&bl.hits?"黑名单命中 "+bl.hits:""].filter(Boolean).join(" · ");
-    d.note="纯净度按实时信号计算："+sc.why.join("；")+"。定位 "+(d.locRows&&d.locRows.length?d.locRows.length:loc.total)+" 源共识（"+(d.locRows?d.conf:loc.agree)+" 个一致）";
+    d.note="纯净度按实时信号计算："+sc.why.join("；")+"；定位 "+(d.locRows&&d.locRows.length?d.locRows.length:loc.total)+" 源共识（"+(d.locRows?d.conf:loc.agree)+" 个一致）";
     d._why=sc.why;
     render(d,true);
     // 第三阶段（不阻塞主结果）：ASN 历史 / BGP 邻居最后加载，到齐后补进详情
@@ -931,11 +931,11 @@ async function runQuery(ip,selfMode){
       ].filter(Boolean);
       if(rows.length){d.locRows=rows;d.conf=rows.filter(r=>r.cc&&r.cc===d.cc).length}
     }
-      if(d._why)d.note="纯净度按实时信号计算："+d._why.join("；")+"。定位 "+(d.locRows?d.locRows.length:0)+" 源共识（"+(d.conf||0)+" 个一致）";
+      if(d._why)d.note="纯净度按实时信号计算："+d._why.join("；")+"；定位 "+(d.locRows?d.locRows.length:0)+" 源共识（"+(d.conf||0)+" 个一致）";
       renderDetails(d);
     });
   }catch(e){
-    $("errBox").textContent="查询失败：实时数据源暂不可达，请稍后重试。";$("errBox").className="err show";
+    $("errBox").textContent="查询失败：实时数据源暂不可达，请稍后重试";$("errBox").className="err show";
   }finally{if(seq===state.querySeq){if(state.asnPaintedSeq!==seq&&state.data)paintAsnHead(state.data);setBusy(false)}}
 }
 function applyType(d){
@@ -1036,13 +1036,13 @@ function paintLlm(d){
   if(!cc){tbl.style.display="none";tbl.innerHTML="";$("llmResult").textContent="";return}
   tbl.innerHTML="<div class='llm-row head'><span></span><span>厂商</span><span>判定（"+cc+"）</span></div>"+VENDORS.map(v=>{const ok=(LLM_LISTS[v.name]||[]).includes(cc);return "<div class='llm-row'><span class='vendor-ic'>"+v.icon+"</span><span><span class='llm-name'>"+v.name+"</span><div class='llm-sub'>"+v.by+"</div></span><span class='llm-chip "+(ok?"ok":"no")+"'>"+(ok?"✓ 可用":"✕ 不可用")+"</span></div>"}).join("");
   tbl.style.display="block";
-  $("llmResult").textContent="方法：该 IP 实时定位国家与各厂商官方支持地区名单核对。"+(d.native===false?"非原生 IP 仍可能触发额外验证。":d.native?"原生 IP，通过率最高。":"");
+  $("llmResult").textContent="方法：该 IP 实时定位国家与各厂商官方支持地区名单核对，"+(d.native===false?"非原生 IP 仍可能触发额外验证":d.native?"原生 IP，通过率最高":"");
 }
 $("companyHead").addEventListener("click",()=>{const b=$("companyBody"),open=b.style.display!=="none";b.style.display=open?"none":"block";$("companyHead").classList.toggle("open",!open)});
 $("rtcBtn").addEventListener("click",()=>{
   const box=$("rtcResult");const btn=$("rtcBtn");btn.textContent="检测中…";box.innerHTML="";const found=new Map();let done=false;
   const render=()=>{if(done)return;done=true;btn.textContent="重新检测";
-    box.innerHTML=found.size?("发现候选地址：<br>"+[...found.values()].map(escapeHtml).join("<br>")+"<br>结论：浏览器暴露了本地 / 公网候选地址，VPN 场景下请留意泄露。"):"未发现候选地址（浏览器限制了 WebRTC / mDNS，或当前网络拦截了 STUN 服务器）。";};
+    box.innerHTML=found.size?("发现候选地址：<br>"+[...found.values()].map(escapeHtml).join("<br>")+"<br>结论：浏览器暴露了本地 / 公网候选地址，VPN 场景下请留意泄露"):"未发现候选地址（浏览器限制了 WebRTC / mDNS，或当前网络拦截了 STUN 服务器）";};
   try{
     const pc=new RTCPeerConnection({iceServers:[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302","stun:stun.cloudflare.com:3478","stun:stun.nextcloud.com:443"]}]});
     pc.createDataChannel("x");
@@ -1052,9 +1052,9 @@ $("rtcBtn").addEventListener("click",()=>{
       if(addr&&!found.has(addr))found.set(addr,addr+(addr.includes(".local")?"（本地 · mDNS 掩码）":typ==="srflx"?"（公网 · STUN 映射）":typ==="host"?"（本地）":""));
     };
     pc.onicegatheringstatechange=()=>{if(pc.iceGatheringState==="complete"){try{pc.close()}catch(_){/*noop*/}render()}};
-    pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(()=>{if(!done){done=true;btn.textContent="重新检测";box.textContent="检测失败：浏览器拒绝创建 WebRTC 会话。"}});
+    pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(()=>{if(!done){done=true;btn.textContent="重新检测";box.textContent="检测失败：浏览器拒绝创建 WebRTC 会话"}});
     setTimeout(render,9000);
-  }catch(err){box.textContent="当前浏览器不支持 WebRTC 检测。";btn.textContent="点击检测"}
+  }catch(err){box.textContent="当前浏览器不支持 WebRTC 检测";btn.textContent="点击检测"}
 });
 $("fpUa").textContent=navigator.userAgent||"—";
 $("fpLang").textContent=(navigator.languages&&navigator.languages.join(", "))||navigator.language||"—";
