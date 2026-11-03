@@ -1135,11 +1135,12 @@ function paintNote(d){
     if(w.indexOf("类型基线")===0){lab="类型基线";val=w.slice(4).trim()}
     else if(w.indexOf("DNS 黑名单")===0){lab="DNS 黑名单";val=w.slice(7).trim()}
     else{const m=w.match(/^(.*?)\s*(\+\d+)$/);if(m){lab=m[1];val=m[2]}}
+    val=val.replace(/\s*\+0$/,"");
     return "<div class='note-row'><span>"+lab+"</span><b>"+val+"</b></div>";
   });
   const n=d.locRows?d.locRows.length:0;
   rows.push("<div class='note-row'><span>定位共识</span><b>"+n+" 源 · "+(d.conf||0)+" 个一致</b></div>");
-  el.innerHTML="<div class='note-cap'>纯净度按实时信号计算</div>"+rows.join("");
+  el.innerHTML=rows.join("");
 }
 function paintLlm(d){
   const tbl=$("llmTable");if(!tbl)return;const cc=(d.cc||"").toUpperCase();
