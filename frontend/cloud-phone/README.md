@@ -1,6 +1,6 @@
 # 云手机横向对比（cloud-phone）
 
-云手机比价与真机核查页：https://kenguba.github.io/useful-budget/cloud-phone/
+云手机比价与真机核查页：https://kenguba.github.io/useful-budget/frontend/cloud-phone/
 
 - `index.html` — 页面（30 家云手机横评：特点、资费、改机支持、底层真机/ARM虚拟/模拟器判定，可按底层筛选、按品牌搜索；含甘甘云专章、按用途推荐、8 步自测真机清单）
 - `scripts/refresh.py` — 纯代码刷新脚本（零依赖）：抓甘甘云官网结构化套餐数据（7/30/90 天全档价）生成 `data/prices.json` 与 `data/prices.js`，并对另外 7 家官网做可用性检查；解析失败不覆盖旧数据

@@ -27,14 +27,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python3 skill-board/scripts/refresh.py
-          python3 ai-shop/scripts/refresh.py
-          if [ "$(TZ=Asia/Shanghai date +%u)" = "1" ] || [ "$(TZ=Asia/Shanghai date +%u)" = "4" ]; then python3 cloud-phone/scripts/refresh.py || echo "::warning::cloud-phone refresh failed, keeping previous data"; fi
+          python3 frontend/skill-board/scripts/refresh.py
+          python3 frontend/ai-shop/scripts/refresh.py
+          if [ "$(TZ=Asia/Shanghai date +%u)" = "1" ] || [ "$(TZ=Asia/Shanghai date +%u)" = "4" ]; then python3 frontend/cloud-phone/scripts/refresh.py || echo "::warning::cloud-phone refresh failed, keeping previous data"; fi
       - name: Commit data
         run: |
           git config user.name "skills-board-bot"
           git config user.email "bot@localhost"
-          git add skill-board/data/ ai-shop/data/ cloud-phone/data/ ai-shop/index.html
+          git add frontend/skill-board/data/ frontend/ai-shop/data/ frontend/cloud-phone/data/ frontend/ai-shop/index.html
           git diff --cached --quiet || git commit -m "data: refresh $(date -u +%F)"
           git push
       - uses: actions/configure-pages@v5

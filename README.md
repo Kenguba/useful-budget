@@ -18,8 +18,8 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 每个项目 = 一级目录一个，自带全套文件（页面、数据、脚本、图标等），互不引用、互不依赖：
 
 ```
-<project>/           # 例：skill-board/
-  index.html         # 项目页面（通过 /useful-budget/<project>/ 访问）
+frontend/<project>/           # 例：frontend/skill-board/
+  index.html         # 项目页面（通过 /useful-budget/frontend/<project>/ 访问）
   data/              # 项目数据（如有）
   scripts/           # 项目脚本（如有）
   icons/             # 项目图标 / PWA 资源（如有）
@@ -28,8 +28,8 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 ## 新增项目规范
 
 1. 目录名：全小写英文 + 连字符（如 `ai-links`），不使用中文、空格、下划线。
-2. 在根 `index.html` 导航页加一张卡片：项目名、一句话说明、状态标签，链接指向 `<project>/`（相对路径）。
-3. 项目需要定时更新的，在 `.github/workflows/` 里处理：脚本路径写全（含项目目录前缀，如 `skill-board/scripts/refresh.py`），数据提交范围写明项目目录（如 `git add skill-board/data/`）。
+2. 在根 `index.html` 导航页加一张卡片：项目名、一句话说明、状态标签，链接指向 `frontend/<project>/`（相对路径）。
+3. 项目需要定时更新的，在 `.github/workflows/` 里处理：脚本路径写全（含项目目录前缀，如 `frontend/skill-board/scripts/refresh.py`），数据提交范围写明项目目录（如 `git add frontend/skill-board/data/`）。
 4. 发布方式全局统一：workflow 用 `actions/upload-pages-artifact` 上传仓库根目录（`path: .`），根导航与所有项目一次发布，不给单个项目单独建发布流程。
 5. 项目下线：删其目录 + 删导航页对应卡片，两处缺一不可。
 
@@ -37,34 +37,34 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 
 | 目录 | 内容 | 更新方式 |
 | --- | --- | --- |
-| `skill-board/` | 全球 Skills 使用量排行榜（安装量双榜 + GitHub 星标榜） | workflow 每 12 小时跑 `scripts/refresh.py` 自动刷新数据并发布；自带 PWA，可添加到手机主屏幕 |
-| `ai-shop/` | AI账号商铺（AI 账号比价 7 分组 + 店铺目录） | workflow 每 12 小时跑 `scripts/refresh.py` 自动刷新数据并发布 |
-| `cloud-phone/` | 云手机横向对比（30 家资费/改机/底层真机核查） | 脚本每周两次（周一/周四）刷甘甘官网价（`scripts/refresh.py`）+ 每周一 agent 全量复核 30 家更新正文 |
-| `cloud-pan/` | 基德盘搜（pan）1:1 复刻：搜索首页 / 热播榜 / 每日更新 / 热搜榜 / APP / 申请友链 / 资源详情 | 手动跑 `scripts/refresh.py` 拉原站公开接口快照（`data/`），页面纯静态渲染 |
-| `ip-check/` | IP 纯净度检测（IPPure 风格 1:1 复刻，融合 ping0 字段）：ASN / 多源位置 / 人机流量比 / 来源 / 属性 / 纯净度系数 + 风控值 / 原生 IP / 大模型检测 / 共享人数 / 适用场景 | 纯静态单文件，浏览器端直查公开 IP 情报接口，无后端、无定时刷新 |
-| `2fa-auth/` | 2FA 验证码工具（2fa.fun 1:1 复刻）：谷歌验证器网页版，批量粘贴 2FA 密钥生成 6 位 TOTP 动态验证码，30 秒自动刷新、一键复制，毛玻璃侧边栏 + 深浅主题 + 中英切换 | 纯静态单文件，浏览器端本地计算（Web Crypto HMAC-SHA1），密钥不上传，无后端、无定时刷新 |
+| `frontend/skill-board/` | 全球 Skills 使用量排行榜（安装量双榜 + GitHub 星标榜） | workflow 每 12 小时跑 `scripts/refresh.py` 自动刷新数据并发布；自带 PWA，可添加到手机主屏幕 |
+| `frontend/ai-shop/` | AI账号商铺（AI 账号比价 7 分组 + 店铺目录） | workflow 每 12 小时跑 `scripts/refresh.py` 自动刷新数据并发布 |
+| `frontend/cloud-phone/` | 云手机横向对比（30 家资费/改机/底层真机核查） | 脚本每周两次（周一/周四）刷甘甘官网价（`scripts/refresh.py`）+ 每周一 agent 全量复核 30 家更新正文 |
+| `frontend/cloud-pan/` | 基德盘搜（pan）1:1 复刻：搜索首页 / 热播榜 / 每日更新 / 热搜榜 / APP / 申请友链 / 资源详情 | 手动跑 `scripts/refresh.py` 拉原站公开接口快照（`data/`），页面纯静态渲染 |
+| `frontend/ip-check/` | IP 纯净度检测（IPPure 风格 1:1 复刻，融合 ping0 字段）：ASN / 多源位置 / 人机流量比 / 来源 / 属性 / 纯净度系数 + 风控值 / 原生 IP / 大模型检测 / 共享人数 / 适用场景 | 纯静态单文件，浏览器端直查公开 IP 情报接口，无后端、无定时刷新 |
+| `frontend/2fa-auth/` | 2FA 验证码工具（2fa.fun 1:1 复刻）：谷歌验证器网页版，批量粘贴 2FA 密钥生成 6 位 TOTP 动态验证码，30 秒自动刷新、一键复制，毛玻璃侧边栏 + 深浅主题 + 中英切换 | 纯静态单文件，浏览器端本地计算（Web Crypto HMAC-SHA1），密钥不上传，无后端、无定时刷新 |
 
 ## 子域名（Cloudflare 转发）
 
 **主域名（`xxxxx.asia`，无前缀）= 全站总体预览页**：打开主域名就是根目录导航页 `index.html`（「便宜、有用的，都在这」），与 `kenguba.github.io/useful-budget/` 内容一致，不给任何单个项目占用。主域名不走通配，须单独配 DNS 与路由（见 `backend/README.md` 迁移清单）。
 
-六个项目各有一个子域名入口，经 Cloudflare Worker 转发到本仓库对应的 Pages 目录，与 `kenguba.github.io/useful-budget/<project>/` 内容一致：
+六个项目各有一个子域名入口，经 Cloudflare Worker 转发到本仓库对应的 Pages 目录，与 `kenguba.github.io/useful-budget/frontend/<project>/` 内容一致：
 
 | 项目 | 子域名 |
 | --- | --- |
 | （全站入口）`index.html` | `xxxxx.asia`（主域名） |
-| `skill-board/` | `skill.xxxxx.asia` |
-| `ai-shop/` | `ai.xxxxx.asia` |
-| `cloud-phone/` | `phone.xxxxx.asia` |
-| `cloud-pan/` | `pan.xxxxx.asia` |
-| `ip-check/` | `ip.xxxxx.asia` |
-| `2fa-auth/` | `2fa.xxxxx.asia` |
+| `frontend/skill-board/` | `skill.xxxxx.asia` |
+| `frontend/ai-shop/` | `ai.xxxxx.asia` |
+| `frontend/cloud-phone/` | `phone.xxxxx.asia` |
+| `frontend/cloud-pan/` | `pan.xxxxx.asia` |
+| `frontend/ip-check/` | `ip.xxxxx.asia` |
+| `frontend/2fa-auth/` | `2fa.xxxxx.asia` |
 
 完整域名不写入本仓库（公开仓库，避免暴露站长域名）；解析与 Worker 配置在站长的 Cloudflare 账号里维护。全部后端 Worker 的源码留档统一放在仓库根目录的 `backend/` 里（说明见 `backend/README.md`）（`backend-proxy.js.back`、`site-router.js.back`、`jpcard.js.back`），迁移时直接取用，配套的通配 DNS/路由配置清单写在 site-router 留档的文件头。
 
 ## 约定
 
-- 链接与仓库名绑定：Pages 地址为 `kenguba.github.io/useful-budget/<project>/`，项目目录名即网址路径段，改目录名 = 改网址，慎重。
+- 链接与仓库名绑定：Pages 地址为 `kenguba.github.io/useful-budget/frontend/<project>/`，项目目录名即网址路径段，改目录名 = 改网址，慎重。
 - **xxxx 占位命名**：文件名与文档中连续 3 个以上 x（`xxxx`）表示占位，代替真实或未定的部分；需要占位的文件直接以占位名命名，如 `xxxxx.md`。
 - 数据文件与代码分开提交：自动刷新只提交 `data/` 变更，提交信息形如 `data: refresh YYYY-MM-DD`。
 - 脚本一致性：仓库内脚本必须与线上实际运行的版本保持一致。项目脚本（如各项目 `scripts/refresh.py`）以仓库 main 为准，本地镜像/工作副本改完必须推送，禁止只改本地；后端 Worker 以 Cloudflare 已部署版为准，先部署、再把源码同步回 `backend/` 留档。发现不一致时以线上为准，并立即对齐。
@@ -72,7 +72,7 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 
 ## 页面规范
 
-- **列表触底加载（2026-11-03 定，全站适用）**：凡是分页 / 分批展示的列表，一律做成滚动触底自动加载下一批，不做「加载更多」按钮、不做「上一页 / 下一页」分页。实现借鉴 `ai-shop/` 店铺目录的哨兵模式：`IntersectionObserver` 哨兵元素 + `rootMargin` 提前约 300px 触发 + 在途锁防重复触发 + 加载中转圈提示；全部加载完显示「已展示全部 N 条」；拉取失败不得空转自动重试，给一次点击重试即可。参考实现：`ai-shop/index.html`（店铺目录哨兵）、`cloud-pan/assets/app.js`（每日更新页）。
+- **列表触底加载（2026-11-03 定，全站适用）**：凡是分页 / 分批展示的列表，一律做成滚动触底自动加载下一批，不做「加载更多」按钮、不做「上一页 / 下一页」分页。实现借鉴 `frontend/ai-shop/` 店铺目录的哨兵模式：`IntersectionObserver` 哨兵元素 + `rootMargin` 提前约 300px 触发 + 在途锁防重复触发 + 加载中转圈提示；全部加载完显示「已展示全部 N 条」；拉取失败不得空转自动重试，给一次点击重试即可。参考实现：`frontend/ai-shop/index.html`（店铺目录哨兵）、`frontend/cloud-pan/assets/app.js`（每日更新页）。
 - **移动端适配（2026-11-03 定）**：所有页面必须在手机宽度（≤860px）下正常可用——顶栏 / 工具栏等固定区域不得横向溢出撑宽页面（放不下就换行或横滚），内容区满宽显示；新页面或改版上线前须按手机宽度核对一遍再发布。每个界面都要单独考虑手机端，不是一处改完就算完。cloud-pan 的具体口径：左右间距收紧（外层 8px、卡片内 12px）；顶栏「求片」按钮手机端隐藏；「保持联系」浮钮手机端缩小并贴右边吸附。
 - **筛选条（2026-11-03 定）**：筛选条放搜索框上方；单行横滚，不换行、不显示滚动条。
 - **行末无句号（2026-11-03 定，全站适用）**：页面可见文案每行末尾默认不加句号（。）；一行内有多句时用分号分隔。

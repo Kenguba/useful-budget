@@ -24,13 +24,13 @@ jobs:
       - name: Verify listed stocks
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 ai-shop/scripts/stock_check.py
+        run: python3 frontend/ai-shop/scripts/stock_check.py
       - name: Commit stock updates
         id: commit
         run: |
           git config user.name "skills-board-bot"
           git config user.email "bot@localhost"
-          git add ai-shop/data/board.json ai-shop/index.html
+          git add frontend/ai-shop/data/board.json frontend/ai-shop/index.html
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
