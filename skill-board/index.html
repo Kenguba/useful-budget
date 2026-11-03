@@ -17,6 +17,11 @@ h1 mark{background:linear-gradient(transparent 65%,#fde68a 65%);color:inherit;pa
 .pill{border:1px solid var(--line);border-radius:999px;padding:5px clamp(9px,2.5vw,13px);font-size:clamp(11px,2.8vw,12px);background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.02)}
 .pill.solid{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
 .pill.warn{border-color:#fde68a;background:#fefce8;color:#92400e}
+.srctag{display:inline-block;margin-left:8px;padding:2px 8px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--mut);font-size:11px;font-weight:600;vertical-align:middle;white-space:nowrap}
+.navchip{border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:12px;background:#fff;color:var(--blue);font-weight:700;text-decoration:none;box-shadow:0 1px 2px rgba(0,0,0,.02)}
+.navchip:active{background:#eef2ff}
+html{scroll-behavior:smooth}
+section{scroll-margin-top:10px}
 select,button{font-size:clamp(13px,3vw,14px);border-radius:10px;border:1px solid var(--line);padding:7px 11px;background:#fff;color:var(--ink);outline:none;transition:border-color .15s}
 select:focus,input[type=search]:focus{border-color:var(--blue2);box-shadow:0 0 0 3px var(--ring)}
 button{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700;cursor:pointer;transition:transform .1s,opacity .15s}
@@ -90,14 +95,17 @@ select#dateSel{min-width:150px}
     </div>
   </div>
   <h1>全球 <mark>Skills</mark> 使用量排行榜</h1>
-  <div class="sub">两张榜：谁被装得最多（3 个注册中心）+ 谁的源码最值得信（GitHub）</div>
+  <div class="sub">两张榜：谁被装得最多（3 个注册中心）+ 谁的源码最值得信（GitHub）<span class="srctag">skills.sh · ClawHub · 腾讯 SkillHub · GitHub</span></div>
   <div class="row">
     <span class="pill solid skelbar" id="datePill">数据截至 ····-··-··（UTC）</span>
-    <span class="pill">skills.sh · ClawHub · 腾讯 SkillHub · GitHub</span>
   </div>
   <div class="row">
-    <span class="pill warn">跨平台数字并列，不做相加</span>
-    <span class="pill">GitHub 无安装数 → 以星标单列</span>
+    <a class="navchip" href="#sec-01">01 安装量总榜</a>
+    <a class="navchip" href="#sec-02">02 三平台分区榜</a>
+    <a class="navchip" href="#sec-03">03 WIS 值得装</a>
+    <a class="navchip" href="#sec-04">04 动能 · 声量</a>
+    <a class="navchip" href="#sec-05">05 厂商榜</a>
+    <a class="navchip" href="#sec-06">06 视频区</a>
     <input type="search" id="q" placeholder="搜技能名，过滤所有榜单…">
   </div>
   <div class="bar"></div>
@@ -125,7 +133,7 @@ function fitCmds(){document.querySelectorAll("code.cmd").forEach(el=>{let s=12;e
 let _rzT;window.addEventListener("resize",()=>{clearTimeout(_rzT);_rzT=setTimeout(fitCmds,150)});
 function nameLink(name,url,meta){const n=url?`<a href="${esc(url)}" target="_blank" rel="noopener">${esc(name)}</a>`:esc(name);return `<span class="name">${n}</span>${meta?`<span class="meta">${esc(meta)}</span>`:""}`}
 function item(r,left,numHtml,cmdHtml){const s=((left.skill||left.repo||"")+" "+(left.blurb||"")+" "+(left.meta||"")).toLowerCase();return `<div class="item" data-skill="${esc(s)}"><div class="itemtop">${rankBadge(r)}<div class="main">${left.html}</div><div class="num">${numHtml||""}</div></div>${cmdHtml||""}</div>`}
-function section(no,title,desc,inner){return `<section><div class="sec-head"><div style="display:flex;gap:10px;align-items:center"><span class="badge">${no}</span><h2>${title}</h2></div><p>${desc}</p></div>${inner}</section>`}
+function section(no,title,desc,inner){return `<section id="sec-${no}"><div class="sec-head"><div style="display:flex;gap:10px;align-items:center"><span class="badge">${no}</span><h2>${title}</h2></div><p>${desc}</p></div>${inner}</section>`}
 function render(b){
   board=b;
   const dp=document.getElementById("datePill");dp.textContent=`数据截至 ${b.date}（UTC）`;dp.classList.remove("skelbar");
