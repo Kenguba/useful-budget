@@ -177,6 +177,7 @@ function fuzzy(q){
 }
 function renderBoard(){
   const q=$('#q').value.trim();
+  $('#leaders').style.display=q?'none':'';
   const sm=(q&&shops)?shops.shops.filter(s=>fuzzy(q,s.name,s.platform,s.code)):[];
   $('#shopMatches').innerHTML=!q?'':'<div class="group"><h2>店铺目录匹配 '+sm.length+' 家</h2><div class="cnt">报价单只收录每组最低 30 条，不在其中的店只在这里和店铺目录出现。</div>'+
     (sm.length?sm.slice(0,20).map(s=>'<div class="row"><div class="main"><div class="title">'+(s.url?'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.name)+' ↗</a>':esc(s.name))+'</div><div class="info">'+esc(s.platform)+(s.code?' · '+esc(s.code):'')+'</div></div></div>').join(''):'<p class="sub">目录 '+(shops&&shops.shops?shops.shops.length:'')+' 家里也没有匹配，去「店铺目录」换个关键词再试。</p>')+
@@ -221,6 +222,7 @@ function switchTab(shopsView){
   $('#viewBoard').classList.toggle('hide',shopsView);
   $('#viewShops').classList.toggle('hide',!shopsView);
   if(shopsView&&!shops)renderShops();
+  if(!shopsView)$('#leaders').style.display=$('#q').value.trim()?'none':'';
 }
 /* 同源店铺弹窗：单一状态源 + 打开/关闭生命周期（遮罩/Esc/焦点还原/inert/减少动态），样式与交互语言对齐 daymark 弹窗规范 */
 const srcOverlay=$('#srcOverlay'), srcSheet=$('#srcSheet'), pageWrap=document.querySelector('.wrap');
