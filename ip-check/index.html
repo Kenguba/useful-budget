@@ -97,6 +97,12 @@ input{font-family:inherit}
 .myip a{color:var(--blue);text-decoration:none;font-weight:500;word-break:break-all;transition:color .2s}
 .myip a:hover{color:var(--blue-dark);text-decoration:underline}
 .myip .v6pref{color:#9aa3ad;font-size:13.5px}
+.myip-list{margin:-8px 6px 14px;display:flex;flex-direction:column;gap:3px}
+.myip-row{display:flex;align-items:center;gap:8px;font-size:14.5px;padding-left:2px}
+.myip-row .fam{font-size:11px;font-weight:700;color:#8a939c;border:1px solid #cfd8de;border-radius:5px;padding:1px 5px;flex:none;line-height:1.5;background:rgba(255,255,255,.55)}
+.myip-row a{color:var(--blue);text-decoration:none;font-weight:500;word-break:break-all}
+.myip-row a:hover{color:var(--blue-dark);text-decoration:underline}
+.myip-row .pref{color:#9aa3ad;font-size:12.5px;flex:none}
 .myip .spacer{flex:1}
 .icon-btn{
   width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.75);display:grid;place-items:center;
@@ -133,7 +139,7 @@ input{font-family:inherit}
 .block.gray{background:var(--row-bg)}
 .kv{display:flex;align-items:baseline;gap:12px;padding:9px 0;font-size:15.5px}
 .kv .k{color:#3c424b;font-weight:500;width:86px;flex:none;font-size:15px}
-.kv .v{color:var(--ink-2);word-break:break-all}
+.kv .v{color:var(--ink-2);word-break:break-all;flex:1;min-width:0}
 .kv .v.blue{color:var(--blue);font-weight:600;font-size:16.5px}
 .asn-head{display:flex;align-items:center;gap:12px;padding:13px 4px 4px;cursor:pointer;user-select:none}
 .asn-head .lbl{width:86px}
@@ -379,9 +385,6 @@ input{font-family:inherit}
 
   <div class="myip">
     <span class="lb">My IP</span>
-    <a href="#" id="myV4">—</a>
-    <a href="#" id="myV6"></a>
-    <span class="v6pref" id="v6Pref"></span>
     <span class="spacer"></span>
     <button class="icon-btn" id="refreshBtn" aria-label="重新检测我的 IP" title="重新检测">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
@@ -389,6 +392,11 @@ input{font-family:inherit}
     <button class="icon-btn" id="shotBtn" aria-label="快照" title="快照">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
     </button>
+  </div>
+
+  <div class="myip-list">
+    <div class="myip-row" id="rowV6" style="display:none"><span class="fam">IPv6</span><a href="#" id="myV6"></a><span class="pref" id="v6Pref"></span></div>
+    <div class="myip-row" id="rowV4"><span class="fam">IPv4</span><a href="#" id="myV4">—</a><span class="pref" id="v4Pref"></span></div>
   </div>
 
   <div class="err" id="errBox"></div>
@@ -426,8 +434,7 @@ input{font-family:inherit}
       </div>
 
       <div class="block gray">
-        <div class="sec-title" style="padding-top:8px">位置</div>
-        <div id="locList"></div>
+        <div id="locList" style="padding-top:6px"></div>
       </div>
 
       <div class="block gray">
@@ -915,7 +922,12 @@ const myIpState={v4:"",v6:"",primary6:false};
 function renderMyIp(){
   const bind=(id,ip)=>{const el=$(id);el.textContent=ip||"";el.onclick=ip?e=>{e.preventDefault();runQuery(ip,false)}:null};
   bind("myV4",myIpState.v4);bind("myV6",myIpState.v6);
-  $("v6Pref").textContent=(myIpState.v6&&myIpState.primary6)?"IPv6优先":"";
+  $("rowV4").style.display=myIpState.v4?"flex":"none";
+  $("rowV6").style.display=myIpState.v6?"flex":"none";
+  $("rowV6").style.order=myIpState.primary6?"1":"2";
+  $("rowV4").style.order=myIpState.primary6?"2":"1";
+  $("v6Pref").textContent=(myIpState.v6&&myIpState.primary6)?"优先":"";
+  $("v4Pref").textContent=(myIpState.v4&&!myIpState.primary6)?"优先":"";
 }
 function setMyIp(ip,primary){
   if(!ip)return;
