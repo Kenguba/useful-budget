@@ -72,7 +72,7 @@ input{font-family:inherit}
   box-shadow:0 6px 24px rgba(31,78,110,.10);height:60px;display:flex;align-items:center;
   transition:box-shadow .3s var(--ease);
 }
-.searchbar:focus-within{box-shadow:0 8px 30px rgba(43,151,198,.28),0 0 0 3px rgba(43,151,198,.16)}
+.searchbar:focus-within{box-shadow:0 10px 34px rgba(43,151,198,.16),0 2px 12px rgba(43,151,198,.07)}
 .searchbar input{
   flex:1;min-width:0;border:none;outline:none;background:transparent;height:100%;
   font-size:19px;color:var(--ink-2);text-align:center;letter-spacing:.02em;padding:0 128px 0 60px;
@@ -1038,7 +1038,6 @@ function fillAltFamily(primary){
 
 /* ---------- 交互 ---------- */
 $("searchForm").addEventListener("submit",e=>{e.preventDefault();runQuery($("ipInput").value,false)});
-$("ipInput").addEventListener("focus",e=>e.target.select());
 function fitInputFont(){const v=$("ipInput").value||"";const n=v.length;$("ipInput").style.fontSize=n<=15?"":n<=24?"16.5px":n<=32?"14.5px":"13px"}
 $("ipInput").addEventListener("input",fitInputFont);
 $("eyeBtn").addEventListener("click",()=>{
