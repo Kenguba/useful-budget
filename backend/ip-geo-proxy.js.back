@@ -1,0 +1,35 @@
+// ============================================================
+// IP 地理多源代理 ip-geo-proxy 的源码留档副本。
+// 真正运行的是部署在 Cloudflare（站长账号）上的 Worker
+// 「ip-geo-proxy」（版本 3b744aca），绑精确路由
+// ip.xxxxx.asia/api/geo*（精确路由优先于通配路由，不影响 ip 站页面本身）。
+// 作用：ip-check 页面的位置多源补充——服务端聚合 Cloudflare Radar、
+// DB-IP、IP2Location、MaxMind(GeoLite2) 四家地理库，各家 key 只存
+// Worker secret（RADAR_TOKEN / DBIP_KEY / IP2L_KEY / MM_ACCOUNT /
+// MM_KEY），不进前端；结果按 IP 在边缘缓存 24 小时。
+// 各源无数据或未配置时对应字段为 null，前端自动跳过不显示。
+// 同步规则：线上代码有任何改动，先部署到 Cloudflare，再同步回本文件。
+// ============================================================
+export default {
+ async fetch(request, env, ctx) {
+  const url = new URL(request.url);
+  if (url.pathname !== "/api/geo") return new Response("Not Found", { status: 404 });
+  const ip = url.searchParams.get("ip") || "";
+  if (!/^[0-9a-fA-F.:]+$/.test(ip)) return json({ error: "bad ip" }, 400);
+  const cache = caches.default; const ck = new Request(url.toString() + "&v=2", request);
+  const hit = await cache.match(ck); if (hit) return hit;
+  const out = { ip: ip, sources: {} };
+  const norm = o => (o && (o.cc || o.country)) ? o : null;
+  const J = async (u, h) => { const r = await fetch(u, { headers: h || {} }); if (!r.ok) throw new Error("upstream"); return r.json(); };
+  const tasks = [];
+  if (env.RADAR_TOKEN) tasks.push(J("https://api.cloudflare.com/client/v4/radar/entities/ip?ip=" + encodeURIComponent(ip), { Authorization: "Bearer " + env.RADAR_TOKEN }).then(j => { const r = (j && j.result && j.result.ip) || {}; out.sources.cloudflare = norm({ cc: r.location || "", country: r.locationName || "", region: "", city: "" }); }).catch(() => { out.sources.cloudflare = null; })); else out.sources.cloudflare = null;
+  if (env.DBIP_KEY) tasks.push(J("https://api.db-ip.com/v2/" + env.DBIP_KEY + "/" + encodeURIComponent(ip)).then(j => { out.sources.dbip = norm({ cc: j.countryCode || "", country: j.countryName || "", region: j.stateProv || "", city: j.city || "" }); }).catch(() => { out.sources.dbip = null; })); else out.sources.dbip = null;
+  if (env.IP2L_KEY) tasks.push(J("https://api.ip2location.io/?key=" + env.IP2L_KEY + "&ip=" + encodeURIComponent(ip)).then(j => { out.sources.ip2location = norm({ cc: j.country_code || "", country: j.country_name || "", region: j.region_name || "", city: j.city_name || "" }); }).catch(() => { out.sources.ip2location = null; })); else out.sources.ip2location = null;
+  if (env.MM_ACCOUNT && env.MM_KEY) tasks.push(J("https://geolite.info/geoip/v2.1/country/" + encodeURIComponent(ip), { Authorization: "Basic " + btoa(env.MM_ACCOUNT + ":" + env.MM_KEY) }).then(j => { const c = (j && j.country) || {}; out.sources.maxmind = norm({ cc: c.iso_code || "", country: (c.names && c.names.en) || "", region: "", city: "" }); }).catch(() => { out.sources.maxmind = null; })); else out.sources.maxmind = null;
+  await Promise.all(tasks);
+  const resp = json(out, 200); resp.headers.set("Cache-Control", "public, max-age=86400");
+  ctx.waitUntil(cache.put(ck, resp.clone()));
+  return resp;
+ }
+};
+function json(o, s) { return new Response(JSON.stringify(o), { status: s || 200, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }); }
