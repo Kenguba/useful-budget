@@ -54,7 +54,8 @@ h1{font-size:24px;margin:9px 0 5px;font-weight:800;letter-spacing:-.01em}
 .leader .g{font-size:12px;font-weight:700;color:#27272a;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:34px}
 .leader .lrow{display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-top:1px solid var(--line);margin-top:10px;padding-top:9px}
 .leader .p{font-size:17px;font-weight:800;color:var(--blue);white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.leader .s{font-size:11px;color:var(--mut2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.leader .s{font-size:11px;color:var(--mut2);white-space:nowrap;overflow:hidden;min-width:0}
+.leader .s.fade{-webkit-mask-image:linear-gradient(90deg,#000 75%,transparent 98%);mask-image:linear-gradient(90deg,#000 75%,transparent 98%)}
 .yen{font-size:.68em;font-weight:700;margin-right:1px}
 #groups{display:grid;grid-template-columns:1fr;gap:16px;align-items:start}
 @media(min-width:1024px){#groups{grid-template-columns:1fr 1fr}}
@@ -227,6 +228,7 @@ function renderBoard(){
     const it=g.items[0];
     return '<div class="leader" data-gid="'+esc(g.id)+'"><div class="g">'+esc(g.name)+'</div><div class="lrow">'+(it?'<span class="p">'+fmtP(it.price)+'</span><span class="s">'+esc(it.shop)+'</span>':'<span class="p">—</span>')+'</div></div>';
   }).join('');
+  fitLeaderShops();
   $('#groups').innerHTML=board.groups.map((g,gi)=>{
     let shown=0;
     const rows=g.items.map((it,ii)=>{
@@ -266,7 +268,20 @@ function switchTab(shopsView){
   $('#chips').classList.toggle('hide',!shopsView);
   if(shopsView&&!shops)renderShops();
   if(!shopsView)$('#leaders').style.display=$('#q').value.trim()?'none':'';
+  if(!shopsView)fitLeaderShops();
 }
+/* 总览卡店名：先自动缩小字号尽量显全（11→9px，0.5 步进），缩到最小仍放不下才加渐隐 */
+function fitLeaderShops(){
+  document.querySelectorAll('.leader .s').forEach(el=>{
+    el.classList.remove('fade');
+    el.style.fontSize='';
+    let size=11;
+    while(el.clientWidth>0&&el.scrollWidth>el.clientWidth&&size>9){ size-=0.5; el.style.fontSize=size+'px'; }
+    if(el.clientWidth>0&&el.scrollWidth>el.clientWidth)el.classList.add('fade');
+  });
+}
+let leaderRsz;
+window.addEventListener('resize',()=>{ clearTimeout(leaderRsz); leaderRsz=setTimeout(fitLeaderShops,150); });
 /* 同源店铺弹窗：单一状态源 + 打开/关闭生命周期（遮罩/Esc/焦点还原/inert/减少动态），样式与交互语言对齐 daymark 弹窗规范 */
 const srcOverlay=$('#srcOverlay'), srcSheet=$('#srcSheet'), pageWrap=document.querySelector('.wrap');
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
