@@ -257,7 +257,7 @@ body.dark .divider{border-top-color:rgba(255,255,255,.12)}
 .otp-code{
   flex:1;min-width:0;background:var(--card-bg-solid);border:1px solid var(--input-border);border-right:none;
   border-radius:.9rem 0 0 .9rem;padding:.6rem .9rem;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:1.25rem;font-weight:700;letter-spacing:.22em;color:var(--text-primary);
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:1.25rem;font-weight:700;letter-spacing:.22em;color:var(--text-primary);user-select:none;-webkit-user-select:none;line-height:1.45;
 }
 .btn-copy{
   background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border-radius:0 .9rem .9rem 0;padding:.6rem 1rem;
@@ -638,7 +638,7 @@ async function renderOtpCodes(force){
   otpList.innerHTML = secrets.map((s, i) =>
     '<div class="otp-row">' +
       '<div class="otp-field"><label>' + t.codeLabel + (secrets.length > 1 && s.title ? ' · ' + escapeHtml(shortTitle(s.title)) : '') + '</label>' +
-        '<div class="otp-code-group"><input class="otp-code" readonly value="' + codes[i] + '" aria-label="' + t.codeLabel + '">' +
+        '<div class=\"otp-code-group\"><div class=\"otp-code\">' + codes[i] + '</div>' +
         '<button type="button" class="btn-copy" data-code="' + codes[i] + '">' + ICONS.copy + '<span>' + t.copyBtn + '</span></button></div></div>' +
     '</div>'
   ).join('');
