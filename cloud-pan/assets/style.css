@@ -245,9 +245,12 @@ details.about summary{cursor:pointer;color:#374151;font-weight:600}
 .contact-card .cc-x{border:none;background:none;color:var(--faint);font-size:15px;line-height:1;padding:2px}
 .contact-card img{width:128px;height:128px;object-fit:cover;border-radius:8px}
 .contact-card .cc-c{color:var(--mut);font-size:12.5px;margin-top:9px;line-height:1.6}
-.contact-mini{position:fixed;right:18px;bottom:40px;z-index:40;background:var(--blue);color:#fff;border:none;border-radius:999px;
-  padding:14px 10px;font-size:13px;font-weight:700;line-height:1.35;letter-spacing:2px;writing-mode:vertical-rl;text-orientation:upright;
-  box-shadow:0 8px 24px rgba(37,99,235,.35);cursor:move;user-select:none;-webkit-user-select:none;touch-action:none}
+/* 贴边低层级标签（大厂侧边工具条做法：白底灰字、细边框、弱阴影，不抢主内容） */
+.contact-mini{position:fixed;right:0;bottom:40px;z-index:40;background:rgba(255,255,255,.94);color:#4b5563;
+  border:1px solid rgba(15,23,42,.08);border-right:none;border-radius:12px 0 0 12px;
+  padding:12px 7px;font-size:12px;font-weight:500;line-height:1.4;letter-spacing:2px;writing-mode:vertical-rl;text-orientation:upright;
+  box-shadow:0 2px 10px rgba(15,23,42,.08);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;opacity:.92}
+.contact-mini:hover,.contact-mini:active{opacity:1}
 
 /* ---------- 公告弹窗 / 对话框 ---------- */
 .overlay{position:fixed;inset:0;background:rgba(17,24,39,.45);z-index:80;display:none;align-items:center;justify-content:center;padding:18px}
@@ -278,8 +281,8 @@ details.about summary{cursor:pointer;color:#374151;font-weight:600}
   .btn-app{margin-left:4px;padding:6px 13px;font-size:13px}
   /* 手机端隐藏「求片」按钮（ken 2026-11-03 定，全站外壳共用、一处生效） */
   .btn-ask{display:none}
-  /* 「保持联系」浮钮手机端缩小并贴右边吸附 */
-  .contact-mini{right:0;bottom:110px;padding:9px 5px;font-size:11px;letter-spacing:1px;border-radius:10px 0 0 10px;opacity:.94}
+  /* 「保持联系」浮钮：全站统一默认位置（贴右边缘、距底 36px），低层级白底灰字 */
+  .contact-mini{right:0;bottom:36px;padding:10px 5px;font-size:11px;letter-spacing:1px;border-radius:10px 0 0 10px}
   .contact-card{right:8px;width:152px;padding:12px}
   .contact-card img{width:112px;height:112px}
 }

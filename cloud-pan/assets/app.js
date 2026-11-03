@@ -258,7 +258,7 @@
       if (q) location.href = BASE + "search/?q=" + encodeURIComponent(q);
     };
 
-    // 右侧联系卡（默认竖排可拖拽按钮，点击展开图1）
+    // 右侧联系卡（贴边竖排低层级标签，位置全站固定、不可拖拽，点击展开图1）
     if (pres.contact_image) {
       var cc =
         '<div class="contact-card" id="contactCard" style="display:none"><div class="cc-t"><span>保持联系</span>' +
@@ -268,32 +268,7 @@
         '<button class="contact-mini" id="contactMini">保持联系</button>';
       document.body.insertAdjacentHTML("beforeend", cc);
       var mini = document.getElementById("contactMini"), card = document.getElementById("contactCard");
-      var sx, sy, sl, st, moved;
-      mini.onpointerdown = function (e) {
-        sx = e.clientX; sy = e.clientY;
-        var r = mini.getBoundingClientRect();
-        sl = r.left; st = r.top; moved = false;
-        try { mini.setPointerCapture(e.pointerId); } catch (_) {}
-        function onMove(ev) {
-          var dx = ev.clientX - sx, dy = ev.clientY - sy;
-          if (!moved && Math.hypot(dx, dy) > 4) moved = true;
-          if (moved) {
-            mini.style.left = Math.max(0, Math.min(window.innerWidth - mini.offsetWidth, sl + dx)) + "px";
-            mini.style.top = Math.max(0, Math.min(window.innerHeight - mini.offsetHeight, st + dy)) + "px";
-            mini.style.right = "auto"; mini.style.bottom = "auto";
-          }
-        }
-        function onUp(ev) {
-          try { mini.releasePointerCapture(ev.pointerId); } catch (_) {}
-          window.removeEventListener("pointermove", onMove);
-          window.removeEventListener("pointerup", onUp);
-          window.removeEventListener("pointercancel", onUp);
-          if (!moved) { card.style.display = "block"; mini.style.display = "none"; }
-        }
-        window.addEventListener("pointermove", onMove);
-        window.addEventListener("pointerup", onUp);
-        window.addEventListener("pointercancel", onUp);
-      };
+      mini.onclick = function () { card.style.display = "block"; mini.style.display = "none"; };
       document.getElementById("ccClose").onclick = function () {
         card.style.display = "none"; mini.style.display = "block";
       };
