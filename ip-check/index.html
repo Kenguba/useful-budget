@@ -218,7 +218,7 @@ input{font-family:inherit}
 .expand-btn svg{width:22px;height:22px;stroke:#a6aeb6;transition:transform .45s var(--ease)}
 .more-open .expand-btn svg{transform:rotate(180deg)}
 
-.foot{margin-top:20px;text-align:center;color:#93a1ad;font-size:13px;line-height:1.7;padding:0 12px}
+.foot{margin-top:20px;text-align:center;color:#9aa7b1;font-size:12px;line-height:1.9;letter-spacing:.02em;padding:0 12px}
 .foot a{color:var(--blue);text-decoration:none}
 .err{
   display:none;margin-top:14px;background:#fff3f4;border:1px solid #ffd7de;color:#c2334b;
@@ -563,7 +563,7 @@ input{font-family:inherit}
     <div style="height:12px"></div>
   </section>
 
-  <p class="foot">全部数据实时查询：定位多源共识（ipwho.is / ipinfo.io / ipapi.co / RIPEstat）、ASN 与 WHOIS 与路由历史与 BGP 邻居（RIPEstat）、黑名单（DNSBL 实时查询）。纯净度为本站按真实信号（类型 / 黑名单 / rDNS / 注册地一致性）透明计算，公式写在展开区「检测说明」。<br>本站无广告、无追踪脚本。IPPure 风格复刻，部署于 useful-budget / ip-check。</p>
+  <p class="foot">定位多源共识 · RIPEstat 路由与 WHOIS · DNSBL 黑名单<br>纯净度按真实信号透明计算，公式见「检测说明」<br>本站无广告、无追踪脚本</p>
 </main>
 
 <div class="flash" id="flash"></div>
@@ -692,15 +692,17 @@ function computeScore(d,cls,bl){
 
 /* ---------- 渲染 ---------- */
 function render(d){
-  state.data=d;state.ipVisible=true;state.numVisible=true;
+  state.data=d;
   $("ipInput").value=d.ip;
   $("fIp").textContent=d.ip;
   $("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>";
   if(state.ipVisible===false){$("fIp").textContent=isIPv4(d.ip)?"***.***.***.***":"****:****:****:****";$("fIp").classList.add("masked");$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}else{$("fIp").classList.remove("masked")}
+  const asnTxt=(d.asn||"")+(d.asnName?" - "+d.asnName:"");
+  const wantFs=asnTxt.length>40?14.5:asnTxt.length>30?15.5:16.5;
+  if(state.asnFs==null||wantFs<state.asnFs)state.asnFs=wantFs;
+  document.querySelector(".asn-head .name").style.fontSize=state.asnFs+"px";
   $("fAsn").textContent=d.asn||"—";
   $("fAsnName").textContent=d.asnName?" - "+d.asnName:"";
-  const asnLen=($("fAsn").textContent+$("fAsnName").textContent).length;
-  document.querySelector(".asn-head .name").style.fontSize=asnLen>40?"14.5px":asnLen>30?"15.5px":"16.5px";
   fitIpFont();
   $("fAsDomain").textContent=d.domain||d.netname||"—";
   $("fRange").textContent=d.range||"—";
@@ -799,6 +801,7 @@ function consensusLoc(srcs){
 }
 async function runQuery(ip,selfMode){
   const seq=++state.querySeq;
+  state.asnFs=null;state.ipVisible=true;state.numVisible=true;
   ip=(ip||"").trim();
   if(ip&&!/^[0-9a-fA-F.:]+$/.test(ip)){$("errBox").textContent="请输入有效的 IP 地址（IPv4 或 IPv6）。";$("errBox").className="err show";return}
   setBusy(true);
