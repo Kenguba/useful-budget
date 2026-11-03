@@ -220,11 +220,20 @@ input{font-family:inherit}
 
 .foot{margin-top:20px;text-align:center;color:#9aa7b1;font-size:12px;line-height:1.9;letter-spacing:.02em;padding:0 12px}
 .foot a{color:var(--blue);text-decoration:none}
-.err{
-  display:none;margin-top:14px;background:#fff3f4;border:1px solid #ffd7de;color:#c2334b;
-  border-radius:12px;padding:12px 16px;font-size:14px;
+.errbar{
+  position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,16px);
+  width:min(640px,calc(100vw - 24px));background:#f1f2f6;color:#3c4043;z-index:100;
+  border-radius:20px;padding:14px 18px;display:flex;align-items:center;gap:14px;
+  box-shadow:0 10px 30px rgba(31,38,135,.16);opacity:0;pointer-events:none;
+  transition:opacity .3s var(--ease),transform .3s var(--ease);
 }
-.err.show{display:block;animation:cardIn .4s var(--ease) both}
+.errbar.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.errbar-msg{flex:1;font-size:15px;line-height:1.5;min-width:0}
+.errbar-close{
+  flex:none;background:none;border:none;outline:none;cursor:pointer;
+  color:#1a66d2;font-size:15px;font-weight:600;padding:4px 2px;font-family:inherit;
+}
+.errbar-close:active{opacity:.6}
 .toast{
   position:fixed;left:50%;bottom:38px;transform:translate(-50%,20px);background:rgba(28,32,38,.92);color:#fff;
   font-size:14px;padding:10px 20px;border-radius:999px;opacity:0;pointer-events:none;z-index:99;
@@ -404,7 +413,6 @@ input{font-family:inherit}
   </div>
   </div>
 
-  <div class="err" id="errBox"></div>
 
   <section class="card" id="card">
     <div class="fade-zone" id="fadeZone">
@@ -579,6 +587,7 @@ input{font-family:inherit}
 
 <div class="flash" id="flash"></div>
 <div class="toast" id="toast"></div>
+<div class="errbar" id="errBar"><span class="errbar-msg" id="errBarMsg"></span><button class="errbar-close" id="errBarClose" type="button">关闭</button></div>
 
 <script>
 "use strict";
@@ -764,7 +773,7 @@ function render(d,final){
   $("fNumIp").dataset.num=num!=null?String(num):"—";$("fNumIp").textContent=state.numVisible?$("fNumIp").dataset.num:"********";syncNumEye();
   $("sceneGrid").innerHTML=d.scenes.map(s=>"<div class='scene'><div class='nm'>"+s[0]+"</div><div class='stars'>"+starsHtml(s[1])+"</div><div class='suit "+suitCls(s[1])+"'>"+suitIcon(s[1])+" <b>"+suitText(s[1])+"</b></div></div>").join("");
   if(d.histAsn)renderExtra(d);
-  $("card").classList.remove("loading");$("errBox").className="err";
+  $("card").classList.remove("loading");hideErr();
 }
 function histItem(h){
   const meta=[];
@@ -819,7 +828,7 @@ async function runQuery(ip,selfMode){
   const seq=++state.querySeq;
   state.asnFs=null;state.ipVisible=true;state.numVisible=true;
   ip=(ip||"").trim();
-  if(ip&&!/^[0-9a-fA-F.:]+$/.test(ip)){$("errBox").textContent="请输入有效的 IP 地址（IPv4 或 IPv6）";$("errBox").className="err show";return}
+  if(ip&&!/^[0-9a-fA-F.:]+$/.test(ip)){showErr("请输入有效的 IP 地址（IPv4 或 IPv6）");return}
   setBusy(true);
   try{
     const[srcs,net]=await Promise.all([
@@ -934,7 +943,7 @@ async function runQuery(ip,selfMode){
       renderDetails(d);
     });
   }catch(e){
-    $("errBox").textContent="查询失败：实时数据源暂不可达，请稍后重试";$("errBox").className="err show";
+    showErr("查询失败：实时数据源暂不可达，请稍后重试");
   }finally{if(seq===state.querySeq){if(state.asnPaintedSeq!==seq&&state.data)paintAsnHead(state.data);setBusy(false)}}
 }
 function applyType(d){
@@ -953,6 +962,9 @@ function applyType(d){
   d.scenes=[["TikTok",tk],["跨境电商",ec],["社媒运营",sm],["AI 应用",ai]];
   if(d.cls&&d.cls.vpn)d.scenes=d.scenes.map(s=>[s[0],Math.max(1,s[1]-1)]);
 }
+function showErr(msg){$("errBarMsg").textContent=msg;$("errBar").classList.add("show")}
+function hideErr(){$("errBar").classList.remove("show")}
+$("errBarClose").addEventListener("click",hideErr);
 function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove("show"),1800)}
 function setBusy(b){state.busy=b;$("searchBtn").disabled=b;$("searchBtn").textContent=b?"检测中…":"Search";$("card").classList.toggle("loading",b)}
 const myIpState={v4:"",v6:"",primary6:false};
