@@ -238,14 +238,15 @@ body.dark .divider{border-top-color:rgba(255,255,255,.12)}
 .countdown-ring .ring-bg{stroke:var(--accent-soft)}
 .countdown-ring .ring-fg{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset 1s linear}
 .otp-row{
-  display:grid;grid-template-columns:minmax(210px,1.1fr) 92px minmax(200px,1.6fr);gap:1rem;align-items:end;
+  display:block;width:100%;min-width:0;
   padding:1rem;border-radius:1.1rem;background:var(--input-bg);border:1px solid var(--border-card);
   margin-bottom:.8rem;animation:rowIn .45s var(--ease-out) both;
 }
 .otp-row:nth-child(2){animation-delay:.05s}.otp-row:nth-child(3){animation-delay:.1s}.otp-row:nth-child(4){animation-delay:.15s}
 @keyframes rowIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+.otp-field{min-width:0}
 .otp-field label{display:block;font-size:.78rem;font-weight:500;color:var(--text-muted);margin-bottom:.35rem}
-.otp-code-group{display:flex}
+.otp-code-group{display:flex;width:100%;max-width:100%}
 .otp-code{
   flex:1;min-width:0;background:var(--card-bg-solid);border:1px solid var(--input-border);border-right:none;
   border-radius:.9rem 0 0 .9rem;padding:.6rem .9rem;
@@ -259,14 +260,6 @@ body.dark .divider{border-top-color:rgba(255,255,255,.12)}
 .btn-copy:hover{filter:brightness(1.08)}
 .btn-copy:active{transform:scale(.96)}
 .btn-copy.copied{background:var(--accent)}
-.otp-timer{text-align:center;padding-bottom:.55rem;color:var(--text-secondary);font-variant-numeric:tabular-nums}
-.otp-timer .t-num{font-size:1.05rem;font-weight:700}
-.otp-timer .t-unit{font-size:.75rem;color:var(--text-muted)}
-.otp-secret{
-  width:100%;background:var(--card-bg-solid);border:1px solid var(--input-border);border-radius:.9rem;
-  padding:.68rem .9rem;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.85rem;color:var(--text-secondary);
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
 .otp-progress{height:4px;border-radius:99px;background:var(--accent-soft);overflow:hidden;margin:-.2rem 0 1rem}
 .otp-progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-violet));border-radius:99px;transition:width 1s linear}
 .otp-empty{font-size:.875rem;color:var(--danger);margin-top:.6rem;display:none}
@@ -297,7 +290,6 @@ body.dark .divider{border-top-color:rgba(255,255,255,.12)}
 @keyframes toastOut{to{opacity:0;transform:translateX(24px)}}
 
 /* ============ 9. Responsive ============ */
-@media (max-width:900px){.otp-row{grid-template-columns:1fr 70px}.otp-field.secret{grid-column:1/-1}}
 @media (max-width:768px){
   body{overflow:auto}
   .shell{flex-direction:column;height:auto;min-height:100dvh;overflow:visible}
@@ -309,7 +301,11 @@ body.dark .divider{border-top-color:rgba(255,255,255,.12)}
   .main-title{font-size:1.45rem}
   .logo-text{font-size:1.4rem}
   .otp-row{grid-template-columns:1fr}
-  .otp-timer{text-align:left;padding-bottom:0}
+  }
+@media (max-width:480px){
+  .otp-code{font-size:1.05rem;letter-spacing:.1em}
+  .btn-copy{padding:.6rem .8rem}
+  .otp-row{padding:.85rem}
 }
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
@@ -373,10 +369,6 @@ body.dark .divider{border-top-color:rgba(255,255,255,.12)}
           <button class="btn-primary" id="btnGet" type="submit" disabled>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4.5"/><path d="m11.2 11.8 8.3-8.3M17 5l3 3M14 8l2.5 2.5"/></svg>
             <span data-i18n="getCodeBtn">获取验证码</span>
-          </button>
-          <button class="btn-ghost" id="btnExample" type="button">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
-            <span data-i18n="demoBtn">填入演示密钥</span>
           </button>
         </div>
         <p class="otp-empty" id="otpEmpty" data-i18n="emptyTip">没有识别到有效的 2FA 密钥，请检查格式（Base32 密钥，或每行 UID|密码|2FA|...）</p>
@@ -482,8 +474,8 @@ const i18n = {
       '2faLabel':'2FA双重验证码/二步验证码获取工具（谷歌身份验证器的网页版）',
       '2faPlaceholder':'在这里输入完整的2FA密钥，可多个/每行一个',
       '2faHint':'也可以输入完整格式：UID|密码|2FA|邮箱|邮箱密码... 每行1个账户',
-      getCodeBtn:'获取验证码', demoBtn:'填入演示密钥', maskKey:'隐藏密钥',
-      otpFrom:'来自2FA的信息', refreshIn:'刷新倒计时', codeLabel:'验证码', timeLabel:'时间', secretLabel:'2FA', copyBtn:'复制', copiedBtn:'已复制',
+      getCodeBtn:'获取验证码', maskKey:'隐藏密钥',
+      otpFrom:'来自2FA的信息', refreshIn:'刷新倒计时', codeLabel:'验证码', copyBtn:'复制', copiedBtn:'已复制',
       emptyTip:'没有识别到有效的 2FA 密钥，请检查格式（Base32 密钥，或每行 UID|密码|2FA|...）',
       usageTitle:'使用说明',
       usageDesc1:'2FA双重验证（Two-factor authentication）是保障账户安全的重要机制，在登录时除密码外还需输入动态验证码',
@@ -497,8 +489,8 @@ const i18n = {
       '2faLabel':'Two-factor Authentication (Web version of Google Authenticator)',
       '2faPlaceholder':'Enter full 2FA secrets, one per line',
       '2faHint':'Format: UID|password|2FA|email|emailPwd... one per line',
-      getCodeBtn:'Get Codes', demoBtn:'Load demo secret', maskKey:'Mask keys',
-      otpFrom:'Codes from 2FA', refreshIn:'Refresh in', codeLabel:'Code', timeLabel:'Time', secretLabel:'2FA', copyBtn:'Copy', copiedBtn:'Copied',
+      getCodeBtn:'Get Codes', maskKey:'Mask keys',
+      otpFrom:'Codes from 2FA', refreshIn:'Refresh in', codeLabel:'Code', copyBtn:'Copy', copiedBtn:'Copied',
       emptyTip:'No valid 2FA secret found. Check the format (Base32 secret, or UID|password|2FA|... per line).',
       usageTitle:'Instructions',
       usageDesc1:'Two-factor authentication adds an extra layer of security. After password, enter a dynamic 6-digit code.',
@@ -582,7 +574,6 @@ const textarea  = document.getElementById('SECRET2FA');
 const btnGet    = document.getElementById('btnGet');
 const btnClear  = document.getElementById('btnClear');
 const btnMask   = document.getElementById('btnMask');
-const btnDemo   = document.getElementById('btnExample');
 const lineCount = document.getElementById('lineCount');
 const otpSection= document.getElementById('otpSection');
 const otpList   = document.getElementById('otpList');
@@ -603,7 +594,6 @@ textarea.addEventListener('input', () => { textarea.classList.remove('error'); o
 textarea.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ e.preventDefault(); document.getElementById('formSecret').requestSubmit(); } });
 btnClear.addEventListener('click', () => { textarea.value = ''; activated = false; otpSection.classList.remove('show'); otpList.innerHTML=''; lastSignature=''; updateMeta(); textarea.focus(); });
 btnMask.addEventListener('click', () => textarea.classList.toggle('masked'));
-btnDemo.addEventListener('click', () => { textarea.value = 'JBSWY3DPEHPK3PXP'; updateMeta(); textarea.focus(); });
 
 document.getElementById('formSecret').addEventListener('submit', e => {
   e.preventDefault();
@@ -643,8 +633,6 @@ async function renderOtpCodes(force){
       '<div class="otp-field"><label>' + t.codeLabel + (secrets.length > 1 && s.title ? ' · ' + escapeHtml(shortTitle(s.title)) : '') + '</label>' +
         '<div class="otp-code-group"><input class="otp-code" readonly value="' + codes[i] + '" aria-label="' + t.codeLabel + '">' +
         '<button type="button" class="btn-copy" data-code="' + codes[i] + '">' + ICONS.copy + '<span>' + t.copyBtn + '</span></button></div></div>' +
-      '<div class="otp-field"><label>' + t.timeLabel + '</label><div class="otp-timer">' + ICONS.clock.replace('<svg','<svg style="display:inline;vertical-align:-2px;margin-right:4px"') + '<span class="t-num" data-remain>' + remain + '</span><span class="t-unit">s</span></div></div>' +
-      '<div class="otp-field secret"><label>' + t.secretLabel + '</label><div class="otp-secret" title="' + s.secret + '">' + s.secret + '</div></div>' +
     '</div>'
   ).join('');
   otpSection.classList.add('show');
