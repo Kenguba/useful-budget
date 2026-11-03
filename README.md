@@ -48,7 +48,7 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 
 **主域名（`xxxxx.asia`，无前缀）= 全站总体预览页**：打开主域名就是根目录导航页 `index.html`（「便宜、有用的，都在这」），与 `kenguba.github.io/useful-budget/` 内容一致，不给任何单个项目占用。主域名不走通配，须单独配 DNS 与路由（见 `backend/README.md` 迁移清单）。
 
-五个项目各有一个子域名入口，经 Cloudflare Worker 转发到本仓库对应的 Pages 目录，与 `kenguba.github.io/useful-budget/<project>/` 内容一致：
+六个项目各有一个子域名入口，经 Cloudflare Worker 转发到本仓库对应的 Pages 目录，与 `kenguba.github.io/useful-budget/<project>/` 内容一致：
 
 | 项目 | 子域名 |
 | --- | --- |
@@ -58,6 +58,7 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 | `cloud-phone/` | `phone.xxxxx.asia` |
 | `cloud-pan/` | `pan.xxxxx.asia` |
 | `ip-check/` | `ip.xxxxx.asia` |
+| `2fa-auth/` | `2fa.xxxxx.asia` |
 
 完整域名不写入本仓库（公开仓库，避免暴露站长域名）；解析与 Worker 配置在站长的 Cloudflare 账号里维护。全部后端 Worker 的源码留档统一放在仓库根目录的 `backend/` 里（说明见 `backend/README.md`）（`backend-proxy.js.back`、`site-router.js.back`、`jpcard.js.back`），迁移时直接取用，配套的通配 DNS/路由配置清单写在 site-router 留档的文件头。
 
