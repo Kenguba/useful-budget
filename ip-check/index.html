@@ -267,9 +267,9 @@ input{font-family:inherit}
 .scene:nth-child(1),.scene:nth-child(2){border-bottom:1px solid #eceff1}
 .scene .nm{font-size:15px;color:var(--ink-2);margin-bottom:5px}
 .scene .stars{color:#1da851;font-size:17px;letter-spacing:3px;line-height:1.2}
-.scene .stars .off{color:#d5dde2}
+.scene .stars .off{color:#a9cdb4}
 .scene .suit{margin-top:5px;font-size:14px;color:var(--ink-2)}
-.scene .suit b{color:#1d9d4e;font-weight:600}
+.scene .suit b{color:#1d9d4e;font-weight:600}.scene .suit.mid b{color:#cf8505}.scene .suit.bad b{color:#d23b3b}
 .kv .v:has(> #fNumIp){display:flex;align-items:center;gap:10px}
 .num-ip{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;font-size:16px}
 /* 历史 / 地图 / BGP / 同机房 */
@@ -627,8 +627,10 @@ function escapeHtml(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&
 function scoreLabel(s){return s<=10?"极度纯净":s<=25?"纯净":s<=40?"中性":s<=60?"有风险":s<=80?"风险较高":"高风险"}
 function badgeColor(s){return s<=40?"#6fbf2e":s<=60?"#f59a23":"#e05252"}
 function pillCls(s){return s<=25?"":s<=60?"warn":"bad"}
-function starsHtml(n){let h="";for(let i=1;i<=5;i++)h+=i<=n?"★":"<span class='off'>★</span>";return h}
-function suitText(n){return n>=5?"非常适合":n===4?"适合":n===3?"一般":n===2?"不太适合":"不适合"}
+function starsHtml(n){let h="";for(let i=1;i<=5;i++)h+=i<=n?"★":"<span class='off'>☆</span>";return h}
+function suitIcon(n){return n>=4?"✅":n===3?"⚠️":"❌"}
+function suitCls(n){return n>=4?"ok":n===3?"mid":"bad"}
+function suitText(n){return n>=5?"非常适合":n===4?"适合":n===3?"可以尝试":n===2?"不太适合":"不推荐"}
 async function fetchJSON(url,ms){
   const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),ms||7000);
   try{const r=await fetch(url,{signal:ctl.signal});if(!r.ok)throw new Error("http "+r.status);return await r.json()}
@@ -760,7 +762,7 @@ function render(d,final){
   paintLlm(d);
   const num=ipToBig(d.ip);
   $("fNumIp").dataset.num=num!=null?String(num):"—";$("fNumIp").textContent=state.numVisible?$("fNumIp").dataset.num:"********";syncNumEye();
-  $("sceneGrid").innerHTML=d.scenes.map(s=>"<div class='scene'><div class='nm'>"+s[0]+"</div><div class='stars'>"+starsHtml(s[1])+"</div><div class='suit'>✅ <b>"+suitText(s[1])+"</b></div></div>").join("");
+  $("sceneGrid").innerHTML=d.scenes.map(s=>"<div class='scene'><div class='nm'>"+s[0]+"</div><div class='stars'>"+starsHtml(s[1])+"</div><div class='suit "+suitCls(s[1])+"'>"+suitIcon(s[1])+" <b>"+suitText(s[1])+"</b></div></div>").join("");
   if(d.histAsn)renderExtra(d);
   $("card").classList.remove("loading");$("errBox").className="err";
 }
