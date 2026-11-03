@@ -1589,6 +1589,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC"
 .sub{color:var(--text-secondary);font-size:12.5px;line-height:1.65;padding:6px 2px}
 
 /* 店铺目录 */
+#viewShops{padding-top:12px}
 #chips{display:flex;gap:7px;margin:0 0 12px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 #chips::-webkit-scrollbar{display:none}
 #shopMeta{font-size:12px;color:var(--text-secondary);margin:0 0 10px;line-height:1.5}
@@ -1816,6 +1817,7 @@ function kindCls(k){
   return 'tag-gray';
 }
 let curCat='all';
+const userOpen=new Set();
 const GCAT=id=>id.indexOf('gpt-')===0?'GPT':id.indexOf('ag-')===0?'Antigravity':id.indexOf('codex-')===0?'Codex':id.indexOf('grok-')===0?'Grok':'Claude';
 const GICON={'gpt-unbound':'✦','gpt-bound':'✦','gpt-weekly':'✦','ag-cheapest':'✳','ag-verified':'✳','codex-sms':'⌘','grok-heavy':'✧','claude':'◈'};
 function renderBoard(){
@@ -1845,14 +1847,14 @@ function renderBoard(){
         return '<div class="real-offer-row" id="it-'+esc(g.id)+'-'+ii+'"><div class="offer-col-left"><span class="offer-price-val">'+fmtP(it.price)+'</span><span class="platform-source-badge">'+esc(it.platform)+'</span></div><div class="offer-col-mid"><div class="offer-item-title"><a data-anchor="it-'+esc(g.id)+'-'+ii+'" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div>'+(tagrow?'<div class="offer-badges-line">'+tagrow+'</div>':'')+'<div class="shoprow"><span class="shopname">'+esc(it.shop)+'</span><span class="stk">'+stockTxt(it)+'</span></div></div></div>';
       }).join('');
     if(q&&!shown) return '';
-    const first=g.items[0];
-    return '<div class="site-list-group open" id="grp-'+esc(g.id)+'"><button class="site-list-trigger" type="button" data-gtoggle aria-expanded="true"><span class="site-list-brand-icon">'+(GICON[g.id]||'✦')+'</span><span class="site-list-main"><span class="site-list-name">'+esc(g.name)+'</span><span class="site-list-detail" style="display:block">有货最低 '+g.items.length+' 条'+(g.items.length<30?'（不足 30 条，如实显示）':'')+'</span></span>'+(first?'<span class="site-list-minimum"><small>有货最低</small><strong>'+fmtP(first.price)+'</strong></span>':'')+'<span class="site-list-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="site-list-collapsible"><div class="site-list-inner"><div class="site-list-offers">'+rows+'</div></div></div></div>';
+    const first=g.items[0]; const open=searching||userOpen.has('grp-'+g.id);
+    return '<div class="site-list-group'+(open?' open':'')+'" id="grp-'+esc(g.id)+'"><button class="site-list-trigger" type="button" data-gtoggle aria-expanded="'+open+'"><span class="site-list-brand-icon">'+(GICON[g.id]||'✦')+'</span><span class="site-list-main"><span class="site-list-name">'+esc(g.name)+'</span><span class="site-list-detail" style="display:block">有货最低 '+g.items.length+' 条'+(g.items.length<30?'（不足 30 条，如实显示）':'')+'</span></span>'+(first?'<span class="site-list-minimum"><small>有货最低</small><strong>'+fmtP(first.price)+'</strong></span>':'')+'<span class="site-list-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="site-list-collapsible"><div class="site-list-inner"><div class="site-list-offers">'+rows+'</div></div></div></div>';
   }).join('')||'<p class="sub">'+(q?'没有匹配的报价。报价单只收录每组最低 30 条，找某家店请切到「店铺目录」搜。':'没有匹配的报价。')+'</p>';
   document.querySelectorAll('.leader').forEach(el=>{
     el.addEventListener('click',()=>{
       const t=document.getElementById('grp-'+el.dataset.gid);
       if(!t) return;
-      t.classList.add('open');
+      t.classList.add('open'); userOpen.add(t.id);
       const tr=t.querySelector('[data-gtoggle]'); if(tr)tr.setAttribute('aria-expanded','true');
       try{ history.pushState(null,'','#grp-'+el.dataset.gid); }catch(e){}
       t.scrollIntoView({behavior:'smooth',block:'start'});
@@ -1862,6 +1864,7 @@ function renderBoard(){
     btn.addEventListener('click',()=>{
       const grp=btn.closest('.site-list-group');
       const open=grp.classList.toggle('open');
+      if(open)userOpen.add(grp.id); else userOpen.delete(grp.id);
       btn.setAttribute('aria-expanded',String(open));
     });
   });
@@ -2016,7 +2019,7 @@ function jumpToHash(){
   const el=document.getElementById(id);
   if(!el) return;
   const grp=el.closest('.site-list-group');
-  if(grp){ grp.classList.add('open'); const tr=grp.querySelector('[data-gtoggle]'); if(tr)tr.setAttribute('aria-expanded','true'); }
+  if(grp){ grp.classList.add('open'); userOpen.add(grp.id); const tr=grp.querySelector('[data-gtoggle]'); if(tr)tr.setAttribute('aria-expanded','true'); }
   el.scrollIntoView({block:'start'});
 }
 window.addEventListener('hashchange',jumpToHash);
