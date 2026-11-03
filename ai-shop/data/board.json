@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-04 00:52",
+ "updated_at": "2026-11-04 01:02",
  "source": "AI价网 + cardnav + PriceAI 按商家遍历合并",
  "groups": [
   {
@@ -2937,6 +2937,32 @@
      ]
     },
     {
+     "price": 17.99,
+     "shop": "欧一",
+     "platform": "16688",
+     "stock": 30,
+     "title": "UPI 仅反代无账密 PLUS已接马 401可刷新|格式可选 质保1h首次导入 质保过期无售后",
+     "url": "https://16688.com.cn/goods/G90193442",
+     "kind": "",
+     "same_source": 6,
+     "sources": [
+      {
+       "price": 17.99,
+       "shop": "欧一",
+       "platform": "16688",
+       "stock": 30,
+       "url": "https://16688.com.cn/goods/G90193442"
+      },
+      {
+       "price": 18.02,
+       "shop": "一梦AI货源 招代理 对接马yimeng",
+       "platform": "16688",
+       "stock": 30,
+       "url": "https://www.16688.com.cn/goods/G47051845"
+      }
+     ]
+    },
+    {
      "price": 18.0,
      "shop": "梦泽AI",
      "platform": "链动小铺",
@@ -2961,10 +2987,10 @@
        "url": "https://wzyp.cn/item/nfzysg"
       },
       {
-       "price": 18.5,
+       "price": 18.03,
        "shop": "牟利ai",
        "platform": "链动小铺",
-       "stock": 22,
+       "stock": 46,
        "url": "https://wzyp.cn/item/29b2l0"
       },
       {
@@ -3208,32 +3234,6 @@
      ]
     },
     {
-     "price": 18.02,
-     "shop": "一梦AI货源 招代理 对接马yimeng",
-     "platform": "16688",
-     "stock": 30,
-     "title": "UPI 仅反代无账密 PLUS已接马 401可刷新|格式可选 质保1h首次导入  质保过期无售后",
-     "url": "https://www.16688.com.cn/goods/G47051845",
-     "kind": "",
-     "same_source": 6,
-     "sources": [
-      {
-       "price": 18.02,
-       "shop": "一梦AI货源 招代理 对接马yimeng",
-       "platform": "16688",
-       "stock": 30,
-       "url": "https://www.16688.com.cn/goods/G47051845"
-      },
-      {
-       "price": 18.02,
-       "shop": "星陨AI",
-       "platform": "16688",
-       "stock": 30,
-       "url": "https://16688.com.cn/goods/G96922839"
-      }
-     ]
-    },
-    {
      "price": 18.19,
      "shop": "精选好货AI",
      "platform": "链动小铺",
@@ -3392,7 +3392,7 @@
        "price": 18.5,
        "shop": "AI搬运工",
        "platform": "16688",
-       "stock": 43,
+       "stock": 46,
        "url": "https://16688.com.cn/goods/G45280072"
       },
       {
@@ -3760,7 +3760,7 @@
      "price": 19.0,
      "shop": "好又来",
      "platform": "16688",
-     "stock": 4,
+     "stock": 3,
      "title": "（源头）plus成品-已接马-新开UPI（质保首登）耐活号，非日抛（账密2fa发货）推荐指数：⭐⭐⭐⭐⭐",
      "url": "https://www.16688.com.cn/goods/G55568423",
      "kind": "",
@@ -3882,7 +3882,7 @@
      "price": 22.8,
      "shop": "AI原厂服务商",
      "platform": "16688",
-     "stock": 3,
+     "stock": 4,
      "title": "自营- Plus 成品号 未接马  张密2FA发货 （upi渠道  周限号，没有5小时限制。）",
      "url": "https://www.16688.com.cn/goods/G97690252",
      "kind": "未接马",
@@ -5888,7 +5888,7 @@
      "price": 8.0,
      "shop": "奶龙Gemini订阅(源头招代理)",
      "platform": "16688",
-     "stock": 22,
+     "stock": 20,
      "title": "Gemini Pro 6个月自动订阅卡密|包绑卡|可使用反重力|卡密可囤",
      "url": "https://www.16688.com.cn/goods/G81445970",
      "kind": "成品号",
@@ -7554,7 +7554,7 @@
      "price": 29.0,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": 58,
+     "stock": 59,
      "title": "11.3老号[反重力成品] Gemini Pro 带rt凭证 可用4和op5.5｜已过Antigravity验证",
      "url": "https://aicdks.com/product/108786",
      "kind": "成品号",
@@ -8218,7 +8218,7 @@
      "price": 37.51,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": 23,
+     "stock": 24,
      "title": "Gemini Pro反重力Antigravity成品号｜稳定渠道耐用成品",
      "url": "https://aicdks.com/product/107051",
      "kind": "成品号",
@@ -8624,7 +8624,7 @@
      "price": 0.36,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": 498,
+     "stock": 499,
      "title": "CDK 美国实卡源头招代理codex 短效单次接马 支持api 在有效期内可以二次验证",
      "url": "https://aicdks.com/product/106845",
      "kind": "",
@@ -11203,7 +11203,7 @@
      "price": 134.0,
      "shop": "Aisou智充",
      "platform": "",
-     "stock": 85,
+     "stock": 84,
      "title": "Claude Pro直充月卡 (美区IOS渠道)",
      "url": "https://aisou.pro/item/45",
      "kind": "Pro·代充",
@@ -11257,7 +11257,7 @@
      "price": 134.0,
      "shop": "米卡店铺",
      "platform": "",
-     "stock": 82,
+     "stock": 84,
      "title": "Claude Pro CDK(下单请先看商品介绍，下单默认同意)",
      "url": "https://buy.aishopstore.com/item/119",
      "kind": "Pro·成品号",
@@ -11370,7 +11370,7 @@
      "price": 135.0,
      "shop": "派大星（5000人群）",
      "platform": "16688",
-     "stock": 54,
+     "stock": 53,
      "title": "【IOS渠道】Claude Pro 官充 月卡【质保订阅30天】",
      "url": "https://www.16688.com.cn/goods/G26143891",
      "kind": "Pro·成品号",
