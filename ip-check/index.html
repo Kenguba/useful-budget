@@ -103,6 +103,7 @@ input{font-family:inherit}
 .myip-row .pref{color:#9aa3ad;font-size:12.5px;flex:none}
 .myip-row a.none{color:#a7b0b8;font-weight:400;pointer-events:none}
 .myip-row{padding-top:3px;padding-bottom:3px;padding-right:8px;border-radius:9px}
+.myip-row.on{background:#f2f6f8;align-self:flex-start;padding-right:10px;cursor:pointer}
 .myip-row .row-eye{margin-left:auto;width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.75);display:grid;place-items:center;flex:none;box-shadow:0 1px 4px rgba(31,78,110,.08)}
 .myip .spacer{flex:1}
 .icon-btn{
@@ -935,7 +936,8 @@ function renderMyIp(){
     const el=$(aid);el.textContent=ip?(vis?ip:starMask(ip)):"未检测到";
     el.classList.toggle("none",!ip);
     $(rid).classList.toggle("on",!!(ip&&vis));
-    el.onclick=e=>{e.preventDefault();if(ip){myIpState[key]=!vis;renderMyIp()}};
+    el.onclick=e=>e.preventDefault();
+    $(rid).onclick=ip?()=>{myIpState[key]=!vis;renderMyIp()}:null;
   };
   row("myV4","rowV4",myIpState.v4,myIpState.vis4!==false,"vis4");
   row("myV6","rowV6",myIpState.v6,myIpState.vis6!==false,"vis6");
