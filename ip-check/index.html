@@ -671,6 +671,11 @@ async function srcIpApi(ip){
   const m=(j.org||"").match(/^(AS\d+)\s*(.*)$/);
   return{src:"ipapi.co",ip:j.ip,country:j.country_name||"",cc:j.country_code||"",region:j.region||"",city:j.city||"",lat:j.latitude,lon:j.longitude,postal:j.postal||"",tz:j.timezone||"",asn:m?m[1]:"",asnName:m?m[2]:(j.org||""),domain:"",isp:j.org||"",network:j.network||""};
 }
+async function srcGeoJs(ip){
+  const j=await fetchJSON(ip?("https://get.geojs.io/v1/ip/geo/"+encodeURIComponent(ip)+".json"):"https://get.geojs.io/v1/ip/geo.json");
+  if(!j||!j.ip)throw new Error("geojs");
+  return{src:"GeoJS",ip:j.ip,country:j.country||"",cc:j.country_code||"",region:j.region||"",city:j.city||"",lat:j.latitude!=null?Number(j.latitude):undefined,lon:j.longitude!=null?Number(j.longitude):undefined,postal:"",tz:j.timezone||"",asn:j.asn?("AS"+j.asn):"",asnName:j.organization_name||"",domain:"",isp:j.organization||j.organization_name||""};
+}
 async function ripe(path,ip,ms){
   const j=await fetchJSON("https://stat.ripe.net/data/"+path+"/data.json?resource="+encodeURIComponent(ip),ms||7000);
   return j&&j.data?j.data:null;
@@ -831,13 +836,26 @@ async function runQuery(ip,selfMode){
   if(ip&&!/^[0-9a-fA-F.:]+$/.test(ip)){showErr("请输入有效的 IP 地址（IPv4 或 IPv6）");return}
   setBusy(true);
   try{
-    const[srcs,net]=await Promise.all([
-      settled([srcIpWho(ip),srcIpInfo(ip),srcIpApi(ip)]),
+    let[srcs,net]=await Promise.all([
+      settled([srcIpWho(ip),srcIpInfo(ip),srcIpApi(ip),srcGeoJs(ip)]),
       ip?ripe("network-info",ip,7000).catch(()=>null):Promise.resolve(null)
     ]);
     if(seq!==state.querySeq)return;
-    const ok=srcs.filter(Boolean);
-    if(!ok.length)throw new Error("no source");
+    if(!srcs.filter(Boolean).length){
+      await new Promise(r=>setTimeout(r,1200));
+      srcs=await settled([srcIpWho(ip),srcIpInfo(ip),srcIpApi(ip),srcGeoJs(ip)]);
+      if(seq!==state.querySeq)return;
+    }
+    let ok=srcs.filter(Boolean);
+    if(!ok.length){
+      const proxy=await fetchJSON("https://ip.jpedu.asia/api/geo?ip="+encodeURIComponent(ip||"")+"&d="+new Date().toISOString().slice(0,10),8000).catch(()=>null);
+      if(seq!==state.querySeq)return;
+      const cf=proxy&&proxy.sources&&proxy.sources.cloudflare;
+      if(cf&&(cf.cc||cf.country)&&proxy.ip){
+        const syn={src:"Cloudflare",ip:proxy.ip,country:cf.country||cf.cc,cc:cf.cc||"",region:cf.region||"",city:cf.city||"",lat:undefined,lon:undefined,postal:"",tz:"",asn:"",asnName:"",domain:"",isp:"",network:""};
+        srcs.push(syn);ok=[syn];
+      }else throw new Error("no source");
+    }
     const targetIp=ip||ok[0].ip;
     const netData=net||await ripe("network-info",targetIp,4500).catch(()=>null);
     if(seq!==state.querySeq)return;
