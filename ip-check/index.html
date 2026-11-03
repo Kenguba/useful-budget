@@ -672,7 +672,7 @@ async function srcIpApi(ip){
   return{src:"ipapi.co",ip:j.ip,country:j.country_name||"",cc:j.country_code||"",region:j.region||"",city:j.city||"",lat:j.latitude,lon:j.longitude,postal:j.postal||"",tz:j.timezone||"",asn:m?m[1]:"",asnName:m?m[2]:(j.org||""),domain:"",isp:j.org||"",network:j.network||""};
 }
 async function ripe(path,ip,ms){
-  const j=await fetchJSON("https://stat.ripe.net/data/"+path+"/data.json?resource="+encodeURIComponent(ip),ms||9000);
+  const j=await fetchJSON("https://stat.ripe.net/data/"+path+"/data.json?resource="+encodeURIComponent(ip),ms||7000);
   return j&&j.data?j.data:null;
 }
 async function dnsbl(ip){
@@ -833,13 +833,13 @@ async function runQuery(ip,selfMode){
   try{
     const[srcs,net]=await Promise.all([
       settled([srcIpWho(ip),srcIpInfo(ip),srcIpApi(ip)]),
-      ip?ripe("network-info",ip).catch(()=>null):Promise.resolve(null)
+      ip?ripe("network-info",ip,7000).catch(()=>null):Promise.resolve(null)
     ]);
     if(seq!==state.querySeq)return;
     const ok=srcs.filter(Boolean);
     if(!ok.length)throw new Error("no source");
     const targetIp=ip||ok[0].ip;
-    const netData=net||await ripe("network-info",targetIp).catch(()=>null);
+    const netData=net||await ripe("network-info",targetIp,4500).catch(()=>null);
     if(seq!==state.querySeq)return;
     const loc=consensusLoc(srcs);
     const first=ok[0];
@@ -883,11 +883,6 @@ async function runQuery(ip,selfMode){
     if(geoLocs&&geoLocs.length){
       d.histLoc=geoLocs.slice(0,3).map(l=>({org:[l.country,l.city].filter(Boolean).join(" "),cidr:(l.resources&&l.resources[0])||d.prefix,extra:"经纬度 "+(l.latitude!=null?Number(l.latitude).toFixed(4):"—")+", "+(l.longitude!=null?Number(l.longitude).toFixed(4):"—")+" · 覆盖 "+(l.covered_percentage!=null?l.covered_percentage+"%":"—")}));
     }else d.histLoc=[{org:[loc.country,loc.region,loc.city].filter(Boolean).join(" "),cidr:d.prefix,extra:"多源共识定位"}];
-    if(!d.host){
-      const ptrHost=await ptrP;
-      if(ptrHost)d.host=ptrHost;
-      if(seq!==state.querySeq)return;
-    }
     d.native=d.whoisCountry&&d.cc?(d.whoisCountry===d.cc):null;
     d.cls=classify(d);applyType(d);
     const sc=computeScore(d,d.cls,bl);d.score=sc.score;
@@ -896,10 +891,12 @@ async function runQuery(ip,selfMode){
     d.note="纯净度按实时信号计算："+sc.why.join("；")+"；定位 "+(d.locRows&&d.locRows.length?d.locRows.length:loc.total)+" 源共识（"+(d.locRows?d.conf:loc.agree)+" 个一致）";
     d._why=sc.why;
     render(d,true);
+    if(seq===state.querySeq)setBusy(false);
     // 第三阶段（不阻塞主结果）：ASN 历史 / BGP 邻居最后加载，到齐后补进详情
     (async()=>{
       const[routing,neigh]=await settled([ripe("routing-history",targetIp,12000),asn?ripe("asn-neighbours",asn,12000):Promise.resolve(null)]);
       if(seq!==state.querySeq)return;
+      if(!d.host){const ptrHost=await ptrP;if(seq===state.querySeq&&ptrHost){d.host=ptrHost;renderDetails(d)}}
     if(routing&&routing.by_origin){
       const items=[];
       routing.by_origin.forEach(o=>{
@@ -1008,6 +1005,7 @@ function fillAltFamily(primary){
 
 /* ---------- 交互 ---------- */
 $("searchForm").addEventListener("submit",e=>{e.preventDefault();runQuery($("ipInput").value,false)});
+$("ipInput").addEventListener("focus",e=>e.target.select());
 $("eyeBtn").addEventListener("click",()=>{
   if(!state.data)return;state.ipVisible=!state.ipVisible;const ip=state.data.ip;
   if(state.ipVisible){$("fIp").classList.remove("masked");$("fIp").textContent=ip;$("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>"}
