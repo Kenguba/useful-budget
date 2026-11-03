@@ -101,7 +101,7 @@ input{font-family:inherit}
 .myip-row .pref{color:#9aa3ad;font-size:12.5px;flex:none}
 .myip-row a.none{color:#a7b0b8;font-weight:400;pointer-events:none}
 .myip-row{padding-top:3px;padding-bottom:3px;padding-right:8px;border-radius:9px}
-.myip-row.on{cursor:pointer}
+.myip-row.on{cursor:auto}.myip-row .fam{cursor:pointer}
 .myip-row .fam{background:rgba(255,255,255,.25);color:#a7b0b8;border-color:#d8dfe3}
 .myip-row.on .fam{background:rgba(255,255,255,.92);color:#5f6b75;border-color:#c3ced4;box-shadow:0 1px 3px rgba(31,78,110,.10)}
 .myip-row .row-eye{margin-left:auto;width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.75);display:grid;place-items:center;flex:none;box-shadow:0 1px 4px rgba(31,78,110,.08)}
@@ -962,9 +962,10 @@ function renderMyIp(){
   const row=(aid,rid,ip,vis,key)=>{
     const el=$(aid);el.textContent=ip?(vis?ip:starMask(ip)):"未检测到";
     el.classList.toggle("none",!ip);
-    $(rid).classList.toggle("on",!!(ip&&vis));
-    el.onclick=e=>e.preventDefault();
-    $(rid).onclick=ip?()=>{myIpState[key]=!vis;renderMyIp()}:null;
+    const rowEl=$(rid);rowEl.classList.toggle("on",!!(ip&&vis));
+    rowEl.onclick=null;
+    rowEl.querySelector(".fam").onclick=ip?e=>{e.stopPropagation();myIpState[key]=!vis;renderMyIp()}:null;
+    el.onclick=ip?async e=>{e.preventDefault();try{await navigator.clipboard.writeText(ip);toast("已复制 "+ip)}catch(err){toast("复制失败，请手动复制")}}:e=>e.preventDefault();
   };
   row("myV4","rowV4",myIpState.v4,myIpState.vis4!==false,"vis4");
   row("myV6","rowV6",myIpState.v6,myIpState.vis6!==false,"vis6");
