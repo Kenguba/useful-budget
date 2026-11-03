@@ -570,7 +570,7 @@ input{font-family:inherit}
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
-const state={data:null,ipVisible:true,numVisible:false,busy:false,querySeq:0};
+const state={data:null,ipVisible:true,numVisible:true,busy:false,querySeq:0};
 function flagEmoji(cc){if(!cc||cc.length!==2)return"🌐";return String.fromCodePoint(...[...cc.toUpperCase()].map(c=>127397+c.charCodeAt(0)))}
 function flagImg(cc){if(!cc||!/^[A-Za-z]{2}$/.test(cc))return"";const c=cc.toLowerCase();return "<img class='flag-img' src='https://flagcdn.com/w80/"+c+".png' srcset='https://flagcdn.com/w160/"+c+".png 2x' alt='' loading='lazy' onerror='this.style.display=\"none\"'>"}
 function isIPv4(ip){return /^\d{1,3}(\.\d{1,3}){3}$/.test(ip)}
@@ -690,7 +690,7 @@ function computeScore(d,cls,bl){
 
 /* ---------- 渲染 ---------- */
 function render(d){
-  state.data=d;state.ipVisible=true;state.numVisible=false;
+  state.data=d;state.ipVisible=true;state.numVisible=true;
   $("ipInput").value=d.ip;
   $("fIp").textContent=d.ip;
   $("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>";
@@ -741,7 +741,7 @@ function render(d){
   $("llmResult").innerHTML="";$("llmBtn").textContent="点击检测";$("llmBtn").disabled=false;
   $("llmTable").style.display="none";$("llmTable").innerHTML="";
   const num=ipToBig(d.ip);
-  $("fNumIp").textContent="********";$("fNumIp").dataset.num=num!=null?String(num):"—";
+  $("fNumIp").dataset.num=num!=null?String(num):"—";$("fNumIp").textContent=state.numVisible?$("fNumIp").dataset.num:"********";syncNumEye();
   $("sceneGrid").innerHTML=d.scenes.map(s=>"<div class='scene'><div class='nm'>"+s[0]+"</div><div class='stars'>"+starsHtml(s[1])+"</div><div class='suit'>✅ <b>"+suitText(s[1])+"</b></div></div>").join("");
   if(d.histAsn)renderExtra(d);
   $("card").classList.remove("loading");$("errBox").className="err";
@@ -963,7 +963,10 @@ $("eyeBtn").addEventListener("click",()=>{
   else{$("fIp").classList.add("masked");$("fIp").textContent=isIPv4(ip)?ip.replace(/\.\d+\.\d+\./,".***.***."):"****:****:****";$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}
 });
 $("fIp").addEventListener("click",async()=>{if(!state.data)return;try{await navigator.clipboard.writeText(state.data.ip);toast("已复制 "+state.data.ip)}catch(e){toast("复制失败，请手动复制")}});
-$("numEyeBtn").addEventListener("click",()=>{state.numVisible=!state.numVisible;$("fNumIp").textContent=state.numVisible?$("fNumIp").dataset.num:"********"});
+const NUM_EYE_ON='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const NUM_EYE_OFF='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88"/><path d="M1 1l22 22"/></svg>';
+function syncNumEye(){$("numEyeBtn").innerHTML=state.numVisible?NUM_EYE_ON:NUM_EYE_OFF}
+$("numEyeBtn").addEventListener("click",()=>{state.numVisible=!state.numVisible;$("fNumIp").textContent=state.numVisible?$("fNumIp").dataset.num:"********";syncNumEye()});
 $("refreshBtn").addEventListener("click",()=>{$("refreshBtn").classList.remove("spinning");void $("refreshBtn").offsetWidth;$("refreshBtn").classList.add("spinning");runQuery("",true)});
 $("shotBtn").addEventListener("click",()=>{const f=$("flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");toast("快照完成，可长按 / 截图保存本页")});
 $("asnHead").addEventListener("click",()=>{const b=$("asnBlock");b.classList.toggle("collapsed");$("asnHead").setAttribute("aria-expanded",String(!b.classList.contains("collapsed")))});
