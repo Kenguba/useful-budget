@@ -1888,11 +1888,9 @@ function switchTab(shopsView){
   $('#categoryBar').style.display=vis;
   $('#leaders').style.display=vis;
   $('#featuredHint').style.display=vis;
-  $('#listTitle').textContent=shopsView?'店铺目录':'8 大分组 · 真实报价明细';
-  $('#listSub').textContent=shopsView?'按平台筛选 · 点店名直达店铺':'按有货价格从低到高 · 含发卡平台标签、属性胶囊与同源铺货';
-  const lc=$('#listCount');
-  if(shopsView){ lc.textContent='共 '+(shops?shops.shops.length:'—')+' 家'; }
-  else if(board){ lc.textContent='8 组 · '+board.groups.reduce((a,g)=>a+g.items.length,0)+' 条报价'; }
+  document.querySelector('.site-list-topline').style.display=shopsView?'none':'';
+  $('#listSub').style.display=shopsView?'none':'';
+  if(board){ $('#listCount').textContent='8 组 · '+board.groups.reduce((a,g)=>a+g.items.length,0)+' 条报价'; }
   if(window.__applyTabTheme)window.__applyTabTheme(shopsView);
   if(shopsView&&!shops)renderShops();
   if(!shopsView)fitLeaderShops();
