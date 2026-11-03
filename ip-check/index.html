@@ -103,6 +103,7 @@ input{font-family:inherit}
 .myip-row .pref{color:#9aa3ad;font-size:12.5px;flex:none}
 .myip-row a.none{color:#a7b0b8;font-weight:400;pointer-events:none}
 .myip-row{padding-top:3px;padding-bottom:3px;padding-right:8px;border-radius:9px}
+.myip-row.on{background:#f2f6f8;align-self:flex-start;padding-right:10px}
 .myip-row .row-eye{margin-left:auto;width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.75);display:grid;place-items:center;flex:none;box-shadow:0 1px 4px rgba(31,78,110,.08)}
 .myip .spacer{flex:1}
 .icon-btn{
@@ -695,12 +696,12 @@ function render(d){
   $("ipInput").value=d.ip;
   $("fIp").textContent=d.ip;
   $("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>";
-  if(state.ipVisible===false){$("fIp").textContent=isIPv4(d.ip)?d.ip.replace(/\.\d+\.\d+\./,".***.***."):"****:****:****";$("fIp").classList.add("masked");$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}else{$("fIp").classList.remove("masked")}
+  if(state.ipVisible===false){$("fIp").textContent=isIPv4(d.ip)?"***.***.***.***":"****:****:****:****";$("fIp").classList.add("masked");$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}else{$("fIp").classList.remove("masked")}
   $("fAsn").textContent=d.asn||"—";
   $("fAsnName").textContent=d.asnName?" - "+d.asnName:"";
   const asnLen=($("fAsn").textContent+$("fAsnName").textContent).length;
   document.querySelector(".asn-head .name").style.fontSize=asnLen>40?"14.5px":asnLen>30?"15.5px":"16.5px";
-  syncMyIpHi();fitIpFont();
+  fitIpFont();
   $("fAsDomain").textContent=d.domain||d.netname||"—";
   $("fRange").textContent=d.range||"—";
   const pure=100-d.score;
@@ -925,13 +926,18 @@ function applyType(d){
 function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove("show"),1800)}
 function setBusy(b){state.busy=b;$("searchBtn").disabled=b;$("searchBtn").textContent=b?"检测中…":"Search";$("card").classList.toggle("loading",b)}
 const myIpState={v4:"",v6:"",primary6:false};
-function syncMyIpHi(){const cur=state.data&&state.data.ip;$("rowV4").classList.toggle("on",!!(cur&&myIpState.v4&&cur===myIpState.v4));$("rowV6").classList.toggle("on",!!(cur&&myIpState.v6&&cur===myIpState.v6))}
+function starMask(ip){return ip.includes(":")?"****:****:****:****":"***.***.***.***"}
 function renderMyIp(){
-  const row=(aid,ip)=>{const el=$(aid);el.textContent=ip||"未检测到";el.classList.toggle("none",!ip);el.onclick=e=>{e.preventDefault();if(ip)runQuery(ip,false)}};
-  row("myV4",myIpState.v4);row("myV6",myIpState.v6);
+  const row=(aid,rid,ip,vis,key)=>{
+    const el=$(aid);el.textContent=ip?(vis?ip:starMask(ip)):"未检测到";
+    el.classList.toggle("none",!ip);
+    $(rid).classList.toggle("on",!!(ip&&vis));
+    el.onclick=e=>{e.preventDefault();if(ip){myIpState[key]=!vis;renderMyIp()}};
+  };
+  row("myV4","rowV4",myIpState.v4,myIpState.vis4!==false,"vis4");
+  row("myV6","rowV6",myIpState.v6,myIpState.vis6!==false,"vis6");
   $("rowV6").style.order=myIpState.primary6?"1":"2";
   $("rowV4").style.order=myIpState.primary6?"2":"1";
-  syncMyIpHi();
 }
 function setMyIp(ip,primary){
   if(!ip)return;
@@ -961,7 +967,7 @@ $("searchForm").addEventListener("submit",e=>{e.preventDefault();runQuery($("ipI
 $("eyeBtn").addEventListener("click",()=>{
   if(!state.data)return;state.ipVisible=!state.ipVisible;const ip=state.data.ip;
   if(state.ipVisible){$("fIp").classList.remove("masked");$("fIp").textContent=ip;$("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>"}
-  else{$("fIp").classList.add("masked");$("fIp").textContent=isIPv4(ip)?ip.replace(/\.\d+\.\d+\./,".***.***."):"****:****:****";$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}
+  else{$("fIp").classList.add("masked");$("fIp").textContent=isIPv4(ip)?"***.***.***.***":"****:****:****:****";$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}
 });
 function fitIpFont(){const el=$("fIp");if(!el||!state.data)return;let fs=19;el.style.fontSize=fs+"px";const row=el.parentElement;const others=[...row.children].filter(c=>c!==el).reduce((w,c)=>w+c.offsetWidth,0);const avail=row.clientWidth-others-30;while(el.scrollWidth>avail&&fs>10){fs-=0.5;el.style.fontSize=fs+"px"}}
 window.addEventListener("resize",()=>{if(state.data)fitIpFont()});
