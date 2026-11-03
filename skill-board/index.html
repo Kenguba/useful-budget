@@ -178,6 +178,7 @@ function render(b){
   document.querySelectorAll(".cmdwrap").forEach(w=>{const t=w.dataset.cmd;w.querySelector("code.cmd").addEventListener("click",()=>doCopy(t));w.querySelector(".copybtn").addEventListener("click",ev=>{ev.stopPropagation();doCopy(t)})});
   fitCmds();
   applyFilter();
+  jumpToHash();
 }
 function applyFilter(){
   const q=document.getElementById("q").value.trim().toLowerCase();let total=0;
@@ -210,9 +211,18 @@ async function loadVideo(){
     const inner=v.items.map((e,i)=>item(i+1,{skill:e.name,blurb:e.blurb,meta:e.meta,html:`${nameLink(e.name,e.url,e.meta)}<div class="blurb">${esc(e.blurb)}</div>`},e.num||"",cmd(e.cmd||""))).join("");
     document.getElementById("videoZone").innerHTML=section("06","视频区 · AI 视频声音",esc(v.desc||""),inner);
     document.querySelectorAll("#videoZone .cmdwrap").forEach(w=>{const t=w.dataset.cmd;w.querySelector("code.cmd").addEventListener("click",()=>doCopy(t));w.querySelector(".copybtn").addEventListener("click",ev=>{ev.stopPropagation();doCopy(t)})});
-    fitCmds();applyFilter();
+    fitCmds();applyFilter();jumpToHash();
   }catch(e){console.error(e)}
 }
+function jumpToHash(){const id=(location.hash||"").slice(1);if(!id)return;const el=document.getElementById(id);if(el)el.scrollIntoView({block:"start"})}
+window.addEventListener("hashchange",jumpToHash);
+window.addEventListener("scroll",()=>{if(window.scrollY<=0&&location.hash){try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}},{passive:true});
+window.addEventListener("pageshow",()=>setTimeout(jumpToHash,60));
+document.querySelectorAll(".navchip").forEach(c=>c.addEventListener("click",e=>{
+  const id=c.getAttribute("href").slice(1);const t=document.getElementById(id);if(!t)return;
+  e.preventDefault();try{history.pushState(null,"","#"+id)}catch(err){}
+  t.scrollIntoView({behavior:"smooth",block:"start"});
+}));
 </script>
 <script>
 if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js", {updateViaCache: "none"}).then(r => r.update()).catch(()=>{})); }
