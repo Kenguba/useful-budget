@@ -1045,7 +1045,7 @@ $("eyeBtn").addEventListener("click",()=>{
   if(state.ipVisible){$("fIp").classList.remove("masked");$("fIp").textContent=ip;$("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>"}
   else{$("fIp").classList.add("masked");$("fIp").textContent=isIPv4(ip)?"***.***.***.***":"****:****:****:****";$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}
 });
-function fitIpFont(){const el=$("fIp");if(!el||!state.data)return;let fs=19;el.style.fontSize=fs+"px";const row=el.parentElement;const others=[...row.children].filter(c=>c!==el).reduce((w,c)=>w+c.offsetWidth,0);const avail=row.clientWidth-others-30;while(el.scrollWidth>avail&&fs>10){fs-=0.5;el.style.fontSize=fs+"px"}}
+function fitIpFont(){const el=$("fIp");if(!el||!state.data)return;let fs=19;el.style.fontSize=fs+"px";const eye=$("eyeBtn");const avail=eye.getBoundingClientRect().left-el.getBoundingClientRect().left-12;while(el.scrollWidth>avail&&fs>10){fs-=0.5;el.style.fontSize=fs+"px"}}
 window.addEventListener("resize",()=>{if(state.data)fitIpFont()});
 $("fIp").addEventListener("click",async()=>{if(!state.data)return;try{await navigator.clipboard.writeText(state.data.ip);toast("已复制 "+state.data.ip)}catch(e){toast("复制失败，请手动复制")}});
 const NUM_EYE_ON='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
