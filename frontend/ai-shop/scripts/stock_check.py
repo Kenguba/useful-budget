@@ -160,7 +160,7 @@ def fetch_latest_board():
     """写盘前取仓库里最新一版 board.json 当合并底版；取不到返回 None（用本地版）。"""
     url = os.environ.get(
         'BOARD_RAW_URL',
-        'https://raw.githubusercontent.com/Kenguba/useful-budget/main/ai-shop/data/board.json')
+        'https://raw.githubusercontent.com/Kenguba/useful-budget/main/frontend/ai-shop/data/board.json')
     try:
         return json.loads(fetch(url, timeout=15).decode('utf-8', 'ignore'))
     except Exception:
