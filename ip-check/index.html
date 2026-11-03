@@ -165,7 +165,7 @@ input{font-family:inherit}
 .ratio-nums .b{color:#f2607e;font-weight:500}
 
 .sec-title{font-size:17px;font-weight:700;padding:14px 4px 4px}
-#detailCard .sec-title{padding-left:0;padding-right:0}
+#card .sec-title{padding-left:0;padding-right:0}
 .loc-row{display:flex;align-items:flex-start;gap:8px;padding:7.5px 0;font-size:15.5px}
 .loc-row .src{padding-top:1px}
 .loc-row .flag-img{margin-top:3px}
@@ -270,6 +270,7 @@ input{font-family:inherit}
 .scene .stars .off{color:#d5dde2}
 .scene .suit{margin-top:5px;font-size:14px;color:var(--ink-2)}
 .scene .suit b{color:#1d9d4e;font-weight:600}
+.kv .v:has(> #fNumIp){display:flex;align-items:center;gap:10px}
 .num-ip{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;font-size:16px}
 /* 历史 / 地图 / BGP / 同机房 */
 .hist-item{background:#fff;border:1px solid #edf0f2;border-radius:12px;padding:11px 13px;margin:9px 0}
@@ -498,7 +499,7 @@ input{font-family:inherit}
           <div class="llm-table" id="llmTable" style="display:none"></div>
           <div class="detect-result" id="llmResult"></div>
           <div class="kv" style="align-items:center"><span class="k">数字地址</span><span class="v"><span class="num-ip" id="fNumIp">********</span>
-            <button class="mini-btn" id="numEyeBtn" aria-label="显示 / 隐藏数字 IP" title="显示 / 隐藏" style="display:inline-grid;vertical-align:-10px;margin-left:10px">
+            <button class="mini-btn" id="numEyeBtn" aria-label="显示 / 隐藏数字 IP" title="显示 / 隐藏">
               <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88"/><path d="M1 1l22 22"/></svg>
             </button></span></div>
         </div>
