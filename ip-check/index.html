@@ -847,6 +847,7 @@ async function runQuery(ip,selfMode){
     if(selfMode){setMyIp(d.ip,true);fillAltFamily(d.ip)}
     // 第二阶段：WHOIS / 路由历史 / BGP 邻居 / 黑名单 / 注册块
     const geoP=fetchJSON("https://ip.jpedu.asia/api/geo?ip="+encodeURIComponent(targetIp)+"&d="+new Date().toISOString().slice(0,10),15000).catch(()=>null);
+    const ptrP=(async()=>{if(!isIPv4(targetIp))return "";try{const rev=targetIp.split(".").reverse().join(".")+".in-addr.arpa";const j=await fetchJSON("https://dns.google/resolve?name="+encodeURIComponent(rev)+"&type=PTR",4000);const ans=(j&&j.Answer||[]).find(a=>a.type===12);return ans?ans.data.replace(/\.$/,""):""}catch(e){return ""}})();
     const[overview,whoisJ,routing,neigh,prefixOv,bl,geo,proxy]=await settled([
       asn?ripe("as-overview",asn):Promise.resolve(null),
       ripe("whois",targetIp),
@@ -872,12 +873,8 @@ async function runQuery(ip,selfMode){
       d.histLoc=geoLocs.slice(0,3).map(l=>({org:[l.country,l.city].filter(Boolean).join(" "),cidr:(l.resources&&l.resources[0])||d.prefix,extra:"经纬度 "+(l.latitude!=null?Number(l.latitude).toFixed(4):"—")+", "+(l.longitude!=null?Number(l.longitude).toFixed(4):"—")+" · 覆盖 "+(l.covered_percentage!=null?l.covered_percentage+"%":"—")}));
     }else d.histLoc=[{org:[loc.country,loc.region,loc.city].filter(Boolean).join(" "),cidr:d.prefix,extra:"多源共识定位"}];
     if(!d.host){
-      try{
-        const rev=targetIp.split(".").reverse().join(".")+".in-addr.arpa";
-        const j=await fetchJSON("https://dns.google/resolve?name="+encodeURIComponent(rev)+"&type=PTR",4000);
-        const ans=(j.Answer||[]).find(a=>a.type===12);
-        if(ans)d.host=ans.data.replace(/\.$/,"");
-      }catch(e){}
+      const ptrHost=await ptrP;
+      if(ptrHost)d.host=ptrHost;
       if(seq!==state.querySeq)return;
     }
     d.native=d.whoisCountry&&d.cc?(d.whoisCountry===d.cc):null;
