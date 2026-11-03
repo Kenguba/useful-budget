@@ -74,8 +74,11 @@ button{font-family:inherit;cursor:pointer}
 .btn-search{flex:none;border:none;color:#fff;font-size:16px;font-weight:700;padding:13px 38px;border-radius:999px;
   background:linear-gradient(90deg,var(--blue),var(--blue2))}
 .btn-search:disabled{opacity:.45;cursor:not-allowed}
-.hotline{margin-top:18px;color:var(--mut);font-size:14px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;align-items:center}
-.hotline .lbl{color:var(--faint)}
+/* 热词行：单行展示，超出横向滑动，隐藏滚动条；内容不满时居中 */
+.hotline{margin:18px auto 0;width:fit-content;max-width:100%;color:var(--mut);font-size:14px;display:flex;gap:10px;flex-wrap:nowrap;align-items:center;overflow-x:auto;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.hotline::-webkit-scrollbar{display:none}
+.hotline .lbl{color:var(--faint);flex:none}
+.hotline a{flex:none}
 .hotline a:hover{color:var(--blue)}
 
 /* ---------- 公告条 ---------- */
