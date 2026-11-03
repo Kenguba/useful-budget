@@ -310,17 +310,17 @@ input{font-family:inherit}
 .detect-result{overflow-wrap:anywhere;word-break:break-word}
 /* 模型检测小表格 */
 .scene-card>#llmTable{margin:14px 0 0}.scene-card>#llmResult{margin:10px 16px 0}
-.llm-table{margin:10px 0 4px;border:1px solid #edf0f2;border-radius:14px;overflow:hidden;background:#fff}
-.llm-row{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:12px;padding:13px 16px}
-.llm-row + .llm-row{border-top:1px solid #f0f2f4}
-.llm-row.head{background:#f7fafc;font-size:12.5px;color:#8a929c;padding:8px 16px;grid-template-columns:40px 1fr auto}
-.vendor-ic{width:34px;height:34px;border-radius:9px;overflow:hidden;flex:none;line-height:0}
+.llm-table{margin:10px 0 4px;border:1px solid #ebeef3;border-radius:14px;overflow:hidden;background:#fff}
+.llm-row{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:28px;padding:13px 16px 13px 18px}
+.llm-row + .llm-row{border-top:1px solid #f2f4f7}
+.llm-row.head{background:#f5f7fa;font-size:14px;color:#8c939e;padding:0 16px 0 18px;min-height:40px;grid-template-columns:36px 1fr auto}
+.vendor-ic{width:36px;height:36px;border-radius:10px;overflow:hidden;flex:none;line-height:0}.vi-chatgpt{box-shadow:0 2px 6px rgba(15,163,127,.20)}.vi-claude{box-shadow:0 2px 6px rgba(216,118,88,.22)}.vi-gemini{box-shadow:0 2px 6px rgba(101,126,230,.22)}.vi-grok{box-shadow:0 2px 6px rgba(17,17,17,.18)}
 .vendor-ic svg{width:17px;height:17px}
-.llm-name{font-size:16.5px;font-weight:600;color:var(--ink)}
-.llm-sub{font-size:13px;color:#93a1ad;margin-top:2px}
-.llm-chip{font-size:13.5px;font-weight:600;padding:6px 13px;border-radius:999px;white-space:nowrap}
-.llm-chip.ok{background:#e6f7ec;color:#1d9d4e}
-.llm-chip.no{background:#fdecec;color:#d23b3b}
+.llm-name{font-size:16px;font-weight:700;color:#1e2227}
+.llm-sub{font-size:13.5px;color:#8c939e;margin-top:1px}
+.llm-chip{font-size:13.5px;font-weight:600;height:30px;min-width:78px;padding:0 14px;border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center}
+.llm-chip.ok{background:#dbfee8;color:#1c8546}
+.llm-chip.no{background:#fbedea;color:#b43e3e}
 .shimmer{position:relative;overflow:hidden;color:transparent!important}
 .shimmer *{visibility:hidden}
 @media (max-width:560px){
@@ -338,7 +338,7 @@ input{font-family:inherit}
   .risk-dots{gap:5px}
   .risk-wrap{gap:7px;flex-wrap:wrap}
   .risk-wrap .pill{min-width:0;padding:8px 16px}
-  .llm-row{padding:12px 13px;gap:10px}
+  .llm-row{padding:13px 12px 13px 14px}
   .searchbar input{padding:0 104px 0 16px}
   .kv{flex-wrap:wrap;row-gap:5px}
   .kv .v{flex:1;min-width:140px}
@@ -1077,7 +1077,7 @@ const VENDORS=[
 function paintLlm(d){
   const tbl=$("llmTable");if(!tbl)return;const cc=(d.cc||"").toUpperCase();
   if(!cc){tbl.style.display="none";tbl.innerHTML="";$("llmResult").textContent="";return}
-  tbl.innerHTML="<div class='llm-row head'><span></span><span>厂商</span><span>判定（"+cc+"）</span></div>"+VENDORS.map(v=>{const ok=(LLM_LISTS[v.name]||[]).includes(cc);return "<div class='llm-row'><span class='vendor-ic'>"+v.icon+"</span><span><span class='llm-name'>"+v.name+"</span><div class='llm-sub'>"+v.by+"</div></span><span class='llm-chip "+(ok?"ok":"no")+"'>"+(ok?"✓ 可用":"✕ 不可用")+"</span></div>"}).join("");
+  tbl.innerHTML="<div class='llm-row head'><span></span><span>厂商</span><span>判定（"+cc+"）</span></div>"+VENDORS.map(v=>{const ok=(LLM_LISTS[v.name]||[]).includes(cc);return "<div class='llm-row'><span class='vendor-ic vi-"+v.name.toLowerCase()+"'>"+v.icon+"</span><span><span class='llm-name'>"+v.name+"</span><div class='llm-sub'>"+v.by+"</div></span><span class='llm-chip "+(ok?"ok":"no")+"'>"+(ok?"✓ 可用":"✕ 不可用")+"</span></div>"}).join("");
   tbl.style.display="block";
   $("llmResult").textContent="方法：该 IP 实时定位国家与各厂商官方支持地区名单核对，"+(d.native===false?"非原生 IP 仍可能触发额外验证":d.native?"原生 IP，通过率最高":"");
 }
