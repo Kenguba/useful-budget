@@ -128,7 +128,7 @@ input{font-family:inherit}
 .row{display:flex;align-items:center;gap:12px;padding:15px 4px}
 .row + .row{border-top:1px solid #fbfcfc}
 .lbl{font-size:17px;font-weight:700;color:var(--ink);width:86px;flex:none}
-.val-blue{color:var(--blue);font-size:19px;font-weight:500;letter-spacing:.01em;word-break:break-all}
+.val-blue{color:var(--blue);font-size:19px;font-weight:500;letter-spacing:.01em;word-break:break-all;cursor:pointer}
 .mini-btn{
   width:32px;height:32px;border-radius:8px;background:#fafafa;border:1px solid #f0f0f0;display:grid;place-items:center;
   transition:background .2s,transform .15s var(--ease);flex:none;
@@ -392,17 +392,9 @@ input{font-family:inherit}
 
   <div class="myip-bar">
     <div class="myip-list">
-    <div class="myip-row" id="rowV6"><span class="fam">IPv6</span><a href="#" id="myV6">检测中…</a><button class="row-eye" id="eyeV6" aria-label="显示 / 隐藏 IPv6"><svg viewBox="0 0 24 24" fill="none" stroke="#9aa1a9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
-    <div class="myip-row" id="rowV4"><span class="fam">IPv4</span><a href="#" id="myV4">—</a><button class="row-eye" id="eyeV4" aria-label="显示 / 隐藏 IPv4"><svg viewBox="0 0 24 24" fill="none" stroke="#9aa1a9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+    <div class="myip-row" id="rowV6"><span class="fam">IPv6</span><a href="#" id="myV6">检测中…</a></div>
+    <div class="myip-row" id="rowV4"><span class="fam">IPv4</span><a href="#" id="myV4">—</a></div>
   </div>
-    <div class="myip-btns">
-    <button class="icon-btn" id="refreshBtn" aria-label="重新检测我的 IP" title="重新检测">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
-    </button>
-    <button class="icon-btn" id="shotBtn" aria-label="快照" title="快照">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-    </button>
-    </div>
   </div>
 
   <div class="err" id="errBox"></div>
@@ -411,12 +403,15 @@ input{font-family:inherit}
     <div class="fade-zone" id="fadeZone">
       <div class="row">
         <span class="lbl">IP</span>
-        <span class="val-blue" id="fIp">—</span>
+        <span class="val-blue" id="fIp" title="点击复制">—</span>
+        <button class="mini-btn" id="shotBtn" aria-label="快照" title="快照">
+          <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </button>
+        <button class="mini-btn" id="refreshBtn" aria-label="重新检测我的 IP" title="重新检测">
+          <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+        </button>
         <button class="mini-btn" id="eyeBtn" aria-label="显示 / 隐藏 IP" title="显示 / 隐藏">
           <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" id="eyeIcon"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-        <button class="mini-btn" id="copyBtn" aria-label="复制 IP" title="复制 IP">
-          <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         </button>
       </div>
 
@@ -929,20 +924,10 @@ function applyType(d){
 function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove("show"),1800)}
 function setBusy(b){state.busy=b;$("searchBtn").disabled=b;$("searchBtn").textContent=b?"检测中…":"Search";$("card").classList.toggle("loading",b)}
 const myIpState={v4:"",v6:"",primary6:false};
-const EYE_ON_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="#9aa1a9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
-const EYE_OFF_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="#9aa1a9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88"/><path d="M1 1l22 22"/></svg>';
-function maskMyIp(ip){return ip.includes(":")?(ip.split(":")[0]+":****:****:****"):ip.replace(/\.\d+\.\d+\./,".***.***.")}
 function syncMyIpHi(){const cur=state.data&&state.data.ip;$("rowV4").classList.toggle("on",!!(cur&&myIpState.v4&&cur===myIpState.v4));$("rowV6").classList.toggle("on",!!(cur&&myIpState.v6&&cur===myIpState.v6))}
 function renderMyIp(){
-  const row=(aid,eid,ip,hide,key)=>{
-    const el=$(aid);el.textContent=ip?(hide?maskMyIp(ip):ip):"未检测到";
-    el.classList.toggle("none",!ip||hide);
-    el.onclick=e=>{e.preventDefault();if(ip&&!hide)runQuery(ip,false)};
-    const eb=$(eid);eb.style.display=ip?"grid":"none";eb.innerHTML=hide?EYE_OFF_SVG:EYE_ON_SVG;
-    eb.onclick=()=>{myIpState[key]=!myIpState[key];renderMyIp()};
-  };
-  row("myV4","eyeV4",myIpState.v4,myIpState.hide4,"hide4");
-  row("myV6","eyeV6",myIpState.v6,myIpState.hide6,"hide6");
+  const row=(aid,ip)=>{const el=$(aid);el.textContent=ip||"未检测到";el.classList.toggle("none",!ip);el.onclick=e=>{e.preventDefault();if(ip)runQuery(ip,false)}};
+  row("myV4",myIpState.v4);row("myV6",myIpState.v6);
   $("rowV6").style.order=myIpState.primary6?"1":"2";
   $("rowV4").style.order=myIpState.primary6?"2":"1";
   syncMyIpHi();
@@ -977,7 +962,7 @@ $("eyeBtn").addEventListener("click",()=>{
   if(state.ipVisible){$("fIp").classList.remove("masked");$("fIp").textContent=ip;$("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>"}
   else{$("fIp").classList.add("masked");$("fIp").textContent=isIPv4(ip)?ip.replace(/\.\d+\.\d+\./,".***.***."):"****:****:****";$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}
 });
-$("copyBtn").addEventListener("click",async()=>{if(!state.data)return;try{await navigator.clipboard.writeText(state.data.ip);toast("已复制 "+state.data.ip)}catch(e){toast("复制失败，请手动复制")}});
+$("fIp").addEventListener("click",async()=>{if(!state.data)return;try{await navigator.clipboard.writeText(state.data.ip);toast("已复制 "+state.data.ip)}catch(e){toast("复制失败，请手动复制")}});
 $("numEyeBtn").addEventListener("click",()=>{state.numVisible=!state.numVisible;$("fNumIp").textContent=state.numVisible?$("fNumIp").dataset.num:"********"});
 $("refreshBtn").addEventListener("click",()=>{$("refreshBtn").classList.remove("spinning");void $("refreshBtn").offsetWidth;$("refreshBtn").classList.add("spinning");runQuery("",true)});
 $("shotBtn").addEventListener("click",()=>{const f=$("flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");toast("快照完成，可长按 / 截图保存本页")});
