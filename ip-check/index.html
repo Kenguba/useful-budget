@@ -482,9 +482,6 @@ input{font-family:inherit}
           <div class="kv"><span class="k">邮政编码</span><span class="v" id="fPostal">—</span></div>
         </div>
 
-        <div class="llm-table" id="llmTable" style="display:none"></div>
-        <div class="detect-result" id="llmResult"></div>
-
         <div style="padding:4px 16px">
           <div class="sec-title" style="padding-left:0">归属与企业</div>
           <div class="kv"><span class="k">ASN所有者</span><span class="v" id="fAsnOwner">—</span></div>
@@ -550,6 +547,9 @@ input{font-family:inherit}
           <div class="scene-grid" id="sceneGrid"></div>
           <div class="kv" style="margin-top:6px"><span class="k">检测说明</span><span class="v" id="fNote" style="font-size:14px;color:#6d7680;line-height:1.6">—</span></div>
         </div>
+
+        <div class="llm-table" id="llmTable" style="display:none"></div>
+        <div class="detect-result" id="llmResult"></div>
 
         <div style="padding:4px 16px">
           <div class="kv" style="align-items:center"><span class="k">数字地址</span><span class="v"><span class="num-ip" id="fNumIp">********</span>
@@ -846,6 +846,7 @@ async function runQuery(ip,selfMode){
     d.cls=classify(d);applyType(d);render(d);
     if(selfMode){setMyIp(d.ip,true);fillAltFamily(d.ip)}
     // 第二阶段：WHOIS / 路由历史 / BGP 邻居 / 黑名单 / 注册块
+    const geoP=fetchJSON("https://ip.jpedu.asia/api/geo?ip="+encodeURIComponent(targetIp)+"&d="+new Date().toISOString().slice(0,10),15000).catch(()=>null);
     const[overview,whoisJ,routing,neigh,prefixOv,bl,geo,proxy]=await settled([
       asn?ripe("as-overview",asn):Promise.resolve(null),
       ripe("whois",targetIp),
@@ -854,7 +855,7 @@ async function runQuery(ip,selfMode){
       ripe("prefix-overview",d.prefix||targetIp),
       dnsbl(targetIp),
       ripe("geoloc",targetIp),
-      fetchJSON("https://ip.jpedu.asia/api/geo?ip="+encodeURIComponent(targetIp),9000)
+      Promise.resolve(null)
     ]);
     if(seq!==state.querySeq)return;
     if(overview&&overview.holder){d.asnHolder=overview.holder;d.asnName=overview.holder.replace(/^[A-Z0-9-]+ - /,"")}
@@ -879,26 +880,13 @@ async function runQuery(ip,selfMode){
       }catch(e){}
       if(seq!==state.querySeq)return;
     }
-    if(proxy&&proxy.sources){
-      const bySrc={};srcs.filter(Boolean).forEach(s=>{bySrc[s.src]=s});
-      const prow=(label,o)=>{if(!o)return null;const place=[o.country||o.cc,o.region,o.city].filter(Boolean).join(", ");return place?{src:label,cc:o.cc||"",place:place}:null};
-      const rows=[
-        prow("Cloudflare",proxy.sources.cloudflare),
-        prow("IP2Location",proxy.sources.ip2location),
-        prow("DB-IP",proxy.sources.dbip),
-        prow("MaxMind",proxy.sources.maxmind),
-        bySrc["ipinfo.io"]?{src:"IPInfo.io",cc:bySrc["ipinfo.io"].cc,place:[bySrc["ipinfo.io"].country||bySrc["ipinfo.io"].cc,bySrc["ipinfo.io"].region,bySrc["ipinfo.io"].city].filter(Boolean).join(", ")}:null,
-        bySrc["ipwho.is"]?{src:"ipwho.is",cc:bySrc["ipwho.is"].cc,place:[bySrc["ipwho.is"].country,bySrc["ipwho.is"].region,bySrc["ipwho.is"].city].filter(Boolean).join(", ")}:null,
-        bySrc["ipapi.co"]?{src:"ipapi.co",cc:bySrc["ipapi.co"].cc,place:[bySrc["ipapi.co"].country,bySrc["ipapi.co"].region,bySrc["ipapi.co"].city].filter(Boolean).join(", ")}:null
-      ].filter(Boolean);
-      if(rows.length){d.locRows=rows;d.conf=rows.filter(r=>r.cc&&r.cc===d.cc).length}
-    }
     d.native=d.whoisCountry&&d.cc?(d.whoisCountry===d.cc):null;
     d.cls=classify(d);applyType(d);
     const sc=computeScore(d,d.cls,bl);d.score=sc.score;
     const blTxt=bl?(bl.checked?("DNSBL 实时查询 "+bl.checked+" 个名单："+(bl.hits?("命中 "+bl.names.join(", ")):"0 命中")):"DNSBL 查询被名单方拒绝（公共解析器限制）"):"";
     d.riskTags=[d.cls.type==="hosting"?"机房 / 数据中心":d.cls.type==="residential"?"住宅宽带":"商业宽带",d.native==null?"注册地未知":d.native?"原生":"非原生（注册地 "+(d.whoisCountry||"?")+" ≠ 定位 "+(d.cc||"?")+")",bl&&bl.hits?"黑名单命中 "+bl.hits:""].filter(Boolean).join(" · ");
     d.note="纯净度按实时信号计算："+sc.why.join("；")+"。定位 "+(d.locRows&&d.locRows.length?d.locRows.length:loc.total)+" 源共识（"+(d.locRows?d.conf:loc.agree)+" 个一致）。";
+    d._why=sc.why;
     render(d,true);
     // 第三阶段（不阻塞主结果）：ASN 历史 / BGP 邻居最后加载，到齐后补进详情
     (async()=>{
@@ -926,6 +914,26 @@ async function runQuery(ip,selfMode){
     }
       if(d.histAsn||d.neighbours)renderExtra(d);
     })();
+    // 地理补充源后到合并：CF / DB-IP 等到了再重排列位行，不阻塞主结果
+    geoP.then(proxy=>{
+      if(seq!==state.querySeq||!proxy||!proxy.sources)return;
+    if(proxy&&proxy.sources){
+      const bySrc={};srcs.filter(Boolean).forEach(s=>{bySrc[s.src]=s});
+      const prow=(label,o)=>{if(!o)return null;const place=[o.country||o.cc,o.region,o.city].filter(Boolean).join(", ");return place?{src:label,cc:o.cc||"",place:place}:null};
+      const rows=[
+        prow("Cloudflare",proxy.sources.cloudflare),
+        prow("IP2Location",proxy.sources.ip2location),
+        prow("DB-IP",proxy.sources.dbip),
+        prow("MaxMind",proxy.sources.maxmind),
+        bySrc["ipinfo.io"]?{src:"IPInfo.io",cc:bySrc["ipinfo.io"].cc,place:[bySrc["ipinfo.io"].country||bySrc["ipinfo.io"].cc,bySrc["ipinfo.io"].region,bySrc["ipinfo.io"].city].filter(Boolean).join(", ")}:null,
+        bySrc["ipwho.is"]?{src:"ipwho.is",cc:bySrc["ipwho.is"].cc,place:[bySrc["ipwho.is"].country,bySrc["ipwho.is"].region,bySrc["ipwho.is"].city].filter(Boolean).join(", ")}:null,
+        bySrc["ipapi.co"]?{src:"ipapi.co",cc:bySrc["ipapi.co"].cc,place:[bySrc["ipapi.co"].country,bySrc["ipapi.co"].region,bySrc["ipapi.co"].city].filter(Boolean).join(", ")}:null
+      ].filter(Boolean);
+      if(rows.length){d.locRows=rows;d.conf=rows.filter(r=>r.cc&&r.cc===d.cc).length}
+    }
+      if(d._why)d.note="纯净度按实时信号计算："+d._why.join("；")+"。定位 "+(d.locRows?d.locRows.length:0)+" 源共识（"+(d.conf||0)+" 个一致）。";
+      renderDetails(d);
+    });
   }catch(e){
     $("errBox").textContent="查询失败：实时数据源暂不可达，请稍后重试。";$("errBox").className="err show";
   }finally{if(seq===state.querySeq){if(state.asnPaintedSeq!==seq&&state.data)paintAsnHead(state.data);setBusy(false)}}
