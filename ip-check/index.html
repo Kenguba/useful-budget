@@ -1037,7 +1037,7 @@ function fillAltFamily(primary){
 }
 
 /* ---------- 交互 ---------- */
-$("searchForm").addEventListener("submit",e=>{e.preventDefault();runQuery($("ipInput").value,false)});
+$("searchForm").addEventListener("submit",e=>{e.preventDefault();const v=($("ipInput").value||"").trim();if(v)runQuery(v,false);else bootSelf()});
 function fitInputFont(){const v=$("ipInput").value||"";const n=v.length;$("ipInput").style.fontSize=n<=15?"":n<=24?"16.5px":n<=32?"14.5px":"13px"}
 $("ipInput").addEventListener("input",fitInputFont);
 $("eyeBtn").addEventListener("click",()=>{
@@ -1154,9 +1154,29 @@ let rszT;window.addEventListener("resize",()=>{clearTimeout(rszT);rszT=setTimeou
 
 /* ---------- 初始化：直接实时检测本机出口 ---------- */
 $("myV4").textContent="检测中…";
+async function probeV4(){
+  const eps=["https://api4.ipify.org?format=json","https://ipv4.icanhazip.com","https://v4.ident.me","https://v4.seeip.org/jsonip","https://api4.my-ip.io/ip"];
+  for(let round=0;round<3;round++){
+    const v4=await new Promise(res=>{
+      let done=false;const finish=v=>{if(!done){done=true;res(v||"")}};
+      eps.forEach(u=>{fetchText(u,4000).then(r=>{let ip=(r||"").trim();if(ip.startsWith("{")){try{ip=JSON.parse(ip).ip||""}catch(e){ip=""}}if(/^\d{1,3}(\.\d{1,3}){3}$/.test(ip))finish(ip)}).catch(()=>{})});
+      setTimeout(()=>finish(""),5000);
+    });
+    if(v4)return v4;
+    if(round<2)await new Promise(r=>setTimeout(r,800));
+  }
+  return "";
+}
+/* 自检卡片只认 IPv4：探不到 IPv4 就停在这里，绝不拿 IPv6 顶替进卡片 */
 async function bootSelf(){
-  const v4=await Promise.race([fetchAltFamily(false),new Promise(r=>setTimeout(()=>r(""),3500))]).catch(()=>"");
-  runQuery(v4||"",true);
+  const seq0=state.querySeq;
+  setBusy(true);
+  const v4=await probeV4().catch(()=>"");
+  if(state.querySeq!==seq0)return;
+  if(v4){runQuery(v4,true);return}
+  if(!errSticky)showErr("未检测到 IPv4 地址，卡片未做检测；可手动输入 IP 查询");
+  else setBusy(false);
+  fetchAltFamily(true).then(ip=>{if(ip)setMyIp(ip,false)}).catch(()=>{});
 }
 const q=new URLSearchParams(location.search);
 const qip=(q.get("ip")||"").trim();
