@@ -9,8 +9,8 @@
 <style>
 /* ============ 1. Design Tokens - extracted from 2fa.fun ============ */
 :root{
-  --bg-gradient-start:#d9e6ff;
-  --bg-gradient-end:#f3efff;
+  --bg-gradient-start:#f4f6fc;
+  --bg-gradient-end:#f4f6fc;
   --card-bg:#ffffff;
   --card-bg-solid:#ffffff;
   --sidebar-bg:#ffffff;
@@ -43,7 +43,7 @@
 }
 body.dark{
   --bg-gradient-start:#0b1120;
-  --bg-gradient-end:#1e1a3a;
+  --bg-gradient-end:#0b1120;
   --card-bg:rgba(17,24,39,.65);
   --card-bg-solid:rgba(17,24,39,.82);
   --sidebar-bg:rgba(10,15,30,.75);
@@ -81,7 +81,7 @@ a:focus,button:focus{outline:none}
 svg{display:block;flex:none}
 
 /* background glow orbs - gives the glass blur something to blur */
-.bg-orbs{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.bg-orbs{display:none}
 .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;animation:orbFloat 18s ease-in-out infinite alternate}
 .orb-1{width:480px;height:480px;left:-120px;top:-140px;background:#c7d2fe}
 .orb-2{width:420px;height:420px;right:-100px;top:12%;background:#ddd6fe;animation-delay:-6s}
