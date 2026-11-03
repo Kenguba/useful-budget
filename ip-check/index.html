@@ -165,7 +165,7 @@ input{font-family:inherit}
 .ratio-nums .b{color:#f2607e;font-weight:500}
 
 .sec-title{font-size:17px;font-weight:700;padding:14px 4px 4px}
-#card .sec-title{padding-left:0;padding-right:0}
+.sec-title{padding-left:0;padding-right:0}
 .loc-row{display:flex;align-items:flex-start;gap:8px;padding:7.5px 0;font-size:15.5px}
 .loc-row .src{padding-top:1px}
 .loc-row .flag-img{margin-top:3px}
@@ -541,6 +541,12 @@ input{font-family:inherit}
   </section>
 
   <section class="card scene-card">
+        <div class="block gray" style="margin-top:2px">
+          <div class="sec-title" style="padding-top:8px">适用场景</div>
+          <div class="scene-grid" id="sceneGrid"></div>
+          <div class="kv" style="margin-top:6px"><span class="k">检测说明</span><span class="v" id="fNote" style="font-size:14px;color:#6d7680;line-height:1.6">—</span></div>
+        </div>
+
         <div style="padding:4px 16px">
           <div class="kv" style="align-items:center"><span class="k">模型检测</span><span class="v"><button class="detect-link" id="llmBtn" type="button">点击检测</button></span></div>
           <div class="llm-table" id="llmTable" style="display:none"></div>
@@ -551,11 +557,7 @@ input{font-family:inherit}
             </button></span></div>
         </div>
 
-        <div class="block gray">
-          <div class="sec-title" style="padding-top:8px">适用场景</div>
-          <div class="scene-grid" id="sceneGrid"></div>
-          <div class="kv" style="margin-top:6px"><span class="k">检测说明</span><span class="v" id="fNote" style="font-size:14px;color:#6d7680;line-height:1.6">—</span></div>
-        </div>
+
   </section>
 
   <section class="card env-card">
@@ -916,7 +918,7 @@ async function runQuery(ip,selfMode){
     const sc=computeScore(d,d.cls,bl);d.score=sc.score;
     const blTxt=bl?(bl.checked?("DNSBL 实时查询 "+bl.checked+" 个名单："+(bl.hits?("命中 "+bl.names.join(", ")):"0 命中")):"DNSBL 查询被名单方拒绝（公共解析器限制）"):"";
     d.riskTags=[d.cls.type==="hosting"?"机房 / 数据中心":d.cls.type==="residential"?"住宅宽带":"商业宽带",d.native==null?"注册地未知":d.native?"原生":"非原生（注册地 "+(d.whoisCountry||"?")+" ≠ 定位 "+(d.cc||"?")+")",bl&&bl.hits?"黑名单命中 "+bl.hits:""].filter(Boolean).join(" · ");
-    d.note="纯净度 = 本站按实时信号透明计算："+sc.why.join("；")+"。"+blTxt+"。定位为 "+(d.locRows&&d.locRows.length?d.locRows.length:loc.total)+" 个数据源共识（"+(d.locRows?d.conf:loc.agree)+" 个一致）。类型依据组织名 / WHOIS / 反向解析实时判定；场景星级按 IP 类型、定位国家与各厂商支持情况给出，非平台官方数据。";
+    d.note="纯净度按实时信号计算："+sc.why.join("；")+"。定位 "+(d.locRows&&d.locRows.length?d.locRows.length:loc.total)+" 源共识（"+(d.locRows?d.conf:loc.agree)+" 个一致）。";
     render(d,true);
   }catch(e){
     $("errBox").textContent="查询失败：实时数据源暂不可达，请稍后重试。";$("errBox").className="err show";
