@@ -548,7 +548,6 @@ input{font-family:inherit}
         </div>
 
         <div style="padding:4px 16px">
-          <div class="kv" style="align-items:center"><span class="k">模型检测</span><span class="v"><button class="detect-link" id="llmBtn" type="button">点击检测</button></span></div>
           <div class="llm-table" id="llmTable" style="display:none"></div>
           <div class="detect-result" id="llmResult"></div>
           <div class="kv" style="align-items:center"><span class="k">数字地址</span><span class="v"><span class="num-ip" id="fNumIp">********</span>
@@ -756,8 +755,7 @@ function render(d,final){
   const shPill=$("fShared");shPill.textContent=d.prefix?(d.prefix+" · "+prefixSize(d.prefix)):"—";shPill.className="pill long"+(d.prefix&&prefixExp(d.prefix)>=16?" warn":"");
   $("fRisk").textContent=d.riskTags||"查询中…";
   $("fNote").textContent=d.note||"正在汇总实时信号…";
-  $("llmResult").innerHTML="";$("llmBtn").textContent="点击检测";$("llmBtn").disabled=false;
-  $("llmTable").style.display="none";$("llmTable").innerHTML="";
+  paintLlm(d);
   const num=ipToBig(d.ip);
   $("fNumIp").dataset.num=num!=null?String(num):"—";$("fNumIp").textContent=state.numVisible?$("fNumIp").dataset.num:"********";syncNumEye();
   $("sceneGrid").innerHTML=d.scenes.map(s=>"<div class='scene'><div class='nm'>"+s[0]+"</div><div class='stars'>"+starsHtml(s[1])+"</div><div class='suit'>✅ <b>"+suitText(s[1])+"</b></div></div>").join("");
@@ -849,8 +847,8 @@ async function runQuery(ip,selfMode){
     const[overview,whoisJ,routing,neigh,prefixOv,bl,geo,proxy]=await settled([
       asn?ripe("as-overview",asn):Promise.resolve(null),
       ripe("whois",targetIp),
-      ripe("routing-history",targetIp,12000),
-      asn?ripe("asn-neighbours",asn,12000):Promise.resolve(null),
+      Promise.resolve(null),
+      Promise.resolve(null),
       ripe("prefix-overview",d.prefix||targetIp),
       dnsbl(targetIp),
       ripe("geoloc",targetIp),
@@ -866,30 +864,10 @@ async function runQuery(ip,selfMode){
       const rir=(prefixOv&&prefixOv.block&&prefixOv.block.desc)||"";
       d.histReg=[{org:(d.whoisCountry||"—")+" · "+rir,cidr:map.inetnum||d.prefix,extra:"IANA / 区域注册局分配块（实时）"}];
     }
-    if(routing&&routing.by_origin){
-      const items=[];
-      routing.by_origin.forEach(o=>{
-        (o.prefixes||[]).forEach(p=>{
-          const tls=p.timelines||[];if(!tls.length)return;
-          items.push({ttl:"AS"+o.origin,org:d.asnHolder||"",cidr:p.prefix,first:fmtDT(tls[0].starttime),last:fmtDT(tls[tls.length-1].endtime),mine:o.origin===String(asn).replace("AS","")});
-        });
-      });
-      items.sort((a,b)=>(b.mine-a.mine)||(a.first<b.first?-1:1));
-      d.histAsn=items.slice(0,3).map(i=>({ttl:i.ttl,org:i.org,cidr:i.cidr,first:i.first,last:i.last}));
-    }
     const geoLocs=geo&&geo.located_resources&&geo.located_resources[0]&&geo.located_resources[0].locations;
     if(geoLocs&&geoLocs.length){
       d.histLoc=geoLocs.slice(0,3).map(l=>({org:[l.country,l.city].filter(Boolean).join(" "),cidr:(l.resources&&l.resources[0])||d.prefix,extra:"经纬度 "+(l.latitude!=null?Number(l.latitude).toFixed(4):"—")+", "+(l.longitude!=null?Number(l.longitude).toFixed(4):"—")+" · 覆盖 "+(l.covered_percentage!=null?l.covered_percentage+"%":"—")}));
     }else d.histLoc=[{org:[loc.country,loc.region,loc.city].filter(Boolean).join(" "),cidr:d.prefix,extra:"多源共识定位"}];
-    if(neigh&&Array.isArray(neigh.neighbours)){
-      const all=neigh.neighbours.map(n=>({asn:n.asn,power:n.power,side:n.type==="right"?"right":"left"}));
-      all.sort((a,b)=>b.power-a.power);
-      const top=all.slice(0,10);
-      const overs=await settled(top.map(n=>ripe("as-overview","AS"+n.asn,4000)));
-      if(seq!==state.querySeq)return;
-      top.forEach((n,i)=>{n.holder=(overs[i]&&overs[i].holder)||"";n.idc=HOST_KW.some(k=>(n.holder||"").toLowerCase().includes(k))?1:0});
-      d.neighbours=top;
-    }
     if(!d.host){
       try{
         const rev=targetIp.split(".").reverse().join(".")+".in-addr.arpa";
@@ -920,6 +898,32 @@ async function runQuery(ip,selfMode){
     d.riskTags=[d.cls.type==="hosting"?"机房 / 数据中心":d.cls.type==="residential"?"住宅宽带":"商业宽带",d.native==null?"注册地未知":d.native?"原生":"非原生（注册地 "+(d.whoisCountry||"?")+" ≠ 定位 "+(d.cc||"?")+")",bl&&bl.hits?"黑名单命中 "+bl.hits:""].filter(Boolean).join(" · ");
     d.note="纯净度按实时信号计算："+sc.why.join("；")+"。定位 "+(d.locRows&&d.locRows.length?d.locRows.length:loc.total)+" 源共识（"+(d.locRows?d.conf:loc.agree)+" 个一致）。";
     render(d,true);
+    // 第三阶段（不阻塞主结果）：ASN 历史 / BGP 邻居最后加载，到齐后补进详情
+    (async()=>{
+      const[routing,neigh]=await settled([ripe("routing-history",targetIp,12000),asn?ripe("asn-neighbours",asn,12000):Promise.resolve(null)]);
+      if(seq!==state.querySeq)return;
+    if(routing&&routing.by_origin){
+      const items=[];
+      routing.by_origin.forEach(o=>{
+        (o.prefixes||[]).forEach(p=>{
+          const tls=p.timelines||[];if(!tls.length)return;
+          items.push({ttl:"AS"+o.origin,org:d.asnHolder||"",cidr:p.prefix,first:fmtDT(tls[0].starttime),last:fmtDT(tls[tls.length-1].endtime),mine:o.origin===String(asn).replace("AS","")});
+        });
+      });
+      items.sort((a,b)=>(b.mine-a.mine)||(a.first<b.first?-1:1));
+      d.histAsn=items.slice(0,3).map(i=>({ttl:i.ttl,org:i.org,cidr:i.cidr,first:i.first,last:i.last}));
+    }
+    if(neigh&&Array.isArray(neigh.neighbours)){
+      const all=neigh.neighbours.map(n=>({asn:n.asn,power:n.power,side:n.type==="right"?"right":"left"}));
+      all.sort((a,b)=>b.power-a.power);
+      const top=all.slice(0,10);
+      const overs=await settled(top.map(n=>ripe("as-overview","AS"+n.asn,4000)));
+      if(seq!==state.querySeq)return;
+      top.forEach((n,i)=>{n.holder=(overs[i]&&overs[i].holder)||"";n.idc=HOST_KW.some(k=>(n.holder||"").toLowerCase().includes(k))?1:0});
+      d.neighbours=top;
+    }
+      if(d.histAsn||d.neighbours)renderExtra(d);
+    })();
   }catch(e){
     $("errBox").textContent="查询失败：实时数据源暂不可达，请稍后重试。";$("errBox").className="err show";
   }finally{if(seq===state.querySeq){if(state.asnPaintedSeq!==seq&&state.data)paintAsnHead(state.data);setBusy(false)}}
@@ -1017,21 +1021,13 @@ const VENDORS=[
   {name:"Gemini",by:"Google",bg:"linear-gradient(135deg,#4285f4,#9b72cb)",icon:"<svg viewBox='0 0 24 24' fill='#fff'><path d='M12 2c.6 5.8 4.2 9.4 10 10-5.8.6-9.4 4.2-10 10-.6-5.8-4.2-9.4-10-10C7.8 11.4 11.4 7.8 12 2z'/></svg>"},
   {name:"Grok",by:"xAI",bg:"#111111",icon:"<svg viewBox='0 0 24 24' stroke='#fff' stroke-width='2.4' stroke-linecap='round'><path d='M5 5l14 14M19 5L5 19'/></svg>"}
 ];
-$("llmBtn").addEventListener("click",()=>{
-  if(!state.data)return;const d=state.data;const btn=$("llmBtn");
-  btn.disabled=true;btn.textContent="检测中…";$("llmResult").innerHTML="";
-  setTimeout(()=>{
-    const cc=(d.cc||"").toUpperCase();
-    const tbl=$("llmTable");
-    tbl.innerHTML="<div class='llm-row head'><span></span><span>厂商</span><span>判定（"+(cc||"?")+"）</span></div>"+VENDORS.map(v=>{
-      const ok=(LLM_LISTS[v.name]||[]).includes(cc);
-      return "<div class='llm-row'><span class='vendor-ic' style='background:"+v.bg+"'>"+v.icon+"</span><span><span class='llm-name'>"+v.name+"</span><div class='llm-sub'>"+v.by+"</div></span><span class='llm-chip "+(ok?"ok":"no")+"'>"+(ok?"✓ 可用":"✕ 不可用")+"</span></div>";
-    }).join("");
-    tbl.style.display="block";
-    $("llmResult").textContent="方法：该 IP 实时定位国家与各厂商官方支持地区名单核对。"+(d.native===false?"非原生 IP 仍可能触发额外验证。":d.native?"原生 IP，通过率最高。":"");
-    btn.textContent="重新检测";btn.disabled=false;
-  },400);
-});
+function paintLlm(d){
+  const tbl=$("llmTable");if(!tbl)return;const cc=(d.cc||"").toUpperCase();
+  if(!cc){tbl.style.display="none";tbl.innerHTML="";$("llmResult").textContent="";return}
+  tbl.innerHTML="<div class='llm-row head'><span></span><span>厂商</span><span>判定（"+cc+"）</span></div>"+VENDORS.map(v=>{const ok=(LLM_LISTS[v.name]||[]).includes(cc);return "<div class='llm-row'><span class='vendor-ic' style='background:"+v.bg+"'>"+v.icon+"</span><span><span class='llm-name'>"+v.name+"</span><div class='llm-sub'>"+v.by+"</div></span><span class='llm-chip "+(ok?"ok":"no")+"'>"+(ok?"✓ 可用":"✕ 不可用")+"</span></div>"}).join("");
+  tbl.style.display="block";
+  $("llmResult").textContent="方法：该 IP 实时定位国家与各厂商官方支持地区名单核对。"+(d.native===false?"非原生 IP 仍可能触发额外验证。":d.native?"原生 IP，通过率最高。":"");
+}
 $("companyHead").addEventListener("click",()=>{const b=$("companyBody"),open=b.style.display!=="none";b.style.display=open?"none":"block";$("companyHead").classList.toggle("open",!open)});
 $("rtcBtn").addEventListener("click",()=>{
   const box=$("rtcResult");const btn=$("rtcBtn");btn.textContent="检测中…";box.innerHTML="";const found=new Map();let done=false;
