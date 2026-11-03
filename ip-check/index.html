@@ -142,10 +142,11 @@ input{font-family:inherit}
 .kv .k{color:#3c424b;font-weight:500;width:86px;flex:none;font-size:15px}
 .kv .v{color:var(--ink-2);word-break:break-all;flex:1;min-width:0}
 .kv .v.blue{color:var(--blue);font-weight:600;font-size:16.5px}
-.asn-head{display:flex;align-items:center;gap:12px;padding:13px 4px 4px;cursor:pointer;user-select:none}
+.asn-head{display:flex;align-items:center;gap:6px;padding:13px 4px 4px;cursor:pointer;user-select:none}
 .asn-head .lbl{width:86px}
 .asn-head .name{font-size:16.5px;color:var(--ink-2);flex:1;min-width:0}
 .asn-head .name b{color:var(--blue);font-weight:600}
+#fIp.masked{letter-spacing:-1px;font-weight:500}
 .chev{margin-left:auto;width:30px;height:30px;border-radius:8px;background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.07);display:grid;place-items:center;transition:transform .4s var(--ease);flex:none}
 .chev svg{width:15px;height:15px;stroke:#8a929c}
 .asn-body{overflow:hidden;max-height:340px;transition:max-height .5s var(--ease),opacity .4s;opacity:1}
@@ -694,8 +695,11 @@ function render(d){
   $("ipInput").value=d.ip;
   $("fIp").textContent=d.ip;
   $("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>";
+  if(state.ipVisible===false){$("fIp").textContent=isIPv4(d.ip)?d.ip.replace(/\.\d+\.\d+\./,".***.***."):"****:****:****";$("fIp").classList.add("masked");$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}else{$("fIp").classList.remove("masked")}
   $("fAsn").textContent=d.asn||"—";
   $("fAsnName").textContent=d.asnName?" - "+d.asnName:"";
+  const asnLen=($("fAsn").textContent+$("fAsnName").textContent).length;
+  document.querySelector(".asn-head .name").style.fontSize=asnLen>40?"14.5px":asnLen>30?"15.5px":"16.5px";
   $("fAsDomain").textContent=d.domain||d.netname||"—";
   $("fRange").textContent=d.range||"—";
   const pure=100-d.score;
@@ -955,8 +959,8 @@ function fillAltFamily(primary){
 $("searchForm").addEventListener("submit",e=>{e.preventDefault();runQuery($("ipInput").value,false)});
 $("eyeBtn").addEventListener("click",()=>{
   if(!state.data)return;state.ipVisible=!state.ipVisible;const ip=state.data.ip;
-  if(state.ipVisible){$("fIp").textContent=ip;$("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>"}
-  else{$("fIp").textContent=isIPv4(ip)?ip.replace(/\.\d+\.\d+\./,".***.***."):"****:****:****";$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}
+  if(state.ipVisible){$("fIp").classList.remove("masked");$("fIp").textContent=ip;$("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>"}
+  else{$("fIp").classList.add("masked");$("fIp").textContent=isIPv4(ip)?ip.replace(/\.\d+\.\d+\./,".***.***."):"****:****:****";$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}
 });
 $("copyBtn").addEventListener("click",async()=>{if(!state.data)return;try{await navigator.clipboard.writeText(state.data.ip);toast("已复制 "+state.data.ip)}catch(e){toast("复制失败，请手动复制")}});
 $("numEyeBtn").addEventListener("click",()=>{state.numVisible=!state.numVisible;$("fNumIp").textContent=state.numVisible?$("fNumIp").dataset.num:"********"});
