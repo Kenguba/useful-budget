@@ -2386,6 +2386,9 @@ try{
   isDarkMode=localStorage.getItem("ip-dark")==="1";
   currentLang=localStorage.getItem("ip-lang")==="en"?"en":"zh";
 }catch(e){}
+function readSharedA(){try{var m=document.cookie.match(/(?:^|;\s*)A=(\d{3,4})(?:;|$)/);if(!m)return null;var v=m[1],t=parseInt(v.slice(2),10);if(v.charAt(1)!=='0'&&v.charAt(1)!=='1')return null;if(!(t>=1&&t<=12))return null;return{l:v.charAt(0),m:v.charAt(1),t:t};}catch(e){return null;}}
+function writeSharedA(){try{var h=location.hostname,s='A='+(currentLang==="en"?'1':'0')+(isDarkMode?'0':'1')+(currentGlobalThemeIndex+1)+';path=/;max-age=31536000;SameSite=Lax';if(h==='jpedu.asia'||h.slice(-11)==='.jpedu.asia')s+=';domain=jpedu.asia';if(location.protocol==='https:')s+=';Secure';document.cookie=s;}catch(e){}}
+(function(){var a=readSharedA();if(a){currentGlobalThemeIndex=a.t-1;isDarkMode=a.m==='0';currentLang=a.l==='1'?'en':'zh';try{localStorage.setItem("ip-theme-idx",String(currentGlobalThemeIndex));localStorage.setItem("ip-dark",isDarkMode?"1":"0");localStorage.setItem("ip-lang",currentLang);}catch(e){}}})();
 
 function applyThemeByGlobalIndex(index){
   currentGlobalThemeIndex=index;
@@ -2407,6 +2410,7 @@ function applyThemeByGlobalIndex(index){
     else{ol.style.transform="";or.style.transform=""}
   }
   try{localStorage.setItem("ip-theme-idx",String(index))}catch(e){}
+  writeSharedA();
   updateSwatchActiveState();
 }
 function renderThemeSwatches(){
@@ -2430,6 +2434,7 @@ function toggleDarkMode(){
   if(isDarkMode){root.setAttribute("data-dark","true");root.style.setProperty("--page-bg","#090D16");icon.innerHTML="<path d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z'></path>"}
   else{root.removeAttribute("data-dark");root.style.setProperty("--page-bg",allThemes[currentGlobalThemeIndex].pageBg);icon.innerHTML="<circle cx='12' cy='12' r='4'></circle><line x1='12' y1='2' x2='12' y2='4.5'></line><line x1='12' y1='19.5' x2='12' y2='22'></line><line x1='4.93' y1='4.93' x2='6.7' y2='6.7'></line><line x1='17.3' y1='17.3' x2='19.07' y2='19.07'></line><line x1='2' y1='12' x2='4.5' y2='12'></line><line x1='19.5' y1='12' x2='22' y2='12'></line><line x1='4.93' y1='19.07' x2='6.7' y2='17.3'></line><line x1='17.3' y1='6.7' x2='19.07' y2='4.93'></line>"}
   try{localStorage.setItem("ip-dark",isDarkMode?"1":"0")}catch(e){}
+  writeSharedA();
   showToast(currentLang==="zh"?(isDarkMode?"已开启深色模式（长按按钮可选 12 色主题）":"已切换浅色模式"):(isDarkMode?"Dark mode on (long-press for 12 themes)":"Light mode on"));
 }
 (function initThemeButtonGestures(){
@@ -2520,6 +2525,7 @@ function applyLanguage(){
 function toggleLanguage(){
   currentLang=currentLang==="zh"?"en":"zh";
   try{localStorage.setItem("ip-lang",currentLang)}catch(e){}
+  writeSharedA();
   applyLanguage();
 }
 const DYN={
