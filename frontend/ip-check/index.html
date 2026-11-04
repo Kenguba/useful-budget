@@ -3200,7 +3200,7 @@ async function probeV4(){
   return "";
 }
 /* 自检卡片只认 IPv4：探不到 IPv4 就停在这里，绝不拿 IPv6 顶替进卡片 */
-async function bootSelf(){
+async function bootSelf(){const ps=document.querySelector(".ip-proto-section");if(ps)ps.style.display="";
   const seq0=state.querySeq;
   setBusy(true);
   const v4=await probeV4().catch(()=>"");
@@ -3256,7 +3256,7 @@ document.querySelector(".modal-close-btn").addEventListener("click",closeSnapsho
 const q=new URLSearchParams(location.search);
 const qip=(q.get("ip")||"").trim();
 if(qip){
-  if(validIp(qip))runQuery(qip,false);
+  if(validIp(qip)){const ps=document.querySelector(".ip-proto-section");if(ps)ps.style.display="none";runQuery(qip,false)}
   else{showErr(TD("errLinkInvalid")+qip,true);bootSelf()}
 }else bootSelf();
 fetchText("https://www.cloudflare.com/cdn-cgi/trace",4000).then(t=>{
