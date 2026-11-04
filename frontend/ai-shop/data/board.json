@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-04 21:58",
+ "updated_at": "2026-11-04 22:08",
  "source": "AI价网 + cardnav + PriceAI 按商家遍历合并",
  "groups": [
   {
@@ -2499,9 +2499,43 @@
     },
     {
      "price": 19.53,
+     "shop": "AI搬运工",
+     "platform": "16688",
+     "stock": 100,
+     "title": "反代专用 G Plus 已接马",
+     "url": "https://16688.com.cn/goods/G45280072",
+     "kind": "",
+     "same_source": 3,
+     "sources": [
+      {
+       "price": 19.53,
+       "shop": "AI搬运工",
+       "platform": "16688",
+       "stock": 100,
+       "url": "https://16688.com.cn/goods/G45280072"
+      },
+      {
+       "price": 29.4,
+       "shop": "YUJI",
+       "platform": "16688",
+       "stock": 100,
+       "url": "https://www.16688.com.cn/goods/G47326273"
+      },
+      {
+       "price": 30.0,
+       "shop": "AI批量部",
+       "platform": "16688",
+       "stock": 100,
+       "url": "https://www.16688.com.cn/goods/G46321110"
+      }
+     ],
+     "pc": "2026-11-04"
+    },
+    {
+     "price": 19.53,
      "shop": "传统ai",
      "platform": "16688",
-     "stock": 193,
+     "stock": 118,
      "title": "upi，gopay渠道 手搓plus 带账密2FA 已接马 质保一小时内首登 。",
      "url": "https://16688.com.cn/goods/G43898635",
      "kind": "",
@@ -3598,16 +3632,6 @@
        "url": "https://wzyp.cn/item/tjrzk0"
       }
      ]
-    },
-    {
-     "price": 21.0,
-     "shop": "好又来",
-     "platform": "16688",
-     "stock": 3,
-     "title": "（源头）plus成品--已接马（质保首登）店家精选-（2号开通）耐活老号，带1张重置卡，非日抛（账密2fa发货）推荐指数：⭐⭐⭐⭐⭐",
-     "url": "https://www.16688.com.cn/goods/G32497293",
-     "kind": "",
-     "same_source": 1
     }
    ]
   },
@@ -6556,7 +6580,7 @@
      "price": 18.0,
      "shop": "奶龙Gemini订阅(源头招代理)",
      "platform": "16688",
-     "stock": 13,
+     "stock": 12,
      "title": "Gemini Pro 24个月自动订阅卡密|包绑卡|可使用反重力|卡密可囤",
      "url": "https://www.16688.com.cn/goods/G63803286",
      "kind": "成品号",
@@ -8521,7 +8545,7 @@
      "price": 0.36,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": 497,
+     "stock": 499,
      "title": "CDK 美国实卡源头招代理codex 短效单次接马 支持api 在有效期内可以二次验证",
      "url": "https://aicdks.com/product/106845",
      "kind": "",
