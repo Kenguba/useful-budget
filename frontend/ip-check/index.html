@@ -911,6 +911,15 @@
     }
 
     /* 系数区并入 IP来源 卡后：去自身卡面，只留顶部分隔线与行距 */
+    /* 英文标签更长（如 IP Attribute）：仅英文时加宽本卡标签列，防换行且三行对齐 */
+    html[lang="en"] .ip-tag-label {
+      width: 110px;
+    }
+
+    html[lang="en"] .ip-tags-subbox .asn-row .field-label {
+      width: 110px;
+    }
+
     .ip-tags-subbox #riskSection {
       margin-top: 2px;
       background: transparent;
@@ -986,6 +995,7 @@
       font-weight: 800;
       color: var(--text-primary);
       flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .ippure-pill-badge {
