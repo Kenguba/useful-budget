@@ -1969,7 +1969,8 @@ function openSrc(gi,ii,btn){
   srcIsOpen=true;
   srcAnchorTop=btn?btn.getBoundingClientRect().top:null;
   srcOpener=btn||document.activeElement;
-  srcHist=false; srcPrevSR=null;
+  srcPrevSR=null;
+  try{ history.pushState({museSrcPopup:1},''); srcHist=true; }catch(e){ srcHist=false; }
   window.__srcSettleUntil=Date.now()+1500;
   srcOverlay.hidden=false;
   srcOverlay.setAttribute('aria-hidden','false');
@@ -1981,8 +1982,8 @@ function openSrc(gi,ii,btn){
 }
 function closeSrc(fromPop){
   if(!srcIsOpen) return;
+  if(!fromPop&&srcHist){ srcHist=false; try{ history.back(); }catch(e){} setTimeout(()=>{ if(srcIsOpen) closeSrc(true); },350); return; }
   srcIsOpen=false;
-  srcHist=false;
   window.__srcSettleUntil=Date.now()+1500;
   srcOverlay.classList.remove('open');
   srcOverlay.setAttribute('aria-hidden','true');
