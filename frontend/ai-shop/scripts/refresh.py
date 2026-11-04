@@ -507,37 +507,45 @@ def main():
             sys.exit(1)
     # 价格变动日志（ken 2026-11-04 定，时间戳错位增量编码）：每件商品只存首条
     # [完整时间戳(epoch 分钟), 首价]，之后每次变价只追加 [距上次分钟数, 新价]，
-    # 精确到分钟、省空间。board 每条附 pc=最近一次变价日期（北京时间），页面在价格后标注。
+    # 精确到分钟、省空间。【2026-11-04 晚 ken 改定：全量维护】维护对象不是上榜的
+    # 200 多条，而是 8 个分组的全部候选（含库存 0 的失效条目、没挤进前 30 的、
+    # 同源里非最低价的），上榜条目只是这张全量表的一个子集；表只增不删，
+    # 条目掉出候选后记录保留、回来接着记。board 的 pc 只做派生：记录里出现过
+    # 第 2 个价位点（真变价）才标，pc 为最近一次变价日期（北京时间）。
     try:
         from datetime import datetime as _dt, timezone as _tz, timedelta as _td
         _bj = _tz(_td(hours=8))
         _now = _dt.now(_bj)
         _now_min = int(_now.timestamp() // 60)
-        _today = _now.strftime('%Y-%m-%d')
         _log_path = os.path.join(DATA, 'price-log.json')
         try:
             with open(_log_path, encoding='utf-8') as f:
                 _log = json.load(f).get('items', {})
         except Exception:
             _log = {}
+        _pool = {}
+        for _lst in (g1, g2, g3, g4, g5, g6, g7, claude_group(rows + pai)):
+            for _o in _lst:
+                if _o['price'] is None or _o['price'] <= 0:
+                    continue
+                _pool[_o['url'].split('?')[0] + '|' + norm_title(_o['title'])] = _o['price']
+        for _key, _price in _pool.items():
+            _rec = _log.get(_key)
+            if not _rec:
+                # 首次出现只建账，不算变价（ken 2026-11-04：真的变了才显示变价）
+                _log[_key] = [_now_min, _price]
+            elif _price != _rec[-1]:
+                _last_ts = _rec[0] + sum(_rec[2::2])
+                _rec += [_now_min - _last_ts, _price]
         for g in groups:
             for it in g['items']:
-                _key = it['url'].split('?')[0] + '|' + norm_title(it['title'])
-                _rec = _log.get(_key)
-                if not _rec:
-                    # 首次出现只建账，不算变价（ken 2026-11-04：真的变了才显示变价）
-                    _log[_key] = [_now_min, it['price']]
-                else:
+                _rec = _log.get(it['url'].split('?')[0] + '|' + norm_title(it['title']))
+                if _rec and len(_rec) > 2:
                     _last_ts = _rec[0] + sum(_rec[2::2])
-                    if it['price'] != _rec[-1]:
-                        _rec += [_now_min - _last_ts, it['price']]
-                        it['pc'] = _today
-                    elif len(_rec) > 2:
-                        # 已有过真实变价：pc 停在最近一次变价日
-                        it['pc'] = _dt.fromtimestamp(_last_ts * 60, _bj).strftime('%Y-%m-%d')
+                    it['pc'] = _dt.fromtimestamp(_last_ts * 60, _bj).strftime('%Y-%m-%d')
         with open(_log_path, 'w', encoding='utf-8') as f:
             json.dump(dict(v=1, items=_log), f, ensure_ascii=False, separators=(',', ':'))
-        print(f'price-log: {len(_log)} keys', file=sys.stderr)
+        print(f'price-log: {len(_log)} keys (pool {len(_pool)})', file=sys.stderr)
     except Exception as e:
         print(f'price-log skipped: {e}', file=sys.stderr)
     os.makedirs(DATA, exist_ok=True)
