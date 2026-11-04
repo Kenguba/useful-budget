@@ -505,6 +505,40 @@ def main():
         if old_total > 0 and new_total < old_total * 0.5:
             print(f'GUARD: new total {new_total} < 50% of previous {old_total}; refusing to overwrite board.json', file=sys.stderr)
             sys.exit(1)
+    # 价格变动日志（ken 2026-11-04 定，时间戳错位增量编码）：每件商品只存首条
+    # [完整时间戳(epoch 分钟), 首价]，之后每次变价只追加 [距上次分钟数, 新价]，
+    # 精确到分钟、省空间。board 每条附 pc=最近一次变价日期（北京时间），页面在价格后标注。
+    try:
+        from datetime import datetime as _dt, timezone as _tz, timedelta as _td
+        _bj = _tz(_td(hours=8))
+        _now = _dt.now(_bj)
+        _now_min = int(_now.timestamp() // 60)
+        _today = _now.strftime('%Y-%m-%d')
+        _log_path = os.path.join(DATA, 'price-log.json')
+        try:
+            with open(_log_path, encoding='utf-8') as f:
+                _log = json.load(f).get('items', {})
+        except Exception:
+            _log = {}
+        for g in groups:
+            for it in g['items']:
+                _key = it['url'].split('?')[0] + '|' + norm_title(it['title'])
+                _rec = _log.get(_key)
+                if not _rec:
+                    _log[_key] = [_now_min, it['price']]
+                    it['pc'] = _today
+                else:
+                    _last_ts = _rec[0] + sum(_rec[2::2])
+                    if it['price'] != _rec[-1]:
+                        _rec += [_now_min - _last_ts, it['price']]
+                        it['pc'] = _today
+                    else:
+                        it['pc'] = _dt.fromtimestamp(_last_ts * 60, _bj).strftime('%Y-%m-%d')
+        with open(_log_path, 'w', encoding='utf-8') as f:
+            json.dump(dict(v=1, items=_log), f, ensure_ascii=False, separators=(',', ':'))
+        print(f'price-log: {len(_log)} keys', file=sys.stderr)
+    except Exception as e:
+        print(f'price-log skipped: {e}', file=sys.stderr)
     os.makedirs(DATA, exist_ok=True)
     with open(os.path.join(DATA, 'board.json'), 'w', encoding='utf-8') as f:
         json.dump(board, f, ensure_ascii=False, indent=1)
