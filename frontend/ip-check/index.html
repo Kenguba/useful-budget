@@ -2539,7 +2539,8 @@ function spaApply(st){
   spaState=st;
   menuVisual(st.menu);panelVisual(st.panel);modalVisual(st.modal);
   if(st.details!==detailsOpen)toggleDetails(st.details);
-  navSeq++;
+  if(st.sec&&!st.menu){jumpToSection(st.sec,false)}
+  else{navSeq++;window.scrollTo({top:st.y||0,behavior:"auto"})}
 }
 window.addEventListener("popstate",e=>{
   const base={menu:false,details:false,modal:false,panel:false,sec:null,y:0};
