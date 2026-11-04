@@ -818,15 +818,19 @@
       transition: opacity 0.3s ease;
     }
 
-    .product-card:hover {
+    @media (hover:hover) and (pointer:fine){
+.product-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 24px -6px var(--search-glow);
       border-color: var(--orb-color-2);
     }
+}
 
-    .product-card:hover::before {
+    @media (hover:hover) and (pointer:fine){
+.product-card:hover::before {
       opacity: 1;
     }
+}
 
     .product-card:active {
       transform: scale(0.97);
@@ -1026,10 +1030,12 @@
                   background-color 0.4s ease;
     }
 
-    .site-list-group:hover {
+    @media (hover:hover) and (pointer:fine){
+.site-list-group:hover {
       box-shadow: 0 8px 22px -10px var(--search-glow), 0 4px 14px rgba(15, 23, 42, 0.04);
       border-color: var(--orb-color-2);
     }
+}
 
     .site-list-trigger {
       display: flex;
@@ -1388,11 +1394,13 @@
       transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
     }
 
-    .site-list-shop:hover {
+    @media (hover:hover) and (pointer:fine){
+.site-list-shop:hover {
       transform: translateY(-2px);
       border-color: var(--orb-color-2);
       box-shadow: 0 10px 22px -10px var(--search-glow);
     }
+}
 
     .shop-dir-name {
       font-size: 14px;
