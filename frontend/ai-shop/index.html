@@ -1981,6 +1981,7 @@ function closeSrc(fromPop){
   srcOverlay.setAttribute('aria-hidden','true');
   if('inert' in pageWrap) pageWrap.inert=false;
   const back=srcOpener; srcOpener=null;
+  const backKey=back&&back.dataset?back.dataset.src:null;
   if(back&&back.isConnected) back.focus({preventScroll:true});
   clearTimeout(srcCloseTimer);
   /* 背景保持冻结，直到面板完全落下才在同一帧里解锁+还原位置+隐藏，避免返回时背景抢先重排闪一帧 */
@@ -1988,6 +1989,8 @@ function closeSrc(fromPop){
     if(srcIsOpen) return;
     srcOverlay.hidden=true;
     unlockScroll();
+    /* 弹窗开着时若数据现核重渲染过页面，保存的滚动位置会失效：按同源钮的新位置自动校正回视口 */
+    if(backKey){ const nb=document.querySelector('[data-src="'+backKey+'"]'); if(nb){ const r=nb.getBoundingClientRect(); if(r.top<-80||r.bottom>window.innerHeight+80) nb.scrollIntoView({block:'center'}); } }
     if(srcPrevSR!==null){ try{ history.scrollRestoration=srcPrevSR; }catch(e){} srcPrevSR=null; }
   }, reducedMotion?0:580);
 }
