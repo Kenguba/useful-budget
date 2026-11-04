@@ -1956,6 +1956,8 @@
       </div>
     </header>
 
+    <nav class="preset-ip-bar" id="historyBar" aria-label="查询历史" style="display:none"></nav>
+
     <!-- ================= IPv4 / IPv6 快捷状态栏 ================= -->
     <section class="ip-proto-section" aria-label="协议检测状态">
       <div class="proto-row" id="rowV4">
@@ -1968,12 +1970,6 @@
       </div>
     </section>
 
-    <nav class="preset-ip-bar" aria-label="测试节点切换">
-      <button type="button" class="preset-chip" data-ip="218.111.*.*"><img class="chip-flag" src="https://flagcdn.com/w80/my.png" alt="">218.111.*.*<span class="chip-desc" data-zh="（截图原版·大马商宽）" data-en=" (Screenshot · MY Business)">（截图原版·大马商宽）</span></button>
-      <button type="button" class="preset-chip" data-ip="136.121.*.*"><img class="chip-flag" src="https://flagcdn.com/w80/us.png" alt="">136.121.*.*<span class="chip-desc" data-zh="（Google机房）" data-en=" (Google Datacenter)">（Google机房）</span></button>
-      <button type="button" class="preset-chip" data-ip="103.84.*.*"><img class="chip-flag" src="https://flagcdn.com/w80/sg.png" alt="">103.84.*.*<span class="chip-desc" data-zh="（新加坡原生家宽）" data-en=" (SG Native Residential)">（新加坡原生家宽）</span></button>
-      <button type="button" class="preset-chip" data-ip="118.238.*.*"><img class="chip-flag" src="https://flagcdn.com/w80/jp.png" alt="">118.238.*.*<span class="chip-desc" data-zh="（东京ISP原生）" data-en=" (Tokyo ISP Native)">（东京ISP原生）</span></button>
-    </nav>
 
     <!-- ================= 核心卡片内容区（严格最多二层卡片，完全对齐原网址 14844.jpg 结构） ================= -->
     <main class="cards-wrapper">
@@ -2922,6 +2918,7 @@ async function runQuery(ip,selfMode){
     d.note="纯净度按实时信号计算："+sc.why.join("；")+"；定位 "+(d.locRows&&d.locRows.length?d.locRows.length:loc.total)+" 源共识（"+(d.locRows?d.conf:loc.agree)+" 个一致）";
     d._why=sc.why;
     render(d,true);
+    if(!selfMode)pushHistory(d.ip,d.cc);
     if(seq===state.querySeq)setBusy(false);
     // 第三阶段（不阻塞主结果）：ASN 历史 / BGP 邻居最后加载，到齐后补进详情
     (async()=>{
@@ -3227,7 +3224,28 @@ syncNumEye();
 syncClearBtn();
 runWebrtc();
 function markPreset(ip){document.querySelectorAll(".preset-chip").forEach(c=>c.classList.toggle("active",c.getAttribute("data-ip")===ip))}
-document.querySelectorAll(".preset-chip").forEach(c=>c.addEventListener("click",()=>{const ip=c.getAttribute("data-ip");markPreset(ip);runQuery(ip,false)}));
+const HKEY="ip-history-v1";
+let histList=[];try{histList=JSON.parse(localStorage.getItem(HKEY)||"[]")}catch(e){histList=[]}
+if(!Array.isArray(histList))histList=[];
+histList=histList.filter(x=>x&&x.ip).slice(0,5);
+function renderHistory(){
+  const bar=$("historyBar");if(!bar)return;
+  if(!histList.length){bar.style.display="none";bar.innerHTML="";return}
+  bar.style.display="";
+  bar.innerHTML=histList.map(e=>'<button type="button" class="preset-chip" data-ip="'+e.ip+'">'+(e.cc?'<img class="chip-flag" src="https://flagcdn.com/w80/'+String(e.cc).toLowerCase()+'.png" alt="">':'')+e.ip+'</button>').join("");
+  markPreset(state.data?state.data.ip:null);
+}
+function pushHistory(ip,cc){
+  if(!ip)return;
+  const prev=histList.find(e=>e.ip===ip);
+  histList=histList.filter(e=>e.ip!==ip);
+  histList.unshift({ip:ip,cc:cc||(prev?prev.cc:null)});
+  if(histList.length>5)histList.length=5;
+  try{localStorage.setItem(HKEY,JSON.stringify(histList))}catch(e){}
+  renderHistory();
+}
+$("historyBar").addEventListener("click",e=>{const c=e.target.closest(".preset-chip");if(!c)return;const ip=c.getAttribute("data-ip");markPreset(ip);runQuery(ip,false)});
+renderHistory();
 $("langBtn").addEventListener("click",toggleLanguage);
 $("themeBackdrop").addEventListener("click",closeThemePanel);
 $("hamburgerBtn").addEventListener("click",toggleNavMenu);
