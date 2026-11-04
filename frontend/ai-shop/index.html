@@ -1947,17 +1947,13 @@ let srcPendingRender=false, srcAnchorTop=null;
 function lockScroll(){
   if(srcLocked) return;
   srcLocked=true;
-  srcScrollY=window.scrollY||0;
-  const b=document.body;
-  b.style.overflow='hidden'; b.style.position='fixed'; b.style.top=(-srcScrollY)+'px';
-  b.style.left='0'; b.style.right='0'; b.style.width='100%';
+  /* 只锁根元素滚动：页面滚动位置物理上不变，关闭时无需还原、不存在落点偏差 */
+  document.documentElement.style.overflow='hidden';
 }
 function unlockScroll(){
   if(!srcLocked) return;
   srcLocked=false;
-  const b=document.body;
-  b.style.overflow=''; b.style.position=''; b.style.top=''; b.style.left=''; b.style.right=''; b.style.width='';
-  window.scrollTo(0,srcScrollY);
+  document.documentElement.style.overflow='';
 }
 function openSrc(gi,ii,btn){
   const g=board&&board.groups[gi]; const it=g&&g.items[ii]; if(!it) return;
@@ -2001,9 +1997,6 @@ function closeSrc(fromPop){
     srcOverlay.hidden=true;
     if(srcPendingRender){ srcPendingRender=false; try{ renderBoard(); }catch(e){} }
     unlockScroll();
-    /* 按打开时同源钮的视口位置精确还原：重渲染删了条目也能落回原位，不做居中跳动 */
-    if(backKey&&srcAnchorTop!==null){ const nb=document.querySelector('[data-src="'+backKey+'"]'); if(nb){ const dy=nb.getBoundingClientRect().top-srcAnchorTop; if(Math.abs(dy)>2) window.scrollTo(0, window.scrollY+dy); } }
-    srcAnchorTop=null;
     window.__srcSettleUntil=Date.now()+1200;
   }, reducedMotion?0:580);
 }
