@@ -2404,6 +2404,7 @@ function applyThemeByGlobalIndex(index){
   root.style.setProperty("--search-glow",t.glow);
   if(t.isHolo)root.setAttribute("data-holo","true");else root.removeAttribute("data-holo");
   if(!isDarkMode)root.style.setProperty("--page-bg",t.pageBg);
+  const mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.setAttribute("content",isDarkMode?"#090D16":t.pageBg);
   const ol=$("orbLeft"),or=$("orbRight");
   if(ol&&or){
     if(!t.isHolo){const sh=index%2===0?1:-1;ol.style.transform="translate("+(sh*14)+"px,"+(-sh*8)+"px) scale("+(1+sh*0.05)+")";or.style.transform="translate("+(-sh*14)+"px,"+(sh*8)+"px) scale("+(1-sh*0.05)+")"}
@@ -2433,6 +2434,7 @@ function toggleDarkMode(){
   btn.classList.add("rotating");setTimeout(()=>btn.classList.remove("rotating"),450);
   if(isDarkMode){root.setAttribute("data-dark","true");root.style.setProperty("--page-bg","#090D16");icon.innerHTML="<path d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z'></path>"}
   else{root.removeAttribute("data-dark");root.style.setProperty("--page-bg",allThemes[currentGlobalThemeIndex].pageBg);icon.innerHTML="<circle cx='12' cy='12' r='4'></circle><line x1='12' y1='2' x2='12' y2='4.5'></line><line x1='12' y1='19.5' x2='12' y2='22'></line><line x1='4.93' y1='4.93' x2='6.7' y2='6.7'></line><line x1='17.3' y1='17.3' x2='19.07' y2='19.07'></line><line x1='2' y1='12' x2='4.5' y2='12'></line><line x1='19.5' y1='12' x2='22' y2='12'></line><line x1='4.93' y1='19.07' x2='6.7' y2='17.3'></line><line x1='17.3' y1='6.7' x2='19.07' y2='4.93'></line>"}
+  const mt2=document.querySelector('meta[name="theme-color"]');if(mt2)mt2.setAttribute("content",isDarkMode?"#090D16":allThemes[currentGlobalThemeIndex].pageBg);
   try{localStorage.setItem("ip-dark",isDarkMode?"1":"0")}catch(e){}
   writeSharedA();
   showToast(currentLang==="zh"?(isDarkMode?"已开启深色模式（长按按钮可选 12 色主题）":"已切换浅色模式"):(isDarkMode?"Dark mode on (long-press for 12 themes)":"Light mode on"));
