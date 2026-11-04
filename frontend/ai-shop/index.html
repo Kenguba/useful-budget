@@ -1591,6 +1591,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC"
 .site-list-brand-icon svg{width:25px;height:25px;display:block}
 .site-list-brand-icon svg.ic-gem{width:31px;height:31px}
 .site-list-brand-icon svg.ic-grok{width:27px;height:27px}
+.offer-col-left .pc-date{font-size:9.5px;color:var(--text-muted);white-space:nowrap}
 /* 目录行：左右宽度 flex 自适应，店名不换行，右侧太长横向滚动（不显示滚动条） */
 .shop .nm{flex:none;word-break:normal}
 .shop .nm a{white-space:nowrap}
@@ -1864,7 +1865,7 @@ function renderBoard(){
         if(q&&!fuzzy(q,it.title,it.shop,it.platform)) return '';
         shown++;
         const tagrow=(it.stock===0?'<span class="attr-pill-tag tag-sold">已售罄</span>':'')+(it.kind?'<span class="attr-pill-tag '+kindCls(it.kind)+'">'+esc(it.kind)+'</span>':'')+(it.same_source>1?'<button type="button" class="same-source-btn" data-src="'+gi+':'+ii+'" aria-haspopup="dialog">同源铺货共 '+it.same_source+' 家 ›</button>':'');
-        return '<div class="real-offer-row" id="it-'+esc(g.id)+'-'+ii+'"><div class="offer-col-left"><span class="offer-price-val">'+fmtP(it.price)+'</span><span class="platform-source-badge">'+esc(it.platform)+'</span></div><div class="offer-col-mid"><div class="offer-item-title"><a data-anchor="it-'+esc(g.id)+'-'+ii+'" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div>'+(tagrow?'<div class="offer-badges-line">'+tagrow+'</div>':'')+'<div class="shoprow"><span class="shopname">'+esc(it.shop)+'</span><span class="stk">'+stockTxt(it)+'</span></div></div></div>';
+        return '<div class="real-offer-row" id="it-'+esc(g.id)+'-'+ii+'"><div class="offer-col-left"><span class="offer-price-val">'+fmtP(it.price)+'</span><span class="platform-source-badge">'+esc(it.platform)+'</span>'+(it.pc?'<span class="pc-date">'+esc(it.pc.slice(5))+' 变价</span>':'')+'</div><div class="offer-col-mid"><div class="offer-item-title"><a data-anchor="it-'+esc(g.id)+'-'+ii+'" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div>'+(tagrow?'<div class="offer-badges-line">'+tagrow+'</div>':'')+'<div class="shoprow"><span class="shopname">'+esc(it.shop)+'</span><span class="stk">'+stockTxt(it)+'</span></div></div></div>';
       }).join('');
     if(q&&!shown) return '';
     const first=g.items[0]; const open=searching||userOpen.has('grp-'+g.id);
