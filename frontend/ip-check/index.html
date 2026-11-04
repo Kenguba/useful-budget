@@ -514,12 +514,22 @@
       transition: background-color 0.2s ease, transform 0.18s ease;
     }
 
-    .nav-menu-item:hover {
-      background: var(--theme-tag-bg);
-      transform: translateX(2px);
+    @media (hover:hover) and (pointer:fine){
+      .nav-menu-item:hover {
+        background: var(--theme-tag-bg);
+        transform: translateX(2px);
+      }
+
+      [data-dark="true"] .nav-menu-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
     }
 
-    [data-dark="true"] .nav-menu-item:hover {
+    .nav-menu-item:active {
+      background: var(--theme-tag-bg);
+    }
+
+    [data-dark="true"] .nav-menu-item:active {
       background: rgba(255, 255, 255, 0.08);
     }
 
