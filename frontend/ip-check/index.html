@@ -26,7 +26,7 @@
       --theme-tab-text: #0F172A;
       --theme-tag-bg: #E6F4EA;
       --theme-tag-text: #137333;
-      --search-glow: rgba(143, 219, 184, 0.44);
+      --search-glow: rgba(143, 219, 184, 0.54);
 
       /* 下方页面背景与卡片表面色（严格控制在最多二层卡片：Layer 1 --card-bg, Layer 2 --card-sub-bg） */
       --page-bg: #F3F8FA;
@@ -1844,6 +1844,11 @@
 .ippure-footer{padding:16px 16px 20px}
 .proto-ip-link{white-space:nowrap}
 .rtc-cands{font-size:12.5px;color:var(--text-secondary);line-height:1.6;word-break:break-all}
+
+/* 搜索卡光晕加强（按 ken 图2 观感：更宽更浓的弥散光） */
+.gemini-search-card{box-shadow:0 10px 28px -6px var(--search-glow),0 24px 60px -12px var(--search-glow),0 2px 8px rgba(15,23,42,0.04)}
+.gemini-search-card:focus-within{box-shadow:0 14px 32px -4px var(--search-glow),0 28px 68px -12px var(--search-glow)}
+.hero-header{box-shadow:0 18px 44px -10px var(--search-glow)}
 </style>
 </head>
 <body>
@@ -2236,7 +2241,7 @@ const allThemes = [
         tagBg: "#EBF5FF",
         tagText: "#1D4ED8",
         pageBg: "#EEF6FA",
-        glow: "rgba(147, 197, 253, 0.38)"
+        glow: "rgba(147, 197, 253, 0.49)"
       },
       {
         name: "02 · 薄荷微风",
@@ -2249,7 +2254,7 @@ const allThemes = [
         tagBg: "#ECFDF5",
         tagText: "#047857",
         pageBg: "#F2FBF7",
-        glow: "rgba(110, 231, 183, 0.36)"
+        glow: "rgba(110, 231, 183, 0.47)"
       },
       {
         name: "03 · 极光青蓝",
@@ -2262,7 +2267,7 @@ const allThemes = [
         tagBg: "#EEF2FF",
         tagText: "#4338CA",
         pageBg: "#F4F6FC",
-        glow: "rgba(129, 140, 248, 0.34)"
+        glow: "rgba(129, 140, 248, 0.45)"
       },
       {
         name: "04 · 抹茶森屿",
@@ -2275,7 +2280,7 @@ const allThemes = [
         tagBg: "#F0FDF4",
         tagText: "#15803D",
         pageBg: "#F6FAF5",
-        glow: "rgba(134, 239, 172, 0.36)"
+        glow: "rgba(134, 239, 172, 0.47)"
       },
       {
         name: "05 · 碧海晴空",
@@ -2288,7 +2293,7 @@ const allThemes = [
         tagBg: "#F0FDFA",
         tagText: "#0F766E",
         pageBg: "#F2F9FA",
-        glow: "rgba(125, 211, 252, 0.36)"
+        glow: "rgba(125, 211, 252, 0.47)"
       },
       {
         name: "06 · 深海星雾",
@@ -2301,7 +2306,7 @@ const allThemes = [
         tagBg: "#F1F5F9",
         tagText: "#1E293B",
         pageBg: "#F5F7FA",
-        glow: "rgba(148, 163, 184, 0.32)"
+        glow: "rgba(148, 163, 184, 0.43)"
       },
       {
         name: "07 · 星云幻紫",
@@ -2314,7 +2319,7 @@ const allThemes = [
         tagBg: "#F3E8FF",
         tagText: "#6D28D9",
         pageBg: "#F8F5FD",
-        glow: "rgba(167, 139, 250, 0.38)"
+        glow: "rgba(167, 139, 250, 0.49)"
       },
       {
         name: "08 · 蜜桃乌龙",
@@ -2327,7 +2332,7 @@ const allThemes = [
         tagBg: "#FDF2F8",
         tagText: "#BE185D",
         pageBg: "#FDF6F9",
-        glow: "rgba(244, 114, 182, 0.34)"
+        glow: "rgba(244, 114, 182, 0.45)"
       },
       {
         name: "09 · 晨曦微光",
@@ -2340,7 +2345,7 @@ const allThemes = [
         tagBg: "#FFF7ED",
         tagText: "#C2410C",
         pageBg: "#FCF9F4",
-        glow: "rgba(251, 146, 60, 0.34)"
+        glow: "rgba(251, 146, 60, 0.46)"
       },
       {
         name: "10 · 落日粉紫",
@@ -2353,7 +2358,7 @@ const allThemes = [
         tagBg: "#FAF5FF",
         tagText: "#7E22CE",
         pageBg: "#FAF6FC",
-        glow: "rgba(192, 132, 252, 0.35)"
+        glow: "rgba(192, 132, 252, 0.46)"
       },
       {
         name: "11 · 香槟流金",
@@ -2366,7 +2371,7 @@ const allThemes = [
         tagBg: "#FEFCE8",
         tagText: "#A16207",
         pageBg: "#FAF9F2",
-        glow: "rgba(234, 179, 8, 0.32)"
+        glow: "rgba(234, 179, 8, 0.43)"
       },
       {
         name: "12 · 幻彩全息",
@@ -2380,7 +2385,7 @@ const allThemes = [
         tagBg: "#E6F4EA",
         tagText: "#137333",
         pageBg: "#F2F8FA",
-        glow: "rgba(143, 219, 184, 0.44)"
+        glow: "rgba(143, 219, 184, 0.54)"
       }
     ];
 let currentGlobalThemeIndex=11;
