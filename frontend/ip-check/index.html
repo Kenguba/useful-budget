@@ -2835,7 +2835,7 @@ function consensusLoc(srcs){
   const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:undefined;
   return{cc:cc,country:pick("country")||cc,region:pick("region"),city:pick("city"),lat:avg(lats),lon:avg(lons),postal:pick("postal"),tz:pick("tz"),agree:cnt[cc]||0,total:ok.length};
 }
-async function runQuery(ip,selfMode){
+async function runQuery(ip,selfMode,fromHist){
   const seq=++state.querySeq;
   state.asnFs=null;state.ipVisible=true;state.numVisible=true;
   ip=(ip||"").trim();
@@ -2919,7 +2919,7 @@ async function runQuery(ip,selfMode){
     d.note="纯净度按实时信号计算："+sc.why.join("；")+"；定位 "+(d.locRows&&d.locRows.length?d.locRows.length:loc.total)+" 源共识（"+(d.locRows?d.conf:loc.agree)+" 个一致）";
     d._why=sc.why;
     render(d,true);
-    pushHistory(d.ip,d.cc);
+    if(!fromHist)pushHistory(d.ip,d.cc);
     if(seq===state.querySeq)setBusy(false);
     // 第三阶段（不阻塞主结果）：ASN 历史 / BGP 邻居最后加载，到齐后补进详情
     (async()=>{
@@ -3245,7 +3245,7 @@ function pushHistory(ip,cc){
   try{localStorage.setItem(HKEY,JSON.stringify(histList))}catch(e){}
   renderHistory();
 }
-$("historyBar").addEventListener("click",e=>{const c=e.target.closest(".preset-chip");if(!c)return;const ip=c.getAttribute("data-ip");markPreset(ip);runQuery(ip,false)});
+$("historyBar").addEventListener("click",e=>{const c=e.target.closest(".preset-chip");if(!c)return;const ip=c.getAttribute("data-ip");markPreset(ip);runQuery(ip,false,true)});
 renderHistory();
 $("langBtn").addEventListener("click",toggleLanguage);
 $("themeBackdrop").addEventListener("click",closeThemePanel);
