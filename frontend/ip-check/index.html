@@ -1820,6 +1820,8 @@
 #mainIpCard.loading .main-ip-row,#mainIpCard.loading .asn-row,#mainIpCard.loading .layer2-subcard{opacity:.45;transition:opacity .25s}
 .badge-hosting{background:linear-gradient(135deg,#64748B 0%,#475569 100%);color:#fff;box-shadow:0 4px 12px rgba(71,85,105,.25)}
 .badge-pending{background:linear-gradient(135deg,#94A3B8 0%,#64748B 100%);color:#fff}
+.ippure-pill-badge.checking-anim,.attr-pill-tag.checking-anim{animation:badgePulse 1.15s ease-in-out infinite}
+@keyframes badgePulse{0%,100%{opacity:1}50%{opacity:.5}}
 .ratio-wrap{margin-top:12px}
 .ratio-bar{height:8px;border-radius:99px;background:#F59E0B33;overflow:hidden;background:linear-gradient(90deg,rgba(245,158,11,.25),rgba(245,158,11,.25))}
 .ratio-human{height:100%;background:linear-gradient(90deg,#34B36A,#57B83E);border-radius:99px;transition:width .5s}
@@ -2046,11 +2048,11 @@
         </div>
           <div class="ip-tag-row">
             <span class="ip-tag-label" id="labelIpOrigin" data-i18n="ipOrigin">IP来源</span>
-            <span class="ippure-pill-badge badge-native" id="badgeIpOrigin">查询中</span>
+            <span class="ippure-pill-badge badge-pending checking-anim" id="badgeIpOrigin">查询中</span>
           </div>
           <div class="ip-tag-row">
             <span class="ip-tag-label" id="labelIpAttr" data-i18n="ipAttr">IP属性</span>
-            <span class="ippure-pill-badge badge-isp-biz" id="badgeIpAttr">查询中</span>
+            <span class="ippure-pill-badge badge-pending checking-anim" id="badgeIpAttr">查询中</span>
           </div>
         <!-- IPPure 风险系数（已并入 IP来源 卡片） -->
         <div class="layer2-subcard" id="riskSection">
@@ -2626,7 +2628,7 @@ function toggleLanguage(){
   applyLanguage();
 }
 const DYN={
-  detecting:{zh:"检测中…",en:"Detecting…"},checking:{zh:"查询中",en:"Checking"},notDetected:{zh:"未检测到",en:"Not Detected"},
+  detecting:{zh:"检测中…",en:"Detecting…"},checking:{zh:"查询中",en:"Checking"},regUnknown:{zh:"注册地未知",en:"Registry unknown"},notDetected:{zh:"未检测到",en:"Not Detected"},
   copied:{zh:"已复制 ",en:"Copied "},copyFail:{zh:"复制失败，请手动复制",en:"Copy failed, please copy manually"},
   nativeIp:{zh:"原生IP",en:"Native IP"},broadcastIp:{zh:"广播IP",en:"Broadcast IP"},nonNative:{zh:"非原生 IP",en:"Non-native IP"},
   residential:{zh:"住宅IP",en:"Residential IP"},business:{zh:"商宽IP",en:"Business IP"},hosting:{zh:"机房IP",en:"Datacenter IP"},
@@ -2822,8 +2824,13 @@ function render(d,final){
   $("valDomain").textContent=d.domain||d.netname||"—";
   $("valRange").textContent=d.range||"—";
   $("geoSourcesBox").innerHTML=d.locRows.map(r=>"<div class='geo-source-item'><span class='geo-provider-name'>"+escapeHtml(r.src)+"</span><div class='geo-location-val'><span class='flag-badge'>"+flagImg(r.cc)+"</span><span>"+escapeHtml(r.place)+"</span></div></div>").join("");
-  const srcTag=$("badgeIpOrigin");srcTag.textContent=d.native==null?TD("checking"):(d.native?TD("nativeIp"):TD("broadcastIp"));srcTag.className="ippure-pill-badge "+(d.native==null?"badge-pending":d.native?"badge-native":"badge-broadcast");
-  const attrTag=$("badgeIpAttr");attrTag.textContent=d.native==null&&!d.attr?TD("checking"):attrName(d);attrTag.className="ippure-pill-badge "+(d.cls&&d.cls.type==="residential"?"badge-residential":d.cls&&d.cls.type==="hosting"?"badge-hosting":"badge-isp-biz");
+  const srcTag=$("badgeIpOrigin");
+  if(d.native==null&&!d.tagsFinal){srcTag.textContent=TD("checking");srcTag.className="ippure-pill-badge badge-pending checking-anim"}
+  else if(d.native==null){srcTag.textContent=TD("regUnknown");srcTag.className="ippure-pill-badge badge-pending"}
+  else{srcTag.textContent=d.native?TD("nativeIp"):TD("broadcastIp");srcTag.className="ippure-pill-badge "+(d.native?"badge-native":"badge-broadcast")}
+  const attrTag=$("badgeIpAttr");
+  if(d.tagsFinal&&d.attr){attrTag.textContent=attrName(d);attrTag.className="ippure-pill-badge "+(d.cls&&d.cls.type==="residential"?"badge-residential":d.cls&&d.cls.type==="hosting"?"badge-hosting":"badge-isp-biz")}
+  else{attrTag.textContent=TD("checking");attrTag.className="ippure-pill-badge badge-pending checking-anim"}
   const badge=$("badgeRiskScore");
   badge.textContent=d.score==null?TD("checking"):d.score+"% "+scoreLabel(d.score);
   badge.className="attr-pill-tag "+(d.score==null?"tag-gray":d.score<=25?"tag-green":d.score<=60?"tag-amber":"tag-red");
@@ -2838,11 +2845,16 @@ function render(d,final){
   $("valAsnOwner").textContent=d.asnHolder||d.isp||"—";
   $("valCompany").textContent=(d.company||d.isp||"—")+(d.netname?" · netname "+d.netname:"");
   $("valIsp").textContent=d.isp||"—";
-  const typePill=$("valIpType");typePill.textContent=typeName(d);typePill.className="attr-pill-tag "+(d.cls&&d.cls.type==="hosting"?"tag-red":d.cls&&d.cls.type==="residential"?"tag-green":"tag-blue");
+  const typePill=$("valIpType");
+  if(d.tagsFinal&&d.ipType){typePill.textContent=typeName(d);typePill.className="attr-pill-tag "+(d.cls&&d.cls.type==="hosting"?"tag-red":d.cls&&d.cls.type==="residential"?"tag-green":"tag-blue")}
+  else{typePill.textContent=TD("checking");typePill.className="attr-pill-tag tag-gray checking-anim"}
   const riskPill=$("valRiskPill");riskPill.textContent=d.score==null?TD("checking"):d.score+"%  "+scoreLabel(d.score);riskPill.className="attr-pill-tag "+(d.score==null?"tag-gray":d.score<=25?"tag-green":d.score<=60?"tag-amber":"tag-red");
   const lit=d.score==null?0:d.score<=10?1:d.score<=25?2:d.score<=40?3:d.score<=60?4:5;
   [...$("valRiskDots").children].forEach((el,i)=>el.className=i<lit?"":"off");
-  const natPill=$("valNative");natPill.textContent=d.native==null?TD("checking"):(d.native?TD("nativeIp"):TD("nonNative"));natPill.className="attr-pill-tag "+(d.native==null?"tag-gray":d.native?"tag-green":"tag-amber");
+  const natPill=$("valNative");
+  if(d.native==null&&!d.tagsFinal){natPill.textContent=TD("checking");natPill.className="attr-pill-tag tag-gray checking-anim"}
+  else if(d.native==null){natPill.textContent=TD("regUnknown");natPill.className="attr-pill-tag tag-gray"}
+  else{natPill.textContent=d.native?TD("nativeIp"):TD("nonNative");natPill.className="attr-pill-tag "+(d.native?"tag-green":"tag-amber")}
   const shPill=$("valShared");shPill.textContent=d.prefix?(d.prefix+" · "+prefixSize(d.prefix)):"—";shPill.className="attr-pill-tag tag-gray";
   $("valRiskTags").textContent=d.riskTags||TD("detecting");
   paintNote(d);
@@ -2947,7 +2959,7 @@ async function runQuery(ip,selfMode,fromHist){
       lat:loc.lat,lon:loc.lon,postal:loc.postal,tz:loc.tz,conf:loc.agree,whoisCountry:"",native:null,
       locRows:ok.map(s=>({src:s.src,cc:s.cc,place:[s.country||s.cc,s.region,s.city].filter(Boolean).join(", ")})),
       scenes:[["TikTok",3],["跨境电商",3],["社媒运营",3],["AI 应用",3]],
-      histAsn:null,neighbours:null,cls:null,score:null,riskTags:TD("riskTagsPending"),note:TD("summarizing")
+      histAsn:null,neighbours:null,cls:null,tagsFinal:false,score:null,riskTags:TD("riskTagsPending"),note:TD("summarizing")
     };
     d.range=rangeFromCIDR(d.prefix,d.ip);
     d.cls=classify(d);applyType(d);render(d);
@@ -2989,6 +3001,7 @@ async function runQuery(ip,selfMode,fromHist){
       :[d.cls.type==="hosting"?"Datacenter":d.cls.type==="residential"?"Residential Broadband":"Business Broadband",d.native==null?"Registry unknown":d.native?"Native":"Non-native (registry "+(d.whoisCountry||"?")+" ≠ located "+(d.cc||"?")+")",bl&&bl.hits?"Blacklist hits "+bl.hits:""]).filter(Boolean).join(" · ");
     d.note="纯净度按实时信号计算："+sc.why.join("；")+"；定位 "+(d.locRows&&d.locRows.length?d.locRows.length:loc.total)+" 源共识（"+(d.locRows?d.conf:loc.agree)+" 个一致）";
     d._why=sc.why;
+    d.tagsFinal=true;
     render(d,true);
     if(!fromHist)pushHistory(d.ip,d.cc);
     if(seq===state.querySeq)setBusy(false);
