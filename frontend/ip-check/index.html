@@ -1823,6 +1823,17 @@
 .expand-mini-arrow{color:var(--text-secondary);font-size:18px}
 #companyHead{cursor:pointer}
 .chip-flag{width:19px;height:auto;border-radius:3px;vertical-align:-4px;margin-right:3px}
+
+/* 间距统一 16px（ken 定） */
+.hero-header{padding:16px 16px 0}
+.ip-proto-section{padding:16px 16px 0}
+.preset-ip-bar{padding:10px 16px 0}
+.cards-wrapper{padding:0 16px 0;margin-top:16px;gap:16px}
+.layer2-subcard{margin-top:16px}
+.scenario-layer2-panel{margin-top:16px}
+.llm-table{margin-top:16px}
+.ippure-footer{padding:16px 16px 20px}
+.proto-ip-link{white-space:nowrap}
 .rtc-cands{font-size:12.5px;color:var(--text-secondary);line-height:1.6;word-break:break-all}
 </style>
 </head>
@@ -2106,22 +2117,7 @@
           </div>
         </div>
 
-              <div class="layer2-subcard">
-                <div class="subcard-head-row">
-                  <span class="subcard-head-title" id="subTitleBgp">BGP 拓扑与同机房节点</span>
-                  <div class="mini-gemini-tabs" id="bgpFilterTabs" data-filter="all">
-                    <div class="mini-tab-glider"></div>
-                    <button type="button" class="mini-tab-btn active" id="btnBgpAll">显示所有</button>
-                    <button type="button" class="mini-tab-btn" id="btnBgpIdc">显示 IDC</button>
-                  </div>
-                </div>
-                <div id="bgpNeighborsList"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Layer 2 子卡 D：适用场景（1:1 对应 14841.jpg & 14844.jpg） -->
+              <!-- Layer 2 子卡 D：适用场景（1:1 对应 14841.jpg & 14844.jpg） -->
         <div class="scenario-layer2-panel" id="scenarioCard">
           <h2 class="scenario-panel-title" id="titleScenario" data-i18n="scenes">适用场景</h2>
           <div class="scenario-cross-grid" id="scenarioGrid"></div>
@@ -2989,7 +2985,20 @@ function renderMyIp(){
   row("myV6","rowV6",myIpState.v6,myIpState.vis6!==false,"vis6");
   $("rowV6").style.order=myIpState.primary6?"1":"2";
   $("rowV4").style.order=myIpState.primary6?"2":"1";
+  fitProtoFont();
 }
+function fitProtoFont(){
+  ["myV4","myV6"].forEach(id=>{
+    const el=$(id);if(!el||!el.textContent)return;
+    el.style.fontSize="";
+    const row=el.closest(".proto-row");if(!row)return;
+    const badge=row.querySelector(".proto-badge");
+    const avail=row.clientWidth-(badge?badge.offsetWidth:52)-14;
+    let fs=parseFloat(getComputedStyle(el).fontSize)||15.5;
+    while(el.scrollWidth>avail&&fs>10){fs-=0.5;el.style.fontSize=fs+"px"}
+  });
+}
+window.addEventListener("resize",()=>fitProtoFont());
 function setMyIp(ip,primary){
   if(!ip)return;
   if(ip.includes(":")){myIpState.v6=ip;if(primary)myIpState.primary6=true}
