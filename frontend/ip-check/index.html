@@ -901,7 +901,7 @@
 
     /* ASN 行进入 IP来源 卡片后的行几何：与 ip-tag-row 同高同距、标签同宽、底部分隔线 */
     .ip-tags-subbox .asn-row {
-      padding: 12px 0;
+      padding: 0 0 12px;
       border-bottom: 1px solid var(--divider-line);
     }
 
@@ -925,6 +925,27 @@
       width: 110px;
     }
 
+    /* 视觉16标准（ken 定）：卡片四边到内容的距离恒为卡面 16，首/末行不得在边缘再叠加自身留白 */
+    .scenario-cell:nth-child(-n+2) {
+      padding-top: 0;
+    }
+
+    .scenario-factor-row:last-child {
+      padding-bottom: 0;
+    }
+
+    .detail-kv-row:last-child {
+      padding-bottom: 0;
+    }
+
+    #localEnvCard .env-kv-row:last-child {
+      padding-bottom: 0;
+    }
+
+    .nb-row:last-child {
+      padding-bottom: 0;
+    }
+
     .ip-tags-subbox #riskSection {
       margin-top: 2px;
       background: transparent;
@@ -932,7 +953,7 @@
       border: none;
       border-top: 1px solid var(--divider-line);
       border-radius: 0;
-      padding: 12px 0 12px;
+      padding: 12px 0 0;
     }
 
     .details-collapsible {
@@ -979,7 +1000,7 @@
 
     /* IP来源 & IP属性（Layer 2） */
     .ip-tags-subbox {
-      padding: 4px 16px;
+      padding: 16px;
     }
 
     .ip-tag-row {
@@ -1470,7 +1491,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 11px 2px;
+      padding: 11px 0;
       font-size: 14.5px;
     }
 
