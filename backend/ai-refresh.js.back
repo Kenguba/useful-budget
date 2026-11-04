@@ -52,7 +52,7 @@ const WORKFLOW = 'refresh.yml';
 const COOLDOWN_MS = 300 * 1000;
 const STOCK_TTL_MS = 60 * 1000;
 const STOCK_STALE_MS = 600 * 1000;
-const BOARD_URL = 'https://kenguba.github.io/useful-budget/ai-shop/data/board.json';
+const BOARD_URL = 'https://kenguba.github.io/useful-budget/frontend/ai-shop/data/board.json';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36';
 
 function cors() {
