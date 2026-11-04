@@ -956,7 +956,7 @@
       padding: 12px 0 0;
     }
 
-    .details-collapsible {
+    .details-collapsible, #mainIpCard, #riskSection, #scenarioCard, #aiSupportCard, #mapSection, #localEnvCard {
       scroll-margin-top: 84px;
     }
 
@@ -2519,8 +2519,9 @@ function renderNavMenu(){
 function jumpToSection(id,smooth){
   const el=$(id);if(!el)return;
   const inDetails=!!el.closest("#detailsCollapsible");
-  if(inDetails&&!detailsOpen)toggleDetails(true);
-  setTimeout(()=>el.scrollIntoView({behavior:smooth?"smooth":"auto",block:"start"}),inDetails?90:60);
+  const expanding=inDetails&&!detailsOpen;
+  if(expanding)toggleDetails(true);
+  setTimeout(()=>el.scrollIntoView({behavior:smooth?"smooth":"auto",block:"start"}),expanding?430:60);
 }
 function jumpToHash(){
   const id=(location.hash||"").slice(1);
