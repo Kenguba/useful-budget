@@ -1852,6 +1852,12 @@
 
 /* 卡片去边框线（ken 定：卡片只靠圆角和阴影区分） */
 .ippure-card,.layer2-subcard,.scenario-layer2-panel,.llm-table{border:none}
+
+/* 去掉最外层卡片壳（ken 定：外层不要，内层灰色子卡直接出来） */
+.ippure-card{background:transparent;box-shadow:none;padding:0;border-radius:0;overflow:visible}
+.ippure-card:hover{box-shadow:none}
+.llm-table{background-color:var(--card-sub-bg)}
+#localEnvCard .layer2-subcard{margin-top:0}
 </style>
 </head>
 <body>
