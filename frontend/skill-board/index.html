@@ -5,78 +5,125 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>全球 Skills 使用量排行榜</title>
 <style>
-:root{--ink:#0f172a;--blue:#1e40af;--blue2:#3b82f6;--gold:#d97706;--bg:#f8fafc;--card:#fff;--mut:#64748b;--line:#e2e8f0;--ring:rgba(59,130,246,.15)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-.wrap{max-width:900px;margin:0 auto;padding:clamp(14px,3vw,20px) clamp(10px,3vw,16px) 64px}
-.kicker{color:var(--blue);font-weight:800;letter-spacing:.12em;font-size:12px;line-height:1.4}
-.kicker:before{content:"";display:inline-block;width:18px;height:4px;border-radius:2px;background:var(--gold);margin-right:8px;vertical-align:middle}
-h1{font-size:clamp(24px,5.5vw,38px);line-height:1.2;margin:10px 0 8px;font-weight:850;letter-spacing:-.02em}
-h1 mark{background:linear-gradient(transparent 65%,#fde68a 65%);color:inherit;padding:0 3px;border-radius:3px}
-.sub{font-weight:600;font-size:clamp(13px,3vw,15px);line-height:1.55;color:var(--mut)}
-.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:10px 0}
-.pill{border:1px solid var(--line);border-radius:999px;padding:5px clamp(9px,2.5vw,13px);font-size:clamp(11px,2.8vw,12px);background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.02)}
-.pill.solid{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
-.pill.warn{border-color:#fde68a;background:#fefce8;color:#92400e}
-.srctag{display:inline-block;margin-left:8px;padding:2px 8px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--mut);font-size:11px;font-weight:600;vertical-align:middle;white-space:nowrap}
-.navchip{border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:12px;background:#fff;color:var(--blue);font-weight:700;text-decoration:none;box-shadow:0 1px 2px rgba(0,0,0,.02)}
-.navchip:active{background:#eef2ff}
+:root{
+  --hero-bg-base:#FFFFFF;
+  --orb-color-1:#8FDBB8;
+  --orb-color-2:#9CC8F7;
+  --refresh-btn-bg:#4FA8F6;
+  --refresh-btn-text:#FFFFFF;
+  --send-circle-bg:#9EE0C5;
+  --send-circle-icon:#0F172A;
+  --theme-accent:#1A73E8;
+  --theme-tab-text:#0F172A;
+  --theme-tag-bg:#E6F4EA;
+  --theme-tag-text:#137333;
+  --search-glow:rgba(143,219,184,0.44);
+  --page-bg:#F3F8FA;
+  --card-bg:#FFFFFF;
+  --text-primary:#0F172A;
+  --text-secondary:#64748B;
+  --text-muted:#94A3B8;
+  --pill-surface:#FFFFFF;
+  --pill-shadow:0 6px 20px rgba(15,23,42,0.06),0 2px 6px rgba(15,23,42,0.03);
+}
+[data-dark="true"]{
+  --hero-bg-base:#0B1120;
+  --page-bg:#090D16;
+  --card-bg:#151F32;
+  --text-primary:#F8FAFC;
+  --text-secondary:#94A3B8;
+  --text-muted:#64748B;
+  --pill-surface:#1E293B;
+  --pill-shadow:0 8px 24px rgba(0,0,0,0.35);
+  --theme-tab-text:#F8FAFC;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;-webkit-tap-highlight-color:transparent}
+body{background-color:var(--page-bg);color:var(--text-primary);min-height:100vh;overflow-x:hidden;transition:background-color .55s cubic-bezier(0.4,0,0.2,1),color .4s ease;-webkit-font-smoothing:antialiased}
 html{scroll-behavior:smooth}
-section{scroll-margin-top:10px}
-select,button{font-size:clamp(13px,3vw,14px);border-radius:10px;border:1px solid var(--line);padding:7px 11px;background:#fff;color:var(--ink);outline:none;transition:border-color .15s}
-select:focus,input[type=search]:focus{border-color:var(--blue2);box-shadow:0 0 0 3px var(--ring)}
-button{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700;cursor:pointer;transition:transform .1s,opacity .15s}
-button:hover{opacity:.92}button:active{transform:scale(.98)}button:disabled{opacity:.5;cursor:not-allowed}
-input[type=search]{flex:1;min-width:180px;font-size:clamp(13px,3vw,14px);border-radius:10px;border:1px solid var(--line);padding:7px 11px;background:#fff;outline:none;transition:border-color .15s}
-.bar{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--blue) 55%,var(--gold) 55%);margin:12px 0 16px}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:clamp(11px,2.5vw,16px);box-shadow:0 1px 3px rgba(0,0,0,.03)}
-.stat b{font-size:clamp(22px,5.5vw,28px);color:var(--blue);display:block}
-.stat span{color:var(--mut);font-size:clamp(11px,2.8vw,13px);line-height:1.45;display:block;margin-top:3px}
-section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:clamp(13px,3vw,18px) clamp(11px,3vw,16px);margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.03);overflow:hidden}
-.sec-head{display:flex;justify-content:space-between;gap:6px 12px;align-items:baseline;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:6px}
-.sec-head h2{margin:0;font-size:clamp(17px,4vw,20px);line-height:1.35}
-.badge{background:var(--blue);color:#fff;border-radius:8px;padding:4px 7px;font-size:11px;font-weight:800}
-.sec-head p{margin:0;color:var(--mut);font-size:12px;line-height:1.5}
-h3{font-size:clamp(14px,3.2vw,15px);margin:14px 0 6px;color:var(--blue);font-weight:700}
-.item{padding:clamp(8px,2vw,11px) 2px;border-bottom:1px dashed var(--line);transition:background .15s}
-.itemtop{display:flex;gap:clamp(8px,2vw,12px)}
-.item:last-child{border-bottom:none}
-.rank{flex:0 0 clamp(28px,6.5vw,32px);height:clamp(28px,6.5vw,32px);border-radius:50%;background:#eef2f8;color:var(--blue);font-weight:800;font-size:clamp(12px,2.8vw,13px);display:flex;align-items:center;justify-content:center}
-.rank.top{background:var(--gold);color:#fff}
-.item .main{flex:1;min-width:0}
-.name{font-weight:750;font-size:clamp(14px,3vw,15px);word-break:break-word;overflow-wrap:anywhere}
-.name a{color:inherit;text-decoration:none}
-.name a:hover{color:var(--blue2)}
-.meta{color:var(--mut);font-size:11px;margin-left:5px;font-weight:normal}
-.blurb{color:#334155;font-size:clamp(12px,2.8vw,13px);line-height:1.5;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.num{font-weight:800;color:var(--blue);text-align:right;flex-shrink:0}
-.num small{display:block;color:var(--mut);font-weight:400;font-size:clamp(10px,2.4vw,11px);line-height:1.35;white-space:nowrap}
-.cmdwrap{position:relative;display:flex;align-items:center;height:34px;margin-top:6px;background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:8px;overflow:hidden;transition:background .15s}
-code.cmd{display:block;flex:1;min-width:0;background:transparent;color:#e2e8f0;padding:0 2px 0 10px;font-size:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto;white-space:nowrap;cursor:pointer;scrollbar-width:none}
-code.cmd::-webkit-scrollbar{display:none}
-.cmdwrap:hover{background:#1e293b}
-.copybtn{position:static;flex:0 0 auto;margin-right:6px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:6px;color:#cbd5e1;cursor:pointer;padding:0}
-.copybtn:hover{background:rgba(255,255,255,.2);color:#fff}
-.copybtn:active{background:rgba(255,255,255,.3)}
-#toast{position:fixed;top:14px;left:50%;transform:translate(-50%,-10px);background:#0f172a;color:#fff;padding:9px 20px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:999;box-shadow:0 6px 20px rgba(0,0,0,.28)}
-#toast.show{opacity:1;transform:translate(-50%,0)}
-.grid2,.grid3{display:grid;grid-template-columns:minmax(0,1fr);gap:0}
-.grid2>div,.grid3>div{min-width:0}
-@media(min-width:700px){.grid2{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}.grid3{grid-template-columns:repeat(3,minmax(0,1fr));gap:0 20px}.stats{grid-template-columns:repeat(4,1fr)}}
-.hl{background:#fefce8;border:1px solid #fde68a;border-radius:14px;padding:12px 14px;line-height:1.8;font-size:13px;color:#78350f}
-.note{color:var(--mut);font-size:13px;line-height:1.8}
-.empty-tip{text-align:center;padding:40px 16px;color:var(--mut);font-size:14px}
-footer{color:var(--mut);font-size:12px;line-height:1.8;margin-top:24px;text-align:center}
+.wrap{max-width:900px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:48px}
 .hidden{display:none!important}
-select#dateSel{min-width:150px}
-#datePill{display:inline-block;min-width:180px;text-align:center}
-.stat{min-height:96px}
-.skel{background:linear-gradient(90deg,#e9eef6 25%,#f7fafd 50%,#e9eef6 75%);background-size:800px 100%;animation:sksh 1.3s infinite linear;border-radius:6px}
-.skelbar{background-image:linear-gradient(90deg,#dfe7f5 25%,#f4f8ff 50%,#dfe7f5 75%)!important;background-size:800px 100%!important;animation:sksh 1.3s infinite linear;color:transparent!important}
-#highlights .skel{background:linear-gradient(90deg,rgba(146,64,14,.16) 25%,rgba(146,64,14,.05) 50%,rgba(146,64,14,.16) 75%);background-size:800px 100%}
-@keyframes sksh{0%{background-position:-400px 0}100%{background-position:400px 0}}
+button{font-family:inherit}
+::selection{background:var(--theme-tag-bg)}
+/* ---------- Hero ---------- */
+.hero-header{position:relative;background-color:var(--hero-bg-base);padding:16px 18px 22px;border-bottom-left-radius:32px;border-bottom-right-radius:32px;box-shadow:0 14px 34px -12px var(--search-glow);transition:background-color .55s ease,box-shadow .6s ease;z-index:10}
+.aura-backdrop{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;border-bottom-left-radius:32px;border-bottom-right-radius:32px}
+.aura-orb{position:absolute;border-radius:50%;filter:blur(48px);opacity:.82;transition:background-color .75s cubic-bezier(0.22,1,0.36,1),transform .85s cubic-bezier(0.34,1.56,0.64,1)}
+[data-dark="true"] .aura-orb{opacity:.28;filter:blur(56px)}
+.aura-orb.orb-left{width:280px;height:220px;bottom:-60px;left:-40px;background-color:var(--orb-color-1)}
+.aura-orb.orb-right{width:300px;height:240px;bottom:-75px;right:-45px;background-color:var(--orb-color-2)}
+.aura-orb.orb-center{width:260px;height:190px;bottom:-55px;left:24%;background-color:#9EE0C5;opacity:0;transition:opacity .6s ease,background-color .75s ease}
+@keyframes videoHoloLeft{0%{background-color:#B2E2B4;transform:translate(-8px,-4px) scale(1.04)}25%{background-color:#8FDBB8;transform:translate(16px,-12px) scale(1.1)}50%{background-color:#92C6F2;transform:translate(8px,6px) scale(1.06)}75%{background-color:#B9CFF8;transform:translate(-12px,-6px) scale(1.02)}100%{background-color:#B2E2B4;transform:translate(-8px,-4px) scale(1.04)}}
+@keyframes videoHoloRight{0%{background-color:#98DBC5;transform:translate(10px,6px) scale(1.05)}25%{background-color:#9CC8F7;transform:translate(-16px,-8px) scale(1.1)}50%{background-color:#A7D0F7;transform:translate(-8px,8px) scale(1.04)}75%{background-color:#BDE7D5;transform:translate(14px,-6px) scale(1.08)}100%{background-color:#98DBC5;transform:translate(10px,6px) scale(1.05)}}
+@keyframes videoHoloCenter{0%{background-color:#9EDDC5;transform:translateY(0) scale(1.02)}33%{background-color:#9FCAF5;transform:translateY(-14px) scale(1.12)}66%{background-color:#CFE7FB;transform:translateY(6px) scale(0.98)}100%{background-color:#9EDDC5;transform:translateY(0) scale(1.02)}}
+@keyframes videoHoloBtn{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+[data-holo="true"] .aura-orb.orb-left{animation:videoHoloLeft 4.8s ease-in-out infinite;filter:blur(42px);opacity:.9}
+[data-holo="true"] .aura-orb.orb-right{animation:videoHoloRight 4.8s ease-in-out infinite;filter:blur(42px);opacity:.9}
+[data-holo="true"] .aura-orb.orb-center{opacity:.78;animation:videoHoloCenter 4.8s ease-in-out infinite;filter:blur(44px)}
+[data-dark="true"][data-holo="true"] .aura-orb.orb-left,[data-dark="true"][data-holo="true"] .aura-orb.orb-right,[data-dark="true"][data-holo="true"] .aura-orb.orb-center{opacity:.34}
+[data-holo="true"] .refresh-btn{background:linear-gradient(120deg,#56C596,#4FA8F6,#74B9FF,#68D391);background-size:240% 240%;animation:videoHoloBtn 4.2s ease infinite}
+[data-holo="true"] .action-circle-btn{background:linear-gradient(135deg,#B2E2B4 0%,#98DBC5 45%,#9CC8F7 100%);background-size:200% 200%;animation:videoHoloBtn 4.2s ease infinite}
+.hero-header>*{position:relative;z-index:1}
+.top-nav-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;position:relative}
+.brand-tag{display:inline-flex;align-items:center;font-size:11.5px;font-weight:800;letter-spacing:1.2px;color:var(--text-secondary)}
+.brand-bar{width:4px;height:15px;background-color:var(--theme-accent);border-radius:3px;margin-right:8px;transition:background-color .45s ease;flex-shrink:0}
+.top-right-widgets{display:flex;align-items:center;gap:8px;position:relative}
+.lang-pill-btn{height:36px;padding:0 13px;border-radius:999px;background-color:var(--pill-surface);border:none;box-shadow:var(--pill-shadow);display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none;transition:transform .25s cubic-bezier(0.34,1.56,0.64,1),box-shadow .3s ease,background-color .4s ease}
+.lang-pill-btn:active{transform:scale(.93)}
+.globe-svg{width:16px;height:16px;stroke:var(--theme-accent);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:stroke .45s ease,transform .4s ease}
+.lang-text{font-size:13px;font-weight:700;color:var(--text-primary)}
+.theme-mode-btn{width:36px;height:36px;border-radius:50%;background-color:var(--pill-surface);border:none;box-shadow:var(--pill-shadow);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-primary);user-select:none;-webkit-user-select:none;touch-action:none;position:relative;z-index:102;transition:transform .25s cubic-bezier(0.34,1.56,0.64,1),background-color .4s ease,color .3s ease,box-shadow .3s ease}
+.theme-mode-btn.pressing{transform:scale(.9);box-shadow:0 0 0 4px var(--search-glow)}
+.sun-moon-svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;transition:transform .5s cubic-bezier(0.34,1.56,0.64,1)}
+.theme-mode-btn.rotating .sun-moon-svg{transform:rotate(180deg) scale(.85)}
+.theme-panel-backdrop{position:fixed;inset:0;z-index:98;background:rgba(15,23,42,.06);opacity:0;pointer-events:none;transition:opacity .25s ease}
+.theme-panel-backdrop.open{opacity:1;pointer-events:auto}
+.theme-popover-panel{position:absolute;top:46px;right:0;width:292px;max-width:86vw;background:rgba(255,255,255,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:none;border-radius:24px;padding:14px;box-shadow:0 20px 40px -10px rgba(15,23,42,.18),0 4px 16px rgba(15,23,42,.06);z-index:101;opacity:0;transform:translateY(-10px) scale(.92);transform-origin:top right;pointer-events:none;user-select:none;transition:opacity .26s cubic-bezier(0.22,1,0.36,1),transform .3s cubic-bezier(0.34,1.56,0.64,1)}
+[data-dark="true"] .theme-popover-panel{background:rgba(21,31,50,.94);box-shadow:0 22px 44px -8px rgba(0,0,0,.55)}
+.theme-popover-panel.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:0 4px}
+.panel-title{font-size:12px;font-weight:800;color:var(--text-primary)}
+.panel-hint{font-size:11px;color:var(--text-secondary);font-weight:500}
+.theme-swatch-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.theme-swatch-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;background:rgba(248,250,252,.75);border:none;cursor:pointer;transition:transform .18s ease,background-color .2s ease,box-shadow .2s ease}
+[data-dark="true"] .theme-swatch-item{background:rgba(30,41,59,.75)}
+.theme-swatch-item.active,.theme-swatch-item.sliding-hover{background:var(--card-bg);transform:scale(1.04);box-shadow:0 6px 16px -4px var(--search-glow)}
+.swatch-orb-preview{width:22px;height:22px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 1px 3px rgba(255,255,255,.6),0 2px 5px rgba(15,23,42,.1)}
+.swatch-orb-preview.holo-animated{background:linear-gradient(135deg,#B2E2B4 0%,#8FDBB8 35%,#92C6F2 72%,#B9CFF8 100%)!important;background-size:220% 220%!important;animation:videoHoloBtn 3.2s ease infinite}
+.swatch-label{font-size:12px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.shop-title{font-size:24px;font-weight:800;color:var(--text-primary);letter-spacing:-.3px;line-height:1.25;margin-bottom:5px}
+.skills-highlight{position:relative;display:inline-block;padding:0 4px;z-index:1}
+.skills-highlight::after{content:"";position:absolute;left:0;right:0;bottom:2px;height:10px;background:rgba(253,224,71,.75);border-radius:3px;z-index:-1}
+[data-dark="true"] .skills-highlight::after{background:rgba(234,179,8,.45)}
+.shop-subtitle{font-size:12.5px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5}
+.status-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:nowrap}
+.period-select-pill{background:var(--pill-surface);color:var(--text-primary);border:none;border-radius:8px;padding:6.5px 12px;font-size:12.5px;font-weight:700;outline:none;cursor:pointer;white-space:nowrap;flex-shrink:1;min-width:0;box-shadow:0 2px 8px rgba(15,23,42,.05)}
+.refresh-btn{background-color:var(--refresh-btn-bg);color:var(--refresh-btn-text);border:none;padding:7px 15px;border-radius:999px;font-size:12.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;box-shadow:0 5px 15px var(--search-glow);transition:background-color .45s ease,transform .25s cubic-bezier(0.34,1.56,0.64,1),box-shadow .45s ease,opacity .2s}
+.refresh-btn:active{transform:scale(.94)}
+.refresh-btn:disabled{opacity:.55;cursor:not-allowed}
+.refresh-svg{width:14px;height:14px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform .55s cubic-bezier(0.34,1.56,0.64,1)}
+.refresh-btn.spinning .refresh-svg{transform:rotate(360deg)}
+.brand-dual-line{height:3px;width:100%;border-radius:2px;overflow:hidden;display:flex;margin-bottom:14px}
+.brand-dual-line .seg-blue{width:55%;background:var(--theme-accent);transition:background-color .45s ease}
+.brand-dual-line .seg-amber{width:45%;background:#F59E0B}
+.source-inline-row{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;margin-bottom:12px;padding-bottom:2px}
+.source-inline-row::-webkit-scrollbar{display:none;width:0;height:0}
+.source-sq-chip{border:none;background:rgba(255,255,255,.72);color:var(--text-secondary);font-size:11px;font-weight:700;padding:3.5px 9px;border-radius:6px;white-space:nowrap;box-shadow:0 2px 6px rgba(15,23,42,.04)}
+[data-dark="true"] .source-sq-chip{background:rgba(30,41,59,.72)}
+.gemini-search-card{background-color:var(--pill-surface);border-radius:24px;padding:8px 9px 8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 28px -6px var(--search-glow),0 24px 60px -12px var(--search-glow),0 2px 6px rgba(15,23,42,.03);border:none;transition:box-shadow .45s ease,transform .25s ease,background-color .4s ease}
+.gemini-search-card:focus-within{transform:translateY(-1px);box-shadow:0 14px 32px -4px var(--search-glow),0 28px 64px -12px var(--search-glow)}
+.plus-action-btn{width:30px;height:30px;border-radius:50%;border:none;background:transparent;color:var(--text-primary);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background-color .2s ease,transform .2s ease}
+.plus-action-btn:active{background-color:rgba(15,23,42,.08);transform:scale(.9)}
+[data-dark="true"] .plus-action-btn:active{background-color:rgba(255,255,255,.16);transform:scale(.9)}
+.search-input{border:none;outline:none;width:100%;min-width:0;font-size:13.5px;color:var(--text-primary);background:transparent;font-weight:500}
+.search-input::placeholder{color:var(--text-muted);font-weight:400}
+.clear-input-btn{border:none;background:rgba(148,163,184,.18);color:var(--text-secondary);width:22px;height:22px;border-radius:50%;font-size:12px;display:none;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+[data-dark="true"] .clear-input-btn{background:rgba(255,255,255,.12)}
+.clear-input-btn.visible{display:inline-flex}
+.action-circle-btn{width:36px;height:36px;border-radius:50%;border:none;background-color:var(--send-circle-bg);color:var(--send-circle-icon);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background-color .5s ease,transform .25s cubic-bezier(0.34,1.56,0.64,1)}
+.action-circle-btn:active{transform:scale(.92)}
+.arrow-up-svg{width:17px;height:17px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 </style>
-<meta name="theme-color" content="#1c4f9c">
+<meta name="theme-color" content="#F3F8FA">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -84,145 +131,1076 @@ select#dateSel{min-width:150px}
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Skills 榜">
+<style>
+/* ---------- Section nav (moved below hero) ---------- */
+.moved-sec-nav-wrap{padding:14px 18px 2px}
+.sec-nav-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:2px 0}
+@media(min-width:700px){.sec-nav-strip{grid-template-columns:repeat(6,1fr)}}
+.sec-sq-btn{width:100%;justify-content:flex-start;border:none;background-color:var(--card-bg);color:var(--text-secondary);padding:7px 7px;border-radius:7px;font-size:11.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(15,23,42,.04);transition:background-color .25s ease,color .25s ease,box-shadow .25s ease}
+.sec-sq-btn .sec-num{font-size:10px;font-weight:800;padding:1.5px 4.5px;border-radius:4px;background:var(--theme-tag-bg);color:var(--theme-tag-text);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;flex-shrink:0}
+.sec-sq-btn.active{background-color:var(--theme-accent);color:#FFFFFF;box-shadow:0 4px 12px var(--search-glow)}
+.sec-sq-btn.active .sec-num{background:rgba(255,255,255,.22);color:#FFFFFF}
+[data-dark="true"] .sec-sq-btn:not(.active) .sec-num{background:rgba(255,255,255,.10);color:var(--orb-color-2)}
+/* ---------- Stats viz ---------- */
+.stats-viz-section{padding:10px 18px 10px;display:flex;flex-direction:column;gap:12px}
+.stats-viz-card{background:var(--card-bg);border:none;border-radius:20px;padding:14px 15px;box-shadow:0 4px 16px rgba(15,23,42,.035);transition:background-color .4s ease;overflow:hidden}
+.stat-summary-table{display:grid;grid-template-columns:repeat(4,1fr);background:var(--page-bg);border-radius:14px;padding:10px 8px;margin-bottom:12px;gap:4px}
+@media(max-width:440px){.stat-summary-table{grid-template-columns:repeat(2,1fr);gap:10px 12px}}
+.stat-cell{padding:2px 4px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.stat-cell-val{font-size:16.5px;font-weight:800;color:var(--theme-accent);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-.4px;line-height:1.15;white-space:nowrap}
+[data-dark="true"] .stat-cell-val{color:var(--orb-color-1)}
+.stat-cell-label{font-size:11px;font-weight:700;color:var(--text-primary);white-space:nowrap}
+.stat-cell-sub{font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:380px){.stat-cell-val{font-size:14.5px}.stat-cell-label{font-size:10px}}
+.viz-header-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:11px;flex-wrap:wrap}
+.viz-title{font-size:13px;font-weight:800;color:var(--text-primary);display:flex;align-items:center;gap:6px;min-width:0}
+.viz-title-dot{width:7px;height:7px;border-radius:2px;background:var(--theme-accent);flex-shrink:0}
+.viz-mode-pills{display:inline-flex;background:var(--page-bg);padding:3px;border-radius:8px;border:none;gap:2px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.viz-mode-pills::-webkit-scrollbar{display:none}
+.viz-mode-btn{border:none;background:transparent;color:var(--text-secondary);font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;cursor:pointer;transition:background-color .2s ease,color .2s ease;white-space:nowrap}
+.viz-mode-btn.active{background:var(--card-bg);color:var(--theme-accent);box-shadow:0 2px 6px rgba(15,23,42,.06)}
+[data-dark="true"] .viz-mode-btn.active{background:var(--pill-surface)}
+.bar-chart-list{display:flex;flex-direction:column;gap:9px}
+.bar-row{display:flex;flex-direction:column;gap:4px;cursor:pointer;padding:6px 8px;border-radius:12px;transition:background-color .2s ease}
+.bar-row-meta{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:11.5px}
+.bar-skill-name{font-weight:700;color:var(--text-primary);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;display:inline-flex;align-items:center;gap:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-plat-tag{font-size:9.5px;font-weight:600;padding:1px 5px;border-radius:4px;background:var(--theme-tag-bg);color:var(--theme-tag-text);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;flex-shrink:0}
+[data-dark="true"] .bar-plat-tag{background:rgba(255,255,255,.10);color:var(--orb-color-2)}
+.bar-skill-val{font-weight:800;color:var(--theme-accent);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;white-space:nowrap}
+[data-dark="true"] .bar-skill-val{color:var(--orb-color-1)}
+.bar-track{width:100%;height:8px;background:var(--page-bg);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--refresh-btn-bg),var(--theme-accent));transition:width .5s cubic-bezier(0.22,1,0.36,1)}
+.line-chart-container{display:flex;flex-direction:column;gap:10px}
+.svg-chart-box{background:var(--page-bg);border:none;border-radius:12px;padding:10px 12px 8px;color:var(--text-primary)}
+.svg-chart-legend{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-secondary);margin-bottom:6px;flex-wrap:wrap;gap:6px}
+.legend-items{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.legend-items::-webkit-scrollbar{display:none}
+.legend-items span{white-space:nowrap;font-size:10.5px}
+.legend-dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
+.stat-data-table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0 4px;font-size:11.5px}
+.stat-data-table th{text-align:left;font-size:10.5px;font-weight:700;color:var(--text-muted);padding:6px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-data-table th:nth-child(1),.stat-data-table td:nth-child(1){width:52%}
+.stat-data-table th:nth-child(2),.stat-data-table td:nth-child(2){width:20%;text-align:center}
+.stat-data-table th:nth-child(3),.stat-data-table td:nth-child(3){width:28%;text-align:right}
+.stat-data-table td{padding:8px 8px;color:var(--text-primary);vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stat-data-table tbody tr{cursor:pointer;transition:background-color .15s ease}
+.stat-data-table tbody tr td:first-child{border-top-left-radius:12px;border-bottom-left-radius:12px}
+.stat-data-table tbody tr td:last-child{border-top-right-radius:12px;border-bottom-right-radius:12px}
+.mini-spark-svg{width:48px;height:18px;vertical-align:middle}
+/* ---------- List ---------- */
+.site-list-section{padding:4px 18px 38px}
+.site-list-topline{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.site-list-title{font-size:18px;font-weight:800;letter-spacing:-.35px;color:var(--text-primary)}
+.site-list-count{margin-left:auto;background:var(--theme-tag-bg);color:var(--theme-tag-text);border-radius:6px;padding:4px 9px;font-size:11px;font-weight:800;white-space:nowrap}
+[data-dark="true"] .site-list-count{background:rgba(147,197,253,.13);color:var(--orb-color-2)}
+.site-list-subhead{font-size:12px;line-height:1.6;color:var(--text-secondary);margin:0 0 14px}
+section.board-sec{scroll-margin-top:10px;margin-bottom:22px}
+section.board-sec:last-child{margin-bottom:0}
+.sec-block-header{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:4px 2px;margin-bottom:8px}
+.sec-block-title-left{display:flex;align-items:center;gap:8px;max-width:100%}
+.sec-block-badge{background:var(--theme-accent);color:#FFFFFF;font-size:11px;font-weight:800;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:2.5px 7px;border-radius:6px;line-height:1.2;flex-shrink:0}
+.sec-block-title{font-size:15.5px;font-weight:800;color:var(--text-primary);letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec-block-sub{font-size:11px;color:var(--text-secondary);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.sec-block-cards{display:flex;flex-direction:column;gap:12px}
+.group{border-radius:20px;border:none;background:var(--card-bg);box-shadow:0 4px 15px rgba(15,23,42,.035);overflow:hidden;transition:box-shadow .36s cubic-bezier(0.2,0.8,0.2,1),background-color .4s ease}
+.group-trigger{display:flex;width:100%;border:0;background:transparent;padding:13px 12px;align-items:center;text-align:left;cursor:pointer;gap:9px;color:inherit}
+.group-brand-icon{flex:0 0 32px;width:32px;height:32px;display:grid;place-items:center;font-size:11.5px;border-radius:8px;background:var(--theme-tag-bg);color:var(--theme-tag-text);font-weight:800;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+[data-dark="true"] .group-brand-icon{background:rgba(147,197,253,.12);color:var(--orb-color-2)}
+.group-main{min-width:0;flex:1}
+.group-name{font-size:14px;font-weight:800;line-height:1.35;color:var(--text-primary);letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.group-detail{margin-top:3px;font-size:11.5px;color:var(--text-muted);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.group-minimum{margin-left:auto;text-align:right;flex-shrink:0;background:var(--page-bg);padding:4px 8px;border-radius:8px}
+.group-minimum small{display:block;font-size:9.5px;color:var(--text-secondary);margin-bottom:1px}
+.group-minimum strong{color:var(--theme-accent);font-size:13.5px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}
+[data-dark="true"] .group-minimum strong{color:var(--orb-color-1)}
+.group-arrow{display:inline-flex;color:var(--text-muted);flex-shrink:0;transition:transform .28s cubic-bezier(0.2,0.8,0.2,1)}
+.group.open .group-arrow{transform:rotate(180deg)}
+.group-collapsible{display:grid;grid-template-rows:0fr;transition:grid-template-rows .34s cubic-bezier(0.22,1,0.36,1)}
+.group.open .group-collapsible{grid-template-rows:1fr}
+.group-inner{min-height:0;overflow:hidden}
+.group-items{padding:4px 12px 12px;display:flex;flex-direction:column;gap:8px}
+.item{background:var(--page-bg);border-radius:14px;padding:11px 12px}
+.itemtop{display:flex;gap:9px;align-items:flex-start}
+.rank{flex:0 0 22px;width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:800;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;display:inline-flex;align-items:center;justify-content:center;background:rgba(148,163,184,.16);color:var(--text-secondary)}
+.rank.top{background:var(--theme-tag-bg);color:var(--theme-accent)}
+[data-dark="true"] .rank{background:rgba(255,255,255,.08);color:#94A3B8}
+[data-dark="true"] .rank.top{background:rgba(147,197,253,.16);color:var(--orb-color-1)}
+.item .main{flex:1;min-width:0}
+.name{font-weight:700;font-size:13.5px;color:var(--text-primary);line-height:1.4;word-break:break-word;overflow-wrap:anywhere;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+.name a{color:inherit;text-decoration:none}
+.blurb{color:var(--text-secondary);font-size:12px;line-height:1.48;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.badges-line{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;margin-top:6px;overflow-x:auto;scrollbar-width:none;min-width:0}
+.badges-line::-webkit-scrollbar{display:none}
+.meta-pill{display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:5px;line-height:1.35;white-space:nowrap;background:var(--theme-tag-bg);color:var(--theme-tag-text)}
+.meta-pill.plain{background:rgba(148,163,184,.14);color:var(--text-secondary)}
+[data-dark="true"] .meta-pill.plain{background:rgba(255,255,255,.08);color:#94A3B8}
+.num{font-weight:800;color:var(--theme-accent);text-align:right;flex-shrink:0;font-size:14.5px;letter-spacing:-.3px;line-height:1.15;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+[data-dark="true"] .num{color:var(--orb-color-1)}
+.num small{display:block;color:var(--text-muted);font-weight:600;font-size:10px;line-height:1.35;white-space:nowrap;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;margin-top:2px}
+.cmdwrap{position:relative;display:flex;align-items:center;height:34px;margin-top:8px;background:#0F172A;border:none;border-radius:10px;overflow:hidden}
+code.cmd{display:block;flex:1;min-width:0;background:transparent;color:#E2E8F0;padding:0 2px 0 10px;font-size:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto;white-space:nowrap;cursor:pointer;scrollbar-width:none}
+code.cmd::-webkit-scrollbar{display:none}
+.copybtn{position:static;flex:0 0 auto;margin-right:6px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.09);border:none;border-radius:6px;color:#CBD5E1;cursor:pointer;padding:0}
+.copybtn:active{background:rgba(255,255,255,.3)}
+.note-card{background:var(--card-bg);border-radius:20px;box-shadow:0 4px 15px rgba(15,23,42,.035);padding:14px 15px;display:flex;flex-direction:column;gap:12px}
+.note-block h4{font-size:13px;font-weight:800;color:var(--text-primary);margin-bottom:5px}
+.note{color:var(--text-secondary);font-size:12.5px;line-height:1.7}
+.empty-tip{text-align:center;padding:40px 16px;color:var(--text-muted);font-size:14px}
+.site-list-footer{padding:16px 2px 0;font-size:11.5px;line-height:1.7;color:var(--text-secondary)}
+.site-online-link{color:var(--theme-accent);font-weight:800;text-decoration:none}
+#toast{position:fixed;top:14px;left:50%;transform:translate(-50%,-10px);background:#0F172A;color:#fff;padding:9px 20px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:999;box-shadow:0 6px 20px rgba(0,0,0,.28)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+/* ---------- Skeleton ---------- */
+.skel{background:linear-gradient(90deg,#E9EEF6 25%,#F7FAFD 50%,#E9EEF6 75%);background-size:800px 100%;animation:sksh 1.3s infinite linear;border-radius:6px}
+[data-dark="true"] .skel{background:linear-gradient(90deg,#1E293B 25%,#273549 50%,#1E293B 75%);background-size:800px 100%}
+.skelbar{background-image:linear-gradient(90deg,#DFE7F5 25%,#F4F8FF 50%,#DFE7F5 75%)!important;background-size:800px 100%!important;animation:sksh 1.3s infinite linear;color:transparent!important}
+[data-dark="true"] .skelbar{background-image:linear-gradient(90deg,#273549 25%,#33465E 50%,#273549 75%)!important}
+@keyframes sksh{0%{background-position:-400px 0}100%{background-position:400px 0}}
+/* ---------- Floating dock ---------- */
+.floating-quick-dock{position:fixed;right:12px;bottom:20px;z-index:95;display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:999px;background:var(--card-bg);box-shadow:0 10px 28px -4px rgba(15,23,42,.22);opacity:0;transform:translate3d(0,0,0) scale(.95);pointer-events:none;user-select:none;-webkit-user-select:none;touch-action:none;cursor:grab;will-change:left,top,transform,opacity;transition:left .42s cubic-bezier(0.22,1,0.36,1),top .38s cubic-bezier(0.22,1,0.36,1),border-radius .32s ease,opacity .28s ease,transform .32s cubic-bezier(0.22,1,0.36,1),box-shadow .28s ease,background-color .4s ease}
+.floating-quick-dock.visible{opacity:1;transform:translate3d(0,0,0) scale(1);pointer-events:auto}
+.floating-quick-dock.dragging{cursor:grabbing;transform:translate3d(0,0,0) scale(1.03);box-shadow:0 16px 36px -4px rgba(15,23,42,.28);transition:transform .22s cubic-bezier(0.22,1,0.36,1),opacity .22s ease,box-shadow .22s ease!important}
+.floating-quick-dock.dragging.edge-ready{transform:translate3d(0,0,0) scale(.95);opacity:.82}
+.floating-quick-dock.stashed-right,.floating-quick-dock.stashed-left{padding:0!important;gap:0!important;width:28px!important;height:46px!important;justify-content:center;background:var(--card-bg);box-shadow:0 6px 20px rgba(15,23,42,.18)}
+.floating-quick-dock.stashed-right{border-radius:16px 0 0 16px!important}
+.floating-quick-dock.stashed-left{border-radius:0 16px 16px 0!important}
+.floating-quick-dock.stashed-idle{opacity:.65}
+.floating-quick-dock.stashed-right .dock-pill-btn,.floating-quick-dock.stashed-right .dock-top-btn,.floating-quick-dock.stashed-left .dock-pill-btn,.floating-quick-dock.stashed-left .dock-top-btn{display:none!important}
+.dock-stash-ear{display:none;width:100%;height:100%;align-items:center;justify-content:center;color:var(--theme-accent);font-weight:900;cursor:pointer}
+.floating-quick-dock.stashed-right .dock-stash-ear,.floating-quick-dock.stashed-left .dock-stash-ear{display:inline-flex}
+.floating-quick-dock.stashed-left .dock-stash-ear svg{transform:rotate(180deg)}
+.dock-pill-btn,.dock-top-btn{display:inline-flex;align-items:center;justify-content:center;min-width:68px;height:28px;padding:0 6px;border-radius:999px;font-size:11px;font-weight:800;line-height:1;border:none;cursor:pointer;white-space:nowrap;user-select:none;-webkit-user-select:none;transition:background-color .25s ease,color .2s ease,transform .2s ease}
+.dock-pill-btn{background:var(--page-bg);color:var(--text-secondary)}
+.dock-top-btn{background:var(--theme-accent);color:#FFFFFF;box-shadow:0 4px 12px var(--search-glow)}
+.dock-top-btn:active{transform:scale(.93)}
+/* ---------- Hover only on real mouse devices ---------- */
+@media(hover:hover) and (pointer:fine){
+  .lang-pill-btn:hover{transform:translateY(-1px)}
+  .lang-pill-btn:hover .globe-svg{transform:rotate(15deg)}
+  .refresh-btn:hover{filter:brightness(1.04);transform:translateY(-1px)}
+  .plus-action-btn:hover{background-color:var(--theme-tag-bg)}
+  [data-dark="true"] .plus-action-btn:hover{background-color:rgba(255,255,255,.10)}
+  .action-circle-btn:hover{transform:scale(1.05)}
+  .bar-row:hover{background-color:var(--page-bg)}
+  .stat-data-table tbody tr:hover td{background-color:var(--page-bg)}
+  .group:hover{box-shadow:0 8px 22px -10px var(--search-glow),0 4px 14px rgba(15,23,42,.04)}
+  .name a:hover{color:var(--theme-accent)}
+  .cmdwrap:hover{background:#1E293B}
+  .copybtn:hover{background:rgba(255,255,255,.2);color:#fff}
+  .dock-pill-btn:hover{color:var(--text-primary)}
+  .sec-sq-btn:hover{color:var(--text-primary)}
+  .sec-sq-btn.active:hover{color:#FFFFFF}
+}
+</style>
 </head>
 <body>
 <div class="wrap">
-  <div class="row" style="justify-content:space-between">
-    <div class="kicker">2026 - GLOBAL AGENT SKILLS USAGE RANKING</div>
-    <div class="row">
-      <select id="dateSel" class="skelbar" aria-label="期数"><option value="">····-··-·· 期</option></select>
-      <button id="reloadBtn">刷新数据</button>
+  <header class="hero-header">
+    <div class="aura-backdrop">
+      <div class="aura-orb orb-left" id="orbLeft"></div>
+      <div class="aura-orb orb-center" id="orbCenter"></div>
+      <div class="aura-orb orb-right" id="orbRight"></div>
     </div>
+    <div class="top-nav-bar">
+      <div class="brand-tag"><span class="brand-bar"></span><span>2026 · GLOBAL AGENT SKILLS</span></div>
+      <div class="top-right-widgets">
+        <button class="lang-pill-btn" id="langBtn" type="button" title="切换中英 / Switch Language">
+          <svg class="globe-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <span class="lang-text" id="langText">中文</span>
+        </button>
+        <button class="theme-mode-btn" id="darkModeBtn" type="button" title="单击切换日夜 / 长按滑动选12色主题">
+          <svg class="sun-moon-svg" id="sunMoonIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4.5"></line><line x1="12" y1="19.5" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line><line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="4.5" y2="12"></line><line x1="19.5" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line><line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line></svg>
+        </button>
+        <div class="theme-panel-backdrop" id="themeBackdrop"></div>
+        <div class="theme-popover-panel" id="themePopover">
+          <div class="panel-header"><span class="panel-title" id="panelTitle">12色弥散主题</span><span class="panel-hint" id="panelHint">滑动或点击选择</span></div>
+          <div class="theme-swatch-grid" id="themeSwatchGrid"></div>
+        </div>
+      </div>
+    </div>
+    <h1 class="shop-title" id="mainTitle">全球 <span class="skills-highlight">Skills</span> 使用量排行榜</h1>
+    <p class="shop-subtitle" id="subTitle">两张榜：谁被装得最多（3 个注册中心）+ 谁的源码最值得信（GitHub）</p>
+    <div class="status-row">
+      <select id="dateSel" class="period-select-pill skelbar" aria-label="选择期数"><option value="">····-··-·· 期</option></select>
+      <button class="refresh-btn" id="reloadBtn" type="button">
+        <svg class="refresh-svg" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path><path d="M16 16h5v5"></path></svg>
+        <span id="refreshBtnText">刷新数据</span>
+      </button>
+    </div>
+    <div class="brand-dual-line"><div class="seg-blue"></div><div class="seg-amber"></div></div>
+    <div class="source-inline-row" id="sourceRow">
+      <span class="source-sq-chip" data-src-label="all">全部数据源</span>
+      <span class="source-sq-chip">skills.sh</span>
+      <span class="source-sq-chip">ClawHub</span>
+      <span class="source-sq-chip">腾讯 SkillHub</span>
+      <span class="source-sq-chip">GitHub</span>
+    </div>
+    <div class="gemini-search-card">
+      <button class="plus-action-btn" id="btnResetSearch" type="button" title="重置搜索">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+      <input type="search" class="search-input" id="q" placeholder="搜技能名，过滤所有榜单（如 find-skills、dev-god、grill-me）">
+      <button class="clear-input-btn" id="btnClearSearch" type="button">✕</button>
+      <button class="action-circle-btn" id="btnTriggerSearch" type="button" title="立即检索">
+        <svg class="arrow-up-svg" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="moved-sec-nav-wrap">
+    <nav class="sec-nav-strip" id="secNavStrip">
+      <button type="button" class="sec-sq-btn" data-sec="sec-01"><span class="sec-num">01</span><span class="sec-nav-label">安装量总榜</span></button>
+      <button type="button" class="sec-sq-btn" data-sec="sec-02"><span class="sec-num">02</span><span class="sec-nav-label">三平台分区榜</span></button>
+      <button type="button" class="sec-sq-btn" data-sec="sec-03"><span class="sec-num">03</span><span class="sec-nav-label">WIS 值得装</span></button>
+      <button type="button" class="sec-sq-btn" data-sec="sec-04"><span class="sec-num">04</span><span class="sec-nav-label">动能 · 声量</span></button>
+      <button type="button" class="sec-sq-btn" data-sec="sec-05"><span class="sec-num">05</span><span class="sec-nav-label">厂商榜</span></button>
+      <button type="button" class="sec-sq-btn" data-sec="sec-06"><span class="sec-num">06</span><span class="sec-nav-label">视频区</span></button>
+    </nav>
   </div>
-  <h1>全球 <mark>Skills</mark> 使用量排行榜</h1>
-  <div class="sub">两张榜：谁被装得最多（3 个注册中心）+ 谁的源码最值得信（GitHub）<span class="srctag">skills.sh · ClawHub · 腾讯 SkillHub · GitHub</span></div>
-  <div class="row">
-    <span class="pill solid skelbar" id="datePill">数据截至 ····-··-··（UTC）</span>
-  </div>
-  <div class="row">
-    <a class="navchip" href="#sec-01">01 安装量总榜</a>
-    <a class="navchip" href="#sec-02">02 三平台分区榜</a>
-    <a class="navchip" href="#sec-03">03 WIS 值得装</a>
-    <a class="navchip" href="#sec-04">04 动能 · 声量</a>
-    <a class="navchip" href="#sec-05">05 厂商榜</a>
-    <a class="navchip" href="#sec-06">06 视频区</a>
-    <input type="search" id="q" placeholder="搜技能名，过滤所有榜单…">
-  </div>
-  <div class="bar"></div>
-  <div class="stats" id="stats"><div class="stat"><span class="skel" style="display:block;height:30px;width:55%"></span><span class="skel" style="display:block;height:12px;width:85%;margin-top:10px"></span><span class="skel" style="display:block;height:12px;width:62%;margin-top:6px"></span></div><div class="stat"><span class="skel" style="display:block;height:30px;width:55%"></span><span class="skel" style="display:block;height:12px;width:85%;margin-top:10px"></span><span class="skel" style="display:block;height:12px;width:62%;margin-top:6px"></span></div><div class="stat"><span class="skel" style="display:block;height:30px;width:55%"></span><span class="skel" style="display:block;height:12px;width:85%;margin-top:10px"></span><span class="skel" style="display:block;height:12px;width:62%;margin-top:6px"></span></div><div class="stat"><span class="skel" style="display:block;height:30px;width:55%"></span><span class="skel" style="display:block;height:12px;width:85%;margin-top:10px"></span><span class="skel" style="display:block;height:12px;width:62%;margin-top:6px"></span></div></div>
-  <div class="hl" id="highlights" style="margin-top:14px"><span class="skel" style="display:block;height:13px;width:92%"></span><span class="skel" style="display:block;height:13px;width:79%;margin-top:11px"></span><span class="skel" style="display:block;height:13px;width:85%;margin-top:11px"></span></div>
-  <div id="sections"><section><div class="sec-head"><div style="display:flex;gap:10px;align-items:center"><span class="skel" style="display:block;width:34px;height:22px"></span><span class="skel" style="display:block;width:150px;height:18px"></span></div><span class="skel" style="display:block;width:180px;height:12px"></span></div><div class="item"><div class="itemtop"><span class="skel" style="flex:0 0 30px;height:30px;border-radius:50%"></span><div class="main"><span class="skel" style="display:block;height:14px;width:45%"></span><span class="skel" style="display:block;height:12px;width:82%;margin-top:7px"></span></div><span class="skel" style="display:block;width:64px;height:20px"></span></div><span class="skel" style="display:block;height:30px;margin-top:8px"></span></div><div class="item"><div class="itemtop"><span class="skel" style="flex:0 0 30px;height:30px;border-radius:50%"></span><div class="main"><span class="skel" style="display:block;height:14px;width:45%"></span><span class="skel" style="display:block;height:12px;width:82%;margin-top:7px"></span></div><span class="skel" style="display:block;width:64px;height:20px"></span></div><span class="skel" style="display:block;height:30px;margin-top:8px"></span></div><div class="item"><div class="itemtop"><span class="skel" style="flex:0 0 30px;height:30px;border-radius:50%"></span><div class="main"><span class="skel" style="display:block;height:14px;width:45%"></span><span class="skel" style="display:block;height:12px;width:82%;margin-top:7px"></span></div><span class="skel" style="display:block;width:64px;height:20px"></span></div><span class="skel" style="display:block;height:30px;margin-top:8px"></span></div><div class="item"><div class="itemtop"><span class="skel" style="flex:0 0 30px;height:30px;border-radius:50%"></span><div class="main"><span class="skel" style="display:block;height:14px;width:45%"></span><span class="skel" style="display:block;height:12px;width:82%;margin-top:7px"></span></div><span class="skel" style="display:block;width:64px;height:20px"></span></div><span class="skel" style="display:block;height:30px;margin-top:8px"></span></div><div class="item"><div class="itemtop"><span class="skel" style="flex:0 0 30px;height:30px;border-radius:50%"></span><div class="main"><span class="skel" style="display:block;height:14px;width:45%"></span><span class="skel" style="display:block;height:12px;width:82%;margin-top:7px"></span></div><span class="skel" style="display:block;width:64px;height:20px"></span></div><span class="skel" style="display:block;height:30px;margin-top:8px"></span></div></section></div>
-  <div id="videoZone"></div>
-  <div id="emptyTip" class="empty-tip hidden">未找到包含该关键词的技能或说明</div>
-  <footer>
-    数据来源：Best Skills（https://github.com/LinklyAI/best-skills，CC BY 4.0，每日 CSV）+ GitHub API 直查。<br>
-    跨平台口径不同，数字并列展示、从不相加；榜单为空 = 未测量，不是 0。自托管版：定时跑 scripts/refresh.py 更新 data/。
-  </footer>
+
+  <section class="stats-viz-section" id="statsVizSection" aria-label="统计数据图表概览">
+    <div class="stats-viz-card">
+      <div class="stat-summary-table" id="statSummary">
+        <div class="stat-cell"><span class="skel" style="display:block;height:18px;width:70%"></span><span class="skel" style="display:block;height:11px;width:55%"></span></div>
+        <div class="stat-cell"><span class="skel" style="display:block;height:18px;width:70%"></span><span class="skel" style="display:block;height:11px;width:55%"></span></div>
+        <div class="stat-cell"><span class="skel" style="display:block;height:18px;width:70%"></span><span class="skel" style="display:block;height:11px;width:55%"></span></div>
+        <div class="stat-cell"><span class="skel" style="display:block;height:18px;width:70%"></span><span class="skel" style="display:block;height:11px;width:55%"></span></div>
+      </div>
+      <div class="viz-header-bar">
+        <div class="viz-title"><span class="viz-title-dot"></span><span id="vizChartTitle">核心技能安装量与 7 日异动趋势统计</span></div>
+        <div class="viz-mode-pills" id="vizModePills">
+          <button type="button" class="viz-mode-btn active" data-viz="both">综合视图</button>
+          <button type="button" class="viz-mode-btn" data-viz="bar">条形图</button>
+          <button type="button" class="viz-mode-btn" data-viz="line" id="vizLineBtn">折线图</button>
+          <button type="button" class="viz-mode-btn" data-viz="table">数据表</button>
+        </div>
+      </div>
+      <div id="statsVizBody"><span class="skel" style="display:block;height:13px;width:92%"></span><span class="skel" style="display:block;height:13px;width:79%;margin-top:11px"></span><span class="skel" style="display:block;height:13px;width:85%;margin-top:11px"></span></div>
+    </div>
+  </section>
+
+  <section class="site-list-section" aria-label="全球Skills榜单明细">
+    <div class="site-list-topline">
+      <h2 class="site-list-title" id="siteListTitle">01–06 全站榜单明细</h2>
+      <span class="site-list-count skelbar" id="siteListCount">····</span>
+    </div>
+    <p class="site-list-subhead" id="siteListSubhead">点分组标题展开或收起；安装命令整行点按即可复制</p>
+    <div id="sections">
+      <div class="group"><div class="group-items" style="padding-top:12px"><span class="skel" style="display:block;height:14px;width:45%"></span><span class="skel" style="display:block;height:12px;width:82%;margin-top:8px"></span><span class="skel" style="display:block;height:12px;width:64%;margin-top:8px"></span></div></div>
+    </div>
+    <div id="videoZone"></div>
+    <div id="emptyTip" class="empty-tip hidden">未找到包含该关键词的技能或说明</div>
+    <p class="site-list-footer" id="siteListFooter">数据来源：<a class="site-online-link" href="https://github.com/LinklyAI/best-skills" target="_blank" rel="noopener noreferrer">Best Skills</a>（CC BY 4.0，每日 CSV）+ GitHub API 直查<br>跨平台口径不同，数字并列展示、从不相加；榜单为空 = 未测量，不是 0</p>
+  </section>
 </div>
+
+<div class="floating-quick-dock" id="floatingQuickDock" title="可自由拖拽；拉向左右屏幕最外侧边缘可自动贴边收起">
+  <span class="dock-stash-ear" id="dockStashEar" title="点击或向内拉出展开">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+  </span>
+  <button type="button" class="dock-pill-btn" id="btnCollapseAllGroups">收起全部</button>
+  <button type="button" class="dock-top-btn" id="btnBackToTop">↑ 顶部</button>
+</div>
+
 <div id="toast" role="status">复制成功</div>
 <script>
+/* ================= 通用工具 ================= */
 const fmt=n=>n==null?"—":Number(n).toLocaleString("en-US");
 const compact=n=>n==null?"—":(n>=1e6?(n/1e6).toFixed(2)+"M":n>=1e3?(n/1e3).toFixed(1)+"K":String(n));
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-let DATES=[], board=null;
-function rankBadge(r){return `<div class="rank ${r<=3?"top":""}">${r}</div>`}
-function cmd(c){return c?`<span class="cmdwrap" data-cmd="${esc(c)}"><code class="cmd" title="点按复制">${esc(c)}</code><button class="copybtn" type="button" aria-label="复制命令" title="复制"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></span>`:""}
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1600)}
-function doCopy(text){const done=()=>showToast("复制成功");const fb=()=>{const a=document.createElement("textarea");a.value=text;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy");done()}catch(e){showToast("复制失败，请长按命令手动复制")}a.remove()};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(fb)}else fb()}
+function doCopy(text){const done=()=>showToast(STR[LANG].copied);const fb=()=>{const a=document.createElement("textarea");a.value=text;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy");done()}catch(e){showToast(STR[LANG].copyFail)}a.remove()};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(fb)}else fb()}
 function fitCmds(){document.querySelectorAll("code.cmd").forEach(el=>{let s=12;el.style.fontSize=s+"px";while(el.scrollWidth>el.clientWidth&&s>10){s-=0.5;el.style.fontSize=s+"px"}})}
 let _rzT;window.addEventListener("resize",()=>{clearTimeout(_rzT);_rzT=setTimeout(fitCmds,150)});
-function nameLink(name,url,meta){const n=url?`<a href="${esc(url)}" target="_blank" rel="noopener">${esc(name)}</a>`:esc(name);return `<span class="name">${n}</span>${meta?`<span class="meta">${esc(meta)}</span>`:""}`}
-function item(r,left,numHtml,cmdHtml){const s=((left.skill||left.repo||"")+" "+(left.blurb||"")+" "+(left.meta||"")).toLowerCase();return `<div class="item" data-skill="${esc(s)}"><div class="itemtop">${rankBadge(r)}<div class="main">${left.html}</div><div class="num">${numHtml||""}</div></div>${cmdHtml||""}</div>`}
-function section(no,title,desc,inner){return `<section id="sec-${no}"><div class="sec-head"><div style="display:flex;gap:10px;align-items:center"><span class="badge">${no}</span><h2>${title}</h2></div><p>${desc}</p></div>${inner}</section>`}
+
+/* ================= 12 套主题（全套搬入新稿，不缩水） ================= */
+const THEMES=[
+ {name:"01 · 冰川晴空",nameEn:"01 · Glacier Sky",orb1:"#BCE0FD",orb2:"#93C5FD",refreshBg:"#60A5FA",sendCircleBg:"#9CCAF9",accent:"#2563EB",tagBg:"#EBF5FF",tagText:"#1D4ED8",pageBg:"#F4F8FC",glow:"rgba(147,197,253,0.38)"},
+ {name:"02 · 薄荷微风",nameEn:"02 · Mint Breeze",orb1:"#A7F3D0",orb2:"#6EE7B7",refreshBg:"#34D399",sendCircleBg:"#86EFAC",accent:"#059669",tagBg:"#ECFDF5",tagText:"#047857",pageBg:"#F2FBF7",glow:"rgba(110,231,183,0.36)"},
+ {name:"03 · 极光青蓝",nameEn:"03 · Aurora Cyan",orb1:"#A5F3FC",orb2:"#818CF8",refreshBg:"#6366F1",sendCircleBg:"#A5B4FC",accent:"#4F46E5",tagBg:"#EEF2FF",tagText:"#4338CA",pageBg:"#F4F6FC",glow:"rgba(129,140,248,0.34)"},
+ {name:"04 · 抹茶森屿",nameEn:"04 · Matcha Isle",orb1:"#D9F99D",orb2:"#86EFAC",refreshBg:"#4ADE80",sendCircleBg:"#BEF264",accent:"#16A34A",tagBg:"#F0FDF4",tagText:"#15803D",pageBg:"#F6FAF5",glow:"rgba(134,239,172,0.36)"},
+ {name:"05 · 碧海晴空",nameEn:"05 · Azure Lagoon",orb1:"#99F6E4",orb2:"#7DD3FC",refreshBg:"#2DD4BF",sendCircleBg:"#67E8F9",accent:"#0D9488",tagBg:"#F0FDFA",tagText:"#0F766E",pageBg:"#F2F9FA",glow:"rgba(125,211,252,0.36)"},
+ {name:"06 · 深海星雾",nameEn:"06 · Mist Slate",orb1:"#CBD5E1",orb2:"#93C5FD",refreshBg:"#64748B",sendCircleBg:"#CBD5E1",accent:"#334155",tagBg:"#F1F5F9",tagText:"#1E293B",pageBg:"#F5F7FA",glow:"rgba(148,163,184,0.32)"},
+ {name:"07 · 星云幻紫",nameEn:"07 · Nebula Violet",orb1:"#E9D5FF",orb2:"#C4B5FD",refreshBg:"#8B5CF6",sendCircleBg:"#A396F8",accent:"#6D28D9",tagBg:"#F3E8FF",tagText:"#6D28D9",pageBg:"#F8F5FD",glow:"rgba(167,139,250,0.38)"},
+ {name:"08 · 蜜桃乌龙",nameEn:"08 · Peach Oolong",orb1:"#FBCFE8",orb2:"#FDA4AF",refreshBg:"#F472B6",sendCircleBg:"#F9A8D4",accent:"#DB2777",tagBg:"#FDF2F8",tagText:"#BE185D",pageBg:"#FDF6F9",glow:"rgba(244,114,182,0.34)"},
+ {name:"09 · 晨曦微光",nameEn:"09 · Dawn Amber",orb1:"#FDE68A",orb2:"#FDBA74",refreshBg:"#FB923C",sendCircleBg:"#FCD34D",accent:"#EA580C",tagBg:"#FFF7ED",tagText:"#C2410C",pageBg:"#FCF9F4",glow:"rgba(251,146,60,0.46)"},
+ {name:"10 · 落日粉紫",nameEn:"10 · Sunset Glow",orb1:"#F5D0FE",orb2:"#FECDD3",refreshBg:"#C084FC",sendCircleBg:"#F0ABFC",accent:"#9333EA",tagBg:"#FAF5FF",tagText:"#7E22CE",pageBg:"#FAF6FC",glow:"rgba(192,132,252,0.35)"},
+ {name:"11 · 香槟流金",nameEn:"11 · Champagne Gold",orb1:"#FEF08A",orb2:"#FDE047",refreshBg:"#EAB308",sendCircleBg:"#FDE047",accent:"#CA8A04",tagBg:"#FEFCE8",tagText:"#A16207",pageBg:"#FAF9F2",glow:"rgba(234,179,8,0.32)"},
+ {name:"12 · 幻彩全息",nameEn:"12 · Gemini Holo",isHolo:true,orb1:"#8FDBB8",orb2:"#9CC8F7",refreshBg:"#4FA8F6",sendCircleBg:"#9EE0C5",accent:"#1A73E8",tagBg:"#E6F4EA",tagText:"#137333",pageBg:"#F3F8FA",glow:"rgba(143,219,184,0.54)"}
+];
+
+/* ================= 偏好：Cookie A 优先（与 ai-shop / ip-check / 2fa 共享）+ localStorage 备份 ================= */
+let LANG="zh", DARK=false, THEME_IDX=11;
+function readCookieA(){
+  try{
+    const m=document.cookie.match(/(?:^|;\s*)A=([0-9]+)/);
+    if(!m) return null;
+    const v=m[1];
+    if(v.length<3) return null;
+    const lang=v[0]==="1"?"en":"zh";
+    const dark=v[1]==="0";
+    const themeNum=parseInt(v.slice(2),10);
+    if(!(themeNum>=1&&themeNum<=12)) return null;
+    return {lang,dark,theme:themeNum-1};
+  }catch(e){return null}
+}
+function writeCookieA(){
+  try{
+    const v=(LANG==="en"?"1":"0")+(DARK?"0":"1")+String(THEME_IDX+1);
+    const onDomain=location.hostname.endsWith("jpedu.asia");
+    document.cookie="A="+v+"; Path=/; Max-Age=31536000; SameSite=Lax"+(onDomain?"; Domain=jpedu.asia":"");
+  }catch(e){}
+}
+function savePrefs(){
+  writeCookieA();
+  try{localStorage.setItem("skill-prefs",JSON.stringify({lang:LANG,dark:DARK,theme:THEME_IDX}))}catch(e){}
+}
+function loadPrefs(){
+  const a=readCookieA();
+  if(a){LANG=a.lang;DARK=a.dark;THEME_IDX=a.theme;return}
+  try{
+    const raw=localStorage.getItem("skill-prefs");
+    if(raw){const p=JSON.parse(raw);if(p){LANG=p.lang==="en"?"en":"zh";DARK=!!p.dark;if(Number.isInteger(p.theme)&&p.theme>=0&&p.theme<12)THEME_IDX=p.theme}}
+  }catch(e){}
+}
+
+/* ================= 界面文案（语言胶囊只翻框架，数据说明保持数据源原文） ================= */
+const STR={
+ zh:{
+  title:'全球 <span class="skills-highlight">Skills</span> 使用量排行榜',
+  subtitle:"两张榜：谁被装得最多（3 个注册中心）+ 谁的源码最值得信（GitHub）",
+  refresh:"刷新数据", panelTitle:"12色弥散主题", panelHint:"滑动或点击选择",
+  searchPh:"搜技能名，过滤所有榜单（如 find-skills、dev-god、grill-me）",
+  allSources:"全部数据源",
+  nav:["安装量总榜","三平台分区榜","WIS 值得装","动能 · 声量","厂商榜","视频区"],
+  statTracked:"在榜追踪技能", statSources:"聚合数据源", statSourcesSub:"3 注册中心 + GitHub",
+  statBoards:"每日刷新榜单", statBoardsUnit:" 张", statBoardsSub:"每日同步更新",
+  statPeak:"最高安装量", asOf:d=>`截至 ${d}（UTC）`,
+  vizTitle:"核心技能安装量与 7 日异动趋势统计",
+  vizModes:{both:"综合视图",bar:"条形图",line:"折线图",table:"数据表"},
+  lineTitle:"近 7 日焦点增长趋势",
+  tableHeads:["维度与代表技能","7日走势","核心统计值"],
+  dims:["7日动能最强","社交声量第一","30天新星第一","星标日增最高"],
+  listTitle:"01–06 全站榜单明细", listSub:"点分组标题展开或收起；安装命令整行点按即可复制",
+  countChip:(boards,tracked)=>`${boards} 张子榜 · ${tracked} 技能`,
+  emptyTip:"未找到包含该关键词的技能或说明",
+  loadFail:"加载失败，请点「刷新数据」重试",
+  copied:"复制成功", copyFail:"复制失败，请长按命令手动复制",
+  collapseAll:"收起全部", backTop:"↑ 顶部",
+  footer:'数据来源：<a class="site-online-link" href="https://github.com/LinklyAI/best-skills" target="_blank" rel="noopener noreferrer">Best Skills</a>（CC BY 4.0，每日 CSV）+ GitHub API 直查<br>跨平台口径不同，数字并列展示、从不相加；榜单为空 = 未测量，不是 0',
+  periodSuffix:" 期",
+  secs:[
+   {t:"安装量总榜 & GitHub 星标榜",s:"共 2 张主榜 · 三平台原生口径并行"},
+   {t:"三平台分区榜",s:"共 3 张平台榜 · 各平台只跟自己比，不跨平台合并"},
+   {t:"WIS 综合值得装榜",s:"热度 × 动能 × 声量 × 维护 × 信任的综合分"},
+   {t:"动能 · 声量 · 新星 · 维护",s:"共 4 张异动子榜 · 最近 7 天和 30 天在发生什么"},
+   {t:"厂商榜 + 权威度四问",s:"体量、质量、维护与安全避坑一起看"},
+   {t:"视频区 · AI 视频声音",s:"精选区 · 给视频配乐与声音的站点和工具"}
+  ],
+  groups:{
+   installs:{t:"安装量总榜 TOP 8",s:"每行都写了它到底干什么 · 三平台原生口径并行",badge:"最高安装"},
+   repos:{t:"GitHub 星标榜 TOP 10",s:"谁的源码最值得信 · GitHub API 直查星标与单日增量",badge:"最高星标"},
+   plat:{s:"平台原生排行（只跟本平台比）",badge:"榜首"},
+   wis:{t:"WIS 综合值得装榜 TOP 10",s:"热度 × 动能 × 声量 × 维护 × 信任的综合分",badge:"最高得分"},
+   trend:{t:"7 日动能榜 TOP 6",s:"最近 7 天安装周涨幅与增量排行",badge:"最高涨幅"},
+   buzz:{t:"社交声量榜 TOP 6",s:"近 7 天 X / GitHub / HackerNews 跨平台讨论声量得分",badge:"声量第一"},
+   rising:{t:"30 天新星榜 TOP 6",s:"首次上榜 30 天内热度与安装爆发力最强的技能",badge:"新星第一"},
+   active:{t:"最活跃维护榜 TOP 6",s:"按最近更新时间与累计发布版本数综合排行",badge:"最高版本"},
+   vendors:{t:"厂商榜",s:"按厂商汇总的技能数与总量",badge:"最高总量"},
+   video:{t:"视频区精选",s:"BGM → 环境音 → 音效 → 转场 → 文字生成 → 代码合成",badge:"精选条目"}
+  },
+  notesTitles:["装之前先问四件事","安装命令示例","三条避坑"],
+  notesBodies:[
+   "1. 谁做的？官方组织 / 知名开发者优先。 2. 还在维护吗？看最活跃维护榜的最近更新与版本数。 3. 热度是真的吗？安装量、星标、社交声量三个口径对得上才算。 4. 覆盖几个平台？只在一个注册中心有数（覆盖 C）的，结论别下太满",
+   "",
+   "· 跨平台数字不能相加：skills.sh 的安装、ClawHub 的下载、SkillHub 的安装不是一回事<br>· 同名不同源是常态：认准厂商（vendor）和链接，别只看技能名<br>· 装任何技能前先过一遍安全预审（如 skill-vetter），尤其是要执行命令的那种"
+  ],
+  versions:v=>`${v} 个版本`, installsSub:(p)=>`安装 · 上榜 ${p} 天`, updated:v=>`${v}`, wisSub:c=>`WIS · 覆盖 ${c}`,
+  buzzSub:e=>`X ${e.x}${e.xTruncated?"+":""} · GH ${e.gh} · HN ${e.hn}`,
+  dayGain:v=>`日增 +${v}`, heat:v=>`热度 ${v}`, perDay:"★/日", totalStars:v=>`总计 ${v} ★`,
+  itemsUnit:" 条"
+ },
+ en:{
+  title:'Global <span class="skills-highlight">Skills</span> Usage Ranking',
+  subtitle:"Two Leaderboards: Most Installed (3 Registries) + Most Trusted Source (GitHub)",
+  refresh:"Refresh", panelTitle:"12-Color Aura Themes", panelHint:"Slide or tap to pick",
+  searchPh:"Search a skill name to filter every board (e.g. find-skills)",
+  allSources:"All Sources",
+  nav:["Top Installed","Per-Platform","WIS Picks","Momentum · Buzz","Vendors","Video Zone"],
+  statTracked:"Tracked Skills", statSources:"Data Sources", statSourcesSub:"3 Registries + GitHub",
+  statBoards:"Daily Boards", statBoardsUnit:"", statBoardsSub:"Synced daily",
+  statPeak:"Peak Installs", asOf:d=>`As of ${d} (UTC)`,
+  vizTitle:"Top Skill Installs & 7-Day Momentum Stats",
+  vizModes:{both:"Overview",bar:"Bars",line:"Lines",table:"Table"},
+  lineTitle:"7-Day Focus Growth Trend",
+  tableHeads:["Dimension & Top Skill","7-Day Trend","Key Stat"],
+  dims:["Top 7-Day Momentum","Top Social Buzz","Top 30-Day Rising Star","Top Daily Star Gain"],
+  listTitle:"01–06 All Boards in Detail", listSub:"Tap a group header to expand or collapse; tap a command row to copy it",
+  countChip:(boards,tracked)=>`${boards} boards · ${tracked} skills`,
+  emptyTip:"No skill or description matches that keyword",
+  loadFail:"Failed to load, tap Refresh to retry",
+  copied:"Copied", copyFail:"Copy failed, long-press the command to copy manually",
+  collapseAll:"Collapse All", backTop:"↑ Top",
+  footer:'Sources: <a class="site-online-link" href="https://github.com/LinklyAI/best-skills" target="_blank" rel="noopener noreferrer">Best Skills</a> (CC BY 4.0, daily CSV) + direct GitHub API<br>Counts from different platforms are shown side by side and never summed; an empty board means unmeasured, not 0',
+  periodSuffix:"",
+  secs:[
+   {t:"Install Leaderboard & GitHub Stars",s:"2 main boards · Native counts side by side"},
+   {t:"Per-Platform Boards",s:"3 platform boards · Each platform compared only with itself"},
+   {t:"WIS Worth-Installing Board",s:"Composite of popularity, momentum, buzz, maintenance & trust"},
+   {t:"Momentum · Buzz · Rising · Maintenance",s:"4 mover boards · What happened in the last 7 and 30 days"},
+   {t:"Vendors + Four Questions",s:"Scale, quality, maintenance and safety checks together"},
+   {t:"Video Zone · AI Video & Sound",s:"Curated picks · Sites and tools for video sound"}
+  ],
+  groups:{
+   installs:{t:"Top 8 Installed Skills",s:"Plain-language notes · 3 registries, native counts",badge:"Top Install"},
+   repos:{t:"GitHub Stars TOP 10",s:"Most trusted source code · Direct GitHub API stars & daily gains",badge:"Top Stars"},
+   plat:{s:"Native leaderboard (compared within this platform only)",badge:"No. 1"},
+   wis:{t:"WIS Worth-Installing TOP 10",s:"Composite of popularity, momentum, buzz, maintenance & trust",badge:"Top Score"},
+   trend:{t:"7-Day Momentum TOP 6",s:"Weekly install growth rate & 7-day volume",badge:"Top Gain"},
+   buzz:{t:"Social Buzz TOP 6",s:"Cross-community mentions across X, GitHub & HN in 7 days",badge:"Top Buzz"},
+   rising:{t:"30-Day Rising Stars TOP 6",s:"Fastest growing newly listed skills within 30 days",badge:"Top Rising"},
+   active:{t:"Most Actively Maintained TOP 6",s:"Ranked by latest release date and total version count",badge:"Most Versions"},
+   vendors:{t:"Vendor Board",s:"Skill counts and totals grouped by vendor",badge:"Top Total"},
+   video:{t:"Video Zone Picks",s:"BGM, ambience, SFX, transitions, text-to-video & code synthesis",badge:"Picks"}
+  },
+  notesTitles:["Four questions before installing","Install command examples","Three pitfalls"],
+  notesBodies:[
+   "1. Who made it? Prefer official orgs and well-known developers. 2. Still maintained? Check the latest update and version count on the maintenance board. 3. Is the heat real? Installs, stars and social buzz should roughly agree. 4. How many platforms cover it? A skill measured on one registry only (coverage C) deserves a softer conclusion",
+   "",
+   "· Counts never add up across platforms: a skills.sh install, a ClawHub download and a SkillHub install are different things<br>· Same name, different source is common: trust the vendor and the link, not just the skill name<br>· Run a safety pre-check (such as skill-vetter) before installing anything, especially skills that execute commands"
+  ],
+  versions:v=>`${v} versions`, installsSub:(p)=>`listed ${p} days`, updated:v=>`${v}`, wisSub:c=>`WIS · Coverage ${c}`,
+  buzzSub:e=>`X ${e.x}${e.xTruncated?"+":""} · GH ${e.gh} · HN ${e.hn}`,
+  dayGain:v=>`+${v} / day`, heat:v=>`heat ${v}`, perDay:"★/day", totalStars:v=>`${v} ★ total`,
+  itemsUnit:""
+ }
+};
+const T=()=>STR[LANG];
+
+/* ================= 主题应用 ================= */
+function applyTheme(idx,save=true){
+  THEME_IDX=idx;
+  const th=THEMES[idx]; if(!th) return;
+  const root=document.documentElement;
+  root.style.setProperty("--orb-color-1",th.orb1);
+  root.style.setProperty("--orb-color-2",th.orb2);
+  root.style.setProperty("--refresh-btn-bg",th.refreshBg);
+  root.style.setProperty("--send-circle-bg",th.sendCircleBg);
+  root.style.setProperty("--theme-accent",th.accent);
+  root.style.setProperty("--theme-tag-bg",th.tagBg);
+  root.style.setProperty("--theme-tag-text",th.tagText);
+  root.style.setProperty("--search-glow",th.glow);
+  if(th.isHolo) root.setAttribute("data-holo","true"); else root.removeAttribute("data-holo");
+  if(!DARK) root.style.setProperty("--page-bg",th.pageBg);
+  const orbLeft=document.getElementById("orbLeft"), orbRight=document.getElementById("orbRight");
+  if(orbLeft&&orbRight){
+    if(!th.isHolo){
+      const shift=idx%2===0?1:-1;
+      orbLeft.style.transform=`translate(${shift*14}px,${-shift*8}px) scale(${1+shift*0.05})`;
+      orbRight.style.transform=`translate(${-shift*14}px,${shift*8}px) scale(${1-shift*0.05})`;
+    }else{orbLeft.style.transform="";orbRight.style.transform=""}
+  }
+  updateThemeColor();
+  updateSwatchActiveState();
+  if(save) savePrefs();
+}
+function updateThemeColor(){
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute("content",DARK?"#090D16":THEMES[THEME_IDX].pageBg);
+}
+function renderThemeSwatches(){
+  const grid=document.getElementById("themeSwatchGrid");
+  grid.innerHTML=THEMES.map((t,idx)=>{
+    const label=LANG==="zh"?t.name:t.nameEn;
+    const isActive=idx===THEME_IDX?"active":"";
+    const holoClass=t.isHolo?"holo-animated":"";
+    return `<div class="theme-swatch-item ${isActive}" data-theme-idx="${idx}"><span class="swatch-orb-preview ${holoClass}" style="background:linear-gradient(135deg,${t.orb1} 0%,${t.orb2} 65%,${t.refreshBg} 100%)"></span><span class="swatch-label">${esc(label)}</span></div>`;
+  }).join("");
+  grid.querySelectorAll(".theme-swatch-item").forEach(el=>{
+    el.addEventListener("click",()=>{applyTheme(Number(el.getAttribute("data-theme-idx")));closeThemePanel()});
+  });
+}
+function updateSwatchActiveState(){
+  document.querySelectorAll(".theme-swatch-item").forEach(el=>{
+    el.classList.toggle("active",Number(el.getAttribute("data-theme-idx"))===THEME_IDX);
+  });
+}
+function openThemePanel(){document.getElementById("themePopover").classList.add("open");document.getElementById("themeBackdrop").classList.add("open")}
+function closeThemePanel(){document.getElementById("themePopover").classList.remove("open");document.getElementById("themeBackdrop").classList.remove("open");document.querySelectorAll(".theme-swatch-item").forEach(el=>el.classList.remove("sliding-hover"))}
+function setDark(dark,save=true){
+  DARK=dark;
+  const root=document.documentElement;
+  const icon=document.getElementById("sunMoonIcon");
+  if(DARK){
+    root.setAttribute("data-dark","true");
+    root.style.setProperty("--page-bg","#090D16");
+    icon.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+  }else{
+    root.removeAttribute("data-dark");
+    root.style.setProperty("--page-bg",THEMES[THEME_IDX].pageBg);
+    icon.innerHTML='<circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4.5"></line><line x1="12" y1="19.5" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line><line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="4.5" y2="12"></line><line x1="19.5" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line><line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line>';
+  }
+  updateThemeColor();
+  if(save) savePrefs();
+}
+function toggleDarkMode(){
+  const btn=document.getElementById("darkModeBtn");
+  btn.classList.add("rotating"); setTimeout(()=>btn.classList.remove("rotating"),450);
+  setDark(!DARK);
+}
+(function initThemeButtonGestures(){
+  const btn=document.getElementById("darkModeBtn");
+  let pressTimer=null,isLongPressTriggered=false,isPointerDown=false,lastHoveredIdx=null;
+  btn.addEventListener("pointerdown",e=>{
+    if(e.button&&e.button!==0) return;
+    isPointerDown=true; isLongPressTriggered=false; lastHoveredIdx=null;
+    btn.classList.add("pressing");
+    try{btn.setPointerCapture(e.pointerId)}catch(_){}
+    pressTimer=setTimeout(()=>{if(!isPointerDown) return; isLongPressTriggered=true; openThemePanel()},340);
+  });
+  btn.addEventListener("pointermove",e=>{
+    if(!isPointerDown||!isLongPressTriggered) return;
+    const targetEl=document.elementFromPoint(e.clientX,e.clientY);
+    const swatchItem=targetEl?targetEl.closest(".theme-swatch-item"):null;
+    document.querySelectorAll(".theme-swatch-item").forEach(el=>el.classList.toggle("sliding-hover",el===swatchItem));
+    if(swatchItem){
+      const idx=Number(swatchItem.getAttribute("data-theme-idx"));
+      if(idx!==lastHoveredIdx){lastHoveredIdx=idx;applyTheme(idx)}
+    }
+  });
+  const finishGesture=()=>{
+    if(!isPointerDown) return;
+    isPointerDown=false; clearTimeout(pressTimer); btn.classList.remove("pressing");
+    if(!isLongPressTriggered){
+      const popover=document.getElementById("themePopover");
+      if(popover.classList.contains("open")) closeThemePanel(); else toggleDarkMode();
+    }else if(lastHoveredIdx!==null){closeThemePanel()}
+  };
+  btn.addEventListener("pointerup",finishGesture);
+  btn.addEventListener("pointercancel",finishGesture);
+  btn.addEventListener("contextmenu",e=>e.preventDefault());
+})();
+
+/* ================= 语言 ================= */
+function applyLang(save=true){
+  const s=T();
+  document.documentElement.lang=LANG==="zh"?"zh-CN":"en";
+  document.getElementById("langText").textContent=LANG==="zh"?"中文":"EN";
+  document.getElementById("mainTitle").innerHTML=s.title;
+  document.getElementById("subTitle").textContent=s.subtitle;
+  document.getElementById("refreshBtnText").textContent=s.refresh;
+  document.getElementById("panelTitle").textContent=s.panelTitle;
+  document.getElementById("panelHint").textContent=s.panelHint;
+  document.getElementById("q").placeholder=s.searchPh;
+  document.querySelector('[data-src-label="all"]').textContent=s.allSources;
+  document.querySelectorAll(".sec-nav-label").forEach((el,i)=>{el.textContent=s.nav[i]||el.textContent});
+  document.getElementById("vizChartTitle").textContent=s.vizTitle;
+  document.querySelectorAll(".viz-mode-btn").forEach(b=>{b.textContent=s.vizModes[b.getAttribute("data-viz")]||b.textContent});
+  document.getElementById("siteListTitle").textContent=s.listTitle;
+  document.getElementById("siteListSubhead").textContent=s.listSub;
+  document.getElementById("emptyTip").textContent=s.emptyTip;
+  document.getElementById("siteListFooter").innerHTML=s.footer;
+  document.getElementById("btnCollapseAllGroups").textContent=s.collapseAll;
+  document.getElementById("btnBackToTop").textContent=s.backTop;
+  const sel=document.getElementById("dateSel");
+  if(DATES.length){
+    const cur=sel.value;
+    sel.innerHTML=DATES.map(d=>`<option value="${d}">${d}${s.periodSuffix}</option>`).join("");
+    if(cur) sel.value=cur;
+  }
+  renderThemeSwatches();
+  if(board){render(board); if(VIDEO) renderVideo(VIDEO)}
+  if(save) savePrefs();
+}
+document.getElementById("langBtn").addEventListener("click",()=>{LANG=LANG==="zh"?"en":"zh";applyLang()});
+document.getElementById("themeBackdrop").addEventListener("click",closeThemePanel);
+</script>
+<script>
+/* ================= 状态 ================= */
+let DATES=[], board=null, VIDEO=null, VIZ="both";
+let HIST=null, HIST_KEY="";
+const openGroups=new Set((()=>{try{const raw=localStorage.getItem("skill-open-groups");if(raw){const arr=JSON.parse(raw);if(Array.isArray(arr))return arr}}catch(e){}return ["g-installs"]})());
+function saveGroups(){try{localStorage.setItem("skill-open-groups",JSON.stringify([...openGroups]))}catch(e){}}
+
+/* ================= 列表渲染 ================= */
+function rankBadge(r){return `<div class="rank ${r<=3?"top":""}">${r}</div>`}
+function cmd(c){return c?`<span class="cmdwrap" data-cmd="${esc(c)}"><code class="cmd" title="点按复制">${esc(c)}</code><button class="copybtn" type="button" aria-label="复制命令" title="复制"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></span>`:""}
+function nameLink(name,url){const n=url?`<a href="${esc(url)}" target="_blank" rel="noopener">${esc(name)}</a>`:esc(name);return `<span class="name">${n}</span>`}
+function item(r,left,numHtml,cmdHtml,metas){
+  const s=((left.skill||left.repo||"")+" "+(left.blurb||"")+" "+(left.meta||"")).toLowerCase();
+  const badges=(metas&&metas.length)?`<div class="badges-line">${metas.map((m,i)=>`<span class="meta-pill ${i===0?"":"plain"}">${esc(m)}</span>`).join("")}</div>`:"";
+  return `<div class="item" data-skill="${esc(s)}"><div class="itemtop">${rankBadge(r)}<div class="main">${left.html}${badges}</div><div class="num">${numHtml||""}</div></div>${cmdHtml||""}</div>`;
+}
+function groupHtml(id,icon,title,sub,badgeLabel,badgeVal,itemsHtml){
+  return `<article class="group" id="${id}"><button class="group-trigger" type="button" data-group="${id}" aria-expanded="false"><span class="group-brand-icon" aria-hidden="true">${esc(icon)}</span><span class="group-main"><span class="group-name">${esc(title)}</span><span class="group-detail">${esc(sub)}</span></span><span class="group-minimum"><small>${esc(badgeLabel)}</small><strong>${esc(badgeVal)}</strong></span><span class="group-arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></span></button><div class="group-collapsible"><div class="group-inner"><div class="group-items">${itemsHtml}</div></div></div></article>`;
+}
+function sectionHtml(no,inner){
+  const meta=T().secs[Number(no)-1];
+  return `<section class="board-sec" id="sec-${no}"><div class="sec-block-header"><div class="sec-block-title-left"><span class="sec-block-badge">${no}</span><span class="sec-block-title">${esc(meta.t)}</span></div><span class="sec-block-sub">${esc(meta.s)}</span></div><div class="sec-block-cards">${inner}</div></section>`;
+}
+function bindCmds(root){
+  root.querySelectorAll(".cmdwrap").forEach(w=>{const t=w.dataset.cmd;w.querySelector("code.cmd").addEventListener("click",()=>doCopy(t));w.querySelector(".copybtn").addEventListener("click",ev=>{ev.stopPropagation();doCopy(t)})});
+}
+function bindGroups(root){
+  root.querySelectorAll(".group-trigger").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      if(document.getElementById("q").value.trim()) return;
+      const id=btn.getAttribute("data-group");
+      if(openGroups.has(id)) openGroups.delete(id); else openGroups.add(id);
+      saveGroups(); applyFilter(); updateDockVisibility();
+    });
+  });
+}
 function render(b){
   board=b;
-  const dp=document.getElementById("datePill");dp.textContent=`数据截至 ${b.date}（UTC）`;dp.classList.remove("skelbar");
-  const s=b.stats;
-  document.getElementById("stats").innerHTML=
-    `<div class="stat"><b>${esc(s.trackedSkills)}</b><span>在榜追踪技能</span></div>`+
-    `<div class="stat"><b>${s.dataSources}</b><span>数据源：3 注册中心 + GitHub</span></div>`+
-    `<div class="stat"><b>${s.boards}</b><span>张每日刷新榜单</span></div>`+
-    `<div class="stat"><b>${compact(s.maxInstalls)}</b><span>单技能最高安装量（${esc(s.maxInstallsSkill)}）</span></div>`;
-  document.getElementById("highlights").innerHTML=b.highlights.map(h=>`· ${esc(h)}`).join("<br>");
+  HIST=null; HIST_KEY="";
+  const s=b.stats, tt=T();
+  document.getElementById("statSummary").innerHTML=
+    `<div class="stat-cell"><span class="stat-cell-val">${esc(s.trackedSkills)}</span><span class="stat-cell-label">${tt.statTracked}</span><span class="stat-cell-sub">${esc(tt.asOf(b.date))}</span></div>`+
+    `<div class="stat-cell"><span class="stat-cell-val">${s.dataSources}</span><span class="stat-cell-label">${tt.statSources}</span><span class="stat-cell-sub">${tt.statSourcesSub}</span></div>`+
+    `<div class="stat-cell"><span class="stat-cell-val">${s.boards}${tt.statBoardsUnit}</span><span class="stat-cell-label">${tt.statBoards}</span><span class="stat-cell-sub">${tt.statBoardsSub}</span></div>`+
+    `<div class="stat-cell"><span class="stat-cell-val">${compact(s.maxInstalls)}</span><span class="stat-cell-label">${tt.statPeak}</span><span class="stat-cell-sub">${esc(s.maxInstallsSkill)}</span></div>`;
+  const cnt=document.getElementById("siteListCount");
+  cnt.textContent=tt.countChip(s.boards,s.trackedSkills); cnt.classList.remove("skelbar");
+  renderStatsViz();
+  loadHistory(b.date);
+  const G=tt.groups;
   let h="";
-  // 01 installs + repos
-  let inner=b.installs.map(e=>{
+  // 01 安装量总榜 + GitHub 星标榜（两个独立折叠组）
+  const installsItems=b.installs.map(e=>{
     const vals=[["skills.sh",e.installsSkillssh],["ClawHub",e.downloadsClawhub],["SkillHub",e.downloadsSkillhub]].filter(x=>x[1]!=null);
-    return item(e.rank,{skill:e.skill,blurb:e.blurb,meta:e.category+" · "+e.platform,html:`${nameLink(e.skill,e.url,e.category+" · "+e.platform)}<div class="blurb">${esc(e.blurb)}</div>`},
-      vals.map(v=>`${fmt(v[1])}<small>${v[0]}</small>`).join(""),cmd(e.installCmd));
+    return item(e.rank,{skill:e.skill,blurb:e.blurb,meta:e.category+" "+e.platform,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},
+      vals.map(v=>`${fmt(v[1])}<small>${v[0]}</small>`).join(""),cmd(e.installCmd),[e.category,e.platform]);
   }).join("");
-  inner+=`<h3>GitHub 星标榜 TOP 10</h3>`+b.repos.map(e=>item(e.rank,{skill:e.repo,blurb:e.blurb,meta:e.maintainer,html:`${nameLink(e.repo,e.url,e.maintainer)}<div class="blurb">${esc(e.blurb)}</div>`},
-    `${fmt(e.stars)} ★${e.starsDelta1d!=null?`<small>日增 +${fmt(e.starsDelta1d)}</small>`:""}`)).join("");
-  h+=section("01","安装量总榜 TOP 8","每行都写了「它到底干什么」· 三平台原生口径并列",inner);
-  // 02 platforms
-  const plat=(t,rows)=>`<h3>${t}</h3>`+rows.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},fmt(e.value))).join("");
-  h+=section("02","三平台分区榜","各平台只跟自己比，不跨平台合并",`<div class="grid3"><div>${plat("skills.sh",b.platforms.skillssh)}</div><div>${plat("ClawHub",b.platforms.clawhub)}</div><div>${plat("腾讯 SkillHub",b.platforms.skillhub)}</div></div>`);
+  const reposItems=b.repos.map(e=>item(e.rank,{skill:e.repo,blurb:e.blurb,meta:e.maintainer,html:`${nameLink(e.repo,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},
+    `${fmt(e.stars)} ★${e.starsDelta1d!=null?`<small>${esc(tt.dayGain(fmt(e.starsDelta1d)))}</small>`:""}`,null,[e.maintainer])).join("");
+  const maxStars=b.repos.reduce((m,e)=>Math.max(m,e.stars||0),0);
+  h+=sectionHtml("01",
+    groupHtml("g-installs","01A",G.installs.t,G.installs.s,G.installs.badge,compact(s.maxInstalls),installsItems)+
+    groupHtml("g-repos","01B",G.repos.t,G.repos.s,G.repos.badge,compact(maxStars)+" ★",reposItems));
+  // 02 三平台分区榜（三个独立折叠组）
+  const platGroup=(id,icon,t,rows)=>groupHtml(id,icon,`${t} TOP ${rows.length}`,G.plat.s,G.plat.badge,fmt(rows.length?rows[0].value:null),
+    rows.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},fmt(e.value))).join(""));
+  h+=sectionHtml("02",
+    platGroup("g-plat-skills","02A","skills.sh",b.platforms.skillssh)+
+    platGroup("g-plat-claw","02B","ClawHub",b.platforms.clawhub)+
+    platGroup("g-plat-hub","02C",LANG==="zh"?"腾讯 SkillHub":"Tencent SkillHub",b.platforms.skillhub));
   // 03 WIS
-  inner=b.wis.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,meta:e.category+" · "+e.platform,html:`${nameLink(e.skill,e.url,e.category+" · "+e.platform)}<div class="blurb">${esc(e.blurb)}</div>`},
-    `${e.wis}<small>WIS · 覆盖 ${esc(e.coverage)}</small>`,cmd(e.installCmd))).join("");
-  h+=section("03","WIS 综合值得装榜 TOP 10","热度 × 动能 × 声量 × 维护 × 信任的综合分",inner);
-  // 04 momentum
-  const trend=b.trending.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${e.growthPct!=null?(e.growthPct>0?"+":"")+e.growthPct+"%":"—"}<small>7 日 · ${fmt(e.installs)}</small>`)).join("");
-  const buzz=b.buzz.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${e.score}<small>X ${e.x}${e.xTruncated?"+":""} · GH ${e.gh} · HN ${e.hn}</small>`)).join("");
-  const rising=b.rising.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,meta:e.platform,html:`${nameLink(e.skill,e.url,e.platform)}<div class="blurb">${esc(e.blurb)}</div>`},`${fmt(e.value)}<small>安装 · 上榜 ${e.ageDays} 天</small>`)).join("");
-  const active=b.active.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${esc(e.lastUpdate)}<small>${e.versions??"—"} 个版本</small>`)).join("");
-  h+=section("04","动能 · 声量 · 新星 · 维护","四张子榜：最近 7 天和 30 天在发生什么",`<div class="grid2"><div><h3>7 日动能</h3>${trend}</div><div><h3>社交声量</h3>${buzz}</div><div><h3>30 天新星</h3>${rising}</div><div><h3>最活跃维护</h3>${active}</div></div>`);
-  // 05 vendors + how to choose
-  inner=b.vendors.map(e=>item(e.rank,{skill:e.vendor,blurb:e.note,meta:e.platform,html:`${nameLink(e.vendor,"",e.platform)}<div class="blurb">${esc(e.note||"")} · ${fmt(e.skillsCount)} 个技能</div>`},fmt(e.total))).join("");
-  inner+=`<h3>装之前先问四件事</h3><div class="note">1. 谁做的？官方组织 / 知名开发者优先。&nbsp;2. 还在维护吗？看最活跃维护榜的最近更新与版本数。&nbsp;3. 热度是真的吗？安装量、星标、社交声量三个口径对得上才算。&nbsp;4. 覆盖几个平台？只在一个注册中心有数（覆盖 C）的，结论别下太满。</div>`;
+  const wisItems=b.wis.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,meta:e.category+" "+e.platform,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},
+    `${e.wis}<small>${esc(tt.wisSub(e.coverage))}</small>`,cmd(e.installCmd),[e.category,e.platform])).join("");
+  h+=sectionHtml("03",groupHtml("g-wis","03",G.wis.t,G.wis.s,G.wis.badge,"WIS "+(b.wis.length?b.wis[0].wis:"—"),wisItems));
+  // 04 动能 · 声量 · 新星 · 维护（四个独立折叠组）
+  const trendItems=b.trending.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${e.growthPct!=null?(e.growthPct>0?"+":"")+e.growthPct+"%":"—"}<small>7 日 · ${fmt(e.installs)}</small>`)).join("");
+  const buzzItems=b.buzz.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${e.score}<small>${esc(tt.buzzSub(e))}</small>`)).join("");
+  const risingItems=b.rising.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,meta:e.platform,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${fmt(e.value)}<small>${esc(tt.installsSub(e.ageDays))}</small>`,null,[e.platform])).join("");
+  const activeItems=b.active.map(e=>item(e.rank,{skill:e.skill,blurb:e.blurb,html:`${nameLink(e.skill,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},`${esc(tt.updated(e.lastUpdate))}<small>${esc(tt.versions(e.versions??"—"))}</small>`)).join("");
+  const maxGrowth=b.trending.reduce((m,e)=>Math.max(m,e.growthPct??-Infinity),-Infinity);
+  const maxVersions=b.active.reduce((m,e)=>Math.max(m,e.versions||0),0);
+  h+=sectionHtml("04",
+    groupHtml("g-trend","04A",G.trend.t,G.trend.s,G.trend.badge,(maxGrowth>-Infinity?("+"+maxGrowth+"%"):"—"),trendItems)+
+    groupHtml("g-buzz","04B",G.buzz.t,G.buzz.s,G.buzz.badge,b.buzz.length?String(b.buzz[0].score):"—",buzzItems)+
+    groupHtml("g-rising","04C",G.rising.t,G.rising.s,G.rising.badge,b.rising.length?b.rising[0].skill:"—",risingItems)+
+    groupHtml("g-active","04D",G.active.t,G.active.s,G.active.badge,tt.versions(maxVersions),activeItems));
+  // 05 厂商榜 + 说明卡
+  const vendorItems=b.vendors.map(e=>item(e.rank,{skill:e.vendor,blurb:e.note,meta:e.platform,html:`${nameLink(e.vendor,"")}<div class="blurb">${esc(e.note||"")} · ${fmt(e.skillsCount)} ${LANG==="zh"?"个技能":"skills"}</div>`},fmt(e.total),null,[e.platform])).join("");
+  const maxVendorTotal=b.vendors.reduce((m,e)=>Math.max(m,e.total||0),0);
   const ex1=b.installs.find(e=>e.installCmd), ex2=b.active.find(e=>e.installCmd);
-  inner+=`<h3>安装命令示例</h3>${ex1?cmd(ex1.installCmd):""}${ex2&&ex2.installCmd!==ex1.installCmd?cmd(ex2.installCmd):""}`;
-  inner+=`<h3>三条避坑</h3><div class="note">· 跨平台数字不能相加：skills.sh 的安装、ClawHub 的下载、SkillHub 的安装不是一回事。<br>· 同名不同源是常态：认准厂商（vendor）和链接，别只看技能名。<br>· 装任何技能前先过一遍安全预审（如 skill-vetter），尤其是要执行命令的那种。</div>`;
-  h+=section("05","厂商榜 + 权威度四问","体量、质量、维护一起看",inner);
+  const notes=`<div class="note-card" id="sec05Notes">
+    <div class="note-block"><h4>${esc(tt.notesTitles[0])}</h4><div class="note">${esc(tt.notesBodies[0])}</div></div>
+    <div class="note-block"><h4>${esc(tt.notesTitles[1])}</h4>${ex1?cmd(ex1.installCmd):""}${ex2&&ex1&&ex2.installCmd!==ex1.installCmd?cmd(ex2.installCmd):""}</div>
+    <div class="note-block"><h4>${esc(tt.notesTitles[2])}</h4><div class="note">${tt.notesBodies[2]}</div></div>
+  </div>`;
+  h+=sectionHtml("05",groupHtml("g-vendors","05",G.vendors.t,G.vendors.s,G.vendors.badge,fmt(maxVendorTotal),vendorItems)+notes);
   document.getElementById("sections").innerHTML=h;
-  document.querySelectorAll(".cmdwrap").forEach(w=>{const t=w.dataset.cmd;w.querySelector("code.cmd").addEventListener("click",()=>doCopy(t));w.querySelector(".copybtn").addEventListener("click",ev=>{ev.stopPropagation();doCopy(t)})});
+  bindCmds(document.getElementById("sections"));
+  bindGroups(document.getElementById("sections"));
   fitCmds();
   applyFilter();
   jumpToHash();
 }
+function renderVideo(v){
+  VIDEO=v;
+  const tt=T();
+  const inner=v.items.map((e,i)=>item(i+1,{skill:e.name,blurb:e.blurb,meta:e.meta,html:`${nameLink(e.name,e.url)}<div class="blurb">${esc(e.blurb)}</div>`},e.num||"",cmd(e.cmd||""),e.meta?[e.meta]:[])).join("");
+  const secMeta={...tt.secs[5]};
+  const html=`<section class="board-sec" id="sec-06"><div class="sec-block-header"><div class="sec-block-title-left"><span class="sec-block-badge">06</span><span class="sec-block-title">${esc(secMeta.t)}</span></div><span class="sec-block-sub">${esc(v.desc||secMeta.s)}</span></div><div class="sec-block-cards">${groupHtml("g-video","06",tt.groups.video.t,tt.groups.video.s,tt.groups.video.badge,String(v.items.length)+tt.itemsUnit,inner)}</div></section>`;
+  document.getElementById("videoZone").innerHTML=html;
+  bindCmds(document.getElementById("videoZone"));
+  bindGroups(document.getElementById("videoZone"));
+  fitCmds(); applyFilter(); jumpToHash();
+}
+
+/* ================= 过滤与折叠状态 ================= */
 function applyFilter(){
-  const q=document.getElementById("q").value.trim().toLowerCase();let total=0;
-  document.querySelectorAll("section").forEach(sec=>{
-    const items=sec.querySelectorAll("[data-skill]");let vis=0;
-    items.forEach(el=>{const m=!q||el.dataset.skill.includes(q);el.classList.toggle("hidden",!m);if(m)vis++});
-    if(items.length>0){sec.classList.toggle("hidden",!!q&&vis===0);total+=vis}
+  const q=document.getElementById("q").value.trim().toLowerCase();
+  let total=0;
+  document.querySelectorAll("section.board-sec").forEach(sec=>{
+    let secVis=0;
+    sec.querySelectorAll(".group").forEach(g=>{
+      const items=g.querySelectorAll("[data-skill]"); let vis=0;
+      items.forEach(el=>{const m=!q||el.dataset.skill.includes(q);el.classList.toggle("hidden",!m);if(m)vis++});
+      if(items.length>0){
+        g.classList.toggle("hidden",!!q&&vis===0);
+        if(!(q&&vis===0)) secVis+=vis;
+        const opened=q?vis>0:openGroups.has(g.id);
+        g.classList.toggle("open",opened);
+        const trig=g.querySelector(".group-trigger"); if(trig) trig.setAttribute("aria-expanded",String(opened));
+      }
+    });
+    const note=sec.querySelector(".note-card"); if(note) note.classList.toggle("hidden",!!q);
+    const secItems=sec.querySelectorAll("[data-skill]").length;
+    sec.classList.toggle("hidden",!!q&&secItems>0&&secVis===0);
+    total+=secVis;
   });
-  const tip=document.getElementById("emptyTip");if(tip)tip.classList.toggle("hidden",!q||total>0);
+  const viz=document.getElementById("statsVizSection"); if(viz) viz.classList.toggle("hidden",!!q);
+  const tip=document.getElementById("emptyTip"); if(tip) tip.classList.toggle("hidden",!q||total>0);
 }
-async function load(date){
-  const btn=document.getElementById("reloadBtn");if(btn){btn.disabled=true}
-  try{const r=await fetch((date?`data/boards/${date}.json`:"data/board.json")+"?t="+Date.now());if(!r.ok)throw new Error();render(await r.json())}catch(e){console.error(e);if(!board)document.getElementById("sections").innerHTML="<div class=\"empty-tip\">加载失败，请点「刷新数据」重试</div>"}finally{if(btn){btn.disabled=false}}
+
+/* ================= 统计可视化（全部由真实 board 数据现算） ================= */
+function installsTop5(b){
+  return b.installs.map(e=>{
+    const vals=[["skills.sh",e.installsSkillssh],["ClawHub",e.downloadsClawhub],["SkillHub CN",e.downloadsSkillhub]].filter(x=>x[1]!=null);
+    if(!vals.length) return null;
+    vals.sort((a,c)=>c[1]-a[1]);
+    return {name:e.skill,plat:vals[0][0],val:vals[0][1]};
+  }).filter(Boolean).sort((a,c)=>c.val-a.val).slice(0,5);
 }
-(async()=>{
-  try{DATES=await (await fetch("data/dates.json?t="+Date.now())).json()}catch(e){DATES=[]}
-  const sel=document.getElementById("dateSel");
-  sel.innerHTML=DATES.map(d=>`<option value="${d}">${d} 期</option>`).join("");sel.classList.remove("skelbar");
-  sel.addEventListener("change",()=>load(sel.value));
-  document.getElementById("reloadBtn").addEventListener("click",()=>load(sel.value||null));
-  document.getElementById("q").addEventListener("input",applyFilter);
-  await load(DATES[0]||null);
-  if(DATES[0]) sel.value=DATES[0];
-  loadVideo();
-})();
-async function loadVideo(){
+function sparkPoints(series,w,h,pad){
+  const vals=series.filter(v=>v!=null);
+  if(vals.length<2) return "";
+  const min=Math.min(...vals), max=Math.max(...vals), span=(max-min)||1;
+  const n=series.length;
+  const pts=[];
+  series.forEach((v,i)=>{if(v==null) return; const x=pad+(w-2*pad)*(n===1?0.5:i/(n-1)); const y=pad+(h-2*pad)*(1-(v-min)/span); pts.push(`${x.toFixed(1)},${y.toFixed(1)}`)});
+  return pts.join(" ");
+}
+function renderStatsViz(){
+  const container=document.getElementById("statsVizBody");
+  if(!container||!board) return;
+  const b=board, tt=T();
+  const top5=installsTop5(b);
+  const maxVal=top5.length?top5[0].val:1;
+  const barHtml=`<div class="bar-chart-list" style="${VIZ==="both"?"margin-bottom:14px;":""}">${top5.map(x=>`
+    <div class="bar-row" data-jump-sec="sec-01" data-jump-group="g-installs">
+      <div class="bar-row-meta"><span class="bar-skill-name"><span>${esc(x.name)}</span><span class="bar-plat-tag">${esc(x.plat)}</span></span><span class="bar-skill-val">${fmt(x.val)}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(3,x.val/maxVal*100)}%;"></div></div>
+    </div>`).join("")}</div>`;
+  // 折线图（7 期历史，缺测断线不补 0）
+  let lineHtml="";
+  if(HIST&&HIST.dates.length>=2){
+    const W=320,H=92,x0=10,x1=262,yT=10,yB=70;
+    const seriesDefs=[
+      {key:"trend",color:"#10B981",label:HIST.labels.trend},
+      {key:"buzz",color:"#3B82F6",label:HIST.labels.buzz},
+      {key:"repo",color:"#F59E0B",label:HIST.labels.repo}
+    ];
+    const lineFor=sd=>{
+      const arr=HIST.series[sd.key]; if(!arr) return "";
+      const vals=arr.filter(v=>v!=null); if(vals.length<2) return "";
+      const min=Math.min(...vals),max=Math.max(...vals),span=(max-min)||1;
+      const X=i=>x0+(x1-x0)*(arr.length===1?0:i/(arr.length-1));
+      const Y=v=>yT+(yB-yT)*(1-(v-min)/span);
+      let out="",run=[];
+      const flush=()=>{if(run.length>=2) out+=`<polyline fill="none" stroke="${sd.color}" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" points="${run.join(" ")}"/>`; else if(run.length===1) out+=`<circle cx="${run[0].split(",")[0]}" cy="${run[0].split(",")[1]}" r="3" fill="${sd.color}"/>`; run=[]};
+      arr.forEach((v,i)=>{if(v==null){flush()}else{run.push(`${X(i).toFixed(1)},${Y(v).toFixed(1)}`)}});
+      flush();
+      let lastIdx=-1; arr.forEach((v,i)=>{if(v!=null)lastIdx=i});
+      if(lastIdx>=0) out+=`<circle cx="${X(lastIdx).toFixed(1)}" cy="${Y(arr[lastIdx]).toFixed(1)}" r="3.5" fill="${sd.color}"/><text x="${x1+8}" y="${(Y(arr[lastIdx])+3).toFixed(1)}" font-size="9.5" font-weight="800" fill="${sd.color}" font-family="ui-monospace,monospace">${esc(sd.label)}</text>`;
+      return out;
+    };
+    const dateLabels=HIST.dates.map((d,i)=>{const x=x0+(x1-x0)*(HIST.dates.length===1?0:i/(HIST.dates.length-1));return `<text x="${(x-8).toFixed(1)}" y="86" font-size="8.5" fill="currentColor" opacity="${i===HIST.dates.length-1?"0.75":"0.45"}" ${i===HIST.dates.length-1?'font-weight="700"':""}>${esc(d.slice(5))}</text>`}).join("");
+    lineHtml=`<div class="line-chart-container" style="${VIZ==="both"?"margin-bottom:12px;":""}"><div class="svg-chart-box">
+      <div class="svg-chart-legend"><span style="font-weight:700;color:var(--text-primary);white-space:nowrap;">${esc(tt.lineTitle)}</span>
+      <div class="legend-items">${seriesDefs.map(sd=>`<span><i class="legend-dot" style="background:${sd.color};"></i>${esc(HIST.names[sd.key]||"")}</span>`).join("")}</div></div>
+      <svg viewBox="0 0 320 92" width="100%" height="92" style="overflow:visible;">
+        <line x1="0" y1="18" x2="262" y2="18" stroke="currentColor" stroke-opacity="0.07" stroke-dasharray="3 3"/>
+        <line x1="0" y1="44" x2="262" y2="44" stroke="currentColor" stroke-opacity="0.07" stroke-dasharray="3 3"/>
+        <line x1="0" y1="70" x2="262" y2="70" stroke="currentColor" stroke-opacity="0.07"/>
+        ${seriesDefs.map(lineFor).join("")}
+        ${dateLabels}
+      </svg></div></div>`;
+  }
+  // 数据表（highlights 四个维度的第一名，走势用同一份 7 期历史）
+  const trendTop=b.trending[0], buzzTop=b.buzz[0], risingTop=b.rising[0];
+  const repoGainTop=b.repos.reduce((m,e)=>(e.starsDelta1d!=null&&(m==null||e.starsDelta1d>m.starsDelta1d))?e:m,null);
+  const rows=[];
+  if(trendTop) rows.push({dim:tt.dims[0],name:trendTop.skill,plat:"",sub:`${fmt(trendTop.installs)}`,main:(trendTop.growthPct!=null?(trendTop.growthPct>0?"+":"")+trendTop.growthPct+"%":"—"),series:HIST?HIST.series.trend:null,color:"#10B981",sec:"sec-04",grp:"g-trend"});
+  if(buzzTop) rows.push({dim:tt.dims[1],name:buzzTop.skill,plat:"",sub:tt.buzzSub(buzzTop),main:String(buzzTop.score),series:HIST?HIST.series.buzz:null,color:"#3B82F6",sec:"sec-04",grp:"g-buzz"});
+  if(risingTop) rows.push({dim:tt.dims[2],name:risingTop.skill,plat:risingTop.platform||"",sub:tt.installsSub(risingTop.ageDays),main:risingTop.heat!=null?tt.heat(risingTop.heat):fmt(risingTop.value),series:HIST?HIST.series.rising:null,color:"#8B5CF6",sec:"sec-04",grp:"g-rising"});
+  if(repoGainTop) rows.push({dim:tt.dims[3],name:repoGainTop.repo,plat:"GitHub",sub:tt.totalStars(fmt(repoGainTop.stars)),main:`+${fmt(repoGainTop.starsDelta1d)} ${tt.perDay}`,series:HIST?HIST.series.repoGain:null,color:"#F59E0B",sec:"sec-01",grp:"g-repos"});
+  const tableHtml=`<table class="stat-data-table"><thead><tr><th>${esc(tt.tableHeads[0])}</th><th>${esc(tt.tableHeads[1])}</th><th>${esc(tt.tableHeads[2])}</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr data-jump-sec="${r.sec}" data-jump-group="${r.grp}">
+      <td><div style="display:flex;align-items:center;gap:5px;min-width:0;"><span style="font-weight:800;font-family:ui-monospace,monospace;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;">${esc(r.name)}</span><span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--theme-tag-bg);color:var(--theme-tag-text);flex-shrink:0;">${esc(r.dim)}</span></div><div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;">${esc(r.sub)}</div></td>
+      <td>${r.series&&sparkPoints(r.series,60,22,2)?`<svg class="mini-spark-svg" viewBox="0 0 60 22"><polyline fill="none" stroke="${r.color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" points="${sparkPoints(r.series,60,22,2)}"/></svg>`:""}</td>
+      <td style="font-weight:800;color:var(--theme-accent);font-family:ui-monospace,monospace;">${esc(r.main)}</td>
+    </tr>`).join("")}
+    </tbody></table>`;
+  if(VIZ==="bar") container.innerHTML=barHtml;
+  else if(VIZ==="line") container.innerHTML=(lineHtml||"")+tableHtml;
+  else if(VIZ==="table") container.innerHTML=tableHtml;
+  else container.innerHTML=barHtml+lineHtml+tableHtml;
+  const lineBtn=document.getElementById("vizLineBtn");
+  if(lineBtn) lineBtn.classList.toggle("hidden",!(HIST&&HIST.dates.length>=2));
+  container.querySelectorAll("[data-jump-sec]").forEach(el=>{
+    el.addEventListener("click",()=>jumpToSection(el.getAttribute("data-jump-sec"),el.getAttribute("data-jump-group")));
+  });
+}
+async function loadHistory(endDate){
+  const key=endDate+"|"+(board?board.date:"");
+  if(HIST_KEY===key&&HIST) return;
+  HIST_KEY=key;
   try{
-    const r=await fetch("data/video.json?t="+Date.now());if(!r.ok)return;
-    const v=await r.json();
-    const inner=v.items.map((e,i)=>item(i+1,{skill:e.name,blurb:e.blurb,meta:e.meta,html:`${nameLink(e.name,e.url,e.meta)}<div class="blurb">${esc(e.blurb)}</div>`},e.num||"",cmd(e.cmd||""))).join("");
-    document.getElementById("videoZone").innerHTML=section("06","视频区 · AI 视频声音",esc(v.desc||""),inner);
-    document.querySelectorAll("#videoZone .cmdwrap").forEach(w=>{const t=w.dataset.cmd;w.querySelector("code.cmd").addEventListener("click",()=>doCopy(t));w.querySelector(".copybtn").addEventListener("click",ev=>{ev.stopPropagation();doCopy(t)})});
-    fitCmds();applyFilter();jumpToHash();
+    const idx=DATES.indexOf(endDate);
+    const dates=(idx>=0?DATES.slice(idx,idx+7):[endDate]).slice().reverse();
+    const boards=await Promise.all(dates.map(async d=>{
+      try{const r=await fetch(`data/boards/${d}.json?t=`+Date.now()); if(r.ok) return await r.json()}catch(e){}
+      return null;
+    }));
+    if(!board||board.date!==endDate) return;
+    const tName=board.trending[0]?.skill, bName=board.buzz[0]?.skill, rName=board.rising[0]?.skill;
+    const repoTop=board.repos[0]?.repo;
+    const gainTop=board.repos.reduce((m,e)=>(e.starsDelta1d!=null&&(m==null||e.starsDelta1d>m.starsDelta1d))?e:m,null);
+    const pick=(list,key,name,field)=>{const e=(list||[]).find(x=>x[key]===name); return e?e[field]??null:null};
+    HIST={
+      dates:dates,
+      names:{trend:tName||"",buzz:bName||"",repo:repoTop||""},
+      labels:{
+        trend:board.trending[0]?(board.trending[0].growthPct!=null?(board.trending[0].growthPct>0?"+":"")+board.trending[0].growthPct+"%":""):"",
+        buzz:board.buzz[0]?`X ${board.buzz[0].x}${board.buzz[0].xTruncated?"+":""}`:"",
+        repo:board.repos[0]&&board.repos[0].starsDelta1d!=null?`+${fmt(board.repos[0].starsDelta1d)}★`:""
+      },
+      series:{
+        trend:boards.map(x=>x?pick(x.trending,"skill",tName,"installs"):null),
+        buzz:boards.map(x=>x?pick(x.buzz,"skill",bName,"score"):null),
+        rising:boards.map(x=>x?pick(x.rising,"skill",rName,"value"):null),
+        repo:boards.map(x=>x?pick(x.repos,"repo",repoTop,"stars"):null),
+        repoGain:boards.map(x=>x&&gainTop?pick(x.repos,"repo",gainTop.repo,"stars"):null)
+      }
+    };
+    renderStatsViz();
   }catch(e){console.error(e)}
 }
-function jumpToHash(){const id=(location.hash||"").slice(1);if(!id)return;const el=document.getElementById(id);if(el)el.scrollIntoView({block:"start"})}
+document.querySelectorAll(".viz-mode-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    VIZ=btn.getAttribute("data-viz");
+    document.querySelectorAll(".viz-mode-btn").forEach(el=>el.classList.toggle("active",el===btn));
+    renderStatsViz();
+  });
+});
+
+/* ================= 跳转（保留 hash，返回可退） ================= */
+function jumpToSection(secId,groupId){
+  const sec=document.getElementById(secId); if(!sec) return;
+  if(groupId){ if(!openGroups.has(groupId)){openGroups.add(groupId)} }
+  else{ sec.querySelectorAll(".group").forEach(g=>openGroups.add(g.id)) }
+  saveGroups(); applyFilter(); updateDockVisibility();
+  document.querySelectorAll(".sec-sq-btn").forEach(b=>b.classList.toggle("active",b.getAttribute("data-sec")===secId));
+  try{history.pushState(null,"","#"+secId)}catch(e){}
+  sec.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function jumpToHash(){
+  const id=(location.hash||"").slice(1); if(!id) return;
+  const el=document.getElementById(id); if(!el) return;
+  el.querySelectorAll(".group").forEach(g=>{ if(!openGroups.has(g.id)){openGroups.add(g.id)} });
+  applyFilter();
+  el.scrollIntoView({block:"start"});
+}
 window.addEventListener("hashchange",jumpToHash);
 window.addEventListener("scroll",()=>{if(window.scrollY<=0&&location.hash){try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}},{passive:true});
 window.addEventListener("pageshow",()=>setTimeout(jumpToHash,60));
-document.querySelectorAll(".navchip").forEach(c=>c.addEventListener("click",e=>{
-  const id=c.getAttribute("href").slice(1);const t=document.getElementById(id);if(!t)return;
-  e.preventDefault();try{history.pushState(null,"","#"+id)}catch(err){}
-  t.scrollIntoView({behavior:"smooth",block:"start"});
-}));
+document.querySelectorAll(".sec-sq-btn").forEach(c=>c.addEventListener("click",()=>jumpToSection(c.getAttribute("data-sec"))));
+
+/* ================= 搜索 ================= */
+const qEl=document.getElementById("q"), clearBtn=document.getElementById("btnClearSearch");
+qEl.addEventListener("input",()=>{clearBtn.classList.toggle("visible",qEl.value.trim().length>0); applyFilter()});
+clearBtn.addEventListener("click",()=>{qEl.value="";clearBtn.classList.remove("visible");applyFilter()});
+document.getElementById("btnResetSearch").addEventListener("click",()=>{qEl.value="";clearBtn.classList.remove("visible");applyFilter();qEl.focus()});
+document.getElementById("btnTriggerSearch").addEventListener("click",()=>{
+  if(!qEl.value.trim()){qEl.focus();return}
+  applyFilter();
+  const first=document.querySelector("section.board-sec:not(.hidden)");
+  if(first) first.scrollIntoView({behavior:"smooth",block:"start"});
+});
+
+/* ================= 数据加载（原管线不动） ================= */
+async function load(date){
+  const btn=document.getElementById("reloadBtn");
+  if(btn){btn.disabled=true;btn.classList.add("spinning")}
+  try{
+    const r=await fetch((date?`data/boards/${date}.json`:"data/board.json")+"?t="+Date.now());
+    if(!r.ok) throw new Error();
+    render(await r.json());
+  }catch(e){
+    console.error(e);
+    if(!board) document.getElementById("sections").innerHTML=`<div class="empty-tip">${esc(T().loadFail)}</div>`;
+  }finally{
+    if(btn){btn.disabled=false;setTimeout(()=>btn.classList.remove("spinning"),520)}
+  }
+}
+async function loadVideo(){
+  try{
+    const r=await fetch("data/video.json?t="+Date.now()); if(!r.ok) return;
+    renderVideo(await r.json());
+  }catch(e){console.error(e)}
+}
+
+/* ================= 悬浮快捷胶囊（拖拽 / 磁吸 / 贴边半隐） ================= */
+const floatingDockEl=document.getElementById("floatingQuickDock");
+const DOCK_STORAGE_KEY="skills_floating_dock_pos_v3";
+let dockWasDragged=false, dockStashedSide=null, dockSnapSide="right";
+let cachedExpandedWidth=154, stashedIdleTimer=null;
+function measureExpandedWidth(){ if(!dockStashedSide&&floatingDockEl.offsetWidth>60) cachedExpandedWidth=floatingDockEl.offsetWidth; return cachedExpandedWidth }
+function scheduleStashedIdleDim(){ clearTimeout(stashedIdleTimer); floatingDockEl.classList.remove("stashed-idle"); if(dockStashedSide){ stashedIdleTimer=setTimeout(()=>{ if(dockStashedSide) floatingDockEl.classList.add("stashed-idle") },2000) } }
+function applyDockState(left,top,stashedSide,autoMagneticSnap=true){
+  dockStashedSide=stashedSide||null;
+  floatingDockEl.classList.remove("stashed-left","stashed-right","edge-ready","stashed-idle");
+  const w=measureExpandedWidth();
+  const h=floatingDockEl.offsetHeight||38;
+  const clampedTop=Math.min(Math.max(10,top),Math.max(10,window.innerHeight-h-10));
+  if(dockStashedSide==="right"){
+    dockSnapSide="right"; floatingDockEl.classList.add("stashed-right");
+    floatingDockEl.style.left=(window.innerWidth-28)+"px"; floatingDockEl.style.top=clampedTop+"px"; floatingDockEl.style.right="auto"; floatingDockEl.style.bottom="auto";
+    scheduleStashedIdleDim();
+    return {left:window.innerWidth-28,top:clampedTop,stashedSide:"right",snapSide:"right"};
+  }else if(dockStashedSide==="left"){
+    dockSnapSide="left"; floatingDockEl.classList.add("stashed-left");
+    floatingDockEl.style.left="0px"; floatingDockEl.style.top=clampedTop+"px"; floatingDockEl.style.right="auto"; floatingDockEl.style.bottom="auto";
+    scheduleStashedIdleDim();
+    return {left:0,top:clampedTop,stashedSide:"left",snapSide:"left"};
+  }else{
+    let targetLeft=left;
+    if(autoMagneticSnap){
+      const centerX=left+w/2;
+      dockSnapSide=centerX<window.innerWidth/2?"left":"right";
+      targetLeft=dockSnapSide==="left"?12:Math.max(12,window.innerWidth-w-12);
+    }else{
+      targetLeft=Math.min(Math.max(8,left),Math.max(8,window.innerWidth-w-8));
+    }
+    floatingDockEl.style.left=Math.round(targetLeft)+"px"; floatingDockEl.style.top=Math.round(clampedTop)+"px"; floatingDockEl.style.right="auto"; floatingDockEl.style.bottom="auto";
+    return {left:Math.round(targetLeft),top:Math.round(clampedTop),stashedSide:null,snapSide:dockSnapSide};
+  }
+}
+function saveDockState(o){ try{localStorage.setItem(DOCK_STORAGE_KEY,JSON.stringify(o))}catch(e){} }
+function loadSavedDockPosition(){
+  try{
+    const raw=localStorage.getItem(DOCK_STORAGE_KEY); if(!raw) return;
+    const parsed=JSON.parse(raw);
+    if(parsed&&typeof parsed.top==="number"){
+      dockSnapSide=parsed.snapSide||"right";
+      const w=measureExpandedWidth();
+      const defaultLeft=dockSnapSide==="left"?12:(window.innerWidth-w-12);
+      applyDockState(parsed.left??defaultLeft,parsed.top,parsed.stashedSide||null,true);
+    }
+  }catch(e){}
+}
+function unstashDockFromEdge(){
+  if(!dockStashedSide) return;
+  const curTop=parseFloat(floatingDockEl.style.top)||(window.innerHeight-68);
+  const side=dockStashedSide;
+  dockStashedSide=null;
+  floatingDockEl.classList.remove("stashed-left","stashed-right","stashed-idle");
+  const w=measureExpandedWidth();
+  const targetLeft=side==="right"?Math.max(12,window.innerWidth-w-12):12;
+  saveDockState(applyDockState(targetLeft,curTop,null,true));
+}
+(function initDraggableDock(){
+  let isDragging=false,startX=0,startY=0,initialLeft=0,initialTop=0,currentDragLeft=0,currentDragTop=0,lastClientX=0,lastMoveTime=0,velocityX=0,pendingStashSide=null;
+  floatingDockEl.addEventListener("pointerdown",e=>{
+    if(e.button&&e.button!==0) return;
+    isDragging=true; dockWasDragged=false; pendingStashSide=null;
+    startX=e.clientX; startY=e.clientY; lastClientX=e.clientX; lastMoveTime=performance.now(); velocityX=0;
+    clearTimeout(stashedIdleTimer); floatingDockEl.classList.remove("stashed-idle"); measureExpandedWidth();
+    const rect=floatingDockEl.getBoundingClientRect();
+    initialLeft=rect.left; initialTop=rect.top; currentDragLeft=initialLeft; currentDragTop=initialTop;
+    try{floatingDockEl.setPointerCapture(e.pointerId)}catch(_){}
+  });
+  floatingDockEl.addEventListener("pointermove",e=>{
+    if(!isDragging) return;
+    const now=performance.now(); const dt=Math.max(1,now-lastMoveTime);
+    const instantVx=(e.clientX-lastClientX)/dt;
+    velocityX=velocityX*0.4+instantVx*0.6;
+    lastClientX=e.clientX; lastMoveTime=now;
+    const dx=e.clientX-startX, dy=e.clientY-startY;
+    if(!dockWasDragged&&Math.hypot(dx,dy)>4){ dockWasDragged=true; floatingDockEl.classList.add("dragging") }
+    if(!dockWasDragged) return;
+    if(dockStashedSide==="right"){
+      if(dx<-14){ dockStashedSide=null; floatingDockEl.classList.remove("stashed-right"); const w=measureExpandedWidth(); initialLeft=e.clientX-w*0.65-dx }
+      else{ const h=floatingDockEl.offsetHeight||46; currentDragTop=Math.min(Math.max(10,initialTop+dy),window.innerHeight-h-10); floatingDockEl.style.top=Math.round(currentDragTop)+"px"; return }
+    }else if(dockStashedSide==="left"){
+      if(dx>14){ dockStashedSide=null; floatingDockEl.classList.remove("stashed-left"); const w=measureExpandedWidth(); initialLeft=e.clientX-w*0.35-dx }
+      else{ const h=floatingDockEl.offsetHeight||46; currentDragTop=Math.min(Math.max(10,initialTop+dy),window.innerHeight-h-10); floatingDockEl.style.top=Math.round(currentDragTop)+"px"; return }
+    }
+    const w=cachedExpandedWidth, h=floatingDockEl.offsetHeight||38;
+    const rawLeft=initialLeft+dx, rawTop=initialTop+dy;
+    currentDragTop=Math.min(Math.max(10,rawTop),Math.max(10,window.innerHeight-h-10));
+    const minInScreen=0, maxInScreen=window.innerWidth-w;
+    if(rawLeft<minInScreen){ const over=minInScreen-rawLeft; currentDragLeft=-Math.min(w*0.48,over*0.45) }
+    else if(rawLeft>maxInScreen){ const over=rawLeft-maxInScreen; currentDragLeft=maxInScreen+Math.min(w*0.48,over*0.45) }
+    else{ currentDragLeft=rawLeft }
+    if(currentDragLeft>=maxInScreen+16){ pendingStashSide="right"; floatingDockEl.classList.add("edge-ready") }
+    else if(currentDragLeft<=-16){ pendingStashSide="left"; floatingDockEl.classList.add("edge-ready") }
+    else{ pendingStashSide=null; floatingDockEl.classList.remove("edge-ready") }
+    floatingDockEl.style.left=Math.round(currentDragLeft)+"px"; floatingDockEl.style.top=Math.round(currentDragTop)+"px"; floatingDockEl.style.right="auto"; floatingDockEl.style.bottom="auto";
+  });
+  const endDockDrag=e=>{
+    if(!isDragging) return;
+    isDragging=false; floatingDockEl.classList.remove("dragging","edge-ready");
+    try{floatingDockEl.releasePointerCapture(e.pointerId)}catch(_){}
+    if(dockWasDragged){
+      const w=cachedExpandedWidth, maxInScreen=window.innerWidth-w;
+      if(!pendingStashSide&&!dockStashedSide){
+        if(currentDragLeft>=maxInScreen-6&&velocityX>0.35) pendingStashSide="right";
+        else if(currentDragLeft<=6&&velocityX<-0.35) pendingStashSide="left";
+      }
+      saveDockState(applyDockState(currentDragLeft,currentDragTop,pendingStashSide||dockStashedSide,true));
+      setTimeout(()=>{dockWasDragged=false},60);
+    }else if(dockStashedSide){ unstashDockFromEdge() }
+  };
+  floatingDockEl.addEventListener("pointerup",endDockDrag);
+  floatingDockEl.addEventListener("pointercancel",endDockDrag);
+  window.addEventListener("resize",()=>{
+    const w=measureExpandedWidth();
+    const curTop=parseFloat(floatingDockEl.style.top)||(window.innerHeight-68);
+    const targetLeft=dockSnapSide==="left"?12:Math.max(12,window.innerWidth-w-12);
+    applyDockState(targetLeft,curTop,dockStashedSide,true);
+  });
+})();
+function updateDockVisibility(){
+  let hasCustomPos=false;
+  try{hasCustomPos=!!localStorage.getItem(DOCK_STORAGE_KEY)}catch(e){}
+  floatingDockEl.classList.toggle("visible",hasCustomPos||window.scrollY>120||openGroups.size>0);
+}
+window.addEventListener("scroll",updateDockVisibility,{passive:true});
+document.getElementById("btnCollapseAllGroups").addEventListener("click",e=>{
+  if(dockWasDragged){e.preventDefault();e.stopPropagation();return}
+  openGroups.clear(); saveGroups();
+  document.querySelectorAll(".sec-sq-btn").forEach(el=>el.classList.remove("active"));
+  applyFilter(); updateDockVisibility();
+});
+document.getElementById("btnBackToTop").addEventListener("click",e=>{
+  if(dockWasDragged){e.preventDefault();e.stopPropagation();return}
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+
+/* ================= 初始化 ================= */
+(async()=>{
+  loadPrefs();
+  applyTheme(THEME_IDX,false);
+  setDark(DARK,false);
+  applyLang(false);
+  loadSavedDockPosition();
+  updateDockVisibility();
+  try{DATES=await (await fetch("data/dates.json?t="+Date.now())).json()}catch(e){DATES=[]}
+  const sel=document.getElementById("dateSel");
+  sel.innerHTML=DATES.map(d=>`<option value="${d}">${d}${T().periodSuffix}</option>`).join("");
+  sel.classList.remove("skelbar");
+  sel.addEventListener("change",()=>load(sel.value));
+  document.getElementById("reloadBtn").addEventListener("click",()=>load(sel.value||null));
+  await load(DATES[0]||null);
+  if(DATES[0]) sel.value=DATES[0];
+  loadVideo();
+  updateDockVisibility();
+})();
 </script>
 <script>
 if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js", {updateViaCache: "none"}).then(r => r.update()).catch(()=>{})); }
