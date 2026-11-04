@@ -1822,6 +1822,7 @@
 .asn-row{cursor:pointer}
 .expand-mini-arrow{color:var(--text-secondary);font-size:18px}
 #companyHead{cursor:pointer}
+.chip-flag{width:19px;height:auto;border-radius:3px;vertical-align:-4px;margin-right:3px}
 .rtc-cands{font-size:12.5px;color:var(--text-secondary);line-height:1.6;word-break:break-all}
 </style>
 </head>
@@ -1930,7 +1931,12 @@
       </div>
     </section>
 
-    
+    <nav class="preset-ip-bar" aria-label="测试节点切换">
+      <button type="button" class="preset-chip" data-ip="218.111.2.28"><img class="chip-flag" src="https://flagcdn.com/w80/my.png" alt="">218.111.2.28<span class="chip-desc" data-zh="（截图原版·大马商宽）" data-en=" (Screenshot · MY Business)">（截图原版·大马商宽）</span></button>
+      <button type="button" class="preset-chip" data-ip="136.121.28.34"><img class="chip-flag" src="https://flagcdn.com/w80/us.png" alt="">136.121.28.34<span class="chip-desc" data-zh="（Google机房）" data-en=" (Google Datacenter)">（Google机房）</span></button>
+      <button type="button" class="preset-chip" data-ip="103.84.216.12"><img class="chip-flag" src="https://flagcdn.com/w80/sg.png" alt="">103.84.216.12<span class="chip-desc" data-zh="（新加坡原生家宽）" data-en=" (SG Native Residential)">（新加坡原生家宽）</span></button>
+      <button type="button" class="preset-chip" data-ip="118.238.251.9"><img class="chip-flag" src="https://flagcdn.com/w80/jp.png" alt="">118.238.251.9<span class="chip-desc" data-zh="（东京ISP原生）" data-en=" (Tokyo ISP Native)">（东京ISP原生）</span></button>
+    </nav>
 
     <!-- ================= 核心卡片内容区（严格最多二层卡片，完全对齐原网址 14844.jpg 结构） ================= -->
     <main class="cards-wrapper">
@@ -2506,6 +2512,7 @@ const T=k=>(STR[k]?(currentLang==="zh"?STR[k].zh:STR[k].en):k);
 function applyLanguage(){
   document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n");if(STR[k])el.textContent=currentLang==="zh"?STR[k].zh:STR[k].en});
   $("langText").textContent=currentLang==="zh"?"中文":"EN";
+  document.querySelectorAll(".chip-desc").forEach(el=>el.textContent=currentLang==="zh"?el.getAttribute("data-zh"):el.getAttribute("data-en"));
   $("panelTitle").textContent=T("panelTitle");$("panelHint").textContent=T("panelHint");
   $("navPanelTitle").textContent=T("navTitle");$("navPanelHint").textContent=T("navHint");
   document.documentElement.lang=currentLang==="zh"?"zh-CN":"en";
@@ -2754,6 +2761,7 @@ function render(d,final){
   $("valDecimalIp").dataset.num=num!=null?String(num):"—";$("valDecimalIp").textContent=state.numVisible?$("valDecimalIp").dataset.num:"********";syncNumEye();
   $("scenarioGrid").innerHTML=d.scenes.map((sc,i)=>"<div class='scenario-cell'><div class='scenario-cell-name'>"+DYN.sceneNames[currentLang][i]+"</div><div class='scenario-stars-row'>"+starsHtml(sc[1])+"</div><div class='scenario-verdict verdict-"+suitCls(sc[1])+"'><span class='verdict-emoji'>"+suitIcon(sc[1])+"</span><span>"+suitText(sc[1])+"</span></div></div>").join("");
   if(d.histAsn)renderExtra(d);
+  markPreset(d.ip);
   $("mainIpCard").classList.remove("loading");hideErr();
 }
 function attrName(d){return currentLang==="zh"?d.attr:(d.cls&&d.cls.type==="residential"?TD("residential"):d.cls&&d.cls.type==="hosting"?TD("hosting"):TD("business"))}
@@ -3183,6 +3191,8 @@ applyLanguage();
 syncNumEye();
 syncClearBtn();
 runWebrtc();
+function markPreset(ip){document.querySelectorAll(".preset-chip").forEach(c=>c.classList.toggle("active",c.getAttribute("data-ip")===ip))}
+document.querySelectorAll(".preset-chip").forEach(c=>c.addEventListener("click",()=>{const ip=c.getAttribute("data-ip");markPreset(ip);runQuery(ip,false)}));
 $("langBtn").addEventListener("click",toggleLanguage);
 $("themeBackdrop").addEventListener("click",closeThemePanel);
 $("hamburgerBtn").addEventListener("click",toggleNavMenu);
