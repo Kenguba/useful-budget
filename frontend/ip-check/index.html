@@ -2043,7 +2043,7 @@
             <span class="attr-pill-tag tag-green" id="badgeRiskScore">检测中…</span>
           </div>
           <div class="risk-bar-track">
-            <div class="risk-pointer" id="riskPointer" style="left: 0%;"></div>
+            <div class="risk-pointer" id="riskPointer" style="left: 0%; visibility: hidden;"></div>
           </div>
           <div class="risk-scale-ticks">
             <span>0</span>
@@ -2749,9 +2749,9 @@ function render(d,final){
   const srcTag=$("badgeIpOrigin");srcTag.textContent=d.native==null?TD("checking"):(d.native?TD("nativeIp"):TD("broadcastIp"));srcTag.className="ippure-pill-badge "+(d.native==null?"badge-pending":d.native?"badge-native":"badge-broadcast");
   const attrTag=$("badgeIpAttr");attrTag.textContent=d.native==null&&!d.attr?TD("checking"):attrName(d);attrTag.className="ippure-pill-badge "+(d.cls&&d.cls.type==="residential"?"badge-residential":d.cls&&d.cls.type==="hosting"?"badge-hosting":"badge-isp-biz");
   const badge=$("badgeRiskScore");
-  badge.textContent=d.score+"% "+scoreLabel(d.score);
-  badge.className="attr-pill-tag "+(d.score<=25?"tag-green":d.score<=60?"tag-amber":"tag-red");
-  $("riskPointer").style.left=Math.min(97,Math.max(3,d.score))+"%";
+  badge.textContent=d.score==null?TD("checking"):d.score+"% "+scoreLabel(d.score);
+  badge.className="attr-pill-tag "+(d.score==null?"tag-gray":d.score<=25?"tag-green":d.score<=60?"tag-amber":"tag-red");
+  const rp=$("riskPointer");if(d.score==null){rp.style.visibility="hidden"}else{rp.style.visibility="visible";rp.style.left=Math.min(97,Math.max(3,d.score))+"%"}
   $("valHostname").textContent=d.host||TD("detecting");
   $("valDetectTime").textContent=fmtTime(new Date());
   $("detailConfidence").textContent=TD("confLabel")+" "+"●".repeat(Math.min(5,d.conf||0))+"○".repeat(Math.max(0,5-(d.conf||0)));
@@ -2763,8 +2763,8 @@ function render(d,final){
   $("valCompany").textContent=(d.company||d.isp||"—")+(d.netname?" · netname "+d.netname:"");
   $("valIsp").textContent=d.isp||"—";
   const typePill=$("valIpType");typePill.textContent=typeName(d);typePill.className="attr-pill-tag "+(d.cls&&d.cls.type==="hosting"?"tag-red":d.cls&&d.cls.type==="residential"?"tag-green":"tag-blue");
-  const riskPill=$("valRiskPill");riskPill.textContent=d.score+"%  "+scoreLabel(d.score);riskPill.className="attr-pill-tag "+(d.score<=25?"tag-green":d.score<=60?"tag-amber":"tag-red");
-  const lit=d.score<=10?1:d.score<=25?2:d.score<=40?3:d.score<=60?4:5;
+  const riskPill=$("valRiskPill");riskPill.textContent=d.score==null?TD("checking"):d.score+"%  "+scoreLabel(d.score);riskPill.className="attr-pill-tag "+(d.score==null?"tag-gray":d.score<=25?"tag-green":d.score<=60?"tag-amber":"tag-red");
+  const lit=d.score==null?0:d.score<=10?1:d.score<=25?2:d.score<=40?3:d.score<=60?4:5;
   [...$("valRiskDots").children].forEach((el,i)=>el.className=i<lit?"":"off");
   const natPill=$("valNative");natPill.textContent=d.native==null?TD("checking"):(d.native?TD("nativeIp"):TD("nonNative"));natPill.className="attr-pill-tag "+(d.native==null?"tag-gray":d.native?"tag-green":"tag-amber");
   const shPill=$("valShared");shPill.textContent=d.prefix?(d.prefix+" · "+prefixSize(d.prefix)):"—";shPill.className="attr-pill-tag tag-gray";
@@ -2871,7 +2871,7 @@ async function runQuery(ip,selfMode,fromHist){
       lat:loc.lat,lon:loc.lon,postal:loc.postal,tz:loc.tz,conf:loc.agree,whoisCountry:"",native:null,
       locRows:ok.map(s=>({src:s.src,cc:s.cc,place:[s.country||s.cc,s.region,s.city].filter(Boolean).join(", ")})),
       scenes:[["TikTok",3],["跨境电商",3],["社媒运营",3],["AI 应用",3]],
-      histAsn:null,neighbours:null,cls:null,score:50,riskTags:TD("riskTagsPending"),note:TD("summarizing")
+      histAsn:null,neighbours:null,cls:null,score:null,riskTags:TD("riskTagsPending"),note:TD("summarizing")
     };
     d.range=rangeFromCIDR(d.prefix,d.ip);
     d.cls=classify(d);applyType(d);render(d);
