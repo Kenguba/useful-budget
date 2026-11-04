@@ -2539,8 +2539,7 @@ function spaApply(st){
   spaState=st;
   menuVisual(st.menu);panelVisual(st.panel);modalVisual(st.modal);
   if(st.details!==detailsOpen)toggleDetails(st.details);
-  if(st.sec&&!st.menu){jumpToSection(st.sec,false)}
-  else{navSeq++;window.scrollTo({top:st.y||0,behavior:"auto"})}
+  navSeq++;
 }
 window.addEventListener("popstate",e=>{
   const base={menu:false,details:false,modal:false,panel:false,sec:null,y:0};
@@ -2553,7 +2552,7 @@ window.addEventListener("popstate",e=>{
   spaState.sec=($(id)?id:null);
   try{history.replaceState({spa:spaState},"",location.href)}catch(e){}
 })();
-window.addEventListener("pageshow",()=>{if(spaState.sec)setTimeout(()=>jumpToSection(spaState.sec,false),80)});
+window.addEventListener("pageshow",e=>{if(e.persisted)return;if(spaState.sec)setTimeout(()=>jumpToSection(spaState.sec,false),80)});
 let spaScrollTm=null;
 window.addEventListener("scroll",()=>{
   if(spaScrollTm)return;
