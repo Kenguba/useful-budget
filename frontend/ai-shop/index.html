@@ -1612,8 +1612,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC"
 .pc-first{margin-left:auto;color:var(--text-muted);font-size:11px}
 .pc-empty{padding:16px 2px;color:var(--text-muted);font-size:12.5px}
 /* 同源商铺钮：被点中/聚焦时不要边框，改一圈轻微光晕 */
-.same-source-btn{outline:none}
-.same-source-btn:focus,.same-source-btn:focus-visible,.same-source-btn:active{outline:none;box-shadow:0 0 0 4px var(--search-glow)}
+.same-source-btn{border-color:transparent;outline:none}
+.same-source-btn:hover,.same-source-btn:active,.same-source-btn:focus,.same-source-btn:focus-visible{border-color:transparent;outline:none}
+.same-source-btn:focus,.same-source-btn:focus-visible,.same-source-btn:active{box-shadow:0 0 0 2px var(--search-glow)}
 /* 目录行：左右宽度 flex 自适应，店名不换行，右侧太长横向滚动（不显示滚动条） */
 .shop .nm{flex:none;word-break:normal}
 .shop .nm a{white-space:nowrap}
@@ -1896,7 +1897,7 @@ function renderBoard(){
     const rows=g.items.map((it,ii)=>{
         if(q&&!fuzzy(q,it.title,it.shop,it.platform)) return '';
         shown++;
-        const tagrow=(it.stock===0?'<span class="attr-pill-tag tag-sold">已售罄</span>':'')+(it.kind?'<span class="attr-pill-tag '+kindCls(it.kind)+'">'+esc(it.kind)+'</span>':'')+(it.same_source>1?'<button type="button" class="same-source-btn" data-src="'+gi+':'+ii+'" aria-haspopup="dialog">同源商铺共 '+it.same_source+' 家 ›</button>':'')+(it.pc?'<button type="button" class="attr-pill-tag tag-pc" data-pc="'+gi+':'+ii+'">价格变动 ›</button>':'');
+        const tagrow=(it.stock===0?'<span class="attr-pill-tag tag-sold">已售罄</span>':'')+(it.kind?'<span class="attr-pill-tag '+kindCls(it.kind)+'">'+esc(it.kind)+'</span>':'')+(it.same_source>1?'<button type="button" class="same-source-btn" data-src="'+gi+':'+ii+'" aria-haspopup="dialog">同源商铺 '+it.same_source+' 家 ›</button>':'')+(it.pc?'<button type="button" class="attr-pill-tag tag-pc" data-pc="'+gi+':'+ii+'">价格变动 ›</button>':'');
         return '<div class="real-offer-row" id="it-'+esc(g.id)+'-'+ii+'"><div class="offer-col-left"><span class="offer-price-val">'+fmtP(it.price)+'</span><span class="platform-source-badge">'+esc(it.platform)+'</span></div><div class="offer-col-mid"><div class="offer-item-title"><a data-anchor="it-'+esc(g.id)+'-'+ii+'" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div>'+(tagrow?'<div class="offer-badges-line">'+tagrow+'</div>':'')+'<div class="shoprow"><span class="shopname">'+esc(it.shop)+'</span><span class="stk">'+stockTxt(it)+'</span></div></div></div>';
       }).join('');
     if(q&&!shown) return '';
