@@ -2511,10 +2511,28 @@ function renderNavMenu(){
   list.querySelectorAll("[data-nav]").forEach(a=>a.addEventListener("click",()=>{
     const it=NAV_ITEMS[Number(a.getAttribute("data-nav"))];
     closeNavMenu();
-    if(it.expand)toggleDetails(true);
-    const el=$(it.target);if(el)setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"start"}),60);
+    try{history.pushState(null,"","#"+it.target)}catch(e){}
+    jumpToSection(it.target,true);
   }));
 }
+/* 模块 hash 路由（同 ai-shop 逻辑）：菜单跳转把 #目标id 写进地址并留一条历史；按返回时 hash 变化触发 jumpToHash 立刻跳回；带 hash 的链接打开也直达；手动滑回顶部则 replaceState 清掉 hash */
+function jumpToSection(id,smooth){
+  const el=$(id);if(!el)return;
+  const inDetails=!!el.closest("#detailsCollapsible");
+  if(inDetails&&!detailsOpen)toggleDetails(true);
+  setTimeout(()=>el.scrollIntoView({behavior:smooth?"smooth":"auto",block:"start"}),inDetails?90:60);
+}
+function jumpToHash(){
+  const id=(location.hash||"").slice(1);
+  if(!id){window.scrollTo({top:0,behavior:"auto"});return}
+  if(!$(id))return;
+  jumpToSection(id,false);
+}
+window.addEventListener("hashchange",jumpToHash);
+window.addEventListener("pageshow",()=>{if(location.hash)setTimeout(jumpToHash,80)});
+window.addEventListener("scroll",()=>{
+  if(window.scrollY<=0&&location.hash){try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}
+},{passive:true});
 function toggleNavMenu(){$("navDropdownPanel").classList.toggle("open");$("navMenuBackdrop").classList.toggle("open")}
 function closeNavMenu(){const p=$("navDropdownPanel");if(p)p.classList.remove("open");const bd=$("navMenuBackdrop");if(bd)bd.classList.remove("open")}
 /* ================= Toast / 快照弹窗 ================= */
