@@ -2145,11 +2145,6 @@
 
         <!-- Layer 2 子卡 E：AI 厂商支持度表格（1:1 还原 14844.jpg 原网址 SVG 图标与表头结构） -->
         <div class="llm-table" id="aiSupportCard">
-          <div class="llm-row head">
-            <span></span>
-            <span id="titleAiVendor" data-i18n="vendor">厂商</span>
-            <span id="badgeAiRegion">判定（MY）</span>
-          </div>
           <div id="aiVendorList"></div>
         </div>
 
@@ -3155,7 +3150,6 @@ function paintNote(d){
 function TD2(k,i){return DYN[k][currentLang][i]}
 function paintLlm(d){
   const list=$("aiVendorList");if(!list)return;const cc=(d.cc||"").toUpperCase();
-  $("badgeAiRegion").textContent=currentLang==="zh"?("判定（"+(cc||"—")+"）"):("Status ("+(cc||"—")+")");
   if(!cc){list.innerHTML="";$("llmMethodNote").textContent="";return}
   list.innerHTML=VENDORS.map(v=>{const ok=(LLM_LISTS[v.name]||[]).includes(cc);return "<div class='llm-row'><span class='vendor-ic vi-"+v.name.toLowerCase()+"'>"+v.icon+"</span><span><span class='llm-name'>"+v.name+"</span><div class='llm-sub'>"+v.by+"</div></span><span class='llm-chip "+(ok?"ok":"bad")+"'>"+(ok?(currentLang==="zh"?"✓ 可用":"✓ Available"):(currentLang==="zh"?"✕ 不可用":"✕ Unavailable"))+"</span></div>"}).join("");
   $("llmMethodNote").textContent=TD("methodPrefix")+(d.native===false?TD("methodNonNative"):d.native?TD("methodNative"):"");
