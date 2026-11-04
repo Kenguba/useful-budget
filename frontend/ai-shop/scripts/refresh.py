@@ -525,14 +525,15 @@ def main():
                 _key = it['url'].split('?')[0] + '|' + norm_title(it['title'])
                 _rec = _log.get(_key)
                 if not _rec:
+                    # 首次出现只建账，不算变价（ken 2026-11-04：真的变了才显示变价）
                     _log[_key] = [_now_min, it['price']]
-                    it['pc'] = _today
                 else:
                     _last_ts = _rec[0] + sum(_rec[2::2])
                     if it['price'] != _rec[-1]:
                         _rec += [_now_min - _last_ts, it['price']]
                         it['pc'] = _today
-                    else:
+                    elif len(_rec) > 2:
+                        # 已有过真实变价：pc 停在最近一次变价日
                         it['pc'] = _dt.fromtimestamp(_last_ts * 60, _bj).strftime('%Y-%m-%d')
         with open(_log_path, 'w', encoding='utf-8') as f:
             json.dump(dict(v=1, items=_log), f, ensure_ascii=False, separators=(',', ':'))
