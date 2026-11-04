@@ -424,6 +424,8 @@ def main():
         print(f'priceai {slug}: {len(r)} rows', file=sys.stderr)
         pai += [o for o in r if o['url'] not in BLOCKED_URLS]
 
+    _full_rows = list(rows)  # prepare 前的全量原始行（价格日志全量维护用）
+    _full_pai = list(pai)
     rows = prepare_offers(rows)
     pai = prepare_offers(pai)
     g1, g2, g3 = gpt_groups(rows + [o for o in pai if o['url']])
@@ -505,15 +507,22 @@ def main():
         if old_total > 0 and new_total < old_total * 0.5:
             print(f'GUARD: new total {new_total} < 50% of previous {old_total}; refusing to overwrite board.json', file=sys.stderr)
             sys.exit(1)
-    # 价格变动日志（ken 2026-11-04 定，时间戳错位增量编码）：每件商品只存首条
-    # [完整时间戳(epoch 分钟), 首价]，之后每次变价只追加 [距上次分钟数, 新价]，
-    # 精确到分钟、省空间。【2026-11-04 晚 ken 改定：全量维护】维护对象不是上榜的
-    # 200 多条，而是 8 个分组的全部候选（含库存 0 的失效条目、没挤进前 30 的、
-    # 同源里非最低价的），上榜条目只是这张全量表的一个子集；表只增不删，
-    # 条目掉出候选后记录保留、回来接着记。board 的 pc 只做派生：记录里出现过
-    # 第 2 个价位点（真变价）才标，pc 为最近一次变价日期（北京时间）。
+    # 价格变动日志（ken 2026-11-04 定版，2026-11-05 改定全量入库）：时间戳错位增量
+    # 编码——每件商品只存首条 [完整时间戳(epoch 分钟), 首价]，之后每次变价只追加
+    # [距上次分钟数, 新价]，价格不变不追加。维护对象是两家聚合库合并去重后的全部
+    # 商品（prepare 前的原始行，含库存 0 的失效件与没进任何分组的品类）+ PriceAI
+    # 补充行，不再只是 8 个分组的候选；表只增不删，商品掉出全量库记录保留、回来
+    # 接着记。board 的 pc 只做派生：记录出现第 2 个价位点（真变价）才标，pc 为
+    # 最近一次变价日期（北京时间）。
+    # 比对算法（单遍哈希直查，全程线性）：本轮全量先一次性建成 key->价 的 dict，
+    # 旧表本身也是 dict，每件商品一次 O(1) 查表比对，没有两两比对。精确键 =
+    # 链接（去参数）+ 归一标题；精确未命中时走同链接兜底：同链接只有一条旧记录、
+    # 或多规格里规格后缀能唯一对上时，认定同一商品（卖家改了标题），把旧记录改名
+    # 到新键续记（改名不断历史），对不上才新建账；被认领的旧键本轮不再二次认领。
     try:
+        import time as _time
         from datetime import datetime as _dt, timezone as _tz, timedelta as _td
+        _t0 = _time.time()
         _bj = _tz(_td(hours=8))
         _now = _dt.now(_bj)
         _now_min = int(_now.timestamp() // 60)
@@ -524,19 +533,51 @@ def main():
         except Exception:
             _log = {}
         _pool = {}
-        for _lst in (g1, g2, g3, g4, g5, g6, g7, claude_group(rows + pai)):
-            for _o in _lst:
-                if _o['price'] is None or _o['price'] <= 0:
-                    continue
-                _pool[_o['url'].split('?')[0] + '|' + norm_title(_o['title'])] = _o['price']
+        _spec_of = {}
+        for _o in _full_rows + _full_pai:
+            if _o['price'] is None or _o['price'] <= 0:
+                continue
+            _k = _o['url'].split('?')[0] + '|' + norm_title(_o['title'])
+            _pool[_k] = _o['price']
+            _spec_of[_k] = norm_title(split_spec(_o['title'])[1])
+        _by_url = {}
+        for _k in _log:
+            _by_url.setdefault(_k.split('|', 1)[0], []).append(_k)
+        _claimed = set()
+        _n_new = _n_chg = _n_ren = 0
+        _default_spec = norm_title('默认规格')
         for _key, _price in _pool.items():
             _rec = _log.get(_key)
-            if not _rec:
-                # 首次出现只建账，不算变价（ken 2026-11-04：真的变了才显示变价）
-                _log[_key] = [_now_min, _price]
-            elif _price != _rec[-1]:
+            if _rec is not None:
+                _claimed.add(_key)
+            else:
+                _url, _ntitle = _key.split('|', 1)
+                _cands = [c for c in _by_url.get(_url, []) if c not in _claimed]
+                _hit = None
+                if len(_cands) == 1:
+                    _hit = _cands[0]
+                elif len(_cands) > 1:
+                    _spec = _spec_of.get(_key) or ''
+                    if _spec and _spec != _default_spec and len(_spec) >= 2:
+                        _m = [c for c in _cands if c.split('|', 1)[1].endswith(_spec)]
+                        if len(_m) == 1:
+                            _hit = _m[0]
+                if _hit is not None:
+                    _log[_key] = _log.pop(_hit)
+                    _claimed.add(_hit)
+                    _claimed.add(_key)
+                    _rec = _log[_key]
+                    _n_ren += 1
+                else:
+                    # 首次出现只建账，不算变价（ken 2026-11-04：真的变了才显示变价）
+                    _log[_key] = [_now_min, _price]
+                    _n_new += 1
+                    continue
+            if _price != _rec[-1]:
                 _last_ts = _rec[0] + sum(_rec[2::2])
-                _rec += [_now_min - _last_ts, _price]
+                _delta = _now_min - _last_ts
+                _rec += [_delta if _delta > 0 else 0, _price]
+                _n_chg += 1
         for g in groups:
             for it in g['items']:
                 _rec = _log.get(it['url'].split('?')[0] + '|' + norm_title(it['title']))
@@ -545,7 +586,7 @@ def main():
                     it['pc'] = _dt.fromtimestamp(_last_ts * 60, _bj).strftime('%Y-%m-%d')
         with open(_log_path, 'w', encoding='utf-8') as f:
             json.dump(dict(v=1, items=_log), f, ensure_ascii=False, separators=(',', ':'))
-        print(f'price-log: {len(_log)} keys (pool {len(_pool)})', file=sys.stderr)
+        print(f'price-log: {len(_log)} keys (pool {len(_pool)}, new {_n_new}, renamed {_n_ren}, changed {_n_chg}, {int((_time.time() - _t0) * 1000)}ms)', file=sys.stderr)
     except Exception as e:
         print(f'price-log skipped: {e}', file=sys.stderr)
     os.makedirs(DATA, exist_ok=True)
