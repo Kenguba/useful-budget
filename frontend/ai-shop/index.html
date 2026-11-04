@@ -1824,8 +1824,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC"
   </section>
 </div>
 <div class="overlay" id="pcOverlay" hidden aria-hidden="true">
-  <button class="shade" type="button" data-pc-close aria-label="关闭变价历史弹窗"></button>
-  <section class="sheet" id="pcSheet" role="dialog" aria-modal="true" aria-label="变价历史">
+  <button class="shade" type="button" data-pc-close aria-label="关闭价格变动弹窗"></button>
+  <section class="sheet" id="pcSheet" role="dialog" aria-modal="true" aria-label="价格变动">
     <div class="grab" aria-hidden="true"></div>
     <div class="s-head"><div><strong id="pcTitle"></strong><small id="pcSub"></small></div><span class="pill" id="pcPill"></span></div>
     <div class="pc-chart" id="pcChart"></div>
@@ -1896,7 +1896,7 @@ function renderBoard(){
     const rows=g.items.map((it,ii)=>{
         if(q&&!fuzzy(q,it.title,it.shop,it.platform)) return '';
         shown++;
-        const tagrow=(it.stock===0?'<span class="attr-pill-tag tag-sold">已售罄</span>':'')+(it.kind?'<span class="attr-pill-tag '+kindCls(it.kind)+'">'+esc(it.kind)+'</span>':'')+(it.same_source>1?'<button type="button" class="same-source-btn" data-src="'+gi+':'+ii+'" aria-haspopup="dialog">同源商铺共 '+it.same_source+' 家 ›</button>':'')+(it.pc?'<button type="button" class="attr-pill-tag tag-pc" data-pc="'+gi+':'+ii+'">'+esc(it.pc.slice(5))+' 变价 ›</button>':'');
+        const tagrow=(it.stock===0?'<span class="attr-pill-tag tag-sold">已售罄</span>':'')+(it.kind?'<span class="attr-pill-tag '+kindCls(it.kind)+'">'+esc(it.kind)+'</span>':'')+(it.same_source>1?'<button type="button" class="same-source-btn" data-src="'+gi+':'+ii+'" aria-haspopup="dialog">同源商铺共 '+it.same_source+' 家 ›</button>':'')+(it.pc?'<button type="button" class="attr-pill-tag tag-pc" data-pc="'+gi+':'+ii+'">价格变动 ›</button>':'');
         return '<div class="real-offer-row" id="it-'+esc(g.id)+'-'+ii+'"><div class="offer-col-left"><span class="offer-price-val">'+fmtP(it.price)+'</span><span class="platform-source-badge">'+esc(it.platform)+'</span></div><div class="offer-col-mid"><div class="offer-item-title"><a data-anchor="it-'+esc(g.id)+'-'+ii+'" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div>'+(tagrow?'<div class="offer-badges-line">'+tagrow+'</div>':'')+'<div class="shoprow"><span class="shopname">'+esc(it.shop)+'</span><span class="stk">'+stockTxt(it)+'</span></div></div></div>';
       }).join('');
     if(q&&!shown) return '';
@@ -2068,7 +2068,7 @@ function openPc(gi,ii,btn){
   const g=board&&board.groups[gi]; const it=g&&g.items[ii]; if(!it) return;
   $('#pcTitle').textContent=it.title;
   $('#pcSub').textContent=it.shop+' · 当前 ¥'+fmtN(it.price);
-  $('#pcPill').textContent='变价历史';
+  $('#pcPill').textContent='价格变动';
   $('#pcChart').style.display='none'; $('#pcChart').innerHTML='';
   $('#pcList').innerHTML='<p class="pc-empty">加载中…</p>';
   clearTimeout(pcCloseTimer);
