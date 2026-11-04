@@ -1971,8 +1971,8 @@ function openSrc(gi,ii,btn){
   clearTimeout(srcCloseTimer);
   srcIsOpen=true;
   srcOpener=btn||document.activeElement;
-  try{ srcPrevSR=history.scrollRestoration; history.scrollRestoration='manual'; }catch(e){ srcPrevSR=null; }
-  try{ history.pushState({museSrcPopup:1},''); srcHist=true; }catch(e){ srcHist=false; }
+  srcHist=false; srcPrevSR=null;
+  window.__srcSettleUntil=Date.now()+1500;
   srcOverlay.hidden=false;
   srcOverlay.setAttribute('aria-hidden','false');
   if('inert' in pageWrap) pageWrap.inert=true;
@@ -1984,7 +1984,8 @@ function openSrc(gi,ii,btn){
 function closeSrc(fromPop){
   if(!srcIsOpen) return;
   srcIsOpen=false;
-  if(!fromPop&&srcHist){ srcHist=false; try{ history.back(); }catch(e){} }
+  srcHist=false;
+  window.__srcSettleUntil=Date.now()+1500;
   srcOverlay.classList.remove('open');
   srcOverlay.setAttribute('aria-hidden','true');
   if('inert' in pageWrap) pageWrap.inert=false;
@@ -1999,7 +2000,7 @@ function closeSrc(fromPop){
     unlockScroll();
     /* 弹窗开着时若数据现核重渲染过页面，保存的滚动位置会失效：按同源钮的新位置自动校正回视口 */
     if(backKey){ const nb=document.querySelector('[data-src="'+backKey+'"]'); if(nb){ const r=nb.getBoundingClientRect(); if(r.top<-80||r.bottom>window.innerHeight+80) nb.scrollIntoView({block:'center'}); } }
-    if(srcPrevSR!==null){ try{ history.scrollRestoration=srcPrevSR; }catch(e){} srcPrevSR=null; }
+    window.__srcSettleUntil=Date.now()+1200;
   }, reducedMotion?0:580);
 }
 window.addEventListener('popstate',()=>{ if(srcIsOpen){ srcHist=false; closeSrc(true); } });
@@ -2047,7 +2048,7 @@ document.addEventListener('click',e=>{
   if(a){ try{ history.pushState(null,'','#'+a.dataset.anchor); }catch(err){} }
 });
 function jumpToHash(){
-  if(srcIsOpen||srcLocked) return;
+  if(srcIsOpen||srcLocked||Date.now()<(window.__srcSettleUntil||0)) return;
   const id=(location.hash||'').slice(1);
   if(!id) return;
   const el=document.getElementById(id);
