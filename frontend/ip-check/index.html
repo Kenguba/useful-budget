@@ -2540,7 +2540,7 @@ function spaApply(st){
   menuVisual(st.menu);panelVisual(st.panel);modalVisual(st.modal);
   if(st.details!==detailsOpen)toggleDetails(st.details);
   if(st.sec&&!st.menu){jumpToSection(st.sec,false)}
-  else{navSeq++;window.scrollTo({top:st.y||0,behavior:"auto"})}
+  else{navSeq++;window.scrollTo({top:st.y||0,behavior:"instant"})}
 }
 window.addEventListener("popstate",e=>{
   const base={menu:false,details:false,modal:false,panel:false,sec:null,y:0};
@@ -2568,7 +2568,7 @@ function jumpToSection(id,smooth){
   const expanding=inDetails&&!detailsOpen;
   if(expanding)toggleDetails(true);
   const tk=++navSeq;
-  setTimeout(()=>{if(tk===navSeq)el.scrollIntoView({behavior:smooth?"smooth":"auto",block:"start"})},expanding?430:60);
+  setTimeout(()=>{if(tk===navSeq)el.scrollIntoView({behavior:smooth?"smooth":"instant",block:"start"})},expanding?430:60);
 }
 function menuVisual(open){$("navDropdownPanel").classList.toggle("open",open);$("navMenuBackdrop").classList.toggle("open",open)}
 function toggleNavMenu(){
