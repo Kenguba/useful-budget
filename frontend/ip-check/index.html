@@ -732,7 +732,7 @@
       background-color: var(--theme-accent);
       color: #FFFFFF;
       border-color: var(--theme-accent);
-      box-shadow: 0 4px 12px var(--search-glow);
+      box-shadow: 0 2px 22px -2px color-mix(in srgb, var(--search-glow) 50%, transparent);
     }
 
     /* ================= 6. 核心卡片体系（严格最多二层卡片：Layer 1 .ippure-card + Layer 2 .layer2-subcard） ================= */
@@ -1832,6 +1832,7 @@
 .expand-mini-arrow{color:var(--text-secondary);font-size:18px}
 #companyHead{cursor:pointer}
 .preset-chip{display:inline-flex;align-items:center;gap:5px}
+.proto-row .ip-Quick-actions{margin-left:auto;display:flex;gap:6px;flex:none}
 .chip-flag{width:19px;height:auto;border-radius:3px;display:block}
 
 /* 间距统一 16px（ken 定） */
@@ -1964,26 +1965,7 @@
       <div class="proto-row" id="rowV4">
         <span class="proto-badge fam" id="famV4">IPv4</span>
         <a class="proto-ip-link" id="myV4" href="#">检测中…</a>
-      </div>
-      <div class="proto-row" id="rowV6">
-        <span class="proto-badge fam" id="famV6">IPv6</span>
-        <a class="proto-ip-link" id="myV6" href="#">未检测到</a>
-      </div>
-    </section>
-
-
-    <!-- ================= 核心卡片内容区（严格最多二层卡片，完全对齐原网址 14844.jpg 结构） ================= -->
-    <main class="cards-wrapper">
-
-      <!-- 1. 主 IP 信息大卡片（包含：IP/ASN -> 四源定位 -> 来源/属性 -> 风险系数与展开详情 -> 适用场景 -> AI厂商支持度表（含原网址4大SVG图标） -> 方法说明与数字地址） -->
-      <article class="ippure-card" id="mainIpCard">
-        <!-- 第一行：IP + 号码 + 右侧 3 个操作按钮 -->
-        <div class="main-ip-row">
-          <div class="ip-row-left">
-            <span class="field-label">IP</span>
-            <span class="main-ip-value" id="displayMainIp" title="点击复制 IP">检测中…</span>
-          </div>
-          <div class="ip-Quick-actions">
+        <div class="ip-Quick-actions">
             <button type="button" class="square-icon-btn" id="maskIpBtn" title="切换 IP 脱敏显示">
               <svg id="eyeSvgIcon" viewBox="0 0 24 24">
                 <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"></path>
@@ -2003,8 +1985,19 @@
               </svg>
             </button>
           </div>
-        </div>
+      </div>
+      <div class="proto-row" id="rowV6">
+        <span class="proto-badge fam" id="famV6">IPv6</span>
+        <a class="proto-ip-link" id="myV6" href="#">未检测到</a>
+      </div>
+    </section>
 
+
+    <!-- ================= 核心卡片内容区（严格最多二层卡片，完全对齐原网址 14844.jpg 结构） ================= -->
+    <main class="cards-wrapper">
+
+      <!-- 1. 主 IP 信息大卡片（包含：IP/ASN -> 四源定位 -> 来源/属性 -> 风险系数与展开详情 -> 适用场景 -> AI厂商支持度表（含原网址4大SVG图标） -> 方法说明与数字地址） -->
+      <article class="ippure-card" id="mainIpCard">
         <!-- 第二行：ASN 信息 + 右侧展开箭头 -->
         <div class="asn-row" id="asnHead" role="button" tabindex="0" aria-expanded="false">
           <div class="asn-row-left">
@@ -2736,13 +2729,8 @@ function paintAsnHead(d){
 function render(d,final){
   state.data=d;
   $("ipSearchInput").value=d.ip;fitInputFont();syncClearBtn();
-  const ipEl=$("displayMainIp");
-  ipEl.textContent=state.ipVisible?d.ip:(isIPv4(d.ip)?"***.***.***.***":"****:****:****:****");
-  ipEl.classList.toggle("masked",!state.ipVisible);
-  $("eyeSvgIcon").innerHTML=state.ipVisible?"<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>":"<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>";
   if(final)paintAsnHead(d);
   else{$("displayAsnCode").textContent=d.asn||"—";$("displayAsnOrg").textContent=d.asnName?(" - "+d.asnName):""}
-  fitIpFont();
   $("valDomain").textContent=d.domain||d.netname||"—";
   $("valRange").textContent=d.range||"—";
   $("geoSourcesBox").innerHTML=d.locRows.map(r=>"<div class='geo-source-item'><span class='geo-provider-name'>"+escapeHtml(r.src)+"</span><div class='geo-location-val'><span class='flag-badge'>"+flagImg(r.cc)+"</span><span>"+escapeHtml(r.place)+"</span></div></div>").join("");
@@ -3012,7 +3000,7 @@ function fitProtoFont(){
     el.style.fontSize="";
     const row=el.closest(".proto-row");if(!row)return;
     const badge=row.querySelector(".proto-badge");
-    const avail=row.clientWidth-(badge?badge.offsetWidth:52)-14;
+    const act=row.querySelector(".ip-Quick-actions");const avail=row.clientWidth-(badge?badge.offsetWidth:52)-(act?act.offsetWidth+8:0)-14;
     let fs=parseFloat(getComputedStyle(el).fontSize)||15.5;
     while(el.scrollWidth>avail&&fs>10){fs-=0.5;el.style.fontSize=fs+"px"}
   });
@@ -3051,13 +3039,10 @@ $("clearIpBtn").addEventListener("click",()=>{$("ipSearchInput").value="";fitInp
 document.querySelector(".ippure-brand").addEventListener("click",e=>{e.preventDefault();window.scrollTo({top:0,behavior:"smooth"});bootSelf()});
 function fitInputFont(){const v=$("ipSearchInput").value||"";const n=v.length;$("ipSearchInput").style.fontSize=n<=15?"":n<=24?"16.5px":n<=32?"14.5px":"13px"}
 $("maskIpBtn").addEventListener("click",()=>{
-  if(!state.data)return;state.ipVisible=!state.ipVisible;const ip=state.data.ip;
-  if(state.ipVisible){$("displayMainIp").classList.remove("masked");$("displayMainIp").textContent=ip;$("eyeSvgIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>"}
-  else{$("displayMainIp").classList.add("masked");$("displayMainIp").textContent=isIPv4(ip)?"***.***.***.***":"****:****:****:****";$("eyeSvgIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}
+  state.ipVisible=!state.ipVisible;
+  myIpState.vis4=state.ipVisible;myIpState.vis6=state.ipVisible;renderMyIp();
+  $("eyeSvgIcon").innerHTML=state.ipVisible?"<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>":"<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>";
 });
-function fitIpFont(){const el=$("displayMainIp");if(!el||!state.data)return;let fs=19;el.style.fontSize=fs+"px";const eye=$("maskIpBtn");const avail=eye.getBoundingClientRect().left-el.getBoundingClientRect().left-12;while(el.scrollWidth>avail&&fs>10){fs-=0.5;el.style.fontSize=fs+"px"}}
-window.addEventListener("resize",()=>{if(state.data)fitIpFont()});
-$("displayMainIp").addEventListener("click",async()=>{if(!state.data)return;try{await navigator.clipboard.writeText(state.data.ip);toast(TD("copied")+state.data.ip)}catch(e){toast(TD("copyFail"))}});
 const NUM_EYE_ON='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const NUM_EYE_OFF='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88"/><path d="M1 1l22 22"/></svg>';
 function syncNumEye(){$("numEyeBtn").innerHTML=state.numVisible?NUM_EYE_ON:NUM_EYE_OFF}
