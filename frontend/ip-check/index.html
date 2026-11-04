@@ -899,21 +899,6 @@
       color: var(--orb-color-2);
     }
 
-    /* ASN 行尾轻量展开符号（无方框，展开时翻转 90 度变主题色） */
-    .asn-chevron {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted, #94a3b8);
-      flex-shrink: 0;
-      transition: transform 0.3s ease, color 0.3s ease;
-    }
-
-    #asnHead[aria-expanded="true"] .asn-chevron {
-      transform: rotate(90deg);
-      color: var(--theme-accent);
-    }
-
     /* ASN 行进入 IP来源 卡片后的行几何：与 ip-tag-row 同高同距、标签同宽、底部分隔线 */
     .ip-tags-subbox .asn-row {
       padding: 12px 0;
@@ -925,6 +910,17 @@
       flex-shrink: 0;
     }
 
+    /* 系数区并入 IP来源 卡后：去自身卡面，只留顶部分隔线与行距 */
+    .ip-tags-subbox #riskSection {
+      margin-top: 2px;
+      background: transparent;
+      box-shadow: none;
+      border: none;
+      border-top: 1px solid var(--divider-line);
+      border-radius: 0;
+      padding: 12px 0 8px;
+    }
+
     .details-collapsible {
       scroll-margin-top: 84px;
     }
@@ -934,6 +930,7 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
+      padding-top: 8px;
     }
 
     .geo-source-item {
@@ -2011,11 +2008,6 @@
               <span id="displayAsnOrg"></span>
             </div>
           </div>
-          <span class="asn-chevron" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </span>
         </div>
           <div class="ip-tag-row">
             <span class="ip-tag-label" id="labelIpOrigin" data-i18n="ipOrigin">IP来源</span>
@@ -2025,9 +2017,7 @@
             <span class="ip-tag-label" id="labelIpAttr" data-i18n="ipAttr">IP属性</span>
             <span class="ippure-pill-badge badge-isp-biz" id="badgeIpAttr">查询中</span>
           </div>
-        </div>
-
-        <!-- Layer 2 子卡 C：IPPure 风险系数刻度条 -->
+        <!-- IPPure 风险系数（已并入 IP来源 卡片） -->
         <div class="layer2-subcard" id="riskSection">
           <div class="risk-header-row">
             <span class="risk-title" id="labelRiskMeter" data-i18n="riskMeter">IPPure 系数</span>
@@ -2051,6 +2041,7 @@
               <path d="m6 9 6 6 6-6"/>
             </svg>
           </button>
+        </div>
         </div>
 
         <!-- 二层平铺展开详情（无三层嵌套） -->
