@@ -919,6 +919,17 @@
       border-color: var(--orb-color-2);
     }
 
+    #asnHead[aria-expanded="true"] .asn-arrow-btn {
+      transform: rotate(90deg);
+      background-color: var(--theme-tag-bg);
+      color: var(--theme-accent);
+      border-color: var(--orb-color-2);
+    }
+
+    .details-collapsible {
+      scroll-margin-top: 84px;
+    }
+
     /* 四源地理定位对比框（Layer 2） */
     .geo-sources-box {
       display: flex;
@@ -1622,9 +1633,6 @@
       line-height: 1.5;
     }
 
-    .env-kv-row + .env-kv-row {
-      border-top: 1px solid var(--divider-line);
-    }
 
     .env-k {
       width: 64px;
@@ -2021,19 +2029,6 @@
           </div>
           <div class="risk-bar-track">
             <div class="risk-pointer" id="riskPointer" style="left: 28%;"></div>
-          </div>
-          <div class="ratio-wrap">
-            <div class="ratio-bar"><div class="ratio-human" id="ratioHuman"></div></div>
-            <div class="ratio-lbls"><span id="ratioHumanTxt"></span><span id="ratioBotTxt"></span></div>
-          </div>
-          <div class="risk-scale-ticks">
-            <span>0</span>
-            <span>15</span>
-            <span>25</span>
-            <span>40</span>
-            <span>50</span>
-            <span>70</span>
-            <span>100</span>
           </div>
           <button type="button" class="expand-details-btn" id="expandDetailsBtn">
             <span id="expandBtnText">展开详细归属、地图与 BGP 拓扑</span>
@@ -2731,10 +2726,6 @@ function render(d,final){
   fitIpFont();
   $("valDomain").textContent=d.domain||d.netname||"—";
   $("valRange").textContent=d.range||"—";
-  const pure=100-d.score;
-  $("ratioHuman").style.width=pure+"%";
-  $("ratioHumanTxt").textContent=TD("pure")+pure+"%";
-  $("ratioBotTxt").textContent=TD("riskW")+d.score+"%";
   $("geoSourcesBox").innerHTML=d.locRows.map(r=>"<div class='geo-source-item'><span class='geo-provider-name'>"+escapeHtml(r.src)+"</span><div class='geo-location-val'><span class='flag-badge'>"+flagImg(r.cc)+"</span><span>"+escapeHtml(r.place)+"</span></div></div>").join("");
   const srcTag=$("badgeIpOrigin");srcTag.textContent=d.native==null?TD("checking"):(d.native?TD("nativeIp"):TD("broadcastIp"));srcTag.className="ippure-pill-badge "+(d.native==null?"badge-pending":d.native?"badge-native":"badge-broadcast");
   const attrTag=$("badgeIpAttr");attrTag.textContent=d.native==null&&!d.attr?TD("checking"):attrName(d);attrTag.className="ippure-pill-badge "+(d.cls&&d.cls.type==="residential"?"badge-residential":d.cls&&d.cls.type==="hosting"?"badge-hosting":"badge-isp-biz");
@@ -3102,7 +3093,7 @@ function toggleDetails(force){
   $("asnHead").setAttribute("aria-expanded",String(detailsOpen));
   syncExpandText();
 }
-$("asnHead").addEventListener("click",e=>{if(e.target.closest("#maskIpBtn,#shotBtn,#refreshCardBtn"))return;toggleDetails()});
+$("asnHead").addEventListener("click",e=>{if(e.target.closest("#maskIpBtn,#shotBtn,#refreshCardBtn"))return;toggleDetails();if(detailsOpen)setTimeout(()=>$("detailsCollapsible").scrollIntoView({behavior:"smooth",block:"start"}),90)});
 $("expandDetailsBtn").addEventListener("click",()=>toggleDetails());
 $("asnHead").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleDetails()}});
 $("myV6").addEventListener("click",e=>e.preventDefault());
