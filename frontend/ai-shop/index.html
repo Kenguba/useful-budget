@@ -1600,6 +1600,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC"
 .site-list-brand-icon svg.ic-gem{width:31px;height:31px}
 .site-list-brand-icon svg.ic-grok{width:27px;height:27px}
 .offer-col-left .pc-date{font-size:9.5px;color:var(--text-muted);white-space:nowrap}
+/* 同源商铺钮：被点中/聚焦时不要边框，改一圈轻微光晕 */
+.same-source-btn{outline:none}
+.same-source-btn:focus,.same-source-btn:focus-visible,.same-source-btn:active{outline:none;box-shadow:0 0 0 4px var(--search-glow)}
 /* 目录行：左右宽度 flex 自适应，店名不换行，右侧太长横向滚动（不显示滚动条） */
 .shop .nm{flex:none;word-break:normal}
 .shop .nm a{white-space:nowrap}
