@@ -899,32 +899,30 @@
       color: var(--orb-color-2);
     }
 
-    .asn-arrow-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      border: 1px solid var(--card-border);
-      background-color: var(--card-bg);
-      color: var(--text-secondary);
+    /* ASN 行尾轻量展开符号（无方框，展开时翻转 90 度变主题色） */
+    .asn-chevron {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
+      color: var(--text-muted, #94a3b8);
       flex-shrink: 0;
-      transition: all 0.25s ease;
+      transition: transform 0.3s ease, color 0.3s ease;
     }
 
-    .asn-arrow-btn:hover {
-      background-color: var(--theme-tag-bg);
-      color: var(--theme-accent);
-      border-color: var(--orb-color-2);
-    }
-
-    #asnHead[aria-expanded="true"] .asn-arrow-btn {
+    #asnHead[aria-expanded="true"] .asn-chevron {
       transform: rotate(90deg);
-      background-color: var(--theme-tag-bg);
       color: var(--theme-accent);
-      border-color: var(--orb-color-2);
+    }
+
+    /* ASN 行进入 IP来源 卡片后的行几何：与 ip-tag-row 同高同距、标签同宽、底部分隔线 */
+    .ip-tags-subbox .asn-row {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--divider-line);
+    }
+
+    .ip-tags-subbox .asn-row .field-label {
+      width: 68px;
+      flex-shrink: 0;
     }
 
     .details-collapsible {
@@ -1998,7 +1996,13 @@
 
       <!-- 1. 主 IP 信息大卡片（包含：IP/ASN -> 四源定位 -> 来源/属性 -> 风险系数与展开详情 -> 适用场景 -> AI厂商支持度表（含原网址4大SVG图标） -> 方法说明与数字地址） -->
       <article class="ippure-card" id="mainIpCard">
-        <!-- 第二行：ASN 信息 + 右侧展开箭头 -->
+
+        <!-- Layer 2 子卡 A：四源地理定位对比框 -->
+        <div class="layer2-subcard geo-sources-box" id="geoSourcesBox"></div>
+
+        <!-- Layer 2 子卡 B：IP来源（原生IP） & IP属性（商宽IP） -->
+        <div class="layer2-subcard ip-tags-subbox">
+        <!-- ASN 信息行（已移入 IP来源 卡片第一行，整行点击展开/收起详情） -->
         <div class="asn-row" id="asnHead" role="button" tabindex="0" aria-expanded="false">
           <div class="asn-row-left">
             <span class="field-label">ASN</span>
@@ -2007,18 +2011,12 @@
               <span id="displayAsnOrg"></span>
             </div>
           </div>
-          <button type="button" class="asn-arrow-btn" id="asnArrow" tabindex="-1" title="查看 ASN 与路由详情">
+          <span class="asn-chevron" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
-          </button>
+          </span>
         </div>
-
-        <!-- Layer 2 子卡 A：四源地理定位对比框 -->
-        <div class="layer2-subcard geo-sources-box" id="geoSourcesBox"></div>
-
-        <!-- Layer 2 子卡 B：IP来源（原生IP） & IP属性（商宽IP） -->
-        <div class="layer2-subcard ip-tags-subbox">
           <div class="ip-tag-row">
             <span class="ip-tag-label" id="labelIpOrigin" data-i18n="ipOrigin">IP来源</span>
             <span class="ippure-pill-badge badge-native" id="badgeIpOrigin">查询中</span>
