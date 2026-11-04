@@ -1,604 +1,2565 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>IP地址信息和纯净度检测 | IPPure</title>
 <meta name="description" content="IP 地址信息与纯净度检测：ASN、地理位置、人机流量比、IP 来源与属性、IPPure 系数">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M26 4C14 6 6 13 5 25c-.1 1.5 1 2.6 2.5 2.5C19 27 26 18 26 4z' fill='%233fae4a'/%3E%3Cpath d='M7 25C11 17 17 11 24 7' stroke='%23fff' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#EEF6FA">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M26.5 5.5C17.5 5.5 8.5 10.2 6.2 21.8C5.9 23.3 6.8 25.1 8.2 25.8C19.8 23.5 26.5 14.5 26.5 5.5Z' fill='%23229A4E'/></svg>">
 <style>
-:root{
-  --lc:96px;
-  --bg:#e9f2f7;
-  --grid-line:rgba(140,175,200,.20);
-  --ink:#23272e;
-  --ink-2:#3a3f47;
-  --mut:#8a929c;
-  --blue:#2b97c6;
-  --blue-dark:#1f83ad;
-  --row-bg:#f6f7f8;
-  --pink:#f45d7e;
-  --pink-dark:#ef4f73;
-  --green:#43bd7c;
-  --badge-green:#6fbf2e;
-  --card-shadow:0 10px 34px rgba(31,78,110,.10),0 2px 8px rgba(31,78,110,.06);
-  --ease:cubic-bezier(.22,1,.36,1);
-  --ease-io:cubic-bezier(.65,.05,0,1);
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{-webkit-text-size-adjust:100%}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",sans-serif;
-  color:var(--ink);
-  background-color:var(--bg);
-  background-image:
-    radial-gradient(900px 420px at 50% -120px,rgba(120,200,235,.28),transparent 70%);
-  background-size:auto;
-  min-height:100vh;
-  padding-bottom:56px;
-}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-input{font-family:inherit}
-::selection{background:#bfe3f2}
+    /* ================= 1. 核心动态 CSS 变量体系（完整继承 Ai比价.html 12色弥散系统） ================= */
+    :root {
+      /* 顶部弥散渐变与双/三光斑色值（默认激活12号：幻彩全息 Gemini Holo） */
+      --hero-bg-base: #FFFFFF;
+      --orb-color-1: #8FDBB8;
+      --orb-color-2: #9CC8F7;
 
-/* ---------- 顶栏 ---------- */
-.topbar{
-  height:62px;display:flex;align-items:center;justify-content:space-between;
-  padding:0 clamp(14px,3.5vw,34px);max-width:1180px;margin:0 auto;position:relative;z-index:30;
-}
-.logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--ink);user-select:none}
-.logo svg{width:30px;height:30px;flex:none;filter:drop-shadow(0 2px 4px rgba(63,174,74,.3))}
-.logo b{font-size:21px;font-weight:600;letter-spacing:.01em}
-.menu-btn{width:42px;height:42px;display:grid;place-items:center;border-radius:10px;transition:background .25s var(--ease)}
-.menu-btn:hover{background:rgba(255,255,255,.65)}
-.menu-btn svg{width:24px;height:24px}
-.menu-panel{
-  position:absolute;top:56px;right:clamp(10px,3vw,28px);width:264px;background:#fff;border-radius:16px;
-  box-shadow:0 18px 44px rgba(31,78,110,.18);padding:8px;z-index:40;
-  opacity:0;transform:translateY(-8px) scale(.98);transform-origin:top right;pointer-events:none;
-  transition:opacity .28s var(--ease),transform .28s var(--ease);
-}
-.menu-panel.open{opacity:1;transform:none;pointer-events:auto}
-.menu-panel a{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;text-decoration:none;color:var(--ink);transition:background .2s}
-.menu-panel a:hover{background:var(--row-bg)}
-.menu-panel a .dot{width:8px;height:8px;border-radius:50%;background:var(--blue);margin-top:7px;flex:none}
-.menu-panel a b{display:block;font-size:14px;font-weight:600}
-.menu-panel a span{display:block;font-size:12px;color:var(--mut);margin-top:2px;line-height:1.45}
+      /* 按钮与组件专属联动色 */
+      --refresh-btn-bg: #4FA8F6;
+      --refresh-btn-text: #FFFFFF;
+      --send-circle-bg: #9EE0C5;
+      --send-circle-icon: #0F172A;
 
-/* ---------- 主体 ---------- */
-.wrap{max-width:1060px;margin:0 auto;padding:0 clamp(12px,3vw,24px)}
-.searchbar{
-  position:relative;margin-top:clamp(18px,4vh,40px);background:#fff;border-radius:999px;
-  box-shadow:0 6px 24px rgba(31,78,110,.10);height:60px;display:flex;align-items:center;
-  transition:box-shadow .3s var(--ease);
-}
-.searchbar:focus-within{box-shadow:0 10px 34px rgba(43,151,198,.16),0 2px 12px rgba(43,151,198,.07)}
-.searchbar input{
-  flex:1;min-width:0;border:none;outline:none;background:transparent;height:100%;
-  font-size:19px;color:var(--ink-2);text-align:center;letter-spacing:.02em;padding:0 128px 0 60px;
-}
-.searchbar input::placeholder{color:#b9c2ca}
-.search-btn{
-  position:absolute;right:7px;top:50%;transform:translateY(-50%);width:106px;text-align:center;
-  background:#f4f4f4;color:#33383f;font-size:16px;font-weight:500;
-  padding:11px 26px;border-radius:999px;transition:background .25s,transform .15s var(--ease),box-shadow .25s;
-}
-.search-btn:hover{background:#e9f4f9;box-shadow:0 2px 8px rgba(43,151,198,.18)}
-.search-btn:active{transform:translateY(-50%) scale(.96)}
-.search-btn:disabled{opacity:.55;cursor:wait}
+      /* 主题强调色与标签配比 */
+      --theme-accent: #1A73E8;
+      --theme-tab-text: #0F172A;
+      --theme-tag-bg: #E6F4EA;
+      --theme-tag-text: #137333;
+      --search-glow: rgba(143, 219, 184, 0.44);
 
-.myip-bar{display:flex;align-items:center;gap:12px;margin:20px 6px 14px}
-.myip-btns{display:flex;gap:10px;flex:none}
-.myip .lb{color:#7c858f}
-.myip a{color:var(--blue);text-decoration:none;font-weight:500;word-break:break-all;transition:color .2s}
-.myip a:hover{color:var(--blue-dark);text-decoration:underline}
-.myip .v6pref{color:#9aa3ad;font-size:13.5px}
-.myip-list{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
-.myip-row{display:flex;align-items:center;gap:8px;font-size:14.5px;padding-left:2px}
-.myip-row .fam{font-size:11px;font-weight:700;color:#8a939c;border:1px solid #cfd8de;border-radius:5px;padding:1px 5px;flex:none;line-height:1.5;background:rgba(255,255,255,.55)}
-.myip-row a{color:var(--blue);text-decoration:none;font-weight:500;word-break:break-all}
-.myip-row a:hover{color:var(--blue-dark);text-decoration:underline}
-.myip-row .pref{color:#9aa3ad;font-size:12.5px;flex:none}
-.myip-row a.none{color:#a7b0b8;font-weight:400;pointer-events:none}
-.myip-row{padding-top:3px;padding-bottom:3px;padding-right:8px;border-radius:9px}
-.myip-row.on{cursor:auto}.myip-row .fam{cursor:pointer}
-.myip-row .fam{background:rgba(255,255,255,.25);color:#a7b0b8;border-color:#d8dfe3}
-.myip-row.on .fam{background:rgba(255,255,255,.92);color:#5f6b75;border-color:#c3ced4;box-shadow:0 1px 3px rgba(31,78,110,.10)}
-.myip-row .row-eye{margin-left:auto;width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.75);display:grid;place-items:center;flex:none;box-shadow:0 1px 4px rgba(31,78,110,.08)}
-.myip .spacer{flex:1}
-.icon-btn{
-  width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.75);display:grid;place-items:center;
-  box-shadow:0 2px 8px rgba(31,78,110,.08);transition:transform .18s var(--ease),background .2s;flex:none;
-}
-.icon-btn:hover{background:#fff}
-.icon-btn:active{transform:scale(.9)}
-.icon-btn svg{width:18px;height:18px;stroke:#7c858f}
-.icon-btn.spinning svg{animation:spin .7s var(--ease-io)}
-@keyframes spin{to{transform:rotate(360deg)}}
+      /* 下方页面背景与卡片表面色（严格控制在最多二层卡片：Layer 1 --card-bg, Layer 2 --card-sub-bg） */
+      --page-bg: #F3F8FA;
+      --card-bg: #FFFFFF;
+      --card-sub-bg: #F6F8FB;
+      --card-border: rgba(226, 232, 240, 0.85);
+      --divider-line: rgba(226, 232, 240, 0.9);
+      --text-primary: #0F172A;
+      --text-secondary: #64748B;
+      --text-muted: #94A3B8;
+      --pill-surface: #FFFFFF;
+      --pill-shadow: 0 6px 20px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03);
+    }
 
-/* ---------- 结果卡 ---------- */
-.card{
-  background:#fff;border-radius:26px;box-shadow:var(--card-shadow);
-  padding:8px clamp(16px,3.4vw,30px) 6px;overflow:hidden;
-  animation:cardIn .55s var(--ease) both;
-}
-@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.card.loading .fade-zone{opacity:.35;filter:saturate(.4);pointer-events:none}
-.fade-zone{transition:opacity .35s var(--ease),filter .35s}
-.row{display:flex;align-items:center;gap:12px;padding:15px 4px}
-.row + .row{border-top:1px solid #fbfcfc}
-.lbl{font-size:17px;font-weight:700;color:var(--ink);width:86px;flex:none}
-.ip-row{gap:6px}
-.ip-row #eyeBtn{margin-left:auto}
-.val-blue{color:var(--blue);font-size:19px;font-weight:500;letter-spacing:.01em;white-space:nowrap;cursor:pointer}
-.mini-btn{
-  width:32px;height:32px;border-radius:8px;background:#fafafa;border:1px solid #f0f0f0;display:grid;place-items:center;
-  transition:background .2s,transform .15s var(--ease);flex:none;
-}
-.mini-btn:hover{background:#f0f7fa}
-.mini-btn:active{transform:scale(.9)}
-.mini-btn svg{width:17px;height:17px;stroke:#9aa1a9;fill:none}
+    /* 深色模式覆盖变量（单击右上角太阳按钮切换） */
+    [data-dark="true"] {
+      --hero-bg-base: #0B1120;
+      --page-bg: #090D16;
+      --card-bg: #151F32;
+      --card-sub-bg: #1B273D;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --divider-line: rgba(255, 255, 255, 0.09);
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --pill-surface: #1E293B;
+      --pill-shadow: 0 8px 24px rgba(0, 0, 0, 0.38);
+      --theme-tab-text: #F8FAFC;
+    }
 
-.block{border-radius:14px;padding:6px 16px;margin:2px 0}
-.block.gray{background:var(--row-bg)}
-.kv{display:flex;align-items:baseline;gap:12px;padding:9px 0;font-size:15.5px}
-.kv .k{color:#3c424b;font-weight:500;width:86px;flex:none;font-size:15px}
-.kv .v{color:var(--ink-2);word-break:break-all;flex:1;min-width:0}
-.kv .v.blue{color:var(--blue);font-weight:600;font-size:16.5px}
-.asn-head{display:flex;align-items:center;gap:6px;padding:13px 4px 4px;cursor:pointer;user-select:none}
-.asn-head .lbl{width:86px}
-.asn-head .name{font-size:16.5px;color:var(--ink-2);flex:1;min-width:0}
-.asn-head .name b{color:var(--blue);font-weight:600}
-#fIp.masked{letter-spacing:-1px;font-weight:500}
-.chev{margin-left:auto;width:30px;height:30px;border-radius:8px;background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.07);display:grid;place-items:center;transition:transform .4s var(--ease);flex:none}
-.chev svg{width:15px;height:15px;stroke:#8a929c}
-.asn-body{overflow:hidden;max-height:340px;transition:max-height .5s var(--ease),opacity .4s;opacity:1}
-.asn-block.collapsed .asn-body{max-height:0;opacity:0}
-.asn-block.collapsed .chev{transform:rotate(-90deg)}
-.sub-k{color:#6d7680;font-size:14.5px;width:86px;flex:none;padding-left:2px}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-.ratio{flex:1;min-width:180px}
-.ratio-bar{display:flex;height:7px;border-radius:99px;overflow:hidden;background:#f2607e}
-.ratio-bar .human{background:linear-gradient(90deg,#3cb371,var(--green));width:11.3%;transition:width .9s var(--ease)}
-.ratio-nums{display:flex;justify-content:space-between;margin-top:6px;font-size:14.5px}
-.ratio-nums .h{color:#35a96a;font-weight:500}
-.ratio-nums .b{color:#f2607e;font-weight:500}
+    html {
+      scroll-behavior: smooth;
+    }
 
-.sec-title{font-size:17px;font-weight:700;padding:14px 4px 4px}
-.sec-title{padding-left:0;padding-right:0}
-.loc-row{display:flex;align-items:flex-start;gap:8px;padding:7.5px 0;font-size:15.5px}
-.loc-row .src{padding-top:1px}
-.loc-row .flag-img{margin-top:3px}
-.loc-row .place{line-height:1.45;flex:1;min-width:0}
-.loc-row .src{color:#6d7680;flex:none;font-size:14.5px}
-.loc-row .flag{font-size:17px;line-height:1}
-.loc-row .place{color:var(--ink-2)}
-.tag{
-  display:inline-block;background:linear-gradient(180deg,#f7688a,var(--pink-dark));color:#fff;
-  font-size:13.5px;font-weight:500;padding:4px 13px;border-radius:6px;letter-spacing:.04em;
-  box-shadow:0 2px 6px rgba(244,93,126,.3);
-}
-.tag.green{background:linear-gradient(180deg,#58c184,#3da96c);box-shadow:0 2px 6px rgba(67,189,124,.3)}
-.tag.gray{background:linear-gradient(180deg,#a7b0ba,#939ea9);box-shadow:none}
+    body {
+      background-color: var(--page-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color 0.55s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s ease;
+    }
 
-/* 纯净度系数 */
-.purity{padding:16px 4px 4px}
-.purity .lbl{width:auto;margin-bottom:26px;display:block}
-.gauge{position:relative;height:34px;margin:0 8px}
-.gauge-track{
-  position:absolute;left:0;right:0;top:16px;height:9px;border-radius:99px;
-  background:linear-gradient(90deg,#0b7a43 0%,#22b573 15%,#7ac74f 28%,#c6d92e 40%,#f2c02e 52%,#f59a23 68%,#ef5b3a 84%,#d92b2b 100%);
-}
-.gauge-badge{
-  position:absolute;top:-24px;transform:translateX(-50%);left:28%;
-  background:var(--badge-c,var(--badge-green));color:#fff;font-size:14.5px;font-weight:600;white-space:nowrap;
-  padding:5px 13px;border-radius:7px;transition:left .95s var(--ease);
-  box-shadow:0 4px 12px rgba(111,191,46,.4);
-}
-.gauge-badge:after{
-  content:"";position:absolute;left:var(--tri-x,50%);bottom:-6px;transform:translateX(-50%);
-  border:7px solid transparent;border-top-color:var(--badge-c,var(--badge-green));border-bottom:none;
-}
-.flag-img{width:22px;height:16px;object-fit:cover;border-radius:3px;flex:none;box-shadow:0 0 0 1px rgba(0,0,0,.07);vertical-align:-3px}
-.hist-meta .flag-img{width:19px;height:14px}
-.gauge-marker{
-  position:absolute;top:12px;width:3px;height:17px;background:#fff;border-radius:2px;
-  transform:translateX(-50%);left:28%;transition:left .95s var(--ease);
-  box-shadow:0 0 0 1.5px rgba(0,0,0,.14);
-}
-.gauge-scale{position:relative;height:20px;margin:2px 8px 0;font-size:13.5px;color:#7c858f}
-.gauge-scale span{position:absolute;transform:translateX(-50%)}
-.gauge-scale span:first-child{transform:none}
-.gauge-scale span:last-child{transform:translateX(-100%)}
+    .app-container {
+      max-width: 560px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      padding-bottom: 52px;
+    }
 
-/* 展开区 */
-.more{overflow:hidden;max-height:0;opacity:0;transition:max-height .55s var(--ease),opacity .45s}
-.more.open{max-height:3600px;opacity:1}
-.expand-btn{display:flex;justify-content:center;width:100%;padding:12px 0 14px}
-.expand-btn svg{width:22px;height:22px;stroke:#a6aeb6;transition:transform .45s var(--ease)}
-.more-open .expand-btn svg{transform:rotate(180deg)}
+    /* ================= 2. 顶部弥散渐变 Hero Header ================= */
+    .hero-header {
+      position: relative;
+      background-color: var(--hero-bg-base);
+      padding: 16px 18px 22px;
+      border-bottom-left-radius: 32px;
+      border-bottom-right-radius: 32px;
+      box-shadow: 0 14px 34px -12px var(--search-glow);
+      transition: background-color 0.55s ease, box-shadow 0.6s ease;
+      z-index: 20;
+    }
 
-.foot{margin-top:20px;text-align:center;color:#9aa7b1;font-size:12px;line-height:1.9;letter-spacing:.02em;padding:0 12px}
-.foot a{color:var(--blue);text-decoration:none}
-.errbar{
-  position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,16px);
-  width:min(640px,calc(100vw - 24px));background:#f1f2f6;color:#3c4043;z-index:100;
-  border-radius:20px;padding:14px 18px;display:flex;align-items:center;gap:14px;
-  box-shadow:0 10px 30px rgba(31,38,135,.16);opacity:0;pointer-events:none;
-  transition:opacity .3s var(--ease),transform .3s var(--ease);
-}
-.errbar.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-.errbar-msg{flex:1;font-size:15px;line-height:1.5;min-width:0}
-.errbar-close{
-  flex:none;background:none;border:none;outline:none;cursor:pointer;
-  color:#1a66d2;font-size:15px;font-weight:600;padding:4px 2px;font-family:inherit;
-}
-.errbar-close:active{opacity:.6}
-.toast{
-  position:fixed;left:50%;bottom:38px;transform:translate(-50%,20px);background:rgba(28,32,38,.92);color:#fff;
-  font-size:14px;padding:10px 20px;border-radius:999px;opacity:0;pointer-events:none;z-index:99;
-  transition:opacity .3s var(--ease),transform .3s var(--ease);backdrop-filter:blur(6px);
-}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-.flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:98}
-.flash.go{animation:flashA .45s ease-out}
-@keyframes flashA{0%{opacity:0}18%{opacity:.85}100%{opacity:0}}
-/* ping0 补充字段（沿用 IPPure 卡片语言） */
-.isp-tag{display:inline-block;background:#3fbb2a;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;vertical-align:2px;margin-right:8px;letter-spacing:.03em}
-.kv .v a{color:#7a6f9e;text-decoration:underline;text-underline-offset:2px}
-.pill{
-  display:inline-block;color:#fff;font-size:15px;font-weight:500;padding:8px 34px;border-radius:999px;white-space:nowrap;
-  background:linear-gradient(180deg,#0a8f08,#067d06);box-shadow:0 3px 8px rgba(6,125,6,.25);
-  min-width:180px;text-align:center;transition:transform .2s var(--ease);
-}
-.pill.warn{background:linear-gradient(180deg,#f59a23,#e07f13);box-shadow:0 3px 8px rgba(240,150,30,.25)}
-.pill.bad{background:linear-gradient(180deg,#e05252,#c23333);box-shadow:0 3px 8px rgba(200,50,50,.25)}
-.pill.dark{background:linear-gradient(180deg,#5b6672,#45505b);box-shadow:0 3px 8px rgba(69,80,91,.25)}
-.risk-wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.risk-wrap .pill{flex:none;width:auto;min-width:0;padding:8px 22px}
-.risk-dots{display:flex;gap:7px}
-.risk-dots i{width:21px;height:21px;border-radius:50%;display:block;box-shadow:inset 0 -2px 4px rgba(0,0,0,.18)}
-.risk-dots i:nth-child(1){background:#35b921}.risk-dots i:nth-child(2){background:#a8d63a}
-.risk-dots i:nth-child(3){background:#f2d21b}.risk-dots i:nth-child(4){background:#f59a23}
-.risk-dots i:nth-child(5){background:#e5322d}
-.risk-dots i.off{opacity:.18;filter:grayscale(.4)}
-.conf{display:inline-flex;gap:5px;vertical-align:middle;margin-left:6px}
-.conf i{width:30px;height:5px;border-radius:99px;background:#e3e8ec;display:block}
-.conf i.on{background:#3bbb62}
-.detect-link{color:#25a9d6;font-size:15.5px;text-decoration:underline;text-underline-offset:4px;cursor:pointer;background:none;border:none;padding:0}
-.detect-link:hover{color:var(--blue-dark)}
-.detect-result{margin-top:8px;font-size:14px;line-height:1.9;color:var(--ink-2)}
-.detect-result .ok{color:#1d9d4e;font-weight:600}
-.detect-result .no{color:#d23b3b;font-weight:600}
-.scene-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:4px}
-.scene{padding:14px 10px 12px;text-align:center}
-.scene:nth-child(odd){border-right:1px solid #eceff1}
-.scene:nth-child(1),.scene:nth-child(2){border-bottom:1px solid #eceff1}
-.scene .nm{font-size:15px;color:var(--ink-2);margin-bottom:5px}
-.scene .stars{color:#1da851;font-size:17px;letter-spacing:3px;line-height:1.2}
-.scene .stars .off{color:#a9cdb4}
-.scene .suit{margin-top:5px;font-size:14px;color:var(--ink-2)}
-.scene .suit b{color:#1d9d4e;font-weight:600}
-.note-box{margin-top:12px}
-.note-head{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:2px}
-.note-cap{font-size:13px;color:#8a939e;padding:3px 0 5px}
-.note-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:5px 0;border-top:1px dashed #e7ebef;font-size:13.5px}
-.note-row span{color:#6d7680}
-.note-row b{color:var(--ink-2);font-weight:600;text-align:right;white-space:nowrap}
-.note-line{font-size:13.5px;color:#6d7680;padding-top:3px}.scene .suit.mid b{color:#cf8505}.scene .suit.bad b{color:#d23b3b}
-.kv .v:has(> #fNumIp){display:flex;align-items:center;gap:10px}
-.num-ip{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;font-size:16px}
-/* 历史 / 地图 / BGP / 同机房 */
-.hist-item{background:#fff;border:1px solid #edf0f2;border-radius:12px;padding:11px 13px;margin:9px 0}
-.hist-top{display:flex;align-items:center;gap:8px;font-size:15px}
-.hist-top .dot-on{width:11px;height:11px;border-radius:50%;background:#43c43a;flex:none;box-shadow:0 0 0 3px rgba(67,196,58,.15)}
-.hist-top .ttl{font-weight:600;color:var(--blue);text-decoration:underline;text-underline-offset:3px}
-.hist-top .org{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hist-top .cidr{margin-left:auto;color:#6d7680;font-size:13.5px;flex:none}
-.hist-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:13px;color:#8a929c}
-.hist-meta b{color:#c25e5e;font-weight:500}
-.collapse-head{display:flex;align-items:center;cursor:pointer;user-select:none}
-.collapse-head .chev{margin-left:auto;width:26px;height:26px;transform:rotate(-90deg)}
-.collapse-head.open .chev{transform:rotate(0deg)}
-.show-old{display:block;margin:8px auto 2px;color:#7fb6cf;font-size:13.5px;background:none;border:none;cursor:pointer}
-.map-frame{width:100%;height:250px;border:0;border-radius:14px;display:block;background:#e6eef2}
-.bgp-box{background:#fff;border:1px solid #edf0f2;border-radius:12px;padding:10px;overflow-x:auto}
-.bgp-box svg{min-width:520px;width:100%;height:auto;display:block}
-.nb-tabs{display:flex;gap:8px;margin:6px 0 4px}
-.nb-tab{padding:6px 16px;border-radius:8px;font-size:14px;color:#3c424b;background:#eef1f3;transition:all .25s var(--ease)}
-.nb-tab.on{background:#dff0fa;color:var(--blue-dark);box-shadow:inset 0 0 0 1.5px #9ed0e8;font-weight:600}
-.nb-row{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid #f0f2f4;font-size:14.5px}
-.nb-row:last-child{border-bottom:none}
-.nb-row .nm{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nb-row .dm{margin-left:auto;color:#7a6f9e;flex:none}
+    .aura-backdrop {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+      border-bottom-left-radius: 32px;
+      border-bottom-right-radius: 32px;
+    }
+
+    .aura-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(48px);
+      opacity: 0.84;
+      transition: background-color 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-dark="true"] .aura-orb {
+      opacity: 0.28;
+      filter: blur(56px);
+    }
+
+    .aura-orb.orb-left {
+      width: 280px;
+      height: 220px;
+      bottom: -60px;
+      left: -40px;
+      background-color: var(--orb-color-1);
+    }
+
+    .aura-orb.orb-right {
+      width: 300px;
+      height: 240px;
+      bottom: -75px;
+      right: -45px;
+      background-color: var(--orb-color-2);
+    }
+
+    .aura-orb.orb-center {
+      width: 260px;
+      height: 190px;
+      bottom: -55px;
+      left: 24%;
+      background-color: #9EE0C5;
+      opacity: 0;
+      transition: opacity 0.6s ease, background-color 0.75s ease;
+    }
+
+    /* ================= 2.5 第12号主题「幻彩全息 Gemini Holo」专属动态呼吸极光 ================= */
+    @keyframes videoHoloLeft {
+      0%   { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
+      25%  { background-color: #8FDBB8; transform: translate(16px, -12px) scale(1.1); }
+      50%  { background-color: #92C6F2; transform: translate(8px, 6px) scale(1.06); }
+      75%  { background-color: #B9CFF8; transform: translate(-12px, -6px) scale(1.02); }
+      100% { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
+    }
+
+    @keyframes videoHoloRight {
+      0%   { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
+      25%  { background-color: #9CC8F7; transform: translate(-16px, -8px) scale(1.1); }
+      50%  { background-color: #A7D0F7; transform: translate(-8px, 8px) scale(1.04); }
+      75%  { background-color: #BDE7D5; transform: translate(14px, -6px) scale(1.08); }
+      100% { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
+    }
+
+    @keyframes videoHoloCenter {
+      0%   { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
+      33%  { background-color: #9FCAF5; transform: translateY(-14px) scale(1.12); }
+      66%  { background-color: #CFE7FB; transform: translateY(6px) scale(0.98); }
+      100% { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
+    }
+
+    @keyframes videoHoloBtn {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    [data-holo="true"] .aura-orb.orb-left {
+      animation: videoHoloLeft 4.8s ease-in-out infinite;
+      filter: blur(42px);
+      opacity: 0.9;
+    }
+
+    [data-holo="true"] .aura-orb.orb-right {
+      animation: videoHoloRight 4.8s ease-in-out infinite;
+      filter: blur(42px);
+      opacity: 0.9;
+    }
+
+    [data-holo="true"] .aura-orb.orb-center {
+      opacity: 0.78;
+      animation: videoHoloCenter 4.8s ease-in-out infinite;
+      filter: blur(44px);
+    }
+
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-left,
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-right,
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-center {
+      opacity: 0.34;
+    }
+
+    [data-holo="true"] .search-submit-pill {
+      background: linear-gradient(135deg, #B2E2B4 0%, #98DBC5 45%, #9CC8F7 100%);
+      background-size: 200% 200%;
+      animation: videoHoloBtn 4.2s ease infinite;
+      color: #0F172A;
+    }
+
+    /* ================= 3. 顶栏导航：IPPure 绿叶品牌 + 右侧语言/日夜12色主题/功能汉堡菜单 ================= */
+    .top-nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .ippure-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      user-select: none;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .leaf-logo-wrap {
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .ippure-brand:hover .leaf-logo-wrap {
+      transform: rotate(-10deg) scale(1.08);
+    }
+
+    .ippure-brand-text {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: var(--text-primary);
+    }
+
+    .top-right-widgets {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+
+    .lang-pill-btn {
+      height: 36px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background-color: var(--pill-surface);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: var(--pill-shadow);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.3s ease,
+                  background-color 0.4s ease;
+    }
+
+    [data-dark="true"] .lang-pill-btn,
+    [data-dark="true"] .theme-mode-btn,
+    [data-dark="true"] .hamburger-btn {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .lang-pill-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .lang-pill-btn:active {
+      transform: scale(0.93);
+    }
+
+    .globe-svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--theme-accent);
+      fill: none;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: stroke 0.45s ease, transform 0.4s ease;
+    }
+
+    .lang-pill-btn:hover .globe-svg {
+      transform: rotate(15deg);
+    }
+
+    .lang-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.3px;
+    }
+
+    .theme-mode-btn,
+    .hamburger-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--pill-surface);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: var(--pill-shadow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-primary);
+      user-select: none;
+      -webkit-user-select: none;
+      position: relative;
+      z-index: 102;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background-color 0.4s ease,
+                  color 0.3s ease,
+                  box-shadow 0.3s ease;
+    }
+
+    .theme-mode-btn {
+      touch-action: none;
+    }
+
+    .theme-mode-btn:hover,
+    .hamburger-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .theme-mode-btn.pressing,
+    .hamburger-btn:active {
+      transform: scale(0.9);
+      box-shadow: 0 0 0 4px var(--search-glow);
+    }
+
+    .sun-moon-svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .theme-mode-btn.rotating .sun-moon-svg {
+      transform: rotate(180deg) scale(0.85);
+    }
+
+    /* ================= 3.5 长按弹出的 12 色主题面板 & 汉堡导航下拉面板 ================= */
+    .theme-panel-backdrop,
+    .nav-menu-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 98;
+      background: rgba(15, 23, 42, 0.08);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .theme-panel-backdrop.open,
+    .nav-menu-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .theme-popover-panel,
+    .nav-dropdown-panel {
+      position: absolute;
+      top: 46px;
+      right: 0;
+      width: 296px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 24px;
+      padding: 14px;
+      box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.18),
+                  0 4px 16px rgba(15, 23, 42, 0.06);
+      z-index: 101;
+      opacity: 0;
+      transform: translateY(-10px) scale(0.92);
+      transform-origin: top right;
+      pointer-events: none;
+      user-select: none;
+      transition: opacity 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-dark="true"] .theme-popover-panel,
+    [data-dark="true"] .nav-dropdown-panel {
+      background: rgba(21, 31, 50, 0.95);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 22px 44px -8px rgba(0, 0, 0, 0.55);
+    }
+
+    .theme-popover-panel.open,
+    .nav-dropdown-panel.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 0 4px;
+    }
+
+    .panel-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: 0.3px;
+    }
+
+    .panel-hint {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .theme-swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
+    }
+
+    .theme-swatch-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      background: rgba(248, 250, 252, 0.75);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: transform 0.18s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    [data-dark="true"] .theme-swatch-item {
+      background: rgba(30, 41, 59, 0.75);
+    }
+
+    .theme-swatch-item.active,
+    .theme-swatch-item.sliding-hover {
+      background: var(--card-bg);
+      border-color: var(--theme-accent);
+      transform: scale(1.04);
+      box-shadow: 0 6px 16px -4px var(--search-glow);
+    }
+
+    .swatch-orb-preview {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6), 0 2px 5px rgba(15, 23, 42, 0.1);
+    }
+
+    .swatch-orb-preview.holo-animated {
+      background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%) !important;
+      background-size: 220% 220% !important;
+      animation: videoHoloBtn 3.2s ease infinite;
+    }
+
+    .swatch-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+
+    .nav-menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .nav-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 11px;
+      border-radius: 14px;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: background-color 0.2s ease, transform 0.18s ease;
+    }
+
+    .nav-menu-item:hover {
+      background: var(--theme-tag-bg);
+      transform: translateX(2px);
+    }
+
+    [data-dark="true"] .nav-menu-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-menu-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: var(--theme-tag-bg);
+      color: var(--theme-accent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    [data-dark="true"] .nav-menu-icon {
+      background: rgba(147, 197, 253, 0.14);
+      color: var(--orb-color-2);
+    }
+
+    .nav-menu-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .nav-menu-desc {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 1px;
+    }
+
+    /* ================= 4. 大圆角悬浮 IP 搜索框 ================= */
+    .gemini-search-card {
+      background-color: var(--pill-surface);
+      border-radius: 999px;
+      padding: 7px 8px 7px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 28px -6px var(--search-glow),
+                  0 2px 8px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      transition: box-shadow 0.45s ease,
+                  transform 0.25s ease,
+                  border-color 0.35s ease,
+                  background-color 0.4s ease;
+    }
+
+    [data-dark="true"] .gemini-search-card {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .gemini-search-card:focus-within {
+      transform: translateY(-1px);
+      border-color: var(--orb-color-2);
+      box-shadow: 0 14px 32px -4px var(--search-glow);
+    }
+
+    .search-input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 17px;
+      color: var(--text-primary);
+      background: transparent;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+      font-size: 14.5px;
+    }
+
+    .clear-input-btn {
+      border: none;
+      background: rgba(148, 163, 184, 0.2);
+      color: var(--text-secondary);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 12px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .clear-input-btn.visible {
+      display: inline-flex;
+    }
+
+    .search-submit-pill {
+      height: 40px;
+      padding: 0 24px;
+      border-radius: 999px;
+      border: none;
+      background-color: var(--send-circle-bg);
+      color: var(--send-circle-icon);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px var(--search-glow);
+      transition: background-color 0.45s ease,
+                  transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  filter 0.25s ease;
+    }
+
+    .search-submit-pill:hover {
+      transform: scale(1.03);
+      filter: brightness(1.03);
+    }
+
+    .search-submit-pill:active {
+      transform: scale(0.95);
+    }
+
+    /* ================= 5. IPv4 / IPv6 状态行 & 预设节点快捷切换胶囊 ================= */
+    .ip-proto-section {
+      padding: 14px 20px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .proto-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+    }
+
+    .proto-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 46px;
+      padding: 3px 9px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      background-color: var(--card-bg);
+      color: var(--text-secondary);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+    }
+
+    .proto-badge.inactive {
+      opacity: 0.65;
+    }
+
+    .proto-ip-link {
+      font-weight: 700;
+      color: var(--theme-accent);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-size: 15.5px;
+      padding: 0;
+      transition: color 0.4s ease, opacity 0.2s ease;
+    }
+
+    [data-dark="true"] .proto-ip-link {
+      color: var(--orb-color-2);
+    }
+
+    .proto-ip-link:hover {
+      opacity: 0.82;
+      text-decoration: underline;
+    }
+
+    .proto-unfound {
+      color: var(--text-muted);
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .preset-ip-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 20px 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .preset-ip-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .preset-chip {
+      border: 1px solid var(--card-border);
+      background-color: var(--card-bg);
+      color: var(--text-secondary);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.26s ease;
+    }
+
+    .preset-chip.active {
+      background-color: var(--theme-accent);
+      color: #FFFFFF;
+      border-color: var(--theme-accent);
+      box-shadow: 0 4px 12px var(--search-glow);
+    }
+
+    /* ================= 6. 核心卡片体系（严格最多二层卡片：Layer 1 .ippure-card + Layer 2 .layer2-subcard） ================= */
+    .cards-wrapper {
+      padding: 10px 18px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* 第一层外卡（Layer 1） */
+    .ippure-card {
+      background-color: var(--card-bg);
+      border-radius: 26px;
+      padding: 18px 16px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 8px 26px -6px rgba(15, 23, 42, 0.05),
+                  0 2px 6px rgba(15, 23, 42, 0.02);
+      transition: background-color 0.45s ease,
+                  border-color 0.4s ease,
+                  box-shadow 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ippure-card:hover {
+      box-shadow: 0 12px 30px -8px var(--search-glow),
+                  0 4px 12px rgba(15, 23, 42, 0.04);
+      border-color: var(--orb-color-2);
+    }
+
+    /* 第二层内嵌浅灰子卡（Layer 2 — 内部绝不再嵌套第三层卡片框） */
+    .layer2-subcard {
+      background-color: var(--card-sub-bg);
+      border-radius: 18px;
+      padding: 16px 16px;
+      border: 1px solid var(--card-border);
+      transition: background-color 0.4s ease, border-color 0.4s ease;
+    }
+
+    .layer2-subcard + .layer2-subcard {
+      margin-top: 12px;
+    }
+
+    /* 主卡片第一行：IP + 号码 + 右侧 3 个圆角方形工具按钮（👁️ 📷 🔄） */
+    .main-ip-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 2px 2px 18px;
+    }
+
+    .ip-row-left {
+      display: flex;
+      align-items: baseline;
+      gap: 22px;
+      min-width: 0;
+    }
+
+    .field-label {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      min-width: 48px;
+      flex-shrink: 0;
+    }
+
+    .main-ip-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--theme-accent);
+      letter-spacing: -0.2px;
+      cursor: pointer;
+      transition: color 0.45s ease;
+      word-break: break-all;
+    }
+
+    [data-dark="true"] .main-ip-value {
+      color: var(--orb-color-2);
+    }
+
+    .ip-Quick-actions {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    .square-icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      border: 1px solid var(--card-border);
+      background-color: var(--card-sub-bg);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background-color 0.25s ease,
+                  color 0.25s ease,
+                  border-color 0.25s ease;
+    }
+
+    .square-icon-btn:hover {
+      background-color: var(--theme-tag-bg);
+      color: var(--theme-accent);
+      border-color: var(--orb-color-2);
+      transform: translateY(-1px);
+    }
+
+    .square-icon-btn:active {
+      transform: scale(0.91);
+    }
+
+    .square-icon-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.85;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .square-icon-btn.spinning svg {
+      transform: rotate(360deg);
+    }
+
+    /* 主卡片第二行：ASN 编号与组织名 + 右侧箭头按钮 */
+    .asn-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 2px 16px;
+    }
+
+    .asn-row-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 22px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .asn-text-block {
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .asn-code-highlight {
+      color: var(--theme-accent);
+      font-weight: 700;
+      transition: color 0.45s ease;
+    }
+
+    [data-dark="true"] .asn-code-highlight {
+      color: var(--orb-color-2);
+    }
+
+    .asn-arrow-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background-color: var(--card-bg);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.25s ease;
+    }
+
+    .asn-arrow-btn:hover {
+      background-color: var(--theme-tag-bg);
+      color: var(--theme-accent);
+      border-color: var(--orb-color-2);
+    }
+
+    /* 四源地理定位对比框（Layer 2） */
+    .geo-sources-box {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .geo-source-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      font-size: 15px;
+      line-height: 1.42;
+    }
+
+    .geo-provider-name {
+      width: 72px;
+      flex-shrink: 0;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 14.5px;
+    }
+
+    .geo-location-val {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      color: var(--text-primary);
+      font-weight: 500;
+      flex: 1;
+    }
+
+    .flag-badge {
+      font-size: 17px;
+      line-height: 1.2;
+      flex-shrink: 0;
+    }
+
+    /* IP来源 & IP属性（Layer 2） */
+    .ip-tags-subbox {
+      padding: 4px 16px;
+    }
+
+    .ip-tag-row {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 12px 0;
+    }
+
+    .ip-tag-row + .ip-tag-row {
+      border-top: 1px solid var(--divider-line);
+    }
+
+    .ip-tag-label {
+      width: 68px;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+
+    .ippure-pill-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .ippure-pill-badge.badge-native {
+      background: linear-gradient(135deg, #34B36A 0%, #289E5A 100%);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(40, 158, 90, 0.25);
+    }
+
+    .ippure-pill-badge.badge-broadcast {
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    }
+
+    .ippure-pill-badge.badge-isp-biz {
+      background: linear-gradient(135deg, #F25774 0%, #E13D5D 100%);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(242, 87, 116, 0.26);
+    }
+
+    .ippure-pill-badge.badge-residential {
+      background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.24);
+    }
+
+    /* 轻量化彩色属性胶囊 */
+    .attr-pill-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 7px;
+      line-height: 1.35;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .attr-pill-tag.tag-green  { background: #DCFCE7; color: #15803D; }
+    .attr-pill-tag.tag-teal   { background: #CCFBF1; color: #0F766E; }
+    .attr-pill-tag.tag-amber  { background: #FEF3C7; color: #B45309; }
+    .attr-pill-tag.tag-orange { background: #FFEDD5; color: #C2410C; }
+    .attr-pill-tag.tag-red    { background: #FFE4E6; color: #E11D48; }
+    .attr-pill-tag.tag-blue   { background: #DBEAFE; color: #1D4ED8; }
+    .attr-pill-tag.tag-purple { background: #F3E8FF; color: #6D28D9; }
+    .attr-pill-tag.tag-gray   { background: #F1F5F9; color: #475569; }
+
+    [data-dark="true"] .attr-pill-tag.tag-green  { background: rgba(34, 197, 94, 0.18); color: #86EFAC; }
+    [data-dark="true"] .attr-pill-tag.tag-teal   { background: rgba(20, 184, 166, 0.18); color: #5EEAD4; }
+    [data-dark="true"] .attr-pill-tag.tag-amber  { background: rgba(245, 158, 11, 0.18); color: #FCD34D; }
+    [data-dark="true"] .attr-pill-tag.tag-orange { background: rgba(249, 115, 22, 0.18); color: #FDBA74; }
+    [data-dark="true"] .attr-pill-tag.tag-red    { background: rgba(244, 63, 94, 0.2); color: #FDA4AF; }
+    [data-dark="true"] .attr-pill-tag.tag-blue   { background: rgba(59, 130, 246, 0.2); color: #93C5FD; }
+    [data-dark="true"] .attr-pill-tag.tag-purple { background: rgba(168, 85, 247, 0.2); color: #D8B4FE; }
+    [data-dark="true"] .attr-pill-tag.tag-gray   { background: rgba(148, 163, 184, 0.16); color: #CBD5E1; }
+
+    /* ================= 7. IPPure 系数（Layer 2） + 二层平铺展开详情 ================= */
+    .risk-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .risk-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .risk-bar-track {
+      position: relative;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg,
+        #22C55E 0%,
+        #84CC16 22%,
+        #EAB308 45%,
+        #F97316 70%,
+        #EF4444 100%);
+      margin-bottom: 7px;
+      box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.12);
+    }
+
+    .risk-pointer {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 3.5px solid var(--theme-accent);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.28);
+      transition: left 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.4s ease;
+    }
+
+    .risk-scale-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .expand-details-btn {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 8px 0 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      border-top: 1px dashed var(--divider-line);
+      transition: color 0.2s ease;
+    }
+
+    .expand-details-btn:hover {
+      color: var(--theme-accent);
+    }
+
+    .expand-details-btn svg {
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .expand-details-btn.open svg {
+      transform: rotate(180deg);
+    }
+
+    .details-collapsible {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .details-collapsible.open {
+      grid-template-rows: 1fr;
+    }
+
+    .details-inner {
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .expanded-sections-wrap {
+      padding-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .subcard-head-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .subcard-head-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .detail-kv-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 0;
+      font-size: 13.5px;
+    }
+
+    .detail-kv-row + .detail-kv-row {
+      border-top: 1px solid var(--divider-line);
+    }
+
+    .detail-k {
+      color: var(--text-secondary);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .detail-v {
+      color: var(--text-primary);
+      font-weight: 700;
+      text-align: right;
+      word-break: break-all;
+    }
+
+    /* 地图可视化区域 */
+    .visual-map-box {
+      position: relative;
+      height: 148px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(147, 197, 253, 0.2) 0%, rgba(167, 243, 208, 0.2) 100%);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px;
+      margin-top: 4px;
+    }
+
+    .map-grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.14) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+    }
+
+    .map-pin-center {
+      position: relative;
+      z-index: 2;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .map-pulse-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: var(--theme-accent);
+      box-shadow: 0 0 0 8px var(--search-glow);
+    }
+
+    .map-coord-label {
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      padding: 4px 12px;
+      border-radius: 999px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+    }
+
+    .map-caption {
+      position: relative;
+      z-index: 2;
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    /* 同机房供应商 / 客户 胶囊切换 */
+    .mini-gemini-tabs {
+      position: relative;
+      display: inline-grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 3px;
+      border-radius: 999px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      flex-shrink: 0;
+    }
+
+    .mini-tab-glider {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: calc(50% - 3px);
+      height: calc(100% - 6px);
+      background-color: var(--theme-tag-bg);
+      border-radius: 999px;
+      transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 0;
+    }
+
+    .mini-gemini-tabs[data-filter="idc"] .mini-tab-glider {
+      transform: translateX(100%);
+    }
+
+    .mini-tab-btn {
+      position: relative;
+      z-index: 1;
+      border: none;
+      background: transparent;
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .mini-tab-btn.active {
+      color: var(--theme-accent);
+    }
+
+    .bgp-peer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 0;
+      font-size: 13px;
+    }
+
+    .bgp-peer-row + .bgp-peer-row {
+      border-top: 1px solid var(--divider-line);
+    }
+
+    .bgp-peer-left {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .bgp-peer-title {
+      color: var(--text-primary);
+      font-weight: 600;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    /* ================= 8. 适用场景 Layer 2 子卡（1:1 还原 14841.jpg 十字分割 2×2 + 底部 4 行虚线因子） ================= */
+    .scenario-layer2-panel {
+      margin-top: 12px;
+      background-color: var(--card-sub-bg);
+      border-radius: 18px;
+      padding: 18px 16px 10px;
+      border: 1px solid var(--card-border);
+      transition: background-color 0.4s ease, border-color 0.4s ease;
+    }
+
+    .scenario-panel-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+    }
+
+    .scenario-cross-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px dashed var(--divider-line);
+      padding-bottom: 6px;
+      margin-bottom: 4px;
+    }
+
+    .scenario-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px 8px 18px;
+    }
+
+    .scenario-cell:nth-child(1),
+    .scenario-cell:nth-child(2) {
+      border-bottom: 1px solid var(--divider-line);
+    }
+
+    .scenario-cell:nth-child(1),
+    .scenario-cell:nth-child(3) {
+      border-right: 1px solid var(--divider-line);
+    }
+
+    .scenario-cell-name {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .scenario-stars-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 15px;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .star-filled {
+      color: #16A34A;
+    }
+
+    .star-empty {
+      color: #A7D7B8;
+    }
+
+    [data-dark="true"] .star-filled {
+      color: #4ADE80;
+    }
+
+    [data-dark="true"] .star-empty {
+      color: #334155;
+    }
+
+    .scenario-verdict {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15.5px;
+      font-weight: 700;
+    }
+
+    .scenario-verdict.verdict-good {
+      color: #159947;
+    }
+
+    .scenario-verdict.verdict-warn {
+      color: #D98207;
+    }
+
+    .scenario-verdict.verdict-bad {
+      color: #E11D48;
+    }
+
+    [data-dark="true"] .scenario-verdict.verdict-good { color: #4ADE80; }
+    [data-dark="true"] .scenario-verdict.verdict-warn { color: #FBBF24; }
+    [data-dark="true"] .scenario-verdict.verdict-bad  { color: #FB7185; }
+
+    .verdict-check-box {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      background-color: #72BE44;
+      color: #FFFFFF;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .verdict-warn-icon {
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .scenario-factors-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .scenario-factor-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 2px;
+      font-size: 14.5px;
+    }
+
+    .scenario-factor-row + .scenario-factor-row {
+      border-top: 1px dashed var(--divider-line);
+    }
+
+    .factor-label {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .factor-value {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    /* ================= 9. AI 厂商支持度表格（1:1 严格还原图二 14844.jpg 源码图标与排版） ================= */
+    .llm-table {
+      margin-top: 12px;
+      border-radius: 18px;
+      border: 1px solid var(--card-border);
+      background-color: var(--card-bg);
+      overflow: hidden;
+    }
+
+    .llm-row {
+      display: grid;
+      grid-template-columns: 44px 1fr auto;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+    }
+
+    .llm-row + .llm-row {
+      border-top: 1px solid var(--divider-line);
+    }
+
+    .llm-row.head {
+      background-color: var(--card-sub-bg);
+      padding: 11px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .llm-row.head span:nth-child(2) {
+      padding-left: 14px;
+    }
+
+    .llm-row.head span:nth-child(3) {
+      text-align: right;
+      padding-right: 4px;
+    }
+
+    .vendor-ic {
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 11px;
+      overflow: hidden;
+      box-shadow: 0 3px 8px rgba(15, 23, 42, 0.08);
+      flex-shrink: 0;
+    }
+
+    .vendor-ic svg {
+      width: 40px;
+      height: 40px;
+      display: block;
+    }
+
+    .llm-name {
+      display: block;
+      font-size: 16.5px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.25;
+    }
+
+    .llm-sub {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .llm-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .llm-chip.ok {
+      background-color: #DCFCE7;
+      color: #15803D;
+    }
+
+    .llm-chip.bad {
+      background-color: #FDECEC;
+      color: #B91C1C;
+    }
+
+    [data-dark="true"] .llm-chip.ok {
+      background-color: rgba(34, 197, 94, 0.18);
+      color: #86EFAC;
+    }
+
+    [data-dark="true"] .llm-chip.bad {
+      background-color: rgba(244, 63, 94, 0.2);
+      color: #FDA4AF;
+    }
+
+    /* 图二 14844.jpg 表格下方的方法说明与数字地址行 */
+    .llm-method-note {
+      padding: 14px 4px 10px;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text-secondary);
+    }
+
+    .decimal-ip-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 4px 2px;
+      gap: 12px;
+    }
+
+    .decimal-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+
+    .decimal-value {
+      font-size: 16.5px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: 2.2px;
+      flex: 1;
+      padding-left: 12px;
+    }
+
+    /* ================= 10. 本机环境（指纹 / WebRTC）外卡 Layer 1 + 浅灰内卡 Layer 2（1:1 还原 14844.jpg 底部） ================= */
+    .env-sec-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .env-kv-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 11px 0;
+      font-size: 14.5px;
+      line-height: 1.5;
+    }
+
+    .env-kv-row + .env-kv-row {
+      border-top: 1px solid var(--divider-line);
+    }
+
+    .env-k {
+      width: 64px;
+      flex-shrink: 0;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .env-v {
+      flex: 1;
+      color: var(--text-primary);
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    .detect-link-btn {
+      border: 1px solid var(--card-border);
+      background-color: var(--card-bg);
+      color: var(--theme-accent);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 5px 13px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .detect-link-btn:hover {
+      background-color: var(--theme-tag-bg);
+      transform: scale(1.03);
+    }
+
+    .ippure-footer {
+      text-align: center;
+      padding: 8px 18px 20px;
+      font-size: 12px;
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+
+    /* ================= 11. 截图预览弹窗 & 轻提示 Toast ================= */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.46);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 220;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.32);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .modal-close-btn {
+      border: none;
+      background: var(--card-sub-bg);
+      color: var(--text-secondary);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .snapshot-preview-box {
+      background: var(--page-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-primary);
+    }
+
+    .modal-action-btn {
+      width: 100%;
+      height: 40px;
+      border-radius: 999px;
+      border: none;
+      background: var(--theme-accent);
+      color: #FFFFFF;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .toast-banner {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(15, 23, 42, 0.9);
+      color: #FFFFFF;
+      padding: 9px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 300;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.25);
+    }
+
+    .toast-banner.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 380px) {
+      .ip-row-left, .asn-row-left { gap: 14px; }
+      .main-ip-value { font-size: 19px; }
+      .llm-row { padding: 12px 12px; gap: 10px; }
+    }
+  
+/* ================= 本站定版补充（与新稿体系并存的行为与组件） ================= */
+*{-webkit-tap-highlight-color:transparent}
+.masked{letter-spacing:.06em;color:var(--text-secondary)!important}
+.flag-badge img{width:23px;height:auto;border-radius:3px;display:block;box-shadow:0 0 0 1px rgba(0,0,0,.06)}
+.ip-proto-section{display:flex;flex-direction:column}
+.proto-badge.fam{cursor:pointer}
+.proto-row:not(.on) .proto-badge{opacity:.5;filter:saturate(.35)}
+.proto-ip-link{cursor:pointer;text-decoration:none}
+.proto-ip-link.none{color:var(--text-muted)!important;pointer-events:none;font-weight:500}
+#mainIpCard.loading .main-ip-row,#mainIpCard.loading .asn-row,#mainIpCard.loading .layer2-subcard{opacity:.45;transition:opacity .25s}
+.badge-hosting{background:linear-gradient(135deg,#64748B 0%,#475569 100%);color:#fff;box-shadow:0 4px 12px rgba(71,85,105,.25)}
+.badge-pending{background:linear-gradient(135deg,#94A3B8 0%,#64748B 100%);color:#fff}
+.ratio-wrap{margin-top:12px}
+.ratio-bar{height:8px;border-radius:99px;background:#F59E0B33;overflow:hidden;background:linear-gradient(90deg,rgba(245,158,11,.25),rgba(245,158,11,.25))}
+.ratio-human{height:100%;background:linear-gradient(90deg,#34B36A,#57B83E);border-radius:99px;transition:width .5s}
+.ratio-lbls{display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-top:5px}
+.risk-dots{display:inline-flex;gap:4px;margin-left:6px;vertical-align:middle}
+.risk-dots i{width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block}
+.risk-dots i.off{background:var(--divider-line)}
+.hist-item{padding:9px 0;border-top:1px dashed var(--divider-line)}
+.hist-item:first-child{border-top:none}
+.hist-top{display:flex;align-items:center;gap:8px;font-size:13.5px;flex-wrap:wrap}
+.hist-top .dot-on{width:9px;height:9px;border-radius:50%;background:#43c43a;flex:none;box-shadow:0 0 0 3px rgba(67,196,58,.15)}
+.hist-top .org{font-weight:600;color:var(--text-primary)}
+.hist-top .cidr{color:var(--text-secondary);margin-left:auto}
+.hist-top .ttl{color:var(--text-secondary);font-size:12px}
+.hist-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--text-secondary);margin-top:5px}
+.hist-meta img{width:19px;border-radius:2px;vertical-align:-3px}
+.show-old-btn{margin-top:8px;background:none;border:none;color:var(--theme-accent);font-size:13px;font-weight:600;cursor:pointer;padding:4px 0}
+.nb-row{display:flex;align-items:center;gap:9px;padding:8px 0;border-top:1px dashed var(--divider-line);font-size:13.5px}
+.nb-row .nm{color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nb-row .dm{margin-left:auto;color:var(--text-secondary);flex:none;font-size:12.5px}
 .tag-cc{display:inline-block;background:#e05252;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;flex:none}
-.env-card{margin-top:18px}
-.scene-card{margin-top:18px;padding-top:14px;padding-bottom:14px}
-.fp-v{font-size:14px;color:var(--ink-2);word-break:break-all;line-height:1.55}
-/* 对齐定版：所有行统一左标签列 + 右值列，左右成线 */
-.lbl,.kv .k,.sub-k,.asn-head .lbl,.loc-row .src{width:var(--lc)}
-.searchbar input{text-align:left;padding:0 118px 0 22px}
-.pill{width:fit-content;min-width:min(250px,100%);max-width:100%;text-align:center}
-.pill.long{font-size:13.5px;padding:8px 16px;letter-spacing:-.01em}
-.risk-wrap{flex-wrap:nowrap;gap:10px}
-.risk-dots i{width:19px;height:19px;flex:none}
-.scene{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:98px;gap:2px}
-.detect-result{overflow-wrap:anywhere;word-break:break-word}
-/* 模型检测小表格 */
-.scene-card>#llmTable{margin:14px 0 0}.scene-card>#llmResult{margin:10px 16px 0}
-.llm-table{margin:10px 0 4px;border:1px solid #ebeef3;border-radius:14px;overflow:hidden;background:#fff}
-.llm-row{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:28px;padding:13px 16px 13px 18px}
-.llm-row + .llm-row{border-top:1px solid #f2f4f7}
-.llm-row.head{background:#f5f7fa;font-size:14px;color:#8c939e;padding:0 16px 0 18px;min-height:40px;grid-template-columns:36px 1fr auto}
-.vendor-ic{width:36px;height:36px;border-radius:10px;overflow:hidden;flex:none;line-height:0}.vi-chatgpt{box-shadow:0 2px 6px rgba(15,163,127,.20)}.vi-claude{box-shadow:0 2px 6px rgba(216,118,88,.22)}.vi-gemini{box-shadow:0 2px 6px rgba(101,126,230,.22)}.vi-grok{box-shadow:0 2px 6px rgba(17,17,17,.18)}
-.vendor-ic svg{width:100%;height:100%;display:block}
-.llm-name{font-size:16px;font-weight:700;color:#1e2227}
-.llm-sub{font-size:13.5px;color:#8c939e;margin-top:1px}
-.llm-chip{font-size:13.5px;font-weight:600;height:30px;min-width:78px;padding:0 14px;border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center}
-.llm-chip.ok{background:#dbfee8;color:#1c8546}
-.llm-chip.no{background:#fbedea;color:#b43e3e}
-.shimmer{position:relative;overflow:hidden;color:transparent!important}
-.shimmer *{visibility:hidden}
-@media (max-width:560px){
-  .lbl,.kv .k,.sub-k{width:74px;font-size:15px}
-  .val-blue{font-size:17.5px}
-  .searchbar{height:54px}
-  .searchbar input{font-size:17px;padding:0 108px 0 18px;text-align:left}
-  .search-btn{padding:10px 20px;font-size:15px}
-  .card{border-radius:22px}
-  :root{--lc:74px}
-  /* ping0 补充区：手机排版 */
-  .pill{padding:8px 14px;font-size:14.5px;min-width:min(230px,100%)}
-  .pill.long{font-size:13px;padding:8px 13px}
-  .risk-dots i{width:15px;height:15px}
-  .risk-dots{gap:5px}
-  .risk-wrap{gap:7px;flex-wrap:wrap}
-  .risk-wrap .pill{min-width:0;padding:8px 16px}
-  .llm-row{padding:13px 12px 13px 14px}
-  .searchbar input{padding:0 104px 0 16px}
-  .kv{flex-wrap:wrap;row-gap:5px}
-  .kv .v{flex:1;min-width:140px}
-  .hist-item{padding:10px 11px}
-  .hist-top{flex-wrap:wrap;row-gap:4px}
-  .hist-top .org{white-space:normal;overflow:visible;text-overflow:clip;flex:1;min-width:150px}
-  .hist-top .cidr{margin-left:auto;font-size:12.5px}
-  .hist-meta{font-size:12px;gap:6px 12px}
-  .map-frame{height:210px}
-  .bgp-box{padding:6px}
-  .bgp-box svg{min-width:460px}
-  .nb-row{flex-wrap:wrap;row-gap:3px;font-size:14px}
-  .nb-row .dm{margin-left:0;width:100%;padding-left:2px}
-  .scene{padding:12px 4px 10px}
-  .scene .stars{font-size:15px;letter-spacing:2px}
-  .gauge-scale{font-size:12px}
-  .gauge-badge{font-size:13.5px;padding:4px 10px}
-  .detect-result{font-size:13.5px}
-  .menu-panel{width:min(264px,calc(100vw - 24px))}
-}
-@media (max-width:380px){
-  .lbl,.kv .k,.sub-k{width:66px;font-size:14px}
-  :root{--lc:66px}
-  .loc-row .src{font-size:13px}
-  .loc-row{font-size:14px}
-  .ratio-nums{font-size:13px}
-  .nb-tabs .nb-tab{padding:6px 12px;font-size:13.5px}
-}
+.isp-tag{display:inline-block;background:var(--theme-tag-bg);color:var(--theme-tag-text);font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;flex:none}
+.bgp-box svg{width:100%;height:auto;display:block}
+.map-frame{width:100%;height:210px;border:0;display:block}
+.map-pin-row{display:flex;justify-content:center;padding:8px 0 2px}
+.err-bar{position:fixed;left:50%;transform:translate(-50%,16px);bottom:calc(18px + env(safe-area-inset-bottom));width:min(92vw,560px);background:#F1F5F9;color:#1F2937;border-radius:14px;box-shadow:0 12px 34px rgba(15,23,42,.22);padding:13px 16px;display:flex;align-items:center;gap:14px;font-size:14.5px;line-height:1.5;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:300}
+.err-bar.show{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.err-bar-msg{flex:1}
+.err-bar-close{background:none;border:none;color:#2563EB;font-size:15px;font-weight:600;cursor:pointer;padding:4px 2px;flex:none}
+.flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:290}
+.flash.go{animation:flashAnim .45s ease-out}
+@keyframes flashAnim{0%{opacity:0}12%{opacity:.85}100%{opacity:0}}
+.snap-hint{text-align:center;color:var(--text-secondary);font-size:13px;margin:2px 0 10px}
+#snapDl{display:block;text-align:center;text-decoration:none;cursor:pointer}
+.spinning svg{animation:spinAnim .8s linear infinite}
+@keyframes spinAnim{to{transform:rotate(360deg)}}
+.scenario-verdict .verdict-emoji{font-size:15px;line-height:1}
+#displayAsnOrg{word-break:break-word}
+.asn-row{cursor:pointer}
+.expand-mini-arrow{color:var(--text-secondary);font-size:18px}
+#companyHead{cursor:pointer}
+.rtc-cands{font-size:12.5px;color:var(--text-secondary);line-height:1.6;word-break:break-all}
 </style>
 </head>
 <body>
 
-<header class="topbar">
-  <a class="logo" href="./" aria-label="IPPure">
-    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M26.5 3.5C14.8 5.4 6.4 12.8 5.3 24.6c-.15 1.7 1.05 2.85 2.75 2.7C19.2 26.4 26.3 17.6 26.5 3.5z" fill="#3fae4a"/><path d="M7.2 24.8C11 16.9 17.2 10.7 24.2 6.6" stroke="#eaf7ec" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-    <b>IPPure</b>
-  </a>
-  <button class="menu-btn" id="menuBtn" aria-label="菜单" aria-expanded="false">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#3a3f47" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
-  </button>
-  <nav class="menu-panel" id="menuPanel" aria-hidden="true">
-    <a href="./"><i class="dot"></i><div><b>IP 定位信息</b><span>精准获悉 IP 地理位置与运营商信息</span></div></a>
-    <a href="./"><i class="dot"></i><div><b>IP 风险检测</b><span>识别欺诈、代理及黑名单风险</span></div></a>
-    <a href="./"><i class="dot"></i><div><b>指纹信息分析</b><span>深度解析浏览器与设备指纹特征</span></div></a>
-    <a href="./"><i class="dot"></i><div><b>IP 出口地图</b><span>可视化展示网络链路与出口节点</span></div></a>
-    <a href="./"><i class="dot"></i><div><b>VPN 泄露检测</b><span>检测是否存在 VPN 穿透与伪装</span></div></a>
-    <a href="./"><i class="dot"></i><div><b>WebRTC 检测</b><span>防止真实 IP 通过 WebRTC 协议泄露</span></div></a>
-    <a href="./"><i class="dot"></i><div><b>DNS 泄露检测</b><span>确保域名解析请求的安全隐私</span></div></a>
-  </nav>
-</header>
-
-<main class="wrap">
-  <form class="searchbar" id="searchForm" autocomplete="off">
-    <input id="ipInput" type="text" inputmode="text" autocapitalize="none" autocomplete="off" spellcheck="false" aria-label="IP 地址">
-    <button class="search-btn" id="searchBtn" type="submit">Search</button>
-  </form>
-
-
-  <div class="myip-bar">
-    <div class="myip-list">
-    <div class="myip-row" id="rowV4"><span class="fam">IPv4</span><a href="#" id="myV4">检测中…</a></div>
-    <div class="myip-row" id="rowV6"><span class="fam">IPv6</span><a href="#" id="myV6">—</a></div>
-  </div>
-  </div>
-
-
-  <section class="card" id="card">
-    <div class="fade-zone" id="fadeZone">
-      <div class="row ip-row">
-        <span class="lbl">IP</span>
-        <span class="val-blue" id="fIp" title="点击复制">—</span>
-        <button class="mini-btn" id="eyeBtn" aria-label="显示 / 隐藏 IP" title="显示 / 隐藏">
-          <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" id="eyeIcon"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-        <button class="mini-btn" id="shotBtn" aria-label="快照" title="快照">
-          <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        </button>
-        <button class="mini-btn" id="refreshBtn" aria-label="重新检测我的 IP" title="重新检测">
-          <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
-        </button>
+  <div class="app-container">
+    <!-- ================= 顶部弥散渐变 Hero Header ================= -->
+    <header class="hero-header">
+      <div class="aura-backdrop">
+        <div class="aura-orb orb-left" id="orbLeft"></div>
+        <div class="aura-orb orb-center" id="orbCenter"></div>
+        <div class="aura-orb orb-right" id="orbRight"></div>
       </div>
 
-      <div class="asn-block collapsed" id="asnBlock">
-        <div class="asn-head" id="asnHead" role="button" aria-expanded="false" tabindex="0">
-          <span class="lbl">ASN</span>
-          <span class="name"><b id="fAsn">—</b><span id="fAsnName"></span></span>
-          <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+      <!-- 顶栏：左侧 IPPure 绿叶 Logo + 右上角（🌐 语言 + ☀️ 单击日夜/长按12色 + ☰ 7大功能菜单） -->
+      <div class="top-nav-bar">
+        <a href="#mainIpCard" class="ippure-brand">
+          <span class="leaf-logo-wrap" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+              <path d="M26.5 5.5C17.5 5.5 8.5 10.2 6.2 21.8C5.9 23.3 6.8 25.1 8.2 25.8C19.8 23.5 26.5 14.5 26.5 5.5Z" fill="url(#leafGrad)"/>
+              <path d="M7.5 24.5C12.8 18.2 18.5 13.2 24.8 7.2" stroke="#E8F8EE" stroke-width="2.1" stroke-linecap="round"/>
+              <defs>
+                <linearGradient id="leafGrad" x1="6" y1="26" x2="27" y2="5" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#229A4E"/>
+                  <stop offset="1" stop-color="#5FD068"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </span>
+          <span class="ippure-brand-text">IPPure</span>
+        </a>
+
+        <div class="top-right-widgets">
+          <button class="lang-pill-btn" id="langBtn" type="button" title="切换语言 / Switch Language">
+            <svg class="globe-svg" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            <span class="lang-text" id="langText">中文</span>
+          </button>
+
+          <button class="theme-mode-btn" id="darkModeBtn" type="button" title="单击切换日夜 / 长按滑动选12色主题">
+            <svg class="sun-moon-svg" id="sunMoonIcon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="4"></circle>
+              <line x1="12" y1="2" x2="12" y2="4.5"></line>
+              <line x1="12" y1="19.5" x2="12" y2="22"></line>
+              <line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line>
+              <line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line>
+              <line x1="2" y1="12" x2="4.5" y2="12"></line>
+              <line x1="19.5" y1="12" x2="22" y2="12"></line>
+              <line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line>
+              <line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line>
+            </svg>
+          </button>
+
+          <button class="hamburger-btn" id="hamburgerBtn" type="button" title="功能导航菜单">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round">
+              <line x1="4" y1="7" x2="20" y2="7"></line>
+              <line x1="4" y1="12" x2="16" y2="12"></line>
+              <line x1="4" y1="17" x2="20" y2="17"></line>
+            </svg>
+          </button>
+
+          <div class="theme-panel-backdrop" id="themeBackdrop"></div>
+          <div class="theme-popover-panel" id="themePopover">
+            <div class="panel-header">
+              <span class="panel-title" id="panelTitle">12色弥散主题</span>
+              <span class="panel-hint" id="panelHint">长按滑动或点击选择</span>
+            </div>
+            <div class="theme-swatch-grid" id="themeSwatchGrid"></div>
+          </div>
+
+          <div class="nav-menu-backdrop" id="navMenuBackdrop"></div>
+          <div class="nav-dropdown-panel" id="navDropdownPanel">
+            <div class="panel-header">
+              <span class="panel-title" id="navPanelTitle">IPPure 检测模块</span>
+              <span class="panel-hint" id="navPanelHint">点击直达对应模块</span>
+            </div>
+            <div class="nav-menu-list" id="navMenuList"></div>
+          </div>
         </div>
-        <div class="asn-body">
-          <div class="kv"><span class="sub-k">AS域名</span><span class="v" id="fAsDomain">—</span></div>
-          <div class="kv"><span class="sub-k">IP范围</span><span class="v" id="fRange">—</span></div>
-          <div class="kv" style="align-items:flex-start">
-            <span class="sub-k" style="padding-top:2px">纯净度</span>
-            <div class="ratio">
-              <div class="ratio-bar"><div class="human" id="ratioHuman"></div></div>
-              <div class="ratio-nums"><span class="h" id="ratioHumanTxt">纯净 —</span><span class="b" id="ratioBotTxt">风险 —</span></div>
+      </div>
+
+      <!-- 大圆角悬浮胶囊搜索框 -->
+      <div class="gemini-search-card">
+        <input
+          type="text"
+          class="search-input" inputmode="text" autocapitalize="none" autocomplete="off" spellcheck="false"
+          id="ipSearchInput"
+        >
+        <button class="clear-input-btn visible" id="clearIpBtn" type="button" title="清空输入">✕</button>
+        <button class="search-submit-pill" id="searchBtnText" type="button">Search</button>
+      </div>
+    </header>
+
+    <!-- ================= IPv4 / IPv6 快捷状态栏 ================= -->
+    <section class="ip-proto-section" aria-label="协议检测状态">
+      <div class="proto-row" id="rowV4">
+        <span class="proto-badge fam" id="famV4">IPv4</span>
+        <a class="proto-ip-link" id="myV4" href="#">检测中…</a>
+      </div>
+      <div class="proto-row" id="rowV6">
+        <span class="proto-badge fam" id="famV6">IPv6</span>
+        <a class="proto-ip-link" id="myV6" href="#">未检测到</a>
+      </div>
+    </section>
+
+    
+
+    <!-- ================= 核心卡片内容区（严格最多二层卡片，完全对齐原网址 14844.jpg 结构） ================= -->
+    <main class="cards-wrapper">
+
+      <!-- 1. 主 IP 信息大卡片（包含：IP/ASN -> 四源定位 -> 来源/属性 -> 风险系数与展开详情 -> 适用场景 -> AI厂商支持度表（含原网址4大SVG图标） -> 方法说明与数字地址） -->
+      <article class="ippure-card" id="mainIpCard">
+        <!-- 第一行：IP + 号码 + 右侧 3 个操作按钮 -->
+        <div class="main-ip-row">
+          <div class="ip-row-left">
+            <span class="field-label">IP</span>
+            <span class="main-ip-value" id="displayMainIp" title="点击复制 IP">218.111.*.*</span>
+          </div>
+          <div class="ip-Quick-actions">
+            <button type="button" class="square-icon-btn" id="maskIpBtn" title="切换 IP 脱敏显示">
+              <svg id="eyeSvgIcon" viewBox="0 0 24 24">
+                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+            <button type="button" class="square-icon-btn" id="shotBtn" title="生成当前检测卡片快照">
+              <svg viewBox="0 0 24 24">
+                <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path>
+                <circle cx="12" cy="13" r="3"></circle>
+              </svg>
+            </button>
+            <button type="button" class="square-icon-btn" id="refreshCardBtn" title="重新检测并切换弥散渐变色">
+              <svg viewBox="0 0 24 24">
+                <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
+                <polyline points="21 3 21 9 15 9"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 第二行：ASN 信息 + 右侧展开箭头 -->
+        <div class="asn-row" id="asnHead" role="button" tabindex="0" aria-expanded="false">
+          <div class="asn-row-left">
+            <span class="field-label">ASN</span>
+            <div class="asn-text-block">
+              <span class="asn-code-highlight" id="displayAsnCode">AS4788</span>
+              <span id="displayAsnOrg"> - TM TECHNOLOGY SERVICES SDN. BHD.</span>
+            </div>
+          </div>
+          <button type="button" class="asn-arrow-btn" id="asnArrow" tabindex="-1" title="查看 ASN 与路由详情">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Layer 2 子卡 A：四源地理定位对比框 -->
+        <div class="layer2-subcard geo-sources-box" id="geoSourcesBox"></div>
+
+        <!-- Layer 2 子卡 B：IP来源（原生IP） & IP属性（商宽IP） -->
+        <div class="layer2-subcard ip-tags-subbox">
+          <div class="ip-tag-row">
+            <span class="ip-tag-label" id="labelIpOrigin" data-i18n="ipOrigin">IP来源</span>
+            <span class="ippure-pill-badge badge-native" id="badgeIpOrigin">原生IP</span>
+          </div>
+          <div class="ip-tag-row">
+            <span class="ip-tag-label" id="labelIpAttr" data-i18n="ipAttr">IP属性</span>
+            <span class="ippure-pill-badge badge-isp-biz" id="badgeIpAttr">商宽IP</span>
+          </div>
+        </div>
+
+        <!-- Layer 2 子卡 C：IPPure 风险系数刻度条 -->
+        <div class="layer2-subcard" id="riskSection">
+          <div class="risk-header-row">
+            <span class="risk-title" id="labelRiskMeter" data-i18n="riskMeter">IPPure 系数</span>
+            <span class="attr-pill-tag tag-green" id="badgeRiskScore">28% 纯净低危</span>
+          </div>
+          <div class="risk-bar-track">
+            <div class="risk-pointer" id="riskPointer" style="left: 28%;"></div>
+          </div>
+          <div class="ratio-wrap">
+            <div class="ratio-bar"><div class="ratio-human" id="ratioHuman"></div></div>
+            <div class="ratio-lbls"><span id="ratioHumanTxt"></span><span id="ratioBotTxt"></span></div>
+          </div>
+          <div class="risk-scale-ticks">
+            <span>0</span>
+            <span>15</span>
+            <span>25</span>
+            <span>40</span>
+            <span>50</span>
+            <span>70</span>
+            <span>100</span>
+          </div>
+          <button type="button" class="expand-details-btn" id="expandDetailsBtn">
+            <span id="expandBtnText">展开详细归属、地图与 BGP 拓扑</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- 二层平铺展开详情（无三层嵌套） -->
+        <div class="details-collapsible" id="detailsCollapsible">
+          <div class="details-inner">
+            <div class="expanded-sections-wrap">
+              <div class="layer2-subcard">
+                <div class="subcard-head-row">
+                  <span class="subcard-head-title" id="subTitleLoc" data-i18n="locTitle">位置与主机详情</span>
+                  <span class="attr-pill-tag tag-teal" id="detailConfidence">—</span>
+                </div>
+                <div class="detail-kv-row"><span class="detail-k" id="lblHostname" data-i18n="hostname">主机名</span><span class="detail-v" id="valHostname">—</span></div>
+                <div class="detail-kv-row"><span class="detail-k" id="lblDetectTime" data-i18n="detectTime">探测时间</span><span class="detail-v" id="valDetectTime">—</span></div>
+                <div class="detail-kv-row"><span class="detail-k" id="lblTimezone" data-i18n="tzPostal">时区 / 邮编</span><span class="detail-v" id="valTimezone">—</span></div>
+                <div class="detail-kv-row"><span class="detail-k" id="lblSubnet" data-i18n="subnet">网段规模</span><span class="detail-v" id="valSubnet">—</span></div>
+                <div class="detail-kv-row"><span class="detail-k" data-i18n="domain">域名 / 网络名</span><span class="detail-v" id="valDomain">—</span></div>
+                <div class="detail-kv-row"><span class="detail-k" data-i18n="range">IP 段</span><span class="detail-v" id="valRange">—</span></div>
+              </div>
+
+              <div class="layer2-subcard">
+                <div class="subcard-head-row"><span class="subcard-head-title" data-i18n="riskTitle">风险与属性详情</span></div>
+                <div class="detail-kv-row"><span class="detail-k" data-i18n="ipType">IP 类型</span><span class="detail-v"><span class="attr-pill-tag tag-blue" id="valIpType">—</span></span></div>
+                <div class="detail-kv-row"><span class="detail-k" data-i18n="riskVal">风控值</span><span class="detail-v"><span class="attr-pill-tag tag-green" id="valRiskPill">—</span> <span class="risk-dots" id="valRiskDots"><i></i><i></i><i></i><i></i><i></i></span></span></div>
+                <div class="detail-kv-row"><span class="detail-k" data-i18n="native">原生</span><span class="detail-v"><span class="attr-pill-tag tag-green" id="valNative">—</span></span></div>
+                <div class="detail-kv-row"><span class="detail-k" data-i18n="shared">网段 / 共享</span><span class="detail-v"><span class="attr-pill-tag tag-gray" id="valShared">—</span></span></div>
+                <div class="detail-kv-row"><span class="detail-k" data-i18n="riskTags">风险标签</span><span class="detail-v" id="valRiskTags">—</span></div>
+              </div>
+
+              <div class="layer2-subcard">
+                <div class="subcard-head-row" id="companyHead" role="button" tabindex="0"><span class="subcard-head-title" data-i18n="whoisTitle">WHOIS / 企业</span><span class="expand-mini-arrow">›</span></div>
+                <div id="companyBody" style="display:none">
+                  <div class="detail-kv-row"><span class="detail-k" data-i18n="asnOwner">ASN 持有者</span><span class="detail-v" id="valAsnOwner">—</span></div>
+                  <div class="detail-kv-row"><span class="detail-k" data-i18n="company">企业</span><span class="detail-v" id="valCompany">—</span></div>
+                  <div class="detail-kv-row"><span class="detail-k" data-i18n="isp">ISP</span><span class="detail-v" id="valIsp">—</span></div>
+                  <div id="histCompany"></div>
+                </div>
+              </div>
+
+              <div class="layer2-subcard">
+                <div class="subcard-head-row"><span class="subcard-head-title" data-i18n="histTitle">ASN 路由历史</span></div>
+                <div id="histAsn"></div>
+                <div id="histOld" style="display:none">
+                  <div id="histLoc"></div>
+                  <div id="histReg"></div>
+                </div>
+                <button type="button" class="show-old-btn" id="showOldBtn">↓ 显示非活跃记录</button>
+              </div>
+
+              <div class="layer2-subcard" id="mapSection">
+                <div class="subcard-head-row">
+                  <span class="subcard-head-title" id="subTitleMap" data-i18n="mapTitle">IP 出口地图定位</span>
+                  <span class="attr-pill-tag tag-blue" id="valCoords">—</span>
+                </div>
+                <div class="visual-map-box">
+                  <iframe id="mapFrame" class="map-frame" title="IP 位置地图" loading="lazy"></iframe>
+                  <div class="map-pin-row"><span class="map-coord-label" id="mapCityLabel">—</span></div>
+                  <div class="map-caption" id="mapCaptionText" data-i18n="mapCaption" data-i18n="mapCaption">地图：OpenStreetMap，标记为 IP 大致位置，精度到城市级</div>
+                </div>
+              </div>
+
+              <div class="layer2-subcard">
+                <div class="subcard-head-row">
+                  <span class="subcard-head-title" id="subTitleBgp" data-i18n="bgpTitle">BGP 拓扑与邻居</span>
+                  <div class="mini-gemini-tabs" id="bgpFilterTabs" data-filter="all">
+                    <div class="mini-tab-glider"></div>
+                    <button type="button" class="mini-tab-btn active" id="btnBgpAll" data-i18n="bgpAll">显示所有</button>
+                    <button type="button" class="mini-tab-btn" id="btnBgpIdc">显示 IDC</button>
+                  </div>
+                </div>
+                <div id="bgpBox" class="bgp-box"></div>
+                <div id="bgpNeighborsList"></div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="block gray">
-        <div id="locList" style="padding-top:6px"></div>
-      </div>
-
-      <div class="block gray">
-        <div class="row" style="padding:13px 0">
-          <span class="lbl">IP来源</span>
-          <span class="tag" id="fSource">—</span>
-        </div>
-        <div class="row" style="padding:13px 0;border-top:1px solid #e9edf0">
-          <span class="lbl">IP属性</span>
-          <span class="tag" id="fAttr">—</span>
-        </div>
-      </div>
-
-      <div class="purity">
-        <span class="lbl">IPPure系数</span>
-        <div class="gauge">
-          <div class="gauge-badge" id="gaugeBadge">—</div>
-          <div class="gauge-track"></div>
-          <div class="gauge-marker" id="gaugeMarker"></div>
-        </div>
-        <div class="gauge-scale">
-          <span style="left:0">0</span><span style="left:15%">15</span><span style="left:25%">25</span>
-          <span style="left:40%">40</span><span style="left:50%">50</span><span style="left:70%">70</span>
-          <span style="left:100%">100</span>
-        </div>
-      </div>
-
-      <div class="more" id="morePanel">
-        <div class="block gray" style="margin-top:14px">
-          <div class="sec-title" style="padding-top:8px">位置详情</div>
-          <div class="kv"><span class="k">主机名</span><span class="v" id="fHost">—</span></div>
-          <div class="kv"><span class="k">探测时间</span><span class="v" id="fTime">—</span></div>
-          <div class="kv"><span class="k">置信度</span><span class="v"><span class="conf" id="fConf"><i></i><i></i><i></i><i></i></span></span></div>
-          <div class="kv"><span class="k">时区</span><span class="v" id="fTz">—</span></div>
-          <div class="kv"><span class="k">经度</span><span class="v" id="fLon">—</span></div>
-          <div class="kv"><span class="k">纬度</span><span class="v" id="fLat">—</span></div>
-          <div class="kv"><span class="k">邮政编码</span><span class="v" id="fPostal">—</span></div>
-        </div>
-
-        <div style="padding:4px 16px">
-          <div class="sec-title" style="padding-left:0">归属与企业</div>
-          <div class="kv"><span class="k">ASN所有者</span><span class="v" id="fAsnOwner">—</span></div>
-          <div class="kv"><span class="k">企业</span><span class="v" id="fCompany">—</span></div>
-          <div class="kv"><span class="k">运营商</span><span class="v" id="fIsp">—</span></div>
-        </div>
-
-        <div class="block gray">
-          <div class="sec-title" style="padding-top:8px">纯净与风险</div>
-          <div class="kv" style="align-items:center"><span class="k">IP类型</span><span class="v"><span class="pill" id="fIpType">—</span></span></div>
-          <div class="kv" style="align-items:center"><span class="k">风控值</span><span class="v"><span class="risk-wrap"><span class="pill" id="fRiskPill">—</span><span class="risk-dots" id="fRiskDots"><i></i><i></i><i></i><i></i><i></i></span></span></span></div>
-          <div class="kv" style="align-items:center"><span class="k">原生IP</span><span class="v"><span class="pill" id="fNative">—</span></span></div>
-          <div class="kv" style="align-items:center"><span class="k">网段规模</span><span class="v"><span class="pill" id="fShared">—</span></span></div>
-          <div class="kv"><span class="k">风险标签</span><span class="v" id="fRisk">—</span></div>
-        </div>
-
-
-
-        <div style="padding:4px 16px">
-          <div class="sec-title" style="padding-left:0">🟢 ASN 历史</div>
-          <div id="histAsn"></div>
-          <div class="sec-title collapse-head" id="companyHead" style="padding-left:0">💥 WHOIS / 企业<span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
-          <div id="companyBody" style="display:none"><div id="histCompany"></div></div>
-          <button class="show-old" id="showOldBtn" type="button">↓ 显示非活跃记录</button>
-          <div id="histOld" style="display:none">
-            <div class="sec-title" style="padding-left:0">🥟 注册地历史</div>
-            <div id="histReg"></div>
-            <div class="sec-title" style="padding-left:0">🐵 地理定位（RIPEstat）</div>
-            <div id="histLoc"></div>
+              <div class="layer2-subcard">
+                <div class="subcard-head-row">
+                  <span class="subcard-head-title" id="subTitleBgp">BGP 拓扑与同机房节点</span>
+                  <div class="mini-gemini-tabs" id="bgpFilterTabs" data-filter="all">
+                    <div class="mini-tab-glider"></div>
+                    <button type="button" class="mini-tab-btn active" id="btnBgpAll">显示所有</button>
+                    <button type="button" class="mini-tab-btn" id="btnBgpIdc">显示 IDC</button>
+                  </div>
+                </div>
+                <div id="bgpNeighborsList"></div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="block gray">
-          <div class="sec-title" style="padding-top:8px">🌏 地图定位</div>
-          <iframe class="map-frame" id="mapFrame" title="IP 地图定位" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-          <div style="font-size:12.5px;color:#93a1ad;padding:8px 0 6px">地图：OpenStreetMap（无广告），标记为 IP 大致位置，精度到城市级</div>
+        <!-- Layer 2 子卡 D：适用场景（1:1 对应 14841.jpg & 14844.jpg） -->
+        <div class="scenario-layer2-panel" id="scenarioCard">
+          <h2 class="scenario-panel-title" id="titleScenario" data-i18n="scenes">适用场景</h2>
+          <div class="scenario-cross-grid" id="scenarioGrid"></div>
+          <div class="scenario-factors-list" id="scenarioFactorsList"></div>
         </div>
 
-        <div style="padding:4px 16px">
-          <div class="sec-title" style="padding-left:0">🌐 BGP 拓扑历史</div>
-          <div class="bgp-box" id="bgpBox"></div>
-        </div>
-
-        <div class="block gray">
-          <div class="sec-title" style="padding-top:8px">🖥 同机房供应商 / 客户</div>
-          <div class="nb-tabs">
-            <button class="nb-tab on" id="nbTabAll" type="button">显示所有</button>
-            <button class="nb-tab" id="nbTabIdc" type="button">显示 IDC</button>
+        <!-- Layer 2 子卡 E：AI 厂商支持度表格（1:1 还原 14844.jpg 原网址 SVG 图标与表头结构） -->
+        <div class="llm-table" id="aiSupportCard">
+          <div class="llm-row head">
+            <span></span>
+            <span id="titleAiVendor" data-i18n="vendor">厂商</span>
+            <span id="badgeAiRegion">判定（MY）</span>
           </div>
-          <div id="nbList"></div>
+          <div id="aiVendorList"></div>
         </div>
+
+        <!-- 表格下方方法说明文字与数字地址行（1:1 还原 14844.jpg） -->
+        <p class="llm-method-note" id="llmMethodNote">
+          方法：该 IP 实时定位国家与各厂商官方支持地区名单核对，原生 IP，通过率最高
+        </p>
+
+        <div class="decimal-ip-bar">
+          <span class="decimal-label" id="lblDecimalIp" data-i18n="decimalIp">数字地址</span>
+          <span class="decimal-value" id="valDecimalIp">—</span>
+          <button type="button" class="square-icon-btn" id="numEyeBtn" title="切换数字地址脱敏">
+            <svg viewBox="0 0 24 24">
+              <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+        </div>
+      </article>
+
+      <!-- 2. 本机环境（指纹 / WebRTC）独立卡片（1:1 还原 14844.jpg 底部二层卡片结构） -->
+      <section class="ippure-card" id="localEnvCard">
+        <div class="layer2-subcard">
+          <div class="env-sec-title">
+            <span id="titleLocalEnv" data-i18n="envTitle">本机环境与泄露检测</span>
+            <button type="button" class="detect-link-btn" id="btnRunAllLeak" data-i18n="retest">重新检测</button>
+          </div>
+          <div class="env-kv-row">
+            <span class="env-k" id="lblUa" data-i18n="ua">浏览器</span>
+            <span class="env-v" id="fpUa">Mozilla/5.0 (Linux; Android 14; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.*.* Mobile Safari/537.36</span>
+          </div>
+          <div class="env-kv-row">
+            <span class="env-k" id="lblLang" data-i18n="lang">语言</span>
+            <span class="env-v" id="fpLang">zh-CN, zh;q=0.9, en-US;q=0.8, en;q=0.7</span>
+          </div>
+          <div class="env-kv-row">
+            <span class="env-k" id="lblClientTz" data-i18n="clientTz">时区</span>
+            <span class="env-v" id="fpTz">Asia/Kuala_Lumpur</span>
+          </div>
+          <div class="env-kv-row">
+            <span class="env-k" id="lblClientScreen" data-i18n="screen">屏幕</span>
+            <span class="env-v" id="fpScreen">390 × 844 · 3x</span>
+          </div>
+          <div class="env-kv-row">
+            <span class="env-k" id="lblPlat" data-i18n="platform">平台</span>
+            <span class="env-v" id="fpPlat">Linux armv8l</span>
+          </div>
+          <div class="env-kv-row">
+            <span class="env-k" id="lblWebrtc" data-i18n="webrtc">WebRTC</span>
+            <span class="env-v" id="rtcResult">—</span>
+          </div>
+          
+        </div>
+      </section>
+    </main>
+
+    <!-- 页脚说明 -->
+    <footer class="ippure-footer" id="footerText">
+      <div data-i18n="foot1">定位多源共识 · RIPEstat 路由与 WHOIS · DNSBL 黑名单</div>
+      <div data-i18n="foot2">纯净度按真实信号透明计算</div>
+      <div data-i18n="foot3">本站无广告、无追踪脚本</div>
+    </footer>
+  </div>
+
+  <!-- ================= 快照预览与导出弹窗 Modal ================= -->
+  <div class="modal-backdrop" id="snapshotModalBackdrop">
+    <div class="modal-card">
+      <div class="modal-head">
+        <span class="modal-title" id="snapshotModalTitle" data-i18n="snapTitle">IPPure 检测报告快照</span>
+        <button type="button" class="modal-close-btn">✕</button>
       </div>
-
-      <button class="expand-btn" id="expandBtn" aria-label="展开详细信息" aria-expanded="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-      </button>
+      <div class="snapshot-preview-box" id="snapshotPreviewContent"></div>
+      <div class="snap-hint" id="snapHint" data-i18n="snapHint">长按图片保存到相册</div>
+      <a class="modal-action-btn" id="snapDl" download="ip-info.png" data-i18n="snapDownload">下载图片</a>
     </div>
-  </section>
+  </div>
 
-  <section class="card scene-card">
-        <div class="block gray" style="margin-top:2px">
-          <div class="sec-title" style="padding-top:8px">适用场景</div>
-          <div class="scene-grid" id="sceneGrid"></div>
-          <div class="note-box"><div id="fNote"></div></div>
-        </div>
+  <div class="err-bar" id="errBar"><span class="err-bar-msg" id="errBarMsg"></span><button type="button" class="err-bar-close" id="errBarClose" data-i18n="close">关闭</button></div>
+  <div class="flash" id="flash"></div>
 
-        <div class="llm-table" id="llmTable" style="display:none"></div>
-        <div class="detect-result" id="llmResult"></div>
+  <!-- 轻提示 Toast -->
+  <div class="toast-banner" id="toastBanner">已复制到剪贴板</div>
 
-        <div style="padding:4px 16px">
-          <div class="kv" style="align-items:center"><span class="k">数字地址</span><span class="v"><span class="num-ip" id="fNumIp">********</span>
-            <button class="mini-btn" id="numEyeBtn" aria-label="显示 / 隐藏数字 IP" title="显示 / 隐藏">
-              <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88"/><path d="M1 1l22 22"/></svg>
-            </button></span></div>
-        </div>
+  
 
-
-  </section>
-
-  <section class="card env-card">
-    <div class="block gray" style="margin-top:10px">
-      <div class="sec-title" style="padding-top:8px">本机环境（指纹 / WebRTC）</div>
-      <div class="kv"><span class="k">浏览器</span><span class="v fp-v" id="fpUa">—</span></div>
-      <div class="kv"><span class="k">语言</span><span class="v fp-v" id="fpLang">—</span></div>
-      <div class="kv"><span class="k">时区</span><span class="v fp-v" id="fpTz">—</span></div>
-      <div class="kv"><span class="k">屏幕</span><span class="v fp-v" id="fpScreen">—</span></div>
-      <div class="kv"><span class="k">平台</span><span class="v fp-v" id="fpPlat">—</span></div>
-      <div class="kv" style="align-items:flex-start"><span class="k">WebRTC</span><span class="v fp-v"><button class="detect-link" id="rtcBtn" type="button">点击检测</button><div class="detect-result" id="rtcResult"></div></span></div>
-    </div>
-    <div style="height:12px"></div>
-  </section>
-
-  <p class="foot">定位多源共识 · RIPEstat 路由与 WHOIS · DNSBL 黑名单<br>纯净度按真实信号透明计算<br>本站无广告、无追踪脚本</p>
-</main>
-
-<div class="flash" id="flash"></div>
-<div class="toast" id="toast"></div>
-<div class="errbar" id="errBar"><span class="errbar-msg" id="errBarMsg"></span><button class="errbar-close" id="errBarClose" type="button">关闭</button></div>
-
-<script>
-"use strict";
+<script>"use strict";
 const $=id=>document.getElementById(id);
+/* ================= 12 色主题体系（新稿） ================= */
+const allThemes = [
+      {
+        name: "01 · 冰川晴空",
+        nameEn: "01 · Glacier Sky",
+        orb1: "#BCE0FD",
+        orb2: "#93C5FD",
+        refreshBg: "#60A5FA",
+        sendCircleBg: "#9CCAF9",
+        accent: "#1989AC",
+        tagBg: "#EBF5FF",
+        tagText: "#1D4ED8",
+        pageBg: "#EEF6FA",
+        glow: "rgba(147, 197, 253, 0.38)"
+      },
+      {
+        name: "02 · 薄荷微风",
+        nameEn: "02 · Mint Breeze",
+        orb1: "#A7F3D0",
+        orb2: "#6EE7B7",
+        refreshBg: "#34D399",
+        sendCircleBg: "#86EFAC",
+        accent: "#059669",
+        tagBg: "#ECFDF5",
+        tagText: "#047857",
+        pageBg: "#F2FBF7",
+        glow: "rgba(110, 231, 183, 0.36)"
+      },
+      {
+        name: "03 · 极光青蓝",
+        nameEn: "03 · Aurora Cyan",
+        orb1: "#A5F3FC",
+        orb2: "#818CF8",
+        refreshBg: "#6366F1",
+        sendCircleBg: "#A5B4FC",
+        accent: "#4F46E5",
+        tagBg: "#EEF2FF",
+        tagText: "#4338CA",
+        pageBg: "#F4F6FC",
+        glow: "rgba(129, 140, 248, 0.34)"
+      },
+      {
+        name: "04 · 抹茶森屿",
+        nameEn: "04 · Matcha Isle",
+        orb1: "#D9F99D",
+        orb2: "#86EFAC",
+        refreshBg: "#4ADE80",
+        sendCircleBg: "#BEF264",
+        accent: "#16A34A",
+        tagBg: "#F0FDF4",
+        tagText: "#15803D",
+        pageBg: "#F6FAF5",
+        glow: "rgba(134, 239, 172, 0.36)"
+      },
+      {
+        name: "05 · 碧海晴空",
+        nameEn: "05 · Azure Lagoon",
+        orb1: "#99F6E4",
+        orb2: "#7DD3FC",
+        refreshBg: "#2DD4BF",
+        sendCircleBg: "#67E8F9",
+        accent: "#0D9488",
+        tagBg: "#F0FDFA",
+        tagText: "#0F766E",
+        pageBg: "#F2F9FA",
+        glow: "rgba(125, 211, 252, 0.36)"
+      },
+      {
+        name: "06 · 深海星雾",
+        nameEn: "06 · Mist Slate",
+        orb1: "#CBD5E1",
+        orb2: "#93C5FD",
+        refreshBg: "#64748B",
+        sendCircleBg: "#CBD5E1",
+        accent: "#334155",
+        tagBg: "#F1F5F9",
+        tagText: "#1E293B",
+        pageBg: "#F5F7FA",
+        glow: "rgba(148, 163, 184, 0.32)"
+      },
+      {
+        name: "07 · 星云幻紫",
+        nameEn: "07 · Nebula Violet",
+        orb1: "#E9D5FF",
+        orb2: "#C4B5FD",
+        refreshBg: "#8B5CF6",
+        sendCircleBg: "#A396F8",
+        accent: "#6D28D9",
+        tagBg: "#F3E8FF",
+        tagText: "#6D28D9",
+        pageBg: "#F8F5FD",
+        glow: "rgba(167, 139, 250, 0.38)"
+      },
+      {
+        name: "08 · 蜜桃乌龙",
+        nameEn: "08 · Peach Oolong",
+        orb1: "#FBCFE8",
+        orb2: "#FDA4AF",
+        refreshBg: "#F472B6",
+        sendCircleBg: "#F9A8D4",
+        accent: "#DB2777",
+        tagBg: "#FDF2F8",
+        tagText: "#BE185D",
+        pageBg: "#FDF6F9",
+        glow: "rgba(244, 114, 182, 0.34)"
+      },
+      {
+        name: "09 · 晨曦微光",
+        nameEn: "09 · Dawn Amber",
+        orb1: "#FDE68A",
+        orb2: "#FDBA74",
+        refreshBg: "#FB923C",
+        sendCircleBg: "#FCD34D",
+        accent: "#EA580C",
+        tagBg: "#FFF7ED",
+        tagText: "#C2410C",
+        pageBg: "#FCF9F4",
+        glow: "rgba(251, 146, 60, 0.34)"
+      },
+      {
+        name: "10 · 落日粉紫",
+        nameEn: "10 · Sunset Glow",
+        orb1: "#F5D0FE",
+        orb2: "#FECDD3",
+        refreshBg: "#C084FC",
+        sendCircleBg: "#F0ABFC",
+        accent: "#9333EA",
+        tagBg: "#FAF5FF",
+        tagText: "#7E22CE",
+        pageBg: "#FAF6FC",
+        glow: "rgba(192, 132, 252, 0.35)"
+      },
+      {
+        name: "11 · 香槟流金",
+        nameEn: "11 · Champagne Gold",
+        orb1: "#FEF08A",
+        orb2: "#FDE047",
+        refreshBg: "#EAB308",
+        sendCircleBg: "#FDE047",
+        accent: "#CA8A04",
+        tagBg: "#FEFCE8",
+        tagText: "#A16207",
+        pageBg: "#FAF9F2",
+        glow: "rgba(234, 179, 8, 0.32)"
+      },
+      {
+        name: "12 · 幻彩全息",
+        nameEn: "12 · Gemini Holo",
+        isHolo: true,
+        orb1: "#8FDBB8",
+        orb2: "#9CC8F7",
+        refreshBg: "#4FA8F6",
+        sendCircleBg: "#9EE0C5",
+        accent: "#1989AC",
+        tagBg: "#E6F4EA",
+        tagText: "#137333",
+        pageBg: "#F2F8FA",
+        glow: "rgba(143, 219, 184, 0.44)"
+      }
+    ];
+let currentGlobalThemeIndex=11;
+let isDarkMode=false;
+let currentLang="zh";
+try{
+  const ti=Number(localStorage.getItem("ip-theme-idx"));if(Number.isInteger(ti)&&ti>=0&&ti<12)currentGlobalThemeIndex=ti;
+  isDarkMode=localStorage.getItem("ip-dark")==="1";
+  currentLang=localStorage.getItem("ip-lang")==="en"?"en":"zh";
+}catch(e){}
+
+function applyThemeByGlobalIndex(index){
+  currentGlobalThemeIndex=index;
+  const t=allThemes[index];if(!t)return;
+  const root=document.documentElement;
+  root.style.setProperty("--orb-color-1",t.orb1);
+  root.style.setProperty("--orb-color-2",t.orb2);
+  root.style.setProperty("--refresh-btn-bg",t.refreshBg);
+  root.style.setProperty("--send-circle-bg",t.sendCircleBg);
+  root.style.setProperty("--theme-accent",t.accent);
+  root.style.setProperty("--theme-tag-bg",t.tagBg);
+  root.style.setProperty("--theme-tag-text",t.tagText);
+  root.style.setProperty("--search-glow",t.glow);
+  if(t.isHolo)root.setAttribute("data-holo","true");else root.removeAttribute("data-holo");
+  if(!isDarkMode)root.style.setProperty("--page-bg",t.pageBg);
+  const ol=$("orbLeft"),or=$("orbRight");
+  if(ol&&or){
+    if(!t.isHolo){const sh=index%2===0?1:-1;ol.style.transform="translate("+(sh*14)+"px,"+(-sh*8)+"px) scale("+(1+sh*0.05)+")";or.style.transform="translate("+(-sh*14)+"px,"+(sh*8)+"px) scale("+(1-sh*0.05)+")"}
+    else{ol.style.transform="";or.style.transform=""}
+  }
+  try{localStorage.setItem("ip-theme-idx",String(index))}catch(e){}
+  updateSwatchActiveState();
+}
+function renderThemeSwatches(){
+  const grid=$("themeSwatchGrid");if(!grid)return;
+  grid.innerHTML=allThemes.map((t,idx)=>{
+    const label=currentLang==="zh"?t.name:t.nameEn;
+    return "<div class='theme-swatch-item"+(idx===currentGlobalThemeIndex?" active":"")+"' data-theme-idx='"+idx+"'><span class='swatch-orb-preview"+(t.isHolo?" holo-animated":"")+"' style='background: linear-gradient(135deg, "+t.orb1+" 0%, "+t.orb2+" 65%, "+t.refreshBg+" 100%);'></span><span class='swatch-label'>"+label+"</span></div>";
+  }).join("");
+  grid.querySelectorAll(".theme-swatch-item").forEach(el=>el.addEventListener("click",()=>selectThemeFromPanel(Number(el.getAttribute("data-theme-idx")))));
+}
+function updateSwatchActiveState(){
+  document.querySelectorAll(".theme-swatch-item").forEach(el=>el.classList.toggle("active",Number(el.getAttribute("data-theme-idx"))===currentGlobalThemeIndex));
+}
+function openThemePanel(){closeNavMenu();$("themePopover").classList.add("open");$("themeBackdrop").classList.add("open");if(navigator.vibrate)navigator.vibrate(18)}
+function closeThemePanel(){$("themePopover").classList.remove("open");$("themeBackdrop").classList.remove("open");document.querySelectorAll(".theme-swatch-item").forEach(el=>el.classList.remove("sliding-hover"))}
+function selectThemeFromPanel(idx){applyThemeByGlobalIndex(idx);closeThemePanel();const t=allThemes[idx];showToast(currentLang==="zh"?("已切换主题："+t.name):("Theme: "+t.nameEn))}
+function toggleDarkMode(){
+  isDarkMode=!isDarkMode;
+  const root=document.documentElement,btn=$("darkModeBtn"),icon=$("sunMoonIcon");
+  btn.classList.add("rotating");setTimeout(()=>btn.classList.remove("rotating"),450);
+  if(isDarkMode){root.setAttribute("data-dark","true");root.style.setProperty("--page-bg","#090D16");icon.innerHTML="<path d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z'></path>"}
+  else{root.removeAttribute("data-dark");root.style.setProperty("--page-bg",allThemes[currentGlobalThemeIndex].pageBg);icon.innerHTML="<circle cx='12' cy='12' r='4'></circle><line x1='12' y1='2' x2='12' y2='4.5'></line><line x1='12' y1='19.5' x2='12' y2='22'></line><line x1='4.93' y1='4.93' x2='6.7' y2='6.7'></line><line x1='17.3' y1='17.3' x2='19.07' y2='19.07'></line><line x1='2' y1='12' x2='4.5' y2='12'></line><line x1='19.5' y1='12' x2='22' y2='12'></line><line x1='4.93' y1='19.07' x2='6.7' y2='17.3'></line><line x1='17.3' y1='6.7' x2='19.07' y2='4.93'></line>"}
+  try{localStorage.setItem("ip-dark",isDarkMode?"1":"0")}catch(e){}
+  showToast(currentLang==="zh"?(isDarkMode?"已开启深色模式（长按按钮可选 12 色主题）":"已切换浅色模式"):(isDarkMode?"Dark mode on (long-press for 12 themes)":"Light mode on"));
+}
+(function initThemeButtonGestures(){
+  const btn=$("darkModeBtn");if(!btn)return;
+  let pressTimer=null,isLong=false,isDown=false,lastIdx=null;
+  btn.addEventListener("pointerdown",e=>{
+    if(e.button&&e.button!==0)return;
+    isDown=true;isLong=false;lastIdx=null;btn.classList.add("pressing");
+    try{btn.setPointerCapture(e.pointerId)}catch(_){}
+    pressTimer=setTimeout(()=>{if(!isDown)return;isLong=true;openThemePanel()},320);
+  });
+  btn.addEventListener("pointermove",e=>{
+    if(!isDown||!isLong)return;
+    const el=document.elementFromPoint(e.clientX,e.clientY);
+    const item=el?el.closest(".theme-swatch-item"):null;
+    document.querySelectorAll(".theme-swatch-item").forEach(x=>x.classList.toggle("sliding-hover",x===item));
+    if(item){const idx=Number(item.getAttribute("data-theme-idx"));if(idx!==lastIdx){lastIdx=idx;applyThemeByGlobalIndex(idx);if(navigator.vibrate)navigator.vibrate(8)}}
+  });
+  const finish=()=>{
+    if(!isDown)return;
+    isDown=false;clearTimeout(pressTimer);btn.classList.remove("pressing");
+    if(!isLong){if($("themePopover").classList.contains("open"))closeThemePanel();else toggleDarkMode()}
+    else if(lastIdx!==null)closeThemePanel();
+  };
+  btn.addEventListener("pointerup",finish);
+  btn.addEventListener("pointercancel",finish);
+  btn.addEventListener("contextmenu",e=>e.preventDefault());
+})();
+/* ================= 顶部导航菜单 ================= */
+const NAV_ITEMS=[
+  {icon:"📍",zh:"IP 定位信息",en:"IP Geolocation",dzh:"多源共识定位与 ASN",den:"Multi-source geolocation & ASN",target:"mainIpCard"},
+  {icon:"🛡️",zh:"IP 风险检测",en:"IP Risk Score",dzh:"纯净度、黑名单与风险信号",den:"Purity, DNSBL & risk signals",target:"riskSection"},
+  {icon:"🎯",zh:"适用场景",en:"Scenarios",dzh:"四大场景星级评定",den:"Star ratings for 4 scenarios",target:"scenarioCard"},
+  {icon:"🤖",zh:"AI 厂商支持",en:"AI Vendor Support",dzh:"四大模型可用性判定",den:"Availability of 4 AI vendors",target:"aiSupportCard"},
+  {icon:"🗺️",zh:"IP 出口地图",en:"IP Exit Map",dzh:"出口城市与经纬度",den:"Exit city & coordinates",target:"mapSection",expand:true},
+  {icon:"🧬",zh:"本机环境",en:"Local Environment",dzh:"指纹与 WebRTC 泄露检测",den:"Fingerprint & WebRTC leak test",target:"localEnvCard"}
+];
+function renderNavMenu(){
+  const list=$("navMenuList");if(!list)return;
+  list.innerHTML=NAV_ITEMS.map((it,i)=>"<a class='nav-menu-item' data-nav='"+i+"' href='javascript:void(0)'><span class='nav-menu-icon'>"+it.icon+"</span><span><span class='nav-menu-title'>"+(currentLang==="zh"?it.zh:it.en)+"</span><div class='nav-menu-desc'>"+(currentLang==="zh"?it.dzh:it.den)+"</div></span></a>").join("");
+  list.querySelectorAll("[data-nav]").forEach(a=>a.addEventListener("click",()=>{
+    const it=NAV_ITEMS[Number(a.getAttribute("data-nav"))];
+    closeNavMenu();
+    if(it.expand)toggleDetails(true);
+    const el=$(it.target);if(el)setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"start"}),60);
+  }));
+}
+function toggleNavMenu(){$("navDropdownPanel").classList.toggle("open");$("navMenuBackdrop").classList.toggle("open")}
+function closeNavMenu(){const p=$("navDropdownPanel");if(p)p.classList.remove("open");const bd=$("navMenuBackdrop");if(bd)bd.classList.remove("open")}
+/* ================= Toast / 快照弹窗 ================= */
+function showToast(msg){const t=$("toastBanner");if(!t)return;t.textContent=msg;t.classList.add("show");clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove("show"),1900)}
+const toast=showToast;
+function openSnapshotModal(){$("snapshotModalBackdrop").classList.add("open")}
+function closeSnapshotModal(){$("snapshotModalBackdrop").classList.remove("open")}
+/* ================= 中英双语 ================= */
+const STR={
+  locTitle:{zh:"位置与主机详情",en:"Location & Host"},hostname:{zh:"主机名",en:"Hostname"},detectTime:{zh:"探测时间",en:"Detect Time"},
+  tzPostal:{zh:"时区 / 邮编",en:"Timezone / Postal"},subnet:{zh:"网段规模",en:"Subnet"},domain:{zh:"域名 / 网络名",en:"Domain / Netname"},range:{zh:"IP 段",en:"IP Range"},
+  riskTitle:{zh:"风险与属性详情",en:"Risk & Attributes"},ipType:{zh:"IP 类型",en:"IP Type"},riskVal:{zh:"风控值",en:"Risk Score"},native:{zh:"原生",en:"Native"},
+  shared:{zh:"网段 / 共享",en:"Subnet / Sharing"},riskTags:{zh:"风险标签",en:"Risk Tags"},whoisTitle:{zh:"WHOIS / 企业",en:"WHOIS / Company"},
+  asnOwner:{zh:"ASN 持有者",en:"ASN Holder"},company:{zh:"企业",en:"Company"},isp:{zh:"ISP",en:"ISP"},histTitle:{zh:"ASN 路由历史",en:"ASN Routing History"},
+  mapTitle:{zh:"IP 出口地图定位",en:"IP Exit Map"},mapCaption:{zh:"地图：OpenStreetMap，标记为 IP 大致位置，精度到城市级",en:"Map: OpenStreetMap, approximate IP location, city-level accuracy"},
+  bgpTitle:{zh:"BGP 拓扑与邻居",en:"BGP Topology & Neighbors"},bgpAll:{zh:"显示所有",en:"Show All"},
+  envTitle:{zh:"本机环境与泄露检测",en:"Local Environment & Leak Test"},retest:{zh:"重新检测",en:"Retest"},
+  ua:{zh:"浏览器",en:"Browser"},lang:{zh:"语言",en:"Language"},clientTz:{zh:"时区",en:"Timezone"},screen:{zh:"屏幕",en:"Screen"},platform:{zh:"平台",en:"Platform"},webrtc:{zh:"WebRTC",en:"WebRTC"},
+  scenes:{zh:"适用场景",en:"Scenarios"},ipOrigin:{zh:"IP来源",en:"IP Origin"},ipAttr:{zh:"IP属性",en:"IP Attribute"},riskMeter:{zh:"IPPure 系数",en:"IPPure Score"},
+  vendor:{zh:"厂商",en:"Vendor"},decimalIp:{zh:"数字地址",en:"Decimal IP"},
+  foot1:{zh:"定位多源共识 · RIPEstat 路由与 WHOIS · DNSBL 黑名单",en:"Multi-source geolocation · RIPEstat routing & WHOIS · DNSBL blacklist"},
+  foot2:{zh:"纯净度按真实信号透明计算",en:"Purity score computed transparently from real signals"},
+  foot3:{zh:"本站无广告、无追踪脚本",en:"No ads, no tracking scripts"},
+  snapTitle:{zh:"IPPure 检测报告快照",en:"IPPure Report Snapshot"},snapHint:{zh:"长按图片保存到相册",en:"Long-press the image to save it"},snapDownload:{zh:"下载图片",en:"Download Image"},
+  close:{zh:"关闭",en:"Close"},panelTitle:{zh:"12色弥散主题",en:"12 Diffuse Themes"},panelHint:{zh:"长按滑动或点击选择",en:"Long-press, slide or tap to pick"},
+  navTitle:{zh:"IPPure 检测模块",en:"IPPure Modules"},navHint:{zh:"点击直达对应模块",en:"Tap to jump to a module"}
+};
+const T=k=>(STR[k]?(currentLang==="zh"?STR[k].zh:STR[k].en):k);
+function applyLanguage(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n");if(STR[k])el.textContent=currentLang==="zh"?STR[k].zh:STR[k].en});
+  $("langText").textContent=currentLang==="zh"?"中文":"EN";
+  $("panelTitle").textContent=T("panelTitle");$("panelHint").textContent=T("panelHint");
+  $("navPanelTitle").textContent=T("navTitle");$("navPanelHint").textContent=T("navHint");
+  document.documentElement.lang=currentLang==="zh"?"zh-CN":"en";
+  renderThemeSwatches();renderNavMenu();
+  syncExpandText();
+  if(state.data)render(state.data);
+  renderMyIp();
+}
+function toggleLanguage(){
+  currentLang=currentLang==="zh"?"en":"zh";
+  try{localStorage.setItem("ip-lang",currentLang)}catch(e){}
+  applyLanguage();
+}
+const DYN={
+  detecting:{zh:"检测中…",en:"Detecting…"},checking:{zh:"查询中",en:"Checking"},notDetected:{zh:"未检测到",en:"Not Detected"},
+  copied:{zh:"已复制 ",en:"Copied "},copyFail:{zh:"复制失败，请手动复制",en:"Copy failed, please copy manually"},
+  nativeIp:{zh:"原生IP",en:"Native IP"},broadcastIp:{zh:"广播IP",en:"Broadcast IP"},nonNative:{zh:"非原生 IP",en:"Non-native IP"},
+  residential:{zh:"住宅IP",en:"Residential IP"},business:{zh:"商宽IP",en:"Business IP"},hosting:{zh:"机房IP",en:"Datacenter IP"},
+  typeResidential:{zh:"家庭宽带 IP",en:"Residential Broadband IP"},typeBusiness:{zh:"商业宽带 IP",en:"Business Broadband IP"},typeHosting:{zh:"数据中心 IP",en:"Datacenter IP"},
+  confLabel:{zh:"置信度",en:"Confidence"},methodNative:{zh:"原生 IP，通过率最高",en:"Native IP, highest pass rate"},
+  methodNonNative:{zh:"非原生 IP 仍可能触发额外验证",en:"Non-native IP may trigger extra verification"},
+  methodPrefix:{zh:"方法：该 IP 实时定位国家与各厂商官方支持地区名单核对，",en:"Method: the IP's live country is checked against each vendor's official supported-region list, "},
+  verdict:{zh:["非常适合","适合","可以尝试","不太适合","不推荐"],en:["Ideal","Suitable","Workable","Not Ideal","Not Recommended"]},
+  scoreLbl:{zh:["极度纯净","纯净","中性","有风险","风险较高","高风险"],en:["Very Pure","Pure","Neutral","Risky","High Risk","Very High Risk"]},
+  noteWhy:{zh:["类型基线","DNS 黑名单","定位共识"],en:["Type Baseline","DNSBL","Geo Consensus"]},
+  residentialW:{zh:"住宅",en:"Residential"},businessW:{zh:"商宽",en:"Business"},hostingW:{zh:"机房",en:"Datacenter"},
+  hits:{zh:"命中",en:"Hits"},sourcesWord:{zh:"源",en:"Sources"},matchWord:{zh:"个一致",en:"Match"},
+  expand:{zh:"展开详细归属、地图与 BGP 拓扑",en:"Expand ASN, Map & BGP Details"},collapse:{zh:"收起详细归属、地图与 BGP 拓扑",en:"Collapse ASN, Map & BGP Details"},
+  showOld:{zh:"↓ 显示非活跃记录",en:"↓ Show inactive records"},hideOld:{zh:"↑ 隐藏非活跃记录",en:"↑ Hide inactive records"},
+  noHist:{zh:"暂无路由历史",en:"No routing history"},noNb:{zh:"暂无 BGP 邻居数据",en:"No BGP neighbor data"},
+  upstream:{zh:"上游",en:"Upstream"},downstream:{zh:"下游",en:"Downstream"},power:{zh:"互联度",en:"Peering"},
+  firstSeen:{zh:"首次出现",en:"First seen"},lastSeen:{zh:"最近活跃",en:"Last seen"},
+  pure:{zh:"纯净 ",en:"Pure "},riskW:{zh:"风险 ",en:"Risk "},addrs:{zh:" 个地址",en:" addresses"},
+  bgpPeers:{zh:"BGP 互联",en:"BGP Peering"},ripeLive:{zh:"数据：RIPEstat 实时",en:"Data: RIPEstat live"},
+  snapFail:{zh:"当前浏览器无法直接生成图片，请用系统截图保存本页",en:"This browser cannot generate the image directly; please use a system screenshot"},
+  errInvalid:{zh:"请输入有效的 IP 地址（IPv4 或 IPv6）",en:"Please enter a valid IP address (IPv4 or IPv6)"},
+  errLinkInvalid:{zh:"链接中的 IP 不符合 IPv4 / IPv6 格式：",en:"The linked IP is not a valid IPv4 / IPv6 address: "},
+  errNoV4:{zh:"未检测到 IPv4 地址，卡片未做检测；可手动输入 IP 查询",en:"No IPv4 detected; the card was not tested. Enter an IP manually to query"},
+  errFail:{zh:"查询失败：实时数据源暂不可达，请稍后重试",en:"Query failed: live data sources are unreachable, please retry later"},
+  rtcTesting:{zh:"检测中…",en:"Testing…"},rtcFound:{zh:"发现候选地址：",en:"Candidate addresses found:"},
+  rtcConclusion:{zh:"结论：浏览器暴露了本地 / 公网候选地址，VPN 场景下请留意泄露",en:"Conclusion: the browser exposed local / public candidates; watch for leaks when using a VPN"},
+  rtcNone:{zh:"未发现候选地址（浏览器限制了 WebRTC / mDNS，或当前网络拦截了 STUN 服务器）",en:"No candidates found (WebRTC / mDNS restricted by the browser, or STUN blocked by the network)"},
+  rtcFail:{zh:"检测失败：浏览器拒绝创建 WebRTC 会话",en:"Test failed: the browser refused to create a WebRTC session"},
+  rtcUnsupported:{zh:"当前浏览器不支持 WebRTC 检测",en:"WebRTC testing is not supported in this browser"},
+  rtcLocalMask:{zh:"（本地 · mDNS 掩码）",en:" (local · mDNS masked)"},rtcSrflx:{zh:"（公网 · STUN 映射）",en:" (public · STUN)"},rtcHost:{zh:"（本地）",en:" (local)"},
+  sceneNames:{zh:["TikTok","跨境电商","社媒运营","AI 应用"],en:["TikTok","E-Commerce","Social Media","AI Apps"]},
+  summarizing:{zh:"正在汇总实时信号…",en:"Aggregating live signals…"},
+  riskTagsPending:{zh:"正在查询 WHOIS / 黑名单 / BGP…",en:"Querying WHOIS / blacklist / BGP…"}
+};
+const TD=k=>DYN[k]?DYN[k][currentLang]:k;
+function scoreLabel(s){const L=DYN.scoreLbl[currentLang];return s<=10?L[0]:s<=25?L[1]:s<=40?L[2]:s<=60?L[3]:s<=80?L[4]:L[5]}
+function suitText(n){const L=DYN.verdict[currentLang];return n>=5?L[0]:n===4?L[1]:n===3?L[2]:n===2?L[3]:L[4]}
+
+"use strict";
 const state={data:null,ipVisible:true,numVisible:true,busy:false,querySeq:0};
 function flagEmoji(cc){if(!cc||cc.length!==2)return"🌐";return String.fromCodePoint(...[...cc.toUpperCase()].map(c=>127397+c.charCodeAt(0)))}
 function flagImg(cc){if(!cc||!/^[A-Za-z]{2}$/.test(cc))return"";const c=cc.toLowerCase();return "<img class='flag-img' src='https://flagcdn.com/w80/"+c+".png' srcset='https://flagcdn.com/w160/"+c+".png 2x' alt='' loading='lazy' onerror='this.style.display=\"none\"'>"}
@@ -652,13 +2613,13 @@ function prefixSize(cidr){
 function fmtTime(d){const z=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())+" "+z(d.getHours())+":"+z(d.getMinutes())}
 function fmtDT(s){if(!s)return"";return String(s).replace("T"," ").slice(0,16)}
 function escapeHtml(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
-function scoreLabel(s){return s<=10?"极度纯净":s<=25?"纯净":s<=40?"中性":s<=60?"有风险":s<=80?"风险较高":"高风险"}
+
 function badgeColor(s){return s<=40?"#6fbf2e":s<=60?"#f59a23":"#e05252"}
 function pillCls(s){return s<=25?"":s<=60?"warn":"bad"}
-function starsHtml(n){let h="";for(let i=1;i<=5;i++)h+=i<=n?"★":"<span class='off'>☆</span>";return h}
+function starsHtml(n){let h="";for(let i=1;i<=5;i++)h+=i<=n?"<span class='star-filled'>★</span>":"<span class='star-empty'>☆</span>";return h}
 function suitIcon(n){return n>=4?"✅":n===3?"⚠️":"❌"}
-function suitCls(n){return n>=4?"ok":n===3?"mid":"bad"}
-function suitText(n){return n>=5?"非常适合":n===4?"适合":n===3?"可以尝试":n===2?"不太适合":"不推荐"}
+function suitCls(n){return n>=4?"good":n===3?"warn":"bad"}
+
 async function fetchJSON(url,ms){
   const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),ms||7000);
   try{const r=await fetch(url,{signal:ctl.signal});if(!r.ok)throw new Error("http "+r.status);return await r.json()}
@@ -738,77 +2699,75 @@ function computeScore(d,cls,bl){
 
 /* ---------- 渲染 ---------- */
 function paintAsnHead(d){
-  if(final)paintAsnHead(d);
+  $("displayAsnCode").textContent=d.asn||"—";
+  const org=$("displayAsnOrg");
+  org.textContent=(d.asnHolder||d.asnName)?(" - "+(d.asnHolder||d.asnName)):"";
+  const txt=(d.asn||"")+(org.textContent||"");
+  const wantFs=txt.length>44?14.5:txt.length>32?15.5:17;
+  if(state.asnFs==null||wantFs<state.asnFs)state.asnFs=wantFs;
+  document.querySelector(".asn-text-block").style.fontSize=state.asnFs+"px";
   state.asnPaintedSeq=state.querySeq;
 }
 function render(d,final){
   state.data=d;
-  $("ipInput").value=d.ip;fitInputFont();
-  $("fIp").textContent=d.ip;
-  $("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>";
-  if(state.ipVisible===false){$("fIp").textContent=isIPv4(d.ip)?"***.***.***.***":"****:****:****:****";$("fIp").classList.add("masked");$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}else{$("fIp").classList.remove("masked")}
-  const asnTxt=(d.asn||"")+(d.asnName?" - "+d.asnName:"");
-  const wantFs=asnTxt.length>40?14.5:asnTxt.length>30?15.5:16.5;
-  if(state.asnFs==null||wantFs<state.asnFs)state.asnFs=wantFs;
-  document.querySelector(".asn-head .name").style.fontSize=state.asnFs+"px";
-  $("fAsn").textContent=d.asn||"—";
-  $("fAsnName").textContent=d.asnName?" - "+d.asnName:"";
+  $("ipSearchInput").value=d.ip;fitInputFont();syncClearBtn();
+  const ipEl=$("displayMainIp");
+  ipEl.textContent=state.ipVisible?d.ip:(isIPv4(d.ip)?"***.***.***.***":"****:****:****:****");
+  ipEl.classList.toggle("masked",!state.ipVisible);
+  $("eyeSvgIcon").innerHTML=state.ipVisible?"<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>":"<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>";
+  if(final)paintAsnHead(d);
+  else{$("displayAsnCode").textContent=d.asn||"—";$("displayAsnOrg").textContent=d.asnName?(" - "+d.asnName):""}
   fitIpFont();
-  $("fAsDomain").textContent=d.domain||d.netname||"—";
-  $("fRange").textContent=d.range||"—";
+  $("valDomain").textContent=d.domain||d.netname||"—";
+  $("valRange").textContent=d.range||"—";
   const pure=100-d.score;
   $("ratioHuman").style.width=pure+"%";
-  $("ratioHumanTxt").textContent="纯净 "+pure+"%";
-  $("ratioBotTxt").textContent="风险 "+d.score+"%";
-  $("locList").innerHTML=d.locRows.map(r=>"<div class='loc-row'><span class='src'>"+escapeHtml(r.src)+"</span>"+flagImg(r.cc)+"<span class='place'>"+escapeHtml(r.place)+"</span></div>").join("");
-  const srcTag=$("fSource");srcTag.textContent=d.native==null?"查询中":(d.native?"原生IP":"广播IP");srcTag.className="tag"+(d.native?" green":"");
-  const attrTag=$("fAttr");attrTag.textContent=d.attr;attrTag.className="tag"+(d.attr==="住宅IP"?" green":"");
-  const badge=$("gaugeBadge");
+  $("ratioHumanTxt").textContent=TD("pure")+pure+"%";
+  $("ratioBotTxt").textContent=TD("riskW")+d.score+"%";
+  $("geoSourcesBox").innerHTML=d.locRows.map(r=>"<div class='geo-source-item'><span class='geo-provider-name'>"+escapeHtml(r.src)+"</span><div class='geo-location-val'><span class='flag-badge'>"+flagImg(r.cc)+"</span><span>"+escapeHtml(r.place)+"</span></div></div>").join("");
+  const srcTag=$("badgeIpOrigin");srcTag.textContent=d.native==null?TD("checking"):(d.native?TD("nativeIp"):TD("broadcastIp"));srcTag.className="ippure-pill-badge "+(d.native==null?"badge-pending":d.native?"badge-native":"badge-broadcast");
+  const attrTag=$("badgeIpAttr");attrTag.textContent=d.native==null&&!d.attr?TD("checking"):attrName(d);attrTag.className="ippure-pill-badge "+(d.cls&&d.cls.type==="residential"?"badge-residential":d.cls&&d.cls.type==="hosting"?"badge-hosting":"badge-isp-biz");
+  const badge=$("badgeRiskScore");
   badge.textContent=d.score+"% "+scoreLabel(d.score);
-  document.querySelector(".gauge").style.setProperty("--badge-c",badgeColor(d.score));
-  badge.style.left=d.score+"%";$("gaugeMarker").style.left=d.score+"%";
-  requestAnimationFrame(()=>{
-    const g=document.querySelector(".gauge");if(!g)return;
-    const gw=g.clientWidth,bw=badge.offsetWidth,markerX=gw*d.score/100;
-    const cx=Math.max(bw/2+2,Math.min(gw-bw/2-2,markerX));
-    badge.style.left=cx+"px";
-    badge.style.setProperty("--tri-x",(markerX-(cx-bw/2))+"px");
-  });
-  $("fHost").textContent=d.host||"查询中…";
-  $("fTime").textContent=fmtTime(new Date());
-  [...$("fConf").children].forEach((el,i)=>el.className=i<(d.conf||0)?"on":"");
-  $("fTz").textContent=d.tz||"—";
-  $("fLon").textContent=d.lon!=null?Number(d.lon).toFixed(4):"—";
-  $("fLat").textContent=d.lat!=null?Number(d.lat).toFixed(4):"—";
-  $("fPostal").textContent=d.postal||"—";
-  $("fAsnOwner").innerHTML="<span class='isp-tag'>ISP</span>"+escapeHtml(d.asnHolder||d.isp||"—");
-  $("fCompany").innerHTML="<span class='isp-tag'>ISP</span>"+escapeHtml(d.company||d.isp||"—")+(d.netname?" · netname "+escapeHtml(d.netname):"");
-  $("fIsp").textContent=d.isp||"—";
-  const typePill=$("fIpType");typePill.textContent=d.ipType;typePill.className="pill"+(d.cls&&d.cls.type==="hosting"?" dark":"");
-  const riskPill=$("fRiskPill");riskPill.textContent=d.score+"%  "+scoreLabel(d.score);riskPill.className="pill "+pillCls(d.score);
+  badge.className="attr-pill-tag "+(d.score<=25?"tag-green":d.score<=60?"tag-amber":"tag-red");
+  $("riskPointer").style.left=Math.min(97,Math.max(3,d.score))+"%";
+  $("valHostname").textContent=d.host||TD("detecting");
+  $("valDetectTime").textContent=fmtTime(new Date());
+  $("detailConfidence").textContent=TD("confLabel")+" "+"●".repeat(Math.min(5,d.conf||0))+"○".repeat(Math.max(0,5-(d.conf||0)));
+  $("valTimezone").textContent=(d.tz||"—")+(d.postal?" • "+d.postal:"");
+  $("valSubnet").textContent=d.prefix?(d.prefix+" • "+prefixSize(d.prefix)):"—";
+  $("valCoords").textContent=(d.lat!=null&&d.lon!=null)?(Number(d.lat).toFixed(4)+", "+Number(d.lon).toFixed(4)):"—";
+  $("mapCityLabel").textContent=[flagEmoji(d.cc),d.country,d.region,d.city].filter(Boolean).join(", ")||"—";
+  $("valAsnOwner").textContent=d.asnHolder||d.isp||"—";
+  $("valCompany").textContent=(d.company||d.isp||"—")+(d.netname?" · netname "+d.netname:"");
+  $("valIsp").textContent=d.isp||"—";
+  const typePill=$("valIpType");typePill.textContent=typeName(d);typePill.className="attr-pill-tag "+(d.cls&&d.cls.type==="hosting"?"tag-red":d.cls&&d.cls.type==="residential"?"tag-green":"tag-blue");
+  const riskPill=$("valRiskPill");riskPill.textContent=d.score+"%  "+scoreLabel(d.score);riskPill.className="attr-pill-tag "+(d.score<=25?"tag-green":d.score<=60?"tag-amber":"tag-red");
   const lit=d.score<=10?1:d.score<=25?2:d.score<=40?3:d.score<=60?4:5;
-  [...$("fRiskDots").children].forEach((el,i)=>el.className=i<lit?"":"off");
-  const natPill=$("fNative");natPill.textContent=d.native==null?"查询中":(d.native?"原生 IP":"非原生 IP");natPill.className="pill"+(d.native?"":" warn");
-  const shPill=$("fShared");shPill.textContent=d.prefix?(d.prefix+" · "+prefixSize(d.prefix)):"—";shPill.className="pill long"+(d.prefix&&prefixExp(d.prefix)>=16?" warn":"");
-  $("fRisk").textContent=d.riskTags||"查询中…";
+  [...$("valRiskDots").children].forEach((el,i)=>el.className=i<lit?"":"off");
+  const natPill=$("valNative");natPill.textContent=d.native==null?TD("checking"):(d.native?TD("nativeIp"):TD("nonNative"));natPill.className="attr-pill-tag "+(d.native==null?"tag-gray":d.native?"tag-green":"tag-amber");
+  const shPill=$("valShared");shPill.textContent=d.prefix?(d.prefix+" · "+prefixSize(d.prefix)):"—";shPill.className="attr-pill-tag tag-gray";
+  $("valRiskTags").textContent=d.riskTags||TD("detecting");
   paintNote(d);
   paintLlm(d);
   const num=ipToBig(d.ip);
-  $("fNumIp").dataset.num=num!=null?String(num):"—";$("fNumIp").textContent=state.numVisible?$("fNumIp").dataset.num:"********";syncNumEye();
-  $("sceneGrid").innerHTML=d.scenes.map(s=>"<div class='scene'><div class='nm'>"+s[0]+"</div><div class='stars'>"+starsHtml(s[1])+"</div><div class='suit "+suitCls(s[1])+"'>"+suitIcon(s[1])+" <b>"+suitText(s[1])+"</b></div></div>").join("");
+  $("valDecimalIp").dataset.num=num!=null?String(num):"—";$("valDecimalIp").textContent=state.numVisible?$("valDecimalIp").dataset.num:"********";syncNumEye();
+  $("scenarioGrid").innerHTML=d.scenes.map((sc,i)=>"<div class='scenario-cell'><div class='scenario-cell-name'>"+DYN.sceneNames[currentLang][i]+"</div><div class='scenario-stars-row'>"+starsHtml(sc[1])+"</div><div class='scenario-verdict verdict-"+suitCls(sc[1])+"'><span class='verdict-emoji'>"+suitIcon(sc[1])+"</span><span>"+suitText(sc[1])+"</span></div></div>").join("");
   if(d.histAsn)renderExtra(d);
-  $("card").classList.remove("loading");hideErr();
+  $("mainIpCard").classList.remove("loading");hideErr();
 }
+function attrName(d){return currentLang==="zh"?d.attr:(d.cls&&d.cls.type==="residential"?TD("residential"):d.cls&&d.cls.type==="hosting"?TD("hosting"):TD("business"))}
+function typeName(d){return currentLang==="zh"?d.ipType:(d.cls&&d.cls.type==="residential"?TD("typeResidential"):d.cls&&d.cls.type==="hosting"?TD("typeHosting"):TD("typeBusiness"))}
 function histItem(h){
   const meta=[];
   if(h.place)meta.push("<span>"+flagImg(h.cc||"")+" "+escapeHtml(h.place)+"</span>");
-  if(h.first)meta.push("<span>首次出现：<b>"+escapeHtml(h.first)+"</b></span>");
-  if(h.last)meta.push("<span>最近活跃：<b>"+escapeHtml(h.last)+"</b></span>");
+  if(h.first)meta.push("<span>"+TD("firstSeen")+"：<b>"+escapeHtml(h.first)+"</b></span>");
+  if(h.last)meta.push("<span>"+TD("lastSeen")+"：<b>"+escapeHtml(h.last)+"</b></span>");
   if(h.extra)meta.push("<span>"+escapeHtml(h.extra)+"</span>");
   return "<div class='hist-item'><div class='hist-top'><span class='dot-on'></span>"+(h.ttl?"<span class='ttl'>"+escapeHtml(h.ttl)+"</span>":"")+"<span class='org'>"+escapeHtml(h.org||"")+"</span><span class='cidr'>"+escapeHtml(h.cidr||"")+"</span></div>"+(meta.length?"<div class='hist-meta'>"+meta.join("")+"</div>":"")+"</div>";
 }
 function renderExtra(d){
-  $("histAsn").innerHTML=(d.histAsn||[]).map(histItem).join("")||"<div class='hist-item'>暂无路由历史</div>";
+  $("histAsn").innerHTML=(d.histAsn||[]).map(histItem).join("")||"<div class='hist-item'>"+TD("noHist")+"</div>";
   $("histCompany").innerHTML=(d.histCompany||[]).map(histItem).join("");
   $("histReg").innerHTML=(d.histReg||[]).map(histItem).join("");
   $("histLoc").innerHTML=(d.histLoc||[]).map(histItem).join("");
@@ -827,14 +2786,15 @@ function renderExtra(d){
   "<defs><marker id='ar' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' orient='auto-start-reverse'><path d='M0 0L10 5L0 10z' fill='#9db6c4'/></marker></defs>"+
   "<rect x='8' y='66' width='128' height='66' rx='8' fill='#e9f9e4' stroke='#57b83e'/><text x='72' y='90' text-anchor='middle' font-size='12' fill='#2c7a1f' font-weight='700'>Origins</text><text x='72' y='108' text-anchor='middle' font-size='12' fill='#23272e' font-weight='600'>"+escapeHtml((d.asn||"AS—")+" "+((d.asnHolder||"").split(" ").slice(0,2).join(" ")))+"</text><text x='72' y='124' text-anchor='middle' font-size='10.5' fill='#6d7680'>"+escapeHtml(d.prefix||d.ip)+"</text>"+
   upBoxes+
-  "<rect x='408' y='52' width='140' height='84' rx='8' fill='#eef4fb' stroke='#8fb8d8'/><text x='478' y='78' text-anchor='middle' font-size='12.5' fill='#1f5f8b' font-weight='700'>BGP 互联</text><text x='478' y='100' text-anchor='middle' font-size='11.5' fill='#3a3f47'>上游 "+(d.neighbours||[]).filter(n=>n.side==="left").length+" · 下游 "+downCount+"</text><text x='478' y='118' text-anchor='middle' font-size='11' fill='#6d7680'>数据：RIPEstat 实时</text>"+
+  "<rect x='408' y='52' width='140' height='84' rx='8' fill='#eef4fb' stroke='#8fb8d8'/><text x='478' y='78' text-anchor='middle' font-size='12.5' fill='#1f5f8b' font-weight='700'>"+TD("bgpPeers")+"</text><text x='478' y='100' text-anchor='middle' font-size='11.5' fill='#3a3f47'>"+TD("upstream")+" "+(d.neighbours||[]).filter(n=>n.side==="left").length+" · "+TD("downstream")+" "+downCount+"</text><text x='478' y='118' text-anchor='middle' font-size='11' fill='#6d7680'>"+TD("ripeLive")+"</text>"+
   "</svg>";
   renderNeighbors(d,"all");
 }
 function renderNeighbors(d,mode){
   const list=(d.neighbours||[]).filter(n=>mode==="all"||n.idc);
-  $("nbList").innerHTML=list.length?list.map(n=>"<div class='nb-row'>"+(n.idc?"<span class='tag-cc'>IDC</span>":"<span class='isp-tag'>"+(n.side==="left"?"上游":"下游")+"</span>")+"<span class='nm'>AS"+n.asn+" "+escapeHtml(n.holder||"")+"</span><span class='dm'>互联度 "+n.power+"</span></div>").join(""):"<div class='nb-row'><span class='nm'>暂无 BGP 邻居数据</span></div>";
-  $("nbTabAll").classList.toggle("on",mode==="all");$("nbTabIdc").classList.toggle("on",mode==="idc");
+  $("bgpNeighborsList").innerHTML=list.length?list.map(n=>"<div class='nb-row'>"+(n.idc?"<span class='tag-cc'>IDC</span>":"<span class='isp-tag'>"+(n.side==="left"?TD("upstream"):TD("downstream"))+"</span>")+"<span class='nm'>AS"+n.asn+" "+escapeHtml(n.holder||"")+"</span><span class='dm'>"+TD("power")+" "+n.power+"</span></div>").join(""):"<div class='nb-row'><span class='nm'>"+TD("noNb")+"</span></div>";
+  $("bgpFilterTabs").setAttribute("data-filter",mode);
+  $("btnBgpAll").classList.toggle("active",mode==="all");$("btnBgpIdc").classList.toggle("active",mode==="idc");
 }
 
 /* ---------- 查询主流程（全实时） ---------- */
@@ -852,7 +2812,7 @@ async function runQuery(ip,selfMode){
   const seq=++state.querySeq;
   state.asnFs=null;state.ipVisible=true;state.numVisible=true;
   ip=(ip||"").trim();
-  if(ip&&!validIp(ip)){showErr("请输入有效的 IP 地址（IPv4 或 IPv6）");return}
+  if(ip&&!validIp(ip)){showErr(TD("errInvalid"));return}
   hideErr();
   setBusy(true);
   try{
@@ -889,7 +2849,7 @@ async function runQuery(ip,selfMode){
       lat:loc.lat,lon:loc.lon,postal:loc.postal,tz:loc.tz,conf:loc.agree,whoisCountry:"",native:null,
       locRows:ok.map(s=>({src:s.src,cc:s.cc,place:[s.country||s.cc,s.region,s.city].filter(Boolean).join(", ")})),
       scenes:[["TikTok",3],["跨境电商",3],["社媒运营",3],["AI 应用",3]],
-      histAsn:null,neighbours:null,cls:null,score:50,riskTags:"正在查询 WHOIS / 黑名单 / BGP…",note:"正在汇总实时信号…"
+      histAsn:null,neighbours:null,cls:null,score:50,riskTags:TD("riskTagsPending"),note:TD("summarizing")
     };
     d.range=rangeFromCIDR(d.prefix,d.ip);
     d.cls=classify(d);applyType(d);render(d);
@@ -926,7 +2886,9 @@ async function runQuery(ip,selfMode){
     d.cls=classify(d);applyType(d);
     const sc=computeScore(d,d.cls,bl);d.score=sc.score;
     const blTxt=bl?(bl.checked?("DNSBL 实时查询 "+bl.checked+" 个名单："+(bl.hits?("命中 "+bl.names.join(", ")):"0 命中")):"DNSBL 查询被名单方拒绝（公共解析器限制）"):"";
-    d.riskTags=[d.cls.type==="hosting"?"机房 / 数据中心":d.cls.type==="residential"?"住宅宽带":"商业宽带",d.native==null?"注册地未知":d.native?"原生":"非原生（注册地 "+(d.whoisCountry||"?")+" ≠ 定位 "+(d.cc||"?")+")",bl&&bl.hits?"黑名单命中 "+bl.hits:""].filter(Boolean).join(" · ");
+    d.riskTags=(currentLang==="zh"
+      ?[d.cls.type==="hosting"?"机房 / 数据中心":d.cls.type==="residential"?"住宅宽带":"商业宽带",d.native==null?"注册地未知":d.native?"原生":"非原生（注册地 "+(d.whoisCountry||"?")+" ≠ 定位 "+(d.cc||"?")+")",bl&&bl.hits?"黑名单命中 "+bl.hits:""]
+      :[d.cls.type==="hosting"?"Datacenter":d.cls.type==="residential"?"Residential Broadband":"Business Broadband",d.native==null?"Registry unknown":d.native?"Native":"Non-native (registry "+(d.whoisCountry||"?")+" ≠ located "+(d.cc||"?")+")",bl&&bl.hits?"Blacklist hits "+bl.hits:""]).filter(Boolean).join(" · ");
     d.note="纯净度按实时信号计算："+sc.why.join("；")+"；定位 "+(d.locRows&&d.locRows.length?d.locRows.length:loc.total)+" 源共识（"+(d.locRows?d.conf:loc.agree)+" 个一致）";
     d._why=sc.why;
     render(d,true);
@@ -979,7 +2941,7 @@ async function runQuery(ip,selfMode){
       renderDetails(d);
     });
   }catch(e){
-    showErr("查询失败：实时数据源暂不可达，请稍后重试");
+    showErr(TD("errFail"));
   }finally{if(seq===state.querySeq){if(state.asnPaintedSeq!==seq&&state.data)paintAsnHead(state.data);setBusy(false)}}
 }
 function applyType(d){
@@ -1002,18 +2964,18 @@ let errSticky=false;
 function showErr(msg,sticky){state.querySeq++;setBusy(false);errSticky=!!sticky;$("errBarMsg").textContent=msg;$("errBar").classList.add("show")}
 function hideErr(){if(errSticky)return;$("errBar").classList.remove("show")}
 $("errBarClose").addEventListener("click",()=>{errSticky=false;$("errBar").classList.remove("show")});
-function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove("show"),1800)}
-function setBusy(b){state.busy=b;$("searchBtn").disabled=b;$("searchBtn").textContent=b?"检测中…":"Search";$("card").classList.toggle("loading",b)}
+
+function setBusy(b){state.busy=b;$("searchBtnText").disabled=b;$("searchBtnText").textContent=b?TD("detecting"):"Search";$("mainIpCard").classList.toggle("loading",b)}
 const myIpState={v4:"",v6:"",primary6:false};
 function starMask(ip){return ip.includes(":")?"****:****:****:****":"***.***.***.***"}
 function renderMyIp(){
   const row=(aid,rid,ip,vis,key)=>{
-    const el=$(aid);el.textContent=ip?(vis?ip:starMask(ip)):"未检测到";
+    const el=$(aid);el.textContent=ip?(vis?ip:starMask(ip)):TD("notDetected");
     el.classList.toggle("none",!ip);
     const rowEl=$(rid);rowEl.classList.toggle("on",!!(ip&&vis));
     rowEl.onclick=null;
     rowEl.querySelector(".fam").onclick=ip?e=>{e.stopPropagation();myIpState[key]=!vis;renderMyIp()}:null;
-    el.onclick=ip?async e=>{e.preventDefault();try{await navigator.clipboard.writeText(ip);toast("已复制 "+ip)}catch(err){toast("复制失败，请手动复制")}}:e=>e.preventDefault();
+    el.onclick=ip?async e=>{e.preventDefault();try{await navigator.clipboard.writeText(ip);toast(TD("copied")+ip)}catch(err){toast(TD("copyFail"))}}:e=>e.preventDefault();
   };
   row("myV4","rowV4",myIpState.v4,myIpState.vis4!==false,"vis4");
   row("myV6","rowV6",myIpState.v6,myIpState.vis6!==false,"vis6");
@@ -1044,42 +3006,42 @@ function fillAltFamily(primary){
 }
 
 /* ---------- 交互 ---------- */
-$("searchForm").addEventListener("submit",e=>{e.preventDefault();const v=($("ipInput").value||"").trim();if(v)runQuery(v,false);else bootSelf()});
-function fitInputFont(){const v=$("ipInput").value||"";const n=v.length;$("ipInput").style.fontSize=n<=15?"":n<=24?"16.5px":n<=32?"14.5px":"13px"}
-$("ipInput").addEventListener("input",fitInputFont);
-$("eyeBtn").addEventListener("click",()=>{
+function submitSearch(){const v=($("ipSearchInput").value||"").trim();if(v)runQuery(v,false);else bootSelf()}
+$("searchBtnText").addEventListener("click",submitSearch);
+$("ipSearchInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();submitSearch()}});
+function syncClearBtn(){$("clearIpBtn").classList.toggle("visible",!!($("ipSearchInput").value||"").length)}
+$("ipSearchInput").addEventListener("input",()=>{fitInputFont();syncClearBtn()});
+$("clearIpBtn").addEventListener("click",()=>{$("ipSearchInput").value="";fitInputFont();syncClearBtn();$("ipSearchInput").focus()});
+document.querySelector(".ippure-brand").addEventListener("click",e=>{e.preventDefault();window.scrollTo({top:0,behavior:"smooth"});bootSelf()});
+function fitInputFont(){const v=$("ipSearchInput").value||"";const n=v.length;$("ipSearchInput").style.fontSize=n<=15?"":n<=24?"16.5px":n<=32?"14.5px":"13px"}
+$("maskIpBtn").addEventListener("click",()=>{
   if(!state.data)return;state.ipVisible=!state.ipVisible;const ip=state.data.ip;
-  if(state.ipVisible){$("fIp").classList.remove("masked");$("fIp").textContent=ip;$("eyeIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>"}
-  else{$("fIp").classList.add("masked");$("fIp").textContent=isIPv4(ip)?"***.***.***.***":"****:****:****:****";$("eyeIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}
+  if(state.ipVisible){$("displayMainIp").classList.remove("masked");$("displayMainIp").textContent=ip;$("eyeSvgIcon").innerHTML="<path d='M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z'/><circle cx='12' cy='12' r='3'/>"}
+  else{$("displayMainIp").classList.add("masked");$("displayMainIp").textContent=isIPv4(ip)?"***.***.***.***":"****:****:****:****";$("eyeSvgIcon").innerHTML="<path d='M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88'/><path d='M1 1l22 22'/>"}
 });
-function fitIpFont(){const el=$("fIp");if(!el||!state.data)return;let fs=19;el.style.fontSize=fs+"px";const eye=$("eyeBtn");const avail=eye.getBoundingClientRect().left-el.getBoundingClientRect().left-12;while(el.scrollWidth>avail&&fs>10){fs-=0.5;el.style.fontSize=fs+"px"}}
+function fitIpFont(){const el=$("displayMainIp");if(!el||!state.data)return;let fs=19;el.style.fontSize=fs+"px";const eye=$("maskIpBtn");const avail=eye.getBoundingClientRect().left-el.getBoundingClientRect().left-12;while(el.scrollWidth>avail&&fs>10){fs-=0.5;el.style.fontSize=fs+"px"}}
 window.addEventListener("resize",()=>{if(state.data)fitIpFont()});
-$("fIp").addEventListener("click",async()=>{if(!state.data)return;try{await navigator.clipboard.writeText(state.data.ip);toast("已复制 "+state.data.ip)}catch(e){toast("复制失败，请手动复制")}});
+$("displayMainIp").addEventListener("click",async()=>{if(!state.data)return;try{await navigator.clipboard.writeText(state.data.ip);toast(TD("copied")+state.data.ip)}catch(e){toast(TD("copyFail"))}});
 const NUM_EYE_ON='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const NUM_EYE_OFF='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88"/><path d="M1 1l22 22"/></svg>';
 function syncNumEye(){$("numEyeBtn").innerHTML=state.numVisible?NUM_EYE_ON:NUM_EYE_OFF}
-$("numEyeBtn").addEventListener("click",()=>{state.numVisible=!state.numVisible;$("fNumIp").textContent=state.numVisible?$("fNumIp").dataset.num:"********";syncNumEye()});
-$("refreshBtn").addEventListener("click",()=>{$("refreshBtn").classList.remove("spinning");void $("refreshBtn").offsetWidth;$("refreshBtn").classList.add("spinning");bootSelf()});
+$("numEyeBtn").addEventListener("click",()=>{state.numVisible=!state.numVisible;$("valDecimalIp").textContent=state.numVisible?$("valDecimalIp").dataset.num:"********";syncNumEye()});
+$("refreshCardBtn").addEventListener("click",()=>{$("refreshCardBtn").classList.remove("spinning");void $("refreshCardBtn").offsetWidth;$("refreshCardBtn").classList.add("spinning");bootSelf()});
 function showSnap(data){
-  let ov=$("snapOv");
-  if(!ov){
-    ov=document.createElement("div");ov.id="snapOv";
-    ov.style.cssText="position:fixed;inset:0;background:rgba(10,20,30,.9);z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px;box-sizing:border-box";
-    ov.innerHTML="<img id='snapImg' style='max-width:100%;max-height:76vh;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.45)' alt='IP 检测快照'><div style='color:#fff;font-size:14.5px'>长按图片保存到相册</div><div style='display:flex;gap:10px'><a id='snapDl' download='ip-info.png' style='background:#fff;color:#123;border-radius:999px;padding:9px 22px;font-size:14.5px;font-weight:600;text-decoration:none'>下载图片</a><button id='snapClose' type='button' style='background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:999px;padding:9px 22px;font-size:14.5px'>关闭</button></div>";
-    document.body.appendChild(ov);
-    ov.querySelector("#snapClose").addEventListener("click",()=>ov.style.display="none");
-    ov.addEventListener("click",e=>{if(e.target===ov)ov.style.display="none"});
-  }
-  ov.querySelector("#snapImg").src=data;ov.querySelector("#snapDl").href=data;ov.style.display="flex";
+  const box=$("snapshotPreviewContent");
+  box.innerHTML="<img id='snapImg' style='max-width:100%;border-radius:10px;display:block;margin:0 auto' alt='IP snapshot'>";
+  box.querySelector("#snapImg").src=data;
+  $("snapDl").href=data;
+  openSnapshotModal();
 }
 async function snapshot(){
   const btn=$("shotBtn");if(btn.dataset.busy)return;btn.dataset.busy="1";
   try{
-    toast("正在生成快照…");
-    const cards=[$("card"),document.querySelector(".scene-card"),document.querySelector(".env-card")].filter(Boolean);
+    toast(currentLang==="zh"?"正在生成快照…":"Generating snapshot…");
+    const cards=[$("mainIpCard"),$("localEnvCard")].filter(Boolean);
     const wrap=document.createElement("div");
     wrap.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
-    wrap.style.cssText="display:flex;flex-direction:column;gap:18px;width:"+cards[0].offsetWidth+"px;background:#e9f4fa;padding:16px;box-sizing:border-box;position:absolute;left:-99999px;top:0";
+    wrap.style.cssText="display:flex;flex-direction:column;gap:18px;width:"+cards[0].offsetWidth+"px;background:"+getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()+";padding:16px;box-sizing:border-box;position:absolute;left:-99999px;top:0";
     const pairs=[];
     cards.forEach(c=>{const cl=c.cloneNode(true);pairs.push([c,cl]);wrap.appendChild(cl)});
     document.body.appendChild(wrap);
@@ -1095,26 +3057,33 @@ async function snapshot(){
     const img=new Image();
     await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url});
     const scale=2,cv=document.createElement("canvas");cv.width=W*scale;cv.height=H*scale;
-    const cx=cv.getContext("2d");cx.fillStyle="#e9f4fa";cx.fillRect(0,0,cv.width,cv.height);cx.scale(scale,scale);cx.drawImage(img,0,0);
+    const cx=cv.getContext("2d");cx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()||"#EEF6FA";cx.fillRect(0,0,cv.width,cv.height);cx.scale(scale,scale);cx.drawImage(img,0,0);
     URL.revokeObjectURL(url);
     const data=cv.toDataURL("image/png");
     wrap.remove();
     showSnap(data);
   }catch(e){
-    toast("当前浏览器无法直接生成图片，请用系统截图保存本页");
+    toast(TD("snapFail"));
   }
   delete btn.dataset.busy;
 }
 $("shotBtn").addEventListener("click",()=>{const f=$("flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");snapshot()});
-$("asnHead").addEventListener("click",()=>{const b=$("asnBlock");b.classList.toggle("collapsed");$("asnHead").setAttribute("aria-expanded",String(!b.classList.contains("collapsed")))});
-$("asnHead").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("asnHead").click()}});
-$("expandBtn").addEventListener("click",()=>{const p=$("morePanel");const open=p.classList.toggle("open");document.querySelector(".card").classList.toggle("more-open",open);$("expandBtn").setAttribute("aria-expanded",String(open))});
-$("menuBtn").addEventListener("click",e=>{e.stopPropagation();const p=$("menuPanel");const open=p.classList.toggle("open");$("menuBtn").setAttribute("aria-expanded",String(open));p.setAttribute("aria-hidden",String(!open))});
-document.addEventListener("click",e=>{if(!$("menuPanel").contains(e.target))$("menuPanel").classList.remove("open")});
+let detailsOpen=false;
+function syncExpandText(){const t=$("expandBtnText");if(t)t.textContent=detailsOpen?TD("collapse"):TD("expand")}
+function toggleDetails(force){
+  detailsOpen=typeof force==="boolean"?force:!detailsOpen;
+  $("detailsCollapsible").classList.toggle("open",detailsOpen);
+  $("expandDetailsBtn").classList.toggle("open",detailsOpen);
+  $("asnHead").setAttribute("aria-expanded",String(detailsOpen));
+  syncExpandText();
+}
+$("asnHead").addEventListener("click",e=>{if(e.target.closest("#maskIpBtn,#shotBtn,#refreshCardBtn"))return;toggleDetails()});
+$("expandDetailsBtn").addEventListener("click",()=>toggleDetails());
+$("asnHead").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleDetails()}});
 $("myV6").addEventListener("click",e=>e.preventDefault());
-$("showOldBtn").addEventListener("click",()=>{const el=$("histOld");const show=el.style.display==="none";el.style.display=show?"block":"none";$("showOldBtn").textContent=show?"↑ 隐藏非活跃记录":"↓ 显示非活跃记录"});
-$("nbTabAll").addEventListener("click",()=>{if(state.data&&state.data.neighbours)renderNeighbors(state.data,"all")});
-$("nbTabIdc").addEventListener("click",()=>{if(state.data&&state.data.neighbours)renderNeighbors(state.data,"idc")});
+$("showOldBtn").addEventListener("click",()=>{const el=$("histOld");const show=el.style.display==="none";el.style.display=show?"block":"none";$("showOldBtn").textContent=show?TD("hideOld"):TD("showOld")});
+$("btnBgpAll").addEventListener("click",()=>{if(state.data&&state.data.neighbours)renderNeighbors(state.data,"all")});
+$("btnBgpIdc").addEventListener("click",()=>{if(state.data&&state.data.neighbours)renderNeighbors(state.data,"idc")});
 const LLM_LISTS={
   "ChatGPT":["US","AU","TW","JP","SG","GB","DE","FR","CA","KR","NL","MY","TH","VN","PH","ID","IN","BR","MX","ES","IT","SE","NO","DK","FI","PL","NZ","IE","CH","AT","BE","PT","CZ","IL","AE"],
   "Claude":["US","AU","JP","SG","GB","DE","FR","CA","KR","NL","TH","VN","PH","ID","IN","BR","MX","ES","IT","SE","NO","DK","FI","PL","NZ","IE","CH","AT","BE","PT","CZ","IL","AE"],
@@ -1128,54 +3097,55 @@ const VENDORS=[
   {name:"Grok",by:"xAI",icon:'<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="10" fill="#111111"></rect><g transform="translate(8, 8) scale(0.8333)"><path fill="#FFFFFF" fill-rule="evenodd" d="M9.27 15.29l7.978-5.897c.391-.29.95-.177 1.137.272.98 2.369.542 5.215-1.41 7.169-1.951 1.954-4.667 2.382-7.149 1.406l-2.711 1.257c3.889 2.661 8.611 2.003 11.562-.953 2.341-2.344 3.066-5.539 2.388-8.42l.006.007c-.983-4.232.242-5.924 2.75-9.383.06-.082.12-.164.179-.248l-3.301 3.305v-.01L9.267 15.292M7.623 16.723c-2.792-2.67-2.31-6.801.071-9.184 1.761-1.763 4.647-2.483 7.166-1.425l2.705-1.25a7.808 7.808 0 00-1.829-1A8.975 8.975 0 005.984 5.83c-2.533 2.536-3.33 6.436-1.962 9.764 1.022 2.487-.653 4.246-2.34 6.022-.599.63-1.199 1.259-1.682 1.925l7.62-6.815"></path></g></svg>'}
 ];
 function paintNote(d){
-  const el=$("fNote");if(!el)return;
-  if(!d._why||!d._why.length){el.innerHTML="<div class='note-line'>"+(d.note||"正在汇总实时信号…")+"</div>";return}
+  const el=$("scenarioFactorsList");if(!el)return;
+  if(!d._why||!d._why.length){el.innerHTML="<div class='scenario-factor-row'><span class='factor-label'>"+(d.note||TD("summarizing"))+"</span><span class='factor-value'></span></div>";return}
   const rows=d._why.map(w=>{
     let lab=w,val="";
-    if(w.indexOf("类型基线")===0){lab="类型基线";val=w.slice(4).trim()}
-    else if(w.indexOf("DNS 黑名单")===0){lab="DNS 黑名单";val=w.slice(7).trim()}
+    if(w.indexOf("类型基线")===0){lab=TD2("noteWhy",0);val=w.slice(4).trim();if(currentLang==="en")val=val.replace("住宅",TD("residentialW")).replace("商宽",TD("businessW")).replace("机房",TD("hostingW"))}
+    else if(w.indexOf("DNS 黑名单")===0){lab=TD2("noteWhy",1);val=w.slice(7).trim();if(currentLang==="en")val=val.replace("命中"," "+TD("hits"))}
     else{const m=w.match(/^(.*?)\s*(\+\d+)$/);if(m){lab=m[1];val=m[2]}}
     val=val.replace(/\s*\+0$/,"");
-    return "<div class='note-row'><span>"+lab+"</span><b>"+val+"</b></div>";
+    return "<div class='scenario-factor-row'><span class='factor-label'>"+lab+"</span><span class='factor-value'>"+val+"</span></div>";
   });
   const n=d.locRows?d.locRows.length:0;
-  rows.push("<div class='note-row'><span>定位共识</span><b>"+n+" 源 · "+(d.conf||0)+" 个一致</b></div>");
+  rows.push("<div class='scenario-factor-row'><span class='factor-label'>"+TD2("noteWhy",2)+"</span><span class='factor-value'>"+n+" "+TD("sourcesWord")+" · "+(d.conf||0)+" "+TD("matchWord")+"</span></div>");
   el.innerHTML=rows.join("");
 }
+function TD2(k,i){return DYN[k][currentLang][i]}
 function paintLlm(d){
-  const tbl=$("llmTable");if(!tbl)return;const cc=(d.cc||"").toUpperCase();
-  if(!cc){tbl.style.display="none";tbl.innerHTML="";$("llmResult").textContent="";return}
-  tbl.innerHTML="<div class='llm-row head'><span></span><span>厂商</span><span>判定（"+cc+"）</span></div>"+VENDORS.map(v=>{const ok=(LLM_LISTS[v.name]||[]).includes(cc);return "<div class='llm-row'><span class='vendor-ic vi-"+v.name.toLowerCase()+"'>"+v.icon+"</span><span><span class='llm-name'>"+v.name+"</span><div class='llm-sub'>"+v.by+"</div></span><span class='llm-chip "+(ok?"ok":"no")+"'>"+(ok?"✓ 可用":"✕ 不可用")+"</span></div>"}).join("");
-  tbl.style.display="block";
-  $("llmResult").textContent="方法：该 IP 实时定位国家与各厂商官方支持地区名单核对，"+(d.native===false?"非原生 IP 仍可能触发额外验证":d.native?"原生 IP，通过率最高":"");
+  const list=$("aiVendorList");if(!list)return;const cc=(d.cc||"").toUpperCase();
+  $("badgeAiRegion").textContent=currentLang==="zh"?("判定（"+(cc||"—")+"）"):("Status ("+(cc||"—")+")");
+  if(!cc){list.innerHTML="";$("llmMethodNote").textContent="";return}
+  list.innerHTML=VENDORS.map(v=>{const ok=(LLM_LISTS[v.name]||[]).includes(cc);return "<div class='llm-row'><span class='vendor-ic vi-"+v.name.toLowerCase()+"'>"+v.icon+"</span><span><span class='llm-name'>"+v.name+"</span><div class='llm-sub'>"+v.by+"</div></span><span class='llm-chip "+(ok?"ok":"bad")+"'>"+(ok?(currentLang==="zh"?"✓ 可用":"✓ Available"):(currentLang==="zh"?"✕ 不可用":"✕ Unavailable"))+"</span></div>"}).join("");
+  $("llmMethodNote").textContent=TD("methodPrefix")+(d.native===false?TD("methodNonNative"):d.native?TD("methodNative"):"");
 }
 $("companyHead").addEventListener("click",()=>{const b=$("companyBody"),open=b.style.display!=="none";b.style.display=open?"none":"block";$("companyHead").classList.toggle("open",!open)});
-$("rtcBtn").addEventListener("click",()=>{
-  const box=$("rtcResult");const btn=$("rtcBtn");btn.textContent="检测中…";box.innerHTML="";const found=new Map();let done=false;
-  const render=()=>{if(done)return;done=true;btn.textContent="重新检测";
-    box.innerHTML=found.size?("发现候选地址：<br>"+[...found.values()].map(escapeHtml).join("<br>")+"<br>结论：浏览器暴露了本地 / 公网候选地址，VPN 场景下请留意泄露"):"未发现候选地址（浏览器限制了 WebRTC / mDNS，或当前网络拦截了 STUN 服务器）";};
+function runWebrtc(){
+  const box=$("rtcResult");const btn=$("btnRunAllLeak");btn.textContent=TD("rtcTesting");const found=new Map();let done=false;
+  const render=()=>{if(done)return;done=true;btn.textContent=T("retest");
+    box.innerHTML=found.size?("<span class='rtc-cands'>"+TD("rtcFound")+"<br>"+[...found.values()].map(escapeHtml).join("<br>")+"<br>"+TD("rtcConclusion")+"</span>"):TD("rtcNone");};
   try{
     const pc=new RTCPeerConnection({iceServers:[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302","stun:stun.cloudflare.com:3478","stun:stun.nextcloud.com:443"]}]});
     pc.createDataChannel("x");
     pc.onicecandidate=e=>{
-      if(!e.candidate){try{pc.close()}catch(_){/*noop*/}render();return}
+      if(!e.candidate){try{pc.close()}catch(_){}render();return}
       const parts=(e.candidate.candidate||"").split(" ");const addr=parts[4];const typ=parts[7]||"";
-      if(addr&&!found.has(addr))found.set(addr,addr+(addr.includes(".local")?"（本地 · mDNS 掩码）":typ==="srflx"?"（公网 · STUN 映射）":typ==="host"?"（本地）":""));
+      if(addr&&!found.has(addr))found.set(addr,addr+(addr.includes(".local")?TD("rtcLocalMask"):typ==="srflx"?TD("rtcSrflx"):typ==="host"?" (local)":""));
     };
-    pc.onicegatheringstatechange=()=>{if(pc.iceGatheringState==="complete"){try{pc.close()}catch(_){/*noop*/}render()}};
-    pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(()=>{if(!done){done=true;btn.textContent="重新检测";box.textContent="检测失败：浏览器拒绝创建 WebRTC 会话"}});
+    pc.onicegatheringstatechange=()=>{if(pc.iceGatheringState==="complete"){try{pc.close()}catch(_){}render()}};
+    pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(()=>{if(!done){done=true;btn.textContent=T("retest");box.textContent=TD("rtcFail")}});
     setTimeout(render,9000);
-  }catch(err){box.textContent="当前浏览器不支持 WebRTC 检测";btn.textContent="点击检测"}
-});
+  }catch(err){box.textContent=TD("rtcUnsupported");btn.textContent=T("retest")}
+}
+$("btnRunAllLeak").addEventListener("click",runWebrtc);;
 $("fpUa").textContent=navigator.userAgent||"—";
 $("fpLang").textContent=(navigator.languages&&navigator.languages.join(", "))||navigator.language||"—";
 try{$("fpTz").textContent=Intl.DateTimeFormat().resolvedOptions().timeZone||"—"}catch(e){$("fpTz").textContent="—"}
 $("fpScreen").textContent=screen.width+" × "+screen.height+" · "+window.devicePixelRatio+"x";
 $("fpPlat").textContent=(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.platform||"—";
-let rszT;window.addEventListener("resize",()=>{clearTimeout(rszT);rszT=setTimeout(()=>{if(!state.data)return;const badge=$("gaugeBadge");const g=document.querySelector(".gauge");if(!g)return;const gw=g.clientWidth,bw=badge.offsetWidth,markerX=gw*state.data.score/100;const cx=Math.max(bw/2+2,Math.min(gw-bw/2-2,markerX));badge.style.left=cx+"px";badge.style.setProperty("--tri-x",(markerX-(cx-bw/2))+"px")},150)});
 
 /* ---------- 初始化：直接实时检测本机出口 ---------- */
-$("myV4").textContent="检测中…";
+$("myV4").textContent=TD("detecting");
 async function probeV4(){
   const eps=["https://api4.ipify.org?format=json","https://ipv4.icanhazip.com","https://v4.ident.me","https://v4.seeip.org/jsonip","https://api4.my-ip.io/ip"];
   for(let round=0;round<3;round++){
@@ -1196,15 +3166,35 @@ async function bootSelf(){
   const v4=await probeV4().catch(()=>"");
   if(state.querySeq!==seq0)return;
   if(v4){runQuery(v4,true);return}
-  if(!errSticky)showErr("未检测到 IPv4 地址，卡片未做检测；可手动输入 IP 查询");
+  if(!errSticky)showErr(TD("errNoV4"));
   else setBusy(false);
   fetchAltFamily(true).then(ip=>{if(ip)setMyIp(ip,true)}).catch(()=>{});
 }
+/* ---------- 新稿外壳初始化 ---------- */
+if(isDarkMode){
+  document.documentElement.setAttribute("data-dark","true");
+  document.documentElement.style.setProperty("--page-bg","#090D16");
+  $("sunMoonIcon").innerHTML="<path d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z'></path>";
+}
+applyThemeByGlobalIndex(currentGlobalThemeIndex);
+renderThemeSwatches();
+renderNavMenu();
+applyLanguage();
+syncNumEye();
+syncClearBtn();
+runWebrtc();
+$("langBtn").addEventListener("click",toggleLanguage);
+$("themeBackdrop").addEventListener("click",closeThemePanel);
+$("hamburgerBtn").addEventListener("click",toggleNavMenu);
+$("navMenuBackdrop").addEventListener("click",closeNavMenu);
+$("snapshotModalBackdrop").addEventListener("click",e=>{if(e.target===$("snapshotModalBackdrop"))closeSnapshotModal()});
+document.querySelector(".modal-close-btn").addEventListener("click",closeSnapshotModal);
+
 const q=new URLSearchParams(location.search);
 const qip=(q.get("ip")||"").trim();
 if(qip){
   if(validIp(qip))runQuery(qip,false);
-  else{showErr("链接中的 IP 不符合 IPv4 / IPv6 格式："+qip,true);bootSelf()}
+  else{showErr(TD("errLinkInvalid")+qip,true);bootSelf()}
 }else bootSelf();
 fetchText("https://www.cloudflare.com/cdn-cgi/trace",4000).then(t=>{
   const m=t.match(/^ip=(.+)$/m);
