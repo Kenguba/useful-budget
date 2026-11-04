@@ -1943,6 +1943,7 @@ window.addEventListener('resize',()=>{ clearTimeout(leaderRsz); leaderRsz=setTim
 const srcOverlay=$('#srcOverlay'), srcSheet=$('#srcSheet'), pageWrap=document.querySelector('.app-container');
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let srcIsOpen=false, srcOpener=null, srcCloseTimer=0, srcHist=false, srcScrollY=0, srcLocked=false, srcPrevSR=null;
+let srcPendingRender=false, srcAnchorTop=null;
 function lockScroll(){
   if(srcLocked) return;
   srcLocked=true;
@@ -1970,6 +1971,7 @@ function openSrc(gi,ii,btn){
   note.style.display=extra>0?'':'none';
   clearTimeout(srcCloseTimer);
   srcIsOpen=true;
+  srcAnchorTop=btn?btn.getBoundingClientRect().top:null;
   srcOpener=btn||document.activeElement;
   srcHist=false; srcPrevSR=null;
   window.__srcSettleUntil=Date.now()+1500;
@@ -1997,9 +1999,11 @@ function closeSrc(fromPop){
   srcCloseTimer=setTimeout(()=>{
     if(srcIsOpen) return;
     srcOverlay.hidden=true;
+    if(srcPendingRender){ srcPendingRender=false; try{ renderBoard(); }catch(e){} }
     unlockScroll();
-    /* 弹窗开着时若数据现核重渲染过页面，保存的滚动位置会失效：按同源钮的新位置自动校正回视口 */
-    if(backKey){ const nb=document.querySelector('[data-src="'+backKey+'"]'); if(nb){ const r=nb.getBoundingClientRect(); if(r.top<-80||r.bottom>window.innerHeight+80) nb.scrollIntoView({block:'center'}); } }
+    /* 按打开时同源钮的视口位置精确还原：重渲染删了条目也能落回原位，不做居中跳动 */
+    if(backKey&&srcAnchorTop!==null){ const nb=document.querySelector('[data-src="'+backKey+'"]'); if(nb){ const dy=nb.getBoundingClientRect().top-srcAnchorTop; if(Math.abs(dy)>2) window.scrollTo(0, window.scrollY+dy); } }
+    srcAnchorTop=null;
     window.__srcSettleUntil=Date.now()+1200;
   }, reducedMotion?0:580);
 }
@@ -2090,7 +2094,7 @@ async function verifyStocks(){
       });
       g.items=kept;
     });
-    if(changed&&board&&board.updated_at===ver) renderBoard();
+    if(changed&&board&&board.updated_at===ver){ if(srcIsOpen||srcLocked){ srcPendingRender=true; } else renderBoard(); }
   }catch(e){}
 }
 function showToast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),1800)}
