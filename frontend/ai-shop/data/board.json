@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-04 13:09",
+ "updated_at": "2026-11-04 13:13",
  "source": "AI价网 + cardnav + PriceAI 按商家遍历合并",
  "groups": [
   {
@@ -10,11 +10,11 @@
      "price": 9.45,
      "shop": "1225069983",
      "platform": "16688",
-     "stock": 4,
+     "stock": 3,
      "title": "自营- Plus 成品号 未接马  张密2FA发货 （upi渠道）",
      "url": "https://www.16688.com.cn/goods/G55351551",
      "kind": "",
-     "same_source": 16,
+     "same_source": 17,
      "sources": [
       {
        "price": 9.45,
@@ -2178,7 +2178,7 @@
      "title": "PLUS账号（质保20分钟，已绑定手机号，提供账号----密码----2fa）",
      "url": "https://www.16688.com.cn/goods/G12711495",
      "kind": "",
-     "same_source": 8,
+     "same_source": 9,
      "sources": [
       {
        "price": 13.81,
@@ -2193,6 +2193,13 @@
        "platform": "16688",
        "stock": 8,
        "url": "https://www.16688.com.cn/goods/G59686118"
+      },
+      {
+       "price": 19.5,
+       "shop": "喵喵ai",
+       "platform": "16688",
+       "stock": 4,
+       "url": "https://16688.com.cn/goods/G71476792"
       },
       {
        "price": 21.45,
@@ -2465,47 +2472,6 @@
      "pc": "2026-11-04"
     },
     {
-     "price": 17.48,
-     "shop": "AI搬运工",
-     "platform": "16688",
-     "stock": 46,
-     "title": "反代专用 G Plus 已接马",
-     "url": "https://16688.com.cn/goods/G45280072",
-     "kind": "",
-     "same_source": 4,
-     "sources": [
-      {
-       "price": 17.48,
-       "shop": "AI搬运工",
-       "platform": "16688",
-       "stock": 1,
-       "url": "https://16688.com.cn/goods/G45280072"
-      },
-      {
-       "price": 18.7,
-       "shop": "梦泽Ai",
-       "platform": "16688",
-       "stock": 3,
-       "url": "https://www.16688.com.cn/goods/G15569544"
-      },
-      {
-       "price": 23.8,
-       "shop": "YUJI",
-       "platform": "16688",
-       "stock": 3,
-       "url": "https://www.16688.com.cn/goods/G47326273"
-      },
-      {
-       "price": 26.0,
-       "shop": "AI批量部",
-       "platform": "16688",
-       "stock": 3,
-       "url": "https://www.16688.com.cn/goods/G46321110"
-      }
-     ],
-     "pc": "2026-11-04"
-    },
-    {
      "price": 17.6,
      "shop": "爪爪AI专卖(对接实力号商)",
      "platform": "链动小铺",
@@ -2540,7 +2506,7 @@
      "title": "【自营】Plus 已接马 仅反代 自助复活 质保一小时",
      "url": "https://wzyp.cn/item/sb47cr",
      "kind": "",
-     "same_source": 39,
+     "same_source": 38,
      "sources": [
       {
        "price": 18.0,
@@ -2564,13 +2530,6 @@
        "url": "https://wzyp.cn/item/29b2l0"
       },
       {
-       "price": 18.7,
-       "shop": "撸秃奥特曼",
-       "platform": "链动小铺",
-       "stock": 1,
-       "url": "https://wzyp.cn/item/8vuxts"
-      },
-      {
        "price": 19.0,
        "shop": "ai成品",
        "platform": "链动小铺",
@@ -2590,6 +2549,13 @@
        "platform": "链动小铺",
        "stock": 38,
        "url": "https://wzyp.cn/item/2dghix"
+      },
+      {
+       "price": 19.26,
+       "shop": "chiyu",
+       "platform": "链动小铺",
+       "stock": 1,
+       "url": "https://wzyp.cn/item/43qo6w"
       },
       {
        "price": 19.5,
@@ -3141,6 +3107,47 @@
        "platform": "链动小铺",
        "stock": 21,
        "url": "https://wzyp.cn/item/q5aj2n"
+      }
+     ],
+     "pc": "2026-11-04"
+    },
+    {
+     "price": 18.7,
+     "shop": "梦泽Ai",
+     "platform": "16688",
+     "stock": 49,
+     "title": "反代专用 G Plus 已接马",
+     "url": "https://www.16688.com.cn/goods/G15569544",
+     "kind": "",
+     "same_source": 4,
+     "sources": [
+      {
+       "price": 18.7,
+       "shop": "梦泽Ai",
+       "platform": "16688",
+       "stock": 3,
+       "url": "https://www.16688.com.cn/goods/G15569544"
+      },
+      {
+       "price": 19.53,
+       "shop": "AI搬运工",
+       "platform": "16688",
+       "stock": 46,
+       "url": "https://16688.com.cn/goods/G45280072"
+      },
+      {
+       "price": 23.8,
+       "shop": "YUJI",
+       "platform": "16688",
+       "stock": 3,
+       "url": "https://www.16688.com.cn/goods/G47326273"
+      },
+      {
+       "price": 26.0,
+       "shop": "AI批量部",
+       "platform": "16688",
+       "stock": 3,
+       "url": "https://www.16688.com.cn/goods/G46321110"
       }
      ],
      "pc": "2026-11-04"
@@ -3859,23 +3866,23 @@
      "pc": "2026-11-04"
     },
     {
-     "price": 19.26,
-     "shop": "鹰鹰小铺",
-     "platform": "链动小铺",
-     "stock": 1,
-     "title": "G Plus 已接马 仅反代 质保首登",
-     "url": "https://wzyp.cn/item/poqtnx",
-     "kind": "",
-     "same_source": 2,
-     "pc": "2026-11-04"
-    },
-    {
      "price": 19.5,
      "shop": "纵享丝滑",
      "platform": "链动小铺",
      "stock": 129,
      "title": "Plus 已接成品｜【源头供货】Plus独享成品账号纯手工|质保首登|已接马· 美国实马|账密+2fa",
      "url": "https://wzyp.cn/item/lpt3yd",
+     "kind": "",
+     "same_source": 1,
+     "pc": "2026-11-04"
+    },
+    {
+     "price": 19.8,
+     "shop": "鹰鹰小铺",
+     "platform": "链动小铺",
+     "stock": 22,
+     "title": "G Plus 已接马 仅反代 质保首登",
+     "url": "https://wzyp.cn/item/poqtnx",
      "kind": "",
      "same_source": 1,
      "pc": "2026-11-04"
