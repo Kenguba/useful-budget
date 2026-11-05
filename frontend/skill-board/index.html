@@ -1115,6 +1115,12 @@ document.querySelectorAll(".viz-mode-btn").forEach(btn=>{
 
 /* ================= 分区导航：历史快照与即时恢复 ================= */
 let lastClickedSec=null;
+let secNavCommit=0;
+/* Let the clicked highlight reach a presented frame before pushState.
+   This keeps Chromium's return preview consistent with the last click. */
+function afterSecPaint(fn){
+  requestAnimationFrame(()=>requestAnimationFrame(fn));
+}
 const secNavSession=Math.random().toString(36).slice(2);
 try{
   history.scrollRestoration="manual";
@@ -1137,21 +1143,25 @@ function markSec(secId,animate){
   paintSec(secId,animate);
 }
 function jumpToSection(secId,groupId){
-  const sec=document.getElementById(secId); if(!sec) return;
+  if(!document.getElementById(secId))return;
   markSec(secId);
-  saveSecPosition();
-  try{history.pushState({secNavSession,y:window.scrollY},"","#"+secId)}catch(e){}
-  /* Disable expansion interpolation for a navigation jump so the browser sees
-     the final document height (especially important near the page bottom). */
-  if(groupId){
-    const g=document.getElementById(groupId);
-    if(g)g.classList.add("jump-open");
-    openGroups.add(groupId);
-  }else{
-    sec.querySelectorAll(".group").forEach(g=>{g.classList.add("jump-open");openGroups.add(g.id)});
-  }
-  saveGroups(); applyFilter(); updateDockVisibility();
-  sec.scrollIntoView({behavior:"smooth",block:"start"});
+  const nav=++secNavCommit;
+  afterSecPaint(()=>{
+    if(nav!==secNavCommit)return;
+    const sec=document.getElementById(secId);if(!sec)return;
+    saveSecPosition();
+    try{history.pushState({secNavSession,y:window.scrollY},"","#"+secId)}catch(e){}
+    /* Calculate the jump against the fully expanded document height. */
+    if(groupId){
+      const g=document.getElementById(groupId);
+      if(g)g.classList.add("jump-open");
+      openGroups.add(groupId);
+    }else{
+      sec.querySelectorAll(".group").forEach(g=>{g.classList.add("jump-open");openGroups.add(g.id)});
+    }
+    saveGroups(); applyFilter(); updateDockVisibility();
+    sec.scrollIntoView({behavior:"smooth",block:"start"});
+  });
 }
 function jumpToHash(){
   const id=(location.hash||"").slice(1); if(!id) return;
@@ -1171,6 +1181,7 @@ window.addEventListener("scroll",()=>{
 },{passive:true});
 window.addEventListener("pageshow",e=>{if(!e.persisted)setTimeout(jumpToHash,60)});
 window.addEventListener("popstate",e=>{
+  secNavCommit++;
   const st=e.state;
   if(!st||st.secNavSession!==secNavSession)return;
   window.scrollTo({top:st.y||0,behavior:"instant"});
