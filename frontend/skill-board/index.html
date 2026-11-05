@@ -226,6 +226,7 @@ section.board-sec:last-child{margin-bottom:0}
 .group.open .group-arrow{transform:rotate(180deg)}
 .group-collapsible{display:grid;grid-template-rows:0fr;transition:grid-template-rows .34s cubic-bezier(0.22,1,0.36,1)}
 .group.open .group-collapsible{grid-template-rows:1fr}
+.group.jump-open .group-collapsible{transition:none}
 .group-inner{min-height:0;overflow:hidden}
 .group-items{padding:2px 14px 6px;display:flex;flex-direction:column;gap:0}
 .item{background:transparent;border-radius:0;padding:11px 0 12px;border-top:1px solid rgba(100,116,139,.12)}
@@ -856,6 +857,7 @@ function bindGroups(root){
     btn.addEventListener("click",()=>{
       if(document.getElementById("q").value.trim()) return;
       const id=btn.getAttribute("data-group");
+      const group=document.getElementById(id);if(group)group.classList.remove("jump-open");
       if(openGroups.has(id)) openGroups.delete(id); else openGroups.add(id);
       saveGroups(); applyFilter(); updateDockVisibility();
     });
@@ -1139,15 +1141,25 @@ function jumpToSection(secId,groupId){
   markSec(secId);
   saveSecPosition();
   try{history.pushState({secNavSession,y:window.scrollY},"","#"+secId)}catch(e){}
-  if(groupId){openGroups.add(groupId)}
-  else{sec.querySelectorAll(".group").forEach(g=>openGroups.add(g.id))}
+  /* Disable expansion interpolation for a navigation jump so the browser sees
+     the final document height (especially important near the page bottom). */
+  if(groupId){
+    const g=document.getElementById(groupId);
+    if(g)g.classList.add("jump-open");
+    openGroups.add(groupId);
+  }else{
+    sec.querySelectorAll(".group").forEach(g=>{g.classList.add("jump-open");openGroups.add(g.id)});
+  }
   saveGroups(); applyFilter(); updateDockVisibility();
   sec.scrollIntoView({behavior:"smooth",block:"start"});
 }
 function jumpToHash(){
   const id=(location.hash||"").slice(1); if(!id) return;
   const el=document.getElementById(id); if(!el) return;
-  el.querySelectorAll(".group").forEach(g=>{ if(!openGroups.has(g.id)){openGroups.add(g.id)} });
+  el.querySelectorAll(".group").forEach(g=>{
+    g.classList.add("jump-open");
+    if(!openGroups.has(g.id))openGroups.add(g.id);
+  });
   applyFilter();
   el.scrollIntoView({block:"start",behavior:"instant"});
 }
