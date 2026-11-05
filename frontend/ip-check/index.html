@@ -1188,6 +1188,11 @@
       grid-template-rows: 1fr;
     }
 
+    /* Section jumps use the final expanded height, not an in-flight animation. */
+    .details-collapsible.jump-open {
+      transition: none;
+    }
+
     .details-inner {
       min-height: 0;
       overflow: hidden;
@@ -2533,7 +2538,6 @@ function renderNavMenu(){
 }
 /* SPA 状态路由：菜单、详情展开、快照弹窗、主题面板、模块跳转都是历史条目，返回/前进按快照恢复界面（从模块返回时菜单不消失，回到打开菜单的状态）；模块跳转同时写 #目标id 可分享直达；手动滑回顶部清掉当前条目的 hash */
 let spaState={menu:false,details:false,modal:false,panel:false,sec:null,y:0};
-let navSeq=0;
 function spaURL(){return spaState.sec?("#"+spaState.sec):(location.pathname+location.search)}
 function spaSaveY(){
   spaState.y=window.scrollY;
@@ -2550,7 +2554,7 @@ function spaApply(st){
   menuVisual(st.menu);panelVisual(st.panel);modalVisual(st.modal);
   if(st.details!==detailsOpen)toggleDetails(st.details);
   if(st.sec&&!st.menu){jumpToSection(st.sec,false)}
-  else{navSeq++;window.scrollTo({top:st.y||0,behavior:"instant"})}
+  else{window.scrollTo({top:st.y||0,behavior:"instant"})}
 }
 window.addEventListener("popstate",e=>{
   const base={menu:false,details:false,modal:false,panel:false,sec:null,y:0};
@@ -2563,7 +2567,7 @@ window.addEventListener("popstate",e=>{
   spaState.sec=($(id)?id:null);
   try{history.replaceState({spa:spaState},"",location.href)}catch(e){}
 })();
-window.addEventListener("pageshow",e=>{if(e.persisted)return;if(spaState.sec)setTimeout(()=>jumpToSection(spaState.sec,false),80)});
+window.addEventListener("pageshow",e=>{if(e.persisted)return;if(spaState.sec)jumpToSection(spaState.sec,false)});
 let spaScrollTm=null;
 window.addEventListener("scroll",()=>{
   if(spaScrollTm)return;
@@ -2575,10 +2579,11 @@ window.addEventListener("scroll",()=>{
 function jumpToSection(id,smooth){
   const el=$(id);if(!el)return;
   const inDetails=!!el.closest("#detailsCollapsible");
-  const expanding=inDetails&&!detailsOpen;
-  if(expanding)toggleDetails(true);
-  const tk=++navSeq;
-  setTimeout(()=>{if(tk===navSeq)el.scrollIntoView({behavior:smooth?"smooth":"instant",block:"start"})},expanding?430:60);
+  if(inDetails){
+    if(!detailsOpen)toggleDetails(true);
+    $("detailsCollapsible").classList.add("jump-open");
+  }
+  el.scrollIntoView({behavior:smooth?"smooth":"instant",block:"start"});
 }
 function menuVisual(open){$("navDropdownPanel").classList.toggle("open",open);$("navMenuBackdrop").classList.toggle("open",open)}
 function toggleNavMenu(){
@@ -3204,13 +3209,24 @@ let detailsOpen=false;
 function syncExpandText(){const t=$("expandBtnText");if(t)t.textContent=detailsOpen?TD("collapse"):TD("expand")}
 function toggleDetails(force){
   detailsOpen=typeof force==="boolean"?force:!detailsOpen;
+  if(!detailsOpen)$("detailsCollapsible").classList.remove("jump-open");
   $("detailsCollapsible").classList.toggle("open",detailsOpen);
   $("expandDetailsBtn").classList.toggle("open",detailsOpen);
   $("asnHead").setAttribute("aria-expanded",String(detailsOpen));
   syncExpandText();
 }
-function userToggleDetails(){spaPush({details:!detailsOpen});toggleDetails()}
-$("asnHead").addEventListener("click",e=>{if(e.target.closest("#maskIpBtn,#shotBtn,#refreshCardBtn"))return;userToggleDetails();if(detailsOpen)setTimeout(()=>$("detailsCollapsible").scrollIntoView({behavior:"smooth",block:"start"}),90)});
+function userToggleDetails(){
+  $("detailsCollapsible").classList.remove("jump-open");
+  spaPush({details:!detailsOpen});toggleDetails();
+}
+$("asnHead").addEventListener("click",e=>{
+  if(e.target.closest("#maskIpBtn,#shotBtn,#refreshCardBtn"))return;
+  userToggleDetails();
+  if(detailsOpen){
+    $("detailsCollapsible").classList.add("jump-open");
+    $("detailsCollapsible").scrollIntoView({behavior:"smooth",block:"start"});
+  }
+});
 $("expandDetailsBtn").addEventListener("click",()=>userToggleDetails());
 $("asnHead").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();userToggleDetails()}});
 $("myV6").addEventListener("click",e=>e.preventDefault());
