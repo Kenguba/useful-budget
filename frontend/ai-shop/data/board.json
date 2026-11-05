@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-05 08:07",
+ "updated_at": "2026-11-05 08:17",
  "source": "AI价网 + cardnav + PriceAI 按商家遍历合并",
  "groups": [
   {
@@ -1713,16 +1713,6 @@
      "same_source": 1
     },
     {
-     "price": 10.99,
-     "shop": "👑NEON AI｜霓虹玩家AI👑(专注精品✨)🔥",
-     "platform": "云猫寄售",
-     "stock": 18,
-     "title": "【源头直供】Plus独享成品号｜纯手工产出｜已接马｜账密+2FA｜质保首登｜诚招代理",
-     "url": "https://catfk.com/item/w5cyew",
-     "kind": "",
-     "same_source": 1
-    },
-    {
      "price": 11.34,
      "shop": "卡网大全",
      "platform": "链动小铺",
@@ -2333,7 +2323,7 @@
      "price": 18.49,
      "shop": "翻车咩萝",
      "platform": "链动小铺",
-     "stock": 13,
+     "stock": 14,
      "title": "Plus（upi渠道）CPA格式 已接马！ 没有质保！！！",
      "url": "https://wzyp.cn/item/xhip9j",
      "kind": "",
@@ -3515,6 +3505,40 @@
      "url": "https://wzyp.cn/item/ly6hjs",
      "kind": "",
      "same_source": 1
+    },
+    {
+     "price": 22.0,
+     "shop": "好又来",
+     "platform": "16688",
+     "stock": 5,
+     "title": "（源头）plus成品--已接马（质保首登）店家精选-（2号开通）耐活老号，带1张重置卡，非日抛（账密2fa发货）推荐指数：⭐⭐⭐⭐⭐",
+     "url": "https://www.16688.com.cn/goods/G32497293",
+     "kind": "",
+     "same_source": 3,
+     "sources": [
+      {
+       "price": 22.0,
+       "shop": "好又来",
+       "platform": "16688",
+       "stock": 5,
+       "url": "https://www.16688.com.cn/goods/G32497293"
+      },
+      {
+       "price": 23.1,
+       "shop": "梦泽Ai",
+       "platform": "16688",
+       "stock": 5,
+       "url": "https://www.16688.com.cn/goods/G37528618"
+      },
+      {
+       "price": 30.0,
+       "shop": "AI批量部",
+       "platform": "16688",
+       "stock": 5,
+       "url": "https://www.16688.com.cn/goods/G90551660"
+      }
+     ],
+     "pc": "2026-11-05"
     }
    ]
   },
@@ -5300,7 +5324,7 @@
      "price": 12.0,
      "shop": "奶龙Gemini订阅(源头招代理)",
      "platform": "16688",
-     "stock": 10,
+     "stock": 9,
      "title": "Gemini Pro 12个月自动订阅卡密|包绑卡|可使用反重力|卡密可囤",
      "url": "https://www.16688.com.cn/goods/G89750228",
      "kind": "成品号",
@@ -5762,7 +5786,7 @@
      "price": 16.0,
      "shop": "RISA AI",
      "platform": "",
-     "stock": 46,
+     "stock": 44,
      "title": "反重力凭证（rt格式） · 默认规格",
      "url": "https://cdstools.shop/products/432432432",
      "kind": "成品号",
@@ -8562,16 +8586,6 @@
      "same_source": 1
     },
     {
-     "price": 125.0,
-     "shop": "byy",
-     "platform": "云猫寄售",
-     "stock": 341,
-     "title": "【官方充值】美区 Grok Ultra CDK 200$ 官方订阅卡充 质保30天订阅【新版三合一】",
-     "url": "https://catfk.com/item/zhr0mi",
-     "kind": "成品号",
-     "same_source": 1
-    },
-    {
      "price": 299.0,
      "shop": "ai源头批发",
      "platform": "链动小铺",
@@ -9221,29 +9235,13 @@
     },
     {
      "price": 690.0,
-     "shop": "ELLAIXSHOP",
+     "shop": "dlswang的小卖铺",
      "platform": "",
      "stock": null,
      "title": "Grok Ultra 月付 半价｜自动发码",
-     "url": "https://ellaixshop.com/item/134",
+     "url": "https://dlswang.top/item/134",
      "kind": "成品号",
-     "same_source": 2,
-     "sources": [
-      {
-       "price": 690.0,
-       "shop": "ELLAIXSHOP",
-       "platform": "",
-       "stock": null,
-       "url": "https://ellaixshop.com/item/134"
-      },
-      {
-       "price": 690.0,
-       "shop": "dlswang的小卖铺",
-       "platform": "",
-       "stock": null,
-       "url": "https://dlswang.top/item/134"
-      }
-     ]
+     "same_source": 1
     },
     {
      "price": 700.0,
@@ -9388,6 +9386,32 @@
      "url": "https://catfk.com/item/1jqyiw",
      "kind": "成品号",
      "same_source": 1
+    },
+    {
+     "price": 700.0,
+     "shop": "沐风小铺",
+     "platform": "",
+     "stock": 1,
+     "title": "【官方充值】美区  Grok Ultra CDK",
+     "url": "https://mfhubs.com/products/kafu_us_grok_200",
+     "kind": "成品号",
+     "same_source": 2,
+     "sources": [
+      {
+       "price": 700.0,
+       "shop": "沐风小铺",
+       "platform": "",
+       "stock": 1,
+       "url": "https://mfhubs.com/products/kafu_us_grok_200"
+      },
+      {
+       "price": 700.0,
+       "shop": "沐风小铺",
+       "platform": "",
+       "stock": 1,
+       "url": "https://shop.mfttai.com/products/kafu_us_grok_200"
+      }
+     ]
     }
    ]
   },
