@@ -37,6 +37,16 @@ assert.ok(!['pointerdown', 'pointerup', 'pointercancel'].some(type =>
   'Card touches must not preview the selected stripe');
 assert.ok(leaderHandlers.includes('markLeader(gid);'), 'Click must commit the selected group');
 
+// Exact anchors: expanded content must have its final height before scrolling.
+// Async stock/data rerenders must re-anchor unless the visitor moved manually.
+assert.ok(has('function revealGroupForJump(grp)'), 'Missing layout-stable group reveal');
+assert.ok(has("grp.classList.add('jump-open','open')"), 'Jump must expand without intermediate height animation');
+assert.ok(has('.site-list-group.jump-open .site-list-collapsible'), 'Missing stable-height CSS');
+assert.ok(has("pinned.scrollIntoView({behavior:'instant',block:'start'})"), 'Async rerender must preserve anchor');
+assert.ok(has("pinnedLeaderGroup=t.id;"), 'Click must pin the target group');
+assert.ok(has('pinnedLeaderGroup=null;'), 'Manual/history navigation must cancel group pin');
+assert.ok(has("el.scrollIntoView({behavior:'instant',block:'start'})"), 'Hash restore must avoid inherited smooth scrolling');
+
 // No visual transition should drag old selected-card color into the next frame.
 const cardCss = html.slice(html.indexOf('    .product-card {'), html.indexOf('    .card-top {'));
 assert.ok(cardCss.length > 0, 'Product card CSS not found');
