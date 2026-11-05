@@ -1038,6 +1038,11 @@
     .geo-location-val .flag-badge img { width: auto; height: auto; max-width: 23px; max-height: 15px; }
     /* 四行共用字号：任一行排到 3 行时，整体换小一号 */
     #geoSourcesBox.geo-compact .geo-location-val { font-size: 13.5px; }
+    /* 宽屏下地点多为一行，骨架同步改一行高，加载前后卡片一样大 */
+    @media (min-width: 900px) {
+      .skl-lines { height: 21.3px; }
+      .skl-l2 { display: none; }
+    }
 
     /* IP来源 & IP属性（Layer 2） */
     .ip-tags-subbox {
