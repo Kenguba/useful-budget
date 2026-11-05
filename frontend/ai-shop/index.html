@@ -837,6 +837,11 @@
       opacity: 1;
     }
 
+    /* Touch-first devices: no colored selection outline; keep the stripe and shadow. */
+    @media (hover:none) and (pointer:coarse){
+      .product-card.seen { border-color: var(--card-border); }
+    }
+
     .product-card:active {
       transform: scale(0.97);
     }
