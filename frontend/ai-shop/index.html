@@ -1974,7 +1974,7 @@ function renderBoard(){
     const rows=g.items.map((it,ii)=>{
         if(q&&!fuzzy(q,it.title,it.shop,it.platform)&&!itemLinkHit(it,lk)) return '';
         shown++;
-        const tagrow=(it.stock===0?'<span class="attr-pill-tag tag-sold">已售罄</span>':'')+(it.kind?'<span class="attr-pill-tag '+kindCls(it.kind)+'">'+esc(it.kind)+'</span>':'')+(it.same_source>1?'<button type="button" class="same-source-btn" data-src="'+gi+':'+ii+'" aria-haspopup="dialog">同源商铺 '+it.same_source+' 家 ›</button>':'')+(it.pc?'<button type="button" class="attr-pill-tag tag-pc" data-pc="'+gi+':'+ii+'">价格变动 ›</button>':'');
+        const tagrow=(it.stock===0?'<span class="attr-pill-tag tag-sold">已售罄</span>':'')+(it.kind?'<span class="attr-pill-tag '+kindCls(it.kind)+'">'+esc(it.kind)+'</span>':'')+(it.minq?'<span class="attr-pill-tag tag-amber">'+it.minq+' 个起购</span>':'')+(it.same_source>1?'<button type="button" class="same-source-btn" data-src="'+gi+':'+ii+'" aria-haspopup="dialog">同源商铺 '+it.same_source+' 家 ›</button>':'')+(it.pc?'<button type="button" class="attr-pill-tag tag-pc" data-pc="'+gi+':'+ii+'">价格变动 ›</button>':'');
         return '<div class="real-offer-row" id="it-'+esc(g.id)+'-'+ii+'"><div class="offer-col-left"><span class="offer-price-val">'+fmtP(it.price)+'</span><span class="platform-source-badge">'+esc(it.platform)+'</span></div><div class="offer-col-mid"><div class="offer-item-title"><a data-anchor="it-'+esc(g.id)+'-'+ii+'" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div>'+(tagrow?'<div class="offer-badges-line">'+tagrow+'</div>':'')+'<div class="shoprow"><span class="shopname">'+esc(it.shop)+'</span><span class="stk">'+stockTxt(it)+'</span></div></div></div>';
       }).join('');
     if(q&&!shown) return '';
