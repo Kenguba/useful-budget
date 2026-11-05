@@ -1065,7 +1065,7 @@
       position: relative;
       border-radius: var(--card-inner-radius);
       background: var(--input-bg);
-      border: 1.5px solid var(--card-border);
+      border: none;
       padding: 12px 8px 40px 14px;
       flex: 1;
       display: flex;
@@ -1076,8 +1076,6 @@
 
     .textarea-box-wrapper:focus-within {
       background: var(--card-bg);
-      border-color: var(--theme-accent);
-      box-shadow: 0 0 0 3px var(--search-glow);
     }
 
     .secret-textarea {
@@ -1793,7 +1791,7 @@
 .primary-aura-btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;filter:saturate(.5)}
 .primary-aura-btn .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:rippleAnim .55s var(--ease-smooth) forwards;pointer-events:none}
 @keyframes rippleAnim{to{transform:scale(4);opacity:0}}
-.textarea-box-wrapper.error{border-color:#E11D48;box-shadow:0 0 0 3px rgba(225,29,72,.15);animation:shakeX .35s var(--ease-smooth)}
+.textarea-box-wrapper.error{animation:shakeX .35s var(--ease-smooth)}
 @keyframes shakeX{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 .otp-empty{display:none;margin-top:10px;font-size:12.5px;font-weight:600;color:#E11D48;line-height:1.5}
 .otp-empty.show{display:block}
@@ -1887,14 +1885,6 @@
     <main class="workspace-grid" id="workspaceGrid">
       <section class="aura-card" id="inputSectionCard">
         <form id="formSecret" autocomplete="off">
-          <div class="card-header-line">
-            <div class="card-header-top">
-              <div class="card-title-group">
-                <div class="card-title-text"><h2 data-i18n="inputTitle">在线获取2FA验证码</h2></div>
-              </div>
-            </div>
-          </div>
-
           <div class="textarea-box-wrapper" id="textareaWrap">
             <textarea class="secret-textarea" id="SECRET2FA" spellcheck="false" data-i18n-ph="2faPlaceholder" placeholder="也可以输入完整格式：UID|密码|2FA|邮箱|邮箱密码... 每行1个账户"></textarea>
             <button class="textarea-clear-x" id="inlineClearX" type="button" aria-label="清空输入">✕</button>
