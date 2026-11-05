@@ -220,8 +220,10 @@ section.board-sec:last-child{margin-bottom:0}
 .group-collapsible{display:grid;grid-template-rows:0fr;transition:grid-template-rows .34s cubic-bezier(0.22,1,0.36,1)}
 .group.open .group-collapsible{grid-template-rows:1fr}
 .group-inner{min-height:0;overflow:hidden}
-.group-items{padding:4px 12px 12px;display:flex;flex-direction:column;gap:8px}
-.item{background:var(--page-bg);border-radius:14px;padding:11px 12px}
+.group-items{padding:2px 14px 6px;display:flex;flex-direction:column;gap:0}
+.item{background:transparent;border-radius:0;padding:11px 0 12px;border-top:1px solid rgba(100,116,139,.12)}
+.group-items .item:first-child{border-top:none}
+[data-dark="true"] .item{border-top-color:rgba(255,255,255,.07)}
 .offer-row-top{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%}
 .offer-title-group{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
 .rank{flex:0 0 22px;width:22px;height:22px;border-radius:6px;font-size:10px;font-weight:800;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;display:inline-flex;align-items:center;justify-content:center;background:rgba(148,163,184,.16);color:var(--text-secondary)}
