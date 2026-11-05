@@ -1009,14 +1009,14 @@
     }
 
     /* 定位源加载中：骨架 + 流光（ken 定：数据没加载出来时不用空白卡） */
-    .geo-skl {
+    .geo-skl,.ippure-pill-badge.checking-anim,.attr-pill-tag.checking-anim,#badgeRiskScore.tag-gray {
       display: block;
       position: relative;
       overflow: hidden;
       background: #E8EDF3;
       border-radius: 6px;
     }
-    .geo-skl::after {
+    .geo-skl::after,.ippure-pill-badge.checking-anim::after,.attr-pill-tag.checking-anim::after,#badgeRiskScore.tag-gray::after {
       content: "";
       position: absolute;
       inset: 0;
@@ -1025,13 +1025,14 @@
       animation: geoSklSweep 1.5s ease-in-out infinite;
     }
     @keyframes geoSklSweep { to { transform: translateX(100%); } }
-    [data-dark="true"] .geo-skl { background: #22304A; }
-    [data-dark="true"] .geo-skl::after { background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.13) 50%, transparent 80%); }
+    [data-dark="true"] .geo-skl,[data-dark="true"] .ippure-pill-badge.checking-anim,[data-dark="true"] .attr-pill-tag.checking-anim,[data-dark="true"] #badgeRiskScore.tag-gray { background: #22304A; }
+    [data-dark="true"] .geo-skl::after,[data-dark="true"] .ippure-pill-badge.checking-anim::after,[data-dark="true"] .attr-pill-tag.checking-anim::after,[data-dark="true"] #badgeRiskScore.tag-gray::after { background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.13) 50%, transparent 80%); }
     .skl-name { width: 54px; height: 14px; margin-top: 2px; }
     .skl-flag { width: 23px; height: 16px; border-radius: 3px; flex-shrink: 0; margin-top: 2px; }
     .skl-lines { display: flex; flex-direction: column; gap: 7px; flex: 1; padding-top: 1px; }
     .skl-l1 { width: 86%; height: 14px; }
     .skl-l2 { width: 44%; height: 14px; }
+    .skl-asn { width: 190px; max-width: 60vw; height: 16px; }
 
     /* IP来源 & IP属性（Layer 2） */
     .ip-tags-subbox {
@@ -1151,6 +1152,8 @@
       margin-bottom: 7px;
       box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.12);
     }
+    .risk-bar-track.geo-skl { background: #E8EDF3; box-shadow: none; }
+    [data-dark="true"] .risk-bar-track.geo-skl { background: #22304A; }
 
     .risk-pointer {
       position: absolute;
@@ -1860,7 +1863,7 @@
 #mainIpCard.loading .main-ip-row,#mainIpCard.loading .asn-row,#mainIpCard.loading .layer2-subcard{opacity:.45;transition:opacity .25s}
 .badge-hosting{background:linear-gradient(135deg,#64748B 0%,#475569 100%);color:#fff;box-shadow:0 4px 12px rgba(71,85,105,.25)}
 .badge-pending{background:linear-gradient(135deg,#94A3B8 0%,#64748B 100%);color:#fff}
-.ippure-pill-badge.checking-anim,.attr-pill-tag.checking-anim{animation:badgePulse 1.15s ease-in-out infinite}
+.ippure-pill-badge.checking-anim,.attr-pill-tag.checking-anim,#badgeRiskScore.tag-gray{animation:none;color:transparent;text-shadow:none}
 @keyframes badgePulse{0%,100%{opacity:1}50%{opacity:.5}}
 .ratio-wrap{margin-top:12px}
 .ratio-bar{height:8px;border-radius:99px;background:#F59E0B33;overflow:hidden;background:linear-gradient(90deg,rgba(245,158,11,.25),rgba(245,158,11,.25))}
@@ -2081,7 +2084,7 @@
           <div class="asn-row-left">
             <span class="field-label">ASN</span>
             <div class="asn-text-block">
-              <span class="asn-code-highlight" id="displayAsnCode">检测中…</span>
+              <span class="asn-code-highlight" id="displayAsnCode"><span class="geo-skl skl-asn"></span></span>
               <span id="displayAsnOrg"></span>
             </div>
           </div>
@@ -2098,9 +2101,9 @@
         <div class="layer2-subcard" id="riskSection">
           <div class="risk-header-row">
             <span class="risk-title" id="labelRiskMeter" data-i18n="riskMeter">IPPure 系数</span>
-            <span class="attr-pill-tag tag-green" id="badgeRiskScore">检测中…</span>
+            <span class="attr-pill-tag tag-gray" id="badgeRiskScore">检测中…</span>
           </div>
-          <div class="risk-bar-track">
+          <div class="risk-bar-track geo-skl">
             <div class="risk-pointer" id="riskPointer" style="left: 0%; visibility: hidden;"></div>
           </div>
           <div class="risk-scale-ticks">
@@ -2875,6 +2878,7 @@ function render(d,final){
   badge.textContent=d.score==null?TD("checking"):d.score+"% "+scoreLabel(d.score);
   badge.className="attr-pill-tag "+(d.score==null?"tag-gray":d.score<=25?"tag-green":d.score<=60?"tag-amber":"tag-red");
   const rp=$("riskPointer");if(d.score==null){rp.style.visibility="hidden"}else{rp.style.visibility="visible";rp.style.left=Math.min(97,Math.max(3,d.score))+"%"}
+  document.querySelector(".risk-bar-track").classList.toggle("geo-skl",d.score==null);
   $("valHostname").textContent=d.host||TD("detecting");
   $("valDetectTime").textContent=fmtTime(new Date());
   $("detailConfidence").textContent=TD("confLabel")+" "+"●".repeat(Math.min(5,d.conf||0))+"○".repeat(Math.max(0,5-(d.conf||0)));
@@ -3113,7 +3117,7 @@ function applyType(d){
   if(d.cls&&d.cls.vpn)d.scenes=d.scenes.map(s=>[s[0],Math.max(1,s[1]-1)]);
 }
 let errSticky=false;
-function showErr(msg,sticky){state.querySeq++;setBusy(false);errSticky=!!sticky;if(!state.data)$("geoSourcesBox").innerHTML="";$("errBarMsg").textContent=msg;$("errBar").classList.add("show")}
+function showErr(msg,sticky){state.querySeq++;setBusy(false);errSticky=!!sticky;if(!state.data){$("geoSourcesBox").innerHTML="";document.querySelector(".risk-bar-track").classList.remove("geo-skl")}$("errBarMsg").textContent=msg;$("errBar").classList.add("show")}
 function hideErr(){if(errSticky)return;$("errBar").classList.remove("show")}
 $("errBarClose").addEventListener("click",()=>{errSticky=false;$("errBar").classList.remove("show")});
 
