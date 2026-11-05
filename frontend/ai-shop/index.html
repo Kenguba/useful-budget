@@ -1923,6 +1923,13 @@ let curCat='all';
 const userOpen=new Set();
 let seenLeader=null;
 let pinnedLeaderGroup=null;
+let leaderNavCommit=0;
+/* Chromium captures the outgoing history entry from a presented frame.
+   Separate the confirmed click's selection paint from pushState by one
+   completed rendering opportunity, without delaying the selection itself. */
+function afterLeaderPaint(fn){
+  requestAnimationFrame(()=>requestAnimationFrame(fn));
+}
 /* 仅在本次页面生命周期内有效：刷新后不恢复旧标记 */
 const leaderNavSession=Math.random().toString(36).slice(2);
 try{
@@ -1997,11 +2004,17 @@ function renderBoard(){
       const t=document.getElementById('grp-'+gid);
       if(!t) return;
       markLeader(gid);
-      saveLeaderPosition();
-      try{ history.pushState({leaderNavSession,y:window.scrollY},'','#grp-'+gid); }catch(e){}
-      pinnedLeaderGroup=t.id;
-      revealGroupForJump(t);
-      t.scrollIntoView({behavior:'smooth',block:'start'});
+      const nav=++leaderNavCommit;
+      afterLeaderPaint(()=>{
+        if(nav!==leaderNavCommit)return;
+        const target=document.getElementById('grp-'+gid);
+        if(!target)return;
+        saveLeaderPosition();
+        try{ history.pushState({leaderNavSession,y:window.scrollY},'','#grp-'+gid); }catch(e){}
+        pinnedLeaderGroup=target.id;
+        revealGroupForJump(target);
+        target.scrollIntoView({behavior:'smooth',block:'start'});
+      });
     });
   });
   document.querySelectorAll('[data-gtoggle]').forEach(btn=>{
@@ -2119,6 +2132,7 @@ function closeSrc(fromPop){
   }, reducedMotion?0:580);
 }
 window.addEventListener('popstate',e=>{
+  leaderNavCommit++;
   pinnedLeaderGroup=null;
   const st=e.state;
   if(!st||st.leaderNavSession!==leaderNavSession)return;
