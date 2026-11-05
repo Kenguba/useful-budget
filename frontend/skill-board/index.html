@@ -1104,14 +1104,19 @@ document.querySelectorAll(".viz-mode-btn").forEach(btn=>{
 });
 
 /* ================= 跳转（保留 hash，返回可退） ================= */
+let jumpSeq=0;
 function jumpToSection(secId,groupId){
   const sec=document.getElementById(secId); if(!sec) return;
-  if(groupId){ if(!openGroups.has(groupId)){openGroups.add(groupId)} }
-  else{ sec.querySelectorAll(".group").forEach(g=>openGroups.add(g.id)) }
-  saveGroups(); applyFilter(); updateDockVisibility();
   document.querySelectorAll(".sec-sq-btn").forEach(b=>b.classList.toggle("active",b.getAttribute("data-sec")===secId));
   try{history.pushState(null,"","#"+secId)}catch(e){}
-  sec.scrollIntoView({behavior:"smooth",block:"start"});
+  const tk=++jumpSeq;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(tk!==jumpSeq) return;
+    if(groupId){ if(!openGroups.has(groupId)){openGroups.add(groupId)} }
+    else{ sec.querySelectorAll(".group").forEach(g=>openGroups.add(g.id)) }
+    saveGroups(); applyFilter(); updateDockVisibility();
+    sec.scrollIntoView({behavior:"smooth",block:"start"});
+  }));
 }
 function jumpToHash(){
   const id=(location.hash||"").slice(1); if(!id) return;
