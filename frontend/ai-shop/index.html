@@ -1169,17 +1169,43 @@
       border-top: 1px solid var(--card-border);
     }
 
-    /* 右滑行：左侧露出收藏 / 删除 */
-    .swipe { position: relative; overflow: hidden; }
+    /* 右滑操作：克制的小按钮、明确的点击热区，不再铺满整行 */
+    .swipe { position: relative; overflow: hidden; isolation: isolate; }
     .swipe + .swipe { border-top: 1px solid var(--card-border); }
-    .swipe .real-offer-row { position: relative; z-index: 1; background: var(--card-bg); touch-action: pan-y; }
-    .swipe-actions { position: absolute; top: 0; left: 0; bottom: 0; width: 136px; display: flex; z-index: 0; }
-    .swipe-actions button { flex: 1; border: 0; font-size: 14px; font-weight: 600; cursor: pointer; color: #FFFFFF; padding: 0; }
-    .swipe-actions button:active { filter: brightness(1.15); }
-    .sw-fav { background: #FF9500; }
-    .sw-del { background: #FF3B30; }
-    [data-dark="true"] .sw-fav { background: #FF9F0A; }
-    [data-dark="true"] .sw-del { background: #FF453A; }
+    .swipe .real-offer-row {
+      position: relative; z-index: 1; background: var(--card-bg);
+      touch-action: pan-y; -webkit-tap-highlight-color: transparent;
+    }
+    .swipe.is-dragging .real-offer-row { will-change: transform; user-select: none; -webkit-user-select: none; }
+    .swipe[data-open="1"] .real-offer-row { will-change: transform; }
+    .swipe-actions {
+      position: absolute; inset: 0 auto 0 0; width: 144px;
+      box-sizing: border-box; padding: 7px; gap: 6px;
+      display: flex; align-items: center; z-index: 0;
+      pointer-events: none;
+    }
+    .swipe[data-open="1"] .swipe-actions,
+    .swipe.is-dragging .swipe-actions { pointer-events: auto; }
+    .swipe-actions button {
+      flex: 1; min-width: 0; min-height: 64px; max-height: 84px;
+      height: calc(100% - 6px); box-sizing: border-box; padding: 7px 2px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+      border: 1px solid transparent; border-radius: 13px;
+      font: 600 12px/1.2 inherit; white-space: nowrap; cursor: pointer;
+      box-shadow: 0 2px 7px rgba(15, 23, 42, .055);
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .12s ease, background-color .15s ease;
+    }
+    .swipe-actions button svg {
+      width: 19px; height: 19px; flex-shrink: 0; fill: none; stroke: currentColor;
+      stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .swipe-actions button:active { transform: scale(.94); }
+    .swipe-actions button:focus-visible { outline: 2px solid var(--theme-accent); outline-offset: 1px; }
+    .swipe-actions .sw-fav { background: #fff5e5; color: #9a651b; border-color: #f5dfbc; }
+    .swipe-actions .sw-del { background: #fff0ef; color: #ba4549; border-color: #f3d5d3; }
+    [data-dark="true"] .swipe-actions .sw-fav { background: #423120; color: #ffd08c; border-color: #634c2f; }
+    [data-dark="true"] .swipe-actions .sw-del { background: #452b30; color: #ffacb1; border-color: #694149; }
     .attr-pill-tag.tag-fav { background: rgba(245, 158, 11, 0.14); color: #B45309; }
     [data-dark="true"] .attr-pill-tag.tag-fav { background: rgba(245, 158, 11, 0.18); color: #FCD34D; }
 
@@ -1935,6 +1961,8 @@ function kindCls(k){
   if(/成品号|Pro|Max/.test(k)) return 'tag-blue';
   return 'tag-gray';
 }
+const SWIPE_FAV_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.3.9-4.55 4.45 1.08 6.25L12 17.35l-5.63 2.95 1.08-6.25L2.9 9.6l6.3-.9L12 3Z"/></svg>';
+const SWIPE_DEL_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-.8 13H6.8L6 7M10 11v5m4-5v5"/></svg>';
 let selCats=new Set(), selFav=false;
 const FKEY='aishop.favs.v1', HKEY='aishop.hidden.v1';
 function loadJSON(k,d){ try{ const v=JSON.parse(localStorage.getItem(k)); return v==null?d:v; }catch(e){ return d; } }
@@ -2015,7 +2043,7 @@ function renderBoard(){
       const erows=ex.map(f=>{
         const it={url:f.url,title:f.title,price:f.price,shop:f.shop,platform:f.platform,kind:f.kind||'',minq:f.minq||0,stock:(f.stock==null?null:f.stock)};
         const tagrow='<span class="attr-pill-tag tag-fav">★ 已收藏</span>'+(it.kind?'<span class="attr-pill-tag '+kindCls(it.kind)+'">'+esc(it.kind)+'</span>':'')+(it.minq?'<span class="attr-pill-tag tag-amber">'+it.minq+' 个起购</span>':'');
-        return '<div class="swipe" data-surl="'+esc(it.url)+'"><div class="swipe-actions"><button type="button" class="sw-fav" data-act="fav">取消收藏</button><button type="button" class="sw-del" data-act="del">删除</button></div><div class="real-offer-row"><div class="offer-col-left"><span class="offer-price-val">'+fmtP(it.price)+'</span><span class="platform-source-badge">'+esc(it.platform)+'</span></div><div class="offer-col-mid"><div class="offer-item-title"><a href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div><div class="offer-badges-line">'+tagrow+'</div><div class="shoprow"><span class="shopname">'+esc(it.shop)+'</span><span class="stk">'+stockTxt(it)+'</span></div></div></div></div>';
+        return '<div class="swipe" data-surl="'+esc(it.url)+'"><div class="swipe-actions"><button type="button" class="sw-fav" data-act="fav" aria-label="取消收藏">'+SWIPE_FAV_ICON+'<span>取消收藏</span></button><button type="button" class="sw-del" data-act="del" aria-label="删除">'+SWIPE_DEL_ICON+'<span>删除</span></button></div><div class="real-offer-row"><div class="offer-col-left"><span class="offer-price-val">'+fmtP(it.price)+'</span><span class="platform-source-badge">'+esc(it.platform)+'</span></div><div class="offer-col-mid"><div class="offer-item-title"><a href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div><div class="offer-badges-line">'+tagrow+'</div><div class="shoprow"><span class="shopname">'+esc(it.shop)+'</span><span class="stk">'+stockTxt(it)+'</span></div></div></div></div>';
       }).join('');
       favExtraHtml='<div class="site-list-group open" id="grp-favs"><button class="site-list-trigger" type="button" data-gtoggle aria-expanded="true"><span class="site-list-brand-icon">★</span><span class="site-list-main"><span class="site-list-name">收藏</span><span class="site-list-detail" style="display:block">已收藏 '+ex.length+' 条（已下榜，价格为收藏时快照）</span></span><span class="site-list-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="site-list-collapsible"><div class="site-list-inner"><div class="site-list-offers">'+erows+'</div></div></div></div>';
     }
@@ -2028,7 +2056,7 @@ function renderBoard(){
         if(!q&&!itemShown(g,it)) return '';
         shown++; if(!firstShown) firstShown=it;
         const tagrow=(favSet.has(it.url)?'<span class="attr-pill-tag tag-fav">★ 已收藏</span>':'')+(it.stock===0?'<span class="attr-pill-tag tag-sold">已售罄</span>':'')+(it.kind?'<span class="attr-pill-tag '+kindCls(it.kind)+'">'+esc(it.kind)+'</span>':'')+(it.minq?'<span class="attr-pill-tag tag-amber">'+it.minq+' 个起购</span>':'')+(it.same_source>1?'<button type="button" class="same-source-btn" data-src="'+gi+':'+ii+'" aria-haspopup="dialog">同源商铺 '+it.same_source+' 家 ›</button>':'')+(it.pc?'<button type="button" class="attr-pill-tag tag-pc" data-pc="'+gi+':'+ii+'">价格变动 ›</button>':'');
-        return '<div class="swipe" data-surl="'+esc(it.url)+'"><div class="swipe-actions"><button type="button" class="sw-fav" data-act="fav">'+(favSet.has(it.url)?'取消收藏':'收藏')+'</button><button type="button" class="sw-del" data-act="del">删除</button></div><div class="real-offer-row" id="it-'+esc(g.id)+'-'+ii+'"><div class="offer-col-left"><span class="offer-price-val">'+fmtP(it.price)+'</span><span class="platform-source-badge">'+esc(it.platform)+'</span></div><div class="offer-col-mid"><div class="offer-item-title"><a data-anchor="it-'+esc(g.id)+'-'+ii+'" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div>'+(tagrow?'<div class="offer-badges-line">'+tagrow+'</div>':'')+'<div class="shoprow"><span class="shopname">'+esc(it.shop)+'</span><span class="stk">'+stockTxt(it)+'</span></div></div></div></div>';
+        return '<div class="swipe" data-surl="'+esc(it.url)+'"><div class="swipe-actions"><button type="button" class="sw-fav" data-act="fav" aria-label="'+(favSet.has(it.url)?'取消收藏':'收藏')+'">'+SWIPE_FAV_ICON+'<span>'+(favSet.has(it.url)?'取消收藏':'收藏')+'</span></button><button type="button" class="sw-del" data-act="del" aria-label="删除">'+SWIPE_DEL_ICON+'<span>删除</span></button></div><div class="real-offer-row" id="it-'+esc(g.id)+'-'+ii+'"><div class="offer-col-left"><span class="offer-price-val">'+fmtP(it.price)+'</span><span class="platform-source-badge">'+esc(it.platform)+'</span></div><div class="offer-col-mid"><div class="offer-item-title"><a data-anchor="it-'+esc(g.id)+'-'+ii+'" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div>'+(tagrow?'<div class="offer-badges-line">'+tagrow+'</div>':'')+'<div class="shoprow"><span class="shopname">'+esc(it.shop)+'</span><span class="stk">'+stockTxt(it)+'</span></div></div></div></div>';
       }).join('');
     if(!shown) return '';
     const first=firstShown; const open=searching||userOpen.has('grp-'+g.id);
@@ -2308,38 +2336,111 @@ $('#plusBtn').onclick=()=>{
   if($('#q').value){ $('#q').value=''; $('#q').oninput(); }
   else if($('#viewShops').classList.contains('hide')){ renderBoard(); }
 };
-/* 右滑：行右滑露出左侧收藏/删除；点已打开行的链接先收起 */
+/* 右滑：轻划/快划直接展开。仅锁定明确的横向手势，纵向页面滚动交给浏览器。 */
 (function(){
   const box=$('#groups'); if(!box) return;
-  const OPEN=136, SLIDE=138; let cur=null;
-  function closeAll(except){ box.querySelectorAll('.swipe .real-offer-row').forEach(r=>{ if(r!==except){ r.style.transition='transform .18s'; r.style.transform='translateX(0)'; if(r.parentElement) r.parentElement.dataset.open=''; } }); }
+  const WIDTH=144, START=5, DISTANCE=24, FLICK_DISTANCE=12, FLICK_SPEED=.23;
+  const SNAP='transform .22s cubic-bezier(.22, 1, .36, 1)';
+  let drag=null, openRow=null, frame=0, suppressedRow=null, suppressUntil=0;
+  const clamp=v=>Math.max(0,Math.min(WIDTH,v));
+  const position=(row,x)=>{ row.style.transform='translate3d('+x+'px,0,0)'; };
+  function snap(row,open){
+    if(!row||!row.isConnected) return;
+    row.style.transition=SNAP;
+    position(row,open?WIDTH:0);
+    row.parentElement.dataset.open=open?'1':'';
+    if(open) openRow=row;
+    else if(openRow===row) openRow=null;
+  }
+  function closeOther(keep){
+    let other=openRow&&openRow.isConnected?openRow:box.querySelector('.swipe[data-open="1"] .real-offer-row');
+    if(other&&other!==keep) snap(other,false);
+    if(openRow&&!openRow.isConnected)openRow=null;
+  }
   box.addEventListener('pointerdown',e=>{
-    const row=e.target.closest('.swipe .real-offer-row'); if(!row) return;
-    cur={row:row,wrap:row.parentElement,startX:e.clientX,startY:e.clientY,base:row.parentElement.dataset.open?SLIDE:0,moved:false,dx:0};
-    row.style.transition='none';
+    if(e.isPrimary===false||e.button!==0) return;
+    const row=e.target.closest('.swipe .real-offer-row');
+    if(!row||!box.contains(row)) return;
+    if(drag) return;
+    closeOther(row);
+    const isOpen=row.parentElement.dataset.open==='1';
+    drag={id:e.pointerId,row,wrap:row.parentElement,x:e.clientX,y:e.clientY,
+      base:isOpen?WIDTH:0,value:isOpen?WIDTH:0,wasOpen:isOpen,axis:null,
+      samples:[{x:e.clientX,t:performance.now()}]};
   });
   box.addEventListener('pointermove',e=>{
-    if(!cur) return;
-    const dx=e.clientX-cur.startX, dy=e.clientY-cur.startY;
-    if(!cur.moved&&Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)) cur.moved=true;
-    if(cur.moved){ cur.dx=Math.max(0,Math.min(SLIDE,cur.base+dx)); cur.row.style.transform='translateX('+cur.dx+'px)'; }
+    const g=drag;
+    if(!g||e.pointerId!==g.id||!g.row.isConnected) return;
+    const dx=e.clientX-g.x,dy=e.clientY-g.y;
+    if(g.axis===null){
+      if(Math.abs(dy)>9&&Math.abs(dy)>Math.abs(dx)*1.12){ g.axis='y'; return; }
+      if(Math.abs(dx)<START||Math.abs(dx)<=Math.abs(dy)*1.12) return;
+      g.axis='x';
+      g.wrap.classList.add('is-dragging');
+      g.row.style.transition='none';
+      try{g.row.setPointerCapture(g.id);}catch(_){}
+    }
+    if(g.axis!=='x') return;
+    if(e.cancelable)e.preventDefault();
+    g.value=clamp(g.base+dx);
+    const t=performance.now();
+    g.samples.push({x:e.clientX,t});
+    while(g.samples.length>2&&g.samples[0].t<t-110)g.samples.shift();
+    if(!frame)frame=requestAnimationFrame(()=>{
+      frame=0;
+      if(drag===g&&g.row.isConnected)position(g.row,g.value);
+    });
   });
-  function endSwipe(){
-    if(!cur) return;
-    const row=cur.row, wrap=cur.wrap;
-    row.style.transition='transform .18s';
-    if(cur.moved){ const open=cur.dx>SLIDE/3; row.style.transform=open?'translateX('+SLIDE+'px)':'translateX(0)'; wrap.dataset.open=open?'1':''; if(open) closeAll(row); }
-    cur=null;
+  function finish(e,cancelled){
+    const g=drag;
+    if(!g||e.pointerId!==g.id)return;
+    drag=null;
+    if(frame){cancelAnimationFrame(frame);frame=0;}
+    if(g.axis==='x'){
+      const dx=e.clientX-g.x;
+      const t=performance.now(), first=g.samples[0];
+      const velocity=(e.clientX-first.x)/Math.max(1,t-first.t);
+      let shouldOpen=g.wasOpen;
+      if(!cancelled){
+        if(dx>=DISTANCE||(dx>=FLICK_DISTANCE&&velocity>=FLICK_SPEED))shouldOpen=true;
+        else if(dx<=-DISTANCE||(dx<=-FLICK_DISTANCE&&velocity<=-FLICK_SPEED))shouldOpen=false;
+      }
+      snap(g.row,shouldOpen);
+      if(shouldOpen)closeOther(g.row);
+      suppressedRow=g.row;
+      suppressUntil=performance.now()+350;
+    }
+    g.wrap.classList.remove('is-dragging');
+    try{if(g.row.hasPointerCapture(g.id))g.row.releasePointerCapture(g.id);}catch(_){}
   }
-  box.addEventListener('pointerup',endSwipe);
-  box.addEventListener('pointercancel',endSwipe);
+  box.addEventListener('pointerup',e=>finish(e,false));
+  box.addEventListener('pointercancel',e=>finish(e,true));
+  box.addEventListener('lostpointercapture',e=>finish(e,true));
   box.addEventListener('click',e=>{
     const btn=e.target.closest('.swipe-actions button');
-    if(btn){ const wrap=btn.closest('.swipe'); const url=wrap?wrap.dataset.surl:''; if(url){ if(btn.dataset.act==='del'){ hiddenSet.add(url); saveHidden(); renderBoard(); } else if(btn.dataset.act==='fav'){ toggleFav(url); } } e.preventDefault(); e.stopPropagation(); return; }
+    if(btn){
+      e.preventDefault();e.stopImmediatePropagation();
+      const wrap=btn.closest('.swipe'), url=wrap&&wrap.dataset.surl;
+      if(!url)return;
+      pinnedLeaderGroup=null;
+      if(btn.dataset.act==='del'){
+        hiddenSet.add(url);saveHidden();renderBoard();showToast('已从列表删除');
+      }else if(btn.dataset.act==='fav'){
+        const removing=favSet.has(url);toggleFav(url);
+        showToast(removing?'已取消收藏':'已收藏');
+      }
+      openRow=null; suppressedRow=null;
+      return;
+    }
     const row=e.target.closest('.swipe .real-offer-row');
-    if(row&&row.parentElement.dataset.open){ e.preventDefault(); e.stopPropagation(); row.style.transition='transform .18s'; row.style.transform='translateX(0)'; row.parentElement.dataset.open=''; }
+    if(!row)return;
+    if((row===suppressedRow&&performance.now()<suppressUntil)||row.parentElement.dataset.open==='1'){
+      e.preventDefault();e.stopImmediatePropagation();
+      if(row.parentElement.dataset.open==='1'&&row!==suppressedRow)snap(row,false);
+      suppressedRow=null;
+    }
   },true);
-})();
+})(); 
 // 触底加载：哨兵进入视口附近时自动加载下一批，带加载特效
 new IntersectionObserver(es=>{
   if(!es[0].isIntersecting||shopLoading||!shops) return;
