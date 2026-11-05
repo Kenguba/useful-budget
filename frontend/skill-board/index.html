@@ -1150,8 +1150,6 @@ window.addEventListener("pageshow",e=>{
 });
 window.addEventListener("popstate",()=>{
   jumpSeq++;
-  const st=history.state;
-  if(st&&st.sec) markSec(st.sec,false);
   nudgeNavPaint();
 });
 document.querySelectorAll(".sec-sq-btn").forEach(c=>c.addEventListener("click",()=>jumpToSection(c.getAttribute("data-sec"))));
