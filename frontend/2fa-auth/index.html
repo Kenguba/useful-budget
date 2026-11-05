@@ -1073,33 +1073,13 @@
       flex-shrink: 0;
     }
 
-    .mini-pill-btn {
-      border: 1px solid var(--card-border);
-      background: var(--input-bg);
-      color: var(--text-secondary);
-      padding: 5px 11px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.2s ease;
-    }
-
-    .mini-pill-btn:active {
-      transform: scale(0.95);
-    }
-
     /* 多行输入容器：内圆角 12px 与外卡片 26px（缝 14px）严格同心 */
     .textarea-box-wrapper {
       position: relative;
       border-radius: var(--card-inner-radius);
       background: var(--input-bg);
       border: 1.5px solid var(--card-border);
-      padding: 12px 14px 40px;
+      padding: 12px 8px 40px 14px;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -1117,7 +1097,7 @@
       width: 100%;
       flex: 1;
       min-height: 150px;
-      padding-right: 22px;
+      padding-right: 10px;
       border: none;
       outline: none;
       resize: none;
@@ -1791,19 +1771,6 @@
     }
 
 
-    .mini-pill-btn:hover {
-      color: var(--theme-accent);
-      background: var(--theme-tag-bg);
-      border-color: var(--orb-color-2);
-    }
-
-
-    [data-dark="true"] .mini-pill-btn:hover {
-      color: var(--orb-color-1);
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-
     .textarea-clear-x:hover {
       background: rgba(239, 68, 68, 0.15);
       color: #EF4444;
@@ -1877,7 +1844,6 @@
 .totp-ring-wrap.urgent .ring-fg{stroke:#EF4444}
 .totp-ring-wrap.urgent .ring-sec{color:#EF4444}
 .aura-toast.error{background:rgba(190,18,60,.94)}
-.mini-pill-btn:disabled{opacity:.45;cursor:not-allowed}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
 </style>
@@ -1962,11 +1928,7 @@
               <div class="card-title-group">
                 <div class="card-title-text"><h2 data-i18n="inputTitle">在线获取2FA验证码</h2></div>
               </div>
-              <div class="card-header-tools">
-                <button class="mini-pill-btn" type="button" id="btnClear" data-i18n="clearBtn">清空</button>
-              </div>
             </div>
-            <p class="card-subtitle-row" data-i18n="2faLabel">2FA双重验证码/二步验证码获取工具（谷歌身份验证器的网页版）</p>
           </div>
 
           <div class="textarea-box-wrapper" id="textareaWrap">
@@ -2087,7 +2049,7 @@ const i18n = {
       '2faLabel':'2FA双重验证码/二步验证码获取工具（谷歌身份验证器的网页版）',
       '2faPlaceholder':'在这里输入完整的2FA密钥，可多个/每行一个',
       '2faHint':'也可以输入完整格式：UID|密码|2FA|邮箱|邮箱密码... 每行1个账户',
-      getCodeBtn:'获取验证码', maskKey:'隐藏密钥', clearBtn:'清空',
+      getCodeBtn:'获取验证码', maskKey:'隐藏密钥', 
       otpFrom:'来自2FA的信息', refreshIn:'刷新倒计时', codeLabel:'验证码', copyBtn:'复制', copiedBtn:'已复制',
       outputSub:'每 30 秒自动更新 · 点复制按钮复制验证码',
       statusBadge:'RFC 6238 · 30s 实时同步', panelTitle:'12色弥散主题', panelHint:'滑动或点击选择',
@@ -2109,7 +2071,7 @@ const i18n = {
       '2faLabel':'Two-factor Authentication (Web version of Google Authenticator)',
       '2faPlaceholder':'Enter full 2FA secrets, one per line',
       '2faHint':'Format: UID|password|2FA|email|emailPwd... one per line',
-      getCodeBtn:'Get Codes', maskKey:'Mask keys', clearBtn:'Clear',
+      getCodeBtn:'Get Codes', maskKey:'Mask keys', 
       otpFrom:'Codes from 2FA', refreshIn:'Refresh in', codeLabel:'Code', copyBtn:'Copy', copiedBtn:'Copied',
       outputSub:'Auto-refreshes every 30s · Copy with the copy button',
       statusBadge:'RFC 6238 · 30s live sync', panelTitle:'12 Aura Themes', panelHint:'Slide or tap to pick',
@@ -2491,7 +2453,6 @@ function parseSecrets(text){
 /* ================= Form + result rendering ================= */
 const textarea  = document.getElementById('SECRET2FA');
 const btnGet    = document.getElementById('btnGet');
-const btnClear  = document.getElementById('btnClear');
 const inlineClearX = document.getElementById('inlineClearX');
 const btnMask   = document.getElementById('btnMask');
 const lineCount = document.getElementById('lineCount');
@@ -2514,7 +2475,6 @@ function clearInput(){
   textarea.value = ''; activated = false; lastSignature = '';
   otpList.innerHTML = emptyNoteHtml(); updateMeta(); textarea.focus();
 }
-btnClear.addEventListener('click', clearInput);
 inlineClearX.addEventListener('click', clearInput);
 btnMask.addEventListener('click', () => textarea.classList.toggle('masked-mode'));
 
