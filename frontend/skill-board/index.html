@@ -86,9 +86,9 @@ button{font-family:inherit}
 .panel-title{font-size:12px;font-weight:800;color:var(--text-primary)}
 .panel-hint{font-size:11px;color:var(--text-secondary);font-weight:500}
 .theme-swatch-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
-.theme-swatch-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;background:rgba(248,250,252,.75);border:none;cursor:pointer;transition:transform .18s ease,background-color .2s ease,box-shadow .2s ease}
+.theme-swatch-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;background:rgba(248,250,252,.75);border:1.5px solid transparent;cursor:pointer;transition:transform .18s ease,background-color .2s ease,border-color .2s ease,box-shadow .2s ease}
 [data-dark="true"] .theme-swatch-item{background:rgba(30,41,59,.75)}
-.theme-swatch-item.active,.theme-swatch-item.sliding-hover{background:var(--card-bg);transform:scale(1.04);box-shadow:0 6px 16px -4px var(--search-glow)}
+.theme-swatch-item.active,.theme-swatch-item.sliding-hover{background:var(--theme-tag-bg);border-color:var(--theme-accent);transform:scale(1.04);box-shadow:0 6px 16px -4px var(--search-glow)}
 .swatch-orb-preview{width:22px;height:22px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 1px 3px rgba(255,255,255,.6),0 2px 5px rgba(15,23,42,.1)}
 .swatch-orb-preview.holo-animated{background:linear-gradient(135deg,#B2E2B4 0%,#8FDBB8 35%,#92C6F2 72%,#B9CFF8 100%)!important;background-size:220% 220%!important;animation:videoHoloBtn 3.2s ease infinite}
 .swatch-label{font-size:12px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
@@ -1115,12 +1115,6 @@ document.querySelectorAll(".viz-mode-btn").forEach(btn=>{
 
 /* ================= 分区导航：历史快照与即时恢复 ================= */
 let lastClickedSec=null;
-let secNavCommit=0;
-/* Let the clicked highlight reach a presented frame before pushState.
-   This keeps Chromium's return preview consistent with the last click. */
-function afterSecPaint(fn){
-  requestAnimationFrame(()=>requestAnimationFrame(fn));
-}
 const secNavSession=Math.random().toString(36).slice(2);
 try{
   history.scrollRestoration="manual";
@@ -1143,25 +1137,21 @@ function markSec(secId,animate){
   paintSec(secId,animate);
 }
 function jumpToSection(secId,groupId){
-  if(!document.getElementById(secId))return;
+  const sec=document.getElementById(secId); if(!sec) return;
   markSec(secId);
-  const nav=++secNavCommit;
-  afterSecPaint(()=>{
-    if(nav!==secNavCommit)return;
-    const sec=document.getElementById(secId);if(!sec)return;
-    saveSecPosition();
-    try{history.pushState({secNavSession,y:window.scrollY},"","#"+secId)}catch(e){}
-    /* Calculate the jump against the fully expanded document height. */
-    if(groupId){
-      const g=document.getElementById(groupId);
-      if(g)g.classList.add("jump-open");
-      openGroups.add(groupId);
-    }else{
-      sec.querySelectorAll(".group").forEach(g=>{g.classList.add("jump-open");openGroups.add(g.id)});
-    }
-    saveGroups(); applyFilter(); updateDockVisibility();
-    sec.scrollIntoView({behavior:"smooth",block:"start"});
-  });
+  saveSecPosition();
+  try{history.pushState({secNavSession,y:window.scrollY},"","#"+secId)}catch(e){}
+  /* Disable expansion interpolation for a navigation jump so the browser sees
+     the final document height (especially important near the page bottom). */
+  if(groupId){
+    const g=document.getElementById(groupId);
+    if(g)g.classList.add("jump-open");
+    openGroups.add(groupId);
+  }else{
+    sec.querySelectorAll(".group").forEach(g=>{g.classList.add("jump-open");openGroups.add(g.id)});
+  }
+  saveGroups(); applyFilter(); updateDockVisibility();
+  sec.scrollIntoView({behavior:"smooth",block:"start"});
 }
 function jumpToHash(){
   const id=(location.hash||"").slice(1); if(!id) return;
@@ -1181,7 +1171,6 @@ window.addEventListener("scroll",()=>{
 },{passive:true});
 window.addEventListener("pageshow",e=>{if(!e.persisted)setTimeout(jumpToHash,60)});
 window.addEventListener("popstate",e=>{
-  secNavCommit++;
   const st=e.state;
   if(!st||st.secNavSession!==secNavSession)return;
   window.scrollTo({top:st.y||0,behavior:"instant"});
