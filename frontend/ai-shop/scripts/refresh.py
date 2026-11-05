@@ -445,7 +445,113 @@ def slim(rows):
         out.append(d)
     return out
 
+# ---------------- 16688 直拉（ken 2026-11-05 拍板接入） ----------------
+# 店铺 1 对多商品：按店铺目录里的 16688 店逐家调 goods/list 拉全目录，
+# 价格/标题用一手数据覆盖聚合库同链接条目，聚合没收的商品一并补进池；
+# 库存列表接口偶有 -1 占位，无效时回退用聚合库存，详情现核照旧兜底。
+# 接口慢（实测约 20 秒/店），单轮拉不完 543 家：结果存 data/direct16688.json 缓存，
+# 每轮从最旧的店开始滚动更新，缓存 5 小时内有效、且不比聚合快照旧太多才覆盖，
+# 接口整体故障时缓存自然过期失效、回退纯聚合，不让单点故障拖垮刷新。
+DIRECT_16688_BUDGET = 420            # 单轮直拉总预算（秒，与聚合抓取并行）
+DIRECT_16688_MAX_AGE = 5 * 3600      # 缓存可用年龄上限（秒）
+DIRECT_16688_PRUNE_AGE = 24 * 3600   # 缓存文件保留上限（秒）
+
+def load_direct_cache():
+    try:
+        with open(os.path.join(DATA, 'direct16688.json'), encoding='utf-8') as f:
+            return json.load(f).get('items') or {}
+    except Exception:
+        return {}
+
+def post_json(url, payload, timeout=40, retries=1):
+    last = None
+    for i in range(retries + 1):
+        try:
+            req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'),
+                                         headers={**HEADERS, 'Content-Type': 'application/json'},
+                                         method='POST')
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return json.loads(r.read().decode('utf-8'))
+        except Exception as e:
+            last = e
+            time.sleep(2 * (i + 1))
+    raise RuntimeError(f'post failed {url}: {last}')
+
+def fetch_16688_shop(code, name):
+    items, seen = [], set()
+    for page in range(1, 6):
+        d = post_json('https://www.16688.com.cn/shopApi/goods/list',
+                      {'shop_no': code, 'page_num': page, 'page_size': 200,
+                       'goods_category_no': '', 'keyword': ''}, timeout=30, retries=0)
+        lst = ((d or {}).get('data') or {}).get('list') or []
+        if not lst:
+            break
+        new = 0
+        for it in lst:
+            gno = it.get('goods_no')
+            if not gno or gno in seen:
+                continue
+            seen.add(gno)
+            price = it.get('price')
+            if price is None or float(price) <= 0 or not it.get('name'):
+                continue
+            stock = it.get('stock_available_quantity')
+            items.append(dict(title=it['name'].strip(), price=float(price),
+                              stock=stock if isinstance(stock, int) and stock >= 0 else None,
+                              shop=name, platform='16688',
+                              url=f'https://www.16688.com.cn/goods/{gno}',
+                              category='', ts=int(time.time() * 1000)))
+            new += 1
+        if new == 0:
+            break
+    return items
+
+def fetch_16688_direct(deadline):
+    """从缓存最旧（或从未拉过）的店开始拉，deadline 到点即停；返回 (本轮新拉 {url: row}, 完成店数)。"""
+    csv_path = os.path.join(DATA, 'shops.csv')
+    shops = []
+    if os.path.exists(csv_path):
+        for r in csv.DictReader(io.open(csv_path, encoding='utf-8')):
+            if r.get('platform') == '16688' and r.get('shop_code') and '失效' not in (r.get('note') or ''):
+                shops.append((r['shop_code'], r['shop_name']))
+    if not shops:
+        return {}, 0
+    cache = load_direct_cache()
+    shop_age = {}
+    for o in cache.values():
+        if o.get('shop'):
+            shop_age[o['shop']] = max(shop_age.get(o['shop'], 0), o.get('ts') or 0)
+    shops.sort(key=lambda sn: shop_age.get(sn[1], 0))  # 没拉过的 ts=0 最优先，其次最旧的
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    out, ok = {}, 0
+    ex = ThreadPoolExecutor(max_workers=12)
+    futs = [ex.submit(fetch_16688_shop, code, name) for code, name in shops]
+    try:
+        for fut in as_completed(futs, timeout=max(1, deadline - time.time())):
+            try:
+                items = fut.result()
+                ok += 1
+                for o in items:
+                    out[o['url']] = o
+            except Exception:
+                pass
+    except Exception:
+        pass
+    ex.shutdown(wait=False, cancel_futures=True)
+    return out, ok
+
 def main():
+    # 16688 直拉放后台线程，与聚合抓取并行，合并时再收结果（预算见 DIRECT_16688_BUDGET）
+    import threading
+    _t0 = time.time()
+    _direct_box = {}
+    def _crawl():
+        try:
+            _direct_box['r'] = fetch_16688_direct(_t0 + DIRECT_16688_BUDGET)
+        except Exception as e:
+            _direct_box['e'] = e
+    _crawl_thread = threading.Thread(target=_crawl, daemon=True)
+    _crawl_thread.start()
     all_offers = {}
     for name, url in (('aiprice', 'https://aiprice.club/api/shop-products.json'),
                       ('cardnav', 'https://cardnav.xyz/api/shop-products.json')):
@@ -461,8 +567,50 @@ def main():
                     all_offers[key] = o
         except Exception as e:
             print(f'{name} failed: {e}', file=sys.stderr)
+    # 16688 直拉覆盖（ken 2026-11-05）：本轮新拉先并入缓存，再用可用缓存覆盖聚合——
+    # 同链接以一手价为准（但缓存比聚合快照旧 30 分钟以上的不覆盖），库存直拉无效时保留聚合值
+    try:
+        _crawl_thread.join(timeout=max(1, _t0 + DIRECT_16688_BUDGET - time.time()))
+        if 'e' in _direct_box:
+            print(f"16688 crawl error: {_direct_box['e']}", file=sys.stderr)
+        fresh, ok_shops = _direct_box.get('r', ({}, 0))
+        now_ms = int(time.time() * 1000)
+        cache = load_direct_cache()
+        for url, o in fresh.items():
+            cache[url] = o
+        cache = {u: o for u, o in cache.items()
+                 if now_ms - (o.get('ts') or 0) <= DIRECT_16688_PRUNE_AGE * 1000}
+        with open(os.path.join(DATA, 'direct16688.json'), 'w', encoding='utf-8') as f:
+            json.dump(dict(items=cache), f, ensure_ascii=False)
+        usable = {u: o for u, o in cache.items()
+                  if now_ms - (o.get('ts') or 0) <= DIRECT_16688_MAX_AGE * 1000}
+        by_url = {}
+        for k in list(all_offers):
+            by_url.setdefault(k[0], []).append(k)
+        applied = 0
+        for url, drow0 in usable.items():
+            keys = by_url.get(url, [])
+            agg_ts = max([(all_offers[k].get('ts') or 0) for k in keys], default=0)
+            if keys and (drow0.get('ts') or 0) < agg_ts - 1800_000:
+                continue  # 缓存明显比聚合快照旧，不拿旧一手价压新快照
+            old_stock = None
+            for k in keys:
+                if all_offers[k].get('stock') is not None:
+                    old_stock = all_offers[k]['stock']
+                del all_offers[k]
+            drow = dict(drow0)
+            if drow.get('stock') is None:
+                drow['stock'] = old_stock
+            _b, _s = split_spec(drow['title'])
+            all_offers[(url, norm_title(_s))] = drow
+            applied += 1
+        print(f'16688 direct: {len(fresh)} fresh from {ok_shops} shops, {applied} applied from cache', file=sys.stderr)
+    except Exception as e:
+        print(f'16688 direct failed: {e}', file=sys.stderr)
     # 定点剔除（ken 2026-11-02 裁定）：异次元店铺 ¥1.85 为引流价（单源、库存未显示），从看板剔除
-    BLOCKED_URLS = {'https://fk.rupap.cn/item/10'}
+    # G47831683（ken 2026-11-05 裁定）：¥0.02 只卖渠道介绍、真卡人工发货 12–35 元，同为引流品剔除
+    BLOCKED_URLS = {'https://fk.rupap.cn/item/10',
+                    'https://www.16688.com.cn/goods/G47831683'}
     rows = [o for o in list(all_offers.values()) if o['url'].split('?')[0] not in BLOCKED_URLS]
     print(f'merged unique products: {len(rows)}', file=sys.stderr)
 
@@ -498,7 +646,7 @@ def main():
     from datetime import datetime, timezone, timedelta
     bj_now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M')
     board = dict(updated_at=bj_now,
-                 source='AI价网 + cardnav + PriceAI 按商家遍历合并',
+                 source='AI价网 + cardnav + PriceAI + 16688 直拉 按商家遍历合并',
                  groups=groups)
     # 详情页库存核验（ken 2026-11-02）：能读到详情页实时库存的平台逐条核验，
     # 详情页库存为 0 / 已售罄的剔除，读到的实时库存同时回填展示；
@@ -516,6 +664,9 @@ def main():
                     headers={**HEADERS, 'Content-Type': 'application/json'})
                 with urllib.request.urlopen(req, timeout=20) as r:
                     d = json.loads(r.read().decode('utf-8', 'ignore'))
+                if not d.get('data'):
+                    # 接口明确回「商品不存在」= 已下架，按售罄剔除；其他空响应仍按读不到保留
+                    return 0 if '不存在' in str(d.get('msg') or '') else None
                 q = (d.get('data') or {}).get('stock_available_quantity')
                 return int(q) if isinstance(q, (int, float)) else None
             if 'aicdks.com' in url or '/item/' in url:
