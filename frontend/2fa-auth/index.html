@@ -283,6 +283,13 @@
       box-shadow: 0 6px 18px -6px var(--search-glow);
     }
 
+    /* No decorative vertical rail beside the selected sidebar item. */
+    .sidebar-nav-item.active::before,
+    .sidebar-nav-item.active::after {
+      content: none;
+      display: none;
+    }
+
     [data-dark="true"] .sidebar-nav-item.active {
       color: var(--orb-color-1);
       background: rgba(30, 41, 59, 0.9);
@@ -1590,9 +1597,14 @@
     /* ================= 10. 响应式断点适配（平板、手机桌面模式 & 手机竖屏自适应） ================= */
     @media (max-width: 1120px) {
       /* Keep the background at its existing scroll position while the mobile drawer is open. */
-      html.sidebar-drawer-open,
-      html.sidebar-drawer-open body {
+      html.sidebar-drawer-open {
         overflow: hidden;
+      }
+      html.sidebar-drawer-open body {
+        position: fixed;
+        width: 100%;
+        overflow: hidden;
+        overscroll-behavior: none;
       }
 
       .layout-shell {
@@ -2297,11 +2309,23 @@ function toggleDarkMode(){
 })();
 
 /* ================= Sidebar drawer ================= */
+let sidebarLockedScrollY = null;
 function toggleMobileSidebar(open){
   const mobileOpen = !!open && window.innerWidth <= 1120;
+  const wasOpen = sidebarLockedScrollY !== null;
+  if(mobileOpen && !wasOpen){
+    sidebarLockedScrollY = window.scrollY;
+    document.body.style.top = -sidebarLockedScrollY + 'px';
+  }
   document.getElementById('appSidebar').classList.toggle('open', mobileOpen);
   document.getElementById('sidebarBackdrop').classList.toggle('open', mobileOpen);
   document.documentElement.classList.toggle('sidebar-drawer-open', mobileOpen);
+  if(!mobileOpen && wasOpen){
+    const y = sidebarLockedScrollY;
+    sidebarLockedScrollY = null;
+    document.body.style.top = '';
+    window.scrollTo({top:y,behavior:'instant'});
+  }
 }
 document.getElementById('sidebarBackdrop').addEventListener('click', () => toggleMobileSidebar(false));
 document.getElementById('drawerCloseBtn').addEventListener('click', () => toggleMobileSidebar(false));
