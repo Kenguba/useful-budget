@@ -1931,7 +1931,7 @@ function renderBoard(){
       if(!t) return;
       t.classList.add('open'); userOpen.add(t.id);
       const tr=t.querySelector('[data-gtoggle]'); if(tr)tr.setAttribute('aria-expanded','true');
-      try{ history.pushState(null,'','#grp-'+el.dataset.gid); }catch(e){}
+      try{ history.pushState({leader:el.dataset.gid},'','#grp-'+el.dataset.gid); }catch(e){}
       t.scrollIntoView({behavior:'smooth',block:'start'});
     });
   });
@@ -2047,6 +2047,7 @@ function closeSrc(fromPop){
     window.__srcSettleUntil=Date.now()+1200;
   }, reducedMotion?0:580);
 }
+window.addEventListener('popstate',()=>{ const st=history.state; if(st&&st.leader){ seenLeader=st.leader; document.querySelectorAll('.leader').forEach(x=>x.classList.toggle('seen',x.dataset.gid===st.leader)); } });
 window.addEventListener('popstate',()=>{ if(srcIsOpen){ srcHist=false; closeSrc(true); } });
 /* 变价历史弹窗：数据来自 data/price-log.json（时间戳错位增量编码，页面端解码还原） */
 let pcLogCache=null, pcIsOpen=false, pcHist=false, pcOpener=null, pcCloseTimer=null, pcLockedFlag=false;
