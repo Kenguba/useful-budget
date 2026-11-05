@@ -20,7 +20,13 @@ assert.ok(has('let seenLeader=null;'), 'Last-click state is missing');
 assert.ok(has('function paintLeader(gid)'), 'Selection paint helper is missing');
 assert.ok(has('function markLeader(gid)'), 'Selection owner is missing');
 assert.ok(has("(seenLeader===g.id?' seen':'')"), 'Rerender must preserve last clicked group');
-assert.ok(has('markLeader(gid);\n      saveLeaderPosition();'), 'Click must mark before navigation');
+assert.ok(has('markLeader(gid);\n      const nav=++leaderNavCommit;\n      afterLeaderPaint('),
+  'Confirmed click must select immediately and defer navigation until after paint');
+assert.ok(has("function afterLeaderPaint(fn)"), 'Missing post-paint navigation barrier');
+assert.ok(has("requestAnimationFrame(()=>requestAnimationFrame(fn))"), 'Navigation should wait a rendered frame');
+assert.ok(has("if(nav!==leaderNavCommit)return;"), 'Queued navigation must be cancellable');
+assert.ok(has("window.addEventListener('popstate',e=>{\n  leaderNavCommit++;"),
+  'Back/forward must cancel uncommitted navigation');
 assert.ok(has('history.pushState({leaderNavSession,y:window.scrollY}'), 'History should save scroll only');
 assert.ok(has('history.replaceState({leaderNavSession,y:window.scrollY}'), 'Initial history entry must not own selection');
 assert.ok(!has('leaderNavSession,leader:'), 'History must never store selected group');
@@ -43,7 +49,7 @@ assert.ok(has('function revealGroupForJump(grp)'), 'Missing layout-stable group 
 assert.ok(has("grp.classList.add('jump-open','open')"), 'Jump must expand without intermediate height animation');
 assert.ok(has('.site-list-group.jump-open .site-list-collapsible'), 'Missing stable-height CSS');
 assert.ok(has("pinned.scrollIntoView({behavior:'instant',block:'start'})"), 'Async rerender must preserve anchor');
-assert.ok(has("pinnedLeaderGroup=t.id;"), 'Click must pin the target group');
+assert.ok(has("pinnedLeaderGroup=target.id;"), 'Click must pin the current target group');
 assert.ok(has('pinnedLeaderGroup=null;'), 'Manual/history navigation must cancel group pin');
 assert.ok(has("el.scrollIntoView({behavior:'instant',block:'start'})"), 'Hash restore must avoid inherited smooth scrolling');
 
