@@ -138,6 +138,8 @@
     .sidebar-drawer-backdrop.open {
       opacity: 1;
       pointer-events: auto;
+      touch-action: none;
+      overscroll-behavior: none;
     }
 
     .app-sidebar {
@@ -284,21 +286,6 @@
     [data-dark="true"] .sidebar-nav-item.active {
       color: var(--orb-color-1);
       background: rgba(30, 41, 59, 0.9);
-    }
-
-    .sidebar-nav-item.active::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 22%;
-      bottom: 22%;
-      width: 4px;
-      border-radius: 0 4px 4px 0;
-      background: var(--theme-accent);
-    }
-
-    [data-dark="true"] .sidebar-nav-item.active::before {
-      background: var(--orb-color-1);
     }
 
     .nav-item-index {
@@ -1642,6 +1629,12 @@
 
     /* ================= 10. 响应式断点适配（平板、手机桌面模式 & 手机竖屏自适应） ================= */
     @media (max-width: 1120px) {
+      /* Keep the background at its existing scroll position while the mobile drawer is open. */
+      html.sidebar-drawer-open,
+      html.sidebar-drawer-open body {
+        overflow: hidden;
+      }
+
       .layout-shell {
         grid-template-columns: 1fr;
         max-width: 1080px;
@@ -1658,6 +1651,7 @@
         max-height: 100vh;
         border-radius: 0 26px 26px 0;
         transform: translateX(-104%);
+        overscroll-behavior-y: contain;
       }
 
       .app-sidebar.open {
@@ -2363,8 +2357,10 @@ function toggleDarkMode(){
 
 /* ================= Sidebar drawer ================= */
 function toggleMobileSidebar(open){
-  document.getElementById('appSidebar').classList.toggle('open', open);
-  document.getElementById('sidebarBackdrop').classList.toggle('open', open);
+  const mobileOpen = !!open && window.innerWidth <= 1120;
+  document.getElementById('appSidebar').classList.toggle('open', mobileOpen);
+  document.getElementById('sidebarBackdrop').classList.toggle('open', mobileOpen);
+  document.documentElement.classList.toggle('sidebar-drawer-open', mobileOpen);
 }
 document.getElementById('sidebarBackdrop').addEventListener('click', () => toggleMobileSidebar(false));
 document.getElementById('drawerCloseBtn').addEventListener('click', () => toggleMobileSidebar(false));
