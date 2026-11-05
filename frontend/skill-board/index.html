@@ -1106,7 +1106,7 @@ document.querySelectorAll(".viz-mode-btn").forEach(btn=>{
 });
 
 /* ================= 分区导航：历史快照与即时恢复 ================= */
-let jumpSeq=0, currentSec=null;
+let jumpSeq=0;
 const secNavSession=Math.random().toString(36).slice(2);
 try{
   history.scrollRestoration="manual";
@@ -1118,7 +1118,6 @@ function saveSecPosition(){
   try{history.replaceState({...st,y},"",location.href)}catch(e){}
 }
 function markSec(secId,animate){
-  currentSec=secId;
   document.querySelectorAll(".sec-sq-btn").forEach(b=>{
     const on=b.getAttribute("data-sec")===secId;
     b.classList.toggle("active",on);
