@@ -120,22 +120,25 @@ def is_weekly(t):
         return True
     return has(t, '周限', '周额度')
 
-GPT_CATS = {'gpt-plus', 'gpt', 'gpt-go'}
 def gpt_groups(rows):
     g1, g2, g3 = [], [], []
     for o in rows:
         t = o.get('ctitle') or o['title']
         low = t.lower()
-        if o['category'] and o['category'] not in GPT_CATS:
-            continue
+        # 不再用聚合站的分类做准入否决（2026-11-06 ken 质疑后审计）：AI价网把「已接马 Plus 成品号」
+        # 归进 phone-verification 类，旧的分类白名单把 ¥14.8/¥15.29 的真货整批挡在门外；
+        # 分类只作参考，分组一律以标题口径为准，误入的杂品靠下面的标题排除词挡
         if 'plus' not in low:
             continue
         if 'free' in low:
             continue  # Free 普号不是 Plus 成品号
         if has(t, 'Team', 'TEAM', 'team', '席位', '教程', '资格', '学生优惠',
                '不含plus', '不含Plus', '非plus', '非Plus', '普通账号', '送plus', '送Plus',
-               'Gemini', 'gemini', 'TextPlus', 'textplus', '非成品号'):
-            continue  # Gemini/TextPlus 不是 GPT Plus；「非成品号」是激活链接类、不是成品号
+               'Gemini', 'gemini', 'TextPlus', 'textplus', '非成品号',
+               'Notion', 'notion', 'Facebook', 'facebook', '共享', '镜像', '非会员', '有限使用'):
+            continue  # Gemini/TextPlus 不是 GPT Plus；「非成品号」是激活链接类、不是成品号；
+            # Notion/Facebook 是别家产品（plus 来自其产品名/邮箱域名）；共享/镜像不是独享成品号；
+            # 「非会员」「有限使用Plus」是免费号蹭 Plus 功能
         if 'chatgpt-api' in low or '微软-chatgpt' in low:
             continue
         if not has(t, '成品号', '成品账号', '账号', '帐号', '账密', '张密', '已接马', '未接马'):
@@ -628,14 +631,51 @@ def main():
     # 背景：AI价网对链动小铺的快照自 2026-10 月底冻结，2 万多条只有它收录的链动商品全是旧价旧库存，
     # 出现过看板 ¥9.9、点开实价 ¥28.33 的错价（ken 2026-11-06 录屏指出）。无时间戳的行（PriceAI 等）不受此限。
     _now_ms = int(time.time() * 1000)
+    # 脚本二覆盖记录（ken 2026-11-06 定版：脚本一先跑出暂定价，脚本二去详情拿一手价、
+    # 以它为准覆盖）：data/overrides.json 由详情现核（链动浏览器现核等）写入，
+    # {url: {price, stock, minq, t(epoch ms)}}；72 小时内的覆盖有效，过期不用，
+    # 免得覆盖本身变僵尸。脚本一每轮读它：被覆盖的商品以一手价为准（见下方应用与价格日志覆盖）。
+    _overrides = {}
+    try:
+        with open(os.path.join(DATA, 'overrides.json'), encoding='utf-8') as f:
+            for _u, _v in json.load(f).items():
+                if isinstance(_v, dict) and _v.get('t') and _now_ms - _v['t'] <= 72 * 3600 * 1000:
+                    _overrides[_u.split('?')[0]] = _v
+    except Exception:
+        _overrides = {}
     _kept, _stale = [], 0
     for o in rows:
         if o.get('ts') and _now_ms - o['ts'] > 48 * 3600 * 1000:
-            _stale += 1
-            continue
+            if o['url'].split('?')[0] not in _overrides:
+                _stale += 1
+                continue
+            # 有新鲜的一手覆盖时以脚本二为准，不被快照新鲜度门拦下
         _kept.append(o)
     rows = _kept
     print(f'stale-gate: dropped {_stale} zombie offers (>48h)', file=sys.stderr)
+    # 应用脚本二覆盖到看板候选：同一链接只有一行时才动（多规格共链接的价格不可归属，不碰）
+    if _overrides:
+        _url_n = {}
+        for o in rows:
+            _url_n[o['url'].split('?')[0]] = _url_n.get(o['url'].split('?')[0], 0) + 1
+        _ov_p = _ov_s = 0
+        _rows2 = []
+        for o in rows:
+            _ov = _overrides.get(o['url'].split('?')[0])
+            if _ov and _url_n[o['url'].split('?')[0]] == 1:
+                if _ov.get('stock') == 0:
+                    _ov_s += 1
+                    continue  # 脚本二现核售罄：不进看板
+                if _ov.get('price'):
+                    o['price'] = _ov['price']
+                    _ov_p += 1
+                if isinstance(_ov.get('stock'), int) and _ov['stock'] > 0:
+                    o['stock'] = _ov['stock']
+                if _ov.get('minq'):
+                    o['minq'] = _ov['minq']
+            _rows2.append(o)
+        rows = _rows2
+        print(f'overrides: {len(_overrides)} fresh, price-applied {_ov_p}, soldout-dropped {_ov_s}', file=sys.stderr)
 
     pai = []
     for slug in ('chatgpt-plus', 'gemini-pro-year', 'gemini-ultra',
@@ -771,11 +811,25 @@ def main():
             _k = _o['url'].split('?')[0] + '|' + norm_title(_o['title'])
             _pool[_k] = _o['price']
             _spec_of[_k] = norm_title(split_spec(_o['title'])[1])
+        # 价格日志同样以脚本二为准：被覆盖且全池只有一条记录的链接，本轮池价换成一手价，
+        # 并在下面比对时把脚本一记错的最后一点直接改掉（_ovr_pool 标记）
+        _ovr_pool = {}
+        try:
+            _url_keys = {}
+            for _k in _pool:
+                _url_keys.setdefault(_k.split('|', 1)[0], []).append(_k)
+            for _u, _v in (_overrides or {}).items():
+                if _v.get('price') and len(_url_keys.get(_u, [])) == 1:
+                    _k = _url_keys[_u][0]
+                    _pool[_k] = _v['price']
+                    _ovr_pool[_k] = (_v['price'], int(_v['t'] // 60000))
+        except Exception:
+            _ovr_pool = {}
         _by_url = {}
         for _k in _log:
             _by_url.setdefault(_k.split('|', 1)[0], []).append(_k)
         _claimed = set()
-        _n_new = _n_chg = _n_ren = 0
+        _n_new = _n_chg = _n_ren = _n_ovr = 0
         _default_spec = norm_title('默认规格')
         for _key, _price in _pool.items():
             _rec = _log.get(_key)
@@ -806,9 +860,16 @@ def main():
                     continue
             if _price != _rec[-1]:
                 _last_ts = _rec[0] + sum(_rec[2::2])
-                _delta = _now_min - _last_ts
-                _rec += [_delta if _delta > 0 else 0, _price]
-                _n_chg += 1
+                _ov = _ovr_pool.get(_key)
+                if _ov and _last_ts <= _ov[1]:
+                    # 脚本二覆盖（ken 2026-11-06 定版）：脚本一记下的这个定价点是错的，
+                    # 一手价直接把最后一点的价格改掉，不追加新点、不产生假涨跌
+                    _rec[-1] = _price
+                    _n_ovr += 1
+                else:
+                    _delta = _now_min - _last_ts
+                    _rec += [_delta if _delta > 0 else 0, _price]
+                    _n_chg += 1
         for g in groups:
             for it in g['items']:
                 _rec = _log.get(it['url'].split('?')[0] + '|' + norm_title(it['title']))
@@ -817,7 +878,7 @@ def main():
                     it['pc'] = _dt.fromtimestamp(_last_ts * 60, _bj).strftime('%Y-%m-%d')
         with open(_log_path, 'w', encoding='utf-8') as f:
             json.dump(dict(v=1, items=_log), f, ensure_ascii=False, separators=(',', ':'))
-        print(f'price-log: {len(_log)} keys (pool {len(_pool)}, new {_n_new}, renamed {_n_ren}, changed {_n_chg}, {int((_time.time() - _t0) * 1000)}ms)', file=sys.stderr)
+        print(f'price-log: {len(_log)} keys (pool {len(_pool)}, new {_n_new}, renamed {_n_ren}, changed {_n_chg}, overridden {_n_ovr}, {int((_time.time() - _t0) * 1000)}ms)', file=sys.stderr)
         # 前端弹窗专用小表（ken 2026-11-05）：只含当前 board 条目的价格记录，
         # 页面点「价格变动」只拉这份（约 230 条、几十 KB），不拉全量 price-log
         # （8 万多条、约 10MB，手机上打开弹窗要等很久）。全量表只做后台维护。
