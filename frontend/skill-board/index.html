@@ -142,6 +142,10 @@ button{font-family:inherit}
 .sec-sq-btn .sec-num{font-size:10px;font-weight:800;padding:1.5px 4.5px;border-radius:4px;background:var(--theme-tag-bg);color:var(--theme-tag-text);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;flex-shrink:0}
 .sec-sq-btn.active{background-color:color-mix(in srgb,var(--theme-accent) 11%,var(--card-bg));color:var(--theme-accent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--theme-accent) 24%,transparent),0 3px 10px rgba(15,23,42,.035)}
 .sec-sq-btn.active .sec-num{background:color-mix(in srgb,var(--theme-accent) 13%,transparent);color:inherit}
+/* Touch-first devices: keep the themed selected fill/text, but not the desktop selection ring. */
+@media (hover:none) and (pointer:coarse){
+  .sec-sq-btn.active{box-shadow:0 3px 10px rgba(15,23,42,.035)}
+}
 [data-dark="true"] .sec-sq-btn.active{background-color:color-mix(in srgb,var(--theme-accent) 19%,var(--card-bg));color:color-mix(in srgb,var(--theme-accent) 40%,#FFFFFF)}
 .sec-sq-btn.pop{animation:secPop .2s ease-out}
 @keyframes secPop{0%{transform:scale(.98)}55%{transform:scale(1.02)}100%{transform:scale(1)}}
