@@ -133,8 +133,9 @@ def gpt_groups(rows):
         if 'free' in low:
             continue  # Free 普号不是 Plus 成品号
         if has(t, 'Team', 'TEAM', 'team', '席位', '教程', '资格', '学生优惠',
-               '不含plus', '不含Plus', '非plus', '非Plus', '普通账号', '送plus', '送Plus'):
-            continue
+               '不含plus', '不含Plus', '非plus', '非Plus', '普通账号', '送plus', '送Plus',
+               'Gemini', 'gemini', 'TextPlus', 'textplus', '非成品号'):
+            continue  # Gemini/TextPlus 不是 GPT Plus；「非成品号」是激活链接类、不是成品号
         if 'chatgpt-api' in low or '微软-chatgpt' in low:
             continue
         if not has(t, '成品号', '成品账号', '账号', '帐号', '账密', '张密', '已接马', '未接马'):
@@ -316,6 +317,11 @@ def prepare_offers(rows):
             o['ctitle'] = spec + '｜' + base + tags
         else:
             o['ctitle'] = o['title']
+        # 标题明写起购量的兜底标注（链动等无结构化字段的平台）：如「10个起购」「5件起批」
+        if not o.get('minq'):
+            mq = re.search(r'(\d+)\s*[个件份]\s*起[购买批售]', o['title'])
+            if mq and int(mq.group(1)) > 1:
+                o['minq'] = int(mq.group(1))
         out.append(o)
     return out
 
@@ -391,8 +397,8 @@ def vcc_group(rows):
         if not (by_cat or by_title):
             continue
         if has(t, '实体卡', '接码', '接马', '短信', '教程', '方法', '测试商品', '虚假',
-               '充值卡', '礼品卡', '兑换卡'):
-            continue
+               '充值卡', '礼品卡', '兑换卡', '渠道推荐', '渠道介绍'):
+            continue  # 渠道推荐/介绍 = 只卖引流介绍、真卡另付费（ken 2026-11-06 同族剔除）
         if not has(t, '卡', 'visa', 'Visa', 'VISA', 'vasa', 'master', 'Master', '万事达'):
             continue
         out.append(o)
@@ -439,6 +445,8 @@ def slim(rows):
         d = dict(price=o['price'], shop=o['shop'], platform=o['platform'],
                  stock=o['stock'], title=o['title'], url=o['url'],
                  kind=o.get('kind', ''), same_source=o.get('same_source', 1))
+        if o.get('minq') and o['minq'] <= 1000:
+            d['minq'] = o['minq']  # 起购量（>1 才有）：价格是单价，但必须买满 minq 个；>1000 视为卖家乱填的假值（如 9999）丢弃
         src = o.get('sources') or []
         if len(src) > 1:
             d['sources'] = src
@@ -496,11 +504,13 @@ def fetch_16688_shop(code, name):
             if price is None or float(price) <= 0 or not it.get('name'):
                 continue
             stock = it.get('stock_available_quantity')
+            lq = it.get('limit_quantity')
             items.append(dict(title=it['name'].strip(), price=float(price),
                               stock=stock if isinstance(stock, int) and stock >= 0 else None,
                               shop=name, platform='16688',
                               url=f'https://www.16688.com.cn/goods/{gno}',
-                              category='', ts=int(time.time() * 1000)))
+                              category='', ts=int(time.time() * 1000),
+                              minq=lq if isinstance(lq, int) and lq > 1 else None))
             new += 1
         if new == 0:
             break
@@ -613,6 +623,19 @@ def main():
                     'https://www.16688.com.cn/goods/G47831683'}
     rows = [o for o in list(all_offers.values()) if o['url'].split('?')[0] not in BLOCKED_URLS]
     print(f'merged unique products: {len(rows)}', file=sys.stderr)
+    _pool_rows = list(rows)  # 价格日志全量池用门前全量（僵尸条目只增不删、继续跟踪）
+    # 快照新鲜度门（ken 2026-11-06）：最新快照超过 48 小时的条目不进看板——价格/库存都可能已变。
+    # 背景：AI价网对链动小铺的快照自 2026-10 月底冻结，2 万多条只有它收录的链动商品全是旧价旧库存，
+    # 出现过看板 ¥9.9、点开实价 ¥28.33 的错价（ken 2026-11-06 录屏指出）。无时间戳的行（PriceAI 等）不受此限。
+    _now_ms = int(time.time() * 1000)
+    _kept, _stale = [], 0
+    for o in rows:
+        if o.get('ts') and _now_ms - o['ts'] > 48 * 3600 * 1000:
+            _stale += 1
+            continue
+        _kept.append(o)
+    rows = _kept
+    print(f'stale-gate: dropped {_stale} zombie offers (>48h)', file=sys.stderr)
 
     pai = []
     for slug in ('chatgpt-plus', 'gemini-pro-year', 'gemini-ultra',
@@ -621,7 +644,7 @@ def main():
         print(f'priceai {slug}: {len(r)} rows', file=sys.stderr)
         pai += [o for o in r if o['url'] not in BLOCKED_URLS]
 
-    _full_rows = list(rows)  # prepare 前的全量原始行（价格日志全量维护用）
+    _full_rows = list(_pool_rows)  # prepare 前的全量原始行（价格日志全量维护用，含被新鲜度门拦下的）
     _full_pai = list(pai)
     rows = prepare_offers(rows)
     pai = prepare_offers(pai)
@@ -652,12 +675,13 @@ def main():
     # 详情页库存为 0 / 已售罄的剔除，读到的实时库存同时回填展示；
     # 读不到的平台（wzyp 被阿里云验证挡、catfk 连不上、/products/ 系 JS 空壳）不在此列，只能靠聚合库库存。
     def detail_stock(it):
+        """返回 (库存, 起购量)：库存 None=读不到保留、0=售罄/下架剔除；起购量 >1 才有值。"""
         url = it['url']
         try:
             if '16688.com.cn' in url:
                 m = re.search(r'/goods/(G\d+)', url)
                 if not m:
-                    return None
+                    return None, None
                 req = urllib.request.Request(
                     'https://www.16688.com.cn/shopApi/goods/detail',
                     data=json.dumps({'goods_no': m.group(1)}).encode(),
@@ -666,18 +690,21 @@ def main():
                     d = json.loads(r.read().decode('utf-8', 'ignore'))
                 if not d.get('data'):
                     # 接口明确回「商品不存在」= 已下架，按售罄剔除；其他空响应仍按读不到保留
-                    return 0 if '不存在' in str(d.get('msg') or '') else None
-                q = (d.get('data') or {}).get('stock_available_quantity')
-                return int(q) if isinstance(q, (int, float)) else None
+                    return (0, None) if '不存在' in str(d.get('msg') or '') else (None, None)
+                data = d.get('data') or {}
+                q = data.get('stock_available_quantity')
+                lq = data.get('limit_quantity')
+                return (int(q) if isinstance(q, (int, float)) else None,
+                        lq if isinstance(lq, int) and lq > 1 else None)
             if 'aicdks.com' in url or '/item/' in url:
                 txt = strip_tags(fetch(url, retries=0).decode('utf-8', 'ignore'))
                 if '售罄' in txt or '已售完' in txt:
-                    return 0
+                    return 0, None
                 km = re.search(r'库存\s*[:：]?\s*(\d+)', txt)
-                return int(km.group(1)) if km else None
+                return (int(km.group(1)) if km else None), None
         except Exception:
-            return None
-        return None
+            return None, None
+        return None, None
 
     def verify_detail_stock(items):
         # 候选池为每组前 45 条：并发核验（单条慢不阻塞整体），剔除售罄后回填截断到 30 条
@@ -685,12 +712,14 @@ def main():
         with ThreadPoolExecutor(max_workers=12) as ex:
             stocks = list(ex.map(detail_stock, items))
         kept = []
-        for it, st in zip(items, stocks):
+        for it, (st, mq) in zip(items, stocks):
             if st == 0:
                 print(f'soldout-drop: {it["url"]}', file=sys.stderr)
                 continue
             if st is not None:
                 it['stock'] = st
+            if mq and mq <= 1000:
+                it['minq'] = mq  # 详情现核回填的起购量（16688）；>1000 视为假值丢弃
             kept.append(it)
         return kept[:30]
     for g in groups:
