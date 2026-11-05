@@ -798,7 +798,8 @@
       }).join(" ");
       snapHtml += '<div class="res-row"><div class="res-main"><div class="res-title">' + esc(it.title || "") +
         '</div><div class="res-note">' + esc(it.note || "") + '</div>' +
-        '<div class="res-meta">' + fmtTime(it.updated_at) + "</div></div>" + chips + "</div>";
+        '<div class="res-meta">' + fmtTime(it.updated_at) + "</div></div>" +
+        (chips ? '<div class="res-chips">' + chips + "</div>" : "") + "</div>";
     });
 
     if (!state.live || !relayReady() || typeof EventSource === "undefined") {
@@ -849,13 +850,13 @@
       var counts = {};
       items.forEach(function (it) { counts[it.provider] = (counts[it.provider] || 0) + 1; });
       var provs = providers.length ? providers : Object.keys(counts);
-      var fhtml = '<div class="frow"><span class="flabel">网盘</span><button class="pill' + (curProv ? "" : " on") +
+      var fhtml = '<div class="frow"><span class="fl">网盘</span><span class="pills-x"><button class="pill' + (curProv ? "" : " on") +
         '" data-prov="">全部（' + items.length + "）</button>";
       provs.forEach(function (p) {
         fhtml += '<button class="pill' + (curProv === p ? " on" : "") + '" data-prov="' + esc(p) + '">' +
           esc(panName(p)) + "（" + (counts[p] || 0) + "）</button>";
       });
-      fhtml += "</div>";
+      fhtml += "</span></div>";
       var fbox = document.getElementById("streamFilters");
       if (fbox) {
         fbox.innerHTML = fhtml;
