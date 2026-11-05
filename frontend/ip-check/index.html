@@ -1027,12 +1027,17 @@
     @keyframes geoSklSweep { to { transform: translateX(100%); } }
     [data-dark="true"] .geo-skl,[data-dark="true"] .ippure-pill-badge.checking-anim,[data-dark="true"] .attr-pill-tag.checking-anim,[data-dark="true"] #badgeRiskScore.tag-gray { background: #22304A; }
     [data-dark="true"] .geo-skl::after,[data-dark="true"] .ippure-pill-badge.checking-anim::after,[data-dark="true"] .attr-pill-tag.checking-anim::after,[data-dark="true"] #badgeRiskScore.tag-gray::after { background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.13) 50%, transparent 80%); }
-    .skl-name { width: 54px; height: 14px; margin-top: 2px; }
-    .skl-flag { width: 23px; height: 16px; border-radius: 3px; flex-shrink: 0; margin-top: 2px; }
-    .skl-lines { display: flex; flex-direction: column; gap: 7px; flex: 1; padding-top: 1px; }
-    .skl-l1 { width: 86%; height: 14px; }
-    .skl-l2 { width: 44%; height: 14px; }
+    .skl-name { width: 54px; height: 14px; margin-top: 3px; }
+    .skl-flag { width: 24px; height: 21px; border-radius: 4px; flex-shrink: 0; }
+    .skl-lines { display: flex; flex-direction: column; gap: 12.6px; flex: 1; height: 42.6px; }
+    .skl-l1 { width: 86%; height: 15px; }
+    .skl-l2 { width: 44%; height: 15px; }
     .skl-asn { width: 190px; max-width: 60vw; height: 16px; }
+    /* 国旗视觉对齐：固定框居中，框高等于一行文字高，中心与第一行文字中心重合 */
+    .geo-location-val .flag-badge { width: 24px; height: 21px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .geo-location-val .flag-badge img { width: auto; height: auto; max-width: 23px; max-height: 15px; }
+    /* 四行共用字号：任一行排到 3 行时，整体换小一号 */
+    #geoSourcesBox.geo-compact .geo-location-val { font-size: 13.5px; }
 
     /* IP来源 & IP属性（Layer 2） */
     .ip-tags-subbox {
@@ -2859,6 +2864,13 @@ function paintAsnHead(d){
   document.querySelector(".asn-text-block").style.fontSize=state.asnFs+"px";
   state.asnPaintedSeq=state.querySeq;
 }
+function fitGeoFont(){
+  const box=$("geoSourcesBox");if(!box)return;
+  box.classList.remove("geo-compact");
+  let need=false;
+  box.querySelectorAll(".geo-location-val").forEach(v=>{const p=v.lastElementChild;if(p&&!p.classList.contains("skl-lines")&&p.getClientRects().length>=3)need=true});
+  box.classList.toggle("geo-compact",need);
+}
 function render(d,final){
   state.data=d;
   $("ipSearchInput").value=d.ip;fitInputFont();syncClearBtn();
@@ -2867,6 +2879,7 @@ function render(d,final){
   $("valDomain").textContent=d.domain||d.netname||"—";
   $("valRange").textContent=d.range||"—";
   $("geoSourcesBox").innerHTML=d.locRows.map(r=>"<div class='geo-source-item'><span class='geo-provider-name'>"+escapeHtml(r.src)+"</span><div class='geo-location-val'><span class='flag-badge'>"+flagImg(r.cc)+"</span><span>"+escapeHtml(r.place)+"</span></div></div>").join("");
+  fitGeoFont();
   const srcTag=$("badgeIpOrigin");
   if(d.native==null&&!d.tagsFinal){srcTag.textContent=TD("checking");srcTag.className="ippure-pill-badge badge-pending checking-anim"}
   else if(d.native==null){srcTag.textContent=TD("regUnknown");srcTag.className="ippure-pill-badge badge-pending"}
@@ -3150,7 +3163,7 @@ function fitProtoFont(){
     while(el.scrollWidth>avail&&fs>10){fs-=0.5;el.style.fontSize=fs+"px"}
   });
 }
-window.addEventListener("resize",()=>fitProtoFont());
+window.addEventListener("resize",()=>{fitProtoFont();fitGeoFont()});
 function setMyIp(ip,primary){
   if(!ip)return;
   if(ip.includes(":")){myIpState.v6=ip;if(primary)myIpState.primary6=true}
