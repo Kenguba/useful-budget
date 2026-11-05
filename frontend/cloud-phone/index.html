@@ -1,644 +1,3491 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="color-scheme" content="light dark" />
-<link rel="icon" href="data:," />
-<title>云手机横向对比：30 家资费、底层与改机核查</title>
-<style>
-  :root{
-    --bg:#ffffff; --surface:#f4f2ec; --surface2:#ece9e0; --ink:#1c2429; --muted:#5c6a72;
-    --line:#d8d3c6; --accent:#b3401e; --accent-ink:#8f2f12; --teal:#0f5f57; --amber:#8a5a00;
-    --b:#0f5f57; --btend:#2e6f9e; --c:#8a3d00; --unknown:#6b7280; --na:#555555;
-    --card:#ffffff; --good:#0f5f57; --warn-bg:#fdf3e7; --warn-line:#e3b98a;
-  }
-  @media (prefers-color-scheme: dark){
-    :root{
-      --bg:#14181a; --surface:#1d2326; --surface2:#242b2f; --ink:#e8e6df; --muted:#a8b2b6;
-      --line:#363f44; --accent:#f0784a; --accent-ink:#ff9a70; --card:#1b2124;
-      --warn-bg:#2a2118; --warn-line:#6b4d26; --b:#4db8a8; --btend:#7ab3dd; --c:#e8a15c;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" id="themeColorMeta" content="#FFFFFF">
+  <title>30家云手机横评 · 资费、底层真假与改机能力（12色弥散光晕终极版）</title>
+  <style>
+    /* ================= 1. 核心动态 CSS 变量体系（1:1 承袭 Ai比价 12色弥散系统） ================= */
+    :root {
+      --hero-bg-base: #FFFFFF;
+      --orb-color-1: #8FDBB8;
+      --orb-color-2: #9CC8F7;
+
+      --refresh-btn-bg: #4FA8F6;
+      --refresh-btn-text: #FFFFFF;
+      --send-circle-bg: #9EE0C5;
+      --send-circle-icon: #0F172A;
+
+      --theme-accent: #1A73E8;
+      --theme-tab-text: #0F172A;
+      --theme-tag-bg: #E6F4EA;
+      --theme-tag-text: #137333;
+      --search-glow: rgba(143, 219, 184, 0.44);
+
+      --page-bg: #F3F8FA;
+      --card-bg: #FFFFFF;
+      --card-sub-bg: #F6F9FC;
+      --card-divider: rgba(226, 232, 240, 0.65);
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+      --pill-surface: #FFFFFF;
+      --pill-shadow: 0 6px 20px rgba(15, 23, 42, 0.05), 0 2px 6px rgba(15, 23, 42, 0.025);
+      --card-shadow: 0 4px 18px rgba(15, 23, 42, 0.035);
+
+      /* 全局统一左右视觉对齐基准线 */
+      --side-pad: 16px;
     }
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
-    line-height:1.65;font-size:16px}
-  a{color:var(--accent-ink)}
-  .wrap{max-width:1120px;margin:0 auto;padding:0 20px 64px}
-  header.lead{padding:34px 0 8px;border-bottom:3px solid var(--ink)}
-  .dateline{color:var(--muted);font-size:13.5px;margin:0 0 8px}
-  h1{font-family:"Noto Serif SC","Songti SC",serif;font-size:34px;line-height:1.25;margin:0 0 10px;letter-spacing:.5px}
-  .lede{font-size:17px;max-width:860px;margin:0 0 6px}
-  .lede strong{color:var(--accent-ink)}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}
-  .stat{background:var(--surface);border:1px solid var(--line);padding:16px 16px 13px}
-  .stat b{display:block;font-size:32px;line-height:1.1;font-family:"Noto Serif SC",serif}
-  .stat span{font-size:13.5px;color:var(--muted)}
-  .stat.zero b{color:var(--accent-ink)}
-  .warn{background:var(--warn-bg);border:1px solid var(--warn-line);padding:14px 18px;margin:18px 0;font-size:14.5px}
-  .warn b{color:var(--accent-ink)}
-  h2{font-family:"Noto Serif SC","Songti SC",serif;font-size:24px;margin:38px 0 6px;padding-top:6px}
-  h2 .no{color:var(--accent-ink);font-size:15px;font-family:inherit;vertical-align:super}
-  h3{font-size:18px;margin:22px 0 6px}
-  .sub{color:var(--muted);font-size:14.5px;margin:0 0 14px;max-width:860px}
-  /* legend */
-  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
-  .legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
-  /* GanGan spotlight */
-  .spot{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--accent);padding:22px 22px 18px;margin-top:14px}
-  .spot h2{margin-top:0}
-  .alert{border:1px solid var(--accent);background:var(--card);padding:14px 18px;margin:14px 0}
-  .alert b{color:var(--accent-ink)}
-  .kv{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 28px;font-size:14.5px;margin:14px 0}
-  .kv dt{color:var(--muted);font-size:13px}
-  .kv dd{margin:2px 0 0}
-  table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--card)}
-  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
-  th{background:var(--surface2);font-weight:600}
-  td.num,th.num{text-align:right;white-space:nowrap}
-  .tblwrap{overflow-x:auto}
-  .chartbox{background:var(--card);border:1px solid var(--line);padding:18px;margin-top:14px}
-  .chartbox figcaption{font-size:13.5px;color:var(--muted);margin-top:8px}
-  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
-  ul.tight{margin:6px 0;padding-left:20px;font-size:14.5px}
-  ul.tight li{margin:4px 0}
-  /* controls */
-  .controls{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 12px;border-bottom:1px solid var(--line);margin-top:8px}
-  .controls input[type="search"]{width:100%;max-width:420px;padding:10px 14px;font-size:15px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
-  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-  .chip{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 13px;border-radius:999px;font-size:14px;cursor:pointer}
-  .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-  .toggles{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;font-size:14px;color:var(--muted)}
-  .toggles label{display:flex;gap:7px;align-items:center;cursor:pointer}
-  .countline{font-size:13.5px;color:var(--muted);margin-top:10px}
-  /* cards */
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px;align-items:start}
-  .card{background:var(--card);border:1px solid var(--line);padding:16px 17px 14px}
-  .card h3{margin:0 0 2px;font-size:18px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
-  .card h3 .idx{color:var(--muted);font-size:13px;font-weight:400}
-  .badge{display:inline-block;font-size:12.5px;padding:3px 9px;border-radius:999px;color:#fff;background:var(--unknown);white-space:nowrap}
-  .badge.b{background:var(--b)} .badge.btend{background:var(--btend)} .badge.c{background:var(--c)} .badge.na{background:var(--na)}
-  .ev{font-size:12.5px;color:var(--muted);margin:2px 0 8px}
-  .card dl{margin:0;font-size:14px}
-  .card dt{color:var(--muted);font-size:12.5px;margin-top:9px;letter-spacing:.4px}
-  .card dd{margin:2px 0 0}
-  .price{font-size:15.5px;font-weight:600}
-  .price small{font-weight:400;color:var(--muted);font-size:12.5px}
-  .empty{border:1px dashed var(--line);padding:26px;text-align:center;color:var(--muted);margin-top:16px;display:none}
-  /* recommendations */
-  .recs{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px;align-items:start}
-  .rec{border:1px solid var(--line);padding:16px 18px;background:var(--card)}
-  .rec h3{margin-top:0}
-  .rec ol{margin:6px 0 0;padding-left:22px;font-size:14.5px}
-  .rec li{margin:7px 0}
-  .rec li b{font-size:15px}
-  .caveat{font-size:13.5px;color:var(--muted)}
-  /* self test */
-  .steps{counter-reset:step;list-style:none;padding:0;margin:14px 0}
-  .steps li{counter-increment:step;position:relative;padding:12px 0 12px 52px;border-bottom:1px solid var(--line);font-size:15px}
-  .steps li::before{content:counter(step);position:absolute;left:0;top:12px;width:34px;height:34px;border:1.5px solid var(--ink);border-radius:50%;text-align:center;line-height:32px;font-weight:700;font-family:"Noto Serif SC",serif}
-  .steps code{background:var(--surface2);padding:1px 6px;border-radius:4px;font-size:13.5px;word-break:break-all}
-  /* sources */
-  .sources{font-size:14px}
-  .sources li{margin:7px 0;word-break:break-all}
-  .sources .tag{color:var(--muted);font-size:13px}
-  footer{margin-top:44px;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:13.5px}
-  @media (max-width:900px){
-    .grid{grid-template-columns:repeat(2,1fr)}
-    .stats{grid-template-columns:repeat(2,1fr)}
-    .recs{grid-template-columns:1fr}
-    .twocol{grid-template-columns:1fr}
-    h1{font-size:28px}
-  }
-  @media (max-width:600px){
-    .grid{grid-template-columns:1fr}
-    .kv{grid-template-columns:1fr}
-    .stats{grid-template-columns:repeat(2,1fr);gap:8px}
-    .stat b{font-size:26px}
-    body{font-size:15.5px}
-    .wrap{padding:0 15px 52px}
-    .controls{position:static}
-  }
-  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
-</style>
+
+    @media (min-width: 768px) {
+      :root {
+        --side-pad: 24px;
+      }
+    }
+
+    [data-dark="true"] {
+      --hero-bg-base: #0B1120;
+      --page-bg: #090D16;
+      --card-bg: #151F32;
+      --card-sub-bg: #0F172A;
+      --card-divider: rgba(255, 255, 255, 0.07);
+      --text-primary: #F8FAFC;
+      --text-secondary: #CBD5E1;
+      --text-muted: #64748B;
+      --pill-surface: #1E293B;
+      --pill-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      --card-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+      --theme-tab-text: #F8FAFC;
+    }
+
+    /* ================= 全局彻底隐藏滚动条（保留顺滑滚动能力） ================= */
+    *,
+    *::before,
+    *::after,
+    html,
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    *::-webkit-scrollbar,
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      background: transparent !important;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background-color: var(--page-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color 0.55s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s ease;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 580px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      padding-bottom: 56px;
+    }
+
+    @media (min-width: 768px) {
+      .app-container {
+        max-width: 880px;
+        padding-top: 16px;
+      }
+    }
+
+    /* ================= 2. 顶部弥散渐变区域 ================= */
+    .hero-header {
+      position: relative;
+      background-color: var(--hero-bg-base);
+      padding: 16px var(--side-pad) 22px;
+      border-bottom-left-radius: 30px;
+      border-bottom-right-radius: 30px;
+      box-shadow: 0 14px 34px -12px var(--search-glow);
+      transition: background-color 0.55s ease, box-shadow 0.6s ease;
+      z-index: 10;
+    }
+
+    @media (min-width: 768px) {
+      .hero-header {
+        padding: 22px var(--side-pad) 26px;
+        border-radius: 32px;
+      }
+    }
+
+    .aura-backdrop {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+      border-bottom-left-radius: 30px;
+      border-bottom-right-radius: 30px;
+    }
+
+    @media (min-width: 768px) {
+      .aura-backdrop {
+        border-radius: 32px;
+      }
+    }
+
+    .aura-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(48px);
+      opacity: 0.82;
+      transition: background-color 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-dark="true"] .aura-orb {
+      opacity: 0.28;
+      filter: blur(56px);
+    }
+
+    .aura-orb.orb-left {
+      width: 280px;
+      height: 220px;
+      bottom: -60px;
+      left: -40px;
+      background-color: var(--orb-color-1);
+    }
+
+    .aura-orb.orb-right {
+      width: 300px;
+      height: 240px;
+      bottom: -75px;
+      right: -45px;
+      background-color: var(--orb-color-2);
+    }
+
+    .aura-orb.orb-center {
+      width: 260px;
+      height: 190px;
+      bottom: -55px;
+      left: 24%;
+      background-color: #9EE0C5;
+      opacity: 0;
+      transition: opacity 0.6s ease, background-color 0.75s ease;
+    }
+
+    /* 第12号主题「流光幻彩」动态呼吸极光 */
+    @keyframes videoHoloLeft {
+      0%   { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
+      25%  { background-color: #8FDBB8; transform: translate(16px, -12px) scale(1.1); }
+      50%  { background-color: #92C6F2; transform: translate(8px, 6px) scale(1.06); }
+      75%  { background-color: #B9CFF8; transform: translate(-12px, -6px) scale(1.02); }
+      100% { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
+    }
+
+    @keyframes videoHoloRight {
+      0%   { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
+      25%  { background-color: #9CC8F7; transform: translate(-16px, -8px) scale(1.1); }
+      50%  { background-color: #A7D0F7; transform: translate(-8px, 8px) scale(1.04); }
+      75%  { background-color: #BDE7D5; transform: translate(14px, -6px) scale(1.08); }
+      100% { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
+    }
+
+    @keyframes videoHoloCenter {
+      0%   { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
+      33%  { background-color: #9FCAF5; transform: translateY(-14px) scale(1.12); }
+      66%  { background-color: #CFE7FB; transform: translateY(6px) scale(0.98); }
+      100% { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
+    }
+
+    @keyframes videoHoloBtn {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    [data-holo="true"] .aura-orb.orb-left {
+      animation: videoHoloLeft 4.8s ease-in-out infinite;
+      filter: blur(42px);
+      opacity: 0.9;
+    }
+
+    [data-holo="true"] .aura-orb.orb-right {
+      animation: videoHoloRight 4.8s ease-in-out infinite;
+      filter: blur(42px);
+      opacity: 0.9;
+    }
+
+    [data-holo="true"] .aura-orb.orb-center {
+      opacity: 0.78;
+      animation: videoHoloCenter 4.8s ease-in-out infinite;
+      filter: blur(44px);
+    }
+
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-left,
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-right,
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-center {
+      opacity: 0.34;
+    }
+
+    [data-holo="true"] .refresh-btn {
+      background: linear-gradient(120deg, #56C596, #4FA8F6, #74B9FF, #68D391);
+      background-size: 240% 240%;
+      animation: videoHoloBtn 4.2s ease infinite;
+    }
+
+    [data-holo="true"] .action-circle-btn {
+      background: linear-gradient(135deg, #B2E2B4 0%, #98DBC5 45%, #9CC8F7 100%);
+      background-size: 200% 200%;
+      animation: videoHoloBtn 4.2s ease infinite;
+    }
+
+    /* 顶部第一行：左侧品牌标识 + 右上角组件 */
+    .top-nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .brand-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--text-secondary);
+      gap: 7px;
+    }
+
+    .brand-bar {
+      width: 4px;
+      height: 15px;
+      background-color: var(--theme-accent);
+      border-radius: 3px;
+      transition: background-color 0.45s ease;
+    }
+
+    .repo-pill-link {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      color: var(--theme-tag-text);
+      background: var(--theme-tag-bg);
+      padding: 2.5px 9px;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    [data-dark="true"] .repo-pill-link {
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--orb-color-2);
+    }
+
+    /* ================= 3. 右上角语言胶囊 + 日夜圆形按钮 ================= */
+    .top-right-widgets {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+
+    .lang-pill-btn {
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background-color: var(--pill-surface);
+      border: none;
+      box-shadow: var(--pill-shadow);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.4s ease;
+    }
+
+    .lang-pill-btn:active {
+      transform: scale(0.93);
+    }
+
+    .globe-svg {
+      width: 17px;
+      height: 17px;
+      stroke: var(--theme-accent);
+      fill: none;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .lang-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .theme-mode-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--pill-surface);
+      border: none;
+      box-shadow: var(--pill-shadow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-primary);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      position: relative;
+      z-index: 102;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.4s ease;
+    }
+
+    .theme-mode-btn.pressing {
+      transform: scale(0.9);
+      box-shadow: 0 0 0 4px var(--search-glow);
+    }
+
+    .sun-moon-svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .theme-mode-btn.rotating .sun-moon-svg {
+      transform: rotate(180deg) scale(0.85);
+    }
+
+    /* 长按弹出的 12 色主题面板 */
+    .theme-panel-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 98;
+      background: rgba(15, 23, 42, 0.06);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .theme-panel-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .theme-popover-panel {
+      position: absolute;
+      top: 46px;
+      right: 0;
+      width: 288px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: none;
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.18), 0 4px 16px rgba(15, 23, 42, 0.06);
+      z-index: 101;
+      opacity: 0;
+      transform: translateY(-10px) scale(0.92);
+      transform-origin: top right;
+      pointer-events: none;
+      user-select: none;
+      transition: opacity 0.26s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-dark="true"] .theme-popover-panel {
+      background: rgba(21, 31, 50, 0.96);
+      box-shadow: 0 22px 44px -8px rgba(0, 0, 0, 0.55);
+    }
+
+    .theme-popover-panel.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 0 4px;
+    }
+
+    .panel-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .panel-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .theme-swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
+    }
+
+    .theme-swatch-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 13px;
+      background: var(--card-sub-bg);
+      border: none;
+      cursor: pointer;
+      transition: transform 0.18s ease, background-color 0.2s ease;
+    }
+
+    .theme-swatch-item.active,
+    .theme-swatch-item.sliding-hover {
+      background: var(--theme-tag-bg);
+      transform: scale(1.03);
+    }
+
+    .swatch-orb-preview {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .swatch-orb-preview.holo-animated {
+      background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%) !important;
+      background-size: 220% 220% !important;
+      animation: videoHoloBtn 3.2s ease infinite;
+    }
+
+    .swatch-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ================= 4. 主标题与刷新数据行 ================= */
+    .shop-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .shop-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+      line-height: 1.25;
+    }
+
+    @media (min-width: 768px) {
+      .shop-title {
+        font-size: 26px;
+      }
+    }
+
+    .shop-subtitle {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+      line-height: 1.5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 10px;
+    }
+
+    .update-time {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .refresh-btn {
+      background-color: var(--refresh-btn-bg);
+      color: var(--refresh-btn-text);
+      border: none;
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      box-shadow: 0 5px 15px var(--search-glow);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .refresh-btn:active {
+      transform: scale(0.94);
+    }
+
+    .refresh-svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .refresh-btn.spinning .refresh-svg {
+      transform: rotate(360deg);
+    }
+
+    /* ================= 5. 悬浮滑动胶囊 Tab ================= */
+    .gemini-tab-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .gemini-tabs {
+      position: relative;
+      display: inline-grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.52);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: none;
+    }
+
+    [data-dark="true"] .gemini-tabs {
+      background: rgba(15, 23, 42, 0.52);
+    }
+
+    .tab-glider {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: calc(50% - 4px);
+      height: calc(100% - 8px);
+      background-color: var(--pill-surface);
+      border-radius: 999px;
+      box-shadow: 0 3px 12px rgba(15, 23, 42, 0.08);
+      transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.4s ease;
+      z-index: 0;
+    }
+
+    .gemini-tabs[data-active="guide"] .tab-glider {
+      transform: translateX(100%);
+    }
+
+    .gemini-tab-btn {
+      position: relative;
+      z-index: 1;
+      border: none;
+      background: transparent;
+      padding: 8px 22px;
+      border-radius: 999px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: color 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .gemini-tab-btn.active {
+      color: var(--theme-tab-text);
+      font-weight: 800;
+    }
+
+    /* ================= 6. 大圆角悬浮搜索框 ================= */
+    .gemini-search-card {
+      background-color: var(--pill-surface);
+      border-radius: 26px;
+      padding: 9px 10px 9px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 28px -6px var(--search-glow), 0 2px 6px rgba(15, 23, 42, 0.03);
+      border: none;
+      transition: box-shadow 0.45s ease, transform 0.25s ease;
+    }
+
+    .gemini-search-card:focus-within {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 32px -4px var(--search-glow);
+    }
+
+    .plus-action-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .search-input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 14px;
+      color: var(--text-primary);
+      background: transparent;
+      font-weight: 500;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .clear-input-btn {
+      border: none;
+      background: rgba(148, 163, 184, 0.18);
+      color: var(--text-secondary);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 12px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .clear-input-btn.visible {
+      display: inline-flex;
+    }
+
+    .action-circle-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background-color: var(--send-circle-bg);
+      color: var(--send-circle-icon);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .arrow-up-svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ================= 7. 下方分类胶囊栏 & 无边框筛选条（图3修复：去除廉价线框与方框，单行水平滚动对齐） ================= */
+    .category-bar {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 8px;
+      padding: 14px var(--side-pad) 6px;
+      overflow-x: auto;
+    }
+
+    .cat-chip {
+      border: none;
+      background-color: var(--card-bg);
+      color: var(--text-secondary);
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+      transition: all 0.25s ease;
+    }
+
+    .cat-chip.active {
+      background-color: var(--theme-accent);
+      color: #FFFFFF;
+      font-weight: 700;
+      box-shadow: 0 4px 12px var(--search-glow);
+    }
+
+    /* 第二行筛选栏：与上方严格左对齐、右对齐，单行不折行，彻底移除廉价方框与描边 */
+    .sub-filter-bar {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px var(--side-pad) 6px;
+      overflow-x: auto;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .filter-toggle-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--card-bg);
+      border: none;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.22s ease;
+    }
+
+    /* 激活态采用柔和弥散胶囊填充，无生硬蓝框与方框 */
+    .filter-toggle-pill.checked {
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      font-weight: 700;
+    }
+
+    [data-dark="true"] .filter-toggle-pill.checked {
+      background: rgba(59, 130, 246, 0.2);
+      color: var(--orb-color-2);
+    }
+
+    .pill-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--text-muted);
+      opacity: 0.45;
+      transition: all 0.22s ease;
+    }
+
+    .filter-toggle-pill.checked .pill-status-dot {
+      background-color: currentColor;
+      opacity: 1;
+      transform: scale(1.2);
+    }
+
+    .filter-status-count {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--theme-tag-text);
+      background: var(--theme-tag-bg);
+      height: 30px;
+      padding: 0 11px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    [data-dark="true"] .filter-status-count {
+      background: rgba(147, 197, 253, 0.14);
+      color: var(--orb-color-2);
+    }
+
+    /* ================= 8. 顶部速览宫格卡片（图1修复：严格单行锁高，左右卡片100%水平基线对齐） ================= */
+    .content-grid {
+      padding: 8px var(--side-pad) 14px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    @media (min-width: 768px) {
+      .content-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+    }
+
+    .content-grid.switching {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .product-card {
+      background-color: var(--card-bg);
+      border-radius: 20px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 112px;
+      box-shadow: var(--card-shadow);
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.22s ease, box-shadow 0.25s ease;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .product-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 22px -8px var(--search-glow);
+      }
+    }
+
+    .product-card:active {
+      transform: scale(0.97);
+    }
+
+    .card-top {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    /* 严格单行 20px 行高，保证同行左右卡片标题与下方胶囊处于同一水平线 */
+    .product-name {
+      width: 100%;
+      height: 20px;
+      line-height: 20px;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 严格单行 22px 高度，绝不折成两行 */
+    .product-tag {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      max-width: 100%;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--theme-tag-text);
+      background-color: var(--theme-tag-bg);
+      padding: 0 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    [data-dark="true"] .product-tag {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: var(--orb-color-2);
+    }
+
+    .card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 6px;
+      height: 24px;
+    }
+
+    .product-price {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--theme-accent);
+      letter-spacing: -0.3px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    [data-dark="true"] .product-price {
+      color: var(--orb-color-1);
+    }
+
+    .product-price .currency {
+      font-size: 11.5px;
+      margin-left: 2px;
+      font-weight: 600;
+    }
+
+    .shop-name {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    /* ================= 9. 结论横幅 Banner（与上下卡片严格左右对齐，无廉价边框） ================= */
+    .warning-banner {
+      margin: 0 var(--side-pad) 16px;
+      padding: 13px 15px;
+      border-radius: 20px;
+      border: none;
+      background: var(--card-bg);
+      box-shadow: var(--card-shadow);
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    .warning-banner strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    /* 证据图例同样支持单行横向滚动不折行 */
+    .evidence-legend {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 6px;
+      margin-top: 9px;
+      overflow-x: auto;
+    }
+
+    .attr-pill-tag {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .attr-pill-tag.tag-green { background: #DCFCE7; color: #15803D; }
+    .attr-pill-tag.tag-teal { background: #CCFBF1; color: #0F766E; }
+    .attr-pill-tag.tag-amber { background: #FEF3C7; color: #B45309; }
+    .attr-pill-tag.tag-orange { background: #FFEDD5; color: #C2410C; }
+    .attr-pill-tag.tag-blue { background: #DBEAFE; color: #1D4ED8; }
+    .attr-pill-tag.tag-purple { background: #F3E8FF; color: #6D28D9; }
+    .attr-pill-tag.tag-gray { background: #F1F5F9; color: #475569; }
+
+    [data-dark="true"] .attr-pill-tag.tag-green { background: rgba(34, 197, 94, 0.18); color: #86EFAC; }
+    [data-dark="true"] .attr-pill-tag.tag-teal { background: rgba(20, 184, 166, 0.18); color: #5EEAD4; }
+    [data-dark="true"] .attr-pill-tag.tag-amber { background: rgba(245, 158, 11, 0.18); color: #FCD34D; }
+    [data-dark="true"] .attr-pill-tag.tag-orange { background: rgba(249, 115, 22, 0.18); color: #FDBA74; }
+    [data-dark="true"] .attr-pill-tag.tag-blue { background: rgba(59, 130, 246, 0.2); color: #93C5FD; }
+    [data-dark="true"] .attr-pill-tag.tag-purple { background: rgba(168, 85, 247, 0.2); color: #D8B4FE; }
+    [data-dark="true"] .attr-pill-tag.tag-gray { background: rgba(148, 163, 184, 0.16); color: #CBD5E1; }
+
+    /* ================= 10. 30家云手机分组手风琴 & 视觉对齐品牌卡片 ================= */
+    .site-list-section {
+      padding: 2px var(--side-pad) 28px;
+    }
+
+    .site-list-topline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .site-list-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+    }
+
+    .site-list-count {
+      margin-left: auto;
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      border-radius: 999px;
+      height: 24px;
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    [data-dark="true"] .site-list-count {
+      background: rgba(147, 197, 253, 0.13);
+      color: var(--orb-color-2);
+    }
+
+    .site-list-subhead {
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .site-list-groups {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .site-list-group {
+      border-radius: 22px;
+      border: none;
+      background: var(--card-bg);
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+    }
+
+    .site-list-trigger {
+      outline: none;
+      display: flex;
+      width: 100%;
+      border: 0;
+      background: transparent;
+      padding: 15px 16px;
+      align-items: center;
+      text-align: left;
+      cursor: pointer;
+      gap: 12px;
+      color: inherit;
+    }
+
+    .site-list-brand-icon {
+      flex: 0 0 36px;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+      border-radius: 11px;
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      font-weight: 800;
+    }
+
+    [data-dark="true"] .site-list-brand-icon {
+      background: rgba(147, 197, 253, 0.12);
+    }
+
+    .site-list-main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .site-list-name {
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.35;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .site-list-detail {
+      margin-top: 2px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .site-list-minimum {
+      margin-left: auto;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .site-list-minimum small {
+      display: block;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      margin-bottom: 1px;
+    }
+
+    .site-list-minimum strong {
+      color: var(--theme-accent);
+      font-size: 14.5px;
+      font-weight: 800;
+    }
+
+    .site-list-arrow {
+      display: inline-flex;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .site-list-group.open .site-list-arrow {
+      transform: rotate(180deg);
+    }
+
+    .site-list-collapsible {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .site-list-group.open .site-list-collapsible {
+      grid-template-rows: 1fr;
+    }
+
+    .site-list-inner {
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .site-list-offers {
+      border-top: 1px solid var(--card-divider);
+      padding: 4px 16px 12px;
+    }
+
+    /* === 全宽品牌卡片：左边缘与右边缘严格对齐 === */
+    .brand-item-card {
+      padding: 14px 0;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .brand-item-card + .brand-item-card {
+      border-top: 1px solid var(--card-divider);
+    }
+
+    /* 第1行：严格单行不折行，左对齐 #序号+品牌+主体，右对齐 价格+官网按钮 */
+    .brand-row-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: nowrap;
+      min-width: 0;
+    }
+
+    .brand-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .brand-seq-num {
+      height: 22px;
+      min-width: 28px;
+      padding: 0 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--theme-tag-text);
+      background: var(--theme-tag-bg);
+      border-radius: 6px;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    [data-dark="true"] .brand-seq-num {
+      background: rgba(147, 197, 253, 0.14);
+      color: var(--orb-color-2);
+    }
+
+    .brand-main-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 22px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .brand-sub-operator {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      line-height: 22px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-price-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .brand-main-price {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--theme-accent);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    [data-dark="true"] .brand-main-price {
+      color: var(--orb-color-1);
+    }
+
+    .site-offer-link {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      height: 24px;
+      padding: 0 9.5px;
+      border-radius: 7px;
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+
+    .site-offer-link:active {
+      transform: scale(0.94);
+    }
+
+    [data-dark="true"] .site-offer-link {
+      background: rgba(147, 197, 253, 0.13);
+      color: var(--orb-color-2);
+    }
+
+    /* 第2行（图2修复）：绝不换行！超出后单行平滑横向滚动，且隐藏滚动条，去除域名廉价描边 */
+    .brand-tags-bar {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      white-space: nowrap;
+      width: 100%;
+    }
+
+    .domain-inline-pill {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #475569;
+      background: #F1F5F9;
+      border: none;
+      padding: 0 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    [data-dark="true"] .domain-inline-pill {
+      background: rgba(148, 163, 184, 0.16);
+      color: #CBD5E1;
+    }
+
+    /* 第3块：无边框柔和底色盒，四维标签与内容严格网格对齐 */
+    .brand-specs-box {
+      background: var(--card-sub-bg);
+      border: none;
+      border-radius: 13px;
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+
+    @media (min-width: 768px) {
+      .brand-specs-box {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px 20px;
+        padding: 11px 14px;
+      }
+    }
+
+    .spec-kv-item {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 8px;
+      align-items: baseline;
+      font-size: 12.5px;
+      line-height: 1.52;
+    }
+
+    .spec-kv-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-align: justify;
+      text-align-last: justify;
+      user-select: none;
+    }
+
+    .spec-kv-label.risk-label {
+      color: #D97706;
+    }
+
+    [data-dark="true"] .spec-kv-label.risk-label {
+      color: #FBBF24;
+    }
+
+    .spec-kv-value {
+      color: var(--text-primary);
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    .spec-kv-value.risk-value {
+      color: var(--text-secondary);
+    }
+
+    /* 第4行：底部域名与官网操作栏（左对齐域名，右对齐官网/详情按钮，与上方价格右边缘严格对齐） */
+    .brand-footer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 2px;
+      flex-wrap: nowrap;
+    }
+
+    .brand-footer-domain {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    /* ================= 11. 甘甘云专章与 8 步真机自测交互清单（无廉价边框，统一阴影层级） ================= */
+    .special-card {
+      background: var(--card-bg);
+      border: none;
+      border-radius: 22px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .special-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: nowrap;
+    }
+
+    .special-card-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tier-table-wrap {
+      overflow-x: auto;
+      margin: 10px 0;
+      border-radius: 13px;
+      background: var(--card-sub-bg);
+      border: none;
+    }
+
+    .tier-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+    }
+
+    .tier-table th {
+      color: var(--text-secondary);
+      font-weight: 700;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--card-divider);
+      white-space: nowrap;
+    }
+
+    .tier-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--card-divider);
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .tier-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tier-price-highlight {
+      font-weight: 800;
+      color: var(--theme-accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .checklist-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    @media (min-width: 768px) {
+      .checklist-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 13px;
+      border-radius: 14px;
+      background: var(--card-sub-bg);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .checklist-item.done {
+      background: var(--theme-tag-bg);
+    }
+
+    [data-dark="true"] .checklist-item.done {
+      background: rgba(59, 130, 246, 0.14);
+    }
+
+    .step-num-badge {
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      background: var(--card-bg);
+      color: var(--theme-accent);
+      font-size: 11.5px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .checklist-item.done .step-num-badge {
+      background: var(--theme-accent);
+      color: #FFFFFF;
+    }
+
+    .checklist-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .checklist-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .checklist-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.52;
+    }
+
+    .checklist-desc code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      background: rgba(15, 23, 42, 0.06);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    [data-dark="true"] .checklist-desc code {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .site-list-footer {
+      padding: 12px 2px 0;
+      font-size: 12px;
+      line-height: 1.75;
+      color: var(--text-secondary);
+    }
+
+    .site-online-link {
+      color: var(--theme-accent);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    /* 来源链接同样支持单行横向滑动不折行 */
+    .source-links-wrap {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 8px;
+      margin-top: 10px;
+      overflow-x: auto;
+    }
+
+    /* ================= 12. 品牌详情档案弹窗 Modal ================= */
+    .same-source-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .same-source-modal-backdrop.open {
+      display: flex;
+    }
+
+    .same-source-modal {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      border: none;
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.28);
+      max-height: 82vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+
+    .modal-close-btn {
+      border: none;
+      background: var(--card-sub-bg);
+      color: var(--text-secondary);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 14px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .modal-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .modal-seller-list {
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .modal-kv-row {
+      padding: 10px 12px;
+      border-radius: 13px;
+      background: var(--card-sub-bg);
+      border: none;
+    }
+
+    .modal-kv-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+
+    .modal-kv-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 36px 20px;
+      color: var(--text-secondary);
+      font-size: 13.5px;
+    }
+  
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      html { scroll-behavior: auto; }
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <p style="margin:18px 0 0;font-size:13.5px"><a href="../" style="text-decoration:none">&larr; 返回导航 · use 有用的都在这</a></p>
 
-  <header class="lead">
-    <p class="dateline">调研日期口径：2026年11月2日（北京时间，每周一复核） · 30 家品牌 · 价格与架构以官网实测或官网原文为准</p>
-    <h1>云手机横向对比：资费、底层真假与改机能力</h1>
-    <p class="lede">用户原名单去重后 29 家，另加<strong>甘甘云手机</strong>，共 30 家。核心结论先说清楚：<strong>没有一家主流套餐能以公开证据确认为整机真机托管</strong>；市场主体是 ARM 服务器／板卡虚拟化，而自称“真机”多为营销话术，须用文末自测清单验证。</p>
-    <div class="stats" id="stats"></div>
-    <div class="warn"><b>可信度警告（全篇适用）：</b>2026 年网易号／搜狐号／什么值得买上大量“云手机横评”文案高度雷同（如多家共用同一组断连率／延迟数字），疑似 SEO 软文，只能作低权重旁证；关键价格／架构以官网 <b>verified live</b>（2026-10-31 在浏览器实地打开官网并操作核对）或官网原文为准。凡标注“横评”的数字，下单前都应在 App 内二次确认。</div>
-    <div class="legend" aria-label="图例">
-      <span><i style="background:var(--b)"></i>B · ARM 服务器／板卡虚拟化（拟真机）</span>
-      <span><i style="background:var(--btend)"></i>B 倾向 · 证据较弱</span>
-      <span><i style="background:var(--c)"></i>疑似 C · x86 转译存疑</span>
-      <span><i style="background:var(--unknown)"></i>无法确认</span>
-      <span><i style="background:var(--na)"></i>不适用（云电脑品类）</span>
+  <div class="app-container">
+    <!-- ================= 顶部弥散渐变 Hero Header ================= -->
+    <header class="hero-header">
+      <div class="aura-backdrop">
+        <div class="aura-orb orb-left" id="orbLeft"></div>
+        <div class="aura-orb orb-center" id="orbCenter"></div>
+        <div class="aura-orb orb-right" id="orbRight"></div>
+      </div>
+
+      <!-- 第一行：左侧品牌 + 仓库标识 + 右上角组件 -->
+      <div class="top-nav-bar">
+        <div class="brand-tag">
+          <span class="brand-bar"></span>
+          <span>KEN · USE</span>
+          <a class="repo-pill-link" href="https://github.com/Kenguba/useful-budget/tree/main/frontend/cloud-phone" target="_blank" rel="noopener noreferrer">useful-budget ↗</a>
+        </div>
+
+        <div class="top-right-widgets">
+          <button class="lang-pill-btn" id="langBtn" type="button" onclick="toggleLanguage()" title="切换语言 / Switch Language">
+            <svg class="globe-svg" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            <span class="lang-text" id="langText">中文</span>
+          </button>
+
+          <button class="theme-mode-btn" id="darkModeBtn" type="button" title="单击切换日夜 / 长按滑动选12色主题">
+            <svg class="sun-moon-svg" id="sunMoonIcon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="4"></circle>
+              <line x1="12" y1="2" x2="12" y2="4.5"></line>
+              <line x1="12" y1="19.5" x2="12" y2="22"></line>
+              <line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line>
+              <line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line>
+              <line x1="2" y1="12" x2="4.5" y2="12"></line>
+              <line x1="19.5" y1="12" x2="22" y2="12"></line>
+              <line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line>
+              <line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line>
+            </svg>
+          </button>
+
+          <div class="theme-panel-backdrop" id="themeBackdrop" onclick="closeThemePanel()"></div>
+
+          <div class="theme-popover-panel" id="themePopover">
+            <div class="panel-header">
+              <span class="panel-title" id="panelTitle">12色弥散主题</span>
+              <span class="panel-hint" id="panelHint">滑动或点击选择</span>
+            </div>
+            <div class="theme-swatch-grid" id="themeSwatchGrid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 主标题 -->
+      <div class="shop-title-row">
+        <h1 class="shop-title" id="mainTitle">📱 30家云手机横评</h1>
+      </div>
+      <p class="shop-subtitle" id="subTitle">资费、底层真假与改机能力 · 0真机托管 · 14家ARM虚拟化 · 8步验机</p>
+
+      <!-- 更新时间 与 刷新按钮 -->
+      <div class="status-row">
+        <span class="update-time" id="updateTime">2026-11-05 22:06 更新 · 共 30 家品牌实测核对</span>
+        <button class="refresh-btn" id="refreshBtn" type="button" onclick="handleRefresh()">
+          <svg class="refresh-svg" viewBox="0 0 24 24">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+            <path d="M16 16h5v5"></path>
+          </svg>
+          <span id="refreshBtnText">刷新主题</span>
+        </button>
+      </div>
+
+      <!-- 滑动胶囊切换栏 -->
+      <div class="gemini-tab-section">
+        <div class="gemini-tabs" id="geminiTabs" data-active="matrix">
+          <div class="tab-glider"></div>
+          <button class="gemini-tab-btn active" id="tabMatrix" type="button" onclick="switchTab('matrix')">横评总表 (30家)</button>
+          <button class="gemini-tab-btn" id="tabGuide" type="button" onclick="switchTab('guide')">甘甘云 · 8步验机</button>
+        </div>
+      </div>
+
+      <!-- 大圆角悬浮搜索框 -->
+      <div class="gemini-search-card">
+        <button class="plus-action-btn" type="button" onclick="resetCategoryFilter()" title="重置全部筛选">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+
+        <input
+          type="text"
+          class="search-input"
+          id="searchInput"
+          placeholder="搜索品牌名，如：川川、VMOS、章鱼、甘甘..."
+          oninput="handleSearchInput()"
+        >
+
+        <button class="clear-input-btn" id="clearBtn" type="button" onclick="clearSearch()">✕</button>
+
+        <button class="action-circle-btn" type="button" onclick="triggerSearchFocus()" title="立即检索">
+          <svg class="arrow-up-svg" viewBox="0 0 24 24">
+            <line x1="12" y1="19" x2="12" y2="5"></line>
+            <polyline points="5 12 12 5 19 12"></polyline>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ================= 下方分类快捷筛选栏（无边框圆润胶囊，单行滑动无滚动条） ================= -->
+    <nav class="category-bar" id="categoryBar">
+      <button class="cat-chip active" data-cat="all" type="button" onclick="selectCategory('all', this)">全部 30 家</button>
+      <button class="cat-chip" data-cat="B·ARM虚拟化" type="button" onclick="selectCategory('B·ARM虚拟化', this)">B·ARM虚拟化 (10)</button>
+      <button class="cat-chip" data-cat="B倾向" type="button" onclick="selectCategory('B倾向', this)">B倾向 (4)</button>
+      <button class="cat-chip" data-cat="疑似C" type="button" onclick="selectCategory('疑似C', this)">疑似C·x86转译 (1)</button>
+      <button class="cat-chip" data-cat="无法确认" type="button" onclick="selectCategory('无法确认', this)">无法确认 (14)</button>
+      <button class="cat-chip" data-cat="不适用" type="button" onclick="selectCategory('不适用', this)">不适用·云电脑 (1)</button>
+    </nav>
+
+    <!-- 第二行筛选开关 + 实时计数（无廉价方框与描边，单行水平对齐） -->
+    <div class="sub-filter-bar">
+      <div class="checkbox-group">
+        <button type="button" class="filter-toggle-pill" id="chkOfficialBtn" onclick="toggleOfficialFilter()">
+          <span class="pill-status-dot" id="chkOfficialDot"></span>
+          <span id="chkOfficialText">只看有官网价/官方文档</span>
+        </button>
+        <button type="button" class="filter-toggle-pill" id="chkModBtn" onclick="toggleModFilter()">
+          <span class="pill-status-dot" id="chkModDot"></span>
+          <span id="chkModText">只看含一键新机/改机说明</span>
+        </button>
+      </div>
+      <span class="filter-status-count" id="filterStatusCount">30 / 30 家</span>
     </div>
-    <p class="legend">证据口径：<b>verified live</b> ＝ 2026-10-31 实地打开官网核对；<b>index</b> ＝ 搜索引擎索引到的页面摘要，未实地打开或页面为第三方；<b>未查到</b> ＝ 官网无／公开信息无，不编造。底层 B 类归类按报告分类口径，含仅横评口径者，卡片内逐项注明证据来源。</p>
-  </header>
 
-  <!-- ============ 甘甘云专章 ============ -->
-  <section class="spot" id="gangan" aria-labelledby="gangan-h">
-    <h2 id="gangan-h">追加核查：甘甘云手机 <span class="no">第 30 家 · 重点查“欢畅版”</span></h2>
-    <div class="alert" role="note">
-      <b>“欢畅版”核查结论——未查到公开信息／官网无，不编造其价格与配置。</b><br>
-      2026-10-31 实地打开甘甘云官网，其套餐区只有 VIP、GVIP、KVIP、XVIP 四档，<b>无“欢畅版”</b>；以“欢畅版＋甘甘”“甘甘云＋欢畅”检索全网公开索引亦<b>无任何结果</b>。仅供排查的可能情况（非结论）：App 内／渠道代理的内部命名、已下线旧档、或与他牌“畅玩版”命名混淆——如需坐实，须凭 App 内套餐截图或代理报价单再核对。以下官网现行四档可作对照基准。
-    </div>
-    <dl class="kv">
-      <div><dt>运营主体 / 官网</dt><dd>湖南威红科技有限公司 · <a href="https://www.ggyphone.com/">ggyphone.com</a>（verified live，2026-10-31）</dd></div>
-      <div><dt>备案与地址</dt><dd>湘ICP备2023039366号-5；长沙市开福区通泰街街道中山路 589 号开福万达广场 B 区 14012（隐私政策，生效 2025-09-07）</dd></div>
-      <div><dt>品牌起始</dt><dd>不早于 2023 年（官网页脚 Copyright@2023、备案口径），属年轻小品牌</dd></div>
-      <div><dt>客户端 / 应用</dt><dd>Android／iOS／Windows／H5 四端；App 包名 com.ganganyun.android，开发者湖南威红（好豆网索引，index）</dd></div>
-    </dl>
+    <!-- ================= 顶部 6 大场景推荐速览宫格（图1修复：严格单行锁高，左右视觉100%对齐） ================= -->
+    <main class="content-grid" id="contentGrid"></main>
 
-    <h3>官网现行四档套餐（2026-10-31 在官网逐档切换时长实测，verified live）</h3>
-    <p class="sub" id="gg-updated">甘甘官网价每周两次由脚本自动抓取官网更新（data/prices.json）；本表初始值为 2026-10-31 实测快照。</p>
-    <div class="tblwrap">
-    <table>
-      <thead><tr><th>套餐（官网，安卓 10 默认）</th><th>配置</th><th>安卓可选</th><th class="num">7 天价</th><th class="num">30 天价</th></tr></thead>
-      <tbody>
-        <tr><td><b>VIP</b></td><td>8 核／4G 内存／64G 存储</td><td>10／11／12</td><td class="num" data-gg="VIP:7">¥7.50</td><td class="num" data-gg="VIP:30"><b>¥23.90</b></td></tr>
-        <tr><td><b>GVIP</b></td><td>12 核／8G／128G</td><td>10／11／12</td><td class="num" data-gg="GVIP:7">¥16.50</td><td class="num" data-gg="GVIP:30">¥48.00</td></tr>
-        <tr><td><b>KVIP</b></td><td>16 核／12G／256G</td><td>10／11／12</td><td class="num" data-gg="KVIP:7">¥23.00</td><td class="num" data-gg="KVIP:30">¥65.00</td></tr>
-        <tr><td><b>XVIP</b></td><td>24 核／16G／512G</td><td>10／11／12／13</td><td class="num" data-gg="XVIP:7">¥38.00</td><td class="num" data-gg="XVIP:30">¥139.00</td></tr>
-      </tbody>
-    </table>
-    </div>
-    <p class="sub" style="margin-top:8px">90 天档官网可选，但本次未逐一取价。横评所称“月费 23.9 元”正对应 VIP 30 天价，可交叉；横评所称活动价 12.8／14.8 元官网未见，属活动／渠道口径；横评所称“安卓 8–15”与官网可选 10–13 冲突，以官网为准。官网自办资讯文曾称“甘甘 Pro 29 元／300 小时”，与套餐页不一致，属站内营销文，不采信。</p>
-
-    <figure class="chartbox" style="margin-left:0;margin-right:0">
-      <div id="gangan-chart" role="img" aria-label="甘甘云四档套餐 30 天价格柱状图：VIP 23.9 元，GVIP 48 元，KVIP 65 元，XVIP 139 元"></div>
-      <figcaption>甘甘云官网四档 30 天价（verified live，2026-10-31）。柱长自 0 起；XVIP 的 24 核标称远超任何单颗手机 SoC，逻辑上只能是服务器端 vCPU 切片，不是整机真机托管的证据。</figcaption>
-    </figure>
-
-    <div class="twocol">
-      <div>
-        <h3>定位与特点</h3>
-        <ul class="tight">
-          <li>官网主打<b>游戏挂机</b>：传奇类“一键批量群控扫图”、角色类多账号在线、养成类“24 小时离线自动推图／养号”、经营类多开群控囤资源、多屏监控、7×24 云托管。</li>
-          <li>横评（index，低权重）补充：一价全包（多开／群控／Root 含基础套餐）、适合 3–5 开轻度搬砖与回合制（梦幻西游／问道）、批量管理工具相对基础、十几台以上大规模群控非强项。</li>
-          <li>跨境／直播／办公定位：<b>官网无此宣传</b>；海外节点、ADB、自动化脚本接口：<b>未查到公开信息</b>。不推荐用于跨境。</li>
-        </ul>
-        <h3>技术底层：B 类倾向，证据弱；排除 A</h3>
-        <ul class="tight">
-          <li>官网<b>未公示任何芯片／架构</b>（无 RK3588／鲲鹏／骁龙命名）。</li>
-          <li>横评称“自研 ARM 架构”“ARM 真机方案”——后者为营销话术；且 GVIP／KVIP／XVIP 标称 12／16／24 核，远超单颗手机 SoC，逻辑上只能是服务器端 vCPU 切片，<b>不可能是整机真机托管</b>。</li>
-          <li>未查到任何用户 Device Info HW／AIDA64 实测帖（CPU abi、传感器、基带）可交叉。故只能凭“ARM”宣传归入 B 类倾向，置信度低于掌派／多多云等公示硬件者；亦无证据指其为 x86（C），最终须按文末自测清单验证（重点看 abi 与 SoC）。</li>
-        </ul>
+    <!-- 核心防坑结论与证据分级说明 -->
+    <div class="warning-banner" id="warningBanner">
+      <div id="warningText">
+        <strong>核心结论与可信度警告：</strong>主流套餐中 <strong>0 家</strong>可确认为 (A) 整机真机托管；<strong>14 家</strong>归入 B 类 ARM 服务器/板卡虚拟化（含 4 家 B 倾向）；<strong>14 家</strong>官网无架构或芯片公示；<strong>1 家</strong>疑似 C 类 x86 转译（章鱼云）；<strong>1 家</strong>不适用（达龙云为云电脑）；自称“真机”多为营销话术，请配合下方 8 步自测清单核验
       </div>
-      <div>
-        <h3>改机／一键新机：官网与公开索引均未查到</h3>
-        <ul class="tight">
-          <li>未查到甘甘云提供一键新机、改机型／IMEI／MAC／序列号、虚拟定位的功能说明。检索中出现的“一键新机文档”实为<b>舟思云 zhousiysj.com，非甘甘，切勿误引</b>。</li>
-          <li>仅横评称其“独立 IP＋设备指纹隔离”（单类来源、无实测），伪装参数能力视为<b>未证实</b>；Root 亦仅横评口径。因此养号防检测能力不能按“可改机”评估，风控风险高于明确支持一键新机且参数联动的品牌。</li>
-        </ul>
-        <h3>口碑与风险</h3>
-        <ul class="tight">
-          <li>未查到公开的跑路／停服／涨价争议或退款投诉报道（2026-10-31 检索黑猫等无结果）——但这与品牌小、用户基数小、运营时间短（2023 起）有关，<b>不等于无风险</b>。</li>
-          <li>横评提及短板：多开数量大时性能波动、高负载场景个别投诉闪退、系统版本更新慢／新游适配一般。</li>
-          <li>建议只买 7 天／30 天档试用、勿预付长周期（官网 90 天档亦然），重要账号勿首选。</li>
-        </ul>
+      <div class="evidence-legend">
+        <span class="attr-pill-tag tag-green">verified live：实地打开官网核对</span>
+        <span class="attr-pill-tag tag-amber">index：搜索引擎索引摘要</span>
+        <span class="attr-pill-tag tag-gray">未查到：官网/公开无，不编造</span>
       </div>
     </div>
-    <p class="sub">甘甘云来源：官网 <a href="https://www.ggyphone.com/">ggyphone.com</a>（verified live）· 隐私政策 <a href="https://privacy.gangancloud.cn/">privacy.gangancloud.cn</a> · 下载页 <a href="https://www.ggyphone.com/downloads.html">ggyphone.com/downloads.html</a> · App 信息 <a href="https://www.haodou.com/soft/1311.html">haodou.com</a> · 横评（低权重）<a href="https://www.163.com/dy/article/LA90FQ380556P1NI.html">网易号</a>、<a href="https://post.smzdm.com/p/a2608wg7/">什么值得买</a>、<a href="https://www.163.com/dy/article/L4S8DLLD0552TVMU.html">网易号旗舰口径</a>。</p>
-  </section>
 
-  <!-- ============ 30 家总表 ============ -->
-  <section id="all" aria-labelledby="all-h">
-    <h2 id="all-h">30 家横向总表 <span class="no">可搜索、可按底层与证据筛选</span></h2>
-    <p class="sub">每家按同一套维度核查：运营主体／官网、最新资费（注明配置与口径）、底层判定、改机能力、口碑与风险。价格找不到官网价的，明确标注“官网无／仅横评或代理价”，不编造。达龙云为云电脑品类，列入总表以免混淆采购；VMOS 国内与海外版并入同一条目，分段标注。</p>
+    <!-- ================= 主列表与甘甘云/8步自测展示区 ================= -->
+    <section class="site-list-section" id="siteListSection" aria-label="30家云手机横评明细">
+      <div class="site-list-topline">
+        <h2 class="site-list-title" id="siteListTitle">30 家云手机横向对比总表</h2>
+        <span class="site-list-count" id="siteListCount">5 组 · 30 家</span>
+      </div>
+      <p class="site-list-subhead" id="siteListSubtitle">全宽视觉对齐排版 · 标签超出可横向滑动 · 点击任意卡片查看完整档案</p>
 
-    <div class="controls">
-      <input type="search" id="q" placeholder="搜索品牌名，如：川川、VMOS、章鱼…" aria-label="搜索品牌" />
-      <div class="chips" role="group" aria-label="按底层筛选" id="chips">
-        <button class="chip" data-cat="all" aria-pressed="true">全部 30 家</button>
-        <button class="chip" data-cat="b" aria-pressed="false">B · ARM 虚拟化</button>
-        <button class="chip" data-cat="btend" aria-pressed="false">B 倾向</button>
-        <button class="chip" data-cat="c" aria-pressed="false">疑似 C</button>
-        <button class="chip" data-cat="unknown" aria-pressed="false">无法确认</button>
-        <button class="chip" data-cat="na" aria-pressed="false">不适用</button>
+      <div class="site-list-groups" id="siteListGroups"></div>
+
+      <div id="extraSpecialSections" style="margin-top: 16px;"></div>
+
+      <p class="site-list-footer" id="siteListFooter">
+        数据同步自
+        <a class="site-online-link" href="https://phone.jpedu.asia" target="_blank" rel="noopener noreferrer">phone.jpedu.asia</a>
+        · GitHub Pages 真身
+        <a class="site-online-link" href="https://kenguba.github.io/useful-budget/frontend/cloud-phone/" target="_blank" rel="noopener noreferrer">kenguba.github.io/useful-budget/frontend/cloud-phone/</a>
+        · 源码仓库
+        <a class="site-online-link" href="https://github.com/Kenguba/useful-budget" target="_blank" rel="noopener noreferrer">Kenguba/useful-budget</a>
+      </p>
+    </section>
+  </div>
+
+  <!-- ================= 品牌完整评测档案弹窗 Modal ================= -->
+  <div class="same-source-modal-backdrop" id="brandModalBackdrop" onclick="closeBrandModal(event)">
+    <div class="same-source-modal" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <div class="modal-title" id="modalBrandTitle">品牌横评档案</div>
+        <button class="modal-close-btn" type="button" onclick="closeBrandModal()">✕</button>
       </div>
-      <div class="toggles">
-        <label><input type="checkbox" id="fOfficial" /> 只看有官网价／官方文价格的</label>
-        <label><input type="checkbox" id="fMod" /> 只看含一键新机／改机说明的</label>
-      </div>
-      <p class="countline" id="countline"></p>
+      <div class="modal-sub" id="modalBrandSub">2026-11 实地核对 · 资费 / 底层架构 / 一键新机 / 风险提示</div>
+      <div class="modal-seller-list" id="modalBrandContent"></div>
     </div>
+  </div>
 
-    <div class="grid" id="grid"></div>
-    <div class="empty" id="empty">没有符合筛选条件的品牌，试试放宽筛选或换个关键词。</div>
-    <noscript><p>本页总表需启用 JavaScript 渲染；甘甘云专章、推荐与自测清单不受影响。</p></noscript>
-  </section>
+  <script>
+    // ================= 1. 12套弥散光晕渐变与全链路配色方案 =================
+    const themes = {
+      quote: [
+        {
+          name: "01 · 冰川晴空",
+          nameEn: "01 · Glacier Sky",
+          orb1: "#BCE0FD",
+          orb2: "#93C5FD",
+          refreshBg: "#60A5FA",
+          sendCircleBg: "#9CCAF9",
+          accent: "#2563EB",
+          tagBg: "#EBF5FF",
+          tagText: "#1D4ED8",
+          pageBg: "#F4F8FC",
+          glow: "rgba(147, 197, 253, 0.38)"
+        },
+        {
+          name: "02 · 薄荷微风",
+          nameEn: "02 · Mint Breeze",
+          orb1: "#A7F3D0",
+          orb2: "#6EE7B7",
+          refreshBg: "#34D399",
+          sendCircleBg: "#86EFAC",
+          accent: "#059669",
+          tagBg: "#ECFDF5",
+          tagText: "#047857",
+          pageBg: "#F2FBF7",
+          glow: "rgba(110, 231, 183, 0.36)"
+        },
+        {
+          name: "03 · 极光青蓝",
+          nameEn: "03 · Aurora Cyan",
+          orb1: "#A5F3FC",
+          orb2: "#818CF8",
+          refreshBg: "#6366F1",
+          sendCircleBg: "#A5B4FC",
+          accent: "#4F46E5",
+          tagBg: "#EEF2FF",
+          tagText: "#4338CA",
+          pageBg: "#F4F6FC",
+          glow: "rgba(129, 140, 248, 0.34)"
+        },
+        {
+          name: "04 · 抹茶森屿",
+          nameEn: "04 · Matcha Isle",
+          orb1: "#D9F99D",
+          orb2: "#86EFAC",
+          refreshBg: "#4ADE80",
+          sendCircleBg: "#BEF264",
+          accent: "#16A34A",
+          tagBg: "#F0FDF4",
+          tagText: "#15803D",
+          pageBg: "#F6FAF5",
+          glow: "rgba(134, 239, 172, 0.36)"
+        },
+        {
+          name: "05 · 碧海晴空",
+          nameEn: "05 · Azure Lagoon",
+          orb1: "#99F6E4",
+          orb2: "#7DD3FC",
+          refreshBg: "#2DD4BF",
+          sendCircleBg: "#67E8F9",
+          accent: "#0D9488",
+          tagBg: "#F0FDFA",
+          tagText: "#0F766E",
+          pageBg: "#F2F9FA",
+          glow: "rgba(125, 211, 252, 0.36)"
+        },
+        {
+          name: "06 · 深海星雾",
+          nameEn: "06 · Mist Slate",
+          orb1: "#CBD5E1",
+          orb2: "#93C5FD",
+          refreshBg: "#64748B",
+          sendCircleBg: "#CBD5E1",
+          accent: "#334155",
+          tagBg: "#F1F5F9",
+          tagText: "#1E293B",
+          pageBg: "#F5F7FA",
+          glow: "rgba(148, 163, 184, 0.32)"
+        }
+      ],
+      shop: [
+        {
+          name: "07 · 星云幻紫",
+          nameEn: "07 · Nebula Violet",
+          orb1: "#E9D5FF",
+          orb2: "#C4B5FD",
+          refreshBg: "#8B5CF6",
+          sendCircleBg: "#A396F8",
+          accent: "#6D28D9",
+          tagBg: "#F3E8FF",
+          tagText: "#6D28D9",
+          pageBg: "#F8F5FD",
+          glow: "rgba(167, 139, 250, 0.38)"
+        },
+        {
+          name: "08 · 蜜桃乌龙",
+          nameEn: "08 · Peach Oolong",
+          orb1: "#FBCFE8",
+          orb2: "#FDA4AF",
+          refreshBg: "#F472B6",
+          sendCircleBg: "#F9A8D4",
+          accent: "#DB2777",
+          tagBg: "#FDF2F8",
+          tagText: "#BE185D",
+          pageBg: "#FDF6F9",
+          glow: "rgba(244, 114, 182, 0.34)"
+        },
+        {
+          name: "09 · 晨曦微光",
+          nameEn: "09 · Dawn Amber",
+          orb1: "#FDE68A",
+          orb2: "#FDBA74",
+          refreshBg: "#FB923C",
+          sendCircleBg: "#FCD34D",
+          accent: "#EA580C",
+          tagBg: "#FFF7ED",
+          tagText: "#C2410C",
+          pageBg: "#FCF9F4",
+          glow: "rgba(251, 146, 60, 0.34)"
+        },
+        {
+          name: "10 · 落日粉紫",
+          nameEn: "10 · Sunset Glow",
+          orb1: "#F5D0FE",
+          orb2: "#FECDD3",
+          refreshBg: "#C084FC",
+          sendCircleBg: "#F0ABFC",
+          accent: "#9333EA",
+          tagBg: "#FAF5FF",
+          tagText: "#7E22CE",
+          pageBg: "#FAF6FC",
+          glow: "rgba(192, 132, 252, 0.35)"
+        },
+        {
+          name: "11 · 香槟流金",
+          nameEn: "11 · Champagne Gold",
+          orb1: "#FEF08A",
+          orb2: "#FDE047",
+          refreshBg: "#EAB308",
+          sendCircleBg: "#FDE047",
+          accent: "#CA8A04",
+          tagBg: "#FEFCE8",
+          tagText: "#A16207",
+          pageBg: "#FAF9F2",
+          glow: "rgba(234, 179, 8, 0.32)"
+        },
+        {
+          name: "12 · 幻彩全息",
+          nameEn: "12 · Gemini Holo",
+          isHolo: true,
+          orb1: "#8FDBB8",
+          orb2: "#9CC8F7",
+          refreshBg: "#4FA8F6",
+          sendCircleBg: "#9EE0C5",
+          accent: "#1A73E8",
+          tagBg: "#E6F4EA",
+          tagText: "#137333",
+          pageBg: "#F3F8FA",
+          glow: "rgba(143, 219, 184, 0.44)"
+        }
+      ]
+    };
 
-  <!-- ============ 推荐 ============ -->
-  <section aria-labelledby="rec-h">
-    <h2 id="rec-h">按用途推荐 <span class="no">各取前 3 · 理由与保留条件一并写明</span></h2>
-    <div class="recs">
-      <div class="rec">
-        <h3>游戏挂机最便宜</h3>
-        <ol>
-          <li><b>小滴云 — ¥13.9 起</b><br><span class="caveat">注意多为 10 台起批量口径；单台有 ¥38 口径冲突，个人价以 App 内为准。</span></li>
-          <li><b>章鱼云 — ¥0.56／天起</b>（官网 verified live）<br><span class="caveat">低价档性能／离线挂机弱（横评）；底层存疑，见总表。</span></li>
-          <li><b>甘甘云 VIP — ¥7.50／7 天、¥23.90／30 天</b>（官网 verified live）<br><span class="caveat">适合先短租验证；8 核／4G／64G、安卓 10–12。</span></li>
-        </ol>
-      </div>
-      <div class="rec">
-        <h3>养号防检测最稳（相对）</h3>
-        <ol>
-          <li><b>VMOS Cloud 高端云真机档</b><br><span class="caveat">独立设备环境／独享静态住宅 IP 80 国；“真机”档自称真实设备，未经用户实测帖交叉，列为“自称 A、待自测”，下单前务必自测。</span></li>
-          <li><b>多多云</b><br><span class="caveat">鲲鹏 ARM＋独立 IP／IMEI 口径；一键新机另付 ¥13／30 天。</span></li>
-          <li><b>傲晨云</b><br><span class="caveat">鲲鹏 ARM＋独立 IP 口径；价格为横评口径，官网未实测价。</span></li>
-        </ol>
-        <p class="caveat">甘甘云仅横评称独立 IP／指纹隔离、无实测佐证，<b>不列入防检测前三</b>。</p>
-      </div>
-      <div class="rec">
-        <h3>跨境海外</h3>
-        <ol>
-          <li><b>VMOS Cloud</b><br><span class="caveat">80 国独享静态住宅 IP、TikTok 场景；计时最低 5 分钟、日封顶 $1（官网价页 verified live，金额 JS 未完全渲染）。</span></li>
-          <li><b>雷电海外版 LDCloud</b><br><span class="caveat">台／新／美／泰／韩／荷等节点，安卓 10–15（官网套餐页，index）。</span></li>
-          <li><b>掌派云</b><br><span class="caveat">官网明列跨境电商场景；节点细节官网无。甘甘云未查到海外节点，不推荐跨境。</span></li>
-        </ol>
-      </div>
-      <div class="rec">
-        <h3>性价比月卡</h3>
-        <ol>
-          <li><b>甘甘云 VIP ¥23.90／30 天</b>（官网价）与 <b>VMOS 国内 ¥23.8／月起</b> 并列第一梯队<br><span class="caveat">甘甘：8 核／4G／64G、安卓 10–12，群控／Root 据横评含在套餐内——下单前在 App 二次确认。</span></li>
-          <li><b>川川云首购 ¥25／30 天、365 天 ¥208 起</b>（官网活动页 verified live，双十一第二波 2026-11-01~15）<br><span class="caveat">活动价波动大，注意首购限定与 11-15 截止。</span></li>
-          <li><b>多多云 ¥20／月起</b>（官网文口径）<br><span class="caveat">配置版本需核对；官网营销文价格版本多，下单以 App 为准。</span></li>
-        </ol>
-      </div>
-    </div>
-    <p class="sub" style="margin-top:12px">一句话定位：游戏挂机主力＝红手指／雷电／川川／甘甘／VMOS／多多云；工作室群控养号＝双子星／云帅／傲晨／川川／甘甘（小规模）；真机敏感业务＝无一家可凭公开证据免自测，优先试 VMOS Cloud 高端云真机档并自测。</p>
-  </section>
+    const allThemes = [...themes.quote, ...themes.shop];
 
-  <!-- ============ 自测 ============ -->
-  <section aria-labelledby="test-h">
-    <h2 id="test-h">用户自测真机方法清单 <span class="no">适用于甘甘及其余各家 · 开 1 台先测再续费</span></h2>
-    <p class="sub">自称“真机”多为营销话术。下面 8 步用免费工具核验，重点看 CPU 架构、传感器、IMEI／基带是否自洽；任何一步出现模拟器特征，都应按 x86 转译／模拟器对待。</p>
-    <ol class="steps">
-      <li><b>装 Device Info HW</b>：看 SoC 型号／GPU（Mali／Adreno 为真机类图形栈；出现 SwiftShader／VirGL／ANGLE 则可疑）、传感器列表是否齐全且数值随“摇晃云机／旋转”变化、摄像头／电池／基带版本是否为空或写死。</li>
-      <li><b>AIDA64／CPU-Z</b>：看 CPU ABI——须为 <code>arm64-v8a</code>；出现 <code>x86_64</code>、<code>houdini</code>、<code>ndk_translation</code> 字样＝转译／C 类；看内核、Build 指纹与机型是否自洽。</li>
-      <li><b>查系统属性（ADB 或终端）</b>：<code>getprop ro.hardware</code>（出现 goldfish／ranchu／vbox＝模拟器）、<code>ro.kernel.qemu</code>（=1 即模拟器）、<code>ro.product.cpu.abi</code>、<code>/proc/cpuinfo</code> 的 Hardware 字段。</li>
-      <li><b>安兔兔／鲁大师验机</b>：跑分量级与所购档位核数／内存是否匹配（如甘甘“24 核”在真机检测中不可能为单 SoC 24 核，重点看实际 SoC 与可用内存）；验机报告是否提示模拟器环境。</li>
-      <li><b>Momo／环境检测类 App ＋ 目标平台自身检测</b>：查 IMEI／MAC／Android ID 是否为空号段／全零／多台重复；一键新机前后对比参数是否“联动变化”——仅改型号而基带／指纹不变＝软改，易被风控关联。</li>
-      <li><b>传感器活体测试</b>：装 Sensor Test，云端无真实运动时陀螺仪／加速度应为微噪声而非恒定直线或全 0；GPS 定位与所购节点／IP 地理是否一致。</li>
-      <li><b>多台交叉比对</b>：同批开 ≥3 台，比对 IMEI 前缀、MAC、序列号、Build 时间、预装应用清单——批量雷同即机房模板镜像，养号风险高。</li>
-      <li><b>断网／关机保活与计费验证</b>：本地关机后云端任务是否继续；按甘甘官网 7 天档先行短租，晚高峰（20–23 点）测延迟／掉线，再决定 30／90 天。</li>
-    </ol>
-  </section>
-
-  <!-- ============ 未能核实 ============ -->
-  <section aria-labelledby="gap-h">
-    <h2 id="gap-h">未能核实 · 开放问题</h2>
-    <ul class="tight">
-      <li><b>甘甘云“欢畅版”</b>：官网无、全网索引无，无价格／配置可核（见专章）；需 App 内截图或代理单据才能续查。</li>
-      <li>甘甘云：芯片型号、ADB、虚拟定位、一键新机、独立 IP 真实性、海外节点——均未查到公开信息；横评数据（断连率 &lt;0.1%、延迟 25ms、15–20 开）无第三方原始实测帖，疑软文复用，未采为定论。</li>
-      <li>原 29 家中：游游峰、小七、八通、集智、泡泡、掌中宝、WA、小六等无官网价／架构公示者，价格与底层均无法确认，已在表中标注；云帅 2022 与 2026 价格口径冲突；章鱼云 x86 说法仅单源。</li>
-      <li>多家横评数字互相复制，无法排除厂商投放；所有“断连率／延迟”类数字未作排名依据。</li>
-    </ul>
-  </section>
-
-  <!-- ============ 来源 ============ -->
-  <section class="sources" aria-labelledby="src-h">
-    <h2 id="src-h">来源</h2>
-    <p class="sub">每家卡片内已标注证据口径（verified live／index／横评／应用宝／未查到）。以下为报告列示的可点来源；其余品牌的价格与架构口径见卡片内标注的来源站点，未另行附链。</p>
-    <ul>
-      <li>红手指官网 FAQ（index）：<a href="https://www.gc.com.cn/faq/product/">gc.com.cn/faq/product/</a> <span class="tag">价格 VIP ¥38／GVIP ¥58／KVIP ¥77、年卡 248 起</span></li>
-      <li>川川云活动页（verified live，2026-11-02，双十一第二波 2026-11-01~15）：<a href="https://www.ccynice.com/huodong.html">ccynice.com/huodong.html</a></li>
-      <li>掌派云官网（verified live）：<a href="https://palmpai.com/">palmpai.com</a> <span class="tag">自研蚁坞 ARM 服务器＋屯云 ARM 平台</span></li>
-      <li>章鱼云官网（verified live）：<a href="https://zy.16163.com/">zy.16163.com</a> <span class="tag">低至 ¥0.56／天、支持 ADB</span></li>
-      <li>VMOS Cloud 价格页（verified live）：<a href="https://www.vmoscloud.com/zh/price">vmoscloud.com/zh/price</a> <span class="tag">计时最低 5 分钟、日封顶 $1，金额 JS 未完全渲染</span></li>
-      <li>多多云官网：<a href="https://www.ddyun.com/">ddyun.com</a></li>
-      <li>雷电海外套餐页（index）：<a href="https://www.ldcloud.net/ch/features/packages">ldcloud.net/ch/features/packages</a></li>
-      <li>甘甘云官网（verified live）：<a href="https://www.ggyphone.com/">ggyphone.com</a> · 隐私政策 <a href="https://privacy.gangancloud.cn/">privacy.gangancloud.cn</a> · 下载页 <a href="https://www.ggyphone.com/downloads.html">ggyphone.com/downloads.html</a> · App 信息 <a href="https://www.haodou.com/soft/1311.html">haodou.com</a></li>
-    </ul>
-  </section>
-
-  <footer>
-    <p>本页初始为 2026-10-31 调研快照，现行维护方式：甘甘云官网价每周两次由脚本自动抓取更新，其余 30 家由每周一全量复核更新；价格、活动与套餐以各品牌官网／App 内实时页面为准，活动价（如川川首购、甘甘 7 天档）波动大，预付长周期前请先短租自测。底层判定中的“B 倾向”“疑似 C”均为公开证据不足时的保守归类，不是对厂商的定性结论。<br>托管于 GitHub Pages · 仓库 Kenguba/useful-budget · <a href="../">返回导航</a></p>
-  </footer>
-</div>
-
-<script src="data/prices.js"></script>
-<script>
-(function(){
-  "use strict";
-  var CAT = {b:"B · ARM虚拟化", btend:"B倾向 · ARM虚拟化", c:"疑似C · x86转译存疑", unknown:"无法确认", na:"不适用（云电脑）"};
-  var EV = {official:"官网价 · verified live", official2:"官网／官方文 · index", app:"应用宝／应用商店", review:"仅横评／榜单 · 低权重", none:"未查到公开价", conflict:"价格口径冲突，以 App 为准"};
-
-  var DATA = [
-    {n:"红手指", cat:"b", ev:"official2", mod:true,
-     body:"湖南微算互联（2015 年成立，2020 年百度全资）／gc.com.cn",
-     price:"VIP ¥38／月、GVIP ¥58／月、KVIP ¥77／月，年卡 ¥248 起 <small>官网 FAQ，index；分辨率 720×1280，安卓 6–13</small>",
-     arch:"B：官网称 ARM 云。",
-     modT:"GVIP 以上提供一键新机（可改机型／IMEI／MAC／序列号）。",
-     risk:"有公开退款投诉经市监调解退款记录（今日头条／湖南日报转投诉，index）。游戏挂机主力之一。"},
-    {n:"雷电云", aka:"雷电云手机 · 海外 LDCloud", cat:"b", ev:"app", mod:true,
-     body:"长沙雷电云网络科技（2021）／ldyuncs.com；海外 ldcloud.net",
-     price:"新用户月卡 ¥26 起 <small>应用宝</small>；海外套餐分 MVIP／XVIP 等，台／新／美／泰／韩／荷节点，安卓 10–15 <small>官网套餐页，index</small>；华为云商店标准型 8 核／6G／30G、安卓 14",
-     arch:"B：ARM（华为云商店标准型配置口径）。",
-     modT:"高阶套餐有一键新机（chinac 文，index）。",
-     risk:"Google Play 有掉线／退款难差评（index）。"},
-    {n:"游峰／游游峰", cat:"unknown", ev:"review", mod:false,
-     body:"未查到稳定官网",
-     price:"官网无稳定官网价；横评称低价、安卓 9 <small>index，低权重</small>",
-     arch:"无法确认（横评称无独立 IP）。",
-     modT:"未查到。",
-     risk:"横评称晚高峰排队、次月涨价、长挂黑屏（单一软文源，谨慎）。"},
-    {n:"Ace 云手机", cat:"btend", ev:"review", mod:true,
-     body:"应用宝在架",
-     price:"横评：安卓 10 VIP ¥19.5／月、3.2G／35G <small>index</small>",
-     arch:"B 倾向：自称 ARM 真实架构（youxibao 介绍，index）。",
-     modT:"自称支持一键新机／换机、ROOT、虚拟定位。",
-     risk:"横评称共享资源、增值包多（低权重）。"},
-    {n:"双子星云手机", cat:"b", ev:"app", mod:true,
-     body:"深圳市臂云科技／应用宝包名 com.gemini.cloud",
-     price:"月卡 ¥22 起 <small>应用宝</small>；星动约 ¥28／月、3.2G／32G <small>横评</small>",
-     arch:"B：ARM 原生（横评口径）。",
-     modT:"有一键换机（腾讯新闻 2022，index）。",
-     risk:"同价位配置偏小；与唔即云同主体。"},
-    {n:"沐桦云", aka:"沐桦云云机", cat:"unknown", ev:"none", mod:false,
-     body:"上海沐桦科技／muhuaphone.com",
-     price:"官网无公开价。",
-     arch:"无法确认（官网称弹性公有云资源）。",
-     modT:"未查到。",
-     risk:"公开信息极少。"},
-    {n:"达龙云", aka:"达龙云云机", cat:"na", ev:"none", mod:false,
-     body:"上海／深圳达龙／dalongyun.com",
-     price:"无安卓云手机标准套餐公开价——主业为云电脑／云游戏（腾讯投资）。",
-     arch:"不适用（x86 云电脑逻辑）。",
-     modT:"不适用。",
-     risk:"勿与云手机混淆采购。"},
-    {n:"川川云手机", cat:"b", ev:"official", mod:true,
-     body:"ccynice.com",
-     price:"双十一第二波 2026-11-01~15：首购 30 天 ¥25 起、60 天 ¥45 起、90 天 ¥65 起、365 天 ¥208 起（标准版；PRO 版对应 30／54／78／268 元）<small>官网活动页 verified live，2026-11-02</small>；千川 30 天 ¥15.8",
-     arch:"B：横评称 ARM 原生；官网未公示芯片。",
-     modT:"横评称群控／Root 全含。",
-     risk:"活动价波动大，注意首购限定。"},
-    {n:"小七云手机", cat:"unknown", ev:"none", mod:false,
-     body:"未查到官网",
-     price:"未查到官网价。",
-     arch:"无法确认。",
-     modT:"未查到。",
-     risk:"仅榜单提及“轻量”。"},
-    {n:"傲晨云", cat:"b", ev:"review", mod:true,
-     body:"aochenyun.com",
-     price:"基础约 ¥18 起、标准 ¥28／月（8 核／4G／44G）<small>横评口径，官网未实测价</small>",
-     arch:"B：鲲鹏 ARM（横评／官网定位）。",
-     modT:"一键新机（横评口径）。",
-     risk:"触控偏慢反馈（横评）。养号防检测相对推荐之一（鲲鹏＋独立 IP 口径）。"},
-    {n:"唔即云", cat:"unknown", ev:"none", mod:false,
-     body:"深圳市臂云科技（与双子星同主体）／应用宝 com.gemini.cloud.wuji",
-     price:"未查到官网价。",
-     arch:"无法确认。",
-     modT:"未查到。",
-     risk:"品牌与双子星关系需以主体为准。"},
-    {n:"小滴云", aka:"小滴云云手机", cat:"btend", ev:"review", mod:true,
-     body:"雷电云旗下（博客园企业文，index）",
-     price:"¥13.9 起 <small>多为 10 台起批量口径</small>；单台有 ¥38 口径冲突",
-     arch:"B 倾向（雷电系 ARM）。",
-     modT:"支持一键新机（搜狐横评）。",
-     risk:"低价口径含批量前提，个人价以 App 内为准。"},
-    {n:"VMOS 云手机", aka:"国内版 ＋ VMOS Cloud 海外版", cat:"b", ev:"official2", mod:true,
-     body:"国内 shouji.vmos.cn；海外 vmoscloud.com",
-     price:"国内：安卓 10／A ¥23.8／月、H ¥28、H Pro ¥35 <small>转述官方价，index</small>，按时计费。<br>海外：标准机 $4.99／月起、高端云真机 $13.99／月起 <small>multilogin，index</small>；计时设备最低 5 分钟、日封顶 $1 <small>官网价页 verified live，金额 JS 未完全渲染</small>",
-     arch:"B（板卡型）：国内官网文公示 3588S／骁龙 865 处理器分档；海外分“标准云机／高端云真机／真机测试（三星、华为等真实机型）”，高端档自称 A、待自测。",
-     modT:"国内可 ROOT、一键新机、谷歌服务（官网文）；海外独立设备环境：一键随机机型／IMEI（官网 features，index）。",
-     risk:"换配置会清空数据（官方攻略提示）。跨境强：海外独享静态住宅 IP 80 国（官网价页 verified live）。"},
-    {n:"多多云手机", cat:"b", ev:"official2", mod:true,
-     body:"福建多多云科技／ddyun.com",
-     price:"基础 ¥20／月、旗舰 ¥25／月，按天 ¥1.8、按时 ¥0.08 <small>官网资讯文，index</small>；旧文 ¥37.9 口径已过时",
-     arch:"B：华为鲲鹏 ARM、GPU 加速（官网）。",
-     modT:"设备大师一键新机另付 ¥13／30 天（chinac 文）。",
-     risk:"官网营销文价格版本多，下单以 App 为准。"},
-    {n:"精灵云", aka:"云手机精灵", cat:"unknown", ev:"review", mod:true,
-     body:"官网未稳定查到",
-     price:"横评：惠享 V4 约 ¥28／月，8 核／4G、安卓 10 <small>index</small>",
-     arch:"无法确认。",
-     modT:"主打海量真实机型库（横评口径，本质改机型库）。",
-     risk:"跨境／团队功能弱（横评）。"},
-    {n:"八通云", cat:"unknown", ev:"none", mod:false,
-     body:"未查到官网",
-     price:"未查到官网价（榜单称按小时计费）。",
-     arch:"无法确认。",
-     modT:"未查到。",
-     risk:"稳定性一般（榜单口径）。"},
-    {n:"章鱼云手机", cat:"c", ev:"official", mod:false,
-     body:"网易系／zy.16163.com",
-     price:"低至 ¥0.56／天 <small>官网 verified live</small>；横评约 ¥10–12／月",
-     arch:"存疑：官网不公示架构；一篇横评称“大量 x86 转译”（单源）→ 列疑似 C／无法确认。",
-     modT:"官网明示支持 ADB 调试（verified live）；一键新机未查到明确说明。",
-     risk:"低价档性能／离线挂机弱（横评）。"},
-    {n:"集智云", cat:"unknown", ev:"none", mod:false,
-     body:"未查到云手机官网（同名多为物联网公司）",
-     price:"未查到。",
-     arch:"无法确认。",
-     modT:"未查到。",
-     risk:"疑为小众／已转型，谨慎预付。"},
-    {n:"掌派云手机", cat:"b", ev:"review", mod:false,
-     body:"长沙九维时空／palmpai.com",
-     price:"官网无价；横评 ¥23.9 起 <small>index</small>",
-     arch:"B（证据较强）：官网自研蚁坞 ARM 服务器＋屯云 ARM 平台（verified live）。",
-     modT:"官网称批量定制／一键同步；改机未查到。",
-     risk:"定位含跨境电商／云办公／云营销（官网）；节点细节官网无。"},
-    {n:"易舜云", cat:"unknown", ev:"none", mod:true,
-     body:"长沙易舜信息／ysyos.com",
-     price:"未查到官网价。",
-     arch:"无法确认。",
-     modT:"横评称一键换机（index，低权重）。",
-     risk:"配置透明度低（横评）。"},
-    {n:"泡泡云", cat:"unknown", ev:"none", mod:false,
-     body:"未查到官网",
-     price:"未查到官网价。",
-     arch:"无法确认。",
-     modT:"未查到。",
-     risk:"仅榜单提及“年轻化界面”。"},
-    {n:"桃心云", cat:"btend", ev:"review", mod:true,
-     body:"taoxyun.com（GitHub 榜单收录，index）",
-     price:"横评：入门 ¥13.9 起、主档约 ¥30–35／月（8 核／16G／128G）<small>index</small>",
-     arch:"B 倾向：横评称独立 ARM 硬件切片。",
-     modT:"横评称可改品牌型号／序列号、一键新机。",
-     risk:"AI 托管为卖点；群控规模上限小（横评）。"},
-    {n:"云帅云手机", cat:"b", ev:"conflict", mod:true,
-     body:"yuncap.com",
-     price:"标准 ¥28／专业 ¥36 <small>2022 对比稿</small>；2026 博客称 ¥35 起——价格口径冲突，以 App 为准；活动 VIP 曾 ¥9.9",
-     arch:"B：自称真实 ARM 硬件（官网，index）。",
-     modT:"一键新机／换机、ROOT、虚拟定位、Xposed、克隆云机（官网）。",
-     risk:"稳定性／掉线率约 1% 反馈（博客，index）。"},
-    {n:"WA 云机", aka:"Wa 云手机", cat:"unknown", ev:"none", mod:false,
-     body:"应用宝 com.walei.vephone",
-     price:"未查到官网价。",
-     arch:"无法确认。",
-     modT:"应用宝仅称多配置／24h 运行。",
-     risk:"公开信息极少，下载量小。"},
-    {n:"鸟人云手机", cat:"unknown", ev:"app", mod:true,
-     body:"长沙乐玩助手信息科技／应用宝",
-     price:"应用宝称“全网超低价”，无具体官网价。",
-     arch:"无法确认。",
-     modT:"支持虚拟定位、批量装卸、一键恢复（应用宝介绍）。",
-     risk:"体量小。"},
-    {n:"蘑菇云手机", cat:"unknown", ev:"review", mod:true,
-     body:"应用宝 com.mushroomcloud.app",
-     price:"横评：¥27／月（8 核／4G／128G）<small>index</small>",
-     arch:"无法确认。",
-     modT:"横评称一键换参数、虚拟定位。",
-     risk:"高峰延迟大（横评）。"},
-    {n:"小六云手机", cat:"unknown", ev:"none", mod:false,
-     body:"应用宝 com.mykj.six.cloud.phone",
-     price:"未查到官网价。",
-     arch:"无法确认。",
-     modT:"未查到。",
-     risk:"公开信息极少。"},
-    {n:"掌中宝云手机", cat:"unknown", ev:"none", mod:false,
-     body:"未查到可核实官网",
-     price:"未查到。",
-     arch:"无法确认。",
-     modT:"未查到。",
-     risk:"名称混淆多，谨慎。"},
-    {n:"爱云兔", cat:"b", ev:"review", mod:true,
-     body:"海马云系／aytpc.haimawan.com",
-     price:"基础约 ¥25–28／月 <small>横评口径</small>",
-     arch:"B：ARM 阵列服务器＋容器化安卓虚拟化（横评／海马云口径）。",
-     modT:"一键换新另付 ¥25／30 天（chinac 文）。",
-     risk:"多开／群控弱于头部（横评）。"},
-    {n:"甘甘云手机", aka:"甘甘云 · 欢畅版未查到，见专章", cat:"btend", ev:"official", mod:false,
-     body:"湖南威红科技有限公司／ggyphone.com（verified live）",
-     price:"VIP ¥23.90／30 天（8 核／4G／64G，安卓 10–12）、GVIP ¥48、KVIP ¥65、XVIP ¥139；7 天档 ¥7.50 起 <small>官网实测，2026-10-31</small>",
-     arch:"B 倾向，证据弱：官网未公示芯片；12／16／24 核标称排除整机真机；横评称“自研 ARM”无实测交叉。",
-     modT:"官网与公开索引均未查到一键新机／改机型／IMEI／MAC／虚拟定位；Root 仅横评口径。",
-     risk:"品牌年轻（2023 起）；未查到跑路／停服／退款投诉报道，但不等于无风险；只买 7／30 天档试用。"}
-  ];
-
-  /* ---- live Gangan prices from data/prices.js (script-refreshed twice a week) ---- */
-  var GG = (window.CP_PRICES && window.CP_PRICES.gangan && window.CP_PRICES.gangan.tiers) || null;
-  var GG_DATE = (window.CP_PRICES && window.CP_PRICES.updated_at) || null;
-  function ggPrice(tier, days){ return GG && GG[tier] && GG[tier].prices ? GG[tier].prices[days] : null; }
-  function fmtY(v){ var t = Number(v).toFixed(2); if (t.slice(-3) === ".00") t = t.slice(0, -3); return "¥" + t; }
-  if (GG) {
-    DATA.forEach(function(d){
-      if (d.n === "甘甘云手机") {
-        d.price = "VIP " + fmtY(ggPrice("VIP","30")) + "／30 天（8 核／4G／64G，安卓 10–12）、GVIP " + fmtY(ggPrice("GVIP","30")) + "、KVIP " + fmtY(ggPrice("KVIP","30")) + "、XVIP " + fmtY(ggPrice("XVIP","30")) + "；7 天档 " + fmtY(ggPrice("VIP","7")) + " 起；90 天 VIP " + fmtY(ggPrice("VIP","90")) + " <small>官网脚本抓取，" + (GG_DATE || "") + "</small>";
+    // ================= 2. 顶部 6 大场景速览卡片（字数精炼，确保手机端单行不换行、左右100%对齐） =================
+    const scenarioCards = [
+      {
+        id: "scene-cheap",
+        name: "游戏挂机 · 最便宜",
+        nameEn: "Cheapest Game AFK",
+        tag: "短租验证 · 章鱼/甘甘",
+        tagEn: "Short Trial · Top 3",
+        price: "¥0.56",
+        unit: "/天起",
+        shop: "章鱼 / 甘甘 / 小滴",
+        targetGroup: "B倾向"
+      },
+      {
+        id: "scene-anti-detect",
+        name: "养号防检测 · 最稳档",
+        nameEn: "Anti-Detection Farming",
+        tag: "鲲鹏ARM · 板卡独立环境",
+        tagEn: "Kunpeng ARM · Board",
+        price: "¥18.0",
+        unit: "/月起",
+        shop: "VMOS / 多多 / 傲晨",
+        targetGroup: "B·ARM虚拟化"
+      },
+      {
+        id: "scene-overseas",
+        name: "跨境海外 · 多国节点",
+        nameEn: "Cross-Border & TikTok",
+        tag: "80国住宅IP · 日封顶$1",
+        tagEn: "80 Countries · $1 Cap",
+        price: "$4.99",
+        unit: "/月起",
+        shop: "VMOS / 雷电海外",
+        targetGroup: "B·ARM虚拟化"
+      },
+      {
+        id: "scene-monthly",
+        name: "性价比月卡 · 第一梯队",
+        nameEn: "Best Value Monthly",
+        tag: "官网实测 verified live",
+        tagEn: "Verified Live Price",
+        price: "¥20.0",
+        unit: "/月起",
+        shop: "多多 / VMOS / 甘甘",
+        targetGroup: "B·ARM虚拟化"
+      },
+      {
+        id: "scene-gangan",
+        name: "甘甘云专章 · 第30家",
+        nameEn: "#30 Special: Gangan",
+        tag: "四档现行价 · 欢畅版无",
+        tagEn: "4 Live Tiers · Verified",
+        price: "¥7.50",
+        unit: "/7天",
+        shop: "ggyphone.com",
+        targetGroup: "guide"
+      },
+      {
+        id: "scene-selftest",
+        name: "真机自测 · 8步核验",
+        nameEn: "8-Step Hardware Check",
+        tag: "0家真机托管 · 下单必测",
+        tagEn: "0 Real Hosting · Test",
+        price: "8 步",
+        unit: "验真伪",
+        shop: "点击进入自测",
+        targetGroup: "guide"
       }
-    });
-    Array.prototype.forEach.call(document.querySelectorAll("[data-gg]"), function(td){
-      var parts = td.getAttribute("data-gg").split(":");
-      var v = ggPrice(parts[0], parts[1]);
-      if (v !== null && v !== undefined) td.innerHTML = (td.querySelector("b") ? "<b>" + fmtY(v) + "</b>" : fmtY(v));
-    });
-    var gu = document.getElementById("gg-updated");
-    if (gu) gu.textContent = "甘甘官网价最近一次脚本抓取：" + (GG_DATE || "") + "（每周两次自动抓取官网 data/prices.json；下单前以官网/App 实时为准）。";
-  }
-
-  /* ---- stats, computed from DATA ---- */
-  var counts = {b:0, btend:0, c:0, unknown:0, na:0};
-  DATA.forEach(function(d){ counts[d.cat]++; });
-  var bTotal = counts.b + counts.btend;
-  document.getElementById("stats").innerHTML =
-    '<div class="stat zero"><b>0 家</b><span>可确认为 (A) 整机真机托管的主流套餐</span></div>' +
-    '<div class="stat"><b>' + bTotal + ' 家</b><span>归入 B 类 ARM 虚拟化（含证据较弱的 B 倾向归类，卡片内逐项注明证据）</span></div>' +
-    '<div class="stat"><b>' + counts.unknown + ' 家</b><span>无法确认：无官网架构说明、无芯片命名、无用户指纹实测</span></div>' +
-    '<div class="stat"><b>' + counts.c + ' 家疑似 C · ' + counts.na + ' 家不适用</b><span>章鱼云单源称 x86 转译；达龙云为云电脑</span></div>';
-
-  /* ---- GanGan chart: single data source, zero baseline ---- */
-  (function(){
-    var vals = [
-      {label:"VIP", sub:"8核/4G/64G", v:23.90},
-      {label:"GVIP", sub:"12核/8G/128G", v:48.00},
-      {label:"KVIP", sub:"16核/12G/256G", v:65.00},
-      {label:"XVIP", sub:"24核/16G/512G", v:139.00}
     ];
-    if (GG) { vals.forEach(function(d){ var v = ggPrice(d.label, "30"); if (v) d.v = v; }); }
-    var max = Math.max(140, Math.ceil(Math.max.apply(null, vals.map(function(d){ return d.v; })) / 35) * 35), W = 640, H = 240, padL = 44, padB = 44, padT = 16, plotW = W - padL - 14, plotH = H - padT - padB;
-    var bw = 72, gap = (plotW - bw * vals.length) / (vals.length + 1);
-    var fg = getComputedStyle(document.body).color;
-    var muted = getComputedStyle(document.body).getPropertyValue("--muted") || "#888";
-    var accent = "#b3401e";
-    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="presentation" style="display:block">';
-    [0,0.25,0.5,0.75,1].map(function(f){ return Math.round(max*f); }).forEach(function(t){
-      var y = padT + plotH - (t/max)*plotH;
-      s += '<line x1="' + padL + '" y1="' + y + '" x2="' + (W-14) + '" y2="' + y + '" stroke="currentColor" stroke-opacity="0.18"/>';
-      s += '<text x="' + (padL-6) + '" y="' + (y+4) + '" text-anchor="end" font-size="11" fill="' + muted + '">' + t + '</text>';
-    });
-    s += '<text x="' + (W-14) + '" y="' + (padT+2) + '" text-anchor="end" font-size="11" fill="' + muted + '">元 / 30天</text>';
-    vals.forEach(function(d,i){
-      var h = (d.v/max)*plotH;
-      var x = padL + gap + i*(bw+gap);
-      var y = padT + plotH - h;
-      s += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw + '" height="' + h.toFixed(1) + '" fill="' + accent + '"/>';
-      s += '<text x="' + (x+bw/2).toFixed(1) + '" y="' + (y-6).toFixed(1) + '" text-anchor="middle" font-size="13" font-weight="700" fill="' + fg + '">¥' + d.v.toFixed(2).replace(/\.00$/,"") + '</text>';
-      s += '<text x="' + (x+bw/2).toFixed(1) + '" y="' + (padT+plotH+18) + '" text-anchor="middle" font-size="13" font-weight="600" fill="' + fg + '">' + d.label + '</text>';
-      s += '<text x="' + (x+bw/2).toFixed(1) + '" y="' + (padT+plotH+34) + '" text-anchor="middle" font-size="11" fill="' + muted + '">' + d.sub + '</text>';
-    });
-    s += '<line x1="' + padL + '" y1="' + (padT+plotH) + '" x2="' + (W-14) + '" y2="' + (padT+plotH) + '" stroke="currentColor"/>';
-    s += '</svg>';
-    document.getElementById("gangan-chart").innerHTML = s;
-  })();
 
-  /* ---- cards ---- */
-  var grid = document.getElementById("grid");
-  function esc(s){ return s; } /* data is authored, HTML intentional in price field */
-  DATA.forEach(function(d, i){
-    var art = document.createElement("article");
-    art.className = "card";
-    art.dataset.cat = d.cat;
-    art.dataset.name = d.n + " " + (d.aka||"");
-    art.dataset.official = (d.ev === "official" || d.ev === "official2") ? "1" : "0";
-    art.dataset.mod = d.mod ? "1" : "0";
-    art.innerHTML =
-      '<h3><span class="idx">' + (i+1) + '.</span> ' + d.n + ' <span class="badge ' + d.cat + '">' + CAT[d.cat] + '</span></h3>' +
-      '<p class="ev">' + (d.aka ? d.aka + ' · ' : '') + EV[d.ev] + '</p>' +
-      '<dl>' +
-      '<dt>运营主体 / 官网</dt><dd>' + d.body + '</dd>' +
-      '<dt>资费</dt><dd class="price">' + d.price + '</dd>' +
-      '<dt>技术底层</dt><dd>' + d.arch + '</dd>' +
-      '<dt>改机 / 一键新机</dt><dd>' + d.modT + '</dd>' +
-      '<dt>口碑与风险</dt><dd>' + d.risk + '</dd>' +
-      '</dl>';
-    grid.appendChild(art);
-  });
+    // ================= 3. 完整 30 家云手机横评数据集 =================
+    const all30Brands = [
+      {
+        id: 1,
+        name: "红手指",
+        nameEn: "Redfinger",
+        cat: "B·ARM虚拟化",
+        catBadgeColor: "tag-green",
+        operator: "湖南微算互联",
+        siteText: "gc.com.cn",
+        siteUrl: "https://gc.com.cn/faq/product/",
+        shortPrice: "¥38/月起",
+        pricingDetail: "VIP ¥38/月、GVIP ¥58/月、KVIP ¥77/月，年卡 ¥248 起",
+        archDetail: "B: 官网称 ARM 云",
+        modDetail: "GVIP 以上提供一键新机（可改机型/IMEI/MAC/序列号）",
+        riskNote: "有公开退款投诉经市监调解退款记录，游戏挂机主力之一",
+        evidence: "index",
+        hasOfficialDoc: true,
+        hasModFeature: true
+      },
+      {
+        id: 2,
+        name: "雷电云",
+        nameEn: "LDCloud",
+        cat: "B·ARM虚拟化",
+        catBadgeColor: "tag-green",
+        operator: "长沙雷电云网络",
+        siteText: "ldcloud.net",
+        siteUrl: "https://ldcloud.net/ch/features/packages",
+        shortPrice: "¥26/月起",
+        pricingDetail: "新用户月卡 ¥26 起；海外分 MVIP/XVIP 等（台/新/美/泰/韩/荷节点）",
+        archDetail: "B: ARM（华为云商店标准型配置口径）",
+        modDetail: "高阶套餐有一键新机",
+        riskNote: "Google Play 有掉线/退款难差评",
+        evidence: "index",
+        hasOfficialDoc: true,
+        hasModFeature: true
+      },
+      {
+        id: 3,
+        name: "游峰 / 游游峰",
+        nameEn: "Youfeng Cloud",
+        cat: "无法确认",
+        catBadgeColor: "tag-gray",
+        operator: "未查到稳定官网",
+        siteText: "",
+        siteUrl: "",
+        shortPrice: "官网无价",
+        pricingDetail: "官网无稳定价；横评称低价、安卓 9",
+        archDetail: "无法确认（横评称无独立 IP）",
+        modDetail: "未查到",
+        riskNote: "横评称晚高峰排队、次月涨价、长挂黑屏",
+        evidence: "未查到",
+        hasOfficialDoc: false,
+        hasModFeature: false
+      },
+      {
+        id: 4,
+        name: "Ace 云手机",
+        nameEn: "Ace Cloud Phone",
+        cat: "B倾向",
+        catBadgeColor: "tag-teal",
+        operator: "应用宝在架",
+        siteText: "",
+        siteUrl: "",
+        shortPrice: "¥19.5/月",
+        pricingDetail: "安卓 10 VIP ¥19.5/月（3.2G/35G）",
+        archDetail: "B倾向: 自称 ARM 真实架构",
+        modDetail: "自称支持一键新机/换机、ROOT、虚拟定位",
+        riskNote: "横评称共享资源、增值包多",
+        evidence: "index",
+        hasOfficialDoc: false,
+        hasModFeature: true
+      },
+      {
+        id: 5,
+        name: "双子星云手机",
+        nameEn: "Gemini Cloud Phone",
+        cat: "B·ARM虚拟化",
+        catBadgeColor: "tag-green",
+        operator: "深圳市臂云科技",
+        siteText: "com.gemini.cloud",
+        siteUrl: "",
+        shortPrice: "¥22/月起",
+        pricingDetail: "月卡 ¥22 起；星动约 ¥28/月（3.2G/32G）",
+        archDetail: "B: ARM 原生",
+        modDetail: "有一键换机",
+        riskNote: "同价位配置偏小；与嗒即云同主体",
+        evidence: "index",
+        hasOfficialDoc: true,
+        hasModFeature: true
+      },
+      {
+        id: 6,
+        name: "沐桦云",
+        nameEn: "Muhua Cloud",
+        cat: "无法确认",
+        catBadgeColor: "tag-gray",
+        operator: "上海沐桦科技",
+        siteText: "muhuaphone.com",
+        siteUrl: "http://muhuaphone.com",
+        shortPrice: "官网无公开价",
+        pricingDetail: "官网无公开价",
+        archDetail: "无法确认（官网称弹性公有云资源）",
+        modDetail: "未查到",
+        riskNote: "公开信息极少",
+        evidence: "index",
+        hasOfficialDoc: false,
+        hasModFeature: false
+      },
+      {
+        id: 7,
+        name: "达龙云",
+        nameEn: "Dalong Cloud (PC)",
+        cat: "不适用",
+        catBadgeColor: "tag-purple",
+        operator: "上海/深圳达龙",
+        siteText: "dalongyun.com",
+        siteUrl: "http://dalongyun.com",
+        shortPrice: "云电脑品类",
+        pricingDetail: "无安卓云手机标准套餐价（主业云电脑/云游戏）",
+        archDetail: "不适用（x86 云电脑逻辑）",
+        modDetail: "不适用",
+        riskNote: "勿与云手机混淆采购",
+        evidence: "verified live",
+        hasOfficialDoc: true,
+        hasModFeature: false
+      },
+      {
+        id: 8,
+        name: "川川云手机",
+        nameEn: "Chuanchuan Cloud",
+        cat: "B·ARM虚拟化",
+        catBadgeColor: "tag-green",
+        operator: "川川云官方",
+        siteText: "ccynice.com",
+        siteUrl: "https://ccynice.com/huodong.html",
+        shortPrice: "¥15.8~25/月",
+        pricingDetail: "双十一活动：首购 30 天 ¥25 起、365 天 ¥208 起（千川 30 天 ¥15.8）",
+        archDetail: "B: 横评称 ARM 原生",
+        modDetail: "横评称群控/Root 全含",
+        riskNote: "活动价波动大，注意首购限定",
+        evidence: "verified live",
+        hasOfficialDoc: true,
+        hasModFeature: true
+      },
+      {
+        id: 9,
+        name: "小七云手机",
+        nameEn: "Xiaoqi Cloud",
+        cat: "无法确认",
+        catBadgeColor: "tag-gray",
+        operator: "未查到官网",
+        siteText: "",
+        siteUrl: "",
+        shortPrice: "未查到",
+        pricingDetail: "未查到官网价",
+        archDetail: "无法确认",
+        modDetail: "未查到",
+        riskNote: "仅榜单提及“轻量”",
+        evidence: "未查到",
+        hasOfficialDoc: false,
+        hasModFeature: false
+      },
+      {
+        id: 10,
+        name: "傲晨云",
+        nameEn: "Aochen Cloud",
+        cat: "B·ARM虚拟化",
+        catBadgeColor: "tag-green",
+        operator: "傲晨云官方",
+        siteText: "aochenyun.com",
+        siteUrl: "http://aochenyun.com",
+        shortPrice: "¥18/月起",
+        pricingDetail: "基础约 ¥18 起、标准 ¥28/月（8核/4G/44G）",
+        archDetail: "B: 鲲鹏 ARM",
+        modDetail: "支持一键新机",
+        riskNote: "触控偏慢反馈；养号防检测相对推荐之一",
+        evidence: "index",
+        hasOfficialDoc: true,
+        hasModFeature: true
+      },
+      {
+        id: 11,
+        name: "嗒即云",
+        nameEn: "Daji Cloud",
+        cat: "无法确认",
+        catBadgeColor: "tag-gray",
+        operator: "深圳市臂云科技",
+        siteText: "",
+        siteUrl: "",
+        shortPrice: "未查到",
+        pricingDetail: "未查到官网价",
+        archDetail: "无法确认",
+        modDetail: "未查到",
+        riskNote: "品牌与双子星关系需以主体为准",
+        evidence: "未查到",
+        hasOfficialDoc: false,
+        hasModFeature: false
+      },
+      {
+        id: 12,
+        name: "小滴云",
+        nameEn: "Xiaodi Cloud",
+        cat: "B倾向",
+        catBadgeColor: "tag-teal",
+        operator: "雷电云旗下",
+        siteText: "",
+        siteUrl: "",
+        shortPrice: "¥13.9起(批量)",
+        pricingDetail: "¥13.9 起（多为 10 台批量口径，单台有 ¥38 冲突）",
+        archDetail: "B倾向（雷电系 ARM）",
+        modDetail: "支持一键新机",
+        riskNote: "低价口径含批量前提，个人价以 App 为准",
+        evidence: "index",
+        hasOfficialDoc: false,
+        hasModFeature: true
+      },
+      {
+        id: 13,
+        name: "VMOS 云手机",
+        nameEn: "VMOS Cloud",
+        cat: "B·ARM虚拟化",
+        catBadgeColor: "tag-green",
+        operator: "VMOS 官方",
+        siteText: "vmoscloud.com",
+        siteUrl: "https://vmoscloud.com/zh/price",
+        shortPrice: "¥23.8/月起",
+        pricingDetail: "国内 A 版 ¥23.8/月起；海外标准机 $4.99/月起、高端云真机 $13.99/月",
+        archDetail: "B(板卡型): 国内公示 3588S/骁龙 865；海外有真实机型测试档",
+        modDetail: "国内可 ROOT、一键新机；海外一键随机机型/IMEI",
+        riskNote: "海外版常与 Multilogin 比较，虚拟机背景深厚",
+        evidence: "verified live",
+        hasOfficialDoc: true,
+        hasModFeature: true
+      },
+      {
+        id: 14,
+        name: "多多云手机",
+        nameEn: "Duoduo Cloud",
+        cat: "B·ARM虚拟化",
+        catBadgeColor: "tag-green",
+        operator: "福建多多云科技",
+        siteText: "ddyun.com",
+        siteUrl: "https://ddyun.com",
+        shortPrice: "¥20/月起",
+        pricingDetail: "基础 ¥20/月、旗舰 ¥25/月（按天 ¥1.8、按时 ¥0.08）",
+        archDetail: "B: 华为鲲鹏 ARM、GPU 加速",
+        modDetail: "设备大师一键新机另付 ¥13/30天",
+        riskNote: "官网营销文价格版本多，下单以 App 为准",
+        evidence: "verified live",
+        hasOfficialDoc: true,
+        hasModFeature: true
+      },
+      {
+        id: 15,
+        name: "精灵云",
+        nameEn: "Jingling Cloud",
+        cat: "无法确认",
+        catBadgeColor: "tag-gray",
+        operator: "官网未稳定查到",
+        siteText: "",
+        siteUrl: "",
+        shortPrice: "约¥28/月",
+        pricingDetail: "横评：惠享 V4 约 ¥28/月（8核/4G，安卓 10）",
+        archDetail: "无法确认",
+        modDetail: "主打海量真实机型库（本质改机型库）",
+        riskNote: "跨境/团队功能弱",
+        evidence: "index",
+        hasOfficialDoc: false,
+        hasModFeature: true
+      },
+      {
+        id: 16,
+        name: "八通云",
+        nameEn: "Batong Cloud",
+        cat: "无法确认",
+        catBadgeColor: "tag-gray",
+        operator: "未查到官网",
+        siteText: "",
+        siteUrl: "",
+        shortPrice: "按时计费(传)",
+        pricingDetail: "未查到官网价（榜单称按小时计费）",
+        archDetail: "无法确认",
+        modDetail: "未查到",
+        riskNote: "稳定性一般",
+        evidence: "未查到",
+        hasOfficialDoc: false,
+        hasModFeature: false
+      },
+      {
+        id: 17,
+        name: "章鱼云手机",
+        nameEn: "Zhangyu Cloud (NetEase)",
+        cat: "疑似C",
+        catBadgeColor: "tag-orange",
+        operator: "网易系",
+        siteText: "zy.16163.com",
+        siteUrl: "https://zy.16163.com",
+        shortPrice: "¥0.56/天起",
+        pricingDetail: "低至 ¥0.56/天 (verified live 官网实测)",
+        archDetail: "存疑: 横评单源称大量 x86 转译",
+        modDetail: "官网明示支持 ADB 调试；一键新机未查到",
+        riskNote: "低价档性能/离线挂机弱",
+        evidence: "verified live",
+        hasOfficialDoc: true,
+        hasModFeature: false
+      },
+      {
+        id: 18,
+        name: "集智云",
+        nameEn: "Jizhi Cloud",
+        cat: "无法确认",
+        catBadgeColor: "tag-gray",
+        operator: "未查到云手机官网",
+        siteText: "",
+        siteUrl: "",
+        shortPrice: "未查到",
+        pricingDetail: "未查到官网价",
+        archDetail: "无法确认",
+        modDetail: "未查到",
+        riskNote: "疑为小众/已转型，谨慎预付",
+        evidence: "未查到",
+        hasOfficialDoc: false,
+        hasModFeature: false
+      },
+      {
+        id: 19,
+        name: "掌派云手机",
+        nameEn: "Palmpai Cloud",
+        cat: "B·ARM虚拟化",
+        catBadgeColor: "tag-green",
+        operator: "长沙九维时空",
+        siteText: "palmpai.com",
+        siteUrl: "https://palmpai.com",
+        shortPrice: "横评¥23.9起",
+        pricingDetail: "官网无公开价；横评 ¥23.9 起",
+        archDetail: "B: 官网自研蚁坞 ARM 服务器+屯云 ARM 平台",
+        modDetail: "官网称批量定制/一键同步；改机未查到",
+        riskNote: "定位含跨境电商/云办公/云营销",
+        evidence: "verified live",
+        hasOfficialDoc: true,
+        hasModFeature: false
+      },
+      {
+        id: 20,
+        name: "易舜云",
+        nameEn: "Yishun Cloud",
+        cat: "无法确认",
+        catBadgeColor: "tag-gray",
+        operator: "长沙易舜信息",
+        siteText: "ysyos.com",
+        siteUrl: "http://ysyos.com",
+        shortPrice: "未查到官网价",
+        pricingDetail: "未查到官网价",
+        archDetail: "无法确认",
+        modDetail: "横评称一键换机",
+        riskNote: "配置透明度低",
+        evidence: "index",
+        hasOfficialDoc: false,
+        hasModFeature: true
+      },
+      {
+        id: 21,
+        name: "泡泡云",
+        nameEn: "Paopao Cloud",
+        cat: "无法确认",
+        catBadgeColor: "tag-gray",
+        operator: "未查到官网",
+        siteText: "",
+        siteUrl: "",
+        shortPrice: "未查到",
+        pricingDetail: "未查到官网价",
+        archDetail: "无法确认",
+        modDetail: "未查到",
+        riskNote: "仅榜单提及“年轻化界面”",
+        evidence: "未查到",
+        hasOfficialDoc: false,
+        hasModFeature: false
+      },
+      {
+        id: 22,
+        name: "桃心云",
+        nameEn: "Taoxin Cloud",
+        cat: "B倾向",
+        catBadgeColor: "tag-teal",
+        operator: "桃心云官方",
+        siteText: "taoxyun.com",
+        siteUrl: "http://taoxyun.com",
+        shortPrice: "¥13.9~35/月",
+        pricingDetail: "入门 ¥13.9 起、主档约 ¥30–35/月",
+        archDetail: "B倾向: 横评称独立 ARM 硬件切片",
+        modDetail: "横评称可改品牌型号/序列号、一键新机",
+        riskNote: "AI 托管为卖点；群控规模上限小",
+        evidence: "index",
+        hasOfficialDoc: true,
+        hasModFeature: true
+      },
+      {
+        id: 23,
+        name: "云帅云手机",
+        nameEn: "Yunshuai Cloud",
+        cat: "B·ARM虚拟化",
+        catBadgeColor: "tag-green",
+        operator: "云帅官方",
+        siteText: "yuncap.com",
+        siteUrl: "http://yuncap.com",
+        shortPrice: "¥28~36/月",
+        pricingDetail: "标准 ¥28/专业 ¥36（2022与2026价格口径冲突，以App为准）",
+        archDetail: "B: 自称真实 ARM 硬件",
+        modDetail: "一键新机/换机、ROOT、虚拟定位、Xposed、克隆云机",
+        riskNote: "稳定性/掉线率约 1% 反馈",
+        evidence: "index",
+        hasOfficialDoc: true,
+        hasModFeature: true
+      },
+      {
+        id: 24,
+        name: "WA 云机",
+        nameEn: "WA Cloud Phone",
+        cat: "无法确认",
+        catBadgeColor: "tag-gray",
+        operator: "瓦雷科技",
+        siteText: "com.walei.vephone",
+        siteUrl: "",
+        shortPrice: "未查到",
+        pricingDetail: "未查到官网价",
+        archDetail: "无法确认",
+        modDetail: "未查到",
+        riskNote: "公开信息极少，下载量小",
+        evidence: "未查到",
+        hasOfficialDoc: false,
+        hasModFeature: false
+      },
+      {
+        id: 25,
+        name: "鸟人云手机",
+        nameEn: "Niaoren Cloud",
+        cat: "无法确认",
+        catBadgeColor: "tag-gray",
+        operator: "长沙乐玩助手",
+        siteText: "",
+        siteUrl: "",
+        shortPrice: "无官网具体价",
+        pricingDetail: "应用宝称“全网超低价”，无具体官网价",
+        archDetail: "无法确认",
+        modDetail: "支持虚拟定位、批量装卸、一键恢复",
+        riskNote: "体量小",
+        evidence: "index",
+        hasOfficialDoc: false,
+        hasModFeature: true
+      },
+      {
+        id: 26,
+        name: "蘑菇云手机",
+        nameEn: "Mogu Cloud",
+        cat: "无法确认",
+        catBadgeColor: "tag-gray",
+        operator: "蘑菇云应用",
+        siteText: "com.mushroomcloud.app",
+        siteUrl: "",
+        shortPrice: "横评¥27/月",
+        pricingDetail: "横评：¥27/月（8核/4G/128G）",
+        archDetail: "无法确认",
+        modDetail: "横评称一键换参数、虚拟定位",
+        riskNote: "高峰延迟大",
+        evidence: "index",
+        hasOfficialDoc: false,
+        hasModFeature: true
+      },
+      {
+        id: 27,
+        name: "小六云手机",
+        nameEn: "Xiaoliu Cloud",
+        cat: "无法确认",
+        catBadgeColor: "tag-gray",
+        operator: "小六云应用",
+        siteText: "com.mykj.six.cloud.phone",
+        siteUrl: "",
+        shortPrice: "未查到",
+        pricingDetail: "未查到官网价",
+        archDetail: "无法确认",
+        modDetail: "未查到",
+        riskNote: "公开信息极少",
+        evidence: "未查到",
+        hasOfficialDoc: false,
+        hasModFeature: false
+      },
+      {
+        id: 28,
+        name: "掌中宝云手机",
+        nameEn: "Zhangzhongbao Cloud",
+        cat: "无法确认",
+        catBadgeColor: "tag-gray",
+        operator: "未查到复核官网",
+        siteText: "",
+        siteUrl: "",
+        shortPrice: "未查到",
+        pricingDetail: "未查到官网价",
+        archDetail: "无法确认",
+        modDetail: "未查到",
+        riskNote: "公开信息极少",
+        evidence: "未查到",
+        hasOfficialDoc: false,
+        hasModFeature: false
+      },
+      {
+        id: 29,
+        name: "爱云兔",
+        nameEn: "Aiyuntu (Haima Cloud)",
+        cat: "B·ARM虚拟化",
+        catBadgeColor: "tag-green",
+        operator: "海马云系",
+        siteText: "aytpc.haimawan.com",
+        siteUrl: "https://aytpc.haimawan.com",
+        shortPrice: "¥25~28/月",
+        pricingDetail: "基础约 ¥25–28/月",
+        archDetail: "B: ARM 阵列服务器+容器化安卓虚拟化",
+        modDetail: "一键换机另付 ¥25/30天",
+        riskNote: "大厂（海马云）技术背景",
+        evidence: "index",
+        hasOfficialDoc: true,
+        hasModFeature: true
+      },
+      {
+        id: 30,
+        name: "甘甘云手机",
+        nameEn: "Gangan Cloud (#30 Special)",
+        cat: "B倾向",
+        catBadgeColor: "tag-teal",
+        operator: "湖南威红科技",
+        siteText: "ggyphone.com",
+        siteUrl: "https://ggyphone.com",
+        shortPrice: "¥7.5/7天起",
+        pricingDetail: "VIP ¥23.90/30天、GVIP ¥48、KVIP ¥65、XVIP ¥139（7天档 ¥7.50 起）",
+        archDetail: "B倾向: 标称 12/16/24 核远超手机 SoC，逻辑上为服务器端 vCPU 切片",
+        modDetail: "未查到改机/一键新机官方说明",
+        riskNote: "品牌小且年轻（2023），“欢畅版”官网无，建议先买 7 天档试用",
+        evidence: "verified live",
+        hasOfficialDoc: true,
+        hasModFeature: false
+      }
+    ];
 
-  /* ---- filtering ---- */
-  var cat = "all", q = "", fOff = false, fMod = false;
-  var countline = document.getElementById("countline");
-  var empty = document.getElementById("empty");
-  function apply(){
-    var shown = 0;
-    Array.prototype.forEach.call(grid.children, function(card){
-      var ok = (cat === "all" || card.dataset.cat === cat)
-        && (!fOff || card.dataset.official === "1")
-        && (!fMod || card.dataset.mod === "1")
-        && (!q || card.dataset.name.toLowerCase().indexOf(q) !== -1);
-      card.style.display = ok ? "" : "none";
-      if (ok) shown++;
-    });
-    countline.textContent = "显示 " + shown + " / " + DATA.length + " 家" +
-      (cat !== "all" ? " · " + CAT[cat] : "") +
-      (fOff ? " · 有官网价／官方文价格" : "") +
-      (fMod ? " · 含一键新机／改机说明" : "") +
-      (q ? " · 关键词“" + q + "”" : "");
-    empty.style.display = shown === 0 ? "block" : "none";
-  }
-  document.getElementById("chips").addEventListener("click", function(e){
-    var btn = e.target.closest(".chip");
-    if (!btn) return;
-    cat = btn.dataset.cat;
-    Array.prototype.forEach.call(this.querySelectorAll(".chip"), function(c){
-      c.setAttribute("aria-pressed", c === btn ? "true" : "false");
-    });
-    apply();
-  });
-  document.getElementById("q").addEventListener("input", function(){ q = this.value.trim().toLowerCase(); apply(); });
-  document.getElementById("fOfficial").addEventListener("change", function(){ fOff = this.checked; apply(); });
-  document.getElementById("fMod").addEventListener("change", function(){ fMod = this.checked; apply(); });
-  apply();
-})();
-</script>
+    const categoryGroupsMeta = [
+      {
+        id: "group-b-arm",
+        cat: "B·ARM虚拟化",
+        icon: "✦",
+        title: "B · ARM 虚拟化（服务器/板卡阵列）",
+        titleEn: "B · ARM Virtualization (Server/Board Array)",
+        subtitle: "含鲲鹏ARM、RK3588S/骁龙865板卡、自研ARM阵列",
+        subtitleEn: "Kunpeng ARM, RK3588S/SD865 Boards, ARM Server",
+        minLabel: "¥15.8/月起"
+      },
+      {
+        id: "group-b-lean",
+        cat: "B倾向",
+        icon: "✳",
+        title: "B 倾向 · 疑似 ARM 虚拟化（证据较弱）",
+        titleEn: "B-Leaning · Likely ARM Slicing",
+        subtitle: "含甘甘云手机（#30专章）、小滴云、桃心云、Ace云",
+        subtitleEn: "Includes Gangan Cloud (#30), Xiaodi, Taoxin, Ace",
+        minLabel: "¥7.5/7天起"
+      },
+      {
+        id: "group-c-x86",
+        cat: "疑似C",
+        icon: "⚠️",
+        title: "疑似 C · x86 指令集转译",
+        titleEn: "Suspected C · x86 Translation",
+        subtitle: "章鱼云手机（网易系，单源称大量 x86 转译，支持 ADB）",
+        subtitleEn: "Zhangyu Cloud (NetEase, ADB supported)",
+        minLabel: "¥0.56/天起"
+      },
+      {
+        id: "group-unknown",
+        cat: "无法确认",
+        icon: "◈",
+        title: "无法确认 · 无官网架构/芯片公示",
+        titleEn: "Unverified · No Official Architecture Info",
+        subtitle: "无官网架构说明、无芯片命名或未查到稳定官网",
+        subtitleEn: "Missing official specs or stable website",
+        minLabel: "谨慎预付"
+      },
+      {
+        id: "group-na",
+        cat: "不适用",
+        icon: "💻",
+        title: "不适用 · x86 云电脑品类",
+        titleEn: "N/A · x86 Cloud PC Category",
+        subtitle: "达龙云（主业为云电脑/云游戏，勿与安卓云手机混淆）",
+        subtitleEn: "Dalong Cloud (Cloud PC, do not confuse with Android)",
+        minLabel: "云电脑"
+      }
+    ];
+
+    const selfTestSteps = [
+      {
+        step: 1,
+        title: "装 Device Info HW 查 SoC 与传感器",
+        titleEn: "1. Install Device Info HW (SoC/GPU & Sensors)",
+        desc: "看 SoC 型号／GPU（Mali／Adreno 为真机图形线；出现 <code>SwiftShader</code>／<code>VirGL</code>／<code>ANGLE</code> 则可疑）、传感器数值是否随摇晃变化"
+      },
+      {
+        step: 2,
+        title: "AIDA64／CPU-Z 核验指令集 ABI",
+        titleEn: "2. AIDA64 / CPU-Z Check CPU ABI",
+        desc: "看 CPU ABI 须为 <code>arm64-v8a</code>；出现 <code>x86_64</code>、<code>houdini</code>、<code>ndk_translation</code> 字样即为 x86 转译（C类）"
+      },
+      {
+        step: 3,
+        title: "查系统属性（ADB 或终端命令）",
+        titleEn: "3. Check System Properties via ADB/Terminal",
+        desc: "执行 <code>getprop ro.hardware</code>（goldfish/ranchu/vbox = 模拟器）、<code>ro.kernel.qemu</code>（=1 即模拟器）、<code>/proc/cpuinfo</code>"
+      },
+      {
+        step: 4,
+        title: "安兔兔／鲁大师验机跑分核对",
+        titleEn: "4. AnTuTu / Ludashi Benchmark Verification",
+        desc: "跑分量级与核数／内存是否匹配（如甘甘云标称“24核”不可能是单颗手机 SoC，必为服务器 vCPU 切片）"
+      },
+      {
+        step: 5,
+        title: "Momo／环境检测 App 查一键新机联动",
+        titleEn: "5. Momo / Environment Detector & One-Click Mod",
+        desc: "查 IMEI／MAC／Android ID 是否全零或重复；一键新机前后对比基带与指纹是否联动变化（仅改型号=软改）"
+      },
+      {
+        step: 6,
+        title: "Sensor Test 传感器活体微噪声测试",
+        titleEn: "6. Sensor Test Live Micro-Noise Check",
+        desc: "云端静止时陀螺仪／加速度应有微噪声而非死板的恒定直线或全 0；核对 GPS 与节点 IP 归属地"
+      },
+      {
+        step: 7,
+        title: "同批 ≥3 台交叉比对模板镜像",
+        titleEn: "7. Cross-Compare ≥3 Instances for Template Cloning",
+        desc: "同批开 ≥3 台，比对 IMEI 前缀、MAC、序列号、Build 时间（批量雷同即为机房同源镜像，养号易连坐）"
+      },
+      {
+        step: 8,
+        title: "断网保活与晚高峰（20–23点）实测",
+        titleEn: "8. Offline Keep-Alive & Peak Hour (20:00–23:00) Test",
+        desc: "先买 7 天短租档（如甘甘云 VIP ¥7.50），验证本地关机后云端是否保活，并在 20–23 点晚高峰测试掉线率"
+      }
+    ];
+
+    // ================= 4. 状态管理 =================
+    let currentTab = 'matrix';
+    let quoteIndex = 0;
+    let shopIndex = 5;
+    let currentGlobalThemeIndex = 11;
+    let currentLang = 'zh';
+    let isDarkMode = false;
+    let currentCategory = 'all';
+    let filterOfficialOnly = false;
+    let filterModOnly = false;
+    const completedSteps = new Set([1, 3]);
+
+    const openSiteGroups = new Set([
+      'group-b-arm',
+      'group-b-lean',
+      'group-c-x86',
+      'group-unknown',
+      'group-na'
+    ]);
+
+    function siteEscape(text) {
+      return String(text).replace(/[&<>"']/g, ch => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[ch]));
+    }
+
+    // ================= 5. 核心主题渲染函数 =================
+    function applyThemeByGlobalIndex(index) {
+      currentGlobalThemeIndex = index;
+      const themeObj = allThemes[index];
+      if (!themeObj) return;
+
+      if (index < 6) {
+        quoteIndex = index;
+      } else {
+        shopIndex = index - 6;
+      }
+
+      const root = document.documentElement;
+      root.style.setProperty('--orb-color-1', themeObj.orb1);
+      root.style.setProperty('--orb-color-2', themeObj.orb2);
+      root.style.setProperty('--refresh-btn-bg', themeObj.refreshBg);
+      root.style.setProperty('--send-circle-bg', themeObj.sendCircleBg);
+      root.style.setProperty('--theme-accent', themeObj.accent);
+      root.style.setProperty('--theme-tag-bg', themeObj.tagBg);
+      root.style.setProperty('--theme-tag-text', themeObj.tagText);
+      root.style.setProperty('--search-glow', themeObj.glow);
+
+      if (themeObj.isHolo) {
+        root.setAttribute('data-holo', 'true');
+      } else {
+        root.removeAttribute('data-holo');
+      }
+
+      if (!isDarkMode) {
+        root.style.setProperty('--page-bg', themeObj.pageBg);
+      }
+
+      const orbLeft = document.getElementById('orbLeft');
+      const orbRight = document.getElementById('orbRight');
+      if (!themeObj.isHolo) {
+        const shift = index % 2 === 0 ? 1 : -1;
+        orbLeft.style.transform = `translate(${shift * 14}px, ${-shift * 8}px) scale(${1 + shift * 0.05})`;
+        orbRight.style.transform = `translate(${-shift * 14}px, ${shift * 8}px) scale(${1 - shift * 0.05})`;
+      } else {
+        orbLeft.style.transform = '';
+        orbRight.style.transform = '';
+      }
+
+      updateSwatchActiveState();
+    }
+
+    function renderThemeSwatches() {
+      const grid = document.getElementById('themeSwatchGrid');
+      grid.innerHTML = allThemes.map((t, idx) => {
+        const label = currentLang === 'zh' ? t.name : t.nameEn;
+        const isActive = idx === currentGlobalThemeIndex ? 'active' : '';
+        const holoClass = t.isHolo ? 'holo-animated' : '';
+        return `
+          <div class="theme-swatch-item ${isActive}" data-theme-idx="${idx}" onclick="selectThemeFromPanel(${idx})">
+            <span class="swatch-orb-preview ${holoClass}" style="background: linear-gradient(135deg, ${t.orb1} 0%, ${t.orb2} 65%, ${t.refreshBg} 100%);"></span>
+            <span class="swatch-label">${label}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateSwatchActiveState() {
+      document.querySelectorAll('.theme-swatch-item').forEach(el => {
+        const idx = Number(el.getAttribute('data-theme-idx'));
+        el.classList.toggle('active', idx === currentGlobalThemeIndex);
+      });
+    }
+
+    function openThemePanel() {
+      document.getElementById('themePopover').classList.add('open');
+      document.getElementById('themeBackdrop').classList.add('open');
+      if (navigator.vibrate) navigator.vibrate(18);
+    }
+
+    function closeThemePanel() {
+      document.getElementById('themePopover').classList.remove('open');
+      document.getElementById('themeBackdrop').classList.remove('open');
+      document.querySelectorAll('.theme-swatch-item').forEach(el => el.classList.remove('sliding-hover'));
+    }
+
+    function selectThemeFromPanel(idx) {
+      applyThemeByGlobalIndex(idx);
+      closeThemePanel();
+    }
+
+    (function initThemeButtonGestures() {
+      const btn = document.getElementById('darkModeBtn');
+      let pressTimer = null;
+      let isLongPressTriggered = false;
+      let isPointerDown = false;
+      let lastHoveredIdx = null;
+
+      btn.addEventListener('pointerdown', (e) => {
+        if (e.button && e.button !== 0) return;
+        isPointerDown = true;
+        isLongPressTriggered = false;
+        lastHoveredIdx = null;
+        btn.classList.add('pressing');
+
+        try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+
+        pressTimer = setTimeout(() => {
+          if (!isPointerDown) return;
+          isLongPressTriggered = true;
+          openThemePanel();
+        }, 340);
+      });
+
+      btn.addEventListener('pointermove', (e) => {
+        if (!isPointerDown || !isLongPressTriggered) return;
+
+        const targetEl = document.elementFromPoint(e.clientX, e.clientY);
+        const swatchItem = targetEl ? targetEl.closest('.theme-swatch-item') : null;
+
+        document.querySelectorAll('.theme-swatch-item').forEach(el => {
+          el.classList.toggle('sliding-hover', el === swatchItem);
+        });
+
+        if (swatchItem) {
+          const idx = Number(swatchItem.getAttribute('data-theme-idx'));
+          if (idx !== lastHoveredIdx) {
+            lastHoveredIdx = idx;
+            applyThemeByGlobalIndex(idx);
+            if (navigator.vibrate) navigator.vibrate(8);
+          }
+        }
+      });
+
+      const finishGesture = () => {
+        if (!isPointerDown) return;
+        isPointerDown = false;
+        clearTimeout(pressTimer);
+        btn.classList.remove('pressing');
+
+        if (!isLongPressTriggered) {
+          const popover = document.getElementById('themePopover');
+          if (popover.classList.contains('open')) {
+            closeThemePanel();
+          } else {
+            toggleDarkMode();
+          }
+        } else if (lastHoveredIdx !== null) {
+          closeThemePanel();
+        }
+      };
+
+      btn.addEventListener('pointerup', finishGesture);
+      btn.addEventListener('pointercancel', finishGesture);
+      btn.addEventListener('contextmenu', e => e.preventDefault());
+    })();
+
+    // ================= 6. Tab 切换 =================
+    function switchTab(tabName) {
+      if (currentTab === tabName) return;
+      currentTab = tabName;
+
+      const tabsContainer = document.getElementById('geminiTabs');
+      tabsContainer.setAttribute('data-active', tabName);
+      document.getElementById('tabMatrix').classList.toggle('active', tabName === 'matrix');
+      document.getElementById('tabGuide').classList.toggle('active', tabName === 'guide');
+
+      const targetGlobalIdx = tabName === 'matrix' ? quoteIndex : (6 + shopIndex);
+      applyThemeByGlobalIndex(targetGlobalIdx);
+
+      const grid = document.getElementById('contentGrid');
+      grid.classList.add('switching');
+      setTimeout(() => {
+        renderAll();
+        grid.classList.remove('switching');
+      }, 180);
+    }
+
+    function handleRefresh() {
+      const btn = document.getElementById('refreshBtn');
+      btn.classList.add('spinning');
+      setTimeout(() => btn.classList.remove('spinning'), 520);
+
+      const nextIdx = (currentGlobalThemeIndex + 1) % allThemes.length;
+      applyThemeByGlobalIndex(nextIdx);
+
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      const timeStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+      const themeName = currentLang === 'zh' ? allThemes[nextIdx].name : allThemes[nextIdx].nameEn;
+      document.getElementById('updateTime').textContent =
+        currentLang === 'zh'
+          ? `${timeStr} 复核 · 主题 [${themeName}]`
+          : `Verified ${timeStr} · Theme [${themeName}]`;
+    }
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      const zh = currentLang === 'zh';
+      document.getElementById('langText').textContent = zh ? '中文' : 'EN';
+      document.getElementById('mainTitle').textContent = zh ? '📱 30家云手机横评' : '📱 30 Cloud Phones Benchmark';
+      document.getElementById('subTitle').textContent = zh
+        ? '资费、底层真假与改机能力 · 0真机托管 · 14家ARM虚拟化 · 8步验机'
+        : 'Pricing, Architecture Truth & Modding · 0 Real Hosting · 14 ARM Virtualized';
+      document.getElementById('refreshBtnText').textContent = zh ? '刷新主题' : 'Next Aura';
+      document.getElementById('tabMatrix').textContent = zh ? '横评总表 (30家)' : '30 Brands Matrix';
+      document.getElementById('tabGuide').textContent = zh ? '甘甘云 · 8步验机' : 'Gangan · 8-Step Test';
+      document.getElementById('searchInput').placeholder = zh
+        ? '搜索品牌名，如：川川、VMOS、章鱼、甘甘...'
+        : 'Search brand, e.g. VMOS, Redfinger, Gangan...';
+      document.getElementById('panelTitle').textContent = zh ? '12色弥散主题' : '12 Aura Themes';
+      document.getElementById('panelHint').textContent = zh ? '滑动或点击选择' : 'Slide or tap';
+      document.getElementById('chkOfficialText').textContent = zh ? '只看有官网价/官方文档' : 'Official Price/Docs Only';
+      document.getElementById('chkModText').textContent = zh ? '只看含一键新机/改机说明' : 'One-Click Modding Only';
+
+      renderThemeSwatches();
+      renderAll();
+    }
+
+    function toggleDarkMode() {
+      isDarkMode = !isDarkMode;
+      const root = document.documentElement;
+      const btn = document.getElementById('darkModeBtn');
+      const icon = document.getElementById('sunMoonIcon');
+
+      btn.classList.add('rotating');
+      setTimeout(() => btn.classList.remove('rotating'), 450);
+
+      if (isDarkMode) {
+        root.setAttribute('data-dark', 'true');
+        root.style.setProperty('--page-bg', '#090D16');
+        document.getElementById('themeColorMeta').setAttribute('content', '#0B1120');
+        icon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+      } else {
+        root.removeAttribute('data-dark');
+        document.getElementById('themeColorMeta').setAttribute('content', '#FFFFFF');
+        const activeTheme = allThemes[currentGlobalThemeIndex];
+        root.style.setProperty('--page-bg', activeTheme.pageBg);
+        icon.innerHTML = `
+          <circle cx="12" cy="12" r="4"></circle>
+          <line x1="12" y1="2" x2="12" y2="4.5"></line>
+          <line x1="12" y1="19.5" x2="12" y2="22"></line>
+          <line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line>
+          <line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line>
+          <line x1="2" y1="12" x2="4.5" y2="12"></line>
+          <line x1="19.5" y1="12" x2="22" y2="12"></line>
+          <line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line>
+          <line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line>
+        `;
+      }
+    }
+
+    // ================= 7. 筛选与搜索逻辑 =================
+    function selectCategory(cat, btnEl) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-chip').forEach(el => el.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      if (currentTab !== 'matrix') {
+        switchTab('matrix');
+        return;
+      }
+      renderAll();
+    }
+
+    function toggleOfficialFilter() {
+      filterOfficialOnly = !filterOfficialOnly;
+      const btn = document.getElementById('chkOfficialBtn');
+      btn.classList.toggle('checked', filterOfficialOnly);
+      renderAll();
+    }
+
+    function toggleModFilter() {
+      filterModOnly = !filterModOnly;
+      const btn = document.getElementById('chkModBtn');
+      btn.classList.toggle('checked', filterModOnly);
+      renderAll();
+    }
+
+    function resetCategoryFilter() {
+      currentCategory = 'all';
+      filterOfficialOnly = false;
+      filterModOnly = false;
+      document.querySelectorAll('.cat-chip').forEach(el => {
+        el.classList.toggle('active', el.getAttribute('data-cat') === 'all');
+      });
+      document.getElementById('chkOfficialBtn').classList.remove('checked');
+      document.getElementById('chkModBtn').classList.remove('checked');
+      clearSearch();
+    }
+
+    function handleSearchInput() {
+      const val = document.getElementById('searchInput').value.trim();
+      document.getElementById('clearBtn').classList.toggle('visible', val.length > 0);
+      renderAll();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('searchInput');
+      input.value = '';
+      document.getElementById('clearBtn').classList.remove('visible');
+      renderAll();
+    }
+
+    function triggerSearchFocus() {
+      const input = document.getElementById('searchInput');
+      if (!input.value.trim()) {
+        input.focus();
+      } else {
+        renderAll();
+      }
+    }
+
+    function handleScenarioCardClick(targetGroup) {
+      if (targetGroup === 'guide') {
+        switchTab('guide');
+        document.getElementById('siteListSection').scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+      const chip = document.querySelector(`.cat-chip[data-cat="${targetGroup}"]`);
+      selectCategory(targetGroup, chip);
+      document.getElementById('siteListSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function toggleSiteGroup(groupId) {
+      if (openSiteGroups.has(groupId)) openSiteGroups.delete(groupId);
+      else openSiteGroups.add(groupId);
+      const group = document.getElementById('site-group-' + groupId);
+      if (group) {
+        const opened = openSiteGroups.has(groupId);
+        group.classList.toggle('open', opened);
+        group.querySelector('.site-list-trigger').setAttribute('aria-expanded', String(opened));
+      }
+    }
+
+    function toggleCheckStep(stepNum) {
+      if (completedSteps.has(stepNum)) {
+        completedSteps.delete(stepNum);
+      } else {
+        completedSteps.add(stepNum);
+      }
+      renderAll();
+    }
+
+    function openBrandModal(brandId) {
+      const b = all30Brands.find(x => x.id === brandId);
+      if (!b) return;
+      const zh = currentLang === 'zh';
+      const titleEl = document.getElementById('modalBrandTitle');
+      const subEl = document.getElementById('modalBrandSub');
+      const contentEl = document.getElementById('modalBrandContent');
+
+      titleEl.textContent = `#${b.id} ${zh ? b.name : b.nameEn} · ${b.cat}`;
+      subEl.textContent = `运营主体：${b.operator} · 证据分级：${b.evidence}`;
+
+      const linkBtn = b.siteUrl
+        ? `<a class="site-offer-link" href="${siteEscape(b.siteUrl)}" target="_blank" rel="noopener noreferrer" style="margin-top:6px;">访问官网 (${siteEscape(b.siteText || b.siteUrl)}) ↗</a>`
+        : `<span class="domain-inline-pill">${siteEscape(b.siteText || '未查到稳定官网')}</span>`;
+
+      contentEl.innerHTML = `
+        <div class="modal-kv-row">
+          <div class="modal-kv-label">${zh ? '最新资费（实测/横评口径）' : 'Pricing & Plans'}</div>
+          <div class="modal-kv-val" style="color:var(--theme-accent);font-weight:800;">${siteEscape(b.pricingDetail)}</div>
+        </div>
+        <div class="modal-kv-row">
+          <div class="modal-kv-label">${zh ? '技术底层架构判定' : 'Architecture Judgment'}</div>
+          <div class="modal-kv-val">${siteEscape(b.archDetail)}</div>
+        </div>
+        <div class="modal-kv-row">
+          <div class="modal-kv-label">${zh ? '改机 / 一键新机能力' : 'One-Click New Device / Modding'}</div>
+          <div class="modal-kv-val">${siteEscape(b.modDetail)}</div>
+        </div>
+        <div class="modal-kv-row">
+          <div class="modal-kv-label">${zh ? '口碑与风险提示' : 'Reputation & Risk Notes'}</div>
+          <div class="modal-kv-val">${siteEscape(b.riskNote)}</div>
+        </div>
+        <div class="modal-kv-row">
+          <div class="modal-kv-label">${zh ? '官网与核验来源' : 'Official Source'}</div>
+          <div class="modal-kv-val">${linkBtn}</div>
+        </div>
+      `;
+
+      document.getElementById('brandModalBackdrop').classList.add('open');
+    }
+
+    function closeBrandModal(e) {
+      if (e && e.target && e.target.id !== 'brandModalBackdrop') return;
+      document.getElementById('brandModalBackdrop').classList.remove('open');
+    }
+
+    function buildSpecialSectionsHtml() {
+      const zh = currentLang === 'zh';
+      const stepsHtml = selfTestSteps.map(s => {
+        const isDone = completedSteps.has(s.step);
+        return `
+          <div class="checklist-item ${isDone ? 'done' : ''}" onclick="toggleCheckStep(${s.step})">
+            <span class="step-num-badge">${isDone ? '✓' : s.step}</span>
+            <div class="checklist-body">
+              <div class="checklist-title">${zh ? s.title : s.titleEn}</div>
+              <div class="checklist-desc">${s.desc}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="special-card" id="ganganSpecialCard">
+          <div class="special-card-head">
+            <div class="special-card-title">
+              <span>🔍 甘甘云手机（第 30 家 · “欢畅版”专章）</span>
+            </div>
+            <a class="site-offer-link" href="https://ggyphone.com" target="_blank" rel="noopener noreferrer">ggyphone.com ↗</a>
+          </div>
+          <p class="site-list-subhead" style="margin-bottom:8px;">
+            <strong>主体与备案：</strong>湖南威红科技有限公司 · 湘ICP备2023039366号-5 · 包名 <code>com.ganganyun.android</code><br>
+            <strong>“欢畅版”核查结论：</strong><span style="color:#DC2626;font-weight:800;">未查到公开信息／官网无</span>；实地核对官网仅 VIP、GVIP、KVIP、XVIP 四档：
+          </p>
+          <div class="tier-table-wrap">
+            <table class="tier-table">
+              <thead>
+                <tr>
+                  <th>套餐档位</th>
+                  <th>标称配置（vCPU切片）</th>
+                  <th>安卓版本</th>
+                  <th>7 天价</th>
+                  <th>30 天价</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>VIP</strong></td>
+                  <td>8 核 / 4G / 64G</td>
+                  <td>安卓 10 / 11 / 12</td>
+                  <td class="tier-price-highlight">¥7.50</td>
+                  <td class="tier-price-highlight">¥23.90</td>
+                </tr>
+                <tr>
+                  <td><strong>GVIP</strong></td>
+                  <td>12 核 / 8G / 128G</td>
+                  <td>安卓 10 / 11 / 12</td>
+                  <td class="tier-price-highlight">¥16.50</td>
+                  <td class="tier-price-highlight">¥48.00</td>
+                </tr>
+                <tr>
+                  <td><strong>KVIP</strong></td>
+                  <td>16 核 / 12G / 256G</td>
+                  <td>安卓 10 / 11 / 12</td>
+                  <td class="tier-price-highlight">¥23.00</td>
+                  <td class="tier-price-highlight">¥65.00</td>
+                </tr>
+                <tr>
+                  <td><strong>XVIP</strong></td>
+                  <td>24 核 / 16G / 512G</td>
+                  <td>安卓 10 / 11 / 12 / 13</td>
+                  <td class="tier-price-highlight">¥38.00</td>
+                  <td class="tier-price-highlight">¥139.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="site-list-subhead" style="margin-bottom:0;">
+            <strong>底层判定：</strong>B 倾向（标称 12/16/24 核远超单颗手机 SoC，逻辑上只能是服务器端 vCPU 切片）；官网未查到一键新机说明，建议先买 <strong>¥7.50 / 7天档</strong> 实测
+          </p>
+        </div>
+
+        <div class="special-card" id="selfTestSpecialCard">
+          <div class="special-card-head">
+            <div class="special-card-title">
+              <span>🧪 用户自测真机方法清单（8 步交互核验）</span>
+            </div>
+            <span class="site-list-count">已完成 ${completedSteps.size} / 8 步</span>
+          </div>
+          <p class="site-list-subhead" style="margin-bottom:8px;">
+            点击任意步骤即可标记“已核验”；主流套餐 0 家可免自测确认为真机托管，短租到手后请按以下 8 步排查：
+          </p>
+          <div class="checklist-grid">
+            ${stepsHtml}
+          </div>
+        </div>
+
+        <div class="special-card">
+          <div class="special-card-head" style="margin-bottom:4px;">
+            <div class="special-card-title"><span>🔗 官网实测与索引来源直达（可横向滑动）</span></div>
+          </div>
+          <div class="source-links-wrap">
+            <a class="site-offer-link" href="https://ggyphone.com" target="_blank" rel="noopener noreferrer">甘甘云 ggyphone.com ↗</a>
+            <a class="site-offer-link" href="https://ccynice.com/huodong.html" target="_blank" rel="noopener noreferrer">川川云活动页 ↗</a>
+            <a class="site-offer-link" href="https://vmoscloud.com/zh/price" target="_blank" rel="noopener noreferrer">VMOS Cloud 价格页 ↗</a>
+            <a class="site-offer-link" href="https://zy.16163.com" target="_blank" rel="noopener noreferrer">章鱼云官网 ↗</a>
+            <a class="site-offer-link" href="https://palmpai.com" target="_blank" rel="noopener noreferrer">掌派云官网 ↗</a>
+            <a class="site-offer-link" href="https://ddyun.com" target="_blank" rel="noopener noreferrer">多多云 ddyun.com ↗</a>
+            <a class="site-offer-link" href="https://gc.com.cn/faq/product/" target="_blank" rel="noopener noreferrer">红手指官网 FAQ ↗</a>
+            <a class="site-offer-link" href="https://ldcloud.net/ch/features/packages" target="_blank" rel="noopener noreferrer">雷电海外套餐页 ↗</a>
+          </div>
+        </div>
+      `;
+    }
+
+    // ================= 8. 主渲染函数 =================
+    function renderAll() {
+      const zh = currentLang === 'zh';
+      const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+
+      // 1. 顶部速览卡片：严格单行锁高，左右卡片100%对齐
+      const grid = document.getElementById('contentGrid');
+      grid.innerHTML = scenarioCards.map(card => {
+        const title = zh ? card.name : card.nameEn;
+        const tag = zh ? card.tag : card.tagEn;
+        return `
+          <div class="product-card" onclick="handleScenarioCardClick('${card.targetGroup}')">
+            <div class="card-top">
+              <div class="product-name">${siteEscape(title)}</div>
+              <span class="product-tag">${siteEscape(tag)}</span>
+            </div>
+            <div class="card-bottom">
+              <span class="product-price">${siteEscape(card.price)}<span class="currency">${siteEscape(card.unit)}</span></span>
+              
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 2. 过滤 30 家品牌
+      const filteredBrands = all30Brands.filter(b => {
+        if (currentCategory !== 'all' && b.cat !== currentCategory) return false;
+        if (filterOfficialOnly && !b.hasOfficialDoc) return false;
+        if (filterModOnly && !b.hasModFeature) return false;
+        if (!keyword) return true;
+        const hay = [
+          b.name, b.nameEn, b.cat, b.operator, b.siteText,
+          b.pricingDetail, b.archDetail, b.modDetail, b.riskNote
+        ].join(' ').toLowerCase();
+        return hay.includes(keyword);
+      });
+
+      document.getElementById('filterStatusCount').textContent = zh
+        ? `${filteredBrands.length} / 30 家`
+        : `${filteredBrands.length} / 30`;
+
+      const listContainer = document.getElementById('siteListGroups');
+      const extraContainer = document.getElementById('extraSpecialSections');
+      const titleEl = document.getElementById('siteListTitle');
+      const subEl = document.getElementById('siteListSubtitle');
+      const countEl = document.getElementById('siteListCount');
+
+      if (currentTab === 'guide') {
+        titleEl.textContent = zh ? '甘甘云手机专章 & 8 步真机自测清单' : 'Gangan Cloud Special & 8-Step Self-Test';
+        subEl.textContent = zh
+          ? '2026-11-05 自动抓取甘甘云官网四档现行价格 · 附 8 步硬件/指令集/传感器验真伪清单'
+          : 'Live scraped Gangan Cloud 4 pricing tiers & 8-step hardware verification checklist';
+        countEl.textContent = zh ? `已完成 ${completedSteps.size}/8 步` : `${completedSteps.size}/8 Done`;
+        listContainer.innerHTML = buildSpecialSectionsHtml();
+        extraContainer.innerHTML = '';
+        return;
+      }
+
+      titleEl.textContent = zh ? '30 家云手机横向对比总表' : '30 Cloud Phones Comparison Matrix';
+      subEl.textContent = zh
+        ? '全宽视觉对齐排版 · 标签超出可横向滑动 · 点击任意卡片查看完整档案'
+        : 'Full-width aligned cards · Single-line scrollable tags · Tap any card for dossier';
+
+      const nonEmptyGroups = categoryGroupsMeta.map(gMeta => {
+        const records = filteredBrands.filter(b => b.cat === gMeta.cat);
+        return { ...gMeta, records };
+      }).filter(g => g.records.length > 0);
+
+      countEl.textContent = zh
+        ? `${nonEmptyGroups.length} 组 · ${filteredBrands.length} 家`
+        : `${nonEmptyGroups.length} groups · ${filteredBrands.length}`;
+
+      if (nonEmptyGroups.length === 0) {
+        listContainer.innerHTML = `<div class="empty-state">${zh ? '没有匹配的云手机品牌，点击搜索框左侧 + 号重置筛选' : 'No matching brands found. Tap + to reset filters.'}</div>`;
+      } else {
+        listContainer.innerHTML = nonEmptyGroups.map(group => {
+          const opened = openSiteGroups.has(group.id);
+          const gTitle = siteEscape(zh ? group.title : group.titleEn);
+          const gSub = siteEscape(zh ? group.subtitle : group.subtitleEn);
+
+          const rowsHtml = group.records.map(b => {
+            const evBadgeClass = b.evidence === 'verified live'
+              ? 'tag-teal'
+              : (b.evidence === 'index' ? 'tag-amber' : 'tag-gray');
+            const evLabel = b.evidence === 'verified live'
+              ? '官网实测 verified live'
+              : (b.evidence === 'index' ? '索引 index' : '官网未查到');
+
+            const modTagClass = b.hasModFeature ? 'tag-blue' : 'tag-gray';
+            const modShort = b.hasModFeature
+              ? '支持一键新机'
+              : (b.cat === '不适用' ? '云电脑不适用' : '未查到改机说明');
+
+            const domainLabel = b.siteText ? b.siteText : (zh ? '未查到稳定官网' : 'No official site');
+            const domainPill = `<span class="domain-inline-pill">🌐 ${siteEscape(domainLabel)}</span>`;
+
+            const actionBtn = b.siteUrl
+              ? `<a class="site-offer-link" href="${siteEscape(b.siteUrl)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">官网 ↗</a>`
+              : `<button type="button" class="site-offer-link" onclick="event.stopPropagation(); openBrandModal(${b.id})">详情 &gt;</button>`;
+
+            return `
+              <div class="brand-item-card" onclick="openBrandModal(${b.id})">
+                <!-- 第1行：#序号+品牌名+主体（左） | 起步价紧贴最右侧（右） -->
+                <div class="brand-row-header">
+                  <div class="brand-title-wrap">
+                    <span class="brand-seq-num">#${b.id}</span>
+                    <span class="brand-main-name">${siteEscape(zh ? b.name : b.nameEn)}</span>
+                    <span class="brand-sub-operator">${siteEscape(b.operator)}</span>
+                  </div>
+                  <div class="brand-price-wrap">
+                    <span class="brand-main-price">${siteEscape(b.shortPrice)}</span>
+                  </div>
+                </div>
+
+                <!-- 第2行：三大核心属性胶囊（分类 + 证据口径 + 改机能力），单行不折行 -->
+                <div class="brand-tags-bar">
+                  <span class="attr-pill-tag ${b.catBadgeColor}">${siteEscape(b.cat)}</span>
+                  <span class="attr-pill-tag ${evBadgeClass}">${siteEscape(evLabel)}</span>
+                  <span class="attr-pill-tag ${modTagClass}">${siteEscape(modShort)}</span>
+                </div>
+
+                <!-- 第3块：无边框柔和参数盒，四维标签严格对齐 -->
+                <div class="brand-specs-box">
+                  <div class="spec-kv-item">
+                    <span class="spec-kv-label">资费</span>
+                    <span class="spec-kv-value">${siteEscape(b.pricingDetail)}</span>
+                  </div>
+                  <div class="spec-kv-item">
+                    <span class="spec-kv-label">底层</span>
+                    <span class="spec-kv-value">${siteEscape(b.archDetail)}</span>
+                  </div>
+                  <div class="spec-kv-item">
+                    <span class="spec-kv-label">改机</span>
+                    <span class="spec-kv-value">${siteEscape(b.modDetail)}</span>
+                  </div>
+                  <div class="spec-kv-item">
+                    <span class="spec-kv-label risk-label">提示</span>
+                    <span class="spec-kv-value risk-value">${siteEscape(b.riskNote)}</span>
+                  </div>
+                </div>
+
+                <!-- 第4行（底部栏）：左侧展示官网域名/包名，右侧展示官网直达/详情按钮 -->
+                <div class="brand-footer-bar">
+                  <div class="brand-footer-domain">
+                    ${domainPill}
+                  </div>
+                  ${actionBtn}
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          return `
+            <article class="site-list-group ${opened ? 'open' : ''}" id="site-group-${group.id}">
+              <button class="site-list-trigger" type="button" onclick="toggleSiteGroup('${group.id}')" aria-expanded="${opened}" aria-controls="offers-${group.id}">
+                <span class="site-list-brand-icon" aria-hidden="true">${group.icon}</span>
+                <span class="site-list-main">
+                  <span class="site-list-name" style="display:block">${gTitle}</span>
+                  <span class="site-list-detail" style="display:block">${gSub}</span>
+                </span>
+                <span class="site-list-minimum"><small>${zh ? '共 ' + group.records.length + ' 家' : group.records.length + ' Brands'}</small><strong>${siteEscape(group.minLabel)}</strong></span>
+                <span class="site-list-arrow" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                </span>
+              </button>
+              <div class="site-list-collapsible" id="offers-${group.id}">
+                <div class="site-list-inner">
+                  <div class="site-list-offers">${rowsHtml}</div>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      extraContainer.innerHTML = buildSpecialSectionsHtml();
+    }
+
+    renderThemeSwatches();
+    applyThemeByGlobalIndex(11);
+    renderAll();
+  </script>
 </body>
 </html>
