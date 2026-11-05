@@ -1106,29 +1106,33 @@ document.querySelectorAll(".viz-mode-btn").forEach(btn=>{
 });
 
 /* ================= 分区导航：历史快照与即时恢复 ================= */
-let jumpSeq=0;
+let jumpSeq=0, lastClickedSec=null;
 const secNavSession=Math.random().toString(36).slice(2);
 try{
   history.scrollRestoration="manual";
-  history.replaceState({secNavSession,sec:null,y:window.scrollY},"",location.href);
+  history.replaceState({secNavSession,y:window.scrollY},"",location.href);
 }catch(e){}
 function saveSecPosition(){
   const st=history.state, y=window.scrollY;
   if(!st||st.secNavSession!==secNavSession||st.y===y)return;
   try{history.replaceState({...st,y},"",location.href)}catch(e){}
 }
-function markSec(secId,animate){
+function paintSec(secId,animate){
   document.querySelectorAll(".sec-sq-btn").forEach(b=>{
     const on=b.getAttribute("data-sec")===secId;
     b.classList.toggle("active",on);
     b.classList.toggle("pop",on&&animate!==false);
   });
 }
+function markSec(secId,animate){
+  lastClickedSec=secId;
+  paintSec(secId,animate);
+}
 function jumpToSection(secId,groupId){
   const sec=document.getElementById(secId); if(!sec) return;
-  saveSecPosition();
-  try{history.pushState({secNavSession,sec:secId,y:window.scrollY},"","#"+secId)}catch(e){}
   markSec(secId);
+  saveSecPosition();
+  try{history.pushState({secNavSession,y:window.scrollY},"","#"+secId)}catch(e){}
   const tk=++jumpSeq;
   setTimeout(()=>{
     if(tk!==jumpSeq) return;
@@ -1156,10 +1160,18 @@ window.addEventListener("popstate",e=>{
   jumpSeq++;
   const st=e.state;
   if(!st||st.secNavSession!==secNavSession)return;
-  if(st.sec)markSec(st.sec,false);
   window.scrollTo({top:st.y||0,behavior:"instant"});
 });
-document.querySelectorAll(".sec-sq-btn").forEach(c=>c.addEventListener("click",()=>jumpToSection(c.getAttribute("data-sec"))));
+document.querySelectorAll(".sec-sq-btn").forEach(c=>{
+  c.addEventListener("pointerdown",e=>{
+    if(e.button===0)paintSec(c.getAttribute("data-sec"),false);
+  });
+  c.addEventListener("pointercancel",()=>paintSec(lastClickedSec,false));
+  c.addEventListener("pointerup",e=>{
+    if(!c.contains(document.elementFromPoint(e.clientX,e.clientY)))paintSec(lastClickedSec,false);
+  });
+  c.addEventListener("click",()=>jumpToSection(c.getAttribute("data-sec")));
+});
 
 /* ================= 搜索 ================= */
 const qEl=document.getElementById("q"), clearBtn=document.getElementById("btnClearSearch");
@@ -1325,7 +1337,6 @@ window.addEventListener("scroll",updateDockVisibility,{passive:true});
 document.getElementById("btnCollapseAllGroups").addEventListener("click",e=>{
   if(dockWasDragged){e.preventDefault();e.stopPropagation();return}
   openGroups.clear(); saveGroups();
-  document.querySelectorAll(".sec-sq-btn").forEach(el=>el.classList.remove("active"));
   applyFilter(); updateDockVisibility();
 });
 document.getElementById("btnBackToTop").addEventListener("click",e=>{
