@@ -1266,56 +1266,6 @@
       transform: scale(0.96);
     }
 
-    /* ================= 7. 右侧动态 2FA 验证码结果面板（同心圆角 + 复制与验证码同行 + 无下一组） ================= */
-    .countdown-strip-wrap {
-      margin-bottom: 10px;
-      padding: 10px 12px;
-      border-radius: var(--card-inner-radius);
-      background: var(--input-bg);
-      border: 1px solid var(--card-border);
-      flex-shrink: 0;
-    }
-
-    .countdown-top-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-secondary);
-      margin-bottom: 7px;
-    }
-
-    .countdown-seconds-val {
-      color: var(--theme-accent);
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .countdown-seconds-val.urgent {
-      color: #EF4444;
-    }
-
-    .countdown-bar-track {
-      width: 100%;
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(148, 163, 184, 0.2);
-      overflow: hidden;
-    }
-
-    .countdown-bar-fill {
-      height: 100%;
-      width: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--orb-color-1), var(--refresh-btn-bg), var(--theme-accent));
-      transition: width 0.95s linear, background 0.3s ease;
-    }
-
-    .countdown-bar-fill.urgent {
-      background: linear-gradient(90deg, #F59E0B, #EF4444);
-    }
-
     .totp-results-list {
       flex: 1;
       display: flex;
@@ -1916,7 +1866,16 @@
 @keyframes shakeX{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 .otp-empty{display:none;margin-top:10px;font-size:12.5px;font-weight:600;color:#E11D48;line-height:1.5}
 .otp-empty.show{display:block}
-.results-empty-note{padding:16px 14px;border-radius:var(--card-inner-radius);border:1.5px dashed var(--card-border);background:var(--input-bg);color:var(--text-muted);font-size:12.5px;line-height:1.6;text-align:center}
+.results-empty-note{padding:16px 14px;border-radius:var(--card-inner-radius);border:1.5px dashed var(--card-border);background:var(--input-bg);color:var(--text-muted);font-size:12.5px;line-height:1.6;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.totp-ring-wrap{position:relative;width:30px;height:30px;flex-shrink:0;margin-left:auto}
+.totp-ring{width:30px;height:30px;transform:rotate(-90deg);display:block}
+.totp-ring .ring-bg{fill:none;stroke:rgba(148,163,184,.28);stroke-width:3}
+.totp-ring .ring-fg{fill:none;stroke:var(--theme-accent);stroke-width:3;stroke-linecap:round;stroke-dasharray:81.68;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s ease}
+[data-dark="true"] .totp-ring .ring-fg{stroke:var(--orb-color-1)}
+.ring-sec{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:var(--theme-accent);font-variant-numeric:tabular-nums}
+[data-dark="true"] .ring-sec{color:var(--orb-color-1)}
+.totp-ring-wrap.urgent .ring-fg{stroke:#EF4444}
+.totp-ring-wrap.urgent .ring-sec{color:#EF4444}
 .aura-toast.error{background:rgba(190,18,60,.94)}
 .mini-pill-btn:disabled{opacity:.45;cursor:not-allowed}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
@@ -2045,16 +2004,8 @@
           <p class="card-subtitle-row" data-i18n="outputSub">每 30 秒自动更新 · 点复制按钮复制验证码</p>
         </div>
 
-        <div class="countdown-strip-wrap">
-          <div class="countdown-top-row">
-            <span data-i18n="refreshIn">刷新倒计时</span>
-            <span class="countdown-seconds-val" id="countdownNum">30s</span>
-          </div>
-          <div class="countdown-bar-track"><div class="countdown-bar-fill" id="progressBar" style="width:100%"></div></div>
-        </div>
-
         <div class="totp-results-list" id="otpList">
-          <div class="results-empty-note" data-i18n="emptyState">输入密钥并点击获取验证码后，验证码会显示在这里</div>
+          <div class="results-empty-note" data-i18n="emptyState">验证码会显示在这里</div>
         </div>
       </section>
     </main>
@@ -2140,7 +2091,7 @@ const i18n = {
       otpFrom:'来自2FA的信息', refreshIn:'刷新倒计时', codeLabel:'验证码', copyBtn:'复制', copiedBtn:'已复制',
       outputSub:'每 30 秒自动更新 · 点复制按钮复制验证码',
       statusBadge:'RFC 6238 · 30s 实时同步', panelTitle:'12色弥散主题', panelHint:'滑动或点击选择',
-      emptyState:'输入密钥并点击获取验证码后，验证码会显示在这里',
+      emptyState:'验证码会显示在这里',
       emptyTip:'没有识别到有效的 2FA 密钥，请检查格式（Base32 密钥，或每行 UID|密码|2FA|...）',
       usageTitle:'使用说明',
       usageDesc1:'2FA双重验证（Two-factor authentication）是保障账户安全的重要机制，在登录时除密码外还需输入动态验证码',
@@ -2162,7 +2113,7 @@ const i18n = {
       otpFrom:'Codes from 2FA', refreshIn:'Refresh in', codeLabel:'Code', copyBtn:'Copy', copiedBtn:'Copied',
       outputSub:'Auto-refreshes every 30s · Copy with the copy button',
       statusBadge:'RFC 6238 · 30s live sync', panelTitle:'12 Aura Themes', panelHint:'Slide or tap to pick',
-      emptyState:'Your codes will appear here after you get them',
+      emptyState:'Codes will appear here',
       emptyTip:'No valid 2FA secret found. Check the format (Base32 secret, or UID|password|2FA|... per line).',
       usageTitle:'Instructions',
       usageDesc1:'Two-factor authentication adds an extra layer of security. After password, enter a dynamic 6-digit code.',
@@ -2547,8 +2498,6 @@ const lineCount = document.getElementById('lineCount');
 const otpList   = document.getElementById('otpList');
 const otpEmpty  = document.getElementById('otpEmpty');
 const wrapEl    = document.getElementById('textareaWrap');
-const countdownNum = document.getElementById('countdownNum');
-const progressBar  = document.getElementById('progressBar');
 let activated = false;
 let lastSignature = '';
 
@@ -2589,12 +2538,17 @@ btnGet.addEventListener('click', e => {
 });
 
 function secretPreview(secret){ return '\u2022\u2022\u2022\u2022 ' + secret.slice(-4); }
+function updateRings(remain){
+  const off = (81.68 * (1 - remain/30)).toFixed(2);
+  document.querySelectorAll('.totp-ring-wrap').forEach(w => {
+    w.classList.toggle('urgent', remain <= 5);
+    const fg = w.querySelector('.ring-fg'); if (fg) fg.style.strokeDashoffset = off;
+    const sec = w.querySelector('.ring-sec'); if (sec) sec.textContent = remain;
+  });
+}
 async function renderOtpCodes(force){
   const remain = 30 - (Math.floor(Date.now()/1000) % 30);
-  countdownNum.textContent = remain + 's';
-  countdownNum.classList.toggle('urgent', remain <= 5);
-  progressBar.style.width = (remain/30*100) + '%';
-  progressBar.classList.toggle('urgent', remain <= 5);
+  updateRings(remain);
   if (!activated) return;
   const secrets = parseSecrets(textarea.value);
   if (!secrets.length){ otpList.innerHTML = emptyNoteHtml(); return; }
@@ -2612,10 +2566,12 @@ async function renderOtpCodes(force){
       '</div>' +
       '<div class="totp-digits-row">' +
         '<div class="totp-big-code">' + codes[i] + '</div>' +
+        '<div class="totp-ring-wrap"><svg class="totp-ring" viewBox="0 0 30 30"><circle class="ring-bg" cx="15" cy="15" r="13"></circle><circle class="ring-fg" cx="15" cy="15" r="13"></circle></svg><span class="ring-sec">' + remain + '</span></div>' +
         '<button type="button" class="copy-code-btn" data-code="' + codes[i] + '">' + ICONS.copy + '<span>' + t.copyBtn + '</span></button>' +
       '</div>' +
     '</div>'
   ).join('');
+  updateRings(remain);
 }
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function shortTitle(s){ return s.length > 26 ? s.slice(0,26) + '…' : s; }
