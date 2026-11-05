@@ -95,12 +95,13 @@ const aiAfter = between(ai, 'function afterLeaderPaint(fn){',
   '\n/* 仅在本次页面生命周期内有效');
 const aiHandlers = between(ai, "document.querySelectorAll('.leader').forEach(el=>{",
   "document.querySelectorAll('[data-gtoggle]')");
-const aiClickAPI = new Function('document','history','markLeader',
+const aiClickAPI = new Function('document','history','window','markLeader',
   'saveLeaderPosition','requestAnimationFrame','revealGroupForJump','userOpen','leaderNavSession',
   'let leaderNavCommit=0;let pinnedLeaderGroup=null;\n' + aiAfter + '\n' + aiHandlers
   + '\nreturn {cancel:()=>leaderNavCommit++};')(
   aiDocument,
   { pushState: () => { aiShots.push(aiPainted); aiSteps.push('push'); } },
+  { scrollY: 80 },
   gid => { aiSelected = gid; aiSteps.push('mark'); },
   () => aiSteps.push('save'),
   aiFrame.raf,
