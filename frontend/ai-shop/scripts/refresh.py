@@ -587,6 +587,19 @@ def main():
         with open(_log_path, 'w', encoding='utf-8') as f:
             json.dump(dict(v=1, items=_log), f, ensure_ascii=False, separators=(',', ':'))
         print(f'price-log: {len(_log)} keys (pool {len(_pool)}, new {_n_new}, renamed {_n_ren}, changed {_n_chg}, {int((_time.time() - _t0) * 1000)}ms)', file=sys.stderr)
+        # 前端弹窗专用小表（ken 2026-11-05）：只含当前 board 条目的价格记录，
+        # 页面点「价格变动」只拉这份（约 230 条、几十 KB），不拉全量 price-log
+        # （8 万多条、约 10MB，手机上打开弹窗要等很久）。全量表只做后台维护。
+        _sub = {}
+        for g in groups:
+            for it in g['items']:
+                _k = it['url'].split('?')[0] + '|' + norm_title(it['title'])
+                _rec = _log.get(_k)
+                if _rec:
+                    _sub[_k] = _rec
+        with open(os.path.join(DATA, 'board-prices.json'), 'w', encoding='utf-8') as f:
+            json.dump(dict(v=1, items=_sub), f, ensure_ascii=False, separators=(',', ':'))
+        print(f'board-prices: {len(_sub)} keys', file=sys.stderr)
     except Exception as e:
         print(f'price-log skipped: {e}', file=sys.stderr)
     os.makedirs(DATA, exist_ok=True)
