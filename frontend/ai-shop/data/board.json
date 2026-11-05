@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-05 14:38",
+ "updated_at": "2026-11-05 14:48",
  "source": "AI价网 + cardnav + PriceAI 按商家遍历合并",
  "groups": [
   {
@@ -2006,12 +2006,55 @@
      ]
     },
     {
+     "price": 12.23,
+     "shop": "壹号铺",
+     "platform": "16688",
+     "stock": 30,
+     "title": "1号源头Plus独享成品账号|· 家宽手搓 |· 已接马|· 账密+2FA·  质保首登· 诚招代理",
+     "url": "https://www.16688.com.cn/goods/G30562124",
+     "kind": "",
+     "same_source": 3,
+     "sources": [
+      {
+       "price": 12.23,
+       "shop": "壹号铺",
+       "platform": "16688",
+       "stock": 24,
+       "url": "https://www.16688.com.cn/goods/G30562124"
+      },
+      {
+       "price": 15.19,
+       "shop": "有求必应的打工人",
+       "platform": "16688",
+       "stock": 23,
+       "url": "https://www.16688.com.cn/goods/G60480146"
+      },
+      {
+       "price": 20.85,
+       "shop": "一梦AI货源 招代理 对接马yimeng",
+       "platform": "16688",
+       "stock": 75,
+       "url": "https://www.16688.com.cn/goods/G71659444"
+      }
+     ]
+    },
+    {
      "price": 13.06,
      "shop": "鹰鹰小铺",
      "platform": "链动小铺",
      "stock": 7,
      "title": "G Plus 成品丨已接马丨质保首登",
      "url": "https://wzyp.cn/item/8jfmvj",
+     "kind": "",
+     "same_source": 1
+    },
+    {
+     "price": 13.31,
+     "shop": "北川AI",
+     "platform": "16688",
+     "stock": 30,
+     "title": "Plus独享账号|· 家宽手搓 |· 已接马|· 账密+2FA·  质保首登· 诚招代理",
+     "url": "https://www.16688.com.cn/goods/G94938957",
      "kind": "",
      "same_source": 1
     },
@@ -2179,17 +2222,6 @@
      "url": "https://wzyp.cn/item/2mglgo",
      "kind": "",
      "same_source": 1
-    },
-    {
-     "price": 17.71,
-     "shop": "翻车咩萝",
-     "platform": "链动小铺",
-     "stock": 8,
-     "title": "Plus（upi渠道）CPA格式 已接马！ 没有质保！！！",
-     "url": "https://wzyp.cn/item/xhip9j",
-     "kind": "",
-     "same_source": 1,
-     "pc": "2026-11-05"
     },
     {
      "price": 18.0,
@@ -2463,6 +2495,17 @@
      ]
     },
     {
+     "price": 18.49,
+     "shop": "翻车咩萝",
+     "platform": "链动小铺",
+     "stock": 8,
+     "title": "Plus（upi渠道）CPA格式 已接马！ 没有质保！！！",
+     "url": "https://wzyp.cn/item/xhip9j",
+     "kind": "",
+     "same_source": 1,
+     "pc": "2026-11-05"
+    },
+    {
      "price": 18.5,
      "shop": "AI搬运工",
      "platform": "16688",
@@ -2476,7 +2519,7 @@
        "price": 18.5,
        "shop": "AI搬运工",
        "platform": "16688",
-       "stock": 77,
+       "stock": 75,
        "url": "https://16688.com.cn/goods/G45280072"
       },
       {
@@ -3007,10 +3050,36 @@
      ]
     },
     {
+     "price": 20.12,
+     "shop": "珠世AI",
+     "platform": "16688",
+     "stock": 30,
+     "title": "3号源头Plus独享成品账号|· 家宽手搓 |· 已接马|· 账密+2FA·  质保首登· 诚招代理",
+     "url": "https://www.16688.com.cn/goods/G19049055",
+     "kind": "",
+     "same_source": 2,
+     "sources": [
+      {
+       "price": 20.12,
+       "shop": "珠世AI",
+       "platform": "16688",
+       "stock": 54,
+       "url": "https://www.16688.com.cn/goods/G19049055"
+      },
+      {
+       "price": 28.29,
+       "shop": "x会员ai订阅（可用u）",
+       "platform": "16688",
+       "stock": 56,
+       "url": "https://www.16688.com.cn/goods/G53370707"
+      }
+     ]
+    },
+    {
      "price": 20.38,
      "shop": "精选好货AI",
      "platform": "链动小铺",
-     "stock": 17,
+     "stock": 14,
      "title": "【自营】已接马 Plus 质保2小时 | 独享成品号 | 家宽现搓 | 可自动401找回 | 带RT | 仅反代使用",
      "url": "https://wzyp.cn/item/25tihz",
      "kind": "",
@@ -3020,7 +3089,7 @@
        "price": 20.38,
        "shop": "精选好货AI",
        "platform": "链动小铺",
-       "stock": 17,
+       "stock": 14,
        "url": "https://wzyp.cn/item/25tihz"
       },
       {
@@ -3495,7 +3564,7 @@
      "price": 21.41,
      "shop": "还没想好",
      "platform": "链动小铺",
-     "stock": 17,
+     "stock": 14,
      "title": "已接马 Plus 质保2小时 | 独享成品号 | 家宽现搓 | 可自动401找回 | 带RT | 仅反代使用",
      "url": "https://wzyp.cn/item/2kkqq4",
      "kind": "",
@@ -3505,7 +3574,7 @@
        "price": 21.41,
        "shop": "还没想好",
        "platform": "链动小铺",
-       "stock": 17,
+       "stock": 14,
        "url": "https://wzyp.cn/item/2kkqq4"
       },
       {
@@ -3522,7 +3591,7 @@
      "price": 21.59,
      "shop": "欧一",
      "platform": "16688",
-     "stock": 7,
+     "stock": 32,
      "title": "UPI 仅反代无账密 PLUS已接马 2次重置 401可刷新|格式可选 质保1h首次导入 质保过期无售后",
      "url": "https://16688.com.cn/goods/G90193442",
      "kind": "",
@@ -3585,275 +3654,6 @@
      "url": "https://www.16688.com.cn/goods/G17486210",
      "kind": "",
      "same_source": 1
-    },
-    {
-     "price": 23.5,
-     "shop": "牟利ai",
-     "platform": "链动小铺",
-     "stock": 6,
-     "title": "Plus | 已接马 | 不满额，带1-2次重置",
-     "url": "https://wzyp.cn/item/chnrv1",
-     "kind": "",
-     "same_source": 27,
-     "sources": [
-      {
-       "price": 23.5,
-       "shop": "牟利ai",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/chnrv1"
-      },
-      {
-       "price": 24.15,
-       "shop": "云脉AI",
-       "platform": "链动小铺",
-       "stock": 13,
-       "url": "https://wzyp.cn/item/2jf3fm"
-      },
-      {
-       "price": 24.9,
-       "shop": "aic007",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/e1wxlz"
-      },
-      {
-       "price": 25.0,
-       "shop": "GGBoy",
-       "platform": "链动小铺",
-       "stock": 13,
-       "url": "https://wzyp.cn/item/y97axx"
-      },
-      {
-       "price": 25.07,
-       "shop": "鹰鹰小铺",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/e11hr7"
-      },
-      {
-       "price": 25.07,
-       "shop": "👑NEON AI｜霓虹玩家AI👑(专注精品✨)🔥",
-       "platform": "链动小铺",
-       "stock": 13,
-       "url": "https://wzyp.cn/item/240mhl"
-      },
-      {
-       "price": 25.3,
-       "shop": "玄奇仙市",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/cqz8jn"
-      },
-      {
-       "price": 25.3,
-       "shop": "AI批发的杂货店",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/2suen9"
-      },
-      {
-       "price": 25.3,
-       "shop": "雪米AI",
-       "platform": "链动小铺",
-       "stock": 13,
-       "url": "https://wzyp.cn/item/wd5r9m"
-      },
-      {
-       "price": 25.3,
-       "shop": "凌小创",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/wmk7hw"
-      },
-      {
-       "price": 26.0,
-       "shop": "哈哈的ai杂货铺",
-       "platform": "链动小铺",
-       "stock": 13,
-       "url": "https://wzyp.cn/item/tgowxv"
-      },
-      {
-       "price": 26.0,
-       "shop": "龙腾专卖店",
-       "platform": "链动小铺",
-       "stock": 13,
-       "url": "https://wzyp.cn/item/kesx66"
-      },
-      {
-       "price": 26.0,
-       "shop": "AI生产队",
-       "platform": "链动小铺",
-       "stock": 13,
-       "url": "https://wzyp.cn/item/vku9j9"
-      },
-      {
-       "price": 26.01,
-       "shop": "FT7",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/7sf707"
-      },
-      {
-       "price": 26.32,
-       "shop": "YisamaAPI",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/9f2vgz"
-      },
-      {
-       "price": 26.45,
-       "shop": "AI账号乐园",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/xxohfe"
-      },
-      {
-       "price": 26.45,
-       "shop": "爪爪AI专卖(对接实力号商)",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/tjdk68"
-      },
-      {
-       "price": 28.0,
-       "shop": "玩去了的AI提效工具店",
-       "platform": "链动小铺",
-       "stock": 13,
-       "url": "https://wzyp.cn/item/p1f7ck"
-      },
-      {
-       "price": 28.0,
-       "shop": "托金AI工具小铺",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/2z67hq"
-      },
-      {
-       "price": 28.98,
-       "shop": "🐓PT-Plus",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/tcc9hc"
-      },
-      {
-       "price": 29.6,
-       "shop": "xiaoxiao",
-       "platform": "链动小铺",
-       "stock": 13,
-       "url": "https://wzyp.cn/item/4bnxcu"
-      },
-      {
-       "price": 30.0,
-       "shop": "比特拈花",
-       "platform": "链动小铺",
-       "stock": 13,
-       "url": "https://wzyp.cn/item/ny3y58"
-      },
-      {
-       "price": 33.0,
-       "shop": "懂你AI的小铺",
-       "platform": "链动小铺",
-       "stock": 13,
-       "url": "https://wzyp.cn/item/f3efa9"
-      },
-      {
-       "price": 39.1,
-       "shop": "ysy科技",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/dmfzj6"
-      },
-      {
-       "price": 41.4,
-       "shop": "AI杂货",
-       "platform": "链动小铺",
-       "stock": 13,
-       "url": "https://wzyp.cn/item/m3z207"
-      },
-      {
-       "price": 45.77,
-       "shop": "【AI源头直供】AICA",
-       "platform": "链动小铺",
-       "stock": 13,
-       "url": "https://wzyp.cn/item/jdve8z"
-      },
-      {
-       "price": 53.0,
-       "shop": "别睡太晚",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/69w6yn"
-      }
-     ],
-     "pc": "2026-11-05"
-    },
-    {
-     "price": 24.0,
-     "shop": "好又来",
-     "platform": "16688",
-     "stock": 12,
-     "title": "（源头）plus成品--已接马（质保首登）店家甄选（29号左右开通）满额度耐活王，带2张重置卡，非日抛（账密2fa发货）推荐指数：⭐⭐⭐⭐⭐",
-     "url": "https://www.16688.com.cn/goods/G53708996",
-     "kind": "",
-     "same_source": 3,
-     "sources": [
-      {
-       "price": 24.0,
-       "shop": "好又来",
-       "platform": "16688",
-       "stock": 17,
-       "url": "https://www.16688.com.cn/goods/G53708996"
-      },
-      {
-       "price": 27.99,
-       "shop": "xueluon",
-       "platform": "16688",
-       "stock": 17,
-       "url": "https://www.16688.com.cn/goods/G70570669"
-      },
-      {
-       "price": 48.0,
-       "shop": "AI批量部",
-       "platform": "16688",
-       "stock": 21,
-       "url": "https://www.16688.com.cn/goods/G10077740"
-      }
-     ]
-    },
-    {
-     "price": 24.01,
-     "shop": "好又来",
-     "platform": "16688",
-     "stock": 9,
-     "title": "（源头）plus成品--已接马（质保首登）店家精选-（2号开通）耐活老号，带1张重置卡，非日抛（账密2fa发货）推荐指数：⭐⭐⭐⭐⭐",
-     "url": "https://www.16688.com.cn/goods/G32497293",
-     "kind": "",
-     "same_source": 3,
-     "sources": [
-      {
-       "price": 24.01,
-       "shop": "好又来",
-       "platform": "16688",
-       "stock": 10,
-       "url": "https://www.16688.com.cn/goods/G32497293"
-      },
-      {
-       "price": 26.4,
-       "shop": "梦泽Ai",
-       "platform": "16688",
-       "stock": 10,
-       "url": "https://www.16688.com.cn/goods/G37528618"
-      },
-      {
-       "price": 33.6,
-       "shop": "xueluon",
-       "platform": "16688",
-       "stock": 10,
-       "url": "https://www.16688.com.cn/goods/G90101757"
-      }
-     ],
-     "pc": "2026-11-05"
     }
    ]
   },
@@ -4111,16 +3911,6 @@
      "title": "GPTplus无5h限制 周限账号 带两次重置 质保3天 · 默认规格",
      "url": "https://shop.wenvo.top/products/ripaoplus3",
      "kind": "未注明",
-     "same_source": 1
-    },
-    {
-     "price": 57.6,
-     "shop": "AI批量部",
-     "platform": "16688",
-     "stock": 3,
-     "title": "UPI 周限仅反代无账密 PLUS已接马 带2次重置 401可刷新|格式可选 质保1h首次导入  质保过期无售后",
-     "url": "https://www.16688.com.cn/goods/G78345189",
-     "kind": "已接马",
      "same_source": 1
     },
     {
@@ -6549,7 +6339,7 @@
      "price": 25.0,
      "shop": "10886源头发卡网",
      "platform": "",
-     "stock": 29,
+     "stock": 28,
      "title": "Antigravity pixel 6个月成品号，已过验证带RT",
      "url": "https://fk.10886.xyz/item/36",
      "kind": "成品号",
@@ -7855,7 +7645,7 @@
      "price": 0.36,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": 498,
+     "stock": 485,
      "title": "CDK 美国实卡源头招代理codex 短效单次接马 支持api 在有效期内可以二次验证",
      "url": "https://aicdks.com/product/106845",
      "kind": "",
@@ -7940,7 +7730,7 @@
        "price": 0.4,
        "shop": "冷热lab",
        "platform": "链动小铺",
-       "stock": 488,
+       "stock": 486,
        "url": "https://wzyp.cn/item/s6xqmo"
       }
      ]
@@ -9702,7 +9492,7 @@
      "price": 655.0,
      "shop": "AI源头(销量第一,发票可开,GP,T /codex源头,有平台保障）",
      "platform": "16688",
-     "stock": 9,
+     "stock": 8,
      "title": "🔥🔥🔥【美区官方充值】 G.rok Ultra 200美金套餐 一个月  需半价资格号 质保30天订阅 需半价资格号可充（可开票）",
      "url": "https://www.16688.com.cn/goods/G68373393",
      "kind": "成品号",
@@ -11537,7 +11327,7 @@
      "price": 139.05,
      "shop": "源点数字",
      "platform": "16688",
-     "stock": 82,
+     "stock": 81,
      "title": "【IOS美区】Claude Pro 官方充值月卡 (正规实付，质保订阅30天)",
      "url": "https://www.16688.com.cn/goods/G19542840",
      "kind": "Pro·代充",
