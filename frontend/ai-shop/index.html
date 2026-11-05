@@ -2424,7 +2424,7 @@ $('#plusBtn').onclick=()=>{
       if(!url)return;
       pinnedLeaderGroup=null;
       if(btn.dataset.act==='del'){
-        hiddenSet.add(url);saveHidden();renderBoard();showToast('已从列表删除');
+        hiddenSet.add(url);saveHidden();renderBoard();showToast('已从当前列表隐藏');
       }else if(btn.dataset.act==='fav'){
         const removing=favSet.has(url);toggleFav(url);
         showToast(removing?'已取消收藏':'已收藏');
