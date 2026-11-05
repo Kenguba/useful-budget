@@ -26,10 +26,16 @@ assert.ok(has('history.replaceState({leaderNavSession,y:window.scrollY}'), 'Init
 assert.ok(!has('leaderNavSession,leader:'), 'History must never store selected group');
 assert.ok(!has('if(st.leader)markLeader'), 'Back/forward must never overwrite last-click selection');
 
-// Touch preview must be fast, but cancelled gestures must not commit the selection.
-assert.ok(has("el.addEventListener('pointerdown'"), 'Missing immediate touch preview');
-assert.ok(has("el.addEventListener('pointercancel'"), 'Missing touch cancellation restore');
-assert.ok(has('paintLeader(seenLeader)'), 'Cancellation must repaint committed selection');
+// Selected stripe belongs to a confirmed click, never to touch press or touch cancellation.
+const leaderBegin = html.indexOf("document.querySelectorAll('.leader').forEach(el=>{");
+const leaderEnd = html.indexOf("document.querySelectorAll('[data-gtoggle]')", leaderBegin);
+assert.ok(leaderBegin >= 0 && leaderEnd > leaderBegin, 'Cannot locate leader card handlers');
+const leaderHandlers = html.slice(leaderBegin, leaderEnd);
+assert.ok(leaderHandlers.includes("el.addEventListener('click'"), 'Missing card click handler');
+assert.ok(!['pointerdown', 'pointerup', 'pointercancel'].some(type =>
+  leaderHandlers.includes("addEventListener('" + type + "'")),
+  'Card touches must not preview the selected stripe');
+assert.ok(leaderHandlers.includes('markLeader(gid);'), 'Click must commit the selected group');
 
 // No visual transition should drag old selected-card color into the next frame.
 const cardCss = html.slice(html.indexOf('    .product-card {'), html.indexOf('    .card-top {'));
