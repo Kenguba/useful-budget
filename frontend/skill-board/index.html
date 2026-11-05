@@ -1123,11 +1123,10 @@ function jumpToHash(){
   const el=document.getElementById(id); if(!el) return;
   el.querySelectorAll(".group").forEach(g=>{ if(!openGroups.has(g.id)){openGroups.add(g.id)} });
   applyFilter();
-  el.scrollIntoView({block:"start"});
+  el.scrollIntoView({block:"start",behavior:"instant"});
 }
-window.addEventListener("hashchange",jumpToHash);
 window.addEventListener("scroll",()=>{if(window.scrollY<=0&&location.hash){try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}},{passive:true});
-window.addEventListener("pageshow",()=>setTimeout(jumpToHash,60));
+window.addEventListener("pageshow",e=>{if(e.persisted)return;setTimeout(jumpToHash,60)});
 document.querySelectorAll(".sec-sq-btn").forEach(c=>c.addEventListener("click",()=>jumpToSection(c.getAttribute("data-sec"))));
 
 /* ================= 搜索 ================= */
