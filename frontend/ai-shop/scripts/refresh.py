@@ -349,6 +349,31 @@ def claude_group(rows):
         out.append(o)
     return out
 
+def muse_kind(t):
+    tier = '310亿' if '310亿' in t else '10亿' if '10亿' in t else ''
+    form = '充值' if '充值' in t else '成品号'
+    return (tier + '·' if tier else '') + form
+
+def muse_group(rows):
+    # Muse（Meta 的 AI）成品号：主流形态是带 Token 额度（10亿/310亿）的成品号。
+    # 聚合类目里同名的大头其实是接码（phone-verification）与 API 网关，先按类目剔除，
+    # 再按标题剔除服务类（接码接马、CDK 自助刷量、卡类、中转、教程），只留成品号/账号。
+    out = []
+    for o in rows:
+        t = o['title']; c = o.get('category', '')
+        if 'muse' not in t.lower():
+            continue
+        if c in ('api-gateway', 'phone-verification', 'vcc', 'kyc'):
+            continue
+        if has(t, '接码', '接马', '短信', '验证码', 'CDK', 'cdk', '自助', '刷满', '刷量',
+               'visa', 'Visa', 'VISA', '虚拟卡', '实体卡', 'API', 'api', '中转', '教程',
+               '方法', '邀请码', '下线', '代理价'):
+            continue
+        if not has(t, '成品号', '成品账号', '账号', '帐号'):
+            continue
+        out.append(o)
+    return out
+
 def top30(rows, kind, limit=30):
     merged = {}
     srcs = {}
@@ -443,6 +468,7 @@ def main():
         dict(id='codex-sms', name='Codex 接码 — 单次', items=slim(top30(g6, None, 45))),
         dict(id='grok-heavy', name='Grok Heavy（SuperGrok Heavy/Ultra）', items=slim(top30(g7, lambda t: '代充' if has(t, '代充', '直充') else '成品号', 45))),
         dict(id='claude', name='Claude — 最便宜', items=slim(top30(claude_group(rows + pai), claude_kind, 45))),
+        dict(id='muse', name='Muse — 最便宜', items=slim(top30(muse_group(rows + pai), muse_kind, 45))),
     ]
     from datetime import datetime, timezone, timedelta
     bj_now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M')
