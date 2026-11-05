@@ -141,9 +141,12 @@ button{font-family:inherit;cursor:pointer}
 .board-head .more{margin-left:auto;color:var(--mut);font-size:14px}
 .board-head .more:hover{color:var(--blue)}
 .filters{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
-.frow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.frow{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
 .frow .fl{color:var(--mut);font-size:13.5px;width:64px;flex:none}
-.pill{border:none;background:transparent;font-size:14px;color:#374151;padding:7px 16px;border-radius:999px}
+/* 筛选条一律单行：标签固定，右侧选项单行横滚、不换行、不显示滚动条（全站筛选条规范） */
+.frow>span:not(.fl){display:flex;align-items:center;flex-wrap:nowrap;gap:8px;overflow-x:auto;scrollbar-width:none;min-width:0;padding:2px 0}
+.frow>span:not(.fl)::-webkit-scrollbar{display:none}
+.pill{border:none;background:transparent;font-size:14px;color:#374151;padding:7px 16px;border-radius:999px;flex:none;white-space:nowrap}
 .pill:hover{color:var(--blue)}
 .pill.on{background:var(--blue-soft);color:var(--blue);font-weight:700}
 .poster-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:16px}
@@ -215,11 +218,18 @@ details.about summary{cursor:pointer;color:#374151;font-weight:600}
 .pager button.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
 .pager button:disabled{opacity:.4;cursor:not-allowed}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+/* 搜索页网盘筛选条：白色胶囊条与上方搜索框同语言，标签固定、选项灰色胶囊单行横滚，选中为品牌蓝浅底 */
+#streamFilters .frow{background:#fff;border-radius:999px;box-shadow:var(--shadow);padding:6px 10px 6px 18px}
+#streamFilters .fl{width:auto;font-size:14px}
+#streamFilters .pill{background:#F3F4F6}
+#streamFilters .pill.on{background:var(--blue-soft);color:var(--blue)}
 
 /* 搜索结果 */
-.res-row{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:16px 20px;margin-bottom:12px;cursor:pointer;transition:box-shadow .15s}
+.res-row{display:flex;align-items:center;gap:14px;background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:16px 20px;margin-bottom:12px;cursor:pointer;transition:box-shadow .15s}
 .res-row:hover{box-shadow:0 6px 20px rgba(15,23,42,.1)}
-.res-main{flex:1 1 240px;min-width:0}
+.res-main{flex:1;min-width:0}
+/* 快照结果行右侧的多网盘按钮组：只在组内换行，整行布局（标题区 + 右侧按钮列）不折行 */
+.res-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;flex:none;max-width:52%}
 .res-title{font-size:16px;font-weight:700}
 .res-note{color:var(--mut);font-size:13.5px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .res-meta{color:var(--faint);font-size:12.5px;margin-top:4px}
