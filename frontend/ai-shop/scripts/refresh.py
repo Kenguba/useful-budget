@@ -374,6 +374,30 @@ def muse_group(rows):
         out.append(o)
     return out
 
+def vcc_kind(t):
+    brand = 'Visa' if has(t, 'visa', 'Visa', 'VISA', 'vasa') else '万事达' if has(t, '万事达', 'master', 'Master', 'MASTER') else ''
+    zero = '0刀' if has(t, '0刀', '0美元', '0美金') else ''
+    return '·'.join(x for x in (brand, zero) if x) or '虚拟卡'
+
+def vcc_group(rows):
+    # 虚拟银行卡（ken 2026-11-05）：聚合类目 vcc 为主信号；类目没标的靠标题认
+    # （含「虚拟卡」，或含「0刀卡」且不是让买家自己绑卡的别的商品链接）。
+    # 剔除实体卡、接码、教程、测试/虚假商品与充值卡/礼品卡类。
+    out = []
+    for o in rows:
+        t = o['title']; c = o.get('category', '')
+        by_cat = c == 'vcc'
+        by_title = has(t, '虚拟卡') or (has(t, '0刀卡') and not has(t, '绑卡', '绑定'))
+        if not (by_cat or by_title):
+            continue
+        if has(t, '实体卡', '接码', '接马', '短信', '教程', '方法', '测试商品', '虚假',
+               '充值卡', '礼品卡', '兑换卡'):
+            continue
+        if not has(t, '卡', 'visa', 'Visa', 'VISA', 'vasa', 'master', 'Master', '万事达'):
+            continue
+        out.append(o)
+    return out
+
 def top30(rows, kind, limit=30):
     merged = {}
     srcs = {}
@@ -469,6 +493,7 @@ def main():
         dict(id='grok-heavy', name='Grok Heavy（SuperGrok Heavy/Ultra）', items=slim(top30(g7, lambda t: '代充' if has(t, '代充', '直充') else '成品号', 45))),
         dict(id='claude', name='Claude — 最便宜', items=slim(top30(claude_group(rows + pai), claude_kind, 45))),
         dict(id='muse', name='Muse — 最便宜', items=slim(top30(muse_group(rows + pai), muse_kind, 45))),
+        dict(id='vcc', name='虚拟卡 — 最便宜', items=slim(top30(vcc_group(rows + pai), vcc_kind, 45))),
     ]
     from datetime import datetime, timezone, timedelta
     bj_now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M')
