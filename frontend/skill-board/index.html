@@ -1107,18 +1107,18 @@ document.querySelectorAll(".viz-mode-btn").forEach(btn=>{
 
 /* ================= 跳转（保留 hash，返回可退） ================= */
 let jumpSeq=0, currentSec=null;
-function markSec(secId){
+function markSec(secId,animate){
   currentSec=secId;
   document.querySelectorAll(".sec-sq-btn").forEach(b=>{
     const on=b.getAttribute("data-sec")===secId;
     b.classList.toggle("active",on);
-    if(on){ void b.offsetWidth; b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); }
+    if(on){ void b.offsetWidth; if(animate!==false){ b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); } }
   });
 }
 function jumpToSection(secId,groupId){
   const sec=document.getElementById(secId); if(!sec) return;
   markSec(secId);
-  try{history.pushState(null,"","#"+secId)}catch(e){}
+  try{history.pushState({sec:secId},"","#"+secId)}catch(e){}
   const tk=++jumpSeq;
   setTimeout(()=>{
     if(tk!==jumpSeq) return;
@@ -1135,13 +1135,24 @@ function jumpToHash(){
   applyFilter();
   el.scrollIntoView({block:"start",behavior:"instant"});
 }
-window.addEventListener("scroll",()=>{if(window.scrollY<=0&&location.hash){try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}},{passive:true});
+window.addEventListener("scroll",()=>{if(window.scrollY<=0&&location.hash){try{history.replaceState(history.state,"",location.pathname+location.search)}catch(e){}}},{passive:true});
+function nudgeNavPaint(){
+  const nav=document.getElementById("secNavStrip");
+  if(nav){ nav.style.transform="translateZ(0)"; requestAnimationFrame(()=>requestAnimationFrame(()=>{nav.style.transform=""})); }
+}
 window.addEventListener("pageshow",e=>{
   if(e.persisted){
-    if(currentSec){ markSec(currentSec); const nav=document.getElementById("secNavStrip"); if(nav){ nav.style.transform="translateZ(0)"; requestAnimationFrame(()=>requestAnimationFrame(()=>{nav.style.transform=""})); } }
+    if(currentSec) markSec(currentSec,false);
+    nudgeNavPaint();
     return;
   }
   setTimeout(jumpToHash,60);
+});
+window.addEventListener("popstate",()=>{
+  jumpSeq++;
+  const st=history.state;
+  if(st&&st.sec) markSec(st.sec,false);
+  nudgeNavPaint();
 });
 document.querySelectorAll(".sec-sq-btn").forEach(c=>c.addEventListener("click",()=>jumpToSection(c.getAttribute("data-sec"))));
 
