@@ -1115,8 +1115,8 @@ function jumpToSection(secId,groupId){
     if(groupId){ if(!openGroups.has(groupId)){openGroups.add(groupId)} }
     else{ sec.querySelectorAll(".group").forEach(g=>openGroups.add(g.id)) }
     saveGroups(); applyFilter(); updateDockVisibility();
-    sec.scrollIntoView({behavior:"smooth",block:"start"});
   }));
+  setTimeout(()=>{ if(tk===jumpSeq) sec.scrollIntoView({behavior:"smooth",block:"start"}); },170);
 }
 function jumpToHash(){
   const id=(location.hash||"").slice(1); if(!id) return;
