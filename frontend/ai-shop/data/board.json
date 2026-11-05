@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-05 16:38",
+ "updated_at": "2026-11-05 16:51",
  "source": "AI价网 + cardnav + PriceAI 按商家遍历合并",
  "groups": [
   {
@@ -2312,7 +2312,7 @@
      "price": 17.48,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": 59,
+     "stock": null,
      "title": "Plus独享账号 · 比较稳定但是日期不确定介意勿拍 · 已接马 · 账密+2FA ·购物30分钟内质保",
      "url": "https://aicdks.com/product/104014",
      "kind": "",
@@ -2593,11 +2593,11 @@
      "price": 18.19,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": 14,
+     "stock": 28,
      "title": "【自营】已接马 Plus 质保2小时 独享成品号 家宽现搓 可自动401找回 带RT 仅反代使用",
      "url": "https://aicdks.com/product/107010",
      "kind": "",
-     "same_source": 28,
+     "same_source": 30,
      "sources": [
       {
        "price": 18.19,
@@ -2607,18 +2607,18 @@
        "url": "https://aicdks.com/product/107010"
       },
       {
+       "price": 20.38,
+       "shop": "精选好货AI",
+       "platform": "链动小铺",
+       "stock": 28,
+       "url": "https://wzyp.cn/item/25tihz"
+      },
+      {
        "price": 20.79,
        "shop": "牟利ai",
        "platform": "链动小铺",
        "stock": 7,
        "url": "https://wzyp.cn/item/fbiga5"
-      },
-      {
-       "price": 20.79,
-       "shop": "精选好货AI",
-       "platform": "链动小铺",
-       "stock": 9,
-       "url": "https://wzyp.cn/item/25tihz"
       },
       {
        "price": 20.79,
@@ -2802,7 +2802,7 @@
      "price": 18.49,
      "shop": "翻车咩萝",
      "platform": "链动小铺",
-     "stock": 6,
+     "stock": 4,
      "title": "Plus（upi渠道）CPA格式 已接马！ 没有质保！！！",
      "url": "https://wzyp.cn/item/xhip9j",
      "kind": "",
@@ -2813,7 +2813,7 @@
      "price": 18.5,
      "shop": "AI搬运工",
      "platform": "16688",
-     "stock": 67,
+     "stock": 66,
      "title": "反代专用 G Plus 已接马",
      "url": "https://16688.com.cn/goods/G45280072",
      "kind": "",
@@ -2823,7 +2823,7 @@
        "price": 18.5,
        "shop": "AI搬运工",
        "platform": "16688",
-       "stock": 71,
+       "stock": 66,
        "url": "https://16688.com.cn/goods/G45280072"
       },
       {
@@ -3369,7 +3369,7 @@
      "title": "UPI 仅反代无账密 PLUS已接马 1-2次重置 401可刷新|格式可选 质保1h首次导入 质保过期无售后",
      "url": "https://16688.com.cn/goods/G90193442",
      "kind": "",
-     "same_source": 2,
+     "same_source": 1,
      "pc": "2026-11-05"
     },
     {
@@ -4352,7 +4352,7 @@
      "price": 2.2,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": 1972,
+     "stock": 1884,
      "title": "Gemini3个月Pro激活链接|需要绑卡|可使用反重力",
      "url": "https://aicdks.com/product/109295",
      "kind": "激活链接·需绑卡",
@@ -5138,10 +5138,20 @@
      "same_source": 1
     },
     {
+     "price": 6.0,
+     "shop": "yh-mo源头批发",
+     "platform": "",
+     "stock": 1,
+     "title": "随机地区2020--2026年邮箱(95%过了反重力的)",
+     "url": "https://yh-mo.xyz/item/33",
+     "kind": "成品号",
+     "same_source": 1
+    },
+    {
      "price": 7.7,
      "shop": "AI批发的杂货店",
      "platform": "16688",
-     "stock": 640,
+     "stock": 638,
      "title": "Gemini pro CDK充值6个月 pixle 都支持gemini4 opus5.5（关闭支付资料）假人机多次提交即可",
      "url": "https://www.16688.com.cn/goods/G33874344",
      "kind": "人机号",
@@ -5598,7 +5608,7 @@
      "price": 12.0,
      "shop": "奶龙Gemini订阅(源头招代理)",
      "platform": "16688",
-     "stock": 30,
+     "stock": 24,
      "title": "Gemini Pro 12个月自动订阅卡密|包绑卡|可使用反重力|卡密可囤",
      "url": "https://www.16688.com.cn/goods/G89750228",
      "kind": "成品号",
@@ -5680,7 +5690,7 @@
      "price": 12.36,
      "shop": "琪琪科技",
      "platform": "链动小铺",
-     "stock": 584,
+     "stock": 583,
      "title": "反重力一年【gemini pro人机验证号】 登陆被封号申诉无售后 事多的 不要拍 【懂货的下单】",
      "url": "https://wzyp.cn/item/l3mmv7",
      "kind": "人机号",
@@ -6125,7 +6135,7 @@
      "price": 15.4,
      "shop": "ton",
      "platform": "16688",
-     "stock": 10,
+     "stock": 8,
      "title": "GeminiPro 订阅6个月 (pixel渠道)反重力可用4argon Opus5.5",
      "url": "https://www.16688.com.cn/goods/G16894327",
      "kind": "成品号",
@@ -6273,7 +6283,7 @@
      "price": 17.0,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": null,
+     "stock": 32,
      "title": "Gemini Pro 24个月自动订阅卡密|包绑卡|可使用反重力|卡密可囤",
      "url": "https://aicdks.com/product/111493",
      "kind": "成品号",
@@ -6337,60 +6347,6 @@
       }
      ],
      "pc": "2026-11-05"
-    },
-    {
-     "price": 18.7,
-     "shop": "珠世AI",
-     "platform": "16688",
-     "stock": 10,
-     "title": "GeminiPro 订阅6个月 反重力可用4argon Opus5.5",
-     "url": "https://www.16688.com.cn/goods/G26591302",
-     "kind": "成品号",
-     "same_source": 6,
-     "sources": [
-      {
-       "price": 18.7,
-       "shop": "珠世AI",
-       "platform": "16688",
-       "stock": 12,
-       "url": "https://www.16688.com.cn/goods/G26591302"
-      },
-      {
-       "price": 18.7,
-       "shop": "ai小铺（不在这个平台回复）",
-       "platform": "16688",
-       "stock": 8,
-       "url": "https://www.16688.com.cn/goods/G37008478"
-      },
-      {
-       "price": 20.0,
-       "shop": "天才AI",
-       "platform": "16688",
-       "stock": 12,
-       "url": "https://www.16688.com.cn/goods/G47383694"
-      },
-      {
-       "price": 27.0,
-       "shop": "绘梦小铺",
-       "platform": "16688",
-       "stock": 2,
-       "url": "https://www.16688.com.cn/goods/G73627034"
-      },
-      {
-       "price": 28.9,
-       "shop": "伽马AI小铺（muse源头） 对接：GMai",
-       "platform": "16688",
-       "stock": 6,
-       "url": "https://www.16688.com.cn/goods/G95169836"
-      },
-      {
-       "price": 38.0,
-       "shop": "tibo欢迎您!",
-       "platform": "16688",
-       "stock": 20,
-       "url": "https://www.16688.com.cn/goods/G25904946"
-      }
-     ]
     }
    ]
   },
@@ -6980,7 +6936,7 @@
      "price": 28.0,
      "shop": "异次元店铺",
      "platform": "",
-     "stock": 12,
+     "stock": 10,
      "title": "反重力/反代专用 3个月gemini pro会员  已经设置好一切，开箱即用 带凭证可一键导入",
      "url": "https://shihuiai.cn/item/39",
      "kind": "成品号",
@@ -7000,7 +6956,7 @@
      "price": 29.0,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": 59,
+     "stock": 82,
      "title": "11.3老号[反重力成品] Gemini Pro 带rt凭证 可用4和op5.5｜已过Antigravity验证",
      "url": "https://aicdks.com/product/108786",
      "kind": "成品号",
@@ -7225,7 +7181,7 @@
      "price": 33.0,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": null,
+     "stock": 9,
      "title": "【批发】11.5老号/反重力pro成品 带rt凭证 账密2Fa/json 已过Antigravity【质保首登】",
      "url": "https://aicdks.com/product/111782",
      "kind": "成品号",
@@ -7385,7 +7341,7 @@
      "price": 37.51,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": 24,
+     "stock": 18,
      "title": "Gemini Pro反重力Antigravity成品号 稳定渠道耐用成品",
      "url": "https://aicdks.com/product/107051",
      "kind": "成品号",
@@ -7804,7 +7760,7 @@
      "price": 0.36,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": 499,
+     "stock": 500,
      "title": "CDK 美国实卡源头招代理codex 短效单次接马 支持api 在有效期内可以二次验证",
      "url": "https://aicdks.com/product/106845",
      "kind": "",
@@ -9542,7 +9498,7 @@
      "price": 532.09,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": 6,
+     "stock": 4,
      "title": "Super gr0k ultra月卡成品（质保一周订阅）",
      "url": "https://aicdks.com/product/107172",
      "kind": "成品号",
@@ -9659,7 +9615,7 @@
      "price": 680.0,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": null,
+     "stock": 956,
      "title": "半价·GroK Ultra 200$ 官方订阅卡充 质保30天订阅",
      "url": "https://aicdks.com/product/111839",
      "kind": "成品号",
@@ -10022,7 +9978,7 @@
      "price": 99.0,
      "shop": "AI CDK 商店",
      "platform": "",
-     "stock": 53,
+     "stock": 52,
      "title": "正价claude pro 卡冲 实充 成品号 日抛 1个（人工交付）",
      "url": "https://aicdks.com/product/104826",
      "kind": "代充",
