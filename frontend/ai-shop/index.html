@@ -1968,13 +1968,7 @@ function renderBoard(){
     return '<div class="site-list-group'+(open?' open':'')+'" id="grp-'+esc(g.id)+'"><button class="site-list-trigger" type="button" data-gtoggle aria-expanded="'+open+'"><span class="site-list-brand-icon">'+(GICON[g.id]||'✦')+'</span><span class="site-list-main"><span class="site-list-name">'+esc(g.name)+'</span><span class="site-list-detail" style="display:block">有货最低 '+g.items.length+' 条'+(g.items.length<30?'（不足 30 条，如实显示）':'')+'</span></span>'+(first?'<span class="site-list-minimum"><small>有货最低</small><strong>'+fmtP(first.price)+'</strong></span>':'')+'<span class="site-list-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="site-list-collapsible"><div class="site-list-inner"><div class="site-list-offers">'+rows+'</div></div></div></div>';
   }).join('')||'<p class="sub">'+(q?'没有匹配的报价。报价单只收录每组最低 30 条，找某家店请切到「店铺目录」搜。':'没有匹配的报价。')+'</p>';
   document.querySelectorAll('.leader').forEach(el=>{
-    el.addEventListener('pointerdown',e=>{
-      if(e.button===0)paintLeader(el.dataset.gid);
-    });
-    el.addEventListener('pointercancel',()=>paintLeader(seenLeader));
-    el.addEventListener('pointerup',e=>{
-      if(!el.contains(document.elementFromPoint(e.clientX,e.clientY)))paintLeader(seenLeader);
-    });
+    // 仅在 click 确认后选中；触摸按住或滑过卡片时不显示顶部标记线。
     el.addEventListener('click',()=>{
       const gid=el.dataset.gid;
       const t=document.getElementById('grp-'+gid);
