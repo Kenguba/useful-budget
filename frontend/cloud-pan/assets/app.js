@@ -162,13 +162,18 @@
   function load(name) {
     return fetch(BASE + "data/" + name + ".json").then(function (r) { return r.json(); });
   }
-  /* 优先实时（经中转），失败回退快照；live=true 表示本次走的是实时数据 */
+  /* 优先实时（经中转），失败回退快照；live=true 表示本次走的是实时数据。
+     实时请求加 10 秒上限：中转慢/挂起时不等死，按失败口径回退快照先把页面渲染出来，避免长时间白屏 */
   function liveOr(path, snapName, onLive) {
     if (!relayReady()) return load(snapName).catch(function () { return null; });
-    return apiGet(path).then(function (d) {
+    var api = apiGet(path).then(function (d) {
       if (onLive) onLive();
       return d;
-    }).catch(function () {
+    });
+    var slow = new Promise(function (resolve, reject) {
+      setTimeout(function () { reject(new Error("api timeout")); }, 10000);
+    });
+    return Promise.race([api, slow]).catch(function () {
       return load(snapName).catch(function () { return null; });
     });
   }
@@ -480,10 +485,16 @@
   }
   function posterCard(item) {
     var rankCls = item.rank <= 3 ? "rank top" : "rank";
+    // 信息行拆两段：年份·类型可省略截断，TMDB 评分固定在右侧完整显示（整行 nowrap 时评分会被省略号吞掉）
+    var meta = item.metadata || "";
+    var mi = meta.indexOf(" · TMDB");
+    var sHtml = mi >= 0
+      ? '<span class="sm">' + esc(meta.slice(0, mi)) + '</span><span class="ss">' + esc(meta.slice(mi + 2).trim()) + "</span>"
+      : esc(meta);
     return '<a class="poster" href="' + BASE + "search/?q=" + encodeURIComponent(item.name) + '">' +
       '<div class="ph"><img loading="lazy" src="' + esc(item.poster_url) + '" alt="' + esc(item.name) + '">' +
       '<span class="' + rankCls + '">' + item.rank + "</span></div>" +
-      '<div class="meta"><div class="t">' + esc(item.name) + '</div><div class="s">' + esc(item.metadata || "") + "</div></div></a>";
+      '<div class="meta"><div class="t">' + esc(item.name) + '</div><div class="s">' + sHtml + "</div></div></a>";
   }
   function discItems() { return (state.discovery && state.discovery.items) || []; }
   function typeOf(item) {
