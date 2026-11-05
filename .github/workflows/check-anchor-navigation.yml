@@ -1,0 +1,29 @@
+name: Anchor navigation regression
+
+on:
+  push:
+    paths:
+      - 'frontend/ai-shop/index.html'
+      - 'frontend/skill-board/index.html'
+      - 'frontend/ip-check/index.html'
+      - '.github/scripts/check-anchor-navigation.mjs'
+      - '.github/workflows/check-anchor-navigation.yml'
+  pull_request:
+    paths:
+      - 'frontend/ai-shop/index.html'
+      - 'frontend/skill-board/index.html'
+      - 'frontend/ip-check/index.html'
+      - '.github/scripts/check-anchor-navigation.mjs'
+      - '.github/workflows/check-anchor-navigation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  anchor-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check layout-stable anchors and history safety
+        run: node .github/scripts/check-anchor-navigation.mjs
