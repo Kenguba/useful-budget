@@ -496,6 +496,8 @@
     .brand-tag {
       display: inline-flex;
       align-items: center;
+      height: 36px;
+      line-height: 1;
       font-size: 12px;
       font-weight: 800;
       letter-spacing: 1.2px;
@@ -541,16 +543,6 @@
       stroke-width: 2.1;
       stroke-linecap: round;
       stroke-linejoin: round;
-    }
-
-    .brand-bar {
-      width: 4px;
-      height: 15px;
-      background-color: var(--theme-accent);
-      border-radius: 3px;
-      margin-right: 7px;
-      flex-shrink: 0;
-      transition: background-color 0.45s ease;
     }
 
     .layout-shell.desktop-sidebar-hidden {
@@ -1847,7 +1839,6 @@
           <button class="drawer-trigger-btn" id="drawerTriggerBtn" type="button" aria-label="打开功能菜单">
             <svg class="drawer-trigger-svg" viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="16" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg>
           </button>
-          <span class="brand-bar"></span>
           <span>2FA.FUN · TOOLS</span>
         </div>
 
