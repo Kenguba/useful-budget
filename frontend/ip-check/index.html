@@ -1931,6 +1931,13 @@
 .ippure-footer{padding:16px 16px 20px}
 .proto-ip-link{white-space:nowrap}
 .rtc-cands{font-size:12.5px;color:var(--text-secondary);line-height:1.6;word-break:break-all}
+.rtc-skl{display:flex;flex-direction:column;gap:8px;padding:2px 0}
+.rtc-skl .geo-skl{height:12px}
+.rtc-skl .geo-skl:nth-child(1){width:34%}
+.rtc-skl .geo-skl:nth-child(2){width:52%}
+.rtc-skl .geo-skl:nth-child(3){width:78%}
+.rtc-skl .geo-skl:nth-child(4){width:92%}
+.rtc-skl .geo-skl:nth-child(5){width:48%}
 
 /* 搜索卡光晕加强（按 ken 图2 观感：更宽更浓的弥散光） */
 .gemini-search-card{box-shadow:0 10px 28px -6px var(--search-glow),0 24px 60px -12px var(--search-glow),0 2px 8px rgba(15,23,42,0.04)}
@@ -3317,6 +3324,7 @@ function paintLlm(d){
 $("companyHead").addEventListener("click",()=>{const b=$("companyBody"),open=b.style.display!=="none";b.style.display=open?"none":"block";$("companyHead").classList.toggle("open",!open)});
 function runWebrtc(){
   const box=$("rtcResult");const btn=$("btnRunAllLeak");btn.textContent=TD("rtcTesting");const found=new Map();let done=false;
+  box.innerHTML="<span class='rtc-skl'><span class='geo-skl'></span><span class='geo-skl'></span><span class='geo-skl'></span><span class='geo-skl'></span><span class='geo-skl'></span></span>";
   const render=()=>{if(done)return;done=true;btn.textContent=T("retest");
     box.innerHTML=found.size?("<span class='rtc-cands'>"+TD("rtcFound")+"<br>"+[...found.values()].map(escapeHtml).join("<br>")+"<br>"+TD("rtcConclusion")+"</span>"):TD("rtcNone");};
   try{
