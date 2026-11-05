@@ -240,13 +240,26 @@ def codex_group(rows):
     out = []
     for o in rows:
         t = o['title']
+        spec = o.get('spec') or ''
+        full = t + ' ' + spec
+        # 权重第一（ken 2026-11-06）：标题/规格带成品号/普号的是账号商品，永远不进接码组，
+        # 哪怕同时带 Codex 字样；标题明说不适用 Codex 的（如「除Codex」）同样不进
+        if has(full, '成品号', '成品账号', '普号'):
+            continue
+        if has(full, '除Codex', '除codex', '非Codex', '不支持codex', '不支持Codex'):
+            continue
         if o['category'] and o['category'] not in ('phone-verification',):
             continue
         if not has(t, 'odex', 'penAI', 'penai', 'GPT', 'gpt'):
             continue
+        # 权重第二：必须有接码类信号才算接码服务；卖家常用分隔符与谐音字规避
+        # （接-码、接🐎），先把标题压平再查。「已接马/已接码」是账号状态不是服务，
+        # 查信号前先摘掉，只剩它一个信号的账号商品进不来
+        flat = re.sub(r'[\s\-—|/·•]+', '', full).replace('已接马', '').replace('已接码', '')
+        if not has(flat, '接码', '接马', '接🐎', '短信', '验证码', '收码', '号码', '手机验证'):
+            continue
         if has(t, '邮箱', 'PayPal', 'paypal', '平台', '谷歌账号', 'Gmail', 'gmail'):
             continue
-        spec = o.get('spec') or ''
         if spec and has(spec, '10次', '十次', '多次', '长效'):
             continue  # 多次/长效规格不是单次接码（ken 2026-11-02 多规格处理）
         out.append(o)
@@ -691,7 +704,7 @@ def main():
     g1, g2, g3 = gpt_groups(rows + [o for o in pai if o['url']])
     # PriceAI 的 GPT 行 category 为空，已在 gpt_groups 内按标题判断；其余分组同理合并
     g4, g5 = ag_groups(rows + pai)
-    g6 = codex_group(rows) + [o for o in pai if has(o['title'], 'odex', 'penAI') and not has(o['title'], '邮箱', 'PayPal', '平台')]
+    g6 = codex_group(rows + pai)  # PriceAI 补充行也走同一套权重规则，不开后门
     g7 = grok_group(rows) + [o for o in pai if grok_marker(o['title']) and has(o['title'], 'Heavy', 'HEAVY', 'Ultra', 'ULTRA') and not has(o['title'], '号池', '额度', '速刷')]
 
     groups = [
@@ -700,9 +713,9 @@ def main():
         dict(id='gpt-weekly', name='GPT 周限号', items=slim(top30(g3, lambda t: '已接马' if is_bound(t) else ('未接马' if has(t, '未接马', '未绑定') else '未注明'), 45))),
         dict(id='ag-cheapest', name='Antigravity 反重力 — 最便宜', items=slim(top30(g4, ag_type, 45))),
         dict(id='ag-verified', name='Antigravity 反重力 — 已过验证成品号', items=slim(top30(g5, ag_type, 45))),
-        dict(id='codex-sms', name='Codex 接码 — 单次', items=slim(top30(g6, None, 45))),
         dict(id='grok-heavy', name='Grok Heavy（SuperGrok Heavy/Ultra）', items=slim(top30(g7, lambda t: '代充' if has(t, '代充', '直充') else '成品号', 45))),
         dict(id='claude', name='Claude — 最便宜', items=slim(top30(claude_group(rows + pai), claude_kind, 45))),
+        dict(id='codex-sms', name='Codex 接码 — 单次', items=slim(top30(g6, None, 45))),
         dict(id='muse', name='Muse — 最便宜', items=slim(top30(muse_group(rows + pai), muse_kind, 45))),
         dict(id='vcc', name='虚拟卡 — 最便宜', items=slim(top30(vcc_group(rows + pai), vcc_kind, 45))),
     ]
