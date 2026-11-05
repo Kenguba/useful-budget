@@ -1105,20 +1105,31 @@ document.querySelectorAll(".viz-mode-btn").forEach(btn=>{
   });
 });
 
-/* ================= 跳转（保留 hash，返回可退） ================= */
+/* ================= 分区导航：历史快照与即时恢复 ================= */
 let jumpSeq=0, currentSec=null;
+const secNavSession=Math.random().toString(36).slice(2);
+try{
+  history.scrollRestoration="manual";
+  history.replaceState({secNavSession,sec:null,y:window.scrollY},"",location.href);
+}catch(e){}
+function saveSecPosition(){
+  const st=history.state, y=window.scrollY;
+  if(!st||st.secNavSession!==secNavSession||st.y===y)return;
+  try{history.replaceState({...st,y},"",location.href)}catch(e){}
+}
 function markSec(secId,animate){
   currentSec=secId;
   document.querySelectorAll(".sec-sq-btn").forEach(b=>{
     const on=b.getAttribute("data-sec")===secId;
     b.classList.toggle("active",on);
-    if(on){ void b.offsetWidth; if(animate!==false){ b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); } }
+    b.classList.toggle("pop",on&&animate!==false);
   });
 }
 function jumpToSection(secId,groupId){
   const sec=document.getElementById(secId); if(!sec) return;
+  saveSecPosition();
+  try{history.pushState({secNavSession,sec:secId,y:window.scrollY},"","#"+secId)}catch(e){}
   markSec(secId);
-  try{history.pushState({sec:secId},"","#"+secId)}catch(e){}
   const tk=++jumpSeq;
   setTimeout(()=>{
     if(tk!==jumpSeq) return;
@@ -1135,24 +1146,19 @@ function jumpToHash(){
   applyFilter();
   el.scrollIntoView({block:"start",behavior:"instant"});
 }
-window.addEventListener("scroll",()=>{if(window.scrollY<=0&&location.hash){try{history.replaceState(history.state,"",location.pathname+location.search)}catch(e){}}},{passive:true});
-function nudgeNavPaint(){
-  const nav=document.getElementById("secNavStrip");
-  if(nav){ nav.style.transform="translateZ(0)"; requestAnimationFrame(()=>requestAnimationFrame(()=>{nav.style.transform=""})); }
-}
-window.addEventListener("pageshow",e=>{
-  if(e.persisted){
-    if(currentSec) markSec(currentSec,false);
-    nudgeNavPaint();
-    return;
+window.addEventListener("scroll",()=>{
+  saveSecPosition();
+  if(window.scrollY<=0&&location.hash){
+    try{history.replaceState(history.state,"",location.pathname+location.search)}catch(e){}
   }
-  setTimeout(jumpToHash,60);
-});
-window.addEventListener("popstate",()=>{
+},{passive:true});
+window.addEventListener("pageshow",e=>{if(!e.persisted)setTimeout(jumpToHash,60)});
+window.addEventListener("popstate",e=>{
   jumpSeq++;
-  const st=history.state;
-  if(st&&st.sec) markSec(st.sec,false);
-  nudgeNavPaint();
+  const st=e.state;
+  if(!st||st.secNavSession!==secNavSession)return;
+  if(st.sec)markSec(st.sec,false);
+  window.scrollTo({top:st.y||0,behavior:"instant"});
 });
 document.querySelectorAll(".sec-sq-btn").forEach(c=>c.addEventListener("click",()=>jumpToSection(c.getAttribute("data-sec"))));
 
