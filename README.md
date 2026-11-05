@@ -83,3 +83,4 @@ frontend/<project>/           # 例：frontend/skill-board/
   - 通用规则：打开页面时先读 `A`、再读本站 localStorage，`A` 优先；改主题 / 日夜 / 语言时双写 `A` 与本站 localStorage；写 `A` 时须保留自己不管理的段位（如 ai-shop 无语言切换，写 `A` 时原样保留语言位）；`A` 不存在但本站有 localStorage 时，首次打开把本站现值写入 `A` 作为种子；`A` 与本站记录都不存在时用本站默认值
   - ai-shop 是单槽（2026-11-04 晚改定，全站一套主题）：localStorage `aishop.theme.v1` 存 `{t, d}`，t 为全站唯一主题位（0–11 对应 1–12 套）、d 为日夜；报价单与店铺目录两个页签共用同一套主题，切页签不换色、也不写 `A`；读 `A` 时主题号直接就是全站主题；只有在主题面板里真正点选 / 滑选了颜色、或单击主题钮切换日夜时才写 `A`；旧版双槽存量 `{q, s, d}` 首次打开时按 q（原报价单槽）迁移为 t，`A` 存在时以 `A` 为准
   - ip-check 与 2fa-auth 是单槽：主题只有一个槽，读 `A` 后主题号 1–12 直接作为本站主题，语言、日夜也全部跟 `A` 走；ip-check 的 localStorage 键为 `ip-theme-idx` / `ip-dark` / `ip-lang`，与 `A` 双写
+  - cloud-phone 是单槽（2026-11-06 接入）：localStorage 键为 `phone-theme-idx` / `phone-dark` / `phone-lang`，与 `A` 双写；读 `A` 后主题号 1–12 直接作为本站主题，语言、日夜也全部跟 `A` 走；切页签不写 `A`，只有在主题面板真正点选 / 滑选、点刷新主题、单击主题钮切换日夜或切换语言时才写 `A`；接入前本站无 localStorage 存量、无种子可迁，`A` 与本站记录都不存在时用本站默认值（第 12 套、中文、浅色）
