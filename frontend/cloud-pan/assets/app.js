@@ -212,6 +212,7 @@
       '<nav class="nav" id="topNav">' + navHtml +
       '<div class="caterpillar-bar" id="caterpillarBar"></div>' +
       '<button class="btn-app' + (active === "app" ? " on" : "") + '" onclick="location.href=\'' + BASE + "app/'\">APP</button>" +
+      '<button class="btn-install" id="btnInstall" type="button">安装</button>' +
       '<button class="btn-ask" id="btnAsk">求片</button>' +
       "</nav></div></header>";
     document.body.insertAdjacentHTML("afterbegin", header);
@@ -329,6 +330,27 @@
       document.getElementById("askForm").style.display = "none";
       document.getElementById("askDone").style.display = "block";
     };
+
+    // PWA 安装钮：浏览器已给出安装提示、或 iOS 未安装时才显示；已安装（standalone）不显示
+    var btnInstall = document.getElementById("btnInstall");
+    if (btnInstall) {
+      var standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+      var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent || "");
+      if (!standalone && (window.__panInstallPrompt || isIos)) btnInstall.classList.add("show");
+      btnInstall.onclick = function () {
+        var p = window.__panInstallPrompt;
+        if (p) {
+          window.__panInstallPrompt = null;
+          p.prompt();
+          p.userChoice.then(function (c) {
+            if (c && c.outcome === "accepted") btnInstall.classList.remove("show");
+            else window.__panInstallPrompt = p;
+          }).catch(function () {});
+        } else {
+          toast("在浏览器分享菜单里点「添加到主屏幕」，即可像 APP 一样打开");
+        }
+      };
+    }
   }
   function extractPopupLink(pres) {
     try {
@@ -959,7 +981,7 @@
       : '<button class="btn-outline" disabled style="opacity:.5">安装包暂不可用</button>';
     main.innerHTML =
       '<div class="page-head"><h1>APP 下载</h1><div class="desc">安卓客户端 · 苹果桌面版</div></div>' +
-      '<div class="cols" style="grid-template-columns:1fr 1fr;margin-top:18px">' +
+      '<div class="cols cols-app" style="margin-top:18px">' +
       '<div class="card"><h2 style="font-size:19px;margin:0 0 4px">安卓客户端</h2>' +
       '<div style="color:var(--mut);font-size:13.5px">网盘直达 · 本地历史</div>' +
       '<div style="color:var(--faint);font-size:13px;margin:12px 0 18px">' + esc(params.join(" · ")) + "</div>" +
@@ -1018,6 +1040,27 @@
         '<div class="form-card" role="status" style="color:#374151;font-size:15px">申请已提交，等待管理员审核。通过后会在本站友情链接区展示。</div>';
     };
   }
+
+  /* ---------------- PWA：Service Worker 注册 + 安装提示捕获 ---------------- */
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register(BASE + "sw.js", { updateViaCache: "none" })
+        .then(function (r) { r.update(); })
+        .catch(function () {});
+    });
+  }
+  window.__panInstallPrompt = null;
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault();
+    window.__panInstallPrompt = e;
+    var b = document.getElementById("btnInstall");
+    if (b) b.classList.add("show");
+  });
+  window.addEventListener("appinstalled", function () {
+    window.__panInstallPrompt = null;
+    var b = document.getElementById("btnInstall");
+    if (b) b.classList.remove("show");
+  });
 
   /* ---------------- 启动 ---------------- */
   // 外壳只依赖站点配置：先到先渲染；各页只等自己需要的数据，不再全站等齐 6 个接口。
