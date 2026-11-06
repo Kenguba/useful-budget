@@ -1678,7 +1678,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC"
 .shop .nm.nm{flex:0 1 auto;max-width:100%;overflow-x:auto;scrollbar-width:none}
 .shop .nm.nm::-webkit-scrollbar{display:none}
 .shop .pf.pf{max-width:100%}
-.offer-col-mid .offer-badges-line{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.offer-col-mid .offer-badges-line{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;touch-action:pan-y;touch-action:pan-right pan-y}
 .offer-col-mid .offer-badges-line::-webkit-scrollbar{display:none}
 .offer-col-mid .offer-badges-line>*{flex:none}
 /* 目录行：左右宽度 flex 自适应，店名不换行，右侧太长横向滚动（不显示滚动条） */
@@ -2351,7 +2351,7 @@ $('#plusBtn').onclick=()=>{
     row.style.transition=SNAP;
     position(row,open?WIDTH:0);
     row.parentElement.dataset.open=open?'1':'';
-    if(open) openRow=row;
+    if(open){openRow=row;const tags=row.querySelector('.offer-badges-line');if(tags)tags.scrollLeft=0;}
     else if(openRow===row) openRow=null;
   }
   function closeOther(keep){
@@ -2443,7 +2443,7 @@ $('#plusBtn').onclick=()=>{
     if(!row)return;
     if((row===suppressedRow&&performance.now()<suppressUntil)||row.parentElement.dataset.open==='1'){
       e.preventDefault();e.stopImmediatePropagation();
-      if(row.parentElement.dataset.open==='1'&&row!==suppressedRow)snap(row,false);
+      if(row.parentElement.dataset.open==='1'&&(row!==suppressedRow||performance.now()>=suppressUntil))snap(row,false);
       suppressedRow=null;
     }
   },true);
