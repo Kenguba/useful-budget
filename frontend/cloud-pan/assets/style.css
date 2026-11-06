@@ -35,7 +35,7 @@
   --soft-aura-glow:0 8px 24px -4px var(--search-glow),0 2px 8px rgba(0,0,0,.35);
   --line:rgba(148,163,184,.16); --blue-soft2:#1E3A5F; --orange-soft:#3A2410;
 }
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);overflow-x:hidden;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",sans-serif;
@@ -139,6 +139,9 @@ button{font-family:inherit;cursor:pointer}
 .topbar .nav[data-active="-1"] .nav-glider{opacity:0}
 .topbar .nav a{position:relative;z-index:1;padding:8px 14px;font-size:14px;font-weight:600;text-align:center;background:transparent;transition:color .3s ease}
 .topbar .nav a.on{background:transparent;color:var(--text-primary);font-weight:700;box-shadow:none}
+/* 按压反馈跟随胶囊形状（ken 点击高亮规范）：不用浏览器默认的矩形蓝高亮，点下时在胶囊内铺一层淡色 */
+.topbar .nav a:not(.on):active{background:rgba(15,23,42,.07)}
+[data-dark="true"] .topbar .nav a:not(.on):active{background:rgba(255,255,255,.14)}
 .topbar .nav .caterpillar-bar,.topbar .nav .btn-ask{display:none}
 @media (min-width:640px){.topbar .nav a{padding:8px 24px}}
 /* 每日更新视图切换图标钮：与同行搜索钮同高（ken 2026-11-07 定，顶替原刷新钮位置） */
