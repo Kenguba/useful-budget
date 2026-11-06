@@ -2080,9 +2080,10 @@
 
       if (!el) { finish(); return; }
 
-      // 收缩目标：搜索框右侧圆形钮的中心；位移在触发瞬间按真实矩形量好，
+      // 神奇效果目标（ken 定，像 macOS 窗口吸进程序坞）：底部中间圆点条里
+      // 当前卡对应的那个活动圆点；位移在触发瞬间按真实矩形量好，
       // 之后每帧由层叠变换管线合成（与切卡同一套机制，不走 WAAPI）
-      const target = document.querySelector('.gemini-search-card .action-circle-btn') || document.querySelector('.gemini-search-card');
+      const target = document.querySelector('#stackDotsBar .stack-dot.active') || document.querySelector('.gemini-search-card .action-circle-btn') || document.querySelector('.gemini-search-card');
       const r = el.getBoundingClientRect();
       const tr = target.getBoundingClientRect();
       flyShrinkDX = (tr.left + tr.width / 2) - (r.left + r.width / 2);
@@ -2246,16 +2247,17 @@
         let shrinkTf = '';
         let shrinkRadius = '';
         if (stackPos === flyIdx && flyOffsetY !== 0) {
+          // 上推跟手全程不透明（ken 定）：透明只发生在松手后的神奇收缩里
           flyTy = flyOffsetY;
-          finalOpacity = opacity * Math.max(0, 1 + flyOffsetY / 420);
         }
         if (stackPos === flyIdx && flyShrinkK > 0) {
           const sx = flyShrinkDX * flyShrinkK;
           const sy = flyShrinkDY * flyShrinkK;
-          const ss = 1 - 0.97 * flyShrinkK;
-          shrinkTf = ` translate(${sx.toFixed(1)}px, ${sy.toFixed(1)}px) scale(${ss.toFixed(3)})`;
+          const ssx = 1 - 0.96 * flyShrinkK;
+          const ssy = 1 - 0.985 * flyShrinkK;
+          shrinkTf = ` translate(${sx.toFixed(1)}px, ${sy.toFixed(1)}px) scale(${ssx.toFixed(3)}, ${ssy.toFixed(3)})`;
           shrinkRadius = (flyShrinkK * 50).toFixed(1) + '%';
-          finalOpacity = finalOpacity * Math.max(0, 1 - Math.max(0, (flyShrinkK - 0.55) / 0.45));
+          finalOpacity = finalOpacity * Math.max(0, 1 - Math.max(0, (flyShrinkK - 0.72) / 0.28));
         }
         const cardTf = `translate3d(${tx.toFixed(1)}px, 0, 0) scale(${scale.toFixed(3)}) translateY(${flyTy.toFixed(1)}px)${shrinkTf}`;
         const cardOp = finalOpacity.toFixed(3);
