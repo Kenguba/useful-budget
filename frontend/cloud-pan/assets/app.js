@@ -680,7 +680,6 @@
       '<section class="hero"><div class="aura-backdrop" aria-hidden="true"><div class="aura-orb orb-left"></div><div class="aura-orb orb-center"></div><div class="aura-orb orb-right"></div></div>' +
       '<div class="hero-badge">⚡ 夸克网盘搜索 · 迅雷会员特权直达 · 磁力聚合</div>' +
       '<h1>好内容，<span class="b">一搜就有</span></h1>' +
-      '<p class="sub">' + esc(pres.hero_subtitle || "夸克网盘搜索") + "</p>" +
       searchbarHtml("") +
       hotBar + "</section>";
     if (content.announcement_enabled && content.announcement) {
@@ -717,6 +716,10 @@
     main.innerHTML = html;
     bindSearchbar();
     layoutHotKeywords();
+    // 导航签移到 Hero 卡底部（ken 2026-11-06：顶栏只留品牌行，签放下去）；毛毛虫指示条靠既有 resize 监听自动重定位
+    var navEl = document.getElementById("topNav");
+    var heroEl = main.querySelector(".hero");
+    if (navEl && heroEl) { heroEl.appendChild(navEl); window.dispatchEvent(new Event("resize")); }
     var curCat = "rec", curKind = "all";
     function drawBoard() {
       var items = boardFilter(curCat, curKind);
