@@ -1938,43 +1938,47 @@
 .rtc-skl .geo-skl:nth-child(3){width:78%}
 .rtc-skl .geo-skl:nth-child(4){width:92%}
 .rtc-skl .geo-skl:nth-child(5){width:48%}
-    /* ================= 截图报告弹窗（按 ken 给的报告排版） ================= */
-    #reportModalBackdrop .modal-card { max-width: 432px; max-height: 92vh; overflow-y: auto; padding: 14px; }
-    .rpt-root { background: var(--page-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px 14px; color: var(--text-primary); }
-    .rpt-sheet-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
-    .rpt-title { font-size: 19px; font-weight: 800; letter-spacing: .01em; }
-    .rpt-sub { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; margin-top: 3px; }
-    .rpt-head-btns { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-    .rpt-confirm { border: none; background: var(--theme-accent); color: #fff; font-size: 13px; font-weight: 700; height: 32px; padding: 0 14px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
-    .rpt-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 13px 14px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(15, 23, 42, .04); }
-    .rpt-card-title { font-size: 13px; font-weight: 800; margin-bottom: 8px; }
-    .rpt-card-title .rpt-muted { color: var(--text-light); font-weight: 600; font-size: 11px; letter-spacing: .04em; }
-    .rpt-ip-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 11px 14px 12px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(15, 23, 42, .04); }
+/* ================= 截图报告弹窗（ken 模板 3×3 九宫格，1000px 画板等比缩放） ================= */
+    #reportModalBackdrop .modal-card { max-width: 432px; max-height: 92vh; overflow-y: auto; padding: 10px; }
+    .rpt-scale-wrap { position: relative; overflow: hidden; width: 100%; }
+    .rpt-scale-wrap.capturing { position: fixed; left: -99999px; top: 0; height: auto !important; overflow: visible; }
+    .rpt-scale-wrap.capturing .rpt-board { transform: none !important; }
+    .rpt-board { width: 1000px; transform-origin: top left; background: var(--page-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 24px 26px 20px; box-sizing: border-box; color: var(--text-primary); }
+    .rpt-board-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+    .rpt-title { font-size: 27px; font-weight: 700; letter-spacing: -.01em; line-height: 1.3; }
+    .rpt-sub { font-size: 13.5px; color: var(--text-secondary); font-weight: 500; margin-top: 6px; }
+    .rpt-head-btns { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .rpt-confirm { border: none; background: var(--theme-accent); color: #fff; font-size: 15px; font-weight: 700; height: 42px; padding: 0 22px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+    .rpt-close { border: none; background: var(--card-sub-bg); color: var(--text-secondary); width: 38px; height: 38px; border-radius: 50%; font-size: 17px; cursor: pointer; }
+    .rpt-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 20px; }
+    .rpt-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 20px 22px; box-shadow: 0 1px 2px rgba(15, 23, 42, .04); overflow: hidden; }
+    .rpt-card-title { font-size: 14.5px; font-weight: 800; margin-bottom: 10px; }
     .rpt-ip-top { display: flex; justify-content: space-between; align-items: center; }
-    .rpt-ip-label { font-size: 12px; font-weight: 700; color: var(--text-secondary); }
-    .rpt-eye { border: none; background: none; padding: 2px; cursor: pointer; display: inline-flex; }
-    .rpt-ip-main { display: flex; align-items: center; gap: 9px; margin-top: 5px; }
+    .rpt-ip-label { font-size: 13.5px; font-weight: 700; color: var(--text-secondary); }
+    .rpt-eye { border: none; background: none; padding: 9px; margin: -9px -9px -9px 0; cursor: pointer; display: inline-flex; }
+    .rpt-ip-main { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
     .rpt-ip-main .flag-badge { display: inline-flex; }
-    .rpt-ip-main .flag-badge img { width: 27px; border-radius: 3px; display: block; }
-    .rpt-ip-val { font-size: 19px; font-weight: 800; letter-spacing: .01em; cursor: pointer; word-break: break-all; }
-    .rpt-ip-val.masked { letter-spacing: .06em; color: var(--text-secondary); }
-    .rpt-ip-loc { font-size: 12px; color: var(--text-secondary); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .rpt-trust { text-align: center; }
-    .rpt-trust .rpt-card-title { text-align: left; }
-    .rpt-trust-num { font-size: 42px; font-weight: 800; line-height: 1.1; }
-    .rpt-trust-desc { font-size: 15px; font-weight: 800; color: #16A34A; margin-top: 1px; }
-    .rpt-trust-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-    .rpt-spectrum { position: relative; margin: 14px 2px 0; }
+    .rpt-ip-main .flag-badge img { width: 30px; border-radius: 3px; display: block; }
+    .rpt-ip-val { font-size: 21px; font-weight: 800; letter-spacing: .01em; cursor: pointer; word-break: break-all; line-height: 1.25; }
+    .rpt-ip-val.masked { letter-spacing: .05em; color: var(--text-secondary); }
+    .rpt-ip-none { font-size: 17px; font-weight: 700; color: var(--text-light); }
+    .rpt-ip-loc { font-size: 12.5px; color: var(--text-secondary); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rpt-trust-center { text-align: center; padding: 4px 0 2px; }
+    .rpt-trust-top { display: flex; align-items: center; justify-content: center; gap: 12px; }
+    .rpt-trust-num { font-size: 47px; font-weight: 800; line-height: 1.05; }
+    .rpt-trust-desc { font-size: 13.5px; color: var(--text-secondary); margin-top: 5px; }
+    .rpt-spectrum { position: relative; margin: 16px 2px 0; text-align: left; }
     .rpt-spectrum-track { height: 10px; border-radius: 999px; background: linear-gradient(90deg, #EF4444, #F59E0B 38%, #A3E635 68%, #22C55E); }
     .rpt-spectrum-ptr { position: absolute; top: 50%; width: 15px; height: 15px; border-radius: 50%; background: #111827; border: 2.5px solid #fff; box-shadow: 0 1px 4px rgba(15, 23, 42, .35); transform: translate(-50%, -50%); }
-    .rpt-spectrum-labels { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--text-light); margin-top: 6px; font-variant-numeric: tabular-nums; }
-    .rpt-kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--divider, rgba(120, 140, 160, .14)); font-size: 13px; }
-    .rpt-kv-row:first-of-type { padding-top: 2px; }
+    .rpt-spectrum-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-light); margin-top: 7px; font-variant-numeric: tabular-nums; }
+    .rpt-divider { border-top: 1px solid var(--divider, rgba(120, 140, 160, .14)); margin: 14px 0 2px; }
+    .rpt-kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10.5px 0; border-bottom: 1px solid var(--divider, rgba(120, 140, 160, .14)); font-size: 13.5px; }
+    .rpt-kv-row:first-of-type { padding-top: 3px; }
     .rpt-kv-row:last-child { border-bottom: none; padding-bottom: 2px; }
     .rpt-kv-label { color: var(--text-secondary); flex-shrink: 0; }
-    .rpt-kv-val { font-weight: 600; text-align: right; word-break: break-all; display: inline-flex; align-items: center; gap: 6px; justify-content: flex-end; }
-    .rpt-kv-val .flag-badge img { width: 21px; border-radius: 3px; display: block; }
-    .rpt-badge { font-size: 11.5px; font-weight: 700; padding: 2.5px 9px; border-radius: 999px; white-space: nowrap; }
+    .rpt-kv-val { font-weight: 600; text-align: right; word-break: break-all; display: inline-flex; align-items: center; gap: 7px; justify-content: flex-end; }
+    .rpt-kv-val .flag-badge img { width: 23px; border-radius: 3px; display: block; }
+    .rpt-badge { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
     .rpt-badge.ok { background: #DCFCE7; color: #16A34A; }
     .rpt-badge.bad { background: #FEE2E2; color: #DC2626; }
     .rpt-badge.warn { background: #FEF3C7; color: #D97706; }
@@ -1982,16 +1986,16 @@
     [data-dark="true"] .rpt-badge.ok { background: rgba(34, 197, 94, .18); }
     [data-dark="true"] .rpt-badge.bad { background: rgba(239, 68, 68, .18); }
     [data-dark="true"] .rpt-badge.warn { background: rgba(245, 158, 11, .18); }
-    .rpt-vendor { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--divider, rgba(120, 140, 160, .14)); }
+    .rpt-vendor { display: flex; align-items: center; gap: 11px; padding: 8px 0; border-bottom: 1px solid var(--divider, rgba(120, 140, 160, .14)); }
     .rpt-vendor:last-of-type { border-bottom: none; }
-    .rpt-vendor .vendor-ic { width: 30px; height: 30px; flex-shrink: 0; }
-    .rpt-vendor-name { font-size: 13.5px; font-weight: 700; line-height: 1.25; }
+    .rpt-vendor .vendor-ic { width: 32px; height: 32px; flex-shrink: 0; }
+    .rpt-vendor-name { font-size: 14px; font-weight: 700; line-height: 1.25; }
     .rpt-vendor-by { display: block; font-size: 11px; font-weight: 500; color: var(--text-light); }
-    .rpt-vendor-right { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; }
-    .rpt-lat { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; min-width: 44px; text-align: right; }
-    .rpt-skl-line { height: 13px; width: 110px; display: inline-block; }
-    .rpt-skl-block { height: 15px; margin: 6px auto; }
-    .rpt-foot { text-align: center; font-size: 10.5px; color: var(--text-light); margin-top: 2px; }
+    .rpt-vendor-right { margin-left: auto; display: inline-flex; align-items: center; gap: 9px; }
+    .rpt-lat { font-size: 12.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; min-width: 46px; text-align: right; }
+    .rpt-skl-line { height: 14px; width: 110px; display: inline-block; }
+    .rpt-skl-block { height: 16px; margin: 8px auto; }
+    .rpt-foot { text-align: center; font-size: 11px; color: var(--text-light); margin-top: 16px; }
 
 
 /* 搜索卡光晕加强（按 ken 图2 观感：更宽更浓的弥散光） */
@@ -2359,7 +2363,7 @@
 
   <div class="modal-backdrop" id="reportModalBackdrop">
     <div class="modal-card">
-      <div class="rpt-root" id="reportRoot"></div>
+      <div class="rpt-scale-wrap" id="reportScaleWrap"><div class="rpt-board" id="reportRoot"></div></div>
     </div>
   </div>
   <div class="err-bar" id="errBar"><span class="err-bar-msg" id="errBarMsg"></span><button type="button" class="err-bar-close" id="errBarClose" data-i18n="close">关闭</button></div>
@@ -3052,6 +3056,7 @@ function render(d,final){
   $("scenarioGrid").innerHTML=d.scenes.map((sc,i)=>"<div class='scenario-cell'><div class='scenario-cell-name'>"+DYN.sceneNames[currentLang][i]+"</div><div class='scenario-stars-row'>"+starsHtml(sc[1])+"</div><div class='scenario-verdict verdict-"+suitCls(sc[1])+"'><span class='verdict-emoji'>"+suitIcon(sc[1])+"</span><span>"+suitText(sc[1])+"</span></div></div>").join("");
   if(d.histAsn)renderExtra(d);
   markPreset(d.ip);
+  if(final)updateReportDynamic(d);
   $("mainIpCard").classList.remove("loading");hideErr();
 }
 function attrName(d){return currentLang==="zh"?d.attr:(d.cls&&d.cls.type==="residential"?TD("residential"):d.cls&&d.cls.type==="hosting"?TD("hosting"):TD("business"))}
@@ -3294,7 +3299,7 @@ function fitProtoFont(){
     while(el.scrollWidth>avail&&fs>10){fs-=0.5;el.style.fontSize=fs+"px"}
   });
 }
-window.addEventListener("resize",()=>{fitProtoFont();fitGeoFont()});
+window.addEventListener("resize",()=>{fitProtoFont();fitGeoFont();fitReportScale()});
 function setMyIp(ip,primary){
   if(!ip)return;
   if(ip.includes(":")){myIpState.v6=ip;if(primary)myIpState.primary6=true}
@@ -3389,70 +3394,107 @@ const rptKv=(label,val)=>"<div class='rpt-kv-row'><span class='rpt-kv-label'>"+l
 const rptBdg=(txt,cls)=>"<span class='rpt-badge "+cls+"'>"+txt+"</span>";
 const rptSkl=w=>"<span class='geo-skl rpt-skl-line' style='width:"+w+"px'></span>";
 function rptIpCard(key,label,ip,cc,loc){
-  const vis=rptVis[key];
-  return "<div class='rpt-ip-card'><div class='rpt-ip-top'><span class='rpt-ip-label'>"+label+"</span><button type='button' class='rpt-eye rpt-nocap' data-eye='"+key+"'>"+(vis?RPT_EYE_ON:RPT_EYE_OFF)+"</button></div><div class='rpt-ip-main'>"+(cc?"<span class='flag-badge'>"+flagImg(cc)+"</span>":"")+"<span class='rpt-ip-val"+(vis?"":" masked")+"' data-ipval='"+key+"'>"+(vis?escapeHtml(ip):starMask(ip))+"</span></div>"+(loc?"<div class='rpt-ip-loc'>"+escapeHtml(loc)+"</div>":"")+"</div>";
+  const vis=ip?rptVis[key]!==false:true;
+  const eye=ip?`<button class="rpt-eye rpt-nocap" data-rpteye="${key}" aria-label="IP visibility">${eyeIcon(vis)}</button>`:"";
+  const main=ip
+    ?`<div class="rpt-ip-main">${cc?flagBadge(cc):""}<span class="rpt-ip-val${vis?"":" masked"}" data-rptcopy="${esc(ip)}">${vis?esc(ip):starMask(true)}</span></div><div class="rpt-ip-loc">${esc(loc||"")}</div>`
+    :`<div class="rpt-ip-main"><span class="rpt-ip-none">${TD("myIpNone6")}</span></div><div class="rpt-ip-loc"></div>`;
+  return `<article class="rpt-card"><div class="rpt-ip-top"><span class="rpt-ip-label">${label}</span>${eye}</div>${main}</article>`;
+}
+function fillTrustHtml(d){
+  if(d.score==null)return `<div class="geo-skl rpt-skl-block" style="width:46%"></div><div class="geo-skl rpt-skl-block" style="width:74%"></div>`;
+  return `<div class="rpt-trust-top"><span class="rpt-trust-num">${100-d.score}</span><span class="rpt-badge ${d.score<=15?"ok":d.score<=40?"warn":d.score<=65?"warn":"bad"}">${TD(scoreLabel(d.score))}</span></div><div class="rpt-trust-desc">${TD("rptTrustSub")}</div><div class="rpt-spectrum"><div class="rpt-spectrum-track"></div><span class="rpt-spectrum-ptr" style="left:${100-d.score}%"></span><div class="rpt-spectrum-labels"><span>0 ${TD("rptScaleRisk")}</span><span>25</span><span>50</span><span>75</span><span>100 ${TD("rptScaleTrust")}</span></div></div>`;
+}
+function attrValHtml(d){
+  if(!d.tagsFinal)return `<span class="geo-skl rpt-skl-line"></span>`;
+  const ipType=d.ipTypeKey?TD(d.ipTypeKey):"";
+  return ipType?(d.isNative?ipType+" · "+TD("nativeTag"):ipType):TD("unknownSource");
+}
+function updateReportDynamic(d){
+  if(!$("reportModalBackdrop").classList.contains("open"))return;
+  const tb=$("rptTrustBody");if(tb)tb.innerHTML=fillTrustHtml(d);
+  const av=$("rptAttrVal");if(av)av.innerHTML=attrValHtml(d);
+  fitReportScale();
+}
+function fitReportScale(){
+  const wrap=$("reportScaleWrap"),board=$("reportRoot");
+  if(!wrap||!board||!board.innerHTML)return;
+  const w=wrap.clientWidth||1000;
+  const s=Math.min(1,w/1000);
+  board.style.transform="scale("+s+")";
+  wrap.style.height=(board.offsetHeight*s)+"px";
 }
 function buildReport(){
-  const d=state.data;if(!d)return;
-  rptIps={v4:myIpState.v4||"",v6:myIpState.v6||"",ip:d.ip||""};
-  rptVis={v4:myIpState.vis4!==false,v6:myIpState.vis6!==false,ip:state.ipVisible!==false};
-  const place=[d.country,d.region,d.city].filter(Boolean).join(", ");
-  const selfCc=ip=>ip&&ip===d.ip?d.cc:"";
-  const selfLoc=ip=>ip&&ip===d.ip?place:"";
-  let h="";
-  h+="<div class='rpt-sheet-head'><div><div class='rpt-title'>"+TD("rptTitle")+"</div><div class='rpt-sub'>"+TD("rptSub")+"</div></div><div class='rpt-head-btns rpt-nocap'><button type='button' class='rpt-confirm' id='rptConfirmBtn'>"+TD("rptConfirm")+"</button><button type='button' class='modal-close-btn' id='rptCloseBtn'>✕</button></div></div>";
-  if(rptIps.v4)h+=rptIpCard("v4",TD("rptLocal4"),rptIps.v4,selfCc(rptIps.v4),selfLoc(rptIps.v4));
-  if(rptIps.v6)h+=rptIpCard("v6",TD("rptLocal6"),rptIps.v6,selfCc(rptIps.v6),selfLoc(rptIps.v6));
-  h+=rptIpCard("ip",TD("rptTarget"),rptIps.ip,d.cc,place);
-  h+="<div class='rpt-card rpt-trust'><div class='rpt-card-title'>"+TD("rptTrust")+" <span class='rpt-muted'>TRUST SCORE</span></div>";
-  if(d.score==null){
-    h+="<span class='geo-skl rpt-skl-block' style='width:120px'></span><span class='geo-skl rpt-skl-block' style='width:180px'></span>";
-  }else{
-    const s=d.score,trust=100-s,idx=s<=10?0:s<=25?1:s<=40?2:s<=60?3:s<=80?4:5;
-    const col=idx<=1?"#16A34A":idx===2?"#D97706":"#DC2626";
-    h+="<div class='rpt-trust-num'>"+trust+"</div><div class='rpt-trust-desc' style='color:"+col+"'>"+scoreLabel(s)+"</div><div class='rpt-trust-sub'>"+DYN.rptTrustSub[currentLang][idx]+"</div>";
-    h+="<div class='rpt-spectrum'><div class='rpt-spectrum-track'></div><div class='rpt-spectrum-ptr' style='left:"+Math.min(97,Math.max(3,trust))+"%'></div></div><div class='rpt-spectrum-labels'><span>0 "+(currentLang==="zh"?"高危":"High risk")+"</span><span>25</span><span>50</span><span>75</span><span>100 "+(currentLang==="zh"?"可信":"Trusted")+"</span></div>";
-  }
-  h+="</div>";
-  const supN=VENDORS.filter(v=>(LLM_LISTS[v.name]||[]).includes(d.cc)).length;
-  const supCls=supN===4?"ok":supN===0?"bad":"warn";
-  const supTxt=supN===4?TD("rptRegionAll"):supN===0?TD("rptRegionNone"):TD("rptRegionPart")+" · "+supN+"/4";
-  h+="<div class='rpt-card'>"+rptKv(TD("rptRegion"),rptBdg(supTxt,supCls))+"</div>";
-  const attrVal=d.tagsFinal?escapeHtml(attrName(d))+(d.native==null?"":" · "+(d.native?TD("nativeIp"):TD("broadcastIp"))):rptSkl(90);
-  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptAttrT")+"</div>"
-    +rptKv(TD("rptCountry"),(d.cc?"<span class='flag-badge'>"+flagImg(d.cc)+"</span>":"")+escapeHtml(d.country||"—"))
-    +rptKv(TD("rptCity"),escapeHtml(d.city||d.region||"—"))
-    +rptKv(TD("rptIpAttr"),attrVal)
-    +rptKv("ASN",escapeHtml(d.asn||"—"))
-    +rptKv(TD("rptCarrier"),escapeHtml(d.asnHolder||d.isp||"—"))+"</div>";
-  const orgTxt=((d.asnHolder||"")+" "+(d.asnName||"")+" "+(d.isp||"")+" "+(d.netname||"")+" "+(d.host||"")).toLowerCase();
-  const hitV=/vpn|nord|expressvpn|surfshark|mullvad/.test(orgTxt),hitP=/proxy/.test(orgTxt),hitT=/\btor\b|torproject/.test(orgTxt);
-  const det=hit=>hit?rptBdg(TD("rptDetected"),"warn"):rptBdg(TD("rptNotDetected"),"ok");
-  const bl=d.bl;
-  const abuse=bl&&bl.checked>0?(bl.hits>0?rptBdg(TD("rptAbuseHit")+" "+bl.hits,"bad"):rptBdg(TD("rptAbuseNone"),"ok")):rptBdg(TD("rptNotTested"),"gray");
-  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptSecT")+"</div>"
-    +rptKv("VPN",det(hitV))+rptKv(TD("rptProxy"),det(hitP))+rptKv("Tor",det(hitT))+rptKv(TD("rptCrawler"),rptBdg(TD("rptNotTested"),"gray"))+rptKv(TD("rptAbuse"),abuse)+"</div>";
-  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptAvailT")+"</div>";
-  VENDORS.forEach((v,i)=>{
-    const ok=(LLM_LISTS[v.name]||[]).includes(d.cc);
-    h+="<div class='rpt-vendor'><span class='vendor-ic vi-"+v.name.toLowerCase()+"'>"+v.icon+"</span><span class='rpt-vendor-name'>"+v.name+"<span class='rpt-vendor-by'>"+v.by+"</span></span><span class='rpt-vendor-right'><span class='rpt-lat' id='rptLat"+i+"'>"+rptSkl(40)+"</span>"+rptBdg(ok?TD("rptOk"):TD("rptNo"),ok?"ok":"bad")+"</span></div>";
-  });
-  h+=rptKv(TD("rptSummary"),rptBdg(supN+"/4 "+(currentLang==="zh"?"家可用":"available"),supCls))+"</div>";
-  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptDnsT")+"</div>"
-    +rptKv(TD("rptDnsStatus"),"<span id='rptDnsStatus'>"+rptSkl(80)+"</span>")
-    +rptKv(TD("rptDnsProto"),"<span id='rptDnsProto'>"+rptSkl(110)+"</span>")
-    +rptKv(TD("rptDnsUp"),"<span id='rptDnsUp'>"+rptSkl(90)+"</span>")
-    +rptKv(TD("rptDnsEdns"),"<span id='rptDnsEdns'>"+rptSkl(70)+"</span>")+"</div>";
-  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptRtcT")+"</div>"
-    +rptKv(TD("rptRtcStatus"),"<span id='rptRtcStatus'>"+rptSkl(80)+"</span>")
-    +rptKv(TD("rptRtcStun"),"<span id='rptRtcStun'>"+rptSkl(90)+"</span>")
-    +rptKv(TD("rptRtcMdns"),"<span id='rptRtcMdns'>"+rptSkl(100)+"</span>")
-    +rptKv(TD("rptRtcTurn"),"<span id='rptRtcTurn'>"+rptSkl(70)+"</span>")+"</div>";
-  h+="<div class='rpt-foot'>IPPure · ip.jpedu.asia · "+fmtTime(new Date())+"</div>";
-  $("reportRoot").innerHTML=h;
+  const d=state.data;
+  if(!d)return;
+  rptVis={v4:ipVisible, v6:ipVisible, vT:ipVisible};
+  const my=myIpState;
+  const cc2name=c=>(c&&CC_NAME[c])||c||"";
+  const locOf=o=>o?[cc2name(o.cc),o.region,o.city].filter(Boolean).join(", "):"";
+  const targetLoc=locOf(d);
+  const sumCls=regionSup.full?"ok":regionSup.n?"warn":"bad";
+  const regionBadge=`<span class="rpt-badge ${d.cc?(LLM_LISTS.claude.ok(d.cc)?"ok":"bad"):"gray"}">${d.cc?(LLM_LISTS.claude.ok(d.cc)?TD("rptRegionOk"):TD("rptRegionNo")):"--"}</span>`;
+  const blTxt=!d.bl?TD("rptDash"):d.bl.hit?TD("rptDnsblHit",{n:d.bl.total}):TD("rptDnsblClean");
+  const probe=`<span class="geo-skl rpt-skl-line" data-probe-wait></span>`;
+  const vendorRows=LLM_VENDORS.map(v=>`<div class="rpt-vendor">${vendorIcon(v)}<span class="rpt-vendor-name">${v.name}<span class="rpt-vendor-by">${v.by}</span></span><span class="rpt-vendor-right"><span class="rpt-lat" data-rpt-lat="${v.key}">${TD("rptTesting")}</span><span data-rpt-ok="${v.key}"><span class="rpt-badge ${regionSup.map[v.key]?"ok":"bad"}">${regionSup.map[v.key]?TD("rptUsable"):TD("rptUnusable")}</span></span></span></div>`).join("");
+  $("reportRoot").innerHTML=`
+    <div class="rpt-board-head">
+      <div><div class="rpt-title">${TD("rptTitle")}</div><div class="rpt-sub">${TD("rptSub")}</div></div>
+      <div class="rpt-head-btns"><button class="rpt-confirm rpt-nocap" id="rptConfirmBtn">${TD("rptConfirm")}</button><button class="rpt-close rpt-nocap" data-rptclose aria-label="close">✕</button></div>
+    </div>
+    <div class="rpt-grid">
+      ${rptIpCard("v4",TD("rptMyV4"),my.v4,my.v4d&&my.v4d.cc,locOf(my.v4d))}
+      ${rptIpCard("v6",TD("rptMyV6"),my.v6,my.v6d&&my.v6d.cc,locOf(my.v6d))}
+      ${rptIpCard("vT",TD("rptTarget"),d.ip,d.cc,targetLoc)}
+      <article class="rpt-card">
+        <div class="rpt-card-title">Claude AI ${TD("rptTrustTitle")}</div>
+        <div class="rpt-trust-center" id="rptTrustBody">${fillTrustHtml(d)}</div>
+        <div class="rpt-divider"></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">Claude ${TD("rptRegionTitle")}</span><span class="rpt-kv-val">${regionBadge}</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptAiRegion")}</span><span class="rpt-kv-val"><span class="rpt-badge ${sumCls}">${regionSup.full?TD("rptRegionAll"):regionSup.n?TD("rptRegionPart",{n:regionSup.n,t:4}):TD("rptRegionNone")}</span></span></div>
+      </article>
+      <article class="rpt-card">
+        <div class="rpt-card-title">Claude AI ${TD("rptAttrTitle")}</div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("geoRegion")}</span><span class="rpt-kv-val">${d.cc?flagBadge(d.cc):""}${esc(cc2name(d.cc))}</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("geoCity")}</span><span class="rpt-kv-val">${esc(d.city||"--")}</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptAttrType")}</span><span class="rpt-kv-val" id="rptAttrVal">${attrValHtml(d)}</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">ASN</span><span class="rpt-kv-val">${d.asn?("AS"+d.asn):"--"}</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("asnOrg")}</span><span class="rpt-kv-val">${esc(shortOrg(d.org||"")||"--")}</span></div>
+      </article>
+      <article class="rpt-card">
+        <div class="rpt-card-title">Claude AI ${TD("rptSecTitle")}</div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">VPN</span><span class="rpt-kv-val" data-rpt-sec="vpn">${probe}</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptProxy")}</span><span class="rpt-kv-val" data-rpt-sec="proxy">${probe}</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">Tor</span><span class="rpt-kv-val" data-rpt-sec="tor">${probe}</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptCrawler")}</span><span class="rpt-kv-val" data-rpt-sec="crawler">${probe}</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptAbuse")}</span><span class="rpt-kv-val">${blTxt?esc(blTxt):"--"}</span></div>
+      </article>
+      <article class="rpt-card">
+        <div class="rpt-card-title">Claude ${TD("rptAvailTitle")}</div>
+        ${vendorRows}
+      </article>
+      <article class="rpt-card">
+        <div class="rpt-card-title">${TD("rptDnsTitle")}</div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptDnsStatus")}</span><span class="rpt-kv-val" data-rpt-dns="status">${probe}</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptDnsUpstream")}</span><span class="rpt-kv-val" data-rpt-dns="upstream">${probe}</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptDnsProto")}</span><span class="rpt-kv-val">DoH (HTTPS)</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">EDNS ${TD("rptDnsEdns")}</span><span class="rpt-kv-val" data-rpt-dns="edns">${probe}</span></div>
+      </article>
+      <article class="rpt-card">
+        <div class="rpt-card-title">WebRTC ${TD("rptRtcTitle")}</div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptRtcStatus")}</span><span class="rpt-kv-val" data-rpt-rtc="status">${probe}</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">STUN ${TD("rptRtcSrflx")}</span><span class="rpt-kv-val" data-rpt-rtc="srflx">${probe}</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">mDNS</span><span class="rpt-kv-val" data-rpt-rtc="mdns">${probe}</span></div>
+        <div class="rpt-kv-row"><span class="rpt-kv-label">TURN ${TD("rptRtcRelay")}</span><span class="rpt-kv-val" data-rpt-rtc="relay">${probe}</span></div>
+      </article>
+    </div>
+    <div class="rpt-foot">IPPure · ip.jpedu.asia · ${new Date().toLocaleString()}</div>`;
   $("rptConfirmBtn").addEventListener("click",captureReport);
-  $("rptCloseBtn").addEventListener("click",closeReportModal);
-  probeVendors();probeDns();probeRtcFill();
+  probeSecurity(d);
+  probeVendors();
+  probeDns(d);
+  probeRtcFill();
+  requestAnimationFrame(fitReportScale);
 }
 function probeVendors(){
   const hosts={ChatGPT:"chatgpt.com",Claude:"claude.ai",Gemini:"gemini.google.com",Grok:"grok.com"};
@@ -3512,14 +3554,45 @@ function probeRtcFill(){
   }catch(e){finish()}
 }
 function closeReportSilent(){spaState.rpt=false;spaSaveY();rptVisual(false)}
+let h2cPromise=null;
+function loadHtml2Canvas(){
+  if(window.html2canvas)return Promise.resolve();
+  if(h2cPromise)return h2cPromise;
+  h2cPromise=new Promise((res,rej)=>{
+    const sc=document.createElement("script");
+    sc.src="html2canvas.min.js";
+    sc.onload=()=>res();
+    sc.onerror=()=>{h2cPromise=null;rej(new Error("h2c load failed"))};
+    document.head.appendChild(sc);
+  });
+  return h2cPromise;
+}
 async function captureReport(){
-  const btn=$("rptConfirmBtn");if(!btn||btn.dataset.busy)return;btn.dataset.busy="1";
+  const btn=$("rptConfirmBtn");
+  if(!btn||btn.dataset.busy)return;
+  btn.dataset.busy="1";
   try{
     toast(TD("rptGenerating"));
-    const data=await renderNodeToPng($("reportRoot"));
+    await loadHtml2Canvas();
+    const wrap=$("reportScaleWrap"),board=$("reportRoot");
+    wrap.classList.add("capturing");
+    let data;
+    try{
+      const cv=await html2canvas(board,{scale:2,backgroundColor:getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()||"#EEF6FA",logging:false,ignoreElements:el=>!!(el.classList&&el.classList.contains("rpt-nocap"))});
+      data=cv.toDataURL("image/png");
+    }finally{
+      wrap.classList.remove("capturing");
+      fitReportScale();
+    }
     closeReportSilent();
     showSnap(data);
-  }catch(e){toast(TD("snapFail"))}
+  }catch(e){
+    try{
+      const data=await renderNodeToPng($("reportRoot"));
+      closeReportSilent();
+      showSnap(data);
+    }catch(e2){toast(TD("snapFail"))}
+  }
   delete btn.dataset.busy;
 }
 function openReport(){
