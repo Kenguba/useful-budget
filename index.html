@@ -2341,14 +2341,8 @@
     }
 
     function triggerActiveCardAction() {
-      const filtered = getStackProjects();
-      if (!filtered.length) return;
-      const activeProj = filtered[activeStackIdx];
-      if (activeProj && activeProj.url) {
-        window.location.href = activeProj.url;
-      } else if (activeProj) {
-        openProjectPreview(activeProj.id);
-      }
+      // 点底部胶囊钮与上滑松手走同一条路：先神奇收缩吸进胶囊钮，再进项目
+      triggerActiveCardFlyOut();
     }
 
     (function initStackCarouselGestures() {
@@ -2382,6 +2376,7 @@
         stopStackAnimation();
         stopFlyAnimation();
         flyShrinkK = 0;
+        flyOffsetY = 0;
         document.getElementById('stackStageWrapper').style.zIndex = '';
         isStackDragging = true;
         downY = e.clientY;
@@ -2522,8 +2517,10 @@
         setTimeout(() => { stackDragMoved = false; }, 0);
       };
 
-      viewport.addEventListener('pointerup', endDrag);
-      viewport.addEventListener('pointercancel', endDrag);
+      // 松手监听挂在 window 上：上推时手指常停在卡片区之外的页头区域，
+      // 个别浏览器不认指针捕获时，绑在卡片区上的 pointerup 会丢、整轮手势不结算
+      window.addEventListener('pointerup', endDrag);
+      window.addEventListener('pointercancel', endDrag);
 
       // 支持触控板双指连续滑动与鼠标滚轮流体推动
       viewport.addEventListener('wheel', (e) => {
