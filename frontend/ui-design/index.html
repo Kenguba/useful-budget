@@ -170,7 +170,7 @@ section{ margin-top:42px; scroll-margin-top:120px;}
 
 <aside class="sidebar">
 <div>
-<a class="wordmark" href="#home">designeer<span>.xyz</span></a>
+<a class="wordmark" href="#home">designeer</a>
 <p class="tagline">A curated collection of interface craft, component libraries, AI tools, and resources for builders.</p>
 </div>
 <nav class="nav" id="nav" aria-label="Collections">
@@ -182,10 +182,10 @@ section{ margin-top:42px; scroll-margin-top:120px;}
 <a href="#tools" data-nav="tools">Tools <span class="count">158</span></a>
 <a href="#portfolios" data-nav="portfolios">Portfolios <span class="count">170</span></a>
 </nav>
-<a class="submit" href="https://designeer.xyz" target="_blank" rel="noopener">Submit
+<span class="submit">Submit
 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
-</a>
-<p class="side-foot">Every entry reviewed by hand.<br/>Replica built for study — original at <a href="https://designeer.xyz" target="_blank" rel="noopener">designeer.xyz</a></p>
+</span>
+<p class="side-foot">Every entry reviewed by hand.<br/>Replica built for study.</p>
 </aside>
 
 <div class="main" id="top">
@@ -247,29 +247,29 @@ section{ margin-top:42px; scroll-margin-top:120px;}
 
 <div class="prompt-block" id="promptBlock">
 <h2>复刻提示词</h2>
-<p>把下面这段发给任何编程 Agent，就能按同样的规格复刻这个站（数据来自 designeer.xyz 官方公开接口）</p>
-<pre id="promptText">请帮我原样复刻 designeer.xyz 首页，做一个设计目录站，单文件 HTML（CSS 和 JS 全部内联）。
+<p>把下面这段发给任何编程 Agent，就能按同样的规格复刻这个站（数据来自 designxxx.xyz 官方公开接口）</p>
+<pre id="promptText">请帮我原样复刻 designxxx.xyz 首页，做一个设计目录站，单文件 HTML（CSS 和 JS 全部内联）。
 
 条目数据走官方公开接口拉取，不要编造：
-- GET https://designeer.xyz/api/catalog?collection=inspiration|resources|tools|portfolios
+- GET https://designxxx.xyz/api/catalog?collection=inspiration|resources|tools|portfolios
 - 接口分页：响应里的 nextCursor 作为下一次请求的 cursor 参数，约 24 条一页，拉到 nextCursor 为空为止
 - 合集条数：灵感 137、资源 205、工具 158、作品集 170，共 670 条；每条取 name、tagline、url、host、category.name、pricing（free / freemium / paid，可能为空）
-- Finds 共 157 条：首页 HTML 里有最新一批的海报图，地址形如 https://cdn.designeer.xyz/finds/&lt;slug&gt;/1-poster.webp，连同作者名 creatorName、句柄 creatorHandle、图片宽高一起解析出来；海报图要下载到本地 assets 目录再引用，不要热链
+- Finds 共 157 条：首页 HTML 里有最新一批的海报图，地址形如 https://cdn.designxxx.xyz/finds/&lt;slug&gt;/1-poster.webp，连同作者名 creatorName、句柄 creatorHandle、图片宽高一起解析出来；海报图要下载到本地 assets 目录再引用，不要热链
 
 
-- 固定左侧栏：顶部字标「designeer.xyz」，其下一句小字「A curated collection of interface craft, component libraries, AI tools, and resources for builders.」；导航列出 Finds / Inspiration / Resources / Tools / Portfolios 并带各自条数；一个黑色胶囊形 Submit 按钮；栏底一行小字脚注
+- 固定左侧栏：顶部字标「designxxx.xyz」，其下一句小字「A curated collection of interface craft, component libraries, AI tools, and resources for builders.」；导航列出 Finds / Inspiration / Resources / Tools / Portfolios 并带各自条数；一个黑色胶囊形 Submit 按钮；栏底一行小字脚注
 - 主区：大标题「Designeer is a curated catalogue for designers and developers.」+ 引言「Design inspiration, UI resources, tools and portfolios, each reviewed by hand. Below, the latest visual work picked from across the web.」，文案逐字照抄不要改写
-- 先是 Finds 海报瀑布流（CSS columns 多列，图片卡圆角，下方标注作者名和 @句柄，点卡跳原站条目页 https://designeer.xyz/finds/&lt;slug&gt;）
+- 先是 Finds 海报瀑布流（CSS columns 多列，图片卡圆角，下方标注作者名和 @句柄，点卡跳原站条目页 https://designxxx.xyz/finds/&lt;slug&gt;）
 - 然后每个合集一节：节标题 + 总条数，下面是条目卡片网格；卡片只有文字：名称、一行简介、分类标签和价格标签（Free / Freemium / Paid），整卡链接到条目的真实外站 url
 - 每节先显示 24 条，带「显示全部 N 条」按钮展开；再加一个搜索框，按名称 / 简介 / 分类模糊过滤全部条目
 - 整个站是单页应用：点左侧导航就地切换视图（标签页式），只显示对应合集、不整页滚动、不刷新；默认是首页视图（大标题 + 引言 + Finds 海报流 + 各合集预览）；切换时把视图写进 location.hash，浏览器返回 / 前进恢复到离开时的视图且内容不消失、不重新加载；搜索词在切换视图后保留
 - 浅色干净风：白 / 米白底、近黑字、细边框、大留白、灰色小字标签；移动端侧栏收成顶栏 + 横向导航，不横向溢出
-- 页脚署名一行：「Content from Designeer (designeer.xyz), replica for study purposes.」</pre>
+- 页脚署名一行：「Content from Designeer (designxxx.xyz), replica for study purposes.」</pre>
 <button class="copy-btn" id="copyPrompt" type="button">复制提示词</button>
 </div>
 
 <footer id="pageFooter">
-Content from <a href="https://designeer.xyz" target="_blank" rel="noopener">Designeer (designeer.xyz)</a>, replica for study purposes.<br/>
+Content from Designeer, replica for study purposes.<br/>
 All 670 catalogue entries and the latest finds were pulled from the original site's public catalogue on 6 Nov 2026; every card links to the entry's real page.
 </footer>
 </div>
@@ -325,10 +325,10 @@ return (f.name + " " + (f.handle || "")).toLowerCase().indexOf(state.q)!== -1;
 });
 grid.innerHTML = items.map(function(f){
 var ratio = (f.w && f.h)? ' style="aspect-ratio:' + f.w + "/" + f.h + '"': "";
-return '<a class="find" href="https://designeer.xyz/finds/' + esc(f.slug) + '" target="_blank" rel="noopener">' +
+return '<div class="find">' +
 '<figure style="margin:0"><span class="frame" style="display:block"><img src="' + esc(f.local) + '" alt="Find by ' + esc(f.name) + '" loading="lazy"' + ratio + '></span>' +
 '<figcaption><span class="who">' + esc(f.name) + '</span>' +
-(f.handle? '<span class="handle">@' + esc(f.handle) + '</span>': '') + '</figcaption></figure></a>';
+(f.handle? '<span class="handle">@' + esc(f.handle) + '</span>': '') + '</figcaption></figure></div>';
 }).join("");
 document.getElementById("finds").querySelector("[data-empty]").style.display = items.length? "none": "block";
 }
