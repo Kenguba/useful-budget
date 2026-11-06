@@ -1001,7 +1001,7 @@
     /* 视口占满中间剩余高度，内部卡片高度自适应且保持黄金比例上限 */
     .floating-squircle-icon svg { width: 15px; height: 15px; display: block; }
     .card-icon-box svg { width: 21px; height: 21px; display: block; }
-    .snap-left-title svg { width: 13px; height: 13px; vertical-align: -2px; }
+    .snap-ico svg { width: 13px; height: 13px; vertical-align: -2px; }
     .modal-title svg { width: 17px; height: 17px; vertical-align: -3px; margin-right: 5px; }
     .view-mode-btn svg { width: 15px; height: 15px; vertical-align: -2px; margin-right: 5px; }
     .stack-carousel-viewport {
@@ -1599,7 +1599,7 @@
 
     const portalProjects = [
       {
-        id: 'skill-board', category: 'live', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="0.8"/><rect x="12" y="8" width="3" height="10" rx="0.8"/><rect x="17" y="5" width="3" height="13" rx="0.8"/></svg>', path: '/frontend/skill-board/',
+        id: 'skill-board', iconColor: '#D97706', category: 'live', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="0.8"/><rect x="12" y="8" width="3" height="10" rx="0.8"/><rect x="17" y="5" width="3" height="13" rx="0.8"/></svg>', path: '/frontend/skill-board/',
         serial: ['榜单与比价', 'LEADERBOARD'],
         shortApp: ['Skills 排行榜', 'Skills Rank'],
         title: ['全球 Skills 使用量排行榜', 'Global Skills Leaderboard'],
@@ -1620,7 +1620,7 @@
         ]
       },
       {
-        id: 'ai-shop', category: 'live', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/><path d="M2.5 3.5h2.2l2.5 11.4a1.6 1.6 0 0 0 1.6 1.3h7.9a1.6 1.6 0 0 0 1.6-1.3L20.5 7H6"/></svg>', path: '/frontend/ai-shop/',
+        id: 'ai-shop', iconColor: '#059669', category: 'live', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/><path d="M2.5 3.5h2.2l2.5 11.4a1.6 1.6 0 0 0 1.6 1.3h7.9a1.6 1.6 0 0 0 1.6-1.3L20.5 7H6"/></svg>', path: '/frontend/ai-shop/',
         serial: ['榜单与比价', 'PRICE ENGINE'],
         shortApp: ['AI 账号商铺', 'AI Account Shop'],
         title: ['AI 账号商铺', 'AI Account Store'],
@@ -1641,7 +1641,7 @@
         ]
       },
       {
-        id: 'cloud-phone', category: 'live', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.4"/><path d="M10.8 18.6h2.4"/></svg>', path: '/frontend/cloud-phone/',
+        id: 'cloud-phone', iconColor: '#2563EB', category: 'live', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.4"/><path d="M10.8 18.6h2.4"/></svg>', path: '/frontend/cloud-phone/',
         serial: ['榜单与比价', 'BENCHMARK'],
         shortApp: ['云手机横评', 'Cloud Phone'],
         title: ['云手机横向对比', 'Cloud Phone Benchmark'],
@@ -1661,7 +1661,7 @@
         ]
       },
       {
-        id: 'cloud-pan', category: 'replica', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16.6 16.6"/></svg>', path: '/frontend/cloud-pan/',
+        id: 'cloud-pan', iconColor: '#0891B2', category: 'replica', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16.6 16.6"/></svg>', path: '/frontend/cloud-pan/',
         serial: ['1:1 精品复刻', '1:1 REPLICA'],
         shortApp: ['基德盘搜', 'Netdisk Search'],
         title: ['基德盘搜（复刻）', 'Kidd Netdisk Search'],
@@ -1681,7 +1681,7 @@
         ]
       },
       {
-        id: 'ip-check', category: 'replica', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><ellipse cx="12" cy="12" rx="4.2" ry="9"/></svg>', path: '/frontend/ip-check/',
+        id: 'ip-check', iconColor: '#4F46E5', category: 'replica', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><ellipse cx="12" cy="12" rx="4.2" ry="9"/></svg>', path: '/frontend/ip-check/',
         serial: ['1:1 精品复刻', '1:1 REPLICA'],
         shortApp: ['IP 纯净度检测', 'IP Purity Check'],
         title: ['IP 纯净度检测（复刻）', 'IP Purity Checker'],
@@ -1701,7 +1701,7 @@
         ]
       },
       {
-        id: '2fa-auth', category: 'replica', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/><circle cx="12" cy="15.2" r="1.3" fill="currentColor" stroke="none"/></svg>', path: '/frontend/2fa-auth/',
+        id: '2fa-auth', iconColor: '#DB2777', category: 'replica', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/><circle cx="12" cy="15.2" r="1.3" fill="currentColor" stroke="none"/></svg>', path: '/frontend/2fa-auth/',
         serial: ['1:1 精品复刻', '1:1 REPLICA'],
         shortApp: ['2FA 验证码', '2FA Auth'],
         title: ['2FA 验证码工具（复刻）', '2FA Authenticator'],
@@ -1721,7 +1721,7 @@
         ]
       },
       {
-        id: 'ui-design', category: 'replica', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 1 9-9c0 2.1-1.7 3-3.8 3h-2.1a2.3 2.3 0 0 0-1.8 3.6c.3.4.5.8.5 1.2 0 1.3-1 2.2-2.8 2.2z"/><circle cx="7.6" cy="10.4" r="1.15" fill="currentColor" stroke="none"/><circle cx="12" cy="7.4" r="1.15" fill="currentColor" stroke="none"/><circle cx="16.4" cy="10.4" r="1.15" fill="currentColor" stroke="none"/></svg>', path: '/frontend/ui-design/',
+        id: 'ui-design', iconColor: '#C026D3', category: 'replica', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 1 9-9c0 2.1-1.7 3-3.8 3h-2.1a2.3 2.3 0 0 0-1.8 3.6c.3.4.5.8.5 1.2 0 1.3-1 2.2-2.8 2.2z"/><circle cx="7.6" cy="10.4" r="1.15" fill="currentColor" stroke="none"/><circle cx="12" cy="7.4" r="1.15" fill="currentColor" stroke="none"/><circle cx="16.4" cy="10.4" r="1.15" fill="currentColor" stroke="none"/></svg>', path: '/frontend/ui-design/',
         serial: ['1:1 精品复刻', '1:1 REPLICA'],
         shortApp: ['设计资源目录', 'Design Directory'],
         title: ['设计资源目录（复刻）', 'Design Resource Directory'],
@@ -1741,7 +1741,7 @@
         ]
       },
       {
-        id: 'ai-nav', category: 'upcoming', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 10a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>', path: '',
+        id: 'ai-nav', iconColor: '#64748B', category: 'upcoming', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 10a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>', path: '',
         serial: ['导航规划', 'ROADMAP'],
         shortApp: ['AI 资源导航', 'AI Directory'],
         title: ['AI 资源链接导航', 'AI Resource Directory'],
@@ -1814,14 +1814,14 @@
 
       const floatingHeaderHtml = includeFloatingHeader
         ? `<div class="floating-card-app-header">
-             <span class="floating-squircle-icon">${proj.icon}</span>
+             <span class="floating-squircle-icon" style="color:${proj.iconColor}">${proj.icon}</span>
              <span class="floating-app-name">${siteEscape(shortApp)}</span>
            </div>`
         : '';
 
       const snapsHtml = proj.snapshots.map(([ico, lbl, val]) => `
         <div class="snapshot-mini-row">
-          <span class="snap-left-title">${ico} ${siteEscape(L(lbl))}</span>
+          <span class="snap-left-title"><span class="snap-ico" style="color:${proj.iconColor}">${ico}</span> ${siteEscape(L(lbl))}</span>
           <span class="snap-right-val">${siteEscape(L(val))}</span>
         </div>
       `).join('');
@@ -1843,7 +1843,7 @@
           </div>
 
           <div class="card-identity-row">
-            <div class="card-icon-box" aria-hidden="true">${proj.icon}</div>
+            <div class="card-icon-box" aria-hidden="true" style="color:${proj.iconColor}">${proj.icon}</div>
             <div class="card-title-wrap">
               <h2 class="card-title">${siteEscape(title)}</h2>
               <div class="card-route-text">${siteEscape(routeText)}</div>
@@ -2341,7 +2341,10 @@
         // 轴向锁定：先动的方向决定本轮手势是横滑切卡还是上滑飞出
         if (!dragAxis && (Math.abs(deltaX) > 9 || Math.abs(deltaY) > 9)) {
           dragAxis = Math.abs(deltaY) > Math.abs(deltaX) ? 'v' : 'h';
-          if (dragAxis === 'v') flyIdx = activeStackIdx;
+          if (dragAxis === 'v') {
+            flyIdx = activeStackIdx;
+            document.getElementById('stackStageWrapper').style.zIndex = '60';
+          }
         }
         if (dragAxis === 'v') {
           stackDragMoved = true;
@@ -2381,7 +2384,10 @@
           if (flyOffsetY < -70) {
             triggerActiveCardFlyOut();
           } else if (flyOffsetY !== 0) {
-            tweenFlyTo(0, 220, (k) => 1 - Math.pow(1 - k, 3), () => { flyIdx = -1; });
+            tweenFlyTo(0, 220, (k) => 1 - Math.pow(1 - k, 3), () => {
+              flyIdx = -1;
+              document.getElementById('stackStageWrapper').style.zIndex = '';
+            });
           }
           setTimeout(() => { stackDragMoved = false; }, 0);
           return;
@@ -2653,7 +2659,7 @@
       const proj = portalProjects.find(p => p.id === projectId);
       if (!proj) return;
 
-      document.getElementById('modalItemTitle').innerHTML = `${proj.icon} ${siteEscape(L(proj.title))}`;
+      document.getElementById('modalItemTitle').innerHTML = `<span style="color:${proj.iconColor}">${proj.icon}</span> ${siteEscape(L(proj.title))}`;
       document.getElementById('modalItemSub').textContent = `${L(proj.status)} · ${proj.path || L(['筹备中', 'Coming Soon'])}`;
 
       const targetHref = proj.url || './';
