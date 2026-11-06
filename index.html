@@ -571,7 +571,7 @@
       color: var(--text-primary);
       letter-spacing: -0.3px;
       line-height: 1.25;
-      margin-bottom: 2px;
+      margin-bottom: 5px;
       white-space: nowrap;
     }
 
@@ -1363,6 +1363,8 @@
       .iphone18-master-chassis::after { display: none; }
       .iphone18-master-screen { border-radius: 0; }
       .iphone18-top-statusbar { display: none; }
+      /* 无框时假状态栏拿掉，它的约 30px 顶部留白由 hero 顶内边距补回，与各站 hero 的 16px 对齐 */
+      .hero-header { padding-top: 16px; }
       .stack-carousel-viewport .app-window-card {
         width: 76%;
         margin-left: 0;
