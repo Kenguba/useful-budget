@@ -176,7 +176,9 @@ button{font-family:inherit}
 .bar-row-meta{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:11.5px}
 .bar-skill-name{font-weight:700;color:var(--text-primary);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;display:inline-flex;align-items:center;gap:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bar-plat-tag{font-size:9.5px;font-weight:600;padding:1px 5px;border-radius:4px;background:var(--theme-tag-bg);color:var(--theme-tag-text);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;flex-shrink:0}
+.dim-tag{font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--theme-tag-bg);color:var(--theme-tag-text);flex-shrink:0}
 [data-dark="true"] .bar-plat-tag{background:rgba(255,255,255,.10);color:var(--orb-color-2)}
+[data-dark="true"] .dim-tag{background:rgba(255,255,255,.10);color:var(--orb-color-2)}
 .bar-skill-val{font-weight:800;color:var(--theme-accent);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;white-space:nowrap}
 [data-dark="true"] .bar-skill-val{color:var(--orb-color-1)}
 .bar-track{width:100%;height:8px;background:var(--page-bg);border-radius:4px;overflow:hidden}
@@ -1067,7 +1069,7 @@ function renderStatsViz(){
   if(repoGainTop) rows.push({dim:tt.dims[3],name:repoGainTop.repo,plat:"GitHub",sub:tt.totalStars(fmt(repoGainTop.stars)),main:`+${fmt(repoGainTop.starsDelta1d)} ${tt.perDay}`,series:HIST?HIST.series.repoGain:null,color:"#F59E0B",sec:"sec-01",grp:"g-repos"});
   const tableHtml=`<table class="stat-data-table"><thead><tr><th>${esc(tt.tableHeads[0])}</th><th>${esc(tt.tableHeads[1])}</th><th>${esc(tt.tableHeads[2])}</th></tr></thead><tbody>
     ${rows.map(r=>`<tr data-jump-sec="${r.sec}" data-jump-group="${r.grp}">
-      <td><div style="display:flex;align-items:center;gap:5px;min-width:0;"><span style="font-weight:800;font-family:ui-monospace,monospace;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;">${esc(r.name)}</span><span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--theme-tag-bg);color:var(--theme-tag-text);flex-shrink:0;">${esc(r.dim)}</span></div><div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;">${esc(r.sub)}</div></td>
+      <td><div style="display:flex;align-items:center;gap:5px;min-width:0;"><span style="font-weight:800;font-family:ui-monospace,monospace;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;">${esc(r.name)}</span><span class="dim-tag">${esc(r.dim)}</span></div><div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;">${esc(r.sub)}</div></td>
       <td>${r.series&&sparkPoints(r.series,60,22,2)?`<svg class="mini-spark-svg" viewBox="0 0 60 22"><polyline fill="none" stroke="${r.color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" points="${sparkPoints(r.series,60,22,2)}"/></svg>`:""}</td>
       <td style="font-weight:800;color:var(--theme-accent);font-family:ui-monospace,monospace;">${esc(r.main)}</td>
     </tr>`).join("")}
