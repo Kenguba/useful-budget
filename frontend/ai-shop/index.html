@@ -2396,6 +2396,7 @@ $('#plusBtn').onclick=()=>{
     w.dataset.open='1';
     openRow=row;
   });
+  box.addEventListener('pointerdown',()=>{ suppressedRow=null; },true);
   box.addEventListener('pointerdown',e=>{
     if(e.isPrimary===false||e.button!==0) return;
     const row=e.target.closest('.swipe .real-offer-row');
