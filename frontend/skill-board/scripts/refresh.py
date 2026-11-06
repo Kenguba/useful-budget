@@ -168,6 +168,26 @@ def build_board(day, token="", is_latest=None):
     for i, r in enumerate(repos, 1):
         r["rank"] = i
 
+    favorites = []
+    if is_latest:
+        # 永久收藏（scripts/favorites.json 手工名单）：不参与排名，星标 GitHub API 直查，
+        # 日增 = 与上一期快照里同一收藏的差；名单外的变动不影响它，刷新永不冲掉
+        fav_meta = load_json(os.path.join(ROOT, "scripts", "favorites.json"), {})
+        prev_fav_stars = {f["repo"]: f["stars"] for f in prev.get("favorites", [])}
+        for repo in fav_meta:
+            stars = gh_stars(repo, token)
+            if stars is None:
+                continue
+            delta = stars - prev_fav_stars[repo] if prev_fav_stars.get(repo) else None
+            meta = fav_meta.get(repo, {})
+            favorites.append({"rank": 0, "repo": repo, "stars": stars,
+                              "starsDelta1d": delta, "blurb": meta.get("blurb", "永久收藏的技能仓库"),
+                              "maintainer": meta.get("maintainer", "社区"),
+                              "url": f"https://github.com/{repo}"})
+        favorites.sort(key=lambda x: -(x["stars"] or 0))
+        for i, f in enumerate(favorites, 1):
+            f["rank"] = i
+
     pool = {}
     for lst in ("top-installs", "best-100"):
         for r in data[lst]:
@@ -258,7 +278,7 @@ def build_board(day, token="", is_latest=None):
     return {"date": day, "generatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             "stats": {"trackedSkills": "10,000+", "dataSources": 4, "boards": 9,
                       "maxInstalls": max_v, "maxInstallsSkill": max_s},
-            "highlights": highlights, "installs": installs, "repos": repos,
+            "highlights": highlights, "installs": installs, "repos": repos, "favorites": favorites,
             "platforms": platforms, "wis": wis, "trending": trending, "buzz": buzz,
             "rising": rising, "active": active, "vendors": vendors,
             "glossary": [{"skill": k, "blurb": v} for k, v in used.items()]}

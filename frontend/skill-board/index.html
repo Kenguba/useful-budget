@@ -561,7 +561,7 @@ const STR={
   footer:'数据来源：<a class="site-online-link" href="https://github.com/LinklyAI/best-skills" target="_blank" rel="noopener noreferrer">Best Skills</a>（CC BY 4.0，每日 CSV）+ GitHub API 直查<br>跨平台口径不同，数字并列展示、从不相加；榜单为空 = 未测量，不是 0',
   periodSuffix:" 期",
   secs:[
-   {t:"安装量总榜 & GitHub 星标榜",s:"共 2 张主榜 · 三平台原生口径并行"},
+   {t:"安装量总榜 & GitHub 星标榜",s:"共 2 张主榜 + 永久收藏 · 三平台原生口径并行"},
    {t:"三平台分区榜",s:"共 3 张平台榜 · 各平台只跟自己比，不跨平台合并"},
    {t:"WIS 综合值得装榜",s:"热度 × 动能 × 声量 × 维护 × 信任的综合分"},
    {t:"动能 · 声量 · 新星 · 维护",s:"共 4 张异动子榜 · 最近 7 天和 30 天在发生什么"},
@@ -578,6 +578,7 @@ const STR={
    rising:{t:"30 天新星榜 TOP 6",s:"首次上榜 30 天内热度与安装爆发力最强的技能",badge:"新星第一"},
    active:{t:"最活跃维护榜 TOP 6",s:"按最近更新时间与累计发布版本数综合排行",badge:"最高版本"},
    vendors:{t:"厂商榜",s:"按厂商汇总的技能数与总量",badge:"最高总量"},
+   favs:{t:"我的收藏 · 花叔",s:"永久收藏，不进榜单排名 · 星标走 GitHub API 直查",badge:"合计星标"},
    video:{t:"视频区精选",s:"BGM → 环境音 → 音效 → 转场 → 文字生成 → 代码合成",badge:"精选条目"}
   },
   notesTitles:["装之前先问四件事","安装命令示例","三条避坑"],
@@ -616,7 +617,7 @@ const STR={
   footer:'Sources: <a class="site-online-link" href="https://github.com/LinklyAI/best-skills" target="_blank" rel="noopener noreferrer">Best Skills</a> (CC BY 4.0, daily CSV) + direct GitHub API<br>Counts from different platforms are shown side by side and never summed; an empty board means unmeasured, not 0',
   periodSuffix:"",
   secs:[
-   {t:"Install Leaderboard & GitHub Stars",s:"2 main boards · Native counts side by side"},
+   {t:"Install Leaderboard & GitHub Stars",s:"2 main boards + favorites · Native counts side by side"},
    {t:"Per-Platform Boards",s:"3 platform boards · Each platform compared only with itself"},
    {t:"WIS Worth-Installing Board",s:"Composite of popularity, momentum, buzz, maintenance & trust"},
    {t:"Momentum · Buzz · Rising · Maintenance",s:"4 mover boards · What happened in the last 7 and 30 days"},
@@ -633,6 +634,7 @@ const STR={
    rising:{t:"30-Day Rising Stars TOP 6",s:"Fastest growing newly listed skills within 30 days",badge:"Top Rising"},
    active:{t:"Most Actively Maintained TOP 6",s:"Ranked by latest release date and total version count",badge:"Most Versions"},
    vendors:{t:"Vendor Board",s:"Skill counts and totals grouped by vendor",badge:"Top Total"},
+   favs:{t:"My Favorites · Huashu",s:"Permanently saved, not ranked · Stars via GitHub API",badge:"Total Stars"},
    video:{t:"Video Zone Picks",s:"BGM, ambience, SFX, transitions, text-to-video & code synthesis",badge:"Picks"}
   },
   notesTitles:["Four questions before installing","Install command examples","Three pitfalls"],
@@ -891,7 +893,14 @@ function render(b){
     `${fmt(e.stars)} ★${e.starsDelta1d!=null?`<small>${esc(tt.dayGain(fmt(e.starsDelta1d)))}</small>`:""}`,
     {pills:[{t:e.maintainer,c:"cat"}],url:e.url||"",cli:e.url?("git clone "+e.url):"",metaLine:"#"+String(e.rank).padStart(2,"0")+" · GitHub · "+e.maintainer})).join("");
   const maxStars=b.repos.reduce((m,e)=>Math.max(m,e.stars||0),0);
+  const favs=b.favorites||[];
+  const favItems=favs.map(e=>item(e.rank,{skill:e.repo,blurb:e.blurb,meta:e.maintainer,html:nameLink(e.repo,"")},
+    `${fmt(e.stars)} ★${e.starsDelta1d!=null?`<small>${esc(tt.dayGain(fmt(e.starsDelta1d)))}</small>`:""}`,
+    {pills:[{t:e.maintainer,c:"cat"},{t:LANG==="zh"?"★ 收藏":"★ Saved"}],url:e.url||"",cli:e.url?("git clone "+e.url):"",metaLine:"★ · GitHub · "+e.maintainer})).join("");
+  const favTotal=favs.reduce((m,e)=>m+(e.stars||0),0);
+  if(favs.length) openGroups.add("g-favs");
   h+=sectionHtml("01",
+    (favs.length?groupHtml("g-favs","★",G.favs.t,G.favs.s,G.favs.badge,compact(favTotal)+" ★",favItems):"")+
     groupHtml("g-installs","01A",G.installs.t,G.installs.s,G.installs.badge,compact(s.maxInstalls),installsItems)+
     groupHtml("g-repos","01B",G.repos.t,G.repos.s,G.repos.badge,compact(maxStars)+" ★",reposItems));
   // 02 三平台分区榜（三个独立折叠组）
