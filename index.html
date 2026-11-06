@@ -1856,6 +1856,7 @@
     }
 
     // ================= 6. 渲染层叠卡片流模式（1:1 复刻视频原生多任务自由流体惯性 + 高速甩动增益 + 连续指数曲线） =================
+    activeStackIdx = portalProjects.length - 1;
     let stackScrollPos = activeStackIdx;
     let stackVelocity = 0;
     let stackAnimRaf = null;
@@ -2568,7 +2569,7 @@
     function handleSearchInput() {
       const val = document.getElementById('searchInput').value.trim();
       document.getElementById('clearBtn').classList.toggle('visible', val.length > 0);
-      activeStackIdx = 0;
+      activeStackIdx = portalProjects.length - 1;
       renderPortalCards();
     }
 
@@ -2576,7 +2577,7 @@
       const input = document.getElementById('searchInput');
       input.value = '';
       document.getElementById('clearBtn').classList.remove('visible');
-      activeStackIdx = 0;
+      activeStackIdx = portalProjects.length - 1;
       renderPortalCards();
     }
 
