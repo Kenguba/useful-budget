@@ -56,8 +56,8 @@ button{font-family:inherit;cursor:pointer}
 .aura-orb.orb-center{width:300px;height:210px;bottom:-100px;left:32%;background:var(--orb-color-3);opacity:0;transition:opacity .6s ease,background-color .75s ease}
 .aura-orb.orb-right{width:340px;height:250px;bottom:-115px;right:-50px;background:var(--orb-color-2)}
 [data-dark="true"] .aura-orb{opacity:.26;filter:blur(64px)}
-/* 头卡下缘渐变过渡（ken 2026-11-07 定）：光斑在贴近卡片底边前先融进卡底色，绿色不再硬切页面底色；顶栏与 Hero 共用此层 */
-.aura-backdrop::after{content:"";position:absolute;left:0;right:0;bottom:0;height:52px;background:linear-gradient(to bottom,transparent,var(--hero-bg-base));pointer-events:none}
+/* 头卡下缘渐变过渡（ken 2026-11-07 定）：光斑在贴近卡片底边前先融进页面底色，绿色不再硬切；顶栏与 Hero 共用此层（初版融卡底色 #FFF 显出白带，已改融页面底色） */
+.aura-backdrop::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40px;background:linear-gradient(to bottom,transparent,var(--page-bg));pointer-events:none}
 [data-holo="true"] .aura-orb.orb-center{opacity:.6}
 [data-holo="true"] .aura-orb.orb-left{animation:pan-holo-l 5s ease-in-out infinite}
 [data-holo="true"] .aura-orb.orb-right{animation:pan-holo-r 5s ease-in-out infinite}
