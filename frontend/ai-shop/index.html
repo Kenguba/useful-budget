@@ -440,6 +440,11 @@
       background: rgba(30, 41, 59, 0.75);
     }
 
+    [data-dark="true"] .theme-swatch-item.active,
+    [data-dark="true"] .theme-swatch-item.sliding-hover {
+      background: rgba(30, 41, 59, 0.75);
+    }
+
     .theme-swatch-item.active,
     .theme-swatch-item.sliding-hover {
       background: var(--theme-tag-bg);
@@ -721,6 +726,16 @@
       flex-shrink: 0;
       transition: background-color 0.5s ease,
                   transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-dark="true"] .action-circle-btn {
+      background-color: rgba(30, 41, 59, 0.75);
+      color: var(--theme-accent);
+    }
+
+    [data-dark="true"][data-holo="true"] .action-circle-btn {
+      background: rgba(30, 41, 59, 0.75);
+      color: var(--theme-accent);
     }
 
     .action-circle-btn:hover {
