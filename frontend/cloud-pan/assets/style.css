@@ -282,7 +282,7 @@ button{font-family:inherit;cursor:pointer}
 .pill{border:none;background:transparent;font-size:14px;color:var(--text-secondary);padding:7px 16px;border-radius:999px;flex:none;white-space:nowrap}
 .pill:hover{color:var(--theme-accent)}
 .pill.on{background:var(--blue-soft);color:var(--blue);font-weight:700}
-.poster-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:16px}
+.poster-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
 .poster{background:var(--card-bg);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);display:block}
 .poster .ph{position:relative;aspect-ratio:2/3;background:var(--sub-surface);overflow:hidden}
 .poster .ph img{width:100%;height:100%;object-fit:cover;display:block}
@@ -429,10 +429,12 @@ details.about summary{cursor:pointer;color:var(--text-secondary);font-weight:600
 .toast.show{display:block}
 
 /* ---------- 响应式 ---------- */
-@media (max-width:1100px){.poster-grid{grid-template-columns:repeat(5,1fr)}}
+/* 海报网格档位（ken 2026-11-06 定）：宽屏 5 个一行 → 4 个 → 3 个 → 手机 2 个，海报不许太小 */
+@media (max-width:1279px){.poster-grid{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:1023px){.poster-grid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:767px){.poster-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:860px){
   .cols{grid-template-columns:1fr}
-  .poster-grid{grid-template-columns:repeat(4,1fr)}
   .hero h1{font-size:30px}
   .wrap,.section,.announce,.footer-in{padding-left:16px;padding-right:16px}
   .today-tools .t-search input,.f-field input,.f-field textarea,.f-field select{font-size:16px}
@@ -486,8 +488,3 @@ details.about summary{cursor:pointer;color:var(--text-secondary);font-weight:600
 .acc-tip{font-size:13px;color:#b45309;margin:4px 0 8px}
 .acc-fail{color:#b91c1c;font-size:14px}
 .acc-loading{color:var(--text-secondary);font-size:14px}
-
-/* 手机端海报一律一行两个（ken 2026-11-06 定，含 561–767 宽度段） */
-@media (min-width:561px) and (max-width:767px){
-  .poster-grid{grid-template-columns:repeat(2,1fr)}
-}
