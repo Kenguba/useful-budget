@@ -1,6 +1,6 @@
 {
  "date": "2026-11-06",
- "generatedAt": "2026-11-06T01:02:39.424722Z",
+ "generatedAt": "2026-11-06T01:14:41.093708Z",
  "stats": {
   "trackedSkills": "10,000+",
   "dataSources": 4,
@@ -9,7 +9,7 @@
   "maxInstallsSkill": "dev-god"
  },
  "highlights": [
-  "7 日动能最强：ui-taste 周涨幅 +87.2%，安装量 982,513",
+  "7 日动能最强：ui-taste 周涨幅 +87.2%，安装量 1,002,922",
   "社交声量第一：agent-browser，近 7 天 X 提及 64+ 次、GitHub 提及 47 次",
   "30 天新星第一：dev-god 首次上榜仅 29 天，热度 0.999",
   "星标日增最高：mattpocock/skills 单日 +1,903★"
@@ -124,8 +124,8 @@
   {
    "rank": 1,
    "repo": "morluto/rea",
-   "stars": 434379,
-   "starsDelta1d": 22,
+   "stars": 434415,
+   "starsDelta1d": 58,
    "blurb": "用 Agent 做软件逆向与二进制分析",
    "maintainer": "社区",
    "url": "https://github.com/morluto/rea"
@@ -133,7 +133,7 @@
   {
    "rank": 2,
    "repo": "mattpocock/skills",
-   "stars": 315234,
+   "stars": 315248,
    "starsDelta1d": 1903,
    "blurb": "实战技能：作者 .agents 目录原样公开",
    "maintainer": "知名开发者",
@@ -151,8 +151,8 @@
   {
    "rank": 4,
    "repo": "affaan-m/ECC",
-   "stars": 297878,
-   "starsDelta1d": 3,
+   "stars": 297881,
+   "starsDelta1d": 6,
    "blurb": "Agent 优化：技能、记忆、安全",
    "maintainer": "社区",
    "url": "https://github.com/affaan-m/ECC"
@@ -160,8 +160,8 @@
   {
    "rank": 5,
    "repo": "multica-ai/andrej-karpathy-skills",
-   "stars": 229883,
-   "starsDelta1d": 2,
+   "stars": 229886,
+   "starsDelta1d": 5,
    "blurb": "一个 CLAUDE.md 纠正编码坏习惯",
    "maintainer": "社区",
    "url": "https://github.com/multica-ai/andrej-karpathy-skills"
@@ -169,7 +169,7 @@
   {
    "rank": 6,
    "repo": "anthropics/skills",
-   "stars": 187764,
+   "stars": 187766,
    "starsDelta1d": 341,
    "blurb": "官方 Agent Skills 公开仓库",
    "maintainer": "官方组织",
@@ -178,7 +178,7 @@
   {
    "rank": 7,
    "repo": "DietrichGebert/ponytail",
-   "stars": 185246,
+   "stars": 185249,
    "starsDelta1d": 692,
    "blurb": "让 Agent 像最懒的资深工程师",
    "maintainer": "社区",
@@ -187,7 +187,7 @@
   {
    "rank": 8,
    "repo": "anthropics/claude-code",
-   "stars": 154674,
+   "stars": 154676,
    "starsDelta1d": 120,
    "blurb": "Claude Code 官方仓库",
    "maintainer": "官方组织",
@@ -196,7 +196,7 @@
   {
    "rank": 9,
    "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
-   "stars": 145715,
+   "stars": 145717,
    "starsDelta1d": 478,
    "blurb": "专业 UI/UX 设计智能技能",
    "maintainer": "社区",
@@ -531,7 +531,7 @@
    "rank": 1,
    "skill": "ai-image-generation",
    "growthPct": 60.0,
-   "installs": 660250,
+   "installs": 688591,
    "blurb": "AI 图像生成",
    "installCmd": "npx skills add https://github.com/skills-shell/superpowers --skill ai-image-generation",
    "url": "https://www.skills.sh/skills-shell/superpowers/ai-image-generation"
@@ -540,7 +540,7 @@
    "rank": 2,
    "skill": "ai-video-generation",
    "growthPct": 60.0,
-   "installs": 660222,
+   "installs": 688543,
    "blurb": "AI 视频生成",
    "installCmd": "npx skills add https://github.com/skills-shell/superpowers --skill ai-video-generation",
    "url": "https://www.skills.sh/skills-shell/superpowers/ai-video-generation"
@@ -549,7 +549,7 @@
    "rank": 3,
    "skill": "twitter-automation",
    "growthPct": 60.0,
-   "installs": 660157,
+   "installs": 688475,
    "blurb": "暂无说明",
    "installCmd": "npx skills add https://github.com/skills-shell/superpowers --skill twitter-automation",
    "url": "https://www.skills.sh/skills-shell/superpowers/twitter-automation"
@@ -558,7 +558,7 @@
    "rank": 4,
    "skill": "ai-avatar-video",
    "growthPct": 60.0,
-   "installs": 659870,
+   "installs": 688188,
    "blurb": "暂无说明",
    "installCmd": "npx skills add https://github.com/skills-shell/superpowers --skill ai-avatar-video",
    "url": "https://www.skills.sh/skills-shell/superpowers/ai-avatar-video"
@@ -567,7 +567,7 @@
    "rank": 5,
    "skill": "ui-taste",
    "growthPct": 87.2,
-   "installs": 982513,
+   "installs": 1002922,
    "blurb": "暂无说明",
    "installCmd": "",
    "url": "https://www.skills.sh/uizze.sh/ui-taste"
@@ -576,7 +576,7 @@
    "rank": 6,
    "skill": "design-mobile-apps",
    "growthPct": 0.0,
-   "installs": 1233455,
+   "installs": 1253403,
    "blurb": "移动端 App 界面设计",
    "installCmd": "npx skills add https://github.com/designed-by-ai/skills --skill design-mobile-apps",
    "url": "https://www.skills.sh/designed-by-ai/skills/design-mobile-apps"
