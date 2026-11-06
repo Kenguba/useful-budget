@@ -345,7 +345,7 @@
       '<div class="theme-panel-backdrop" id="themeBackdrop"></div>' +
       '<div class="theme-popover-panel" id="themePopover"><div class="panel-header"><span class="panel-title">12色弥散主题</span><span class="panel-hint">滑动或点击选择</span></div><div class="theme-swatch-grid" id="themeSwatchGrid"></div></div>' +
       "</div></div>" +
-      '<nav class="nav" id="topNav">' + navHtml +
+      '<nav class="nav" id="topNav" data-active="' + ["home", "discover", "today", "hot"].indexOf(active) + '"><span class="nav-glider" aria-hidden="true"></span>' + navHtml +
       '<div class="caterpillar-bar" id="caterpillarBar"></div>' +
       '<button class="btn-ask" id="btnAsk">求片</button>' +
       "</nav></div></header>";
@@ -794,14 +794,16 @@
   function renderToday() {
     var main = document.querySelector("#main .wrap") || document.getElementById("main");
     var per = 24, view = "list", kw = "", pan = "xunlei";
+    var GRID_SVG = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/></svg>';
+    var LIST_SVG = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8.5 6h12M8.5 12h12M8.5 18h12"/><circle cx="4" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.4" fill="currentColor" stroke="none"/></svg>';
     var items = state.updates.slice(), total = state.updatesTotal, curPage = 1, shown = per;
     main.innerHTML =
       '<div class="page-head page-head-flex"><div><h1>每日更新</h1><div class="desc">新发布与追更内容 · 共 ' +
       '<span id="tTotal">' + total + "</span> 项</div></div>" +
-      '<div class="view-toggle"><button id="vList" class="on">条目视图</button><button id="vGrid">网格视图</button></div></div>' +
+      '</div>' +
       '<div class="today-tools"><div class="t-search"><input id="tKw" placeholder="搜索每日更新">' +
-      '<button class="btn-small blue" id="tSearchBtn">搜索</button><button class="btn-small" id="tRefresh">刷新</button></div></div>' +
-      '<div class="frow" style="margin:4px 0 14px"><span class="fl" style="color:var(--mut);font-size:13.5px;width:64px">网盘筛选</span><span id="tPan"></span></div>' +
+      '<button class="btn-small blue" id="tSearchBtn">搜索</button><button class="btn-small view-toggle-btn" id="tViewBtn" type="button" aria-label="切换视图" title="切换视图"></button></div></div>' +
+      '<div class="frow" style="margin:4px 0 14px"><span id="tPan"></span></div>' +
       '<div id="tBody"></div><div class="more-row" id="tMore"></div>';
     function localFilter(list) {
       return list.filter(function (it) {
@@ -892,22 +894,17 @@
         more.innerHTML = list.length ? '<span style="color:var(--faint);font-size:13.5px">已展示全部 ' + (state.live ? total : list.length) + " 条</span>" : "";
       }
       boardPills(document.getElementById("tPan"),
-        [{ id: "xunlei", name: "迅雷" }, { id: "magnet", name: "磁力" }, { id: "", name: "全部" }], pan,
+        [{ id: "", name: "全部" }, { id: "xunlei", name: "迅雷" }, { id: "magnet", name: "磁力" }], pan,
         function (id) {
           pan = id; shown = per;
           if (state.live) fetchPage(1, true); else draw();
         });
-      document.getElementById("vList").className = view === "list" ? "on" : "";
-      document.getElementById("vGrid").className = view === "grid" ? "on" : "";
+      var tvb = document.getElementById("tViewBtn");
+      if (tvb) tvb.innerHTML = view === "list" ? GRID_SVG : LIST_SVG;
     }
-    document.getElementById("vList").onclick = function () { view = "list"; draw(); };
-    document.getElementById("vGrid").onclick = function () { view = "grid"; draw(); };
+    document.getElementById("tViewBtn").onclick = function () { view = view === "list" ? "grid" : "list"; draw(); };
     document.getElementById("tSearchBtn").onclick = function () {
       kw = document.getElementById("tKw").value.trim(); shown = per;
-      if (state.live) fetchPage(1, true); else draw();
-    };
-    document.getElementById("tRefresh").onclick = function () {
-      kw = ""; document.getElementById("tKw").value = ""; shown = per;
       if (state.live) fetchPage(1, true); else draw();
     };
     draw();
@@ -1355,6 +1352,7 @@
         try { k = routeKeyFromUrl(new URL(a.href)); } catch (e) {}
         a.classList.toggle("on", k === key);
       });
+      nav.setAttribute("data-active", ["home", "discover", "today", "hot"].indexOf(key));
     }
     var appBtn = document.getElementById("btnAppNav");
     if (appBtn) appBtn.classList.toggle("on", key === "app");
