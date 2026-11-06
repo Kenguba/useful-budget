@@ -761,6 +761,11 @@
       background: rgba(30, 41, 59, 0.78);
     }
 
+    [data-dark="true"] .theme-swatch-item.active,
+    [data-dark="true"] .theme-swatch-item.sliding-hover {
+      background: rgba(30, 41, 59, 0.78);
+    }
+
     .theme-swatch-item.active,
     .theme-swatch-item.sliding-hover {
       background: var(--theme-tag-bg);
@@ -1748,6 +1753,10 @@
       color: var(--theme-accent);
     }
 
+    [data-dark="true"] .mask-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.10);
+    }
+
 
     .primary-aura-btn:hover {
       transform: translateY(-2px);
@@ -1787,6 +1796,7 @@
 
 /* ===== graft additions: current-logic elements in the new skin ===== */
 ::selection{background:var(--theme-tag-bg)}
+[data-dark="true"] ::selection{background:rgba(255,255,255,.25)}
 .nav-item-index svg{width:15px;height:15px;flex-shrink:0}
 .tool-chip-inner svg{width:16px;height:16px;flex-shrink:0}
 .tool-chip.active .tool-chip-inner svg{color:var(--theme-accent)}
