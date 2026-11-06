@@ -1994,6 +1994,7 @@
     let flyIdx = -1;
     let flyOffsetY = 0;
     let flyAnimRaf = null;
+    let flyWaapi = null;
 
     function stopFlyAnimation() {
       if (flyAnimRaf) {
@@ -2026,17 +2027,50 @@
       const proj = filtered[activeStackIdx];
       if (!proj) return;
       flyIdx = activeStackIdx;
-      const vh = document.getElementById('stackViewport').clientHeight || 600;
-      tweenFlyTo(-(vh + 180), 300, (k) => k * k * k, () => {
+
+      const viewport = document.getElementById('stackViewport');
+      const stage = document.getElementById('stackStageWrapper');
+      const el = viewport.querySelectorAll('.app-window-card')[activeStackIdx];
+
+      const finish = () => {
         if (proj.url) {
           window.location.href = proj.url;
-        } else {
-          openProjectPreview(proj.id);
-          flyOffsetY = 0;
-          flyIdx = -1;
-          updateStackTransforms();
+          return;
         }
-      });
+        if (flyWaapi) { flyWaapi.cancel(); flyWaapi = null; }
+        if (el) el.style.zIndex = '';
+        if (stage) stage.style.zIndex = '';
+        flyOffsetY = 0;
+        flyIdx = -1;
+        updateStackTransforms();
+        openProjectPreview(proj.id);
+      };
+
+      // 无 WAAPI 的环境退回上一版的直飞出
+      if (!el || typeof el.animate !== 'function') {
+        const vh = viewport.clientHeight || 600;
+        tweenFlyTo(-(vh + 180), 300, (k) => k * k * k, finish);
+        return;
+      }
+
+      // 收缩目标：搜索框右侧的圆形钮中心，卡片飞向它、缩成圆点后消失
+      const target = document.querySelector('.gemini-search-card .action-circle-btn') || document.querySelector('.gemini-search-card');
+      const r = el.getBoundingClientRect();
+      const tr = target.getBoundingClientRect();
+      const dx = (tr.left + tr.width / 2) - (r.left + r.width / 2);
+      const dy = (tr.top + tr.height / 2) - (r.top + r.height / 2);
+
+      // 飞出全程置于最上层：容器与卡片双层抬升，邻卡不得压住它
+      if (stage) stage.style.zIndex = '60';
+      el.style.zIndex = '999';
+
+      const baseTransform = el.style.transform;
+      const baseOpacity = el.style.opacity || '1';
+      flyWaapi = el.animate([
+        { transform: baseTransform, opacity: baseOpacity, borderRadius: '22px' },
+        { transform: baseTransform + ' translate(' + dx.toFixed(1) + 'px, ' + dy.toFixed(1) + 'px) scale(0.03)', opacity: '0', borderRadius: '50%' }
+      ], { duration: 460, easing: 'cubic-bezier(.5, 0, .75, 0)', fill: 'forwards' });
+      flyWaapi.onfinish = finish;
     }
 
     function renderPortalCards() {
@@ -2259,6 +2293,8 @@
         // 支持在惯性滑行途中随时手指按住截停接管（Catch in flight）
         stopStackAnimation();
         stopFlyAnimation();
+        if (flyWaapi) { flyWaapi.cancel(); flyWaapi = null; }
+        document.getElementById('stackStageWrapper').style.zIndex = '';
         isStackDragging = true;
         stackDragMoved = false;
         dragAxis = null;
