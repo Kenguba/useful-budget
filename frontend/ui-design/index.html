@@ -1386,63 +1386,7 @@
       box-shadow: 0 4px 12px var(--search-glow);
     }
 
-    /* ================= 12. 底部「复刻提示词」卡片与原站页脚 ================= */
-    .replica-prompt-card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
-    }
-
-    .replica-prompt-title {
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--text-primary);
-    }
-
-    .replica-prompt-sub {
-      font-size: 12px;
-      color: var(--text-secondary);
-      line-height: 1.55;
-    }
-
-    .replica-prompt-pre {
-      background-color: var(--page-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 12px;
-      font-size: 11.5px;
-      line-height: 1.65;
-      color: var(--text-secondary);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      max-height: 180px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-
-    .copy-prompt-btn {
-      align-self: flex-start;
-      border: none;
-      background-color: var(--refresh-btn-bg);
-      color: #FFFFFF;
-      padding: 8px 16px;
-      border-radius: 999px;
-      font-size: 12.5px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 12px var(--search-glow);
-      transition: transform 0.2s var(--ease-spring);
-    }
-
-    .copy-prompt-btn:active {
-      transform: scale(0.95);
-    }
-
+    /* ================= 12. 原站页脚 ================= */
     .catalogue-footer {
       border-top: 1px solid var(--card-border);
       padding-top: 16px;
@@ -1819,7 +1763,6 @@
       }
 
       .catalogue-body,
-      .replica-prompt-card,
       .catalogue-footer {
         margin-left: 18px;
         margin-right: 18px;
@@ -1863,7 +1806,7 @@
 
     /* Toast：深色下不再是实心近白胶囊，改深色抬升面 + 浅字 + 微透描边 */
     [data-dark="true"] .toast-banner { background: rgba(30, 41, 59, 0.94); color: #F8FAFC; border: 1px solid rgba(255, 255, 255, 0.14); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45); }
-    .refresh-btn, .action-circle-btn, .lang-pill-btn, .subtag-chip, .submit-cta-btn, .login-trigger-btn, .copy-prompt-btn, .show-all-btn { -webkit-tap-highlight-color: transparent; }
+    .refresh-btn, .action-circle-btn, .lang-pill-btn, .subtag-chip, .submit-cta-btn, .login-trigger-btn, .show-all-btn { -webkit-tap-highlight-color: transparent; }
 
     @media (prefers-reduced-motion: reduce) {
       .aura-orb, .sidebar-orb-top, .sidebar-orb-bottom, .refresh-btn, .submit-cta-btn, .action-circle-btn, .swatch-orb-preview.holo-animated { animation: none !important; }
@@ -2103,30 +2046,6 @@
         </section>
 
       </main>
-
-      <!-- 底部「复刻提示词」卡片 -->
-      <section class="replica-prompt-card" id="promptBlock" aria-label="Replica Prompt">
-        <div class="replica-prompt-title" id="promptCardTitle">复刻提示词</div>
-        <p class="replica-prompt-sub" id="promptCardSub">把下面这段发给任何编程 Agent，就能按同样的规格复刻这个站（数据来自 designxxx.xyz 官方公开接口）</p>
-        <pre class="replica-prompt-pre" id="promptText">请帮我原样复刻 designxxx.xyz 首页，做一个设计目录站，单文件 HTML（CSS 和 JS 全部内联）
-
-条目数据走官方公开接口拉取，不要编造：
-- GET https://designxxx.xyz/api/catalog?collection=inspiration|resources|tools|portfolios
-- 接口分页：响应里的 nextCursor 作为下一次请求的 cursor 参数，约 24 条一页，拉到 nextCursor 为空为止
-- 合集条数：灵感 137、资源 205、工具 158、作品集 170，共 670 条；每条取 name、tagline、url、host、category.name、pricing（free / freemium / paid，可能为空）
-- Finds 共 157 条：首页 HTML 里有最新一批的海报图，地址形如 https://cdn.designxxx.xyz/finds/&lt;slug&gt;/1-poster.webp，连同作者名 creatorName、句柄 creatorHandle、图片宽高一起解析出来；海报图要下载到本地 assets 目录再引用，不要热链
-
-
-- 固定左侧栏：顶部字标「designxxx.xyz」，其下一句小字「A curated collection of interface craft, component libraries, AI tools, and resources for builders.」；导航列出 Finds / Inspiration / Resources / Tools / Portfolios 并带各自条数；一个黑色胶囊形 Submit 按钮；栏底一行小字脚注
-- 主区：大标题「Designeer is a curated catalogue for designers and developers.」+ 引言「Design inspiration, UI resources, tools and portfolios, each reviewed by hand. Below, the latest visual work picked from across the web.」，文案逐字照抄不要改写
-- 先是 Finds 海报瀑布流（CSS columns 多列，图片卡圆角，下方标注作者名和 @句柄，点卡跳原站条目页 https://designxxx.xyz/finds/&lt;slug&gt;）
-- 然后每个合集一节：节标题 + 总条数，下面是条目卡片网格；卡片只有文字：名称、一行简介、分类标签和价格标签（Free / Freemium / Paid），整卡链接到条目的真实外站 url
-- 每节先显示 24 条，带「显示全部 N 条」按钮展开；再加一个搜索框，按名称 / 简介 / 分类模糊过滤全部条目
-- 整个站是单页应用：点左侧导航就地切换视图（标签页式），只显示对应合集、不整页滚动、不刷新；默认是首页视图（大标题 + 引言 + Finds 海报流 + 各合集预览）；切换时把视图写进 location.hash，浏览器返回 / 前进恢复到离开时的视图且内容不消失、不重新加载；搜索词在切换视图后保留
-- 浅色干净风：白 / 米白底、近黑字、细边框、大留白、灰色小字标签；移动端侧栏收成顶栏 + 横向导航，不横向溢出
-- 页脚署名一行：「Content from Designeer (designxxx.xyz), replica for study purposes.」</pre>
-        <button type="button" class="copy-prompt-btn" id="copyPrompt">复制提示词</button>
-      </section>
 
       <footer class="catalogue-footer" id="pageFooter">
         Content from Designeer, replica for study purposes.<br>
@@ -2569,11 +2488,6 @@ function applyLang(){
     : "Every entry reviewed by hand. Replica built for study.";
   document.getElementById("panelTitle").textContent = z ? "12 色弥散主题" : "12 Aura Themes";
   document.getElementById("panelHint").textContent = z ? "滑动或点选" : "Slide or tap";
-  document.getElementById("promptCardTitle").textContent = z ? "复刻提示词" : "Replica Prompt";
-  document.getElementById("promptCardSub").textContent = z
-    ? "把下面这段发给任何编程 Agent，就能按同样的规格复刻这个站（数据来自 designxxx.xyz 官方公开接口）"
-    : "Send the prompt below to any coding agent to rebuild this site to the same spec (data from the designxxx.xyz public catalogue API)";
-  document.getElementById("copyPrompt").textContent = z ? "复制提示词" : "Copy prompt";
   var findsSec = document.getElementById("finds");
   findsSec.querySelector("[data-finds-meta]").textContent = z ? "原站 157 幅 — 最新 24 期海报精选" : "157 on the original — 27 posters from the latest 24 below";
   findsSec.querySelector("[data-finds-desc]").textContent = z ? "来自全网独立设计师与开发者的最新视觉界面佳作" : "The latest visual work picked from across the web.";
@@ -2735,27 +2649,6 @@ document.getElementById("searchGoBtn").addEventListener("click", function(){
   else document.getElementById("catalogueBody").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-/* ================= 复刻提示词复制 ================= */
-document.getElementById("copyPrompt").addEventListener("click", function(){
-  var btn = this;
-  var text = document.getElementById("promptText").textContent;
-  function done(){
-    showToast(zh() ? "已复制复刻提示词" : "Prompt copied to clipboard");
-    var old = btn.textContent;
-    btn.textContent = zh() ? "已复制" : "Copied";
-    setTimeout(function(){ btn.textContent = old; }, 1600);
-  }
-  function fallback(){
-    var ta = document.createElement("textarea");
-    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
-    document.body.appendChild(ta); ta.select();
-    try { document.execCommand("copy"); done(); } catch (e) {}
-    document.body.removeChild(ta);
-  }
-  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);
-  else fallback();
-});
-
 /* ================= 登录 / 提交 模态框（装饰性） ================= */
 var authTabOrder = ["login", "register", "submit"];
 function switchAuthTab(tabName){
@@ -2832,7 +2725,6 @@ function showView(view, scrollTop){
   currentView = view;
   var isHome = view === "home";
   document.getElementById("heroBlock").style.display = isHome ? "" : "none";
-  document.getElementById("promptBlock").style.display = isHome ? "" : "none";
   document.getElementById("pageFooter").style.display = isHome ? "" : "none";
   SECTION_IDS.forEach(function(id){
     document.getElementById(id).style.display = (isHome || view === id) ? "" : "none";
