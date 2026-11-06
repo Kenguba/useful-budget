@@ -210,14 +210,25 @@
       ? '<form class="top-search" id="topSearch"><input id="topSearchInput" placeholder="搜索你想找的资源" autocomplete="off">' +
         '<button type="submit">搜索</button></form>'
       : "";
+    var sunPaths = '<circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4.5"></line><line x1="12" y1="19.5" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line><line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="4.5" y2="12"></line><line x1="19.5" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line><line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line>';
+    var globeSvg = '<svg class="globe-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>';
+    var auraHtml = '<div class="aura-backdrop" aria-hidden="true"><div class="aura-orb orb-left"></div><div class="aura-orb orb-center"></div><div class="aura-orb orb-right"></div></div>';
     var header =
-      '<header class="topbar"><div class="topbar-in">' +
-      '<a class="logo" href="' + BASE + 'index.html">' + logoGrid() + esc(name) + "</a>" +
+      '<header class="topbar">' + auraHtml + '<div class="topbar-in">' +
+      '<div class="top-row">' +
+      '<a class="logo" href="' + BASE + 'index.html">' + logoGrid() + '<span class="logo-name" id="brandNameText">' + esc(name) + "</span></a>" +
       topSearch +
+      '<div class="top-right-widgets">' +
+      '<button class="btn-app' + (active === "app" ? " on" : "") + '" onclick="location.href=\'' + BASE + "app/'\">📱<span class=\"app-txt\">APP</span></button>" +
+      '<button class="btn-install" id="btnInstall" type="button">安装</button>' +
+      '<button class="lang-pill-btn" id="langBtn" type="button" title="切换语言 / Switch Language">' + globeSvg + '<span class="lang-text" id="langText">中文</span></button>' +
+      '<button class="theme-mode-btn" id="darkModeBtn" type="button" title="单击切换日夜 / 长按滑动选12色主题" aria-label="切换日夜或选择主题">' +
+      '<svg class="sun-moon-svg" id="sunMoonIcon" viewBox="0 0 24 24">' + sunPaths + "</svg></button>" +
+      '<div class="theme-panel-backdrop" id="themeBackdrop"></div>' +
+      '<div class="theme-popover-panel" id="themePopover"><div class="panel-header"><span class="panel-title">12色弥散主题</span><span class="panel-hint">滑动或点击选择</span></div><div class="theme-swatch-grid" id="themeSwatchGrid"></div></div>' +
+      "</div></div>" +
       '<nav class="nav" id="topNav">' + navHtml +
       '<div class="caterpillar-bar" id="caterpillarBar"></div>' +
-      '<button class="btn-app' + (active === "app" ? " on" : "") + '" onclick="location.href=\'' + BASE + "app/'\">APP</button>" +
-      '<button class="btn-install" id="btnInstall" type="button">安装</button>' +
       '<button class="btn-ask" id="btnAsk">求片</button>' +
       "</nav></div></header>";
     document.body.insertAdjacentHTML("afterbegin", header);
@@ -356,6 +367,8 @@
         }
       };
     }
+    // 12 色主题 / 日夜 / 语言模块挂接（assets/theme.js，只管外壳偏好）
+    if (window.PanTheme) window.PanTheme.bindShell();
   }
   function extractPopupLink(pres) {
     try {
@@ -533,7 +546,9 @@
       return '<a href="' + BASE + "search/?q=" + encodeURIComponent(h.query) + '">' + esc(h.query) + "</a>";
     }).join("");
     var html =
-      '<section class="hero"><h1>好内容，<span class="b">一搜就有</span></h1>' +
+      '<section class="hero"><div class="aura-backdrop" aria-hidden="true"><div class="aura-orb orb-left"></div><div class="aura-orb orb-center"></div><div class="aura-orb orb-right"></div></div>' +
+      '<div class="hero-badge">⚡ 夸克网盘搜索 · 迅雷会员特权直达 · 磁力聚合</div>' +
+      '<h1>好内容，<span class="b">一搜就有</span></h1>' +
       '<p class="sub">' + esc(pres.hero_subtitle || "夸克网盘搜索") + "</p>" +
       searchbarHtml("") +
       '<div class="hotline"><span class="lbl">大家都在搜</span>' + hotTop + "</div></section>";
@@ -765,7 +780,7 @@
     var main = document.querySelector("#main .wrap") || document.getElementById("main");
     var q = new URLSearchParams(location.search).get("q") || "";
     var prov0 = new URLSearchParams(location.search).get("provider") || "";
-    var html = '<section class="hero" style="padding-top:36px">' + searchbarHtml(q) + "</section>";
+    var html = '<section class="hero" style="padding-top:36px"><div class="aura-backdrop" aria-hidden="true"><div class="aura-orb orb-left"></div><div class="aura-orb orb-center"></div><div class="aura-orb orb-right"></div></div>' + searchbarHtml(q) + "</section>";
     if (!q) {
       html += '<div class="section"><div class="card"><div class="card-head"><span class="ic ic-orange">🔥</span>' +
         "<div><h2>热门搜索</h2></div></div>" +
