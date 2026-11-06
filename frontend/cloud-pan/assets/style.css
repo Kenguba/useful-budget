@@ -123,8 +123,19 @@ button{font-family:inherit;cursor:pointer}
 .nav a{padding:8px 16px;font-size:14px;color:var(--text-secondary);border-radius:999px;white-space:nowrap;flex:none;transition:color .2s,background-color .25s}
 .nav a:hover{color:var(--theme-accent)}
 .nav a.on{background:var(--pill-surface);color:var(--text-primary);font-weight:700;box-shadow:0 4px 12px -2px var(--search-glow)}
-/* 首页导航签在 Hero 卡底部时的间距（ken 2026-11-06 移签） */
-.hero .nav{margin:18px 0 0}
+/* 首页导航签按原稿 gemini 分段控件复刻（ken 2026-11-06 回原稿核对）：等宽四格、居中限宽 420px、毛玻璃底、选中白胶囊 */
+.hero .nav{display:grid;grid-template-columns:repeat(4,1fr);width:100%;max-width:420px;margin:0 auto 14px;padding:4px;gap:0;
+  overflow:visible;background:rgba(255,255,255,.58);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:inset 0 1px 3px rgba(15,23,42,.04),0 6px 18px -6px var(--search-glow)}
+[data-dark="true"] .hero .nav{background:rgba(15,23,42,.58)}
+.hero .nav a{padding:7px 6px;font-size:13px;font-weight:600;text-align:center}
+.hero .nav a.on{font-weight:800;box-shadow:0 4px 14px var(--search-glow),0 2px 6px rgba(15,23,42,.06)}
+.hero .nav .caterpillar-bar,.hero .nav .btn-ask{display:none}
+@media (min-width:640px){.hero .nav a{padding:8px 18px;font-size:14px}}
+/* 联系卡内的在线求片按钮（原稿联系窗内含求片） */
+.cc-ask{display:block;width:100%;margin-top:10px;padding:8px 0;border:none;border-radius:999px;background:var(--theme-tag-bg);
+  color:var(--theme-tag-text);font-size:13px;font-weight:700;cursor:pointer;transition:transform .12s ease}
+.cc-ask:active{transform:scale(.97)}
 .caterpillar-bar{display:none}
 .btn-ask{margin-left:auto;flex:none;background:var(--pill-surface);color:var(--text-primary);border:none;font-size:13px;font-weight:700;
   padding:8px 16px;border-radius:999px;box-shadow:var(--pill-shadow);white-space:nowrap}
@@ -199,7 +210,7 @@ button{font-family:inherit;cursor:pointer}
 .btn-search:disabled{opacity:.45;cursor:not-allowed}
 /* 热搜词推荐栏（新稿 6.5 节口径）：电脑端带「大家都在搜」标签、严格单行按行宽装入、不滚不截；
    手机端无标签、严格两行、整条不截、两行一起横向可滚；装入数量由 app.js 量宽决定（PC 3–10、手机 3–8） */
-.hot-keywords-bar{max-width:760px;margin:14px auto 0;padding:2px 4px;position:relative}
+.hot-keywords-bar{max-width:760px;margin:10px auto 0;padding:2px 4px;position:relative}
 .kw-measure-sandbox{position:fixed;top:-9999px;left:-9999px;visibility:hidden;pointer-events:none;display:flex;gap:7px;white-space:nowrap}
 .hot-kw-pc{display:none}
 .hot-kw-pc .lbl{color:var(--text-muted);flex:none;font-size:12.5px}
@@ -394,7 +405,7 @@ details.about summary{cursor:pointer;color:var(--text-secondary);font-weight:600
 /* 联系我们磁吸竖签（新稿 11 节：竖排贴边 + 自由拖拽 + 边缘磁吸 + 半收起耳片） */
 .floating-contact-dock{position:fixed;right:0;bottom:110px;z-index:95;display:flex;align-items:center;justify-content:center;
   background:rgba(255,255,255,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  padding:14px 8px;border-radius:18px 0 0 18px;
+  padding:10px 6px;border-radius:18px 0 0 18px;
   box-shadow:-2px 6px 22px -2px var(--search-glow),-2px 2px 10px rgba(15,23,42,.08);
   user-select:none !important;-webkit-user-select:none !important;-webkit-touch-callout:none !important;
   touch-action:none;cursor:grab;will-change:left,top,transform,opacity,border-radius;
@@ -404,8 +415,8 @@ details.about summary{cursor:pointer;color:var(--text-secondary);font-weight:600
 .floating-contact-dock.docked-right{border-radius:18px 0 0 18px}
 .floating-contact-dock.is-dragging{cursor:grabbing;transition:none !important;border-radius:20px !important;transform:scale(1.05) !important;
   box-shadow:0 16px 36px -2px var(--search-glow),0 6px 18px rgba(15,23,42,.18)}
-.floating-contact-dock.stashed-right{border-radius:14px 0 0 14px;padding:12px 4px;transform:translate3d(calc(100% - 14px),0,0)}
-.floating-contact-dock.stashed-left{border-radius:0 14px 14px 0;padding:12px 4px;transform:translate3d(calc(-100% + 14px),0,0)}
+.floating-contact-dock.stashed-right{border-radius:14px 0 0 14px;padding:9px 3px;transform:translate3d(calc(100% - 14px),0,0)}
+.floating-contact-dock.stashed-left{border-radius:0 14px 14px 0;padding:9px 3px;transform:translate3d(calc(-100% + 14px),0,0)}
 .floating-contact-dock.stashed-idle{opacity:.52}
 .floating-contact-dock:hover{opacity:1;box-shadow:0 10px 28px -2px var(--search-glow),0 4px 14px rgba(15,23,42,.12)}
 .dock-stash-ear{display:none;align-items:center;justify-content:center;color:var(--theme-accent);pointer-events:none}
@@ -413,7 +424,7 @@ details.about summary{cursor:pointer;color:var(--text-secondary);font-weight:600
 .floating-contact-dock.stashed-left .dock-stash-ear svg{transform:rotate(180deg)}
 .floating-contact-dock.stashed-right .contact-float-btn,.floating-contact-dock.stashed-left .contact-float-btn{display:none !important}
 .contact-float-btn{background:transparent;border:none;color:var(--text-secondary);writing-mode:vertical-rl;text-orientation:upright;
-  font-size:12px;font-weight:700;letter-spacing:3px;line-height:1.2;cursor:inherit;display:inline-flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;letter-spacing:2px;line-height:1.2;cursor:inherit;display:inline-flex;align-items:center;justify-content:center;
   user-select:none !important;-webkit-user-select:none !important;-webkit-touch-callout:none !important;transition:color .25s ease;padding:0}
 .floating-contact-dock:hover .contact-float-btn{color:var(--theme-accent)}
 
