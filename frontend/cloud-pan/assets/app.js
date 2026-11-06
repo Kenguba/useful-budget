@@ -1,7 +1,12 @@
 /* 基德盘搜复刻 — 共享外壳 + 各页渲染（数据来自 data/ 快照） */
 (function () {
   "use strict";
-  var BASE = window.PAN_BASE || "";
+  /* SPA 化（ken 2026-11-07 定）：BASE 启动时归一化为站点根绝对地址，
+     站内切视图（pushState 改址）后数据与链接仍按根解析，不随当前路由深度漂移 */
+  var BASE = (function () {
+    var rel = window.PAN_BASE || "";
+    return new URL(rel === "" ? "." : rel, location.href).href;
+  })();
   var ORIGIN = "https://naspt.vip";
   /* 实时数据中转（Cloudflare Worker）：页面 -> Worker -> 原站公开接口。
      RELAY 未配置或请求失败时，自动回退到 data/ 快照。 */
@@ -333,7 +338,7 @@
       '<a class="logo" href="' + BASE + 'index.html">' + logoGrid() + '<span class="logo-name" id="brandNameText">' + esc(name) + "</span></a>" +
       topSearch +
       '<div class="top-right-widgets">' +
-      '<button class="btn-app' + (active === "app" ? " on" : "") + '" onclick="location.href=\'' + BASE + "app/'\">📱<span class=\"app-txt\">APP</span></button>" +
+      '<button class="btn-app' + (active === "app" ? " on" : "") + '" id="btnAppNav">📱<span class="app-txt">APP</span></button>' +
       '<button class="lang-pill-btn" id="langBtn" type="button" title="切换语言 / Switch Language">' + globeSvg + '<span class="lang-text" id="langText">中文</span></button>' +
       '<button class="theme-mode-btn" id="darkModeBtn" type="button" title="单击切换日夜 / 长按滑动选12色主题" aria-label="切换日夜或选择主题">' +
       '<svg class="sun-moon-svg" id="sunMoonIcon" viewBox="0 0 24 24">' + sunPaths + "</svg></button>" +
@@ -386,7 +391,7 @@
     if (tsForm) tsForm.onsubmit = function (e) {
       e.preventDefault();
       var q = document.getElementById("topSearchInput").value.trim();
-      if (q) location.href = BASE + "search/?q=" + encodeURIComponent(q);
+      if (q) navigate(BASE + "search/?q=" + encodeURIComponent(q));
     };
 
     // 右侧联系卡 + 磁吸竖签（按新稿 floating-contact-dock：可拖拽、松手磁吸左右边缘、拉到最外侧或甩向边缘半收起露耳片，点击展开二维码卡）
@@ -551,14 +556,18 @@
         }
       };
     }
-    document.addEventListener("click", function (e) {
-      if (sel && !sel.contains(e.target)) closeMenu();
-    });
-    document.addEventListener("keydown", function (e) {
+    function docClick(e) { if (sel && !sel.contains(e.target)) closeMenu(); }
+    function docKey(e) {
       if (e.key === "Escape" && sel && sel.classList.contains("open")) {
         closeMenu();
         if (btn) btn.focus();
       }
+    }
+    document.addEventListener("click", docClick);
+    document.addEventListener("keydown", docKey);
+    onCleanup(function () {
+      document.removeEventListener("click", docClick);
+      document.removeEventListener("keydown", docKey);
     });
 
     renderMenu();
@@ -567,7 +576,7 @@
       e.preventDefault();
       var q = input.value.trim();
       if (!q) return;
-      location.href = BASE + "search/?q=" + encodeURIComponent(q) + (curPan ? "&provider=" + curPan : "");
+      navigate(BASE + "search/?q=" + encodeURIComponent(q) + (curPan ? "&provider=" + curPan : ""));
     };
   }
 
@@ -727,11 +736,7 @@
     main.innerHTML = html;
     bindSearchbar();
     layoutHotKeywords();
-    // 导航签按原稿位置移进 Hero：标题之下、搜索框之上（ken 2026-11-06 回原稿核对）；毛毛虫指示条靠既有 resize 监听自动重定位
-    var navEl = document.getElementById("topNav");
-    var heroEl = main.querySelector(".hero");
-    var sbEl = heroEl ? heroEl.querySelector(".searchbar") : null;
-    if (navEl && heroEl && sbEl) { heroEl.insertBefore(navEl, sbEl); window.dispatchEvent(new Event("resize")); }
+    // 导航签按 ken 2026-11-07 指示放回顶栏原位：首页不再移签，顶栏导航与子页面同款分段控件
     var curCat = "rec", curKind = "all";
     function drawBoard() {
       var items = boardFilter(curCat, curKind);
@@ -849,6 +854,7 @@
         if (es[0].isIntersecting) loadMore();
       }, { rootMargin: "300px" });
     }
+    onCleanup(function () { if (tObserver) tObserver.disconnect(); });
     function tgCard(it) {
       var links = it.links || [];
       var pref = links.filter(function (l) { return l.provider === pan; })[0] || links[0];
@@ -1064,6 +1070,7 @@
       es = new EventSource(RELAY + "/api/search/stream?q=" + encodeURIComponent(q));
     } catch (e) { failover(); return; }
     var timer = setTimeout(function () { if (!done && !items.length) { try { es.close(); } catch (e) {} failover(); } }, 40000);
+    onCleanup(function () { done = true; clearTimeout(timer); try { es.close(); } catch (e) {} });
     es.addEventListener("start", function (e) {
       try { providers = JSON.parse(e.data).providers || []; } catch (err) {}
       paint();
@@ -1269,69 +1276,163 @@
     state.updatesTotal = (u && u.total) || state.updates.length;
     state.updatesPage = 1;
   }
+  /* ================= SPA 路由（ken 2026-11-07 定：全站单页化） =================
+     外壳（顶栏/竖签/弹窗）只渲染一次；站内跳转拦截链接、pushState 改址、就地换视图，
+     前进/返回恢复视图与滚动位置；页面级副作用（搜索流、触底观察器、文档监听）离页时统一清理 */
+  var TITLES = {
+    home: "基德盘搜 - 网盘资源搜索引擎 | 夸克百度阿里迅雷全平台",
+    discover: "影视榜单与热门剧集 - 基德盘搜",
+    today: "今日更新 - 基德盘搜",
+    hot: "热搜榜 - 基德盘搜",
+    search: "搜索资源 - 基德盘搜",
+    resource: "资源详情 - 基德盘搜",
+    app: "基德盘搜 APP - 基德盘搜",
+    apply: "申请友情链接 - 基德盘搜"
+  };
+  var VARIANT_B = ["discover", "hot", "apply", "search", "resource"];
+  var cleanups = [];
+  function onCleanup(fn) { cleanups.push(fn); }
+  function runCleanups() {
+    var fns = cleanups; cleanups = [];
+    fns.forEach(function (f) { try { f(); } catch (e) {} });
+  }
+  var dataCache = {};
+  function getHot() {
+    if (dataCache.hot) { state.hot = dataCache.hot; return Promise.resolve(); }
+    return liveOr("/hot-searches?limit=50", "hot").then(function (h) { dataCache.hot = h || []; state.hot = dataCache.hot; });
+  }
+  function getUpdates() {
+    if (dataCache.updates) { fillUpdates(dataCache.updates); return Promise.resolve(); }
+    return liveOr("/updates?page=1&page_size=24", "updates").then(function (u) { dataCache.updates = u; fillUpdates(u); });
+  }
+  function getDiscovery() {
+    if (dataCache.discovery) { state.discovery = dataCache.discovery; return Promise.resolve(); }
+    return liveOr("/discovery?limit=40&source=tmdb", "discovery").then(function (d) { dataCache.discovery = absDiscovery(d); state.discovery = dataCache.discovery; });
+  }
+  function getFriend() {
+    if (dataCache.friend) { state.friend = dataCache.friend; return Promise.resolve(); }
+    return liveOr("/friend-link-settings", "friend").then(function (f) { dataCache.friend = f || {}; state.friend = dataCache.friend; });
+  }
+  function getApp() {
+    if (dataCache.app) { state.appInfo = dataCache.app; return Promise.resolve(); }
+    var appLive = relayReady()
+      ? fetch(RELAY + "/app/android/latest.json").then(function (r) { return r.json(); }).catch(function () { return load("app"); })
+      : load("app").catch(function () { return {}; });
+    return appLive.then(function (a) { dataCache.app = a || {}; state.appInfo = dataCache.app; });
+  }
+  function loadAndRender(key) {
+    if (key === "home") return Promise.all([getHot(), getUpdates(), getDiscovery()]).then(function () { renderHome(); });
+    if (key === "search") return Promise.all([getHot(), getUpdates(), getDiscovery()]).then(function () { renderSearch(); });
+    if (key === "discover") return getDiscovery().then(function () { renderDiscover(); });
+    if (key === "today") return getUpdates().then(function () { renderToday(); });
+    if (key === "hot") return getHot().then(function () { renderHot(); });
+    if (key === "resource") return load("updates").then(function (u) { fillUpdates(u); renderResource(); }).catch(function () { renderResource(); });
+    if (key === "app") return getApp().then(function () { renderApp(); });
+    if (key === "apply") return getFriend().then(function () { renderApply(); });
+    renderHome();
+    return Promise.resolve();
+  }
+  function routeKeyFromUrl(u) {
+    var p = u.pathname, root = new URL(BASE).pathname;
+    if (/\/friend-links\/apply\/?$/.test(p)) return "apply";
+    if (/\/discover\/?$/.test(p)) return "discover";
+    if (/\/today\/?$/.test(p)) return "today";
+    if (/\/hot\/?$/.test(p)) return "hot";
+    if (/\/search\/?$/.test(p)) return "search";
+    if (/\/resource\/?$/.test(p)) return "resource";
+    if (/\/app\/?$/.test(p)) return "app";
+    if (p === root || p === root + "index.html") return "home";
+    return null;
+  }
+  function updateShell(key) {
+    document.body.setAttribute("data-page", key);
+    document.body.classList.toggle("page-home", key === "home");
+    document.title = TITLES[key] || "基德盘搜";
+    var nav = document.getElementById("topNav");
+    if (nav) {
+      Array.prototype.forEach.call(nav.querySelectorAll("a"), function (a) {
+        var k = null;
+        try { k = routeKeyFromUrl(new URL(a.href)); } catch (e) {}
+        a.classList.toggle("on", k === key);
+      });
+    }
+    var appBtn = document.getElementById("btnAppNav");
+    if (appBtn) appBtn.classList.toggle("on", key === "app");
+    var needTs = VARIANT_B.indexOf(key) >= 0;
+    var ts = document.getElementById("topSearch");
+    if (needTs && !ts) {
+      var row = document.querySelector(".top-row");
+      if (row) {
+        var form = document.createElement("form");
+        form.className = "top-search"; form.id = "topSearch";
+        form.innerHTML = '<input id="topSearchInput" placeholder="搜索你想找的资源" autocomplete="off"><button type="submit">搜索</button>';
+        row.insertBefore(form, row.querySelector(".top-right-widgets"));
+        form.onsubmit = function (e) {
+          e.preventDefault();
+          var q = document.getElementById("topSearchInput").value.trim();
+          if (q) navigate(BASE + "search/?q=" + encodeURIComponent(q));
+        };
+      }
+    } else if (!needTs && ts) {
+      ts.parentNode.removeChild(ts);
+    }
+  }
+  function mountReset(key) {
+    var m = document.getElementById("main");
+    if (m) m.innerHTML = key === "home" ? "" : '<div class="wrap"></div>';
+  }
+  var routerReady = false, currentKey = null, lastHref = location.href, renderedHref = location.href, scrollCache = {};
+  function navigate(url, push) {
+    var u;
+    try { u = new URL(url, location.href); } catch (e) { location.href = url; return; }
+    if (!routerReady || u.origin !== location.origin) { location.href = u.href; return; }
+    var key = routeKeyFromUrl(u);
+    if (!key) { location.href = u.href; return; }
+    /* 同址判断必须比「当前已渲染的地址」而非 location.href：popstate 触发时浏览器已先改址，
+       拿 location.href 比会把所有返回/前进都误判成同页而吞掉（2026-11-07 本地实测定位） */
+    if (push !== false && u.href === renderedHref) { window.scrollTo(0, 0); return; }
+    runCleanups();
+    if (push !== false) history.pushState({ pan: 1 }, "", u.href);
+    lastHref = u.href;
+    renderedHref = u.href;
+    currentKey = key;
+    updateShell(key);
+    mountReset(key);
+    loadAndRender(key).then(function () {
+      if (push === false) window.scrollTo(0, scrollCache[u.href] || 0);
+      else window.scrollTo(0, 0);
+    });
+  }
+  function installRouter() {
+    routerReady = true;
+    currentKey = page;
+    lastHref = location.href;
+    renderedHref = location.href;
+    try { history.replaceState({ pan: 1 }, "", location.href); } catch (e) {}
+    document.addEventListener("click", function (e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var a = e.target && e.target.closest ? e.target.closest("a[href]") : null;
+      if (!a || a.target === "_blank" || a.hasAttribute("download")) return;
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#" || href.indexOf("javascript:") === 0) return;
+      var u;
+      try { u = new URL(href, location.href); } catch (err) { return; }
+      if (u.origin !== location.origin) return;
+      if (!routeKeyFromUrl(u)) return;
+      e.preventDefault();
+      navigate(u.href, true);
+    });
+    window.addEventListener("popstate", function () { navigate(location.href, false); });
+    window.addEventListener("scroll", function () { scrollCache[lastHref] = window.scrollY; }, { passive: true });
+    var appBtn = document.getElementById("btnAppNav");
+    if (appBtn) appBtn.addEventListener("click", function () { navigate(BASE + "app/"); });
+  }
+
   liveOr("/site", "site", function () { state.live = true; }).then(function (siteRes) {
     state.site = siteRes || {};
     if (state.site.presentation) state.site.presentation.contact_image = absolutize(state.site.presentation.contact_image);
     renderShell(page);
-    document.title = document.title || "基德盘搜";
-    if (page === "home") {
-      Promise.all([
-        liveOr("/hot-searches?limit=50", "hot"),
-        liveOr("/updates?page=1&page_size=24", "updates"),
-        liveOr("/discovery?limit=40&source=tmdb", "discovery")
-      ]).then(function (res) {
-        state.hot = res[0] || [];
-        fillUpdates(res[1]);
-        state.discovery = absDiscovery(res[2]);
-        renderHome();
-      });
-    } else if (page === "discover") {
-      liveOr("/discovery?limit=40&source=tmdb", "discovery").then(function (d) {
-        state.discovery = absDiscovery(d);
-        renderDiscover();
-      });
-    } else if (page === "today") {
-      liveOr("/updates?page=1&page_size=24", "updates").then(function (u) {
-        fillUpdates(u);
-        renderToday();
-      });
-    } else if (page === "hot") {
-      liveOr("/hot-searches?limit=50", "hot").then(function (h) {
-        state.hot = h || [];
-        renderHot();
-      });
-    } else if (page === "search") {
-      Promise.all([
-        liveOr("/hot-searches?limit=50", "hot"),
-        liveOr("/updates?page=1&page_size=24", "updates"),
-        liveOr("/discovery?limit=40&source=tmdb", "discovery")
-      ]).then(function (res) {
-        state.hot = res[0] || [];
-        fillUpdates(res[1]);
-        state.discovery = absDiscovery(res[2]);
-        renderSearch();
-      });
-    } else if (page === "resource") {
-      load("updates").then(function (u) {
-        fillUpdates(u);
-        renderResource();
-      }).catch(function () { renderResource(); });
-    } else if (page === "app") {
-      var appLive = relayReady()
-        ? fetch(RELAY + "/app/android/latest.json").then(function (r) { return r.json(); })
-            .catch(function () { return load("app"); })
-        : load("app").catch(function () { return {}; });
-      appLive.then(function (a) {
-        state.appInfo = a || {};
-        renderApp();
-      });
-    } else if (page === "apply") {
-      liveOr("/friend-link-settings", "friend").then(function (f) {
-        state.friend = f || {};
-        renderApply();
-      });
-    } else {
-      renderHome();
-    }
+    currentKey = page;
+    loadAndRender(page).then(function () { installRouter(); });
   });
 })();
