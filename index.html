@@ -2006,7 +2006,9 @@
     let flyIdx = -1;
     let flyOffsetY = 0;
     let flyAnimRaf = null;
-    let flyWaapi = null;
+    let flyShrinkK = 0;
+    let flyShrinkDX = 0;
+    let flyShrinkDY = 0;
 
     function stopFlyAnimation() {
       if (flyAnimRaf) {
@@ -2049,42 +2051,41 @@
           window.location.href = proj.url;
           return;
         }
-        if (flyWaapi) { flyWaapi.cancel(); flyWaapi = null; }
-        if (el) el.style.zIndex = '';
         if (stage) stage.style.zIndex = '';
         flyOffsetY = 0;
+        flyShrinkK = 0;
         flyIdx = -1;
         updateStackTransforms();
         openProjectPreview(proj.id);
       };
 
-      // 无 WAAPI 的环境退回上一版的直飞出
-      if (!el || typeof el.animate !== 'function') {
-        const vh = viewport.clientHeight || 600;
-        tweenFlyTo(-(vh + 180), 300, (k) => k * k * k, finish);
-        return;
-      }
+      if (!el) { finish(); return; }
 
-      // 收缩目标：搜索框右侧的圆形钮中心，卡片飞向它、缩成圆点后消失
+      // 收缩目标：搜索框右侧圆形钮的中心；位移在触发瞬间按真实矩形量好，
+      // 之后每帧由层叠变换管线合成（与切卡同一套机制，不走 WAAPI）
       const target = document.querySelector('.gemini-search-card .action-circle-btn') || document.querySelector('.gemini-search-card');
       const r = el.getBoundingClientRect();
       const tr = target.getBoundingClientRect();
-      const dx = (tr.left + tr.width / 2) - (r.left + r.width / 2);
-      const dy = (tr.top + tr.height / 2) - (r.top + r.height / 2);
-
-      // 飞出全程置于最上层：容器与卡片双层抬升，邻卡不得压住它
+      flyShrinkDX = (tr.left + tr.width / 2) - (r.left + r.width / 2);
+      flyShrinkDY = (tr.top + tr.height / 2) - (r.top + r.height / 2);
       if (stage) stage.style.zIndex = '60';
-      el.style.zIndex = '999';
 
-      const baseTransform = el.style.transform;
-      const baseOpacity = el.style.opacity || '1';
-      flyWaapi = el.animate([
-        { transform: baseTransform, opacity: baseOpacity, borderRadius: '22px' },
-        { transform: baseTransform + ' translate(' + dx.toFixed(1) + 'px, ' + dy.toFixed(1) + 'px) scale(0.03)', opacity: '0', borderRadius: '50%' }
-      ], { duration: 460, easing: 'cubic-bezier(.5, 0, .75, 0)', fill: 'forwards' });
-      flyWaapi.onfinish = finish;
+      stopFlyAnimation();
+      const start = performance.now();
+      const DURATION = 460;
+      const step = (now) => {
+        const raw = Math.min(1, (now - start) / DURATION);
+        flyShrinkK = raw < 0.5 ? 4 * raw * raw * raw : 1 - Math.pow(-2 * raw + 2, 3) / 2;
+        updateStackTransforms();
+        if (raw < 1) {
+          flyAnimRaf = requestAnimationFrame(step);
+        } else {
+          flyAnimRaf = null;
+          finish();
+        }
+      };
+      flyAnimRaf = requestAnimationFrame(step);
     }
-
     function renderPortalCards() {
       stopStackAnimation();
       const filtered = getFilteredProjects();
@@ -2192,8 +2193,10 @@
           opacity = 1 - (rel - 1.03) / 0.12;
         }
 
-        // 严格单调递增层级：右侧卡片永远自然叠在左侧卡片之上，绝不发生过中心点层级跳变
-        const zIndex = 20 + idx;
+        // 层级口径（ken 定）：焦点卡永远在卡片中置顶，飞出中的卡片再压过一切
+        let zIndex = 20 + idx;
+        if (stackPos === Math.round(pos)) zIndex = 60;
+        if (stackPos === flyIdx && flyShrinkK > 0) zIndex = 999;
         return { cardEl, idx, stackPos, rel, tx, scale, opacity, visible, zIndex };
       });
 
@@ -2211,14 +2214,25 @@
 
         let finalOpacity = opacity;
         let flyTy = 0;
+        let shrinkTf = '';
+        let shrinkRadius = '';
         if (stackPos === flyIdx && flyOffsetY !== 0) {
           flyTy = flyOffsetY;
           finalOpacity = opacity * Math.max(0, 1 + flyOffsetY / 420);
         }
+        if (stackPos === flyIdx && flyShrinkK > 0) {
+          const sx = flyShrinkDX * flyShrinkK;
+          const sy = flyShrinkDY * flyShrinkK;
+          const ss = 1 - 0.97 * flyShrinkK;
+          shrinkTf = ` translate(${sx.toFixed(1)}px, ${sy.toFixed(1)}px) scale(${ss.toFixed(3)})`;
+          shrinkRadius = (flyShrinkK * 50).toFixed(1) + '%';
+          finalOpacity = finalOpacity * Math.max(0, 1 - Math.max(0, (flyShrinkK - 0.55) / 0.45));
+        }
         cardEl.style.zIndex = String(zIndex);
         cardEl.style.visibility = visible ? 'visible' : 'hidden';
         cardEl.style.opacity = finalOpacity.toFixed(3);
-        cardEl.style.transform = `translate3d(${tx.toFixed(1)}px, 0, 0) scale(${scale.toFixed(3)}) translateY(${flyTy.toFixed(1)}px)`;
+        cardEl.style.transform = `translate3d(${tx.toFixed(1)}px, 0, 0) scale(${scale.toFixed(3)}) translateY(${flyTy.toFixed(1)}px)${shrinkTf}`;
+        cardEl.style.borderRadius = shrinkRadius;
         cardEl.style.pointerEvents = visible ? 'auto' : 'none';
 
         const headerEl = cardEl.querySelector('.floating-card-app-header');
@@ -2317,7 +2331,7 @@
         // 支持在惯性滑行途中随时手指按住截停接管（Catch in flight）
         stopStackAnimation();
         stopFlyAnimation();
-        if (flyWaapi) { flyWaapi.cancel(); flyWaapi = null; }
+        flyShrinkK = 0;
         document.getElementById('stackStageWrapper').style.zIndex = '';
         isStackDragging = true;
         stackDragMoved = false;
