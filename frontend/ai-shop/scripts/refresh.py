@@ -826,12 +826,26 @@ def main():
             _spec_of[_k] = norm_title(split_spec(_o['title'])[1])
         # 价格日志同样以脚本二为准：被覆盖且全池只有一条记录的链接，本轮池价换成一手价，
         # 并在下面比对时把脚本一记错的最后一点直接改掉（_ovr_pool 标记）
+        # 浏览器按店轮换采集（脚本二的全量池通道）：data/browser-pool.json {url:{price,t}}，
+        # 8 天内有效；优先级低于看板现核 overrides（条目级现核更准），高于聚合快照
+        _bpool = {}
+        try:
+            with open(os.path.join(DATA, 'browser-pool.json'), encoding='utf-8') as f:
+                _bp_raw = json.load(f)
+            _bp_now = int(_time.time() * 1000)
+            for _u, _v in (_bp_raw or {}).items():
+                if isinstance(_v, dict) and _v.get('price') and _v.get('t') and _bp_now - _v['t'] <= 8 * 24 * 3600 * 1000:
+                    _bpool[_u.split('?')[0]] = _v
+        except Exception:
+            _bpool = {}
         _ovr_pool = {}
         try:
             _url_keys = {}
             for _k in _pool:
                 _url_keys.setdefault(_k.split('|', 1)[0], []).append(_k)
-            for _u, _v in (_overrides or {}).items():
+            _merged_ovr = dict(_bpool)
+            _merged_ovr.update(_overrides or {})
+            for _u, _v in _merged_ovr.items():
                 if _v.get('price') and len(_url_keys.get(_u, [])) == 1:
                     _k = _url_keys[_u][0]
                     _pool[_k] = _v['price']
