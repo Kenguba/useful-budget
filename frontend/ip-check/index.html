@@ -1963,7 +1963,12 @@
     .rpt-ip-val.masked { letter-spacing: .05em; color: var(--text-secondary); }
     .rpt-ip-none { font-size: 17px; font-weight: 700; color: var(--text-light); }
     .rpt-ip-loc { font-size: 12.5px; color: var(--text-secondary); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .rpt-trust-center { text-align: center; padding: 4px 0 2px; }
+    #rptTrustBody { text-align: center; }
+    .rpt-muted { font-size: 12px; font-weight: 600; color: var(--text-light); letter-spacing: .04em; }
+    .rpt-trust-num { text-align: center; }
+    .rpt-trust-desc { text-align: center; font-size: 15.5px; font-weight: 700; margin-top: 2px; }
+    .rpt-trust-sub { text-align: center; font-size: 12.5px; color: var(--text-light); margin-top: 4px; }
+    .rpt-spectrum { text-align: left; }
     .rpt-trust-top { display: flex; align-items: center; justify-content: center; gap: 12px; }
     .rpt-trust-num { font-size: 47px; font-weight: 800; line-height: 1.05; }
     .rpt-trust-desc { font-size: 13.5px; color: var(--text-secondary); margin-top: 5px; }
@@ -1994,7 +1999,7 @@
     .rpt-vendor-right { margin-left: auto; display: inline-flex; align-items: center; gap: 9px; }
     .rpt-lat { font-size: 12.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; min-width: 46px; text-align: right; }
     .rpt-skl-line { height: 14px; width: 110px; display: inline-block; }
-    .rpt-skl-block { height: 16px; margin: 8px auto; }
+    .rpt-skl-block { display: block; height: 16px; margin: 8px auto; }
     .rpt-foot { text-align: center; font-size: 11px; color: var(--text-light); margin-top: 16px; }
 
 
@@ -3394,21 +3399,21 @@ const rptKv=(label,val)=>"<div class='rpt-kv-row'><span class='rpt-kv-label'>"+l
 const rptBdg=(txt,cls)=>"<span class='rpt-badge "+cls+"'>"+txt+"</span>";
 const rptSkl=w=>"<span class='geo-skl rpt-skl-line' style='width:"+w+"px'></span>";
 function rptIpCard(key,label,ip,cc,loc){
-  const vis=ip?rptVis[key]!==false:true;
-  const eye=ip?`<button class="rpt-eye rpt-nocap" data-rpteye="${key}" aria-label="IP visibility">${eyeIcon(vis)}</button>`:"";
-  const main=ip
-    ?`<div class="rpt-ip-main">${cc?flagBadge(cc):""}<span class="rpt-ip-val${vis?"":" masked"}" data-rptcopy="${esc(ip)}">${vis?esc(ip):starMask(true)}</span></div><div class="rpt-ip-loc">${esc(loc||"")}</div>`
-    :`<div class="rpt-ip-main"><span class="rpt-ip-none">${TD("myIpNone6")}</span></div><div class="rpt-ip-loc"></div>`;
-  return `<article class="rpt-card"><div class="rpt-ip-top"><span class="rpt-ip-label">${label}</span>${eye}</div>${main}</article>`;
+  const vis=rptVis[key];
+  return "<article class='rpt-card'><div class='rpt-ip-top'><span class='rpt-ip-label'>"+label+"</span><button type='button' class='rpt-eye rpt-nocap' data-eye='"+key+"'>"+(vis?RPT_EYE_ON:RPT_EYE_OFF)+"</button></div><div class='rpt-ip-main'>"+(cc?"<span class='flag-badge'>"+flagImg(cc)+"</span>":"")+"<span class='rpt-ip-val"+(vis?"":" masked")+"' data-ipval='"+key+"'>"+(vis?escapeHtml(ip):starMask(ip))+"</span></div>"+(loc?"<div class='rpt-ip-loc'>"+escapeHtml(loc)+"</div>":"")+"</article>";
+}
+function rptIpNone(label){
+  return "<article class='rpt-card'><div class='rpt-ip-top'><span class='rpt-ip-label'>"+label+"</span></div><div class='rpt-ip-main'><span class='rpt-ip-none'>"+TD("rptNotDetected")+"</span></div></article>";
 }
 function fillTrustHtml(d){
-  if(d.score==null)return `<div class="geo-skl rpt-skl-block" style="width:46%"></div><div class="geo-skl rpt-skl-block" style="width:74%"></div>`;
-  return `<div class="rpt-trust-top"><span class="rpt-trust-num">${100-d.score}</span><span class="rpt-badge ${d.score<=15?"ok":d.score<=40?"warn":d.score<=65?"warn":"bad"}">${TD(scoreLabel(d.score))}</span></div><div class="rpt-trust-desc">${TD("rptTrustSub")}</div><div class="rpt-spectrum"><div class="rpt-spectrum-track"></div><span class="rpt-spectrum-ptr" style="left:${100-d.score}%"></span><div class="rpt-spectrum-labels"><span>0 ${TD("rptScaleRisk")}</span><span>25</span><span>50</span><span>75</span><span>100 ${TD("rptScaleTrust")}</span></div></div>`;
+  if(d.score==null)return "<span class='geo-skl rpt-skl-block' style='width:120px'></span><span class='geo-skl rpt-skl-block' style='width:180px'></span>";
+  const s=d.score,trust=100-s,idx=s<=10?0:s<=25?1:s<=40?2:s<=60?3:s<=80?4:5;
+  const col=idx<=1?"#16A34A":idx===2?"#D97706":"#DC2626";
+  return "<div class='rpt-trust-num'>"+trust+"</div><div class='rpt-trust-desc' style='color:"+col+"'>"+scoreLabel(s)+"</div><div class='rpt-trust-sub'>"+DYN.rptTrustSub[currentLang][idx]+"</div>"
+    +"<div class='rpt-spectrum'><div class='rpt-spectrum-track'></div><div class='rpt-spectrum-ptr' style='left:"+Math.min(97,Math.max(3,trust))+"%'></div></div><div class='rpt-spectrum-labels'><span>0 "+(currentLang==="zh"?"高危":"High risk")+"</span><span>25</span><span>50</span><span>75</span><span>100 "+(currentLang==="zh"?"可信":"Trusted")+"</span></div>";
 }
 function attrValHtml(d){
-  if(!d.tagsFinal)return `<span class="geo-skl rpt-skl-line"></span>`;
-  const ipType=d.ipTypeKey?TD(d.ipTypeKey):"";
-  return ipType?(d.isNative?ipType+" · "+TD("nativeTag"):ipType):TD("unknownSource");
+  return d.tagsFinal?escapeHtml(attrName(d))+(d.native==null?"":" · "+(d.native?TD("nativeIp"):TD("broadcastIp"))):rptSkl(90);
 }
 function updateReportDynamic(d){
   if(!$("reportModalBackdrop").classList.contains("open"))return;
@@ -3425,75 +3430,58 @@ function fitReportScale(){
   wrap.style.height=(board.offsetHeight*s)+"px";
 }
 function buildReport(){
-  const d=state.data;
-  if(!d)return;
-  rptVis={v4:ipVisible, v6:ipVisible, vT:ipVisible};
-  const my=myIpState;
-  const cc2name=c=>(c&&CC_NAME[c])||c||"";
-  const locOf=o=>o?[cc2name(o.cc),o.region,o.city].filter(Boolean).join(", "):"";
-  const targetLoc=locOf(d);
-  const sumCls=regionSup.full?"ok":regionSup.n?"warn":"bad";
-  const regionBadge=`<span class="rpt-badge ${d.cc?(LLM_LISTS.claude.ok(d.cc)?"ok":"bad"):"gray"}">${d.cc?(LLM_LISTS.claude.ok(d.cc)?TD("rptRegionOk"):TD("rptRegionNo")):"--"}</span>`;
-  const blTxt=!d.bl?TD("rptDash"):d.bl.hit?TD("rptDnsblHit",{n:d.bl.total}):TD("rptDnsblClean");
-  const probe=`<span class="geo-skl rpt-skl-line" data-probe-wait></span>`;
-  const vendorRows=LLM_VENDORS.map(v=>`<div class="rpt-vendor">${vendorIcon(v)}<span class="rpt-vendor-name">${v.name}<span class="rpt-vendor-by">${v.by}</span></span><span class="rpt-vendor-right"><span class="rpt-lat" data-rpt-lat="${v.key}">${TD("rptTesting")}</span><span data-rpt-ok="${v.key}"><span class="rpt-badge ${regionSup.map[v.key]?"ok":"bad"}">${regionSup.map[v.key]?TD("rptUsable"):TD("rptUnusable")}</span></span></span></div>`).join("");
-  $("reportRoot").innerHTML=`
-    <div class="rpt-board-head">
-      <div><div class="rpt-title">${TD("rptTitle")}</div><div class="rpt-sub">${TD("rptSub")}</div></div>
-      <div class="rpt-head-btns"><button class="rpt-confirm rpt-nocap" id="rptConfirmBtn">${TD("rptConfirm")}</button><button class="rpt-close rpt-nocap" data-rptclose aria-label="close">✕</button></div>
-    </div>
-    <div class="rpt-grid">
-      ${rptIpCard("v4",TD("rptMyV4"),my.v4,my.v4d&&my.v4d.cc,locOf(my.v4d))}
-      ${rptIpCard("v6",TD("rptMyV6"),my.v6,my.v6d&&my.v6d.cc,locOf(my.v6d))}
-      ${rptIpCard("vT",TD("rptTarget"),d.ip,d.cc,targetLoc)}
-      <article class="rpt-card">
-        <div class="rpt-card-title">Claude AI ${TD("rptTrustTitle")}</div>
-        <div class="rpt-trust-center" id="rptTrustBody">${fillTrustHtml(d)}</div>
-        <div class="rpt-divider"></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">Claude ${TD("rptRegionTitle")}</span><span class="rpt-kv-val">${regionBadge}</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptAiRegion")}</span><span class="rpt-kv-val"><span class="rpt-badge ${sumCls}">${regionSup.full?TD("rptRegionAll"):regionSup.n?TD("rptRegionPart",{n:regionSup.n,t:4}):TD("rptRegionNone")}</span></span></div>
-      </article>
-      <article class="rpt-card">
-        <div class="rpt-card-title">Claude AI ${TD("rptAttrTitle")}</div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("geoRegion")}</span><span class="rpt-kv-val">${d.cc?flagBadge(d.cc):""}${esc(cc2name(d.cc))}</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("geoCity")}</span><span class="rpt-kv-val">${esc(d.city||"--")}</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptAttrType")}</span><span class="rpt-kv-val" id="rptAttrVal">${attrValHtml(d)}</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">ASN</span><span class="rpt-kv-val">${d.asn?("AS"+d.asn):"--"}</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("asnOrg")}</span><span class="rpt-kv-val">${esc(shortOrg(d.org||"")||"--")}</span></div>
-      </article>
-      <article class="rpt-card">
-        <div class="rpt-card-title">Claude AI ${TD("rptSecTitle")}</div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">VPN</span><span class="rpt-kv-val" data-rpt-sec="vpn">${probe}</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptProxy")}</span><span class="rpt-kv-val" data-rpt-sec="proxy">${probe}</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">Tor</span><span class="rpt-kv-val" data-rpt-sec="tor">${probe}</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptCrawler")}</span><span class="rpt-kv-val" data-rpt-sec="crawler">${probe}</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptAbuse")}</span><span class="rpt-kv-val">${blTxt?esc(blTxt):"--"}</span></div>
-      </article>
-      <article class="rpt-card">
-        <div class="rpt-card-title">Claude ${TD("rptAvailTitle")}</div>
-        ${vendorRows}
-      </article>
-      <article class="rpt-card">
-        <div class="rpt-card-title">${TD("rptDnsTitle")}</div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptDnsStatus")}</span><span class="rpt-kv-val" data-rpt-dns="status">${probe}</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptDnsUpstream")}</span><span class="rpt-kv-val" data-rpt-dns="upstream">${probe}</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptDnsProto")}</span><span class="rpt-kv-val">DoH (HTTPS)</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">EDNS ${TD("rptDnsEdns")}</span><span class="rpt-kv-val" data-rpt-dns="edns">${probe}</span></div>
-      </article>
-      <article class="rpt-card">
-        <div class="rpt-card-title">WebRTC ${TD("rptRtcTitle")}</div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">${TD("rptRtcStatus")}</span><span class="rpt-kv-val" data-rpt-rtc="status">${probe}</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">STUN ${TD("rptRtcSrflx")}</span><span class="rpt-kv-val" data-rpt-rtc="srflx">${probe}</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">mDNS</span><span class="rpt-kv-val" data-rpt-rtc="mdns">${probe}</span></div>
-        <div class="rpt-kv-row"><span class="rpt-kv-label">TURN ${TD("rptRtcRelay")}</span><span class="rpt-kv-val" data-rpt-rtc="relay">${probe}</span></div>
-      </article>
-    </div>
-    <div class="rpt-foot">IPPure · ip.jpedu.asia · ${new Date().toLocaleString()}</div>`;
+  const d=state.data;if(!d)return;
+  rptIps={v4:myIpState.v4||"",v6:myIpState.v6||"",ip:d.ip||""};
+  rptVis={v4:myIpState.vis4!==false,v6:myIpState.vis6!==false,ip:state.ipVisible!==false};
+  const place=[d.country,d.region,d.city].filter(Boolean).join(", ");
+  const selfCc=ip=>ip&&ip===d.ip?d.cc:"";
+  const selfLoc=ip=>ip&&ip===d.ip?place:"";
+  const supN=VENDORS.filter(v=>(LLM_LISTS[v.name]||[]).includes(d.cc)).length;
+  const supCls=supN===4?"ok":supN===0?"bad":"warn";
+  const supTxt=supN===4?TD("rptRegionAll"):supN===0?TD("rptRegionNone"):TD("rptRegionPart")+" · "+supN+"/4";
+  const orgTxt=((d.asnHolder||"")+" "+(d.asnName||"")+" "+(d.isp||"")+" "+(d.netname||"")+" "+(d.host||"")).toLowerCase();
+  const hitV=/vpn|nord|expressvpn|surfshark|mullvad/.test(orgTxt),hitP=/proxy/.test(orgTxt),hitT=/\btor\b|torproject/.test(orgTxt);
+  const det=hit=>hit?rptBdg(TD("rptDetected"),"warn"):rptBdg(TD("rptNotDetected"),"ok");
+  const bl=d.bl;
+  const abuse=bl&&bl.checked>0?(bl.hits>0?rptBdg(TD("rptAbuseHit")+" "+bl.hits,"bad"):rptBdg(TD("rptAbuseNone"),"ok")):rptBdg(TD("rptNotTested"),"gray");
+  let h="";
+  h+="<div class='rpt-board-head'><div><div class='rpt-title'>"+TD("rptTitle")+"</div><div class='rpt-sub'>"+TD("rptSub")+"</div></div><div class='rpt-head-btns rpt-nocap'><button type='button' class='rpt-confirm rpt-nocap' id='rptConfirmBtn'>"+TD("rptConfirm")+"</button><button type='button' class='rpt-close rpt-nocap' id='rptCloseBtn'>✕</button></div></div>";
+  h+="<div class='rpt-grid'>";
+  h+=rptIps.v4?rptIpCard("v4",TD("rptLocal4"),rptIps.v4,selfCc(rptIps.v4),selfLoc(rptIps.v4)):rptIpNone(TD("rptLocal4"));
+  h+=rptIps.v6?rptIpCard("v6",TD("rptLocal6"),rptIps.v6,selfCc(rptIps.v6),selfLoc(rptIps.v6)):rptIpNone(TD("rptLocal6"));
+  h+=rptIpCard("ip",TD("rptTarget"),rptIps.ip,d.cc,place);
+  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptTrust")+" <span class='rpt-muted'>TRUST SCORE</span></div><div id='rptTrustBody'>"+fillTrustHtml(d)+"</div>"
+    +"<div class='rpt-divider'></div>"+rptKv(TD("rptRegion"),rptBdg(supTxt,supCls))+"</div>";
+  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptAttrT")+"</div>"
+    +rptKv(TD("rptCountry"),(d.cc?"<span class='flag-badge'>"+flagImg(d.cc)+"</span>":"")+escapeHtml(d.country||"—"))
+    +rptKv(TD("rptCity"),escapeHtml(d.city||d.region||"—"))
+    +"<div class='rpt-kv-row'><span class='rpt-kv-label'>"+TD("rptIpAttr")+"</span><span class='rpt-kv-val' id='rptAttrVal'>"+attrValHtml(d)+"</span></div>"
+    +rptKv("ASN",escapeHtml(d.asn||"—"))
+    +rptKv(TD("rptCarrier"),escapeHtml(d.asnHolder||d.isp||"—"))+"</div>";
+  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptSecT")+"</div>"
+    +rptKv("VPN",det(hitV))+rptKv(TD("rptProxy"),det(hitP))+rptKv("Tor",det(hitT))+rptKv(TD("rptCrawler"),rptBdg(TD("rptNotTested"),"gray"))+rptKv(TD("rptAbuse"),abuse)+"</div>";
+  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptAvailT")+"</div>";
+  VENDORS.forEach((v,i)=>{
+    const ok=(LLM_LISTS[v.name]||[]).includes(d.cc);
+    h+="<div class='rpt-vendor'><span class='vendor-ic vi-"+v.name.toLowerCase()+"'>"+v.icon+"</span><span class='rpt-vendor-name'>"+v.name+"<span class='rpt-vendor-by'>"+v.by+"</span></span><span class='rpt-vendor-right'><span class='rpt-lat' id='rptLat"+i+"'>"+rptSkl(40)+"</span>"+rptBdg(ok?TD("rptOk"):TD("rptNo"),ok?"ok":"bad")+"</span></div>";
+  });
+  h+=rptKv(TD("rptSummary"),rptBdg(supN+"/4 "+(currentLang==="zh"?"家可用":"available"),supCls))+"</div>";
+  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptDnsT")+"</div>"
+    +rptKv(TD("rptDnsStatus"),"<span id='rptDnsStatus'>"+rptSkl(80)+"</span>")
+    +rptKv(TD("rptDnsProto"),"<span id='rptDnsProto'>"+rptSkl(110)+"</span>")
+    +rptKv(TD("rptDnsUp"),"<span id='rptDnsUp'>"+rptSkl(90)+"</span>")
+    +rptKv(TD("rptDnsEdns"),"<span id='rptDnsEdns'>"+rptSkl(70)+"</span>")+"</div>";
+  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptRtcT")+"</div>"
+    +rptKv(TD("rptRtcStatus"),"<span id='rptRtcStatus'>"+rptSkl(80)+"</span>")
+    +rptKv(TD("rptRtcStun"),"<span id='rptRtcStun'>"+rptSkl(90)+"</span>")
+    +rptKv(TD("rptRtcMdns"),"<span id='rptRtcMdns'>"+rptSkl(100)+"</span>")
+    +rptKv(TD("rptRtcTurn"),"<span id='rptRtcTurn'>"+rptSkl(70)+"</span>")+"</div>";
+  h+="</div>";
+  h+="<div class='rpt-foot'>IPPure · ip.jpedu.asia · "+fmtTime(new Date())+"</div>";
+  $("reportRoot").innerHTML=h;
   $("rptConfirmBtn").addEventListener("click",captureReport);
-  probeSecurity(d);
-  probeVendors();
-  probeDns(d);
-  probeRtcFill();
+  $("rptCloseBtn").addEventListener("click",closeReportModal);
+  probeVendors();probeDns();probeRtcFill();
   requestAnimationFrame(fitReportScale);
 }
 function probeVendors(){
