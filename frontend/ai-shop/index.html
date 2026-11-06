@@ -2351,15 +2351,16 @@ document.addEventListener('keydown',e=>{
 });
 $('#tabBoard').onclick=()=>switchTab(false);
 $('#tabShops').onclick=()=>switchTab(true);
-$('#q').oninput=()=>{ $('#clearBtn').classList.toggle('visible',$('#q').value.length>0); if($('#viewShops').classList.contains('hide')) renderBoard(); else { shopShown=300; renderShops(); } };
+let qTimer=0;
+$('#q').oninput=(immediate)=>{ $('#clearBtn').classList.toggle('visible',$('#q').value.length>0); const run=()=>{ if($('#viewShops').classList.contains('hide')) renderBoard(); else { shopShown=300; renderShops(); } }; if(immediate===true){ clearTimeout(qTimer); run(); } else { clearTimeout(qTimer); qTimer=setTimeout(run,160); } };
 document.querySelectorAll('#categoryBar .cat-chip').forEach(ch=>{ ch.onclick=()=>{ const c=ch.dataset.cat; if(c==='all'){ selCats.clear(); selFav=false; } else if(c==='__fav'){ selFav=!selFav; } else if(selCats.has(c)){ selCats.delete(c); } else { selCats.add(c); } paintChips(); renderBoard(); }; });
 paintChips();
-$('#clearBtn').onclick=()=>{ $('#q').value=''; $('#q').oninput(); $('#q').focus(); };
+$('#clearBtn').onclick=()=>{ $('#q').value=''; $('#q').oninput(true); $('#q').focus(); };
 $('#sendBtn').onclick=()=>{ if(!$('#q').value.trim()){ $('#q').focus(); } else if($('#viewShops').classList.contains('hide')){ renderBoard(); } else { shopShown=300; renderShops(); } };
 $('#plusBtn').onclick=()=>{
   selCats.clear(); selFav=false; paintChips();
   if(shopFilter!=='全部'){ shopFilter='全部'; shopShown=300; document.querySelectorAll('#chips button').forEach(x=>x.classList.toggle('active',x.dataset.p==='全部')); if(!$('#viewShops').classList.contains('hide'))renderShops(); }
-  if($('#q').value){ $('#q').value=''; $('#q').oninput(); }
+  if($('#q').value){ $('#q').value=''; $('#q').oninput(true); }
   else if($('#viewShops').classList.contains('hide')){ renderBoard(); }
 };
 /* 右滑：轻划/快划直接展开。仅锁定明确的横向手势，纵向页面滚动交给浏览器。 */
