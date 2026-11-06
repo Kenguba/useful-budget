@@ -2358,6 +2358,8 @@
       let dragAxis = null;
       let dragStartPos = 0;
       let samples = [];
+      let vSamples = [];
+      let downY = 0;
 
       function applyRubberBand(rawPos, maxIdx) {
         if (rawPos < 0) {
@@ -2382,12 +2384,14 @@
         flyShrinkK = 0;
         document.getElementById('stackStageWrapper').style.zIndex = '';
         isStackDragging = true;
+        downY = e.clientY;
         stackDragMoved = false;
         dragAxis = null;
         startX = e.clientX;
         startY = e.clientY;
         dragStartPos = stackScrollPos;
         stackVelocity = 0;
+        vSamples = [];
         samples = [{ t: performance.now(), pos: stackScrollPos }];
         try { viewport.setPointerCapture(e.pointerId); } catch (_) {}
       });
@@ -2399,14 +2403,28 @@
 
         const deltaX = e.clientX - startX;
         const deltaY = e.clientY - startY;
+        const rawDY = e.clientY - downY;
+        const mvNow = performance.now();
+        vSamples.push({ t: mvNow, y: rawDY });
+        while (vSamples.length > 1 && mvNow - vSamples[0].t > 100) vSamples.shift();
 
-        // 轴向锁定：先动的方向决定本轮手势是横滑切卡还是上滑飞出
-        if (!dragAxis && (Math.abs(deltaX) > 9 || Math.abs(deltaY) > 9)) {
-          dragAxis = Math.abs(deltaY) > Math.abs(deltaX) ? 'v' : 'h';
+        // 轴向锁定：等主导方向明确了才锁定（斜着起步的拇指推滑，
+        // 前几像素常是斜的，先到先锁会把上推误判成横滑、整轮手势作废）；
+        // 锁定瞬间把起点重置到当前位置，后续位移从零算，不跳帧
+        if (!dragAxis) {
+          const ax = Math.abs(deltaX), ay = Math.abs(deltaY);
+          if (ay > 12 && ay > ax * 1.15) dragAxis = 'v';
+          else if (ax > 12 && ax > ay * 1.15) dragAxis = 'h';
+          else if (ax > 30 || ay > 30) dragAxis = ay > ax ? 'v' : 'h';
+          if (!dragAxis) return;
           if (dragAxis === 'v') {
             flyIdx = activeStackIdx;
             document.getElementById('stackStageWrapper').style.zIndex = '60';
           }
+          startX = e.clientX;
+          startY = e.clientY;
+          dragStartPos = stackScrollPos;
+          return;
         }
         if (dragAxis === 'v') {
           stackDragMoved = true;
@@ -2443,7 +2461,16 @@
 
         if (dragAxis === 'v') {
           dragAxis = null;
-          if (flyOffsetY < -70) {
+          // 触发口径：推过 -45px，或者短距离快速上甩（末段速度够快）；
+          // 原 -70px 在真机上约等于 185 物理像素，多数自然推滑到不了
+          let vVel = 0;
+          let rawY = flyOffsetY;
+          if (vSamples.length >= 2) {
+            const va = vSamples[0], vb = vSamples[vSamples.length - 1];
+            rawY = vb.y;
+            if (vb.t > va.t) vVel = (vb.y - va.y) / (vb.t - va.t);
+          }
+          if (rawY < -45 || (rawY < -25 && vVel < -0.4)) {
             triggerActiveCardFlyOut();
           } else if (flyOffsetY !== 0) {
             tweenFlyTo(0, 220, (k) => 1 - Math.pow(1 - k, 3), () => {
