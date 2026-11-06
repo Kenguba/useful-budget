@@ -1009,7 +1009,7 @@
       display: flex;
       align-items: stretch;
       justify-content: center;
-      touch-action: pan-y;
+      touch-action: none;
       cursor: grab;
     }
 
@@ -1141,7 +1141,6 @@
 
     .flat-cards-grid .app-window-card {
       box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.06);
-      cursor: pointer;
     }
 
     .flat-cards-grid .app-window-card:hover {
@@ -1554,7 +1553,7 @@
       langText: ['中文', 'EN'],
       heroEyebrow: ['✦ KEN · USE · 实用工具门户', '✦ KEN · USE · Practical Tools'],
       mainTitle: ['便宜、有用的，都在这', 'Affordable & Useful, All Here'],
-      subTitle: ['左右滑动切换卡片 · 长按太阳切换 12 色主题', 'Swipe stacked cards · Hold sun icon for 12 themes'],
+      subTitle: ['左右滑动切换卡片 · 上滑卡片飞出进入 · 长按太阳切换主题', 'Swipe to switch · Flick card up to open · Hold sun for themes'],
       modeStackBtn: ['🗂️ 层叠', '🗂️ Stack'],
       modeGridBtn: ['💻 全览', '💻 Grid'],
       searchPlaceholder: ['搜项目或功能（如 Skills、2FA）', 'Search tools (e.g. Skills, 2FA)'],
@@ -1988,6 +1987,55 @@
       stackAnimRaf = requestAnimationFrame(step);
     }
 
+    // ================= 6b. 上滑飞出：焦点卡跟手上移，越过阈值加速飞出后跳转 =================
+    let flyIdx = -1;
+    let flyOffsetY = 0;
+    let flyAnimRaf = null;
+
+    function stopFlyAnimation() {
+      if (flyAnimRaf) {
+        cancelAnimationFrame(flyAnimRaf);
+        flyAnimRaf = null;
+      }
+    }
+
+    function tweenFlyTo(targetY, durMs, easeFn, done) {
+      stopFlyAnimation();
+      const fromY = flyOffsetY;
+      const startT = performance.now();
+      const step = (now) => {
+        const k = Math.min(1, (now - startT) / durMs);
+        flyOffsetY = fromY + (targetY - fromY) * easeFn(k);
+        updateStackTransforms();
+        if (k < 1) {
+          flyAnimRaf = requestAnimationFrame(step);
+        } else {
+          flyAnimRaf = null;
+          if (done) done();
+        }
+      };
+      flyAnimRaf = requestAnimationFrame(step);
+    }
+
+    function triggerActiveCardFlyOut() {
+      const filtered = getFilteredProjects();
+      if (!filtered.length) return;
+      const proj = filtered[activeStackIdx];
+      if (!proj) return;
+      flyIdx = activeStackIdx;
+      const vh = document.getElementById('stackViewport').clientHeight || 600;
+      tweenFlyTo(-(vh + 180), 300, (k) => k * k * k, () => {
+        if (proj.url) {
+          window.location.href = proj.url;
+        } else {
+          openProjectPreview(proj.id);
+          flyOffsetY = 0;
+          flyIdx = -1;
+          updateStackTransforms();
+        }
+      });
+    }
+
     function renderPortalCards() {
       stopStackAnimation();
       const filtered = getFilteredProjects();
@@ -1996,7 +2044,7 @@
 
       grid.innerHTML = filtered.length === 0
         ? emptyHtml
-        : filtered.map(proj => `<article class="app-window-card" onclick="handleGridCardClick(event, '${proj.id}')">${buildAppWindowCardHtml(proj, false)}</article>`).join('');
+        : filtered.map(proj => `<article class="app-window-card">${buildAppWindowCardHtml(proj, false)}</article>`).join('');
 
       const viewport = document.getElementById('stackViewport');
       const dotsBarEl = document.getElementById('stackDotsBar');
@@ -2100,10 +2148,16 @@
         const { cardEl, rel, tx, scale, opacity, visible, zIndex } = st;
         cardEl.classList.remove('is-non-focus');
 
+        let finalOpacity = opacity;
+        let flyTy = 0;
+        if (idx === flyIdx && flyOffsetY !== 0) {
+          flyTy = flyOffsetY;
+          finalOpacity = opacity * Math.max(0, 1 + flyOffsetY / 420);
+        }
         cardEl.style.zIndex = String(zIndex);
         cardEl.style.visibility = visible ? 'visible' : 'hidden';
-        cardEl.style.opacity = opacity.toFixed(3);
-        cardEl.style.transform = `translate3d(${tx.toFixed(1)}px, 0, 0) scale(${scale.toFixed(3)})`;
+        cardEl.style.opacity = finalOpacity.toFixed(3);
+        cardEl.style.transform = `translate3d(${tx.toFixed(1)}px, 0, 0) scale(${scale.toFixed(3)}) translateY(${flyTy.toFixed(1)}px)`;
         cardEl.style.pointerEvents = visible ? 'auto' : 'none';
 
         const headerEl = cardEl.querySelector('.floating-card-app-header');
@@ -2144,18 +2198,9 @@
 
     function handleStackCardClick(idx) {
       if (stackDragMoved) return;
-      const proj = getFilteredProjects()[idx];
-      if (!proj) return;
-      if (proj.url) window.location.href = proj.url;
-      else openProjectPreview(proj.id);
-    }
-
-    function handleGridCardClick(e, id) {
-      if (e.target.closest('button, a')) return;
-      const proj = portalProjects.find(p => p.id === id);
-      if (!proj) return;
-      if (proj.url) window.location.href = proj.url;
-      else openProjectPreview(id);
+      if (idx !== activeStackIdx || Math.abs(stackScrollPos - idx) > 0.04) {
+        jumpToStackCard(idx);
+      }
     }
 
     function jumpToStackCard(idx) {
@@ -2186,6 +2231,8 @@
     (function initStackCarouselGestures() {
       const viewport = document.getElementById('stackViewport');
       let startX = 0;
+      let startY = 0;
+      let dragAxis = null;
       let dragStartPos = 0;
       let samples = [];
 
@@ -2208,9 +2255,12 @@
 
         // 支持在惯性滑行途中随时手指按住截停接管（Catch in flight）
         stopStackAnimation();
+        stopFlyAnimation();
         isStackDragging = true;
         stackDragMoved = false;
+        dragAxis = null;
         startX = e.clientX;
+        startY = e.clientY;
         dragStartPos = stackScrollPos;
         stackVelocity = 0;
         samples = [{ t: performance.now(), pos: stackScrollPos }];
@@ -2223,6 +2273,19 @@
         if (!filtered.length) return;
 
         const deltaX = e.clientX - startX;
+        const deltaY = e.clientY - startY;
+
+        // 轴向锁定：先动的方向决定本轮手势是横滑切卡还是上滑飞出
+        if (!dragAxis && (Math.abs(deltaX) > 9 || Math.abs(deltaY) > 9)) {
+          dragAxis = Math.abs(deltaY) > Math.abs(deltaX) ? 'v' : 'h';
+          if (dragAxis === 'v') flyIdx = activeStackIdx;
+        }
+        if (dragAxis === 'v') {
+          stackDragMoved = true;
+          flyOffsetY = deltaY < 0 ? deltaY : deltaY * 0.25;
+          updateStackTransforms();
+          return;
+        }
         if (Math.abs(deltaX) > 4) stackDragMoved = true;
 
         // 1:1 真实像素跟手比例：手指在主交互区划动距离与卡片实际位移严格匹配
@@ -2249,6 +2312,18 @@
       const endDrag = () => {
         if (!isStackDragging) return;
         isStackDragging = false;
+
+        if (dragAxis === 'v') {
+          dragAxis = null;
+          if (flyOffsetY < -70) {
+            triggerActiveCardFlyOut();
+          } else if (flyOffsetY !== 0) {
+            tweenFlyTo(0, 220, (k) => 1 - Math.pow(1 - k, 3), () => { flyIdx = -1; });
+          }
+          setTimeout(() => { stackDragMoved = false; }, 0);
+          return;
+        }
+        dragAxis = null;
 
         const filtered = getFilteredProjects();
         if (!filtered.length) return;
