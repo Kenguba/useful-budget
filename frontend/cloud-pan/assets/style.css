@@ -45,7 +45,7 @@ button{font-family:inherit;cursor:pointer}
 .wrap{max-width:1240px;margin:0 auto;padding:0 20px}
 
 /* ---------- 顶栏（Hero 头：光斑层 + 两行结构） ---------- */
-.topbar{position:sticky;top:10px;z-index:50;width:min(1240px,calc(100% - 20px));margin:10px auto 0;
+.topbar{position:relative;z-index:50;width:min(1240px,calc(100% - 20px));margin:10px auto 0;
   background:var(--hero-bg-base);border-radius:28px;
   box-shadow:0 16px 40px -12px var(--search-glow),0 4px 14px rgba(15,23,42,.03);
   transition:background-color .55s ease,box-shadow .6s ease}
@@ -130,13 +130,13 @@ button{font-family:inherit;cursor:pointer}
 /* 手机端头卡贴边全宽（新稿 hero-header 口径）：顶栏贴屏幕顶与左右两边、只有下圆角；
    首页时顶栏与 Hero 连成一张卡（顶栏去底角与阴影、藏自身光斑，Hero 顶部直角衔接、整卡全宽） */
 @media (max-width:767px){
-  .topbar{width:100%;margin:0;top:0;border-radius:0 0 28px 28px}
+  .topbar{width:100%;margin:0;border-radius:0 0 28px 28px}
   body.page-home .topbar{border-radius:0;box-shadow:none}
   body.page-home .topbar>.aura-backdrop{display:none}
   body.page-home .hero{margin-top:0;border-radius:0 0 28px 28px;margin-left:0;margin-right:0}
 }
 @media (min-width:768px) and (max-width:860px){
-  .topbar{top:6px;width:calc(100% - 12px);margin-top:6px;border-radius:24px}
+  .topbar{width:calc(100% - 12px);margin-top:6px;border-radius:24px}
 }
 /* 顶栏紧凑搜索（B 版页面第一行中段） */
 .top-search{flex:1 1 auto;min-width:0;max-width:430px;display:flex;align-items:center;background:var(--sub-surface);border-radius:999px;padding:3px;margin:0 2px}
@@ -445,7 +445,7 @@ details.about summary{cursor:pointer;color:var(--text-secondary);font-weight:600
   .contact-card img{width:112px;height:112px}
 }
 @media (max-width:560px){
-  .poster-grid{grid-template-columns:repeat(3,1fr)}
+  .poster-grid{grid-template-columns:repeat(2,1fr)}
   .wrap,.section,.announce{padding-left:12px;padding-right:12px}
   .card{padding:16px 12px !important}
   .poster-grid{gap:10px}
@@ -486,3 +486,8 @@ details.about summary{cursor:pointer;color:var(--text-secondary);font-weight:600
 .acc-tip{font-size:13px;color:#b45309;margin:4px 0 8px}
 .acc-fail{color:#b91c1c;font-size:14px}
 .acc-loading{color:var(--text-secondary);font-size:14px}
+
+/* 手机端海报一律一行两个（ken 2026-11-06 定，含 561–767 宽度段） */
+@media (min-width:561px) and (max-width:767px){
+  .poster-grid{grid-template-columns:repeat(2,1fr)}
+}
