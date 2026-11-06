@@ -2220,10 +2220,10 @@
           opacity = 1 - (rel - 1.03) / 0.12;
         }
 
-        // 层级口径（ken 定）：焦点卡永远在卡片中置顶，飞出中的卡片再压过一切
+        // 层级口径：滑动时按原稿单调递增（右侧/前面的卡自然压住左侧卡）；
+        // 只有正在上滑飞出的那张卡置顶 999，压过所有邻卡（ken 定：飞出卡在最上层）
         let zIndex = 20 + idx;
-        if (stackPos === Math.round(pos)) zIndex = 60;
-        if (stackPos === flyIdx && flyShrinkK > 0) zIndex = 999;
+        if (stackPos === flyIdx && (flyShrinkK > 0 || flyOffsetY !== 0)) zIndex = 999;
         return { cardEl, idx, stackPos, rel, tx, scale, opacity, visible, zIndex };
       });
 
