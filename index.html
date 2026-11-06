@@ -2080,10 +2080,10 @@
 
       if (!el) { finish(); return; }
 
-      // 神奇效果目标（ken 定，像 macOS 窗口吸进程序坞）：底部中间圆点条里
-      // 当前卡对应的那个活动圆点；位移在触发瞬间按真实矩形量好，
-      // 之后每帧由层叠变换管线合成（与切卡同一套机制，不走 WAAPI）
-      const target = document.querySelector('#stackDotsBar .stack-dot.active') || document.querySelector('.gemini-search-card .action-circle-btn') || document.querySelector('.gemini-search-card');
+      // 神奇效果目标（ken 2026-11-07 红圈定版）：吸进底部中间那颗
+      // 「打开『当前项目』」胶囊钮的中心（圆点条就在它正上方、同属红圈区域）；
+      // 位移在触发瞬间按真实矩形量好，之后每帧由层叠变换管线合成（不走 WAAPI）
+      const target = document.getElementById('stackBottomPillBtn') || document.querySelector('#stackDotsBar .stack-dot.active') || document.querySelector('.gemini-search-card');
       const r = el.getBoundingClientRect();
       const tr = target.getBoundingClientRect();
       flyShrinkDX = (tr.left + tr.width / 2) - (r.left + r.width / 2);
