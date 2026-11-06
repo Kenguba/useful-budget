@@ -704,7 +704,7 @@
 
     .floating-card-app-header {
       position: absolute;
-      top: clamp(-32px, -4.4dvh, -27px);
+      top: clamp(-46px, -5.8dvh, -40px);
       left: 2px;
       display: inline-flex;
       align-items: center;
@@ -999,12 +999,17 @@
     .stack-stage-wrapper.active-mode { display: flex; }
 
     /* 视口占满中间剩余高度，内部卡片高度自适应且保持黄金比例上限 */
+    .floating-squircle-icon svg { width: 15px; height: 15px; display: block; }
+    .card-icon-box svg { width: 21px; height: 21px; display: block; }
+    .snap-left-title svg { width: 13px; height: 13px; vertical-align: -2px; }
+    .modal-title svg { width: 17px; height: 17px; vertical-align: -3px; margin-right: 5px; }
+    .view-mode-btn svg { width: 15px; height: 15px; vertical-align: -2px; margin-right: 5px; }
     .stack-carousel-viewport {
       position: relative;
       width: 100%;
       flex: 1;
       min-height: 0;
-      margin-top: clamp(27px, 4.2dvh, 34px);
+      margin-top: clamp(44px, 6dvh, 50px);
       margin-bottom: clamp(4px, 0.9dvh, 8px);
       display: flex;
       align-items: stretch;
@@ -1467,8 +1472,8 @@
           <div class="view-mode-row">
             <div class="view-mode-switch" role="group" aria-label="视图模式切换">
               <div class="tab-glider" id="viewGlider"></div>
-              <button type="button" class="view-mode-btn active" id="modeStackBtn" onclick="setDisplayMode('stack')">🗂️ 层叠流</button>
-              <button type="button" class="view-mode-btn" id="modeGridBtn" onclick="setDisplayMode('grid')">💻 横排全览</button>
+              <button type="button" class="view-mode-btn active" id="modeStackBtn" onclick="setDisplayMode('stack')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3.5 9 4.7-9 4.7-9-4.7z"/><path d="m4.6 12.8 7.4 3.9 7.4-3.9"/><path d="m4.6 16.8 7.4 3.9 7.4-3.9"/></svg><span id="modeStackLabel">层叠</span></button>
+              <button type="button" class="view-mode-btn" id="modeGridBtn" onclick="setDisplayMode('grid')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/></svg><span id="modeGridLabel">全览</span></button>
             </div>
           </div>
 
@@ -1553,11 +1558,11 @@
 
     const UI_TEXT = {
       langText: ['中文', 'EN'],
-      heroEyebrow: ['✦ KEN · USE · 实用工具门户', '✦ KEN · USE · Practical Tools'],
+      heroEyebrow: ['KEN · USE · 实用工具门户', 'KEN · USE · Practical Tools'],
       mainTitle: ['便宜、有用的，都在这', 'Affordable & Useful, All Here'],
       subTitle: ['左右滑动切换卡片 · 上滑卡片飞出进入 · 长按太阳切换主题', 'Swipe to switch · Flick card up to open · Hold sun for themes'],
-      modeStackBtn: ['🗂️ 层叠', '🗂️ Stack'],
-      modeGridBtn: ['💻 全览', '💻 Grid'],
+      modeStackBtn: ['层叠', 'Stack'],
+      modeGridBtn: ['全览', 'Grid'],
       searchPlaceholder: ['搜项目或功能（如 Skills、2FA）', 'Search tools (e.g. Skills, 2FA)'],
       panelTitle: ['12色弥散主题', '12 Aura Themes'],
       panelHint: ['滑动或点击选择', 'Slide or tap'],
@@ -1594,14 +1599,14 @@
 
     const portalProjects = [
       {
-        id: 'skill-board', category: 'live', icon: '📊', path: '/frontend/skill-board/',
+        id: 'skill-board', category: 'live', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="0.8"/><rect x="12" y="8" width="3" height="10" rx="0.8"/><rect x="17" y="5" width="3" height="13" rx="0.8"/></svg>', path: '/frontend/skill-board/',
         serial: ['榜单与比价', 'LEADERBOARD'],
         shortApp: ['Skills 排行榜', 'Skills Rank'],
         title: ['全球 Skills 使用量排行榜', 'Global Skills Leaderboard'],
         status: ['● 每 12h 更新', '● 12h Sync'],
         snapshots: [
-          ['🔥', ['全网安装量 Top 1 · ClawHub', 'Most Installed · ClawHub'], ['128.4k 次', '128.4k']],
-          ['⭐', ['GitHub 源码星标可信榜', 'GitHub Stars Trust Rank'], ['双榜合一', 'Dual Verified']]
+          ['<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21.5c4.1 0 6.8-2.7 6.8-6.3 0-3-2-5.1-3.3-6.7C14.2 6.9 13.2 5.2 13.2 2.6 10.4 4.5 8 7.3 8 10.4c-.9-.6-1.6-1.4-2.1-2.6C4.9 9.3 5.2 11 5.2 12.7c0 5.3 2.7 8.8 6.8 8.8z"/></svg>', ['全网安装量 Top 1 · ClawHub', 'Most Installed · ClawHub'], ['128.4k 次', '128.4k']],
+          ['<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.6l2.5 5.2 5.7.7-4.2 4 1.1 5.6L12 16.4l-5.1 2.7L8 13.5 3.8 9.5l5.7-.7z"/></svg>', ['GitHub 源码星标可信榜', 'GitHub Stars Trust Rank'], ['双榜合一', 'Dual Verified']]
         ],
         desc: [
           '谁被装得最多（skills.sh / ClawHub / 腾讯 SkillHub）+ 谁的源码最值得信任（GitHub 星标），双榜合一，每期带「它到底干什么」',
@@ -1615,14 +1620,14 @@
         ]
       },
       {
-        id: 'ai-shop', category: 'live', icon: '🛒', path: '/frontend/ai-shop/',
+        id: 'ai-shop', category: 'live', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/><path d="M2.5 3.5h2.2l2.5 11.4a1.6 1.6 0 0 0 1.6 1.3h7.9a1.6 1.6 0 0 0 1.6-1.3L20.5 7H6"/></svg>', path: '/frontend/ai-shop/',
         serial: ['榜单与比价', 'PRICE ENGINE'],
         shortApp: ['AI 账号商铺', 'AI Account Shop'],
         title: ['AI 账号商铺', 'AI Account Store'],
         status: ['● 每 12h 更新', '● 12h Sync'],
         snapshots: [
-          ['✦', ['GPT Plus 独享成品号（有货）', 'GPT Plus Ready (In-Stock)'], ['¥9.90 起', '¥9.90']],
-          ['✳', ['Antigravity 反重力激活', 'Antigravity Pro Link'], ['¥2.20 起', '¥2.20']]
+          ['<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.5 13.9 10 20.5 12 13.9 14 12 20.5 10.1 14 3.5 12 10.1 10z"/></svg>', ['GPT Plus 独享成品号（有货）', 'GPT Plus Ready (In-Stock)'], ['¥9.90 起', '¥9.90']],
+          ['<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v16M5 8l14 8M19 8 5 16"/></svg>', ['Antigravity 反重力激活', 'Antigravity Pro Link'], ['¥2.20 起', '¥2.20']]
         ],
         desc: [
           'AI 账号比价：GPT 日抛/周限、反重力、Codex 接码、Grok Heavy 有货最低价（7 分组）+ 2700 家店铺目录，店名可直达店铺主页',
@@ -1636,14 +1641,14 @@
         ]
       },
       {
-        id: 'cloud-phone', category: 'live', icon: '📱', path: '/frontend/cloud-phone/',
+        id: 'cloud-phone', category: 'live', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.4"/><path d="M10.8 18.6h2.4"/></svg>', path: '/frontend/cloud-phone/',
         serial: ['榜单与比价', 'BENCHMARK'],
         shortApp: ['云手机横评', 'Cloud Phone'],
         title: ['云手机横向对比', 'Cloud Phone Benchmark'],
         status: ['● 每周复核刷价', '● Weekly Audit'],
         snapshots: [
-          ['🎮', ['游戏挂机 — 最便宜 Top 5', 'Gaming AFK — Cheapest Top 5'], ['¥0.56/天', '¥0.56/d']],
-          ['🌍', ['跨境海外 — TikTok 多国节点', 'Overseas TikTok Multi-Node'], ['¥4.99/天', '¥4.99/d']]
+          ['<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="7.5" width="19" height="10" rx="5"/><path d="M8 11v3M6.5 12.5h3"/><circle cx="15.8" cy="11.3" r="0.9" fill="currentColor" stroke="none"/><circle cx="18" cy="13.8" r="0.9" fill="currentColor" stroke="none"/></svg>', ['游戏挂机 — 最便宜 Top 5', 'Gaming AFK — Cheapest Top 5'], ['¥0.56/天', '¥0.56/d']],
+          ['<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><ellipse cx="12" cy="12" rx="4.2" ry="9"/></svg>', ['跨境海外 — TikTok 多国节点', 'Overseas TikTok Multi-Node'], ['¥4.99/天', '¥4.99/d']]
         ],
         desc: [
           '30 家云手机比价：特点、资费、改机支持一次看清，重点核查是不是真机——主流套餐多为 ARM 虚拟化，附自测真机清单和按用途推荐',
@@ -1656,14 +1661,14 @@
         ]
       },
       {
-        id: 'cloud-pan', category: 'replica', icon: '🔍', path: '/frontend/cloud-pan/',
+        id: 'cloud-pan', category: 'replica', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16.6 16.6"/></svg>', path: '/frontend/cloud-pan/',
         serial: ['1:1 精品复刻', '1:1 REPLICA'],
         shortApp: ['基德盘搜', 'Netdisk Search'],
         title: ['基德盘搜（复刻）', 'Kidd Netdisk Search'],
         status: ['● 原站接口快照', '● API Snapshot'],
         snapshots: [
-          ['🎬', ['实时热播榜 & 每日更新', 'Trending & Daily Updates'], ['6 大页面', '6 Pages']],
-          ['⚡', ['夸克 / 百度 / 阿里多网盘检索', 'Multi-Netdisk Instant Search'], ['1:1 复刻', '1:1 Replica']]
+          ['<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="10" width="18" height="9" rx="1.6"/><path d="M3.6 10 4.9 4.4a1.8 1.8 0 0 1 2.1-1.4l12.3 2.6a1.8 1.8 0 0 1 1.4 2.1L19.6 10"/><path d="m8.2 4.9-1.1 4.7M13.2 6l-1.1 4.7M18.2 7.1l-1.1 4.7"/></svg>', ['实时热播榜 & 每日更新', 'Trending & Daily Updates'], ['6 大页面', '6 Pages']],
+          ['<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2.5 4.5 13.5H11L9.8 21.5l8.7-11H12z"/></svg>', ['夸克 / 百度 / 阿里多网盘检索', 'Multi-Netdisk Instant Search'], ['1:1 复刻', '1:1 Replica']]
         ],
         desc: [
           '基德盘搜网盘资源搜索站（pan）1:1 复刻：搜索首页、热播榜、每日更新、热搜榜、APP 与申请友链全套页面，数据为原站公开接口快照',
@@ -1676,14 +1681,14 @@
         ]
       },
       {
-        id: 'ip-check', category: 'replica', icon: '🌐', path: '/frontend/ip-check/',
+        id: 'ip-check', category: 'replica', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><ellipse cx="12" cy="12" rx="4.2" ry="9"/></svg>', path: '/frontend/ip-check/',
         serial: ['1:1 精品复刻', '1:1 REPLICA'],
         shortApp: ['IP 纯净度检测', 'IP Purity Check'],
         title: ['IP 纯净度检测（复刻）', 'IP Purity Checker'],
         status: ['● 自动测出口 IP', '● Auto Exit-IP'],
         snapshots: [
-          ['🛡️', ['原生住宅 IP · 风险纯净度', 'Native ISP · Purity Score'], ['98% 极佳', '98% Clean']],
-          ['🤖', ['ChatGPT / Claude 解锁检测', 'ChatGPT / Claude Unlock'], ['原生支持', 'Supported']]
+          ['<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21.5s7.5-3.4 7.5-9.3V5.2L12 2.5 4.5 5.2v7c0 5.9 7.5 9.3 7.5 9.3z"/><path d="m9 11.6 2.2 2.2 4-4.2"/></svg>', ['原生住宅 IP · 风险纯净度', 'Native ISP · Purity Score'], ['98% 极佳', '98% Clean']],
+          ['<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="8.5" width="15" height="11" rx="2.4"/><path d="M12 8.5V5.2"/><circle cx="12" cy="3.9" r="1.2"/><circle cx="9" cy="13.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="15" cy="13.5" r="1.1" fill="currentColor" stroke="none"/><path d="M9.5 17h5"/></svg>', ['ChatGPT / Claude 解锁检测', 'ChatGPT / Claude Unlock'], ['原生支持', 'Supported']]
         ],
         desc: [
           'IPPure 风格 1:1 复刻：查任意 IP 的 ASN、多源位置、人机流量比、来源/属性与纯净度系数，展开还有风控值、原生 IP、大模型检测与适用场景',
@@ -1696,13 +1701,13 @@
         ]
       },
       {
-        id: '2fa-auth', category: 'replica', icon: '🔐', path: '/frontend/2fa-auth/',
+        id: '2fa-auth', category: 'replica', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/><circle cx="12" cy="15.2" r="1.3" fill="currentColor" stroke="none"/></svg>', path: '/frontend/2fa-auth/',
         serial: ['1:1 精品复刻', '1:1 REPLICA'],
         shortApp: ['2FA 验证码', '2FA Auth'],
         title: ['2FA 验证码工具（复刻）', '2FA Authenticator'],
         status: ['● 纯静态本地算', '● Local Static'],
         snapshots: [
-          ['🔑', ['动态验证码 · 点击一键复制', 'Live TOTP Code · Tap to Copy'], ['849 201', '849 201']],
+          ['<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15.5" r="4.5"/><path d="M11.3 12.3 20 3.6"/><path d="m16 7.6 3 3M13.4 10.2l2.2 2.2"/></svg>', ['动态验证码 · 点击一键复制', 'Live TOTP Code · Tap to Copy'], ['849 201', '849 201']],
           ['⏱️', ['本地离线计算 · 30s 自动刷新', '100% Client-Side · 30s Cycle'], ['零上传', 'Zero Upload']]
         ],
         desc: [
@@ -1716,14 +1721,14 @@
         ]
       },
       {
-        id: 'ui-design', category: 'replica', icon: '🎨', path: '/frontend/ui-design/',
+        id: 'ui-design', category: 'replica', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 1 9-9c0 2.1-1.7 3-3.8 3h-2.1a2.3 2.3 0 0 0-1.8 3.6c.3.4.5.8.5 1.2 0 1.3-1 2.2-2.8 2.2z"/><circle cx="7.6" cy="10.4" r="1.15" fill="currentColor" stroke="none"/><circle cx="12" cy="7.4" r="1.15" fill="currentColor" stroke="none"/><circle cx="16.4" cy="10.4" r="1.15" fill="currentColor" stroke="none"/></svg>', path: '/frontend/ui-design/',
         serial: ['1:1 精品复刻', '1:1 REPLICA'],
         shortApp: ['设计资源目录', 'Design Directory'],
         title: ['设计资源目录（复刻）', 'Design Resource Directory'],
         status: ['● 827 条已收录', '● 827 Entries'],
         snapshots: [
-          ['🧭', ['灵感 / 资源 / 工具 / 作品集', 'Inspiration / Resources / Tools / Portfolios'], ['670 条目录', '670 Entries']],
-          ['✦', ['Finds 动态精选', 'Finds Curated Picks'], ['157 条', '157 Posts']]
+          ['<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/><circle cx="12" cy="12" r="0.8" fill="currentColor" stroke="none"/></svg>', ['灵感 / 资源 / 工具 / 作品集', 'Inspiration / Resources / Tools / Portfolios'], ['670 条目录', '670 Entries']],
+          ['<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.5 13.9 10 20.5 12 13.9 14 12 20.5 10.1 14 3.5 12 10.1 10z"/></svg>', ['Finds 动态精选', 'Finds Curated Picks'], ['157 条', '157 Posts']]
         ],
         desc: [
           'Designeer 设计资源目录 1:1 复刻：灵感、资源、工具、作品集四大类 670 条正式目录加 157 条 Finds，条目简介双语，点条目直达外站',
@@ -1736,14 +1741,14 @@
         ]
       },
       {
-        id: 'ai-nav', category: 'upcoming', icon: '🔗', path: '',
+        id: 'ai-nav', category: 'upcoming', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 10a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>', path: '',
         serial: ['导航规划', 'ROADMAP'],
         shortApp: ['AI 资源导航', 'AI Directory'],
         title: ['AI 资源链接导航', 'AI Resource Directory'],
         status: ['● 筹备中', '● Upcoming'],
         snapshots: [
-          ['🧭', ['比价站 / GPT 店铺 / 反重力', 'AI Price Sites & GPT Shops'], ['分类归档', 'Categorized']],
-          ['📲', ['常用海外接码平台导航', 'SMS Verification Directory'], ['即将上线', 'Coming Soon']]
+          ['<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/><circle cx="12" cy="12" r="0.8" fill="currentColor" stroke="none"/></svg>', ['比价站 / GPT 店铺 / 反重力', 'AI Price Sites & GPT Shops'], ['分类归档', 'Categorized']],
+          ['<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.4"/><path d="M12 7.5v5M9.9 10.4 12 12.5l2.1-2.1"/></svg>', ['常用海外接码平台导航', 'SMS Verification Directory'], ['即将上线', 'Coming Soon']]
         ],
         desc: [
           '比价站、GPT 店铺、反重力、接码等常用链接的分类导航页，汇集高频刚需站点入口',
@@ -1765,6 +1770,13 @@
       return String(text).replace(/[&<>"']/g, ch => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
       }[ch]));
+    }
+
+    // 层叠序列口径：AI 资源导航不进层叠，只在全览显示（ken 2026-11-07 定）
+    const STACK_EXCLUDED_ID = 'ai-nav';
+    let stackDomOrder = [];
+    function getStackProjects() {
+      return getFilteredProjects().filter(p => p.id !== STACK_EXCLUDED_ID);
     }
 
     function getFilteredProjects() {
@@ -1874,7 +1886,7 @@
     // 模式 A：点击卡片/圆点/左右按钮时，使用临界阻尼弹簧平滑过渡到指定卡片
     function startStackSpringToIndex(targetIdx, initialVelCardsPerSec = 0) {
       stopStackAnimation();
-      const filtered = getFilteredProjects();
+      const filtered = getStackProjects();
       if (!filtered.length) return;
 
       const clampedTarget = Math.max(0, Math.min(filtered.length - 1, targetIdx));
@@ -1921,7 +1933,7 @@
     // 模式 B：手指滑动松开后，复刻原生「高速低阻飞轮滑行 + 慢速细腻阻尼 + 首尾边界柔和回弹」
     function startStackFreeMomentum(initialVelCardsPerSec) {
       stopStackAnimation();
-      const filtered = getFilteredProjects();
+      const filtered = getStackProjects();
       if (!filtered.length) return;
 
       const maxIdx = Math.max(0, filtered.length - 1);
@@ -2022,7 +2034,7 @@
     }
 
     function triggerActiveCardFlyOut() {
-      const filtered = getFilteredProjects();
+      const filtered = getStackProjects();
       if (!filtered.length) return;
       const proj = filtered[activeStackIdx];
       if (!proj) return;
@@ -2030,7 +2042,7 @@
 
       const viewport = document.getElementById('stackViewport');
       const stage = document.getElementById('stackStageWrapper');
-      const el = viewport.querySelectorAll('.app-window-card')[activeStackIdx];
+      const el = viewport.querySelectorAll('.app-window-card')[stackDomOrder.indexOf(activeStackIdx)];
 
       const finish = () => {
         if (proj.url) {
@@ -2092,21 +2104,25 @@
         return;
       }
 
-      activeStackIdx = Math.max(0, Math.min(filtered.length - 1, activeStackIdx));
+      const stackList = filtered.filter(p => p.id !== STACK_EXCLUDED_ID);
+      stackDomOrder = filtered.map(p => stackList.indexOf(p));
+      activeStackIdx = Math.max(0, Math.min(stackList.length - 1, activeStackIdx));
       stackScrollPos = activeStackIdx;
       stackVelocity = 0;
 
-      viewport.innerHTML = filtered.map((proj, idx) => `
+      viewport.innerHTML = filtered.map((proj, idx) => {
+        const stackPos = stackDomOrder[idx];
+        return `
         <article
-          class="app-window-card ${idx !== activeStackIdx ? 'is-stacked-card' : ''}"
-          data-stack-idx="${idx}"
-          onclick="handleStackCardClick(${idx})"
+          class="app-window-card ${stackPos !== activeStackIdx ? 'is-stacked-card' : ''}"
+          data-stack-idx="${stackPos}"
+          ${stackPos >= 0 ? `onclick="handleStackCardClick(${stackPos})"` : 'style="display:none"'}
         >
           ${buildAppWindowCardHtml(proj, true)}
-        </article>
-      `).join('');
+        </article>`;
+      }).join('');
 
-      dotsBarEl.innerHTML = filtered.map((_, idx) => `
+      dotsBarEl.innerHTML = stackList.map((_, idx) => `
         <button
           type="button"
           class="stack-dot ${idx === activeStackIdx ? 'active' : ''}"
@@ -2115,7 +2131,7 @@
         ></button>
       `).join('');
 
-      syncStackControlsUI(filtered);
+      syncStackControlsUI(stackList);
       updateStackTransforms();
     }
 
@@ -2125,7 +2141,7 @@
       const activeProj = filtered[safeIdx];
       const name = L(activeProj.shortApp);
       document.getElementById('stackViewport').querySelectorAll('.app-window-card').forEach((el, idx) => {
-        el.classList.toggle('is-stacked-card', idx !== safeIdx);
+        el.classList.toggle('is-stacked-card', stackDomOrder[idx] !== safeIdx);
       });
       document.getElementById('stackDotsBar').querySelectorAll('.stack-dot').forEach((dot, idx) => {
         dot.classList.toggle('active', idx === safeIdx);
@@ -2149,7 +2165,8 @@
 
       // 第一遍：按 C^∞ 连续指数+线性混合曲线计算每张卡片的像素坐标、缩放与透明度
       const states = Array.from(cards).map((cardEl, idx) => {
-        const rel = idx - pos;
+        const stackPos = typeof stackDomOrder[idx] === 'number' ? stackDomOrder[idx] : idx;
+        const rel = stackPos - pos;
         const clampedRel = Math.max(-4.0, Math.min(1.5, rel));
 
         // 连续非对称指数展开曲线（经视频逐帧标尺拟合）：
@@ -2177,17 +2194,24 @@
 
         // 严格单调递增层级：右侧卡片永远自然叠在左侧卡片之上，绝不发生过中心点层级跳变
         const zIndex = 20 + idx;
-        return { cardEl, idx, rel, tx, scale, opacity, visible, zIndex };
+        return { cardEl, idx, stackPos, rel, tx, scale, opacity, visible, zIndex };
       });
 
       // 第二遍：应用卡片矩阵，并根据相邻卡片实时像素间距计算顶部「图标+标题」同显与零碰撞避让
       states.forEach((st, idx) => {
-        const { cardEl, rel, tx, scale, opacity, visible, zIndex } = st;
+        const { cardEl, stackPos, rel, tx, scale, opacity, visible, zIndex } = st;
+        if (typeof stackPos === 'number' && stackPos < 0) {
+          cardEl.style.display = 'none';
+          cardEl.style.visibility = 'hidden';
+          cardEl.style.pointerEvents = 'none';
+          return;
+        }
+        cardEl.style.display = '';
         cardEl.classList.remove('is-non-focus');
 
         let finalOpacity = opacity;
         let flyTy = 0;
-        if (idx === flyIdx && flyOffsetY !== 0) {
+        if (stackPos === flyIdx && flyOffsetY !== 0) {
           flyTy = flyOffsetY;
           finalOpacity = opacity * Math.max(0, 1 + flyOffsetY / 420);
         }
@@ -2241,21 +2265,21 @@
     }
 
     function jumpToStackCard(idx) {
-      const filtered = getFilteredProjects();
+      const filtered = getStackProjects();
       if (!filtered.length) return;
       const target = Math.max(0, Math.min(filtered.length - 1, idx));
       startStackSpringToIndex(target, stackVelocity * 0.35);
     }
 
     function stepStackCard(delta) {
-      const filtered = getFilteredProjects();
+      const filtered = getStackProjects();
       if (!filtered.length) return;
       const nextIdx = (activeStackIdx + delta + filtered.length) % filtered.length;
       startStackSpringToIndex(nextIdx, 0);
     }
 
     function triggerActiveCardAction() {
-      const filtered = getFilteredProjects();
+      const filtered = getStackProjects();
       if (!filtered.length) return;
       const activeProj = filtered[activeStackIdx];
       if (activeProj && activeProj.url) {
@@ -2287,7 +2311,7 @@
       viewport.addEventListener('pointerdown', (e) => {
         if (e.button && e.button !== 0) return;
         if (e.target.closest('button, a')) return;
-        const filtered = getFilteredProjects();
+        const filtered = getStackProjects();
         if (!filtered.length) return;
 
         // 支持在惯性滑行途中随时手指按住截停接管（Catch in flight）
@@ -2308,7 +2332,7 @@
 
       viewport.addEventListener('pointermove', (e) => {
         if (!isStackDragging) return;
-        const filtered = getFilteredProjects();
+        const filtered = getStackProjects();
         if (!filtered.length) return;
 
         const deltaX = e.clientX - startX;
@@ -2364,7 +2388,7 @@
         }
         dragAxis = null;
 
-        const filtered = getFilteredProjects();
+        const filtered = getStackProjects();
         if (!filtered.length) return;
 
         const now = performance.now();
@@ -2408,7 +2432,7 @@
 
       // 支持触控板双指连续滑动与鼠标滚轮流体推动
       viewport.addEventListener('wheel', (e) => {
-        const filtered = getFilteredProjects();
+        const filtered = getStackProjects();
         if (filtered.length <= 1) return;
         const dominantDelta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
         if (Math.abs(dominantDelta) < 1) return;
@@ -2560,10 +2584,12 @@
     function syncStaticUIText() {
       [
         'langText', 'heroEyebrow', 'mainTitle', 'subTitle',
-        'modeStackBtn', 'modeGridBtn', 'panelTitle', 'panelHint'
+        'panelTitle', 'panelHint'
       ].forEach(id => {
         document.getElementById(id).textContent = L(UI_TEXT[id]);
       });
+      document.getElementById('modeStackLabel').textContent = L(UI_TEXT.modeStackBtn);
+      document.getElementById('modeGridLabel').textContent = L(UI_TEXT.modeGridBtn);
       document.getElementById('searchInput').placeholder = L(UI_TEXT.searchPlaceholder);
       applyThemeByGlobalIndex(currentGlobalThemeIndex);
       renderThemeSwatches();
@@ -2627,7 +2653,7 @@
       const proj = portalProjects.find(p => p.id === projectId);
       if (!proj) return;
 
-      document.getElementById('modalItemTitle').textContent = `${proj.icon} ${L(proj.title)}`;
+      document.getElementById('modalItemTitle').innerHTML = `${proj.icon} ${siteEscape(L(proj.title))}`;
       document.getElementById('modalItemSub').textContent = `${L(proj.status)} · ${proj.path || L(['筹备中', 'Coming Soon'])}`;
 
       const targetHref = proj.url || './';
