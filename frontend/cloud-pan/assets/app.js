@@ -395,7 +395,8 @@
         '<div class="contact-card" id="contactCard" style="display:none"><div class="cc-t"><span>保持联系</span>' +
         '<button class="cc-x" id="ccClose">✕</button></div>' +
         '<img src="' + esc(pres.contact_image) + '" alt="二维码">' +
-        '<div class="cc-c">' + esc(pres.contact_caption || "扫码加入交流群") + "<br>点击放大查看</div></div>" +
+        '<div class="cc-c">' + esc(pres.contact_caption || "扫码加入交流群") + "<br>点击放大查看</div>" +
+        '<button type="button" class="cc-ask" id="ccAsk">在线求片</button></div>' +
         '<div class="floating-contact-dock docked-right" id="contactDock" title="可自由拖拽移动，松手自动贴边吸附；点击打开联系我们">' +
         '<span class="dock-stash-ear" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></span>' +
         '<button type="button" class="contact-float-btn" id="contactFloatBtn"><span>保持联系</span></button></div>';
@@ -441,6 +442,16 @@
     document.body.insertAdjacentHTML("beforeend", ask);
     bindClose("askOv");
     document.getElementById("btnAsk").onclick = function () {
+      document.getElementById("askDone").style.display = "none";
+      document.getElementById("askForm").style.display = "block";
+      document.getElementById("askOv").classList.add("open");
+    };
+    // 联系卡内的在线求片（按原稿：联系窗内含求片）——先关联系卡并恢复竖签，再打开求片弹窗
+    var ccAsk = document.getElementById("ccAsk");
+    if (ccAsk) ccAsk.onclick = function () {
+      document.getElementById("contactCard").style.display = "none";
+      var d = document.getElementById("contactDock");
+      if (d) d.style.display = "";
       document.getElementById("askDone").style.display = "none";
       document.getElementById("askForm").style.display = "block";
       document.getElementById("askOv").classList.add("open");
@@ -716,10 +727,11 @@
     main.innerHTML = html;
     bindSearchbar();
     layoutHotKeywords();
-    // 导航签移到 Hero 卡底部（ken 2026-11-06：顶栏只留品牌行，签放下去）；毛毛虫指示条靠既有 resize 监听自动重定位
+    // 导航签按原稿位置移进 Hero：标题之下、搜索框之上（ken 2026-11-06 回原稿核对）；毛毛虫指示条靠既有 resize 监听自动重定位
     var navEl = document.getElementById("topNav");
     var heroEl = main.querySelector(".hero");
-    if (navEl && heroEl) { heroEl.appendChild(navEl); window.dispatchEvent(new Event("resize")); }
+    var sbEl = heroEl ? heroEl.querySelector(".searchbar") : null;
+    if (navEl && heroEl && sbEl) { heroEl.insertBefore(navEl, sbEl); window.dispatchEvent(new Event("resize")); }
     var curCat = "rec", curKind = "all";
     function drawBoard() {
       var items = boardFilter(curCat, curKind);
