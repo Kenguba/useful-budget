@@ -2405,7 +2405,7 @@ $('#plusBtn').onclick=()=>{
     closeOther(row);
     const isOpen=row.parentElement.dataset.open==='1';
     drag={id:e.pointerId,row,wrap:row.parentElement,x:e.clientX,y:e.clientY,
-      base:isOpen?WIDTH:0,value:isOpen?WIDTH:0,wasOpen:isOpen,axis:null,
+      base:isOpen?WIDTH:0,value:isOpen?WIDTH:0,wasOpen:isOpen,axis:null,tag:e.target.closest('.offer-badges-line'),
       samples:[{x:e.clientX,t:performance.now()}]};
   });
   box.addEventListener('pointermove',e=>{
@@ -2415,6 +2415,7 @@ $('#plusBtn').onclick=()=>{
     if(g.axis===null){
       if(Math.abs(dy)>9&&Math.abs(dy)>Math.abs(dx)*1.12) return;
       if(Math.abs(dx)<START||Math.abs(dx)<=Math.abs(dy)*1.12) return;
+      if(g.tag&&dx<0){g.axis='tag';return;}
       g.axis='x';
       g.wrap.classList.add('is-dragging');
       g.row.style.transition='none';
