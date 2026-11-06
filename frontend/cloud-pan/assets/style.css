@@ -66,26 +66,26 @@ button{font-family:inherit;cursor:pointer}
 .topbar-in{position:relative;z-index:1;display:flex;flex-direction:column;gap:10px;padding:14px 16px 12px}
 /* 第一行不换行：品牌可收缩省略，右侧控件组 flex:none 不许压（主题钮防消失的机制修复） */
 .top-row{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;min-width:0}
-.logo{display:flex;align-items:center;gap:9px;font-size:18px;font-weight:800;letter-spacing:.02em;min-width:0;flex:0 1 auto}
+.logo{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:800;letter-spacing:.02em;min-width:0;flex:0 1 auto}
 .logo .logo-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .logo-grid{display:grid;grid-template-columns:repeat(3,6px);grid-template-rows:repeat(3,6px);gap:2.5px;background:var(--refresh-btn-bg);padding:6px;border-radius:8px;flex:none;transition:background-color .4s ease}
 .logo-grid i{background:#fff;border-radius:1.5px;display:block}
 .top-right-widgets{margin-left:auto;display:flex;align-items:center;gap:7px;flex:none;position:relative}
-.nav-pill-btn,.btn-app{height:36px;padding:0 14px;border:none;border-radius:999px;background:var(--pill-surface);box-shadow:var(--pill-shadow);
-  color:var(--text-primary);font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;flex:none;
+.nav-pill-btn,.btn-app{height:34px;padding:0 12px;border:none;border-radius:999px;background:var(--pill-surface);box-shadow:var(--pill-shadow);
+  color:var(--text-primary);font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;flex:none;
   transition:transform .24s var(--ease-spring),box-shadow .3s ease,background-color .35s ease;-webkit-tap-highlight-color:transparent}
 .nav-pill-btn:active,.btn-app:active{transform:scale(.95)}
 .btn-app.on{background:var(--theme-tag-bg);color:var(--theme-tag-text)}
-/* PWA 安装钮：默认隐藏，浏览器给出安装提示（或 iOS 未安装）时才由 app.js 加 .show 显示；在顶栏第一行内排布，不再绝对定位压住主题钮 */
-.btn-install{display:none;height:36px;padding:0 14px;border:none;border-radius:999px;background:var(--refresh-btn-bg);color:#fff;
-  font-size:13px;font-weight:700;white-space:nowrap;flex:none;-webkit-tap-highlight-color:transparent;transition:background-color .35s ease}
+/* PWA 安装钮（已收进 APP 页，顶栏不放）：默认隐藏，浏览器给出安装提示（或 iOS 未安装）时才由 renderApp 加 .show 显示 */
+.btn-install{display:none;height:40px;padding:0 20px;border:none;border-radius:999px;background:var(--refresh-btn-bg);color:#fff;
+  font-size:14px;font-weight:700;white-space:nowrap;margin-top:12px;-webkit-tap-highlight-color:transparent;transition:background-color .35s ease}
 .btn-install.show{display:inline-flex;align-items:center}
-.lang-pill-btn{height:36px;padding:0 12px;border:none;border-radius:999px;background:var(--pill-surface);box-shadow:var(--pill-shadow);
+.lang-pill-btn{height:34px;padding:0 11px;border:none;border-radius:999px;background:var(--pill-surface);box-shadow:var(--pill-shadow);
   color:var(--text-primary);font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;flex:none;
   transition:transform .24s var(--ease-spring),background-color .35s ease;-webkit-tap-highlight-color:transparent}
 .lang-pill-btn:active{transform:scale(.95)}
 .lang-pill-btn .globe-svg{width:15px;height:15px;fill:none;stroke:var(--theme-accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
-.theme-mode-btn{width:36px;height:36px;border:none;border-radius:50%;background:var(--pill-surface);box-shadow:var(--pill-shadow);
+.theme-mode-btn{width:34px;height:34px;border:none;border-radius:50%;background:var(--pill-surface);box-shadow:var(--pill-shadow);
   display:inline-flex;align-items:center;justify-content:center;color:var(--text-primary);flex:none;position:relative;z-index:102;
   user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent;
   transition:transform .25s var(--ease-spring),background-color .4s ease,box-shadow .3s ease}
@@ -127,6 +127,17 @@ button{font-family:inherit;cursor:pointer}
 .btn-ask{margin-left:auto;flex:none;background:var(--pill-surface);color:var(--text-primary);border:none;font-size:13px;font-weight:700;
   padding:8px 16px;border-radius:999px;box-shadow:var(--pill-shadow);white-space:nowrap}
 .btn-ask:hover{color:var(--theme-accent)}
+/* 手机端头卡贴边全宽（新稿 hero-header 口径）：顶栏贴屏幕顶与左右两边、只有下圆角；
+   首页时顶栏与 Hero 连成一张卡（顶栏去底角与阴影、藏自身光斑，Hero 顶部直角衔接、整卡全宽） */
+@media (max-width:767px){
+  .topbar{width:100%;margin:0;top:0;border-radius:0 0 28px 28px}
+  body.page-home .topbar{border-radius:0;box-shadow:none}
+  body.page-home .topbar>.aura-backdrop{display:none}
+  body.page-home .hero{margin-top:0;border-radius:0 0 28px 28px;margin-left:0;margin-right:0}
+}
+@media (min-width:768px) and (max-width:860px){
+  .topbar{top:6px;width:calc(100% - 12px);margin-top:6px;border-radius:24px}
+}
 /* 顶栏紧凑搜索（B 版页面第一行中段） */
 .top-search{flex:1 1 auto;min-width:0;max-width:430px;display:flex;align-items:center;background:var(--sub-surface);border-radius:999px;padding:3px;margin:0 2px}
 .top-search input{flex:1;border:none;outline:none;background:transparent;font-size:14px;padding:7px 12px;min-width:0;color:var(--text-primary)}
@@ -184,12 +195,28 @@ button{font-family:inherit;cursor:pointer}
 .btn-search::after{content:"↑";font-size:21px;font-weight:800;line-height:1}
 .btn-search:active{transform:scale(.93)}
 .btn-search:disabled{opacity:.45;cursor:not-allowed}
-/* 热词行：胶囊单行横滚、不显示滚动条 */
-.hotline{margin:16px auto 0;width:fit-content;max-width:100%;color:var(--text-secondary);font-size:13px;display:flex;gap:8px;flex-wrap:nowrap;align-items:center;overflow-x:auto;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px}
-.hotline::-webkit-scrollbar{display:none}
-.hotline .lbl{color:var(--text-muted);flex:none;font-size:12.5px}
-.hotline a{flex:none;background:var(--sub-surface);padding:6px 13px;border-radius:999px;color:var(--text-secondary);transition:background-color .25s,color .25s}
-.hotline a:hover{background:var(--theme-tag-bg);color:var(--theme-tag-text)}
+/* 热搜词推荐栏（新稿 6.5 节口径）：电脑端带「大家都在搜」标签、严格单行按行宽装入、不滚不截；
+   手机端无标签、严格两行、整条不截、两行一起横向可滚；装入数量由 app.js 量宽决定（PC 3–10、手机 3–8） */
+.hot-keywords-bar{max-width:760px;margin:14px auto 0;padding:2px 4px;position:relative}
+.kw-measure-sandbox{position:fixed;top:-9999px;left:-9999px;visibility:hidden;pointer-events:none;display:flex;gap:7px;white-space:nowrap}
+.hot-kw-pc{display:none}
+.hot-kw-pc .lbl{color:var(--text-muted);flex:none;font-size:12.5px}
+.hot-kw-pc-wrap{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:nowrap;overflow:hidden;white-space:nowrap;padding:2px 0}
+.hot-kw-mobile-wrap{display:flex;flex-direction:column;gap:6px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px 0}
+.hot-kw-mobile-wrap::-webkit-scrollbar{display:none}
+.hot-kw-mobile-row{display:flex;align-items:center;gap:5px;flex-wrap:nowrap;width:max-content;margin:0 auto;padding:0 4px}
+@media (min-width:768px){
+  .hot-kw-pc{display:flex;align-items:center;justify-content:center;gap:10px}
+  .hot-kw-mobile-wrap{display:none}
+}
+.hot-kw-chip{background:rgba(255,255,255,.82);color:var(--text-primary);padding:2.5px 8px;border-radius:999px;
+  font-size:10.5px;font-weight:600;line-height:1.35;display:inline-flex;align-items:center;gap:3.5px;flex:none;white-space:nowrap;
+  box-shadow:0 2px 8px rgba(15,23,42,.04);transition:transform .2s ease,box-shadow .25s ease,color .2s ease,background-color .25s ease}
+@media (min-width:768px){.hot-kw-chip{font-size:11.5px;padding:3.5px 10px}}
+[data-dark="true"] .hot-kw-chip{background:rgba(30,41,59,.82)}
+.hot-kw-chip:hover{color:var(--theme-accent);background:var(--card-bg);transform:translateY(-1px);box-shadow:0 6px 16px -2px var(--search-glow)}
+.hot-badge-mini{background:#FFF7ED;color:#EA580C;font-size:9.5px;font-weight:800;padding:.5px 3.5px;border-radius:4px;line-height:1.25;flex:none}
+[data-dark="true"] .hot-badge-mini{background:rgba(249,115,22,.2);color:#FB923C}
 
 /* ---------- 公告条 ---------- */
 .announce{max-width:1240px;margin:16px auto 0;padding:0 20px}
@@ -362,11 +389,31 @@ details.about summary{cursor:pointer;color:var(--text-secondary);font-weight:600
 .contact-card .cc-x{border:none;background:none;color:var(--faint);font-size:15px;line-height:1;padding:2px}
 .contact-card img{width:128px;height:128px;object-fit:cover;border-radius:8px}
 .contact-card .cc-c{color:var(--mut);font-size:12.5px;margin-top:9px;line-height:1.6}
-.contact-mini{position:fixed;right:0;bottom:calc(40px + env(safe-area-inset-bottom,0px));z-index:40;background:var(--pill-surface);color:var(--text-secondary);
-  border:1px solid var(--line);border-right:none;border-radius:12px 0 0 12px;
-  padding:12px 7px;font-size:12px;font-weight:500;line-height:1.4;letter-spacing:2px;writing-mode:vertical-rl;text-orientation:upright;
-  box-shadow:0 2px 10px rgba(15,23,42,.08);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;opacity:.94}
-.contact-mini:hover,.contact-mini:active{opacity:1}
+/* 联系我们磁吸竖签（新稿 11 节：竖排贴边 + 自由拖拽 + 边缘磁吸 + 半收起耳片） */
+.floating-contact-dock{position:fixed;right:0;bottom:110px;z-index:95;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  padding:14px 8px;border-radius:18px 0 0 18px;
+  box-shadow:-2px 6px 22px -2px var(--search-glow),-2px 2px 10px rgba(15,23,42,.08);
+  user-select:none !important;-webkit-user-select:none !important;-webkit-touch-callout:none !important;
+  touch-action:none;cursor:grab;will-change:left,top,transform,opacity,border-radius;
+  transition:left .42s cubic-bezier(.22,1,.36,1),top .38s cubic-bezier(.22,1,.36,1),border-radius .28s ease,opacity .28s ease,transform .32s cubic-bezier(.22,1,.36,1),box-shadow .28s ease,background-color .35s ease}
+[data-dark="true"] .floating-contact-dock{background:rgba(23,35,61,.96);box-shadow:-2px 6px 24px -2px var(--search-glow),-2px 2px 12px rgba(0,0,0,.45)}
+.floating-contact-dock.docked-left{border-radius:0 18px 18px 0;box-shadow:2px 6px 22px -2px var(--search-glow),2px 2px 10px rgba(15,23,42,.08)}
+.floating-contact-dock.docked-right{border-radius:18px 0 0 18px}
+.floating-contact-dock.is-dragging{cursor:grabbing;transition:none !important;border-radius:20px !important;transform:scale(1.05) !important;
+  box-shadow:0 16px 36px -2px var(--search-glow),0 6px 18px rgba(15,23,42,.18)}
+.floating-contact-dock.stashed-right{border-radius:14px 0 0 14px;padding:12px 4px;transform:translate3d(calc(100% - 14px),0,0)}
+.floating-contact-dock.stashed-left{border-radius:0 14px 14px 0;padding:12px 4px;transform:translate3d(calc(-100% + 14px),0,0)}
+.floating-contact-dock.stashed-idle{opacity:.52}
+.floating-contact-dock:hover{opacity:1;box-shadow:0 10px 28px -2px var(--search-glow),0 4px 14px rgba(15,23,42,.12)}
+.dock-stash-ear{display:none;align-items:center;justify-content:center;color:var(--theme-accent);pointer-events:none}
+.floating-contact-dock.stashed-right .dock-stash-ear,.floating-contact-dock.stashed-left .dock-stash-ear{display:inline-flex}
+.floating-contact-dock.stashed-left .dock-stash-ear svg{transform:rotate(180deg)}
+.floating-contact-dock.stashed-right .contact-float-btn,.floating-contact-dock.stashed-left .contact-float-btn{display:none !important}
+.contact-float-btn{background:transparent;border:none;color:var(--text-secondary);writing-mode:vertical-rl;text-orientation:upright;
+  font-size:12px;font-weight:700;letter-spacing:3px;line-height:1.2;cursor:inherit;display:inline-flex;align-items:center;justify-content:center;
+  user-select:none !important;-webkit-user-select:none !important;-webkit-touch-callout:none !important;transition:color .25s ease;padding:0}
+.floating-contact-dock:hover .contact-float-btn{color:var(--theme-accent)}
 
 /* ---------- 公告弹窗 / 对话框 ---------- */
 .overlay{position:fixed;inset:0;background:rgba(17,24,39,.45);z-index:80;display:none;align-items:center;justify-content:center;padding:18px}
@@ -390,12 +437,10 @@ details.about summary{cursor:pointer;color:var(--text-secondary);font-weight:600
   .wrap,.section,.announce,.footer-in{padding-left:16px;padding-right:16px}
   .today-tools .t-search input,.f-field input,.f-field textarea,.f-field select{font-size:16px}
   .today-tools .t-search{min-width:0}
-  .topbar{top:6px;width:calc(100% - 12px);margin-top:6px;border-radius:24px}
   .topbar-in{padding:12px 12px 10px}
   .logo{font-size:16.5px}
   /* 手机端隐藏「求片」按钮（ken 2026-11-03 定，全站外壳共用、一处生效） */
   .btn-ask{display:none}
-  .contact-mini{right:0;bottom:calc(36px + env(safe-area-inset-bottom,0px));padding:10px 5px;font-size:11px;letter-spacing:1px;border-radius:10px 0 0 10px}
   .contact-card{right:8px;width:152px;padding:12px}
   .contact-card img{width:112px;height:112px}
 }
@@ -422,15 +467,7 @@ details.about summary{cursor:pointer;color:var(--text-secondary);font-weight:600
   .btn-app{padding:0 10px}
   .logo{gap:7px}
 }
-/* 窄屏防挤的分级释放阀（主题钮固定 36px 永远不参与压缩，先瘦 APP、再瘦语言胶囊，品牌名省略号兜底） */
-@media (max-width:400px){
-  .btn-app{padding:0 9px}
-  .btn-app .app-txt{display:none}
-}
-@media (max-width:360px){
-  .lang-pill-btn{padding:0 8px}
-  .lang-pill-btn .lang-text{display:none}
-}
+/* 顶栏防挤口径（2026-11-06 晚改定）：顶栏不放安装钮、胶囊按 34px 规格收一号、右侧组 flex:none、主题钮固定 34px、品牌名 min-width:0 省略号兜底 */
 /* 流式搜索：关键词高亮与来源标签 */
 .res-title mark{background:#ffec99;border-radius:2px;padding:0 1px}
 [data-dark="true"] .res-title mark{background:#6B5E14;color:#FFF3BF}

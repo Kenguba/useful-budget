@@ -190,6 +190,120 @@
     for (var i = 0; i < 9; i++) s += "<i></i>";
     return s + "</span>";
   }
+  /* 联系我们磁吸竖签（移植新稿 initDraggableContactDock 逻辑，状态存 pan_contact_dock_state_v1） */
+  function initContactDock(dockEl, onTap) {
+    if (!dockEl) return;
+    var STORAGE_KEY = "pan_contact_dock_state_v1";
+    var isPointerDown = false, wasDragged = false;
+    var startX = 0, startY = 0, initialLeft = 0, initialTop = 0;
+    var currentLeft = 0, currentTop = 0;
+    var lastMoveTime = 0, lastMoveX = 0, instantVx = 0;
+    var pendingStashSide = null, stashedSide = null, dockEdgeSide = "right";
+    var stashedIdleTimer = null;
+    function clearIdleTimer() {
+      if (stashedIdleTimer) { clearTimeout(stashedIdleTimer); stashedIdleTimer = null; }
+      dockEl.classList.remove("stashed-idle");
+    }
+    function scheduleIdleFade() {
+      clearIdleTimer();
+      if (stashedSide) stashedIdleTimer = setTimeout(function () {
+        if (stashedSide) dockEl.classList.add("stashed-idle");
+      }, 2800);
+    }
+    function saveDockState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ top: currentTop, dockEdgeSide: dockEdgeSide, stashedSide: stashedSide }));
+      } catch (e) {}
+    }
+    function applyDockPosition(animate) {
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var rect = dockEl.getBoundingClientRect();
+      var w = rect.width || 32, h = rect.height || 96;
+      currentTop = Math.min(Math.max(16, currentTop), Math.max(16, vh - h - 16));
+      dockEl.classList.remove("stashed-left", "stashed-right", "docked-left", "docked-right");
+      dockEl.style.transition = animate ? "" : "none";
+      if (stashedSide === "right") {
+        dockEdgeSide = "right"; currentLeft = vw - w;
+        dockEl.classList.add("stashed-right"); scheduleIdleFade();
+      } else if (stashedSide === "left") {
+        dockEdgeSide = "left"; currentLeft = 0;
+        dockEl.classList.add("stashed-left"); scheduleIdleFade();
+      } else {
+        clearIdleTimer();
+        if (dockEdgeSide === "left") { currentLeft = 0; dockEl.classList.add("docked-left"); }
+        else { currentLeft = vw - w; dockEl.classList.add("docked-right"); }
+      }
+      dockEl.style.right = "auto"; dockEl.style.bottom = "auto";
+      dockEl.style.left = currentLeft + "px"; dockEl.style.top = currentTop + "px";
+      if (!animate) { void dockEl.offsetWidth; dockEl.style.transition = ""; }
+    }
+    (function initPosition() {
+      var vh = window.innerHeight;
+      currentTop = Math.max(80, vh - 220);
+      dockEdgeSide = "right"; stashedSide = null;
+      try {
+        var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+        if (saved && typeof saved.top === "number") {
+          currentTop = saved.top;
+          dockEdgeSide = saved.dockEdgeSide === "left" ? "left" : "right";
+          stashedSide = (saved.stashedSide === "left" || saved.stashedSide === "right") ? saved.stashedSide : null;
+        }
+      } catch (e) {}
+      applyDockPosition(false);
+    })();
+    dockEl.addEventListener("pointerdown", function (e) {
+      if (e.button && e.button !== 0) return;
+      isPointerDown = true; wasDragged = false; pendingStashSide = null; instantVx = 0;
+      clearIdleTimer();
+      var rect = dockEl.getBoundingClientRect();
+      startX = e.clientX; startY = e.clientY;
+      initialLeft = rect.left; initialTop = rect.top;
+      currentLeft = initialLeft; currentTop = initialTop;
+      lastMoveTime = performance.now(); lastMoveX = e.clientX;
+      try { dockEl.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+    dockEl.addEventListener("pointermove", function (e) {
+      if (!isPointerDown) return;
+      var dx = e.clientX - startX, dy = e.clientY - startY;
+      if (!wasDragged && Math.hypot(dx, dy) > 4) {
+        wasDragged = true; stashedSide = null;
+        dockEl.classList.remove("stashed-left", "stashed-right", "stashed-idle");
+        dockEl.classList.add("is-dragging");
+      }
+      if (!wasDragged) return;
+      var now = performance.now(), dt = now - lastMoveTime;
+      if (dt > 0) { instantVx = (e.clientX - lastMoveX) / dt; lastMoveX = e.clientX; lastMoveTime = now; }
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var w = dockEl.offsetWidth || 32, h = dockEl.offsetHeight || 96;
+      currentLeft = Math.min(Math.max(-w * 0.45, initialLeft + dx), vw - w * 0.55);
+      currentTop = Math.min(Math.max(12, initialTop + dy), vh - h - 12);
+      if (currentLeft <= -10) pendingStashSide = "left";
+      else if (currentLeft >= vw - w + 10) pendingStashSide = "right";
+      else pendingStashSide = null;
+      dockEl.style.left = currentLeft + "px"; dockEl.style.top = currentTop + "px";
+    });
+    function endDrag(e) {
+      if (!isPointerDown) return;
+      isPointerDown = false;
+      try { dockEl.releasePointerCapture(e.pointerId); } catch (err) {}
+      if (wasDragged) {
+        dockEl.classList.remove("is-dragging");
+        var vw = window.innerWidth, w = dockEl.offsetWidth || 32;
+        var centerX = currentLeft + w / 2;
+        if (pendingStashSide === "left" || (centerX < 28 && instantVx < -0.55)) { stashedSide = "left"; dockEdgeSide = "left"; }
+        else if (pendingStashSide === "right" || (centerX > vw - 28 && instantVx > 0.55)) { stashedSide = "right"; dockEdgeSide = "right"; }
+        else { stashedSide = null; dockEdgeSide = centerX < vw / 2 ? "left" : "right"; }
+        applyDockPosition(true); saveDockState();
+      } else if (stashedSide) {
+        stashedSide = null; applyDockPosition(true); saveDockState();
+      } else if (onTap) onTap();
+    }
+    dockEl.addEventListener("pointerup", endDrag);
+    dockEl.addEventListener("pointercancel", endDrag);
+    dockEl.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+    dockEl.addEventListener("selectstart", function (e) { e.preventDefault(); });
+    window.addEventListener("resize", function () { applyDockPosition(false); });
+  }
   function renderShell(active) {
     var site = state.site || {};
     var pres = site.presentation || {};
@@ -220,7 +334,6 @@
       topSearch +
       '<div class="top-right-widgets">' +
       '<button class="btn-app' + (active === "app" ? " on" : "") + '" onclick="location.href=\'' + BASE + "app/'\">📱<span class=\"app-txt\">APP</span></button>" +
-      '<button class="btn-install" id="btnInstall" type="button">安装</button>' +
       '<button class="lang-pill-btn" id="langBtn" type="button" title="切换语言 / Switch Language">' + globeSvg + '<span class="lang-text" id="langText">中文</span></button>' +
       '<button class="theme-mode-btn" id="darkModeBtn" type="button" title="单击切换日夜 / 长按滑动选12色主题" aria-label="切换日夜或选择主题">' +
       '<svg class="sun-moon-svg" id="sunMoonIcon" viewBox="0 0 24 24">' + sunPaths + "</svg></button>" +
@@ -232,6 +345,7 @@
       '<button class="btn-ask" id="btnAsk">求片</button>' +
       "</nav></div></header>";
     document.body.insertAdjacentHTML("afterbegin", header);
+    document.body.classList.toggle("page-home", active === "home");
     function initCaterpillar() {
       var navEl = document.getElementById("topNav");
       if (!navEl) return;
@@ -275,21 +389,29 @@
       if (q) location.href = BASE + "search/?q=" + encodeURIComponent(q);
     };
 
-    // 右侧联系卡（贴边竖排低层级标签，位置全站固定、不可拖拽，点击展开图1）
+    // 右侧联系卡 + 磁吸竖签（按新稿 floating-contact-dock：可拖拽、松手磁吸左右边缘、拉到最外侧或甩向边缘半收起露耳片，点击展开二维码卡）
     if (pres.contact_image) {
       var cc =
         '<div class="contact-card" id="contactCard" style="display:none"><div class="cc-t"><span>保持联系</span>' +
         '<button class="cc-x" id="ccClose">✕</button></div>' +
         '<img src="' + esc(pres.contact_image) + '" alt="二维码">' +
         '<div class="cc-c">' + esc(pres.contact_caption || "扫码加入交流群") + "<br>点击放大查看</div></div>" +
-        '<button class="contact-mini" id="contactMini">保持联系</button>';
+        '<div class="floating-contact-dock docked-right" id="contactDock" title="可自由拖拽移动，松手自动贴边吸附；点击打开联系我们">' +
+        '<span class="dock-stash-ear" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></span>' +
+        '<button type="button" class="contact-float-btn" id="contactFloatBtn"><span>保持联系</span></button></div>';
       document.body.insertAdjacentHTML("beforeend", cc);
-      var mini = document.getElementById("contactMini"), card = document.getElementById("contactCard");
-      mini.onclick = function () { card.style.display = "block"; mini.style.display = "none"; };
+      var card = document.getElementById("contactCard");
       document.getElementById("ccClose").onclick = function () {
-        card.style.display = "none"; mini.style.display = "block";
+        card.style.display = "none";
+        var d = document.getElementById("contactDock");
+        if (d) d.style.display = "";
       };
       document.querySelector("#contactCard img").onclick = function () { window.open(pres.contact_image, "_blank"); };
+      initContactDock(document.getElementById("contactDock"), function () {
+        card.style.display = "block";
+        var d = document.getElementById("contactDock");
+        if (d) d.style.display = "none";
+      });
     }
 
     // 资源获取弹窗（全站共用）
@@ -300,21 +422,7 @@
       "</div></div>");
     bindClose("accessOv");
 
-    // 公告弹窗（每会话一次）
-    if (pres.popup_enabled && !sessionStorage.getItem("pan_popup_seen")) {
-      var link = extractPopupLink(pres);
-      var bodyHtml = esc(pres.popup_content || "").replace(/\n/g, "<br>");
-      if (link) bodyHtml = bodyHtml.replace("点我进群", '<a href="' + esc(link) + '" target="_blank" rel="noopener">点我进群</a>');
-      var ov =
-        '<div class="overlay open" id="popupOv"><div class="dialog">' +
-        '<button class="d-x" data-close>✕</button>' +
-        "<h3>" + esc(pres.popup_title || "站点公告") + "</h3>" +
-        '<div class="d-body">' + bodyHtml + "</div>" +
-        '<div class="d-foot"><button class="btn-primary" data-close>我知道了</button></div>' +
-        "</div></div>";
-      document.body.insertAdjacentHTML("beforeend", ov);
-      bindClose("popupOv", function () { sessionStorage.setItem("pan_popup_seen", "1"); });
-    }
+    // 站点公告自动弹窗已按 ken 2026-11-06 指示彻底删除（首页公告条保留展示）
 
     // 求片弹窗（字段与原站 ResourceRequestDialog 一致；原站提交 POST /public/resource-requests，复刻版跨域不可达，本地模拟成功态）
     var ask =
@@ -347,41 +455,9 @@
       document.getElementById("askDone").style.display = "block";
     };
 
-    // PWA 安装钮：浏览器已给出安装提示、或 iOS 未安装时才显示；已安装（standalone）不显示
-    var btnInstall = document.getElementById("btnInstall");
-    if (btnInstall) {
-      var standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
-      var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent || "");
-      if (!standalone && (window.__panInstallPrompt || isIos)) btnInstall.classList.add("show");
-      btnInstall.onclick = function () {
-        var p = window.__panInstallPrompt;
-        if (p) {
-          window.__panInstallPrompt = null;
-          p.prompt();
-          p.userChoice.then(function (c) {
-            if (c && c.outcome === "accepted") btnInstall.classList.remove("show");
-            else window.__panInstallPrompt = p;
-          }).catch(function () {});
-        } else {
-          toast("在浏览器分享菜单里点「添加到主屏幕」，即可像 APP 一样打开");
-        }
-      };
-    }
+    // PWA 安装入口已按新稿收进 APP 页（顶栏不再放安装钮）；beforeinstallprompt 监听在文件末尾，按钮在 renderApp 里绑定
     // 12 色主题 / 日夜 / 语言模块挂接（assets/theme.js，只管外壳偏好）
     if (window.PanTheme) window.PanTheme.bindShell();
-  }
-  function extractPopupLink(pres) {
-    try {
-      var stack = [pres.popup_rich_text];
-      while (stack.length) {
-        var n = stack.pop();
-        if (!n || typeof n !== "object") continue;
-        if (n.marks) for (var i = 0; i < n.marks.length; i++)
-          if (n.marks[i].type === "link" && n.marks[i].attrs && n.marks[i].attrs.href) return n.marks[i].attrs.href;
-        for (var k in n) stack.push(n[k]);
-      }
-    } catch (e) { /* ignore */ }
-    return "";
   }
   function bindClose(id, after) {
     var ov = document.getElementById(id);
@@ -537,21 +613,76 @@
       '<details class="about"><summary>关于榜单与分类</summary><p>榜单内容不代表本站资源已收录；评分为 TMDB 用户评分。地区按作品产地归类，合拍作品可能出现在多个分类中。</p></details>';
   }
 
+  /* 热搜词推荐栏（移植新稿 layoutResponsiveHotKeywords 量宽算法）：
+     电脑端带「大家都在搜」标签、单行按行宽装 3–10 个整条标签，不滚不截；
+     手机端无标签、严格两行均衡装入（3–8 个），整条不截，两行一起横向可滚 */
+  function hotChipHtml(it) {
+    return '<a class="hot-kw-chip" href="' + BASE + "search/?q=" + encodeURIComponent(it.q) + '"><span>' + esc(it.q) + "</span>" +
+      (it.hot ? '<span class="hot-badge-mini">热</span>' : "") + "</a>";
+  }
+  function layoutHotKeywords() {
+    var bar = document.getElementById("hotKeywordsBar");
+    var items = window.__panHotItems;
+    if (!bar || !items || !items.length) return;
+    var sandbox = document.getElementById("kwMeasureSandbox");
+    var row1 = document.getElementById("hotKwRow1"), row2 = document.getElementById("hotKwRow2");
+    var pcWrap = document.getElementById("hotKwPcWrap");
+    if (!sandbox || !row1 || !row2 || !pcWrap) return;
+    sandbox.innerHTML = items.map(hotChipHtml).join("");
+    var widths = Array.prototype.map.call(sandbox.children, function (n) { return n.offsetWidth || 68; });
+    var containerWidth = Math.max(260, bar.clientWidth - 8);
+    // 电脑端：标签占位先扣掉，剩余宽度贪心装入
+    var lbl = bar.querySelector(".hot-kw-pc .lbl");
+    var pcAvail = containerWidth - (lbl ? lbl.offsetWidth + 10 : 0);
+    var used = 0, fit = 0;
+    for (var i = 0; i < items.length; i++) {
+      var w = widths[i] + (i > 0 ? 7 : 0);
+      if (used + w <= pcAvail) { used += w; fit++; } else break;
+    }
+    fit = Math.max(Math.min(3, items.length), Math.min(10, fit));
+    pcWrap.innerHTML = items.slice(0, fit).map(hotChipHtml).join("");
+    // 手机端：两行均衡装入（与新稿同一套分配规则）
+    var mobilePool = items.slice(0, 8), mobileGap = 5;
+    var row1Items = [], row2Items = [], w1 = 0, w2 = 0;
+    mobilePool.forEach(function (item, idx) {
+      var cw = widths[idx] || 60;
+      if (w1 + cw <= containerWidth && row1Items.length <= row2Items.length + 1) { row1Items.push(item); w1 += cw + mobileGap; }
+      else if (w2 + cw <= containerWidth) { row2Items.push(item); w2 += cw + mobileGap; }
+      else if (row1Items.length + row2Items.length < 3) {
+        if (w1 <= w2) { row1Items.push(item); w1 += cw + mobileGap; } else { row2Items.push(item); w2 += cw + mobileGap; }
+      } else {
+        if (w1 <= w2) { row1Items.push(item); w1 += cw + mobileGap; } else { row2Items.push(item); w2 += cw + mobileGap; }
+      }
+    });
+    row1.innerHTML = row1Items.map(hotChipHtml).join("");
+    row2.innerHTML = row2Items.map(hotChipHtml).join("");
+    if (!window.__panKwResizeBound) {
+      window.__panKwResizeBound = true;
+      window.addEventListener("resize", layoutHotKeywords);
+    }
+  }
+
   /* ---------------- 首页 ---------------- */
   function renderHome() {
     var main = document.getElementById("main");
     var pres = state.site.presentation || {};
     var content = state.site.content || {};
-    var hotTop = state.hot.slice(0, 4).map(function (h) {
-      return '<a href="' + BASE + "search/?q=" + encodeURIComponent(h.query) + '">' + esc(h.query) + "</a>";
-    }).join("");
+    var hotItems = state.hot.slice(0, 10).map(function (h, i) {
+      return { q: h.query, hot: i < 3 };
+    });
+    window.__panHotItems = hotItems;
+    var hotBar =
+      '<div class="hot-keywords-bar" id="hotKeywordsBar">' +
+      '<div class="hot-kw-pc"><span class="lbl">大家都在搜</span><div class="hot-kw-pc-wrap" id="hotKwPcWrap"></div></div>' +
+      '<div class="hot-kw-mobile-wrap" id="hotKwMobileWrap"><div class="hot-kw-mobile-row" id="hotKwRow1"></div><div class="hot-kw-mobile-row" id="hotKwRow2"></div></div>' +
+      '<div class="kw-measure-sandbox" id="kwMeasureSandbox" aria-hidden="true"></div></div>';
     var html =
       '<section class="hero"><div class="aura-backdrop" aria-hidden="true"><div class="aura-orb orb-left"></div><div class="aura-orb orb-center"></div><div class="aura-orb orb-right"></div></div>' +
       '<div class="hero-badge">⚡ 夸克网盘搜索 · 迅雷会员特权直达 · 磁力聚合</div>' +
       '<h1>好内容，<span class="b">一搜就有</span></h1>' +
       '<p class="sub">' + esc(pres.hero_subtitle || "夸克网盘搜索") + "</p>" +
       searchbarHtml("") +
-      '<div class="hotline"><span class="lbl">大家都在搜</span>' + hotTop + "</div></section>";
+      hotBar + "</section>";
     if (content.announcement_enabled && content.announcement) {
       html += '<div class="announce"><div class="announce-in"><span class="ic">📣</span><b>站点公告</b><span>' +
         esc(content.announcement) + "</span></div></div>";
@@ -585,6 +716,7 @@
       "</div></div>";
     main.innerHTML = html;
     bindSearchbar();
+    layoutHotKeywords();
     var curCat = "rec", curKind = "all";
     function drawBoard() {
       var items = boardFilter(curCat, curKind);
@@ -1019,6 +1151,7 @@
       '<div style="color:var(--mut);font-size:13.5px">本站图标 · 随网站更新</div>' +
       '<div style="margin:12px 0 18px"><span class="tag-hot" style="font-size:12px;padding:4px 10px">网页版 · 无需自签</span></div>' +
       '<a class="btn-primary" style="display:inline-block" href="' + ORIGIN + '/api/public/app/ios.mobileconfig">下载桌面版 ↓</a>' +
+      '<div><button class="btn-install" id="btnInstall" type="button">安装到桌面</button></div>' +
       '<p style="color:var(--mut);font-size:13.5px;line-height:1.8;margin:16px 0 0">下载后打开「设置 → 已下载描述文件 → 安装」。</p>' +
       '<details class="about"><summary>也可以直接添加到主屏幕</summary><p>用 Safari 或支持此功能的 Chrome 打开本站，在分享菜单中选择「添加到主屏幕」。<br>描述文件仅添加本站图标，系统可能显示「未签名」。<br>桌面版使用网页，网盘唤起以手机实际支持为准。</p></details></div>' +
       "</div>" +
@@ -1027,6 +1160,26 @@
       '" alt="本站 APP 下载页面二维码" style="width:168px;height:168px" onerror="this.style.display=\'none\'">' +
       '<div style="font-weight:800;font-size:16px;margin-top:12px">用手机扫码打开</div>' +
       '<div style="color:var(--mut);font-size:13.5px;margin-top:5px">在手机上下载，连接本站。</div></div>';
+    // PWA 安装钮（从顶栏收进本页）：浏览器已给出安装提示、或 iOS 未安装时才显示；已安装（standalone）不显示
+    var btnInstall = document.getElementById("btnInstall");
+    if (btnInstall) {
+      var standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+      var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent || "");
+      if (!standalone && (window.__panInstallPrompt || isIos)) btnInstall.classList.add("show");
+      btnInstall.onclick = function () {
+        var p = window.__panInstallPrompt;
+        if (p) {
+          window.__panInstallPrompt = null;
+          p.prompt();
+          p.userChoice.then(function (c) {
+            if (c && c.outcome === "accepted") btnInstall.classList.remove("show");
+            else window.__panInstallPrompt = p;
+          }).catch(function () {});
+        } else {
+          toast("在浏览器分享菜单里点「添加到主屏幕」，即可像 APP 一样打开");
+        }
+      };
+    }
   }
 
   /* ---------------- 申请友链页 ---------------- */

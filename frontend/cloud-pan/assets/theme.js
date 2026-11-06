@@ -113,7 +113,7 @@
     "告诉我们你需要的资源。邮箱选填。": "Tell us what you are looking for. Email is optional",
     "求片已提交，感谢你的反馈。": "Request submitted. Thank you", "需要的资源": "Resource needed",
     "必填": "Required", "选填": "Optional", "邮箱": "Email", "可留空": "Optional",
-    "提交求片": "Submit Request", "完成": "Done", "发现": "Discover",
+    "提交求片": "Submit Request", "完成": "Done", "发现": "Discover", "安装到桌面": "Add to Home Screen",
     "条目视图": "List", "网格视图": "Grid", "网盘筛选": "Cloud Filter", "刷新": "Refresh",
     "无符合条件的更新": "No matching updates", "快照内无符合条件的更新": "No matching updates in snapshot",
     "查看相关资源": "View related resources", "资源详情": "Resource Details", "正在加载…": "Loading…",
