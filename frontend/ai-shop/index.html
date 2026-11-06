@@ -1992,10 +1992,19 @@ const allSel=()=>!selFav&&selCats.size===0;
 function itemShown(g,it){ if(hiddenSet.has(it.url)) return false; if(allSel()) return true; if(selCats.has(GCAT(g.id))) return true; if(selFav&&favSet.has(it.url)) return true; return false; }
 function paintChips(){ document.querySelectorAll('#categoryBar .cat-chip').forEach(x=>{ const c=x.dataset.cat; x.classList.toggle('active', c==='all'?allSel():c==='__fav'?selFav:selCats.has(c)); if(c==='__fav') x.textContent='收藏'+(favs.length?' ('+favs.length+')':''); }); }
 function findItem(url){ if(typeof board==='undefined'||!board||!board.groups) return null; for(const g of board.groups){ const it=g.items.find(x=>x.url===url); if(it) return {g,it}; } return null; }
-function toggleFav(url){
+function toggleFav(url,wrap){
   if(favSet.has(url)){ favs=favs.filter(f=>f.url!==url); favSet.delete(url); }
   else{ const f=findItem(url); favs.push(f?{url:f.it.url,title:f.it.title,price:f.it.price,shop:f.it.shop,platform:f.it.platform,kind:f.it.kind||'',minq:f.it.minq||0,stock:(f.it.stock==null?null:f.it.stock)}:{url:url,title:url,price:0,shop:'',platform:''}); favSet.add(url); }
-  saveFavs(); paintChips(); renderBoard();
+  saveFavs(); paintChips();
+  if(selFav||!wrap){ renderBoard(); return; }
+  const on=favSet.has(url);
+  const fb=wrap.querySelector('.sw-fav');
+  if(fb){ fb.setAttribute('aria-label',on?'取消收藏':'收藏'); const sp=fb.querySelector('span'); if(sp)sp.textContent=on?'取消收藏':'收藏'; }
+  const line=wrap.querySelector('.offer-badges-line');
+  if(line){ const pill=line.querySelector('.tag-fav');
+    if(on&&!pill){ const s=document.createElement('span'); s.className='attr-pill-tag tag-fav'; s.textContent='★ 已收藏'; line.insertBefore(s,line.firstChild); }
+    if(!on&&pill) pill.remove();
+  }
 }
 const userOpen=new Set();
 let seenLeader=null;
@@ -2446,9 +2455,9 @@ $('#plusBtn').onclick=()=>{
       if(!url)return;
       pinnedLeaderGroup=null;
       if(btn.dataset.act==='del'){
-        hiddenSet.add(url);saveHidden();renderBoard();showToast('已从当前列表隐藏');
+        hiddenSet.add(url);saveHidden();wrap.remove();showToast('已从当前列表隐藏');requestAnimationFrame(()=>renderBoard());
       }else if(btn.dataset.act==='fav'){
-        const removing=favSet.has(url);toggleFav(url);
+        const removing=favSet.has(url);toggleFav(url,wrap);
         showToast(removing?'已取消收藏':'已收藏');
       }
       openRow=null; suppressedRow=null;
