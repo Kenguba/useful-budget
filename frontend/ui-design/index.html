@@ -1850,8 +1850,19 @@
     [data-dark="true"] .lang-pill-btn:active,
     [data-dark="true"] .theme-mode-btn:active { background-color: rgba(255, 255, 255, 0.12); }
     [data-dark="true"] .subtag-chip:active { background-color: rgba(255, 255, 255, 0.1); color: var(--text-primary); }
-    [data-dark="true"] .plus-action-btn:active { background-color: rgba(255, 255, 255, 0.1); }
+    [data-dark="true"] .plus-action-btn:active { background-color: rgba(255, 255, 255, 0.22); }
     [data-dark="true"] .sidebar-nav-btn:active { background-color: rgba(255, 255, 255, 0.08); }
+
+    /* 搜索框左 + 圆钮：深色下常驻白色微透底 + 白色图标，悬停（含触屏粘滞）/点按同样不许借主题浅色标签底变实心浅盘 */
+    [data-dark="true"] .plus-action-btn { background-color: rgba(255, 255, 255, 0.09); color: #F8FAFC; }
+    [data-dark="true"] .plus-action-btn:hover { background-color: rgba(255, 255, 255, 0.16); }
+
+    /* 12 色面板选中/滑动悬停项：深色下不用浅色标签底（否则近白字压近白底看不清），改白色微透 + 主题描边 */
+    [data-dark="true"] .theme-swatch-item.active,
+    [data-dark="true"] .theme-swatch-item.sliding-hover { background: rgba(255, 255, 255, 0.1); border-color: var(--theme-accent); }
+
+    /* Toast：深色下不再是实心近白胶囊，改深色抬升面 + 浅字 + 微透描边 */
+    [data-dark="true"] .toast-banner { background: rgba(30, 41, 59, 0.94); color: #F8FAFC; border: 1px solid rgba(255, 255, 255, 0.14); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45); }
     .refresh-btn, .action-circle-btn, .lang-pill-btn, .subtag-chip, .submit-cta-btn, .login-trigger-btn, .copy-prompt-btn, .show-all-btn { -webkit-tap-highlight-color: transparent; }
 
     @media (prefers-reduced-motion: reduce) {
