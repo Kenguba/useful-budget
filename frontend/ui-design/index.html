@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UI 设计资源目录 · UI Design Catalogue</title>
+<meta name="description" content="灵感、组件资源、工具与作品集目录，数据来自 Designeer">
+<style>
+:root{
+  --accent:#1A73E8; --tag-bg:#E6F4EA; --tag-text:#137333; --page-bg:#F3F8FA;
+  --glow:rgba(143,219,184,.44); --orb1:#8FDBB8; --orb2:#9CC8F7;
+  --card-bg:#FFFFFF; --card-sub:#F1F5F9; --text:#0F172A; --muted:#64748B; --line:rgba(15,23,42,.08);
+}
+body.dark{
+  --card-bg:#16202E; --card-sub:#1E2A3A; --text:#EAF1F8; --muted:#94A7BB; --line:rgba(255,255,255,.10);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0; padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; background:var(--page-bg); color:var(--text); transition:background-color .25s ease, color .25s ease}
+a{color:inherit; text-decoration:none}
+.wrap{max-width:1120px; margin:0 auto; padding:14px 14px 40px}
+.hero{position:relative; overflow:hidden; background:var(--card-bg); border:1px solid var(--line); border-radius:22px; padding:20px 18px 16px; box-shadow:0 10px 30px -18px var(--glow)}
+.hero .orb{position:absolute; border-radius:50%; filter:blur(46px); opacity:.55; pointer-events:none}
+.hero .orb-a{width:220px; height:220px; right:-60px; top:-80px; background:var(--orb1)}
+.hero .orb-b{width:200px; height:200px; right:70px; bottom:-110px; background:var(--orb2)}
+.hero-top{position:relative; display:flex; align-items:flex-start; gap:10px}
+.hero h1{font-size:23px; margin:0; line-height:1.25; font-weight:800}
+.hero .sub{position:relative; margin-top:7px; font-size:13px; color:var(--muted); line-height:1.55}
+.hero .counts{position:relative; margin-top:10px; font-size:12.5px; font-weight:700; color:var(--tag-text)}
+.top-btns{margin-left:auto; display:flex; gap:8px; flex:none; position:relative}
+.tbtn{min-width:40px; height:40px; padding:0 10px; border-radius:999px; border:1px solid var(--line); background:var(--card-sub); color:var(--text); font-size:15px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center}
+.tbtn:active{transform:scale(.96)}
+.ov-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-top:14px}
+@media(max-width:760px){.ov-grid{grid-template-columns:repeat(3,1fr)} .hero h1{font-size:20px}}
+@media(max-width:430px){.ov-grid{grid-template-columns:repeat(2,1fr)}}
+.ov-card{position:relative; background:var(--card-bg); border:1.5px solid var(--line); border-radius:16px; padding:13px 12px 11px; cursor:pointer; overflow:hidden; transition:border-color .18s ease, box-shadow .18s ease}
+.ov-card .n{font-size:22px; font-weight:800; line-height:1.1}
+.ov-card .t{font-size:12.5px; font-weight:700; margin-top:4px}
+.ov-card .e{font-size:11px; color:var(--muted); margin-top:2px}
+.ov-card.seen{border-color:var(--accent); box-shadow:0 8px 22px -8px var(--glow)}
+.ov-card.seen::before{content:""; position:absolute; left:0; right:0; top:0; height:3.5px; background:var(--accent)}
+.filterbar{display:flex; gap:8px; overflow-x:auto; padding:14px 2px 4px; scrollbar-width:none; -ms-overflow-style:none}
+.filterbar::-webkit-scrollbar{display:none}
+.pill{flex:none; border:1.5px solid transparent; background:var(--card-bg); color:var(--text); border-radius:999px; padding:8px 14px; font-size:13.5px; font-weight:700; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
+.pill.active{background:var(--tag-bg); color:var(--tag-text); border-color:var(--accent); box-shadow:0 4px 14px -6px var(--glow)}
+.catbar{display:flex; gap:7px; overflow-x:auto; padding:8px 2px 2px; scrollbar-width:none; -ms-overflow-style:none}
+.catbar::-webkit-scrollbar{display:none}
+.catbar .pill{padding:6px 11px; font-size:12.5px; font-weight:600}
+.searchbar{margin-top:10px; position:relative}
+.searchbar input{width:100%; height:46px; border-radius:14px; border:1px solid var(--line); background:var(--card-bg); color:var(--text); font-size:15px; padding:0 44px 0 15px; outline:none; box-shadow:0 6px 18px -12px var(--glow)}
+.searchbar input:focus{border-color:var(--accent)}
+.searchbar .clear{position:absolute; right:8px; top:50%; transform:translateY(-50%); width:30px; height:30px; border-radius:50%; border:none; background:var(--card-sub); color:var(--muted); font-size:15px; cursor:pointer; display:none}
+.list{display:grid; grid-template-columns:repeat(auto-fill,minmax(305px,1fr)); gap:10px; margin-top:14px}
+@media(max-width:430px){.list{grid-template-columns:1fr}}
+.card{background:var(--card-bg); border:1px solid var(--line); border-radius:16px; padding:13px 14px; display:flex; gap:11px; cursor:pointer; min-height:118px; transition:border-color .15s ease, box-shadow .15s ease}
+.card:hover{border-color:var(--accent); box-shadow:0 8px 20px -12px var(--glow)}
+.card .orb{width:42px; height:42px; flex:none; border-radius:50%; background:linear-gradient(135deg,var(--orb1),var(--orb2)); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:17px; color:#10304A}
+.card .main{flex:1; min-width:0}
+.card .name{font-size:15.5px; font-weight:800; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.card .tag{font-size:12.8px; color:var(--muted); line-height:1.45; margin-top:3px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:37px}
+.card .meta{display:flex; align-items:center; gap:6px; margin-top:7px; flex-wrap:nowrap; overflow:hidden}
+.tagchip{flex:none; font-size:11px; font-weight:700; background:var(--tag-bg); color:var(--tag-text); border-radius:999px; padding:3px 8px}
+.hostchip{flex:none; font-size:11px; color:var(--muted); white-space:nowrap}
+.srclink{flex:none; margin-left:auto; font-size:11px; font-weight:700; color:var(--accent); white-space:nowrap}
+.skel{border-radius:16px; min-height:118px; background:linear-gradient(100deg,var(--card-sub) 40%,var(--card-bg) 50%,var(--card-sub) 60%); background-size:200% 100%; animation:shim 1.2s infinite}
+@keyframes shim{to{background-position:-200% 0}}
+.skel-line{display:inline-block; width:180px; height:13px; border-radius:6px; background:linear-gradient(100deg,var(--card-sub) 40%,var(--card-bg) 50%,var(--card-sub) 60%); background-size:200% 100%; animation:shim 1.2s infinite; vertical-align:middle}
+.sentinel{height:8px}
+.statusline{text-align:center; color:var(--muted); font-size:12.5px; padding:16px 0 4px; display:flex; align-items:center; justify-content:center; gap:8px}
+.spinner{width:16px; height:16px; border-radius:50%; border:2px solid var(--line); border-top-color:var(--accent); animation:spin .7s linear infinite; display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.retrybtn{border:1px solid var(--line); background:var(--card-bg); color:var(--accent); font-weight:700; border-radius:999px; padding:7px 16px; cursor:pointer; display:none}
+footer{margin-top:26px; font-size:12px; color:var(--muted); line-height:1.7; text-align:center}
+footer a{color:var(--accent); font-weight:700}
+.panel-mask{position:fixed; inset:0; background:rgba(8,15,26,.45); display:none; z-index:50}
+.panel-mask.show{display:block}
+.panel{position:fixed; left:50%; bottom:0; transform:translate(-50%,100%); width:min(560px,100%); max-height:78vh; overflow-y:auto; background:var(--card-bg); color:var(--text); border-radius:20px 20px 0 0; padding:16px 16px 26px; z-index:51; transition:transform .25s ease}
+.panel.show{transform:translate(-50%,0)}
+.panel h3{margin:2px 0 4px; font-size:15px}
+.panel .hint{font-size:11.5px; color:var(--muted); margin-bottom:10px}
+.theme-swatch-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:7px}
+.theme-swatch-item{display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:13px; background:var(--card-sub); border:1.5px solid transparent; cursor:pointer; transition:transform .18s ease, background-color .2s ease, border-color .2s ease, box-shadow .2s ease}
+.theme-swatch-item.active,.theme-swatch-item.sliding-hover{background:var(--tag-bg); border-color:var(--accent); transform:scale(1.04); box-shadow:0 6px 16px -4px var(--glow)}
+.swatch-orb{width:20px; height:20px; border-radius:50%; flex:none}
+.swatch-label{font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="orb orb-a"></div><div class="orb orb-b"></div>
+    <div class="hero-top">
+      <div>
+        <h1 id="uiTitle">UI 设计资源目录</h1>
+        <div class="sub" id="uiSub">灵感画廊、组件资源、开发与 AI 工具、设计师作品集，一处找齐</div>
+      </div>
+      <div class="top-btns">
+        <button class="tbtn" id="langBtn" aria-label="language">EN</button>
+        <button class="tbtn" id="darkBtn" aria-label="dark mode">◐</button>
+        <button class="tbtn" id="themeBtn" aria-label="theme">🎨</button>
+      </div>
+    </div>
+    <div class="counts" id="countsLine"><span class="skel-line"></span></div>
+    <div class="ov-grid" id="ovGrid"></div>
+  </header>
+
+  <nav class="filterbar" id="filterBar"></nav>
+  <nav class="catbar" id="catBar" style="display:none"></nav>
+  <div class="searchbar">
+    <input id="searchInput" type="search" autocomplete="off">
+    <button class="clear" id="clearBtn" aria-label="clear">✕</button>
+  </div>
+
+  <main class="list" id="list"></main>
+  <div class="sentinel" id="sentinel"></div>
+  <div class="statusline"><span class="spinner" id="spinner"></span><span id="statusText"></span><button class="retrybtn" id="retryBtn">重试</button></div>
+
+  <footer id="footer"></footer>
+</div>
+
+<div class="panel-mask" id="panelMask"></div>
+<section class="panel" id="themePanel">
+  <h3 id="panelTitle">主题颜色</h3>
+  <div class="hint" id="panelHint">点选即生效，与其他站共用同一套偏好</div>
+  <div class="theme-swatch-grid" id="swatchGrid"></div>
+</section>
+
+<script>
+"use strict";
+const THEMES=[
+{name:"01 · 冰川晴空",nameEn:"01 · Glacier Sky",orb1:"#BCE0FD",orb2:"#93C5FD",accent:"#2563EB",tagBg:"#EBF5FF",tagText:"#1D4ED8",pageBg:"#F4F8FC",glow:"rgba(147,197,253,0.38)"},
+{name:"02 · 薄荷微风",nameEn:"02 · Mint Breeze",orb1:"#A7F3D0",orb2:"#6EE7B7",accent:"#059669",tagBg:"#ECFDF5",tagText:"#047857",pageBg:"#F2FBF7",glow:"rgba(110,231,183,0.36)"},
+{name:"03 · 极光青蓝",nameEn:"03 · Aurora Cyan",orb1:"#A5F3FC",orb2:"#818CF8",accent:"#4F46E5",tagBg:"#EEF2FF",tagText:"#4338CA",pageBg:"#F4F6FC",glow:"rgba(129,140,248,0.34)"},
+{name:"04 · 抹茶森屿",nameEn:"04 · Matcha Isle",orb1:"#D9F99D",orb2:"#86EFAC",accent:"#16A34A",tagBg:"#F0FDF4",tagText:"#15803D",pageBg:"#F6FAF5",glow:"rgba(134,239,172,0.36)"},
+{name:"05 · 碧海晴空",nameEn:"05 · Azure Lagoon",orb1:"#99F6E4",orb2:"#7DD3FC",accent:"#0D9488",tagBg:"#F0FDFA",tagText:"#0F766E",pageBg:"#F2F9FA",glow:"rgba(125,211,252,0.36)"},
+{name:"06 · 深海星雾",nameEn:"06 · Mist Slate",orb1:"#CBD5E1",orb2:"#93C5FD",accent:"#334155",tagBg:"#F1F5F9",tagText:"#1E293B",pageBg:"#F5F7FA",glow:"rgba(148,163,184,0.32)"},
+{name:"07 · 星云幻紫",nameEn:"07 · Nebula Violet",orb1:"#E9D5FF",orb2:"#C4B5FD",accent:"#6D28D9",tagBg:"#F3E8FF",tagText:"#6D28D9",pageBg:"#F8F5FD",glow:"rgba(167,139,250,0.38)"},
+{name:"08 · 蜜桃乌龙",nameEn:"08 · Peach Oolong",orb1:"#FBCFE8",orb2:"#FDA4AF",accent:"#DB2777",tagBg:"#FDF2F8",tagText:"#BE185D",pageBg:"#FDF6F9",glow:"rgba(244,114,182,0.34)"},
+{name:"09 · 晨曦微光",nameEn:"09 · Dawn Amber",orb1:"#FDE68A",orb2:"#FDBA74",accent:"#EA580C",tagBg:"#FFF7ED",tagText:"#C2410C",pageBg:"#FCF9F4",glow:"rgba(251,146,60,0.34)"},
+{name:"10 · 落日粉紫",nameEn:"10 · Sunset Glow",orb1:"#F5D0FE",orb2:"#FECDD3",accent:"#9333EA",tagBg:"#FAF5FF",tagText:"#7E22CE",pageBg:"#FAF6FC",glow:"rgba(192,132,252,0.35)"},
+{name:"11 · 香槟流金",nameEn:"11 · Champagne Gold",orb1:"#FEF08A",orb2:"#FDE047",accent:"#CA8A04",tagBg:"#FEFCE8",tagText:"#A16207",pageBg:"#FAF9F2",glow:"rgba(234,179,8,0.32)"},
+{name:"12 · 幻彩全息",nameEn:"12 · Gemini Holo",orb1:"#8FDBB8",orb2:"#9CC8F7",accent:"#1A73E8",tagBg:"#E6F4EA",tagText:"#137333",pageBg:"#F3F8FA",glow:"rgba(143,219,184,0.44)"}
+];
+let themeIdx=11, isDark=false, lang="zh";
+function readSharedA(){try{var m=document.cookie.match(/(?:^|;\s*)A=(\d{3,4})(?:;|$)/);if(!m)return null;var v=m[1],t=parseInt(v.slice(2),10);if(v.charAt(1)!=="0"&&v.charAt(1)!=="1")return null;if(!(t>=1&&t<=12))return null;return{l:v.charAt(0),m:v.charAt(1),t:t};}catch(e){return null;}}
+function writeSharedA(){try{var h=location.hostname,s="A="+(lang==="en"?"1":"0")+(isDark?"0":"1")+(themeIdx+1)+";path=/;max-age=31536000;SameSite=Lax";if(h==="jpedu.asia"||h.slice(-11)===".jpedu.asia")s+=";domain=jpedu.asia";if(location.protocol==="https:")s+=";Secure";document.cookie=s;}catch(e){}}
+function saveLocal(){try{localStorage.setItem("ui-theme-idx",String(themeIdx));localStorage.setItem("ui-dark",isDark?"1":"0");localStorage.setItem("ui-lang",lang);}catch(e){}}
+function loadPrefs(){var hasLocal=false;try{var tk=localStorage.getItem("ui-theme-idx"),dk=localStorage.getItem("ui-dark"),lk=localStorage.getItem("ui-lang");if(tk!==null){var ti=parseInt(tk,10);if(ti>=0&&ti<12){themeIdx=ti;hasLocal=true;}}if(dk!==null){isDark=dk==="1";hasLocal=true;}if(lk==="en"||lk==="zh"){lang=lk;hasLocal=true;}}catch(e){}var a=readSharedA();if(a){themeIdx=a.t-1;isDark=a.m==="0";lang=a.l==="1"?"en":"zh";saveLocal();}else if(hasLocal){writeSharedA();}}
+function applyTheme(){var t=THEMES[themeIdx],r=document.documentElement.style;r.setProperty("--accent",t.accent);r.setProperty("--orb1",t.orb1);r.setProperty("--orb2",t.orb2);r.setProperty("--glow",t.glow);if(isDark){document.body.classList.add("dark");r.setProperty("--page-bg","#0C1420");r.setProperty("--tag-bg",t.accent+"33");r.setProperty("--tag-text",t.orb1);}else{document.body.classList.remove("dark");r.setProperty("--page-bg",t.pageBg);r.setProperty("--tag-bg",t.tagBg);r.setProperty("--tag-text",t.tagText);}document.querySelectorAll(".theme-swatch-item").forEach(function(el){el.classList.toggle("active",parseInt(el.dataset.idx,10)===themeIdx);});}
+const I18N={
+zh:{title:"UI 设计资源目录",sub:"灵感画廊、组件资源、开发与 AI 工具、设计师作品集，一处找齐",counts:function(c){return "正式目录 "+c.listings+" 条 · Finds "+c.finds+" 条 · 数据更新 "+DATA.updated;},search:"搜名称、简介或域名，可直接粘贴链接",all:"全部",finds:"Finds",shown:function(n){return "已展示全部 "+n+" 条";},nomatch:"没有找到匹配的条目，换个词试试",retry:"重试",loadfail:"数据没拉到，点重试再来一次",panel:"主题颜色",hint:"点选即生效，与其他站共用同一套偏好",src:"条目页",by:"作者",foot:function(){return "数据来源 <a href='https://designeer.xyz' target='_blank' rel='noopener'>Designeer</a>，由 Dhruv Jaradi 人工精选；每条简介为原文，权利归原作者；点条目直达原站，点「条目页」看 Designeer 原页";}},
+en:{title:"UI Design Catalogue",sub:"Inspiration galleries, component resources, dev & AI tools and designer portfolios in one place",counts:function(c){return c.listings+" listings · "+c.finds+" Finds · Updated "+DATA.updated;},search:"Search name, tagline or host, or paste a link",all:"All",finds:"Finds",shown:function(n){return "All "+n+" items shown";},nomatch:"No matches, try another word",retry:"Retry",loadfail:"Data failed to load, tap retry",panel:"Theme colour",hint:"Applies instantly and shares one preference across the sites",src:"Listing",by:"By",foot:function(){return "Data from <a href='https://designeer.xyz' target='_blank' rel='noopener'>Designeer</a>, hand-curated by Dhruv Jaradi; taglines are quoted as-is and rights stay with their creators; tap an item to visit the original site";}}
+};
+const COLS=[
+{key:"inspiration",zh:"灵感",en:"Inspiration"},
+{key:"resources",zh:"资源",en:"Resources"},
+{key:"tools",zh:"工具",en:"Tools"},
+{key:"portfolios",zh:"作品集",en:"Portfolios"},
+{key:"finds",zh:"Finds",en:"Finds"}
+];
+function T(){return I18N[lang];}
+function applyLang(){var t=T();document.getElementById("uiTitle").textContent=t.title;document.getElementById("uiSub").textContent=t.sub;document.getElementById("searchInput").placeholder=t.search;document.getElementById("panelTitle").textContent=t.panel;document.getElementById("panelHint").textContent=t.hint;document.getElementById("langBtn").textContent=lang==="zh"?"EN":"中";document.getElementById("retryBtn").textContent=t.retry;document.getElementById("footer").innerHTML=t.foot();document.documentElement.lang=lang==="zh"?"zh-CN":"en";}
+function buildSwatches(){var g=document.getElementById("swatchGrid");g.innerHTML="";THEMES.forEach(function(t,i){var d=document.createElement("div");d.className="theme-swatch-item";d.dataset.idx=i;d.innerHTML="<span class='swatch-orb' style='background:linear-gradient(135deg,"+t.orb1+","+t.orb2+")'></span><span class='swatch-label'>"+(lang==="en"?t.nameEn:t.name)+"</span>";d.addEventListener("click",function(){themeIdx=i;saveLocal();writeSharedA();applyTheme();buildSwatches();});d.addEventListener("mouseenter",function(){if(window.matchMedia("(hover:hover)").matches){document.querySelectorAll(".theme-swatch-item").forEach(function(el){el.classList.remove("sliding-hover");});d.classList.add("sliding-hover");}});g.appendChild(d);});}
+document.getElementById("themeBtn").addEventListener("click",function(){buildSwatches();document.getElementById("panelMask").classList.add("show");document.getElementById("themePanel").classList.add("show");});
+document.getElementById("panelMask").addEventListener("click",function(){document.getElementById("panelMask").classList.remove("show");document.getElementById("themePanel").classList.remove("show");});
+document.getElementById("darkBtn").addEventListener("click",function(){isDark=!isDark;saveLocal();writeSharedA();applyTheme();});
+document.getElementById("langBtn").addEventListener("click",function(){lang=lang==="zh"?"en":"zh";saveLocal();writeSharedA();applyLang();renderOverview();renderFilters();renderCats();resetList();});
+loadPrefs();applyTheme();applyLang();
+</script>
+<script>
+"use strict";
+let DATA=null, curCol="all", curCat="All", query="", filtered=[], shownCount=0, loading=false, seenKey=null;
+const BATCH=30;
+const listEl=document.getElementById("list"), statusEl=document.getElementById("statusText"), spinEl=document.getElementById("spinner"), retryEl=document.getElementById("retryBtn");
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function colName(key){var c=COLS.find(function(x){return x.key===key;});return c?(lang==="en"?c.en:c.zh):key;}
+function pool(){if(!DATA)return[];if(curCol==="finds")return DATA.finds.map(function(f){return{find:true,author:f.author,text:f.title||f.snippet||"",url:f.url};});var src=curCol==="all"?COLS.filter(function(c){return c.key!=="finds";}).flatMap(function(c){return DATA.collections[c.key].map(function(it){return Object.assign({_col:c.key},it);});}):DATA.collections[curCol].map(function(it){return Object.assign({_col:curCol},it);});return src;}
+function catsOf(){if(!DATA||curCol==="all"||curCol==="finds")return[];var m={};DATA.collections[curCol].forEach(function(it){var k=it.category||"—";m[k]=(m[k]||0)+1;});return Object.keys(m).sort(function(a,b){return m[b]-m[a];}).map(function(k){return{name:k,n:m[k]};});}
+function fuzzy(q,s){q=q.toLowerCase();s=s.toLowerCase();if(s.indexOf(q)>=0)return true;var i=0;for(var j=0;j<s.length&&i<q.length;j++){if(s.charAt(j)===q.charAt(i))i++;}return i===q.length;}
+function matches(it){if(curCat!=="All"&&!it.find&&it.category!==curCat&&!(curCat==="—"&&!it.category))return false;if(!query)return true;var q=query.trim().toLowerCase();if(it.find){return fuzzy(q,it.author+" "+it.text);}var hostQ=q.replace(/^https?:\/\//,"").replace(/\/.*$/,"");if(hostQ&&it.host&&it.host.toLowerCase().indexOf(hostQ)>=0)return true;return fuzzy(q,it.name+" "+(it.tagline||"")+" "+(it.host||"")+" "+(it.category||""));}
+function applyFilter(){filtered=pool().filter(matches);shownCount=0;listEl.innerHTML="";loadMore();}
+function resetList(){if(DATA)applyFilter();}
+function cardHTML(it){if(it.find){var init=esc((it.author||"?").charAt(0).toUpperCase());return "<article class='card' data-url='"+esc(it.url)+"'><div class='orb'>"+init+"</div><div class='main'><div class='name'>"+esc(it.author)+"</div><div class='tag'>"+esc(it.text)+"</div><div class='meta'><span class='tagchip'>Finds</span><span class='hostchip'>designeer.xyz</span><span class='srclink'>"+T().src+" ›</span></div></div></article>";}
+var init2=esc((it.name||"?").charAt(0).toUpperCase());var price=it.pricing?("<span class='tagchip'>"+esc(it.pricing.charAt(0).toUpperCase()+it.pricing.slice(1))+"</span>"):"";var cat=it.category?("<span class='tagchip'>"+esc(it.category)+"</span>"):"";var src="https://designeer.xyz/"+it._col+"/"+it.slug;return "<article class='card' data-url='"+esc(it.url)+"' data-src='"+esc(src)+"'><div class='orb'>"+init2+"</div><div class='main'><div class='name'>"+esc(it.name)+"</div><div class='tag'>"+esc(it.tagline||"")+"</div><div class='meta'>"+cat+price+"<span class='hostchip'>"+esc(it.host||"")+"</span><a class='srclink' href='"+esc(src)+"' target='_blank' rel='noopener'>"+T().src+" ›</a></div></div></article>";}
+function loadMore(){if(loading||!DATA)return;if(shownCount>=filtered.length){statusEl.textContent=filtered.length?(T().shown(filtered.length)):(query||curCat!=="All"?T().nomatch:"");spinEl.style.display="none";return;}loading=true;spinEl.style.display="inline-block";statusEl.textContent="";var end=Math.min(shownCount+BATCH,filtered.length),html="";for(var i=shownCount;i<end;i++)html+=cardHTML(filtered[i]);listEl.insertAdjacentHTML("beforeend",html);shownCount=end;loading=false;spinEl.style.display="none";if(shownCount>=filtered.length)statusEl.textContent=T().shown(filtered.length);}
+listEl.addEventListener("click",function(e){var a=e.target.closest("a.srclink");if(a){e.stopPropagation();return;}var card=e.target.closest(".card");if(card&&card.dataset.url)window.open(card.dataset.url,"_blank","noopener");});
+function renderOverview(){if(!DATA)return;var g=document.getElementById("ovGrid");g.innerHTML="";COLS.forEach(function(c){var n=c.key==="finds"?DATA.counts.finds:DATA.counts[c.key];var d=document.createElement("div");d.className="ov-card"+(seenKey===c.key?" seen":"");d.innerHTML="<div class='n'>"+n+"</div><div class='t'>"+(lang==="en"?c.en:c.zh)+"</div><div class='e'>"+c.en+"</div>";d.addEventListener("click",function(){seenKey=c.key;setCol(c.key,true);});g.appendChild(d);});document.getElementById("countsLine").innerHTML=esc(T().counts(DATA.counts)).replace(esc(DATA.updated),"<span style='white-space:nowrap'>"+esc(DATA.updated)+"</span>");}
+function renderFilters(){var bar=document.getElementById("filterBar");bar.innerHTML="";var keys=["all"].concat(COLS.map(function(c){return c.key;}));keys.forEach(function(k){var b=document.createElement("button");b.className="pill"+(curCol===k?" active":"");b.textContent=k==="all"?T().all:colName(k);b.addEventListener("click",function(){setCol(k,true);});bar.appendChild(b);});}
+function renderCats(){var bar=document.getElementById("catBar");var cats=catsOf();if(!cats.length){bar.style.display="none";bar.innerHTML="";return;}bar.style.display="flex";bar.innerHTML="";var all=document.createElement("button");all.className="pill"+(curCat==="All"?" active":"");all.textContent=T().all+" · "+DATA.counts[curCol];all.addEventListener("click",function(){curCat="All";renderCats();applyFilter();});bar.appendChild(all);cats.forEach(function(c){var b=document.createElement("button");b.className="pill"+(curCat===c.name?" active":"");b.textContent=c.name+" · "+c.n;b.addEventListener("click",function(){curCat=c.name;renderCats();applyFilter();});bar.appendChild(b);});}
+function setCol(k,push){curCol=k;curCat="All";if(seenKey!==k&&k!=="all")seenKey=k;if(k==="all")seenKey=null;renderOverview();renderFilters();renderCats();applyFilter();if(push){try{history.pushState({col:k},"","#"+k);}catch(e){}}}
+var searchEl=document.getElementById("searchInput"), clearEl=document.getElementById("clearBtn"), debounce=null;
+searchEl.addEventListener("input",function(){query=searchEl.value;clearEl.style.display=query?"block":"none";clearTimeout(debounce);debounce=setTimeout(applyFilter,160);});
+clearEl.addEventListener("click",function(){searchEl.value="";query="";clearEl.style.display="none";applyFilter();});
+retryEl.addEventListener("click",function(){loadData();});
+var io=new IntersectionObserver(function(es){if(es[0].isIntersecting)loadMore();},{rootMargin:"300px"});
+io.observe(document.getElementById("sentinel"));
+window.addEventListener("popstate",function(e){var k=(e.state&&e.state.col)||"all";curCol=k;curCat="All";renderOverview();renderFilters();renderCats();applyFilter();});
+function showSkeletons(){var html="";for(var i=0;i<9;i++)html+="<div class='skel'></div>";listEl.innerHTML=html;}
+function loadData(){retryEl.style.display="none";statusEl.textContent="";showSkeletons();fetch("data/data.json").then(function(r){if(!r.ok)throw new Error(r.status);return r.json();}).then(function(d){DATA=d;var h=(location.hash||"").replace("#","");if(COLS.some(function(c){return c.key===h;})){curCol=h;seenKey=h;}renderOverview();renderFilters();renderCats();applyFilter();}).catch(function(){listEl.innerHTML="";statusEl.textContent=T().loadfail;retryEl.style.display="inline-block";});}
+showSkeletons();loadData();
+</script>
+</body>
+</html>
