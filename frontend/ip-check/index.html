@@ -1938,6 +1938,61 @@
 .rtc-skl .geo-skl:nth-child(3){width:78%}
 .rtc-skl .geo-skl:nth-child(4){width:92%}
 .rtc-skl .geo-skl:nth-child(5){width:48%}
+    /* ================= 截图报告弹窗（按 ken 给的报告排版） ================= */
+    #reportModalBackdrop .modal-card { max-width: 432px; max-height: 92vh; overflow-y: auto; padding: 14px; }
+    .rpt-root { background: var(--page-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px 14px; color: var(--text-primary); }
+    .rpt-sheet-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+    .rpt-title { font-size: 19px; font-weight: 800; letter-spacing: .01em; }
+    .rpt-sub { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; margin-top: 3px; }
+    .rpt-head-btns { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .rpt-confirm { border: none; background: var(--theme-accent); color: #fff; font-size: 13px; font-weight: 700; height: 32px; padding: 0 14px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+    .rpt-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 13px 14px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(15, 23, 42, .04); }
+    .rpt-card-title { font-size: 13px; font-weight: 800; margin-bottom: 8px; }
+    .rpt-card-title .rpt-muted { color: var(--text-light); font-weight: 600; font-size: 11px; letter-spacing: .04em; }
+    .rpt-ip-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 11px 14px 12px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(15, 23, 42, .04); }
+    .rpt-ip-top { display: flex; justify-content: space-between; align-items: center; }
+    .rpt-ip-label { font-size: 12px; font-weight: 700; color: var(--text-secondary); }
+    .rpt-eye { border: none; background: none; padding: 2px; cursor: pointer; display: inline-flex; }
+    .rpt-ip-main { display: flex; align-items: center; gap: 9px; margin-top: 5px; }
+    .rpt-ip-main .flag-badge { display: inline-flex; }
+    .rpt-ip-main .flag-badge img { width: 27px; border-radius: 3px; display: block; }
+    .rpt-ip-val { font-size: 19px; font-weight: 800; letter-spacing: .01em; cursor: pointer; word-break: break-all; }
+    .rpt-ip-val.masked { letter-spacing: .06em; color: var(--text-secondary); }
+    .rpt-ip-loc { font-size: 12px; color: var(--text-secondary); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rpt-trust { text-align: center; }
+    .rpt-trust .rpt-card-title { text-align: left; }
+    .rpt-trust-num { font-size: 42px; font-weight: 800; line-height: 1.1; }
+    .rpt-trust-desc { font-size: 15px; font-weight: 800; color: #16A34A; margin-top: 1px; }
+    .rpt-trust-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .rpt-spectrum { position: relative; margin: 14px 2px 0; }
+    .rpt-spectrum-track { height: 10px; border-radius: 999px; background: linear-gradient(90deg, #EF4444, #F59E0B 38%, #A3E635 68%, #22C55E); }
+    .rpt-spectrum-ptr { position: absolute; top: 50%; width: 15px; height: 15px; border-radius: 50%; background: #111827; border: 2.5px solid #fff; box-shadow: 0 1px 4px rgba(15, 23, 42, .35); transform: translate(-50%, -50%); }
+    .rpt-spectrum-labels { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--text-light); margin-top: 6px; font-variant-numeric: tabular-nums; }
+    .rpt-kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--divider, rgba(120, 140, 160, .14)); font-size: 13px; }
+    .rpt-kv-row:first-of-type { padding-top: 2px; }
+    .rpt-kv-row:last-child { border-bottom: none; padding-bottom: 2px; }
+    .rpt-kv-label { color: var(--text-secondary); flex-shrink: 0; }
+    .rpt-kv-val { font-weight: 600; text-align: right; word-break: break-all; display: inline-flex; align-items: center; gap: 6px; justify-content: flex-end; }
+    .rpt-kv-val .flag-badge img { width: 21px; border-radius: 3px; display: block; }
+    .rpt-badge { font-size: 11.5px; font-weight: 700; padding: 2.5px 9px; border-radius: 999px; white-space: nowrap; }
+    .rpt-badge.ok { background: #DCFCE7; color: #16A34A; }
+    .rpt-badge.bad { background: #FEE2E2; color: #DC2626; }
+    .rpt-badge.warn { background: #FEF3C7; color: #D97706; }
+    .rpt-badge.gray { background: var(--card-sub-bg); color: var(--text-secondary); }
+    [data-dark="true"] .rpt-badge.ok { background: rgba(34, 197, 94, .18); }
+    [data-dark="true"] .rpt-badge.bad { background: rgba(239, 68, 68, .18); }
+    [data-dark="true"] .rpt-badge.warn { background: rgba(245, 158, 11, .18); }
+    .rpt-vendor { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--divider, rgba(120, 140, 160, .14)); }
+    .rpt-vendor:last-of-type { border-bottom: none; }
+    .rpt-vendor .vendor-ic { width: 30px; height: 30px; flex-shrink: 0; }
+    .rpt-vendor-name { font-size: 13.5px; font-weight: 700; line-height: 1.25; }
+    .rpt-vendor-by { display: block; font-size: 11px; font-weight: 500; color: var(--text-light); }
+    .rpt-vendor-right { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; }
+    .rpt-lat { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; min-width: 44px; text-align: right; }
+    .rpt-skl-line { height: 13px; width: 110px; display: inline-block; }
+    .rpt-skl-block { height: 15px; margin: 6px auto; }
+    .rpt-foot { text-align: center; font-size: 10.5px; color: var(--text-light); margin-top: 2px; }
+
 
 /* 搜索卡光晕加强（按 ken 图2 观感：更宽更浓的弥散光） */
 .gemini-search-card{box-shadow:0 10px 28px -6px var(--search-glow),0 24px 60px -12px var(--search-glow),0 2px 8px rgba(15,23,42,0.04)}
@@ -2301,6 +2356,12 @@
     </div>
   </div>
 
+
+  <div class="modal-backdrop" id="reportModalBackdrop">
+    <div class="modal-card">
+      <div class="rpt-root" id="reportRoot"></div>
+    </div>
+  </div>
   <div class="err-bar" id="errBar"><span class="err-bar-msg" id="errBarMsg"></span><button type="button" class="err-bar-close" id="errBarClose" data-i18n="close">关闭</button></div>
   <div class="flash" id="flash"></div>
 
@@ -2582,7 +2643,7 @@ function renderNavMenu(){
   }));
 }
 /* SPA 状态路由：菜单、详情展开、快照弹窗、主题面板、模块跳转都是历史条目，返回/前进按快照恢复界面（从模块返回时菜单不消失，回到打开菜单的状态）；模块跳转同时写 #目标id 可分享直达；手动滑回顶部清掉当前条目的 hash */
-let spaState={menu:false,details:false,modal:false,panel:false,sec:null,y:0};
+let spaState={menu:false,details:false,modal:false,rpt:false,panel:false,sec:null,y:0};
 function spaURL(){return spaState.sec?("#"+spaState.sec):(location.pathname+location.search)}
 function spaSaveY(){
   spaState.y=window.scrollY;
@@ -2596,13 +2657,13 @@ function spaPush(patch){
 }
 function spaApply(st){
   spaState=st;
-  menuVisual(st.menu);panelVisual(st.panel);modalVisual(st.modal);
+  menuVisual(st.menu);panelVisual(st.panel);modalVisual(st.modal);rptVisual(st.rpt);
   if(st.details!==detailsOpen)toggleDetails(st.details);
   if(st.sec&&!st.menu){jumpToSection(st.sec,false)}
   else{window.scrollTo({top:st.y||0,behavior:"instant"})}
 }
 window.addEventListener("popstate",e=>{
-  const base={menu:false,details:false,modal:false,panel:false,sec:null,y:0};
+  const base={menu:false,details:false,modal:false,rpt:false,panel:false,sec:null,y:0};
   const st=e.state&&e.state.spa?Object.assign({},base,e.state.spa):base;
   spaApply(st);
 });
@@ -2647,6 +2708,11 @@ function openSnapshotModal(){spaPush({modal:true});modalVisual(true)}
 function closeSnapshotModal(){
   if(history.state&&history.state.spa&&history.state.spa.modal){history.back();return}
   spaState.modal=false;modalVisual(false);
+}
+function rptVisual(open){$("reportModalBackdrop").classList.toggle("open",open)}
+function closeReportModal(){
+  if(history.state&&history.state.spa&&history.state.spa.rpt){history.back();return}
+  spaState.rpt=false;rptVisual(false);
 }
 /* ================= 中英双语 ================= */
 const STR={
@@ -2698,6 +2764,7 @@ const DYN={
   methodPrefix:{zh:"方法：该 IP 实时定位国家与各厂商官方支持地区名单核对，",en:"Method: the IP's live country is checked against each vendor's official supported-region list, "},
   verdict:{zh:["非常适合","适合","可以尝试","不太适合","不推荐"],en:["Ideal","Suitable","Workable","Not Ideal","Not Recommended"]},
   scoreLbl:{zh:["极度纯净","纯净","中性","有风险","风险较高","高风险"],en:["Very Pure","Pure","Neutral","Risky","High Risk","Very High Risk"]},
+  rptTrustSub:{zh:["该 IP 信誉极好","该 IP 信誉良好","该 IP 信誉一般","存在风险信号，需留意","风险信号较多","该 IP 风险很高"],en:["Excellent reputation","Good reputation","Average reputation","Risk signals present","Multiple risk signals","Very high risk"]},
   noteWhy:{zh:["类型基线","DNS 黑名单","定位共识"],en:["Type Baseline","DNSBL","Geo Consensus"]},
   residentialW:{zh:"住宅",en:"Residential"},businessW:{zh:"商宽",en:"Business"},hostingW:{zh:"机房",en:"Datacenter"},
   hits:{zh:"命中",en:"Hits"},sourcesWord:{zh:"源",en:"Sources"},matchWord:{zh:"个一致",en:"Match"},
@@ -2718,6 +2785,58 @@ const DYN={
   rtcNone:{zh:"未发现候选地址（浏览器限制了 WebRTC / mDNS，或当前网络拦截了 STUN 服务器）",en:"No candidates found (WebRTC / mDNS restricted by the browser, or STUN blocked by the network)"},
   rtcFail:{zh:"检测失败：浏览器拒绝创建 WebRTC 会话",en:"Test failed: the browser refused to create a WebRTC session"},
   rtcUnsupported:{zh:"当前浏览器不支持 WebRTC 检测",en:"WebRTC testing is not supported in this browser"},
+  rptTitle:{zh:"IP 风险检测报告",en:"IP Risk Report"},
+  rptSub:{zh:"出口 IP 纯净度、风险、属性、AI 可用性、DNS 与 WebRTC 泄露一次看清",en:"Exit IP purity, risk, attributes, AI availability, DNS & WebRTC leaks in one view"},
+  rptConfirm:{zh:"确认截屏",en:"Capture"},
+  rptLocal4:{zh:"本机 IPv4",en:"Local IPv4"},
+  rptLocal6:{zh:"本机 IPv6",en:"Local IPv6"},
+  rptTarget:{zh:"检测 IP",en:"Checked IP"},
+  rptTrust:{zh:"信任评分",en:"Trust Score"},
+  rptRegion:{zh:"AI 支持地区",en:"AI Region Support"},
+  rptRegionAll:{zh:"支持 · 4/4 家可用",en:"Supported · 4/4 available"},
+  rptRegionPart:{zh:"部分支持",en:"Partially supported"},
+  rptRegionNone:{zh:"不受支持",en:"Not supported"},
+  rptAttrT:{zh:"IP 属性",en:"IP Attributes"},
+  rptCountry:{zh:"地区",en:"Region"},
+  rptCity:{zh:"城市",en:"City"},
+  rptIpAttr:{zh:"IP 属性",en:"IP Type"},
+  rptCarrier:{zh:"运营商",en:"Carrier"},
+  rptSecT:{zh:"安全检测",en:"Security Checks"},
+  rptProxy:{zh:"代理 (Proxy)",en:"Proxy"},
+  rptCrawler:{zh:"机器人 (Crawler)",en:"Crawler"},
+  rptAbuse:{zh:"滥用记录",en:"Abuse Record"},
+  rptDetected:{zh:"检出特征",en:"Detected"},
+  rptNotDetected:{zh:"未检测到",en:"Not detected"},
+  rptNotTested:{zh:"未检测",en:"Not tested"},
+  rptAbuseHit:{zh:"命中黑名单",en:"Blacklist hits"},
+  rptAbuseNone:{zh:"无记录",en:"No record"},
+  rptAvailT:{zh:"AI 可用性检测",en:"AI Availability"},
+  rptOk:{zh:"可用",en:"Available"},
+  rptNo:{zh:"不可用",en:"Unavailable"},
+  rptLatFail:{zh:"连接失败",en:"Unreachable"},
+  rptSummary:{zh:"综合状态",en:"Overall"},
+  rptDnsT:{zh:"DNS 泄露检测",en:"DNS Leak Test"},
+  rptDnsStatus:{zh:"状态",en:"Status"},
+  rptDnsProto:{zh:"解析协议",en:"Protocol"},
+  rptDnsUp:{zh:"上游解析节点",en:"Upstream Resolver"},
+  rptDnsEdns:{zh:"EDNS 客户端子网",en:"EDNS Client Subnet"},
+  rptDnsSafe:{zh:"未暴露真实 IP",en:"Real IP not exposed"},
+  rptDnsExposed:{zh:"EDNS 子网已暴露",en:"EDNS subnet exposed"},
+  rptEdnsNone:{zh:"未暴露",en:"Not exposed"},
+  rptUnknown:{zh:"未检出",en:"Not found"},
+  rptRtcT:{zh:"WebRTC UDP 泄露检测",en:"WebRTC UDP Leak Test"},
+  rptRtcStatus:{zh:"状态",en:"Status"},
+  rptRtcStun:{zh:"STUN 公网候选",en:"STUN Public Candidates"},
+  rptRtcMdns:{zh:"mDNS 局域网掩码",en:"mDNS Local Mask"},
+  rptRtcTurn:{zh:"TURN 中继",en:"TURN Relay"},
+  rptRtcFound:{zh:"检出候选地址",en:"Candidates found"},
+  rptRtcNoneF:{zh:"未检出候选地址",en:"No candidates found"},
+  rptMdnsOn:{zh:"已启用（.local 掩码）",en:"Enabled (.local masked)"},
+  rptMdnsOff:{zh:"未启用（局域网地址直出）",en:"Off (LAN address exposed)"},
+  rptTurnFound:{zh:"检出中继候选",en:"Relay candidate found"},
+  rptNone:{zh:"未检出",en:"None found"},
+  rptWait:{zh:"数据还在检测中，稍等再截",en:"Still detecting — try again in a moment"},
+  rptGenerating:{zh:"正在生成图片…",en:"Generating image…"},
   rtcLocalMask:{zh:"（本地 · mDNS 掩码）",en:" (local · mDNS masked)"},rtcSrflx:{zh:"（公网 · STUN 映射）",en:" (public · STUN)"},rtcHost:{zh:"（本地）",en:" (local)"},
   sceneNames:{zh:["TikTok","跨境电商","社媒运营","AI 应用"],en:["TikTok","E-Commerce","Social Media","AI Apps"]},
   summarizing:{zh:"正在汇总实时信号…",en:"Aggregating live signals…"},
@@ -3063,7 +3182,7 @@ async function runQuery(ip,selfMode,fromHist){
     }else d.histLoc=[{org:[loc.country,loc.region,loc.city].filter(Boolean).join(" "),cidr:d.prefix,extra:"多源共识定位"}];
     d.native=d.whoisCountry&&d.cc?(d.whoisCountry===d.cc):null;
     d.cls=classify(d);applyType(d);
-    const sc=computeScore(d,d.cls,bl);d.score=sc.score;
+    const sc=computeScore(d,d.cls,bl);d.score=sc.score;d.bl=bl;
     const blTxt=bl?(bl.checked?("DNSBL 实时查询 "+bl.checked+" 个名单："+(bl.hits?("命中 "+bl.names.join(", ")):"0 命中")):"DNSBL 查询被名单方拒绝（公共解析器限制）"):"";
     d.riskTags=(currentLang==="zh"
       ?[d.cls.type==="hosting"?"机房 / 数据中心":d.cls.type==="residential"?"住宅宽带":"商业宽带",d.native==null?"注册地未知":d.native?"原生":"非原生（注册地 "+(d.whoisCountry||"?")+" ≠ 定位 "+(d.cc||"?")+")",bl&&bl.hits?"黑名单命中 "+bl.hits:""]
@@ -3225,40 +3344,196 @@ function showSnap(data){
   $("snapDl").href=data;
   openSnapshotModal();
 }
-async function snapshot(){
-  const btn=$("shotBtn");if(btn.dataset.busy)return;btn.dataset.busy="1";
-  try{
-    toast(currentLang==="zh"?"正在生成快照…":"Generating snapshot…");
-    const cards=[$("mainIpCard"),$("localEnvCard")].filter(Boolean);
-    const wrap=document.createElement("div");
-    wrap.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
-    wrap.style.cssText="display:flex;flex-direction:column;gap:18px;width:"+cards[0].offsetWidth+"px;background:"+getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()+";padding:16px;box-sizing:border-box;position:absolute;left:-99999px;top:0";
-    const pairs=[];
-    cards.forEach(c=>{const cl=c.cloneNode(true);pairs.push([c,cl]);wrap.appendChild(cl)});
-    document.body.appendChild(wrap);
-    const walk=(o,n)=>{const cs=getComputedStyle(o);let t="";for(let i=0;i<cs.length;i++){const k=cs[i];t+=k+":"+cs.getPropertyValue(k)+";"}n.style.cssText=t;const oc=o.children,nc=n.children;for(let i=0;i<oc.length&&i<nc.length;i++)walk(oc[i],nc[i])};
-    pairs.forEach(pr=>walk(pr[0],pr[1]));
-    wrap.querySelectorAll("svg").forEach(sv=>{if(!sv.getAttribute("xmlns"))sv.setAttribute("xmlns","http://www.w3.org/2000/svg")});
-    const imgs=wrap.querySelectorAll("img");
-    await Promise.all([...imgs].map(async im=>{try{const r=await fetch(im.src,{mode:"cors"});const b=await r.blob();im.src=await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>res(im.src);fr.readAsDataURL(b)})}catch(e){}}));
-    const W=wrap.offsetWidth,H=wrap.offsetHeight;
-    const xml=new XMLSerializer().serializeToString(wrap);
-    const svg="<svg xmlns='http://www.w3.org/2000/svg' width='"+W+"' height='"+H+"'><foreignObject width='100%' height='100%'>"+xml+"</foreignObject></svg>";
-    const url=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml;charset=utf-8"}));
-    const img=new Image();
-    await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url});
-    const scale=2,cv=document.createElement("canvas");cv.width=W*scale;cv.height=H*scale;
-    const cx=cv.getContext("2d");cx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()||"#EEF6FA";cx.fillRect(0,0,cv.width,cv.height);cx.scale(scale,scale);cx.drawImage(img,0,0);
-    URL.revokeObjectURL(url);
-    const data=cv.toDataURL("image/png");
-    wrap.remove();
-    showSnap(data);
-  }catch(e){
-    toast(TD("snapFail"));
+async function renderNodeToPng(node){
+  const wrap=document.createElement("div");
+  wrap.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
+  wrap.style.cssText="width:"+node.offsetWidth+"px;background:"+getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()+";position:absolute;left:-99999px;top:0";
+  const cl=node.cloneNode(true);
+  wrap.appendChild(cl);
+  document.body.appendChild(wrap);
+  const walk=(o,n)=>{const cs=getComputedStyle(o);let t="";for(let i=0;i<cs.length;i++){const k=cs[i];t+=k+":"+cs.getPropertyValue(k)+";"}n.style.cssText=t;const oc=o.children,nc=n.children;for(let i=0;i<oc.length&&i<nc.length;i++)walk(oc[i],nc[i])};
+  walk(node,cl);
+  cl.querySelectorAll(".rpt-nocap").forEach(n=>n.remove());
+  wrap.querySelectorAll("svg").forEach(sv=>{if(!sv.getAttribute("xmlns"))sv.setAttribute("xmlns","http://www.w3.org/2000/svg")});
+  const imgs=wrap.querySelectorAll("img");
+  await Promise.all([...imgs].map(async im=>{try{const r=await fetch(im.src,{mode:"cors"});const b=await r.blob();im.src=await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>res(im.src);fr.readAsDataURL(b)})}catch(e){}}));
+  const W=wrap.offsetWidth,H=wrap.offsetHeight;
+  const xml=new XMLSerializer().serializeToString(wrap);
+  const svg="<svg xmlns='http://www.w3.org/2000/svg' width='"+W+"' height='"+H+"'><foreignObject width='100%' height='100%'>"+xml+"</foreignObject></svg>";
+  const url=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml;charset=utf-8"}));
+  const img=new Image();
+  await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url});
+  const scale=2,cv=document.createElement("canvas");cv.width=W*scale;cv.height=H*scale;
+  const cx=cv.getContext("2d");cx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()||"#EEF6FA";cx.fillRect(0,0,cv.width,cv.height);cx.scale(scale,scale);cx.drawImage(img,0,0);
+  URL.revokeObjectURL(url);
+  const data=cv.toDataURL("image/png");
+  wrap.remove();
+  return data;
+}
+/* ---------- 截图报告（弹窗预览 → 确认出图） ---------- */
+const RPT_EYE_ON='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const RPT_EYE_OFF='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88"/><path d="M1 1l22 22"/></svg>';
+let rptVis={v4:true,v6:true,ip:true};
+let rptIps={v4:"",v6:"",ip:""};
+const rptKv=(label,val)=>"<div class='rpt-kv-row'><span class='rpt-kv-label'>"+label+"</span><span class='rpt-kv-val'>"+val+"</span></div>";
+const rptBdg=(txt,cls)=>"<span class='rpt-badge "+cls+"'>"+txt+"</span>";
+const rptSkl=w=>"<span class='geo-skl rpt-skl-line' style='width:"+w+"px'></span>";
+function rptIpCard(key,label,ip,cc,loc){
+  const vis=rptVis[key];
+  return "<div class='rpt-ip-card'><div class='rpt-ip-top'><span class='rpt-ip-label'>"+label+"</span><button type='button' class='rpt-eye rpt-nocap' data-eye='"+key+"'>"+(vis?RPT_EYE_ON:RPT_EYE_OFF)+"</button></div><div class='rpt-ip-main'>"+(cc?"<span class='flag-badge'>"+flagImg(cc)+"</span>":"")+"<span class='rpt-ip-val"+(vis?"":" masked")+"' data-ipval='"+key+"'>"+(vis?escapeHtml(ip):starMask(ip))+"</span></div>"+(loc?"<div class='rpt-ip-loc'>"+escapeHtml(loc)+"</div>":"")+"</div>";
+}
+function buildReport(){
+  const d=state.data;if(!d)return;
+  rptIps={v4:myIpState.v4||"",v6:myIpState.v6||"",ip:d.ip||""};
+  rptVis={v4:myIpState.vis4!==false,v6:myIpState.vis6!==false,ip:state.ipVisible!==false};
+  const place=[d.country,d.region,d.city].filter(Boolean).join(", ");
+  const selfCc=ip=>ip&&ip===d.ip?d.cc:"";
+  const selfLoc=ip=>ip&&ip===d.ip?place:"";
+  let h="";
+  h+="<div class='rpt-sheet-head'><div><div class='rpt-title'>"+TD("rptTitle")+"</div><div class='rpt-sub'>"+TD("rptSub")+"</div></div><div class='rpt-head-btns rpt-nocap'><button type='button' class='rpt-confirm' id='rptConfirmBtn'>"+TD("rptConfirm")+"</button><button type='button' class='modal-close-btn' id='rptCloseBtn'>✕</button></div></div>";
+  if(rptIps.v4)h+=rptIpCard("v4",TD("rptLocal4"),rptIps.v4,selfCc(rptIps.v4),selfLoc(rptIps.v4));
+  if(rptIps.v6)h+=rptIpCard("v6",TD("rptLocal6"),rptIps.v6,selfCc(rptIps.v6),selfLoc(rptIps.v6));
+  h+=rptIpCard("ip",TD("rptTarget"),rptIps.ip,d.cc,place);
+  h+="<div class='rpt-card rpt-trust'><div class='rpt-card-title'>"+TD("rptTrust")+" <span class='rpt-muted'>TRUST SCORE</span></div>";
+  if(d.score==null){
+    h+="<span class='geo-skl rpt-skl-block' style='width:120px'></span><span class='geo-skl rpt-skl-block' style='width:180px'></span>";
+  }else{
+    const s=d.score,trust=100-s,idx=s<=10?0:s<=25?1:s<=40?2:s<=60?3:s<=80?4:5;
+    const col=idx<=1?"#16A34A":idx===2?"#D97706":"#DC2626";
+    h+="<div class='rpt-trust-num'>"+trust+"</div><div class='rpt-trust-desc' style='color:"+col+"'>"+scoreLabel(s)+"</div><div class='rpt-trust-sub'>"+DYN.rptTrustSub[currentLang][idx]+"</div>";
+    h+="<div class='rpt-spectrum'><div class='rpt-spectrum-track'></div><div class='rpt-spectrum-ptr' style='left:"+Math.min(97,Math.max(3,trust))+"%'></div></div><div class='rpt-spectrum-labels'><span>0 "+(currentLang==="zh"?"高危":"High risk")+"</span><span>25</span><span>50</span><span>75</span><span>100 "+(currentLang==="zh"?"可信":"Trusted")+"</span></div>";
   }
+  h+="</div>";
+  const supN=VENDORS.filter(v=>(LLM_LISTS[v.name]||[]).includes(d.cc)).length;
+  const supCls=supN===4?"ok":supN===0?"bad":"warn";
+  const supTxt=supN===4?TD("rptRegionAll"):supN===0?TD("rptRegionNone"):TD("rptRegionPart")+" · "+supN+"/4";
+  h+="<div class='rpt-card'>"+rptKv(TD("rptRegion"),rptBdg(supTxt,supCls))+"</div>";
+  const attrVal=d.tagsFinal?escapeHtml(attrName(d))+(d.native==null?"":" · "+(d.native?TD("nativeIp"):TD("broadcastIp"))):rptSkl(90);
+  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptAttrT")+"</div>"
+    +rptKv(TD("rptCountry"),(d.cc?"<span class='flag-badge'>"+flagImg(d.cc)+"</span>":"")+escapeHtml(d.country||"—"))
+    +rptKv(TD("rptCity"),escapeHtml(d.city||d.region||"—"))
+    +rptKv(TD("rptIpAttr"),attrVal)
+    +rptKv("ASN",escapeHtml(d.asn||"—"))
+    +rptKv(TD("rptCarrier"),escapeHtml(d.asnHolder||d.isp||"—"))+"</div>";
+  const orgTxt=((d.asnHolder||"")+" "+(d.asnName||"")+" "+(d.isp||"")+" "+(d.netname||"")+" "+(d.host||"")).toLowerCase();
+  const hitV=/vpn|nord|expressvpn|surfshark|mullvad/.test(orgTxt),hitP=/proxy/.test(orgTxt),hitT=/\btor\b|torproject/.test(orgTxt);
+  const det=hit=>hit?rptBdg(TD("rptDetected"),"warn"):rptBdg(TD("rptNotDetected"),"ok");
+  const bl=d.bl;
+  const abuse=bl&&bl.checked>0?(bl.hits>0?rptBdg(TD("rptAbuseHit")+" "+bl.hits,"bad"):rptBdg(TD("rptAbuseNone"),"ok")):rptBdg(TD("rptNotTested"),"gray");
+  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptSecT")+"</div>"
+    +rptKv("VPN",det(hitV))+rptKv(TD("rptProxy"),det(hitP))+rptKv("Tor",det(hitT))+rptKv(TD("rptCrawler"),rptBdg(TD("rptNotTested"),"gray"))+rptKv(TD("rptAbuse"),abuse)+"</div>";
+  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptAvailT")+"</div>";
+  VENDORS.forEach((v,i)=>{
+    const ok=(LLM_LISTS[v.name]||[]).includes(d.cc);
+    h+="<div class='rpt-vendor'><span class='vendor-ic vi-"+v.name.toLowerCase()+"'>"+v.icon+"</span><span class='rpt-vendor-name'>"+v.name+"<span class='rpt-vendor-by'>"+v.by+"</span></span><span class='rpt-vendor-right'><span class='rpt-lat' id='rptLat"+i+"'>"+rptSkl(40)+"</span>"+rptBdg(ok?TD("rptOk"):TD("rptNo"),ok?"ok":"bad")+"</span></div>";
+  });
+  h+=rptKv(TD("rptSummary"),rptBdg(supN+"/4 "+(currentLang==="zh"?"家可用":"available"),supCls))+"</div>";
+  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptDnsT")+"</div>"
+    +rptKv(TD("rptDnsStatus"),"<span id='rptDnsStatus'>"+rptSkl(80)+"</span>")
+    +rptKv(TD("rptDnsProto"),"<span id='rptDnsProto'>"+rptSkl(110)+"</span>")
+    +rptKv(TD("rptDnsUp"),"<span id='rptDnsUp'>"+rptSkl(90)+"</span>")
+    +rptKv(TD("rptDnsEdns"),"<span id='rptDnsEdns'>"+rptSkl(70)+"</span>")+"</div>";
+  h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptRtcT")+"</div>"
+    +rptKv(TD("rptRtcStatus"),"<span id='rptRtcStatus'>"+rptSkl(80)+"</span>")
+    +rptKv(TD("rptRtcStun"),"<span id='rptRtcStun'>"+rptSkl(90)+"</span>")
+    +rptKv(TD("rptRtcMdns"),"<span id='rptRtcMdns'>"+rptSkl(100)+"</span>")
+    +rptKv(TD("rptRtcTurn"),"<span id='rptRtcTurn'>"+rptSkl(70)+"</span>")+"</div>";
+  h+="<div class='rpt-foot'>IPPure · ip.jpedu.asia · "+fmtTime(new Date())+"</div>";
+  $("reportRoot").innerHTML=h;
+  $("rptConfirmBtn").addEventListener("click",captureReport);
+  $("rptCloseBtn").addEventListener("click",closeReportModal);
+  probeVendors();probeDns();probeRtcFill();
+}
+function probeVendors(){
+  const hosts={ChatGPT:"chatgpt.com",Claude:"claude.ai",Gemini:"gemini.google.com",Grok:"grok.com"};
+  VENDORS.forEach((v,i)=>{
+    const el=$("rptLat"+i);if(!el)return;
+    const t0=performance.now();
+    const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),6000);
+    fetch("https://"+hosts[v.name]+"/favicon.ico",{mode:"no-cors",cache:"no-store",signal:ctl.signal}).then(()=>{clearTimeout(tm);if(el.isConnected)el.textContent=Math.max(1,Math.round(performance.now()-t0))+"ms"}).catch(()=>{clearTimeout(tm);if(el.isConnected)el.textContent=TD("rptLatFail")});
+  });
+}
+async function probeDns(){
+  const set=(id,html)=>{const e=$(id);if(e)e.innerHTML=html};
+  try{
+    const j=await fetchJSON("https://dns.google/resolve?name=o-o.myaddr.l.google.com&type=TXT",6000);
+    const txt=((j&&j.Answer)||[]).filter(a=>a.type===16).map(a=>String(a.data).replace(/"/g,"")).join(" ");
+    if(!txt)throw new Error("empty");
+    const ecs=(txt.match(/edns-client-subnet\s+([0-9a-fA-F:.\/]+)/)||[])[1]||"";
+    const rip=(txt.match(/(\d{1,3}(?:\.\d{1,3}){3})/)||[])[1]||"";
+    set("rptDnsProto","DoH (DNS over HTTPS)");
+    if(rip){
+      let place="";
+      try{const g=await srcIpWho(rip).catch(()=>null);if(g)place=" · "+[g.country,g.city].filter(Boolean).join(" ")}catch(e){}
+      set("rptDnsUp",escapeHtml(rip+place));
+    }else set("rptDnsUp",TD("rptUnknown"));
+    if(ecs){set("rptDnsStatus",rptBdg(TD("rptDnsExposed"),"warn"));set("rptDnsEdns",escapeHtml(ecs))}
+    else{set("rptDnsStatus",rptBdg(TD("rptDnsSafe"),"ok"));set("rptDnsEdns",TD("rptEdnsNone"))}
+  }catch(e){
+    ["rptDnsStatus","rptDnsProto","rptDnsUp","rptDnsEdns"].forEach(id=>set(id,TD("rptUnknown")));
+  }
+}
+function probeRtcFill(){
+  const set=(id,html)=>{const e=$(id);if(e)e.innerHTML=html};
+  const found=[];let done=false;
+  const finish=()=>{
+    if(done)return;done=true;
+    const srflx=found.filter(c=>c.typ==="srflx").map(c=>c.addr);
+    const relay=found.filter(c=>c.typ==="relay");
+    const mdns=found.some(c=>c.mdns);
+    const hostRaw=found.some(c=>c.typ==="host"&&!c.mdns);
+    set("rptRtcStatus",found.length?rptBdg(TD("rptRtcFound")+" · "+found.length,"warn"):rptBdg(TD("rptRtcNoneF"),"ok"));
+    set("rptRtcStun",srflx.length?escapeHtml(srflx.join(", ")):TD("rptNone"));
+    set("rptRtcMdns",mdns?TD("rptMdnsOn"):hostRaw?TD("rptMdnsOff"):TD("rptNone"));
+    set("rptRtcTurn",relay.length?rptBdg(TD("rptTurnFound"),"warn"):TD("rptNone"));
+  };
+  try{
+    const pc=new RTCPeerConnection({iceServers:[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302","stun:stun.cloudflare.com:3478","stun:stun.nextcloud.com:443"]}]});
+    pc.createDataChannel("x");
+    pc.onicecandidate=e=>{
+      if(!e.candidate){try{pc.close()}catch(_){}finish();return}
+      const parts=(e.candidate.candidate||"").split(" ");
+      const addr=parts[4],typ=parts[7]||"";
+      if(addr)found.push({addr:addr,typ:typ,mdns:addr.includes(".local")});
+    };
+    pc.onicegatheringstatechange=()=>{if(pc.iceGatheringState==="complete"){try{pc.close()}catch(_){}finish()}};
+    pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(finish);
+    setTimeout(finish,4500);
+  }catch(e){finish()}
+}
+function closeReportSilent(){spaState.rpt=false;spaSaveY();rptVisual(false)}
+async function captureReport(){
+  const btn=$("rptConfirmBtn");if(!btn||btn.dataset.busy)return;btn.dataset.busy="1";
+  try{
+    toast(TD("rptGenerating"));
+    const data=await renderNodeToPng($("reportRoot"));
+    closeReportSilent();
+    showSnap(data);
+  }catch(e){toast(TD("snapFail"))}
   delete btn.dataset.busy;
 }
-$("shotBtn").addEventListener("click",()=>{const f=$("flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");snapshot()});
+function openReport(){
+  if(!state.data){toast(TD("rptWait"));return}
+  spaPush({rpt:true});rptVisual(true);buildReport();
+}
+$("reportRoot").addEventListener("click",e=>{
+  const eye=e.target.closest("[data-eye]");
+  if(eye){
+    const key=eye.getAttribute("data-eye");
+    rptVis[key]=!rptVis[key];
+    const val=$("reportRoot").querySelector("[data-ipval='"+key+"']");
+    if(val){val.textContent=rptVis[key]?rptIps[key]:starMask(rptIps[key]);val.classList.toggle("masked",!rptVis[key])}
+    eye.innerHTML=rptVis[key]?RPT_EYE_ON:RPT_EYE_OFF;
+    return;
+  }
+  const valEl=e.target.closest("[data-ipval]");
+  if(valEl){
+    const ip=rptIps[valEl.getAttribute("data-ipval")];
+    if(ip){try{navigator.clipboard.writeText(ip);toast(TD("copied")+ip)}catch(err){toast(TD("copyFail"))}}
+  }
+});
+$("shotBtn").addEventListener("click",()=>{const f=$("flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");openReport()});
+$("reportModalBackdrop").addEventListener("click",e=>{if(e.target===$("reportModalBackdrop"))closeReportModal()});
 let detailsOpen=false;
 function syncExpandText(){const t=$("expandBtnText");if(t)t.textContent=detailsOpen?TD("collapse"):TD("expand")}
 function toggleDetails(force){
