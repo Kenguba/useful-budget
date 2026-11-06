@@ -208,6 +208,13 @@
       color: #0F172A;
     }
 
+    [data-holo="true"] #snapDl {
+      background: linear-gradient(135deg, #B2E2B4 0%, #98DBC5 45%, #9CC8F7 100%);
+      background-size: 200% 200%;
+      animation: videoHoloBtn 4.2s ease infinite;
+      color: #0F172A;
+    }
+
     /* ================= 3. 顶栏导航：IPPure 绿叶品牌 + 右侧语言/日夜12色主题/功能汉堡菜单 ================= */
     .top-nav-bar {
       display: flex;
@@ -1908,7 +1915,7 @@
 .flash.go{animation:flashAnim .45s ease-out}
 @keyframes flashAnim{0%{opacity:0}12%{opacity:.85}100%{opacity:0}}
 .snap-hint{text-align:center;color:var(--text-secondary);font-size:13px;margin:2px 0 10px}
-#snapDl{display:block;text-align:center;text-decoration:none;cursor:pointer}
+#snapDl{display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;cursor:pointer;line-height:1.2}
 .spinning svg{animation:spinAnim .8s linear infinite}
 @keyframes spinAnim{to{transform:rotate(360deg)}}
 .scenario-verdict .verdict-emoji{font-size:15px;line-height:1}
@@ -1974,7 +1981,7 @@
     .rpt-trust-desc { font-size: 13.5px; color: var(--text-secondary); margin-top: 5px; }
     .rpt-spectrum { position: relative; margin: 16px 2px 0; text-align: left; }
     .rpt-spectrum-track { height: 10px; border-radius: 999px; background: linear-gradient(90deg, #EF4444, #F59E0B 38%, #A3E635 68%, #22C55E); }
-    .rpt-spectrum-ptr { position: absolute; top: 50%; width: 15px; height: 15px; border-radius: 50%; background: #111827; border: 2.5px solid #fff; box-shadow: 0 1px 4px rgba(15, 23, 42, .35); transform: translate(-50%, -50%); }
+    .rpt-spectrum-ptr { position: absolute; top: 50%; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 4.5px solid #16A34A; box-shadow: 0 0 0 2px #fff, 0 2px 8px rgba(22, 163, 74, .38), 0 1px 3px rgba(0, 0, 0, .15); transform: translate(-50%, -50%); z-index: 2; }
     .rpt-spectrum-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-light); margin-top: 7px; font-variant-numeric: tabular-nums; }
     .rpt-divider { border-top: 1px solid var(--divider, rgba(120, 140, 160, .14)); margin: 14px 0 2px; }
     .rpt-kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10.5px 0; border-bottom: 1px solid var(--divider, rgba(120, 140, 160, .14)); font-size: 13.5px; }
@@ -2360,7 +2367,6 @@
         <button type="button" class="modal-close-btn">✕</button>
       </div>
       <div class="snapshot-preview-box" id="snapshotPreviewContent"></div>
-      <div class="snap-hint" id="snapHint" data-i18n="snapHint">长按图片保存到相册</div>
       <a class="modal-action-btn" id="snapDl" download="ip-info.png" data-i18n="snapDownload">下载图片</a>
     </div>
   </div>
@@ -3409,8 +3415,9 @@ function fillTrustHtml(d){
   if(d.score==null)return "<span class='geo-skl rpt-skl-block' style='width:120px'></span><span class='geo-skl rpt-skl-block' style='width:180px'></span>";
   const s=d.score,trust=100-s,idx=s<=10?0:s<=25?1:s<=40?2:s<=60?3:s<=80?4:5;
   const col=idx<=1?"#16A34A":idx===2?"#D97706":"#DC2626";
+  const glow=idx<=1?"rgba(22,163,74,.38)":idx===2?"rgba(217,119,6,.38)":"rgba(220,38,38,.38)";
   return "<div class='rpt-trust-num'>"+trust+"</div><div class='rpt-trust-desc' style='color:"+col+"'>"+scoreLabel(s)+"</div><div class='rpt-trust-sub'>"+DYN.rptTrustSub[currentLang][idx]+"</div>"
-    +"<div class='rpt-spectrum'><div class='rpt-spectrum-track'></div><div class='rpt-spectrum-ptr' style='left:"+Math.min(97,Math.max(3,trust))+"%'></div></div><div class='rpt-spectrum-labels'><span>0 "+(currentLang==="zh"?"高危":"High risk")+"</span><span>25</span><span>50</span><span>75</span><span>100 "+(currentLang==="zh"?"可信":"Trusted")+"</span></div>";
+    +"<div class='rpt-spectrum'><div class='rpt-spectrum-track'></div><div class='rpt-spectrum-ptr' style='left:"+Math.min(97,Math.max(3,trust))+"%;border-color:"+col+";box-shadow:0 0 0 2px #fff,0 2px 8px "+glow+",0 1px 3px rgba(0,0,0,.15)'></div></div><div class='rpt-spectrum-labels'><span>0 "+(currentLang==="zh"?"高危":"High risk")+"</span><span>25</span><span>50</span><span>75</span><span>100 "+(currentLang==="zh"?"可信":"Trusted")+"</span></div>";
 }
 function attrValHtml(d){
   return d.tagsFinal?escapeHtml(attrName(d))+(d.native==null?"":" · "+(d.native?TD("nativeIp"):TD("broadcastIp"))):rptSkl(90);
