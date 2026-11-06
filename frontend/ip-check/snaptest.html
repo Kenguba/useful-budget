@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>snap test</title>
+<style>
+  body{font-family:sans-serif;background:#EEF6FA;margin:0;padding:16px}
+  .box{background:#fff;border:1px solid #ddd;border-radius:14px;padding:14px;margin-bottom:12px;width:340px}
+  .grad{height:10px;border-radius:99px;background:linear-gradient(90deg,#EF4444,#F59E0B 38%,#A3E635 68%,#22C55E)}
+  .bdg{background:#DCFCE7;color:#16A34A;border-radius:99px;padding:2px 9px;font-size:12px;font-weight:700}
+  pre{background:#111827;color:#A7F3D0;padding:12px;border-radius:10px;white-space:pre-wrap;word-break:break-all}
+</style>
+</head>
+<body>
+<div class="box" id="t1"><div style="font-size:19px;font-weight:800">纯文本卡片</div><div>hello 123.45</div></div>
+
+<div class="box" id="t2">
+  <div style="font-weight:800">带渐变与徽章</div>
+  <div class="grad"></div>
+  <div style="margin-top:8px"><span class="bdg">可用</span></div>
+  <svg width="30" height="30" viewBox="0 0 36 36"><defs><linearGradient id="gg1" x1="0" y1="0" x2="0" y2="36" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#DC785A"></stop><stop offset="100%" stop-color="#D47153"></stop></linearGradient></defs><rect width="36" height="36" rx="10" fill="url(#gg1)"></rect></svg>
+</div>
+
+<div class="box" id="t3">
+  <div style="font-weight:800">带外链图片</div>
+  <img src="https://flagcdn.com/w80/us.png" alt="" style="width:27px">
+  <div>flag above</div>
+</div>
+
+<pre id="out">running...</pre>
+
+<script>
+async function renderNodeToPng(node){
+  const wrap=document.createElement("div");
+  wrap.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
+  wrap.style.cssText="width:"+node.offsetWidth+"px;background:#EEF6FA;position:absolute;left:-99999px;top:0";
+  const cl=node.cloneNode(true);
+  wrap.appendChild(cl);
+  document.body.appendChild(wrap);
+  const walk=(o,n)=>{const cs=getComputedStyle(o);let t="";for(let i=0;i<cs.length;i++){const k=cs[i];t+=k+":"+cs.getPropertyValue(k)+";"}n.style.cssText=t;const oc=o.children,nc=n.children;for(let i=0;i<oc.length&&i<nc.length;i++)walk(oc[i],nc[i])};
+  walk(node,cl);
+  wrap.querySelectorAll("svg").forEach(sv=>{if(!sv.getAttribute("xmlns"))sv.setAttribute("xmlns","http://www.w3.org/2000/svg")});
+  const imgs=wrap.querySelectorAll("img");
+  await Promise.all([...imgs].map(async im=>{try{const r=await fetch(im.src,{mode:"cors"});const b=await r.blob();im.src=await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>res("");fr.readAsDataURL(b)})}catch(e){im.src=""}}));
+  wrap.querySelectorAll("img").forEach(im=>{if(!im.src||im.src.indexOf("data:")!==0)im.remove()});
+  const W=wrap.offsetWidth,H=wrap.offsetHeight;
+  const xml=new XMLSerializer().serializeToString(wrap);
+  const svg="<svg xmlns='http://www.w3.org/2000/svg' width='"+W+"' height='"+H+"'><foreignObject width='100%' height='100%'>"+xml+"</foreignObject></svg>";
+  const url=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml;charset=utf-8"}));
+  const img=new Image();
+  try{await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url})}finally{URL.revokeObjectURL(url)}
+  const scale=2,cv=document.createElement("canvas");cv.width=W*scale;cv.height=H*scale;
+  const cx=cv.getContext("2d");cx.fillStyle="#EEF6FA";cx.fillRect(0,0,cv.width,cv.height);cx.scale(scale,scale);cx.drawImage(img,0,0);
+  const data=cv.toDataURL("image/png");
+  wrap.remove();
+  return data;
+}
+(async()=>{
+  const out=document.getElementById("out");
+  const lines=[];
+  for(const id of ["t1","t2","t3"]){
+    try{
+      const d=await renderNodeToPng(document.getElementById(id));
+      lines.push(id+": OK len="+d.length);
+    }catch(e){
+      lines.push(id+": FAIL "+(e&&e.name?e.name:"")+" "+(e&&e.message?e.message:String(e)));
+    }
+  }
+  out.textContent=lines.join("\n");
+  document.title="DONE";
+})();
+</script>
+</body>
+</html>
