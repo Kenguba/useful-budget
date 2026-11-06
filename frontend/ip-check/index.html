@@ -3067,7 +3067,7 @@ function render(d,final){
   $("scenarioGrid").innerHTML=d.scenes.map((sc,i)=>"<div class='scenario-cell'><div class='scenario-cell-name'>"+DYN.sceneNames[currentLang][i]+"</div><div class='scenario-stars-row'>"+starsHtml(sc[1])+"</div><div class='scenario-verdict verdict-"+suitCls(sc[1])+"'><span class='verdict-emoji'>"+suitIcon(sc[1])+"</span><span>"+suitText(sc[1])+"</span></div></div>").join("");
   if(d.histAsn)renderExtra(d);
   markPreset(d.ip);
-  if(final)updateReportDynamic(d);
+  if(final){updateReportDynamic(d);reportPrefetch(d)}
   $("mainIpCard").classList.remove("loading");hideErr();
 }
 function attrName(d){return currentLang==="zh"?d.attr:(d.cls&&d.cls.type==="residential"?TD("residential"):d.cls&&d.cls.type==="hosting"?TD("hosting"):TD("business"))}
@@ -3470,69 +3470,106 @@ function buildReport(){
   h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptAvailT")+"</div>";
   VENDORS.forEach((v,i)=>{
     const ok=(LLM_LISTS[v.name]||[]).includes(d.cc);
-    h+="<div class='rpt-vendor'><span class='vendor-ic vi-"+v.name.toLowerCase()+"'>"+v.icon+"</span><span class='rpt-vendor-name'>"+v.name+"<span class='rpt-vendor-by'>"+v.by+"</span></span><span class='rpt-vendor-right'><span class='rpt-lat' id='rptLat"+i+"'>"+rptSkl(40)+"</span>"+rptBdg(ok?TD("rptOk"):TD("rptNo"),ok?"ok":"bad")+"</span></div>";
+    h+="<div class='rpt-vendor'><span class='vendor-ic vi-"+v.name.toLowerCase()+"'>"+v.icon+"</span><span class='rpt-vendor-name'>"+v.name+"<span class='rpt-vendor-by'>"+v.by+"</span></span><span class='rpt-vendor-right'><span class='rpt-lat' id='rptLat"+i+"'>"+((rptData.vendors&&rptData.vendors[i]!=null)?escapeHtml(rptData.vendors[i]):rptSkl(40))+"</span>"+rptBdg(ok?TD("rptOk"):TD("rptNo"),ok?"ok":"bad")+"</span></div>";
   });
   h+=rptKv(TD("rptSummary"),rptBdg(supN+"/4 "+(currentLang==="zh"?"家可用":"available"),supCls))+"</div>";
   h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptDnsT")+"</div>"
-    +rptKv(TD("rptDnsStatus"),"<span id='rptDnsStatus'>"+rptSkl(80)+"</span>")
-    +rptKv(TD("rptDnsProto"),"<span id='rptDnsProto'>"+rptSkl(110)+"</span>")
-    +rptKv(TD("rptDnsUp"),"<span id='rptDnsUp'>"+rptSkl(90)+"</span>")
-    +rptKv(TD("rptDnsEdns"),"<span id='rptDnsEdns'>"+rptSkl(70)+"</span>")+"</div>";
+    +rptKv(TD("rptDnsStatus"),"<span id='rptDnsStatus'>"+(rptData.dns?rptData.dns.status:rptSkl(80))+"</span>")
+    +rptKv(TD("rptDnsProto"),"<span id='rptDnsProto'>"+(rptData.dns?rptData.dns.proto:rptSkl(110))+"</span>")
+    +rptKv(TD("rptDnsUp"),"<span id='rptDnsUp'>"+(rptData.dns?rptData.dns.up:rptSkl(90))+"</span>")
+    +rptKv(TD("rptDnsEdns"),"<span id='rptDnsEdns'>"+(rptData.dns?rptData.dns.edns:rptSkl(70))+"</span>")+"</div>";
   h+="<div class='rpt-card'><div class='rpt-card-title'>"+TD("rptRtcT")+"</div>"
-    +rptKv(TD("rptRtcStatus"),"<span id='rptRtcStatus'>"+rptSkl(80)+"</span>")
-    +rptKv(TD("rptRtcStun"),"<span id='rptRtcStun'>"+rptSkl(90)+"</span>")
-    +rptKv(TD("rptRtcMdns"),"<span id='rptRtcMdns'>"+rptSkl(100)+"</span>")
-    +rptKv(TD("rptRtcTurn"),"<span id='rptRtcTurn'>"+rptSkl(70)+"</span>")+"</div>";
+    +rptKv(TD("rptRtcStatus"),"<span id='rptRtcStatus'>"+(rptData.rtc?rptData.rtc.status:rptSkl(80))+"</span>")
+    +rptKv(TD("rptRtcStun"),"<span id='rptRtcStun'>"+(rptData.rtc?rptData.rtc.stun:rptSkl(90))+"</span>")
+    +rptKv(TD("rptRtcMdns"),"<span id='rptRtcMdns'>"+(rptData.rtc?rptData.rtc.mdns:rptSkl(100))+"</span>")
+    +rptKv(TD("rptRtcTurn"),"<span id='rptRtcTurn'>"+(rptData.rtc?rptData.rtc.turn:rptSkl(70))+"</span>")+"</div>";
   h+="</div>";
   h+="<div class='rpt-foot'>IPPure · ip.jpedu.asia · "+fmtTime(new Date())+"</div>";
   $("reportRoot").innerHTML=h;
   $("rptConfirmBtn").addEventListener("click",captureReport);
   $("rptCloseBtn").addEventListener("click",closeReportModal);
-  probeVendors();probeDns();probeRtcFill();
+  startReportProbes(true);
   requestAnimationFrame(fitReportScale);
 }
+const rptData={ip:"",vendors:null,dns:null,rtc:null};
+const rptRun={vendors:0,dns:0,rtc:0,rtcActive:false};
+function rptRefit(){if($("reportModalBackdrop").classList.contains("open"))fitReportScale()}
+function paintRptVendors(){
+  if(!rptData.vendors)return;
+  VENDORS.forEach((v,i)=>{const el=$("rptLat"+i);if(el&&rptData.vendors[i]!=null)el.textContent=rptData.vendors[i]});
+}
+function paintRptDns(){
+  const c=rptData.dns;if(!c)return;
+  const set=(id,html)=>{const e=$(id);if(e)e.innerHTML=html};
+  set("rptDnsStatus",c.status);set("rptDnsProto",c.proto);set("rptDnsUp",c.up);set("rptDnsEdns",c.edns);
+}
+function paintRptRtc(){
+  const c=rptData.rtc;if(!c)return;
+  const set=(id,html)=>{const e=$(id);if(e)e.innerHTML=html};
+  set("rptRtcStatus",c.status);set("rptRtcStun",c.stun);set("rptRtcMdns",c.mdns);set("rptRtcTurn",c.turn);
+}
 function probeVendors(){
+  const seq=++rptRun.vendors;
   const hosts={ChatGPT:"chatgpt.com",Claude:"claude.ai",Gemini:"gemini.google.com",Grok:"grok.com"};
   VENDORS.forEach((v,i)=>{
-    const el=$("rptLat"+i);if(!el)return;
     const t0=performance.now();
     const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),6000);
-    fetch("https://"+hosts[v.name]+"/favicon.ico",{mode:"no-cors",cache:"no-store",signal:ctl.signal}).then(()=>{clearTimeout(tm);if(el.isConnected)el.textContent=Math.max(1,Math.round(performance.now()-t0))+"ms"}).catch(()=>{clearTimeout(tm);if(el.isConnected)el.textContent=TD("rptLatFail")});
+    fetch("https://"+hosts[v.name]+"/favicon.ico",{mode:"no-cors",cache:"no-store",signal:ctl.signal})
+      .then(()=>{clearTimeout(tm);return Math.max(1,Math.round(performance.now()-t0))+"ms"})
+      .catch(()=>{clearTimeout(tm);return TD("rptLatFail")})
+      .then(val=>{
+        if(seq!==rptRun.vendors)return;
+        if(!rptData.vendors)rptData.vendors=[null,null,null,null];
+        rptData.vendors[i]=val;
+        paintRptVendors();rptRefit();
+      });
   });
 }
 async function probeDns(){
-  const set=(id,html)=>{const e=$(id);if(e)e.innerHTML=html};
+  const seq=++rptRun.dns;
   try{
     const j=await fetchJSON("https://dns.google/resolve?name=o-o.myaddr.l.google.com&type=TXT",6000);
     const txt=((j&&j.Answer)||[]).filter(a=>a.type===16).map(a=>String(a.data).replace(/"/g,"")).join(" ");
     if(!txt)throw new Error("empty");
     const ecs=(txt.match(/edns-client-subnet\s+([0-9a-fA-F:.\/]+)/)||[])[1]||"";
     const rip=(txt.match(/(\d{1,3}(?:\.\d{1,3}){3})/)||[])[1]||"";
-    set("rptDnsProto","DoH (DNS over HTTPS)");
+    let up=TD("rptUnknown");
     if(rip){
       let place="";
       try{const g=await srcIpWho(rip).catch(()=>null);if(g)place=" · "+[g.country,g.city].filter(Boolean).join(" ")}catch(e){}
-      set("rptDnsUp",escapeHtml(rip+place));
-    }else set("rptDnsUp",TD("rptUnknown"));
-    if(ecs){set("rptDnsStatus",rptBdg(TD("rptDnsExposed"),"warn"));set("rptDnsEdns",escapeHtml(ecs))}
-    else{set("rptDnsStatus",rptBdg(TD("rptDnsSafe"),"ok"));set("rptDnsEdns",TD("rptEdnsNone"))}
+      up=escapeHtml(rip+place);
+    }
+    if(seq!==rptRun.dns)return;
+    rptData.dns=ecs
+      ?{status:rptBdg(TD("rptDnsExposed"),"warn"),proto:"DoH (DNS over HTTPS)",up:up,edns:escapeHtml(ecs)}
+      :{status:rptBdg(TD("rptDnsSafe"),"ok"),proto:"DoH (DNS over HTTPS)",up:up,edns:TD("rptEdnsNone")};
+    paintRptDns();rptRefit();
   }catch(e){
-    ["rptDnsStatus","rptDnsProto","rptDnsUp","rptDnsEdns"].forEach(id=>set(id,TD("rptUnknown")));
+    if(seq!==rptRun.dns||rptData.dns)return;
+    const u=TD("rptUnknown");
+    rptData.dns={status:u,proto:u,up:u,edns:u};
+    paintRptDns();rptRefit();
   }
 }
 function probeRtcFill(){
-  const set=(id,html)=>{const e=$(id);if(e)e.innerHTML=html};
+  if(rptRun.rtcActive)return;
+  rptRun.rtcActive=true;
+  const seq=++rptRun.rtc;
   const found=[];let done=false;
   const finish=()=>{
-    if(done)return;done=true;
+    if(done)return;done=true;rptRun.rtcActive=false;
+    if(seq!==rptRun.rtc)return;
     const srflx=found.filter(c=>c.typ==="srflx").map(c=>c.addr);
     const relay=found.filter(c=>c.typ==="relay");
     const mdns=found.some(c=>c.mdns);
     const hostRaw=found.some(c=>c.typ==="host"&&!c.mdns);
-    set("rptRtcStatus",found.length?rptBdg(TD("rptRtcFound")+" · "+found.length,"warn"):rptBdg(TD("rptRtcNoneF"),"ok"));
-    set("rptRtcStun",srflx.length?escapeHtml(srflx.join(", ")):TD("rptNone"));
-    set("rptRtcMdns",mdns?TD("rptMdnsOn"):hostRaw?TD("rptMdnsOff"):TD("rptNone"));
-    set("rptRtcTurn",relay.length?rptBdg(TD("rptTurnFound"),"warn"):TD("rptNone"));
+    rptData.rtc={
+      status:found.length?rptBdg(TD("rptRtcFound")+" · "+found.length,"warn"):rptBdg(TD("rptRtcNoneF"),"ok"),
+      stun:srflx.length?escapeHtml(srflx.join(", ")):TD("rptNone"),
+      mdns:mdns?TD("rptMdnsOn"):hostRaw?TD("rptMdnsOff"):TD("rptNone"),
+      turn:relay.length?rptBdg(TD("rptTurnFound"),"warn"):TD("rptNone")
+    };
+    paintRptRtc();rptRefit();
   };
   try{
     const pc=new RTCPeerConnection({iceServers:[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302","stun:stun.cloudflare.com:3478","stun:stun.nextcloud.com:443"]}]});
@@ -3547,6 +3584,19 @@ function probeRtcFill(){
     pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(finish);
     setTimeout(finish,4500);
   }catch(e){finish()}
+}
+function startReportProbes(verify){
+  if(verify||!rptData.vendors)probeVendors();
+  if(verify||!rptData.dns)probeDns();
+  probeRtcFill();
+}
+function reportPrefetch(d){
+  if(!d||!d.ip)return;
+  if(rptData.ip!==d.ip){
+    rptData.ip=d.ip;rptData.vendors=null;rptData.dns=null;rptData.rtc=null;
+    rptRun.vendors++;rptRun.dns++;rptRun.rtc++;
+  }
+  startReportProbes(false);
 }
 function closeReportSilent(){spaState.rpt=false;spaSaveY();rptVisual(false)}
 let h2cPromise=null;
