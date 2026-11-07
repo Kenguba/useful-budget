@@ -1924,7 +1924,21 @@ body{
             void pill.offsetWidth;
             pill.classList.add('pill-land');
           }
-          setTimeout(() => { if (window.__hubTryEnter && window.__hubTryEnter(proj)) return; window.location.href = proj.url; }, 200);
+          setTimeout(() => {
+            if (window.__hubTryEnter && window.__hubTryEnter(proj)) {
+              // 交接给总汇后页面不卸载：飞出状态必须在这里收尾（与无 url
+              // 分支同一套清理），否则焦点卡保持收缩/透明地留在层叠里，
+              // 从子站返回时焦点区是空缺。__hubTryEnter 已在同一任务内
+              // 同步点亮覆盖层，此刻复位不会被眼睛看到。
+              if (stage) stage.style.zIndex = '';
+              flyOffsetY = 0;
+              flyShrinkK = 0;
+              flyIdx = -1;
+              updateStackTransforms();
+              return;
+            }
+            window.location.href = proj.url;
+          }, 200);
           return;
         }
         if (stage) stage.style.zIndex = '';
