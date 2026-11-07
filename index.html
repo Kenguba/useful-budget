@@ -1638,6 +1638,7 @@ body{
     let stackNameWidths = [];
     let stackCardRefs = [];
     let stackLastSig = [];
+    let stackMetrics = { vw: 376, cardH: 330, cardW: 290 };
     function getStackProjects() {
       return getFilteredProjects().filter(p => p.id !== STACK_EXCLUDED_ID);
     }
@@ -1997,6 +1998,9 @@ body{
       if (filtered.length === 0) {
         viewport.innerHTML = emptyHtml;
         dotsBarEl.innerHTML = '';
+        stackCardRefs = [];
+        stackNameWidths = [];
+        stackLastSig = [];
         return;
       }
 
@@ -2029,11 +2033,13 @@ body{
 
       // 性能：悬浮标题的元素引用与标题宽度在渲染时一次量好缓存，逐帧变换只读缓存，不再逐帧量布局
       stackCardRefs = Array.from(viewport.querySelectorAll('.app-window-card')).map(el => ({
+        card: el,
         header: el.querySelector('.floating-card-app-header'),
         name: el.querySelector('.floating-app-name')
       }));
       stackNameWidths = stackCardRefs.map((refs, idx) => (stackDomOrder[idx] >= 0 && refs.name ? (refs.name.offsetWidth || 64) : 64));
       stackLastSig = [];
+      measureStackMetrics();
 
       syncStackControlsUI(stackList);
       updateStackTransforms();
@@ -2056,19 +2062,26 @@ body{
     }
 
     // 复刻视频原生多任务连续指数阻尼曲线（左密 -> 中段双卡宽幅并排 -> 右侧平滑滑入）
-    function updateStackTransforms(overridePos) {
+    function measureStackMetrics() {
       const viewport = document.getElementById('stackViewport');
-      const cards = viewport.querySelectorAll('.app-window-card');
+      const firstCard = stackCardRefs[0]?.card;
+      stackMetrics = {
+        vw: viewport.clientWidth || 376,
+        cardH: firstCard?.offsetHeight || 330,
+        cardW: firstCard?.offsetWidth || 290
+      };
+    }
+
+    function updateStackTransforms(overridePos) {
+      const cards = stackCardRefs;
       if (!cards.length) return;
 
       const pos = typeof overridePos === 'number' ? overridePos : stackScrollPos;
-      const vw = viewport.clientWidth || 376;
-      const cardH = cards[0].offsetHeight || 330;
-      const cardW = cards[0].offsetWidth || 290;
+      const { vw, cardH, cardW } = stackMetrics;
       const focusLeft = Math.max(0, (vw - cardW) / 2);
 
       // 第一遍：按 C^∞ 连续指数+线性混合曲线计算每张卡片的像素坐标、缩放与透明度
-      const states = Array.from(cards).map((cardEl, idx) => {
+      const states = cards.map(({ card: cardEl }, idx) => {
         const stackPos = typeof stackDomOrder[idx] === 'number' ? stackDomOrder[idx] : idx;
         const rel = stackPos - pos;
         const clampedRel = Math.max(-4.0, Math.min(1.5, rel));
@@ -2164,7 +2177,7 @@ body{
           const availPx = Math.min(nextCardTx - tx, rightBound - tx);
 
           // 根据当前标题真实像素宽度动态计算显隐阈值，确保多卡并排时双标题同显、收拢时在触碰右侧图标前平滑淡出
-          const textWidth = stackNameWidths[idx] > 0 ? stackNameWidths[idx] : (nameEl.offsetWidth || 64);
+          const textWidth = stackNameWidths[idx] || 64;
           const neededPx = 34 + textWidth;
           const fadeStart = neededPx - 8;
           const nameAlpha = Math.max(0, Math.min(1, (availPx - fadeStart) / 24));
@@ -2229,6 +2242,20 @@ body{
       let samples = [];
       let vSamples = [];
       let downY = 0;
+      let dragPaintRaf = null;
+      function scheduleDragPaint() {
+        if (dragPaintRaf !== null) return;
+        dragPaintRaf = requestAnimationFrame(() => {
+          dragPaintRaf = null;
+          updateStackTransforms();
+        });
+      }
+      function flushDragPaint() {
+        if (dragPaintRaf === null) return;
+        cancelAnimationFrame(dragPaintRaf);
+        dragPaintRaf = null;
+        updateStackTransforms();
+      }
 
       function applyRubberBand(rawPos, maxIdx) {
         if (rawPos < 0) {
@@ -2278,35 +2305,28 @@ body{
         vSamples.push({ t: mvNow, y: rawDY });
         while (vSamples.length > 1 && mvNow - vSamples[0].t > 100) vSamples.shift();
 
-        // 轴向锁定：等主导方向明确了才锁定（斜着起步的拇指推滑，
-        // 前几像素常是斜的，先到先锁会把上推误判成横滑、整轮手势作废）；
-        // 锁定瞬间把起点重置到当前位置，后续位移从零算，不跳帧
+        // 等主导方向明确后锁轴；保留起始坐标并处理本次事件，避免首段位移丢失
         if (!dragAxis) {
           const ax = Math.abs(deltaX), ay = Math.abs(deltaY);
-          if (ay > 12 && ay > ax * 1.15) dragAxis = 'v';
-          else if (ax > 12 && ax > ay * 1.15) dragAxis = 'h';
-          else if (ax > 30 || ay > 30) dragAxis = ay > ax ? 'v' : 'h';
+          if (ay > 8 && ay > ax * 1.15) dragAxis = 'v';
+          else if (ax > 8 && ax > ay * 1.15) dragAxis = 'h';
+          else if (ax > 24 || ay > 24) dragAxis = ay > ax ? 'v' : 'h';
           if (!dragAxis) return;
           if (dragAxis === 'v') {
             flyIdx = activeStackIdx;
             document.getElementById('stackStageWrapper').style.zIndex = '60';
           }
-          startX = e.clientX;
-          startY = e.clientY;
-          dragStartPos = stackScrollPos;
-          return;
         }
         if (dragAxis === 'v') {
           stackDragMoved = true;
           flyOffsetY = deltaY < 0 ? deltaY : deltaY * 0.25;
-          updateStackTransforms();
+          scheduleDragPaint();
           return;
         }
         if (Math.abs(deltaX) > 4) stackDragMoved = true;
 
         // 1:1 真实像素跟手比例：手指在主交互区划动距离与卡片实际位移严格匹配
-        const vw = viewport.clientWidth || 376;
-        const pxPerCard = Math.max(132, vw * 0.43);
+        const pxPerCard = Math.max(132, stackMetrics.vw * 0.43);
         const rawPos = dragStartPos - deltaX / pxPerCard;
         stackScrollPos = applyRubberBand(rawPos, Math.max(0, filtered.length - 1));
 
@@ -2322,12 +2342,13 @@ body{
           syncStackControlsUI(filtered);
         }
 
-        updateStackTransforms();
+        scheduleDragPaint();
       });
 
       const endDrag = () => {
         if (!isStackDragging) return;
         isStackDragging = false;
+        flushDragPaint();
 
         if (dragAxis === 'v') {
           dragAxis = null;
@@ -2422,8 +2443,13 @@ body{
       }, { passive: false });
 
       window.addEventListener('resize', () => {
-        if (currentDisplayMode === 'stack') updateStackTransforms();
+        if (currentDisplayMode === 'stack') { measureStackMetrics(); updateStackTransforms(); }
       });
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(() => {
+          if (currentDisplayMode === 'stack') { measureStackMetrics(); updateStackTransforms(); }
+        }).observe(viewport);
+      }
     })();
 
     // ================= 7. 12 色主题渲染与手势 =================
