@@ -101,6 +101,23 @@
       max-width: 1200px;
     }
 
+    /* 全览模式不锁头部（ken 定）：整屏一个滚动，头部跟列表一起滚走；
+       层叠模式不在此列，保持整屏锁定、头部钉住 */
+    .iphone18-master-chassis.wide-grid-chassis .iphone18-master-screen {
+      overflow-y: auto;
+      justify-content: flex-start;
+      scrollbar-width: none;
+    }
+
+    .iphone18-master-chassis.wide-grid-chassis .iphone18-master-screen::-webkit-scrollbar {
+      display: none;
+    }
+
+    .iphone18-master-chassis.wide-grid-chassis .flat-cards-grid.active-mode {
+      flex: none;
+      overflow-y: visible;
+    }
+
     .iphone18-master-chassis::before {
       content: "";
       position: absolute;
@@ -1830,6 +1847,7 @@
       document.getElementById('contentGrid').classList.toggle('active-mode', mode === 'grid');
       document.getElementById('masterPhoneChassis').classList.toggle('wide-grid-chassis', mode === 'grid');
       document.getElementById('viewGlider').style.transform = mode === 'grid' ? 'translateX(100%)' : 'translateX(0)';
+      document.querySelector('.iphone18-master-screen').scrollTop = 0;
       renderPortalCards();
     }
 
