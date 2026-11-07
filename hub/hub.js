@@ -369,7 +369,14 @@
    * A pull engages only while EVERY scrollable ancestor of the touched
    * element sits at its top (checked live on each move, so a gesture that
    * first scrolls a nested list up to its top starts counting from there),
-   * and fires only past the threshold on release. */
+   * and fires only past the threshold on release.
+   * Phase 9 (ken): the stream itself is only guaranteed where
+   * touch-action forbids the browser claiming the pan — the card
+   * viewport had that declaration, the rest of the home did not, and on
+   * ken's phone off-card pulls were claimed and cancelled before any
+   * move reached this tracker. hub.css therefore declares the whole
+   * stack-mode home screen touch-action:none (lifted in grid mode,
+   * where the screen scrolls natively and the scrollTop gate rules). */
   var ptrEl = document.createElement('div'); ptrEl.id = 'hubPtr';
   ptrEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/></svg>';
   document.body.appendChild(ptrEl);

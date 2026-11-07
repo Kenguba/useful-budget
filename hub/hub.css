@@ -15,6 +15,26 @@
 #hubPtr svg{width:20px;height:20px;stroke:#fff;flex:none}
 #hubPtr.spin svg{animation:hubPtrSpin .7s linear infinite}
 @keyframes hubPtrSpin{to{transform:rotate(360deg)}}
+/* PTR gesture surface (phase 9): the pull tracker in hub.js listens to
+   the raw touch stream, which a browser only guarantees where
+   touch-action forbids it claiming the pan for its own overscroll /
+   pull handling. On the home stack the card viewport has carried
+   touch-action:none all along (the home session's gesture design), so
+   pulls starting on a card always reached the tracker — but every
+   other home surface (pinned header, stage gaps, bottom bar) sat at
+   touch-action:auto, and a browser that claims a downward pan at the
+   top cancels the stream there (touchstart, then touchcancel, no
+   moves reach the page): the pull silently did nothing, exactly as
+   ken reported from his phone. In stack mode the home screen is a
+   fully gesture-driven surface with no native scroller at all, so
+   declare the whole screen the way the viewport is declared. The
+   chassis carries .wide-grid-chassis in grid mode, where the screen
+   IS the scroller and must keep native touch scrolling (the tracker
+   gates on its scrollTop there instead), so the rule lifts in grid
+   mode. Gestures starting inside a nested scroller (preview-modal
+   list) are unaffected: a gesture's touch-action intersection stops
+   at its own scroller, above the screen. */
+#masterPhoneChassis:not(.wide-grid-chassis) .iphone18-master-screen{touch-action:none}
 #hubSkeleton{padding:18px 16px}
 #hubSkeleton .skblock{border-radius:8px;background:linear-gradient(100deg,#e6ecf3 40%,#f4f8fb 50%,#e6ecf3 60%);
   background-size:200% 100%;animation:hubShim 1.2s infinite linear}
