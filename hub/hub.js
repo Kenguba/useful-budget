@@ -414,9 +414,14 @@
       if (startY === null || !activeWhen() || ev.touches.length !== 1) return;
       var y = ev.touches[0].clientY, x = ev.touches[0].clientX;
       if (!engaged) {
+        var dx = x - startX, dy = y - startY;
+        if (dy < -4 || (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.15)) {
+          startY = null;  /* upward or predominantly-horizontal: not a pull */
+          return;
+        }
+        if (dy <= 8) return;
         var tops = scrollTopsOf(target);
-        if (tops && tops.every(function (t) { return t <= 0; }) && y > startY + 8) { engaged = true; startY = y - 8; engX = x; }
-        else if (y < startY - 4) startY = null;   /* upward gesture: not a pull */
+        if (tops && tops.every(function (t) { return t <= 0; })) { engaged = true; startY = y - 8; engX = x; }
         return;
       }
       lastDy = y - startY;
