@@ -3585,21 +3585,23 @@ function loadHtml2Canvas(){
 const rptShot={active:false,busy:false,queued:false};
 let rptShotTimer=null;
 async function renderReportImage(quiet){
-  if(rptShot.busy){rptShot.queued=true;return}
-  const root=$("reportRoot");if(!root)return;
+  if(rptShot.busy){rptShot.queued=true;return null}
+  const root=$("reportRoot");if(!root)return null;
   rptShot.busy=true;
+  let data=null;
   try{
     await loadHtml2Canvas();
-    const wrap=$("reportScaleWrap");
-    wrap.classList.add("capturing");
-    let data;
+    const liveWrap=$("reportScaleWrap");
+    const clWrap=liveWrap.cloneNode(true);
+    clWrap.querySelectorAll(".rpt-shot-img,.rpt-nocap").forEach(n=>n.remove());
+    const clBoard=clWrap.querySelector(".rpt-board");
+    clBoard.style.transform="none";
+    clWrap.style.cssText="position:fixed;left:-99999px;top:0;width:"+liveWrap.clientWidth+"px;height:auto;overflow:visible";
+    document.body.appendChild(clWrap);
     try{
-      const cv=await html2canvas(root,{scale:2,backgroundColor:getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()||"#EEF6FA",logging:false,ignoreElements:el=>!!(el.classList&&(el.classList.contains("rpt-nocap")||el.classList.contains("rpt-shot-img")))});
+      const cv=await html2canvas(clBoard,{scale:2,backgroundColor:getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()||"#EEF6FA",logging:false});
       data=cv.toDataURL("image/png");
-    }finally{
-      wrap.classList.remove("capturing");
-      fitReportScale();
-    }
+    }finally{clWrap.remove()}
     let img=root.querySelector(".rpt-shot-img");
     if(!img){img=document.createElement("img");img.className="rpt-shot-img";img.alt="IP snapshot";root.appendChild(img)}
     img.src=data;
@@ -3609,11 +3611,12 @@ async function renderReportImage(quiet){
   }
   rptShot.busy=false;
   if(rptShot.queued){rptShot.queued=false;if(rptShot.active)renderReportImage(true)}
+  return data;
 }
 function scheduleReportImage(){
   if(!rptShot.active)return;
   clearTimeout(rptShotTimer);
-  rptShotTimer=setTimeout(()=>renderReportImage(true),700);
+  rptShotTimer=setTimeout(()=>renderReportImage(true),1200);
 }
 async function captureReport(){
   const btn=$("rptConfirmBtn");
@@ -3621,7 +3624,12 @@ async function captureReport(){
   btn.dataset.busy="1";
   rptShot.active=true;
   toast(TD("rptGenerating"));
-  await renderReportImage(false);
+  const data=await renderReportImage(false);
+  if(data){
+    const a=document.createElement("a");
+    a.href=data;a.download="ip-report.png";
+    document.body.appendChild(a);a.click();a.remove();
+  }
   delete btn.dataset.busy;
 }
 function openReport(){
