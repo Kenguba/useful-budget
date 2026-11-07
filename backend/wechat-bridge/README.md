@@ -4,7 +4,7 @@ ken 的微信与 Muse（逗包）之间的双向通道，2026-11-07 接通。
 
 ## 链路
 
-微信（ClawBot 官方插件）→ 腾讯 iLink → Muse 虚拟机上的网关 gateway.py（长轮询收、队列发）→ 逗包被唤醒处理 → 原路回微信。细节见 ARCHITECTURE.md；为什么选这条路见 可行方案.md。
+微信（ClawBot 官方插件）→ 腾讯 iLink → Muse 虚拟机上的网关 gateway.py（长轮询收、队列发）→ 逗包被唤醒处理 → 原路回微信。细节见 [ARCHITECTURE.md](ARCHITECTURE.md)；为什么选这条路见 [可行方案.md](%E5%8F%AF%E8%A1%8C%E6%96%B9%E6%A1%88.md)。
 
 ## 本目录文件
 
@@ -13,9 +13,9 @@ ken 的微信与 Muse（逗包）之间的双向通道，2026-11-07 接通。
 - run-gateway.sh — 网关启动脚本（服务单元调用它拉起 gateway.py）
 - wechat-inbox.sh — 收件检查 hook 脚本留档（10 秒轮询，有新消息才唤醒 agent）
 - wechat-gateway-guard.sh — 守护 hook 脚本留档（30 秒轮询，重装丢失的服务单元、拉起停掉的网关、报告登录过期）
-- ARCHITECTURE.md — 整体搭建说明（组件、脚本读写、故障自愈、边界、迁移重建步骤）
-- 可行方案.md — 接入前的选型调研报告（14 条路线对比）
-- 可行方案的网页版在仓库 frontend/wechat-bridge/（GitHub Pages 可直接打开，本目录只留文字版）
+- [ARCHITECTURE.md](ARCHITECTURE.md) — 整体搭建说明（组件、脚本读写、故障自愈、边界、迁移重建步骤）
+- [可行方案.md](%E5%8F%AF%E8%A1%8C%E6%96%B9%E6%A1%88.md) — 接入前的选型调研报告（14 条路线对比）
+- 可行方案的网页版在仓库 [frontend/wechat-bridge/](../../frontend/wechat-bridge/)（GitHub Pages 可直接打开，本目录只留文字版）
 
 ## 同步约定
 
