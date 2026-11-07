@@ -173,19 +173,35 @@
     var ov = document.createElement('div');
     ov.id = 'hubSkeleton'; ov.className = 'panBoot';
     ov.innerHTML =
-      '<div style="display:flex;align-items:center;gap:10px"><div class="skblock" style="width:34px;height:34px;border-radius:10px"></div>' +
-      '<div class="skblock" style="width:38%;height:20px"></div>' +
-      '<div class="skblock" style="width:18%;height:20px;margin-left:auto"></div></div>' +
-      '<div class="skblock" style="width:100%;height:48px;margin-top:18px;border-radius:24px"></div>' +
-      '<div style="display:flex;gap:8px;margin-top:16px"><div class="skblock" style="width:23%;height:26px;border-radius:13px"></div>' +
-      '<div class="skblock" style="width:19%;height:26px;border-radius:13px"></div>' +
-      '<div class="skblock" style="width:27%;height:26px;border-radius:13px"></div></div>' +
-      '<div class="skblock" style="width:56%;height:17px;margin-top:24px"></div>' +
-      '<div class="skblock" style="width:88%;height:13px;margin-top:9px"></div>' +
-      '<div class="skblock" style="width:56%;height:17px;margin-top:22px"></div>' +
-      '<div class="skblock" style="width:92%;height:13px;margin-top:9px"></div>' +
-      '<div class="skblock" style="width:56%;height:17px;margin-top:22px"></div>' +
-      '<div class="skblock" style="width:84%;height:13px;margin-top:9px"></div>';
+      /* static-first cover (ken, 2026-11-08): everything above the data
+       * zones is STATIC in pan's home — header, nav tabs, promo, title,
+       * search bar and the announcement never wait for data, so the cover
+       * renders them as real content from the first frame (the UI-first
+       * rule). Only the genuinely data-driven zones — the hot-search
+       * chips and the daily-update list — stay skeleton + shimmer until
+       * the real frame paints and the whole cover lifts at once. */
+      '<div class="pb-head">' +
+        '<div class="pb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M5 5h.01M9.5 5h.01M14 5h.01M18.5 5h.01M5 9.5h.01M9.5 9.5h.01M14 9.5h.01M18.5 9.5h.01M5 14h.01M9.5 14h.01M14 14h.01M18.5 14h.01M5 18.5h.01M9.5 18.5h.01M14 18.5h.01M18.5 18.5h.01"/></svg></div>' +
+        '<div class="pb-name">基德盘搜</div>' +
+        '<div class="pb-actions">' +
+          '<span class="pb-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="7" y="2.5" width="10" height="19" rx="2.4"/><path d="M11 18.8h2"/></svg>APP</span>' +
+          '<span class="pb-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M3.4 12h17.2M12 3.4c2.4 2.3 3.5 5.2 3.5 8.6s-1.1 6.3-3.5 8.6c-2.4-2.3-3.5-5.2-3.5-8.6S9.6 5.7 12 3.4Z"/></svg>中文</span>' +
+          '<span class="pb-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19"/></svg></span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="pb-tabs"><span class="pb-tab on">搜索首页</span><span class="pb-tab">热播榜</span><span class="pb-tab">每日更新</span><span class="pb-tab">热搜榜</span></div>' +
+      '<div class="pb-promo"><svg viewBox="0 0 24 24" fill="#F59E0B"><path d="M13 2 4.5 13.5H11L9.8 22 19 9.8h-6.5L13 2Z"/></svg>夸克网盘搜索 · 迅雷会员特权直达 · 磁力聚合</div>' +
+      '<div class="pb-title">好内容，<span>一搜就有</span></div>' +
+      '<div class="pb-search"><span class="pb-scope">全部网盘<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9.5 6 6 6-6"/></svg></span>' +
+        '<span class="pb-ph">搜索你想找的资源</span>' +
+        '<span class="pb-go"><svg viewBox="0 0 24 24" fill="none" stroke="#10312A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V5M5.5 11 12 4.5 18.5 11"/></svg></span></div>' +
+      '<div class="pb-tags"><div class="skblock" style="width:84px"></div><div class="skblock" style="width:108px"></div><div class="skblock" style="width:118px"></div><div class="skblock" style="width:96px"></div><div class="skblock" style="width:94px"></div><div class="skblock" style="width:74px"></div><div class="skblock" style="width:88px"></div><div class="skblock" style="width:62px"></div></div>' +
+      '<div class="pb-note"><span class="pb-note-ico"><svg viewBox="0 0 24 24" fill="#E8590C"><path d="M3 10.5v3a1.5 1.5 0 0 0 1.5 1.5H7l7.5 4.5v-15L7 9H4.5A1.5 1.5 0 0 0 3 10.5Z"/><path d="M17.5 9.2a4 4 0 0 1 0 5.6M20 6.8a7.6 7.6 0 0 1 0 10.4" fill="none" stroke="#E8590C" stroke-width="1.9" stroke-linecap="round"/></svg></span>' +
+        '<span class="pb-note-t"><b>站点公告</b>每天多轮自动更新 · 追更最快 | 优先使用迅雷网盘。</span></div>' +
+      '<div class="pb-daily"><div class="pb-daily-h"><div class="skblock" style="width:34px;height:34px;border-radius:10px"></div><div class="skblock" style="width:32%;height:19px"></div><div class="skblock" style="width:22%;height:19px;margin-left:auto"></div></div>' +
+      '<div class="pb-row"><div class="skblock" style="width:26px;height:15px"></div><div style="flex:1"><div class="skblock" style="width:72%;height:15px"></div><div class="skblock" style="width:34%;height:11px;margin-top:7px"></div></div><div class="skblock" style="width:40px;height:40px;border-radius:11px"></div></div>' +
+      '<div class="pb-row"><div class="skblock" style="width:26px;height:15px"></div><div style="flex:1"><div class="skblock" style="width:64%;height:15px"></div><div class="skblock" style="width:30%;height:11px;margin-top:7px"></div></div><div class="skblock" style="width:40px;height:40px;border-radius:11px"></div></div>' +
+      '<div class="pb-row"><div class="skblock" style="width:26px;height:15px"></div><div style="flex:1"><div class="skblock" style="width:78%;height:15px"></div><div class="skblock" style="width:38%;height:11px;margin-top:7px"></div></div><div class="skblock" style="width:40px;height:40px;border-radius:11px"></div></div></div>';
     root.appendChild(ov);
     var f = document.createElement('iframe');
     f.className = 'subappFrame';
