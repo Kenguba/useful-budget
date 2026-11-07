@@ -2,13 +2,35 @@
    Module roots carry [data-mod] and their own scoped module.css. */
 #hubView{position:fixed;inset:0;z-index:9000;background:#f4f8fc;display:none}
 #hubView.on{display:block}
-#hubView .modRoot{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;background:inherit}
+/* bottom padding = capsule clearance, part 1: the fixed #hubBack capsule
+   floats over the module's bottom-right corner (footprint ~60px). This
+   padding shrinks percentage-height content and the pan sub-application
+   frame (leaving the capsule a clear band below the app). For plain flow
+   content the effective clearance is each module's own trailing space
+   inside its scroll height, verified per module with a visibility-aware
+   probe at the true scroll bottom; the one module short of the footprint
+   (ui) gets the rest at its footer — see below. */
+#hubView .modRoot{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;background:inherit;padding-bottom:120px}
 #hubView .modRoot.on{display:block}
 #hubBack{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:9500;
   display:none;align-items:center;gap:6px;border:0;border-radius:999px;padding:11px 18px;
   background:rgba(20,24,32,.88);color:#fff;font-size:14px;font-weight:600;
   box-shadow:0 8px 24px rgba(10,20,40,.28);backdrop-filter:blur(6px);cursor:pointer}
 #hubBack.on{display:flex}
+/* modules whose own fixed dock permanently owns the bottom-right corner
+   (skill's floating-quick-dock) get the capsule on the left instead */
+#hubBack.hubBackLeft{left:16px;right:auto}
+/* ip's error toast (.err-bar) is a centred fixed bar docked at bottom:18px;
+   in the hub its close button would sit under the capsule. The shell lifts
+   the toast above the capsule band while it is shown (hub context only;
+   the module's own bottom:18px is untouched on its standalone site). */
+#hubView .modRoot[data-mod="ip"] .err-bar{bottom:92px}
+/* ui's catalogue footer carries only ~48px of trailing space inside its
+   scroll height — less than the capsule's ~60px footprint — and Chrome
+   absorbs the scroll root's own padding-bottom into clientHeight, so the
+   padding above cannot clear it. The missing clearance is added at the
+   footer's own box instead. */
+#hubView .modRoot[data-mod="ui"] .catalogue-footer{margin-bottom:72px}
 #hubBack svg{width:16px;height:16px;flex:none}
 #hubSkeleton{padding:18px 16px}
 #hubSkeleton .skblock{border-radius:8px;background:linear-gradient(100deg,#e6ecf3 40%,#f4f8fb 50%,#e6ecf3 60%);
