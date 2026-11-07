@@ -1655,7 +1655,12 @@ body{
     }
 
     // ================= 4. 双模式切换 =================
+    // 每个模式各自记住滚动位置：切走时存、切回时在本函数同一同步段里
+    // （浏览器重绘之前）就恢复到位，眼睛看不到任何跳动或滚动过程
+    const savedScrollByMode = { stack: 0, grid: 0 };
     function setDisplayMode(mode) {
+      const screenEl = document.querySelector('.iphone18-master-screen');
+      if (screenEl) savedScrollByMode[currentDisplayMode] = screenEl.scrollTop;
       currentDisplayMode = mode;
       document.getElementById('modeStackBtn').classList.toggle('active', mode === 'stack');
       document.getElementById('modeGridBtn').classList.toggle('active', mode === 'grid');
@@ -1663,8 +1668,8 @@ body{
       document.getElementById('contentGrid').classList.toggle('active-mode', mode === 'grid');
       document.getElementById('masterPhoneChassis').classList.toggle('wide-grid-chassis', mode === 'grid');
       document.getElementById('viewGlider').style.transform = mode === 'grid' ? 'translateX(100%)' : 'translateX(0)';
-      document.querySelector('.iphone18-master-screen').scrollTop = 0;
       renderPortalCards();
+      if (screenEl) screenEl.scrollTop = savedScrollByMode[mode] || 0;
     }
 
     // ================= 5. 生成卡片 HTML =================
