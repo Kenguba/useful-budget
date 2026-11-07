@@ -1443,6 +1443,7 @@
     r.style.setProperty('--theme-accent',th[4]);r.style.setProperty('--theme-tag-bg',th[5]);
     r.style.setProperty('--theme-tag-text',th[6]);r.style.setProperty('--search-glow',th[8]);})();
   </script>
+<link rel="stylesheet" href="hub/hub.css">
 </head>
 <body>
 
@@ -2103,7 +2104,7 @@
             void pill.offsetWidth;
             pill.classList.add('pill-land');
           }
-          setTimeout(() => { window.location.href = proj.url; }, 200);
+          setTimeout(() => { if (window.__hubTryEnter && window.__hubTryEnter(proj)) return; window.location.href = proj.url; }, 200);
           return;
         }
         if (stage) stage.style.zIndex = '';
@@ -2816,5 +2817,6 @@
     document.getElementById('sunMoonIcon').innerHTML = isDarkMode ? MOON_SVG : SUN_SVG;
     syncStaticUIText();
   </script>
+<script src="hub/hub.js"></script>
 </body>
 </html>
