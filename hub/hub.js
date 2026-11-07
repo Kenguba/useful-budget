@@ -12,10 +12,7 @@
   var MODULES = {
     phone: { proj: 'cloud-phone', dir: '/frontend/cloud-phone/', tier: 'light' },
     '2fa': { proj: '2fa-auth',    dir: '/frontend/2fa-auth/',    tier: 'light' },
-    /* backLeft: skill's own floating-quick-dock (position:fixed, bottom
-     * right) is a permanent resident of the bottom-right corner, so the
-     * shell puts its back capsule on the left while skill is current. */
-    skill: { proj: 'skill-board', dir: '/frontend/skill-board/', tier: 'light', backLeft: true },
+    skill: { proj: 'skill-board', dir: '/frontend/skill-board/', tier: 'light' },
     /* ai is on-demand (heaviest: code 320KB + board ~424KB): never in the
      * idle preload order; the focus-card warm path downloads ui/css/js only.
      * lazyShops is a SWITCH POSITION ONLY (phase 3, not implemented):
@@ -73,10 +70,7 @@
 
   /* ---------- view layer ---------- */
   var view = document.createElement('div'); view.id = 'hubView';
-  var back = document.createElement('button'); back.id = 'hubBack'; back.type = 'button';
-  back.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span>返回总汇</span>';
-  document.body.appendChild(view); document.body.appendChild(back);
-  back.addEventListener('click', function () { exitModule(true); });
+  document.body.appendChild(view);
 
   var state = {};   // name -> {root, status, mod}
   var current = null;
@@ -106,8 +100,7 @@
     var cfg = MODULES[name]; if (!cfg) return Promise.resolve(false);
     if (current && current !== name) suspend(current);
     current = name;
-    view.classList.add('on'); back.classList.add('on');
-    back.classList.toggle('hubBackLeft', !!cfg.backLeft);
+    view.classList.add('on');
     var root = rootFor(name);
     showRoot(name);
     if (push !== false) {
@@ -172,6 +165,7 @@
     f.addEventListener('load', function () {
       st.status = 'ready';
       var sk = root.querySelector('#hubSkeleton'); if (sk) sk.remove();
+      attachPanPtr(f);
     });
     root.appendChild(f);
     st.frame = f;
@@ -185,7 +179,8 @@
   function exitModule(push) {
     if (current) suspend(current);
     current = null;
-    view.classList.remove('on'); back.classList.remove('on'); back.classList.remove('hubBackLeft');
+    view.classList.remove('on');
+    ptrHide();
     if (push) { try { history.pushState(stamp(null), '', '/'); } catch (e) {} }
   }
 
@@ -289,6 +284,108 @@
       if (name) warm(name);
     }, 650);
   });
+
+  /* ---------- pull-to-refresh (phase 6, ken request) ----------
+   * Standalone, each site scrolls at document level, so Android Chrome's
+   * native pull-to-refresh works. In the hub the shell document never
+   * scrolls (the root page pins it: overflow hidden + overscroll-behavior
+   * none) and module content scrolls inside .modRoot instead — the native
+   * gesture has nothing to grab and no in-page gesture replaced it, so
+   * pulling at a module's top did nothing at all. The shell therefore
+   * tracks the gesture itself and refreshes the current module the way
+   * the standalone site would: pipeline modules via location.reload()
+   * (a standalone refresh is the same full reload; the deep-link boot
+   * then re-mounts the module through the normal path and re-fetches its
+   * data), the pan sub-application by reloading only its frame.
+   * A pull engages only while EVERY scrollable ancestor of the touched
+   * element sits at its top (checked live on each move, so a gesture that
+   * first scrolls a nested list up to its top starts counting from there),
+   * and fires only past the threshold on release. */
+  var ptrEl = document.createElement('div'); ptrEl.id = 'hubPtr';
+  ptrEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/></svg>';
+  document.body.appendChild(ptrEl);
+  var PTR_THRESHOLD = 72;
+  function ptrShow(dy, spinning) {
+    var lift = spinning ? 66 : Math.min(dy * 0.55, 66);
+    ptrEl.style.opacity = (dy > 2 || spinning) ? '1' : '0';
+    ptrEl.style.transform = 'translateY(' + (-52 + lift) + 'px)';
+    ptrEl.classList.toggle('spin', !!spinning);
+    if (!spinning) ptrEl.querySelector('svg').style.transform = 'rotate(' + (dy * 2.2) + 'deg)';
+  }
+  function ptrHide() {
+    ptrEl.style.opacity = '0';
+    ptrEl.style.transform = 'translateY(-52px)';
+    ptrEl.classList.remove('spin');
+  }
+  function refreshCurrent() {
+    if (!current) return;
+    var name = current;
+    ptrShow(0, true);
+    setTimeout(function () {
+      var st = state[name];
+      if (MODULES[name].subapp && st && st.frame) {
+        try { st.frame.contentWindow.location.reload(); ptrHide(); return; } catch (e) {}
+      }
+      location.reload();
+    }, 380);
+  }
+  function trackPull(doc, scrollTopsOf) {
+    var startY = null, engaged = false, lastDy = 0, target = null;
+    doc.addEventListener('touchstart', function (ev) {
+      if (!current || ev.touches.length !== 1) { engaged = false; startY = null; return; }
+      target = ev.target; startY = ev.touches[0].clientY; engaged = false; lastDy = 0;
+    }, { passive: true });
+    doc.addEventListener('touchmove', function (ev) {
+      if (startY === null || !current || ev.touches.length !== 1) return;
+      var y = ev.touches[0].clientY;
+      if (!engaged) {
+        var tops = scrollTopsOf(target);
+        if (tops && tops.every(function (t) { return t <= 0; }) && y > startY + 8) { engaged = true; startY = y - 8; }
+        else if (y < startY - 4) startY = null;   /* upward gesture: not a pull */
+        return;
+      }
+      lastDy = y - startY;
+      if (lastDy <= 0) { ptrHide(); return; }
+      ptrShow(lastDy, false);
+    }, { passive: true });
+    function end() {
+      if (engaged && lastDy >= PTR_THRESHOLD) refreshCurrent();
+      else if (engaged) ptrHide();
+      engaged = false; startY = null; lastDy = 0;
+    }
+    doc.addEventListener('touchend', end);
+    doc.addEventListener('touchcancel', end);
+  }
+  /* scroll positions that must all be at top for a pull in the shell
+   * document: the current module root plus any scrollable ancestor of the
+   * touched element inside it */
+  function rootScrollTops(target) {
+    if (!current || !state[current]) return null;
+    var root = state[current].root, tops = [], el = target;
+    while (el && el !== view) {
+      if (el === root) { tops.push(el.scrollTop); break; }
+      var cs = getComputedStyle(el);
+      if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight + 1) tops.push(el.scrollTop);
+      el = el.parentElement;
+    }
+    return tops.length ? tops : null;
+  }
+  trackPull(document, rootScrollTops);
+  /* pan: touches land in the frame's own document, so the same tracker is
+   * attached there after every frame load (each reload swaps in a fresh
+   * document). The frame is same-origin (its src is the site's own
+   * directory on this host), and its scroll model is window-level. */
+  function attachPanPtr(frame) {
+    try {
+      var doc = frame.contentDocument;
+      if (!doc || doc.__hubPtrTracked) return;
+      doc.__hubPtrTracked = 1;
+      trackPull(doc, function () {
+        var w = frame.contentWindow; if (!w) return null;
+        return [w.scrollY || 0];
+      });
+    } catch (e) {}
+  }
 
   /* deep link: landed on /phone, /2fa, /skill, /ai (site-router serves the shell
    * for those paths) — mount directly. Harmless on plain static hosting. */
