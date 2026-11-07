@@ -1,7 +1,7 @@
 // ============================================================
 // 子域名分发服务 site-router 的源码留档副本。
 // 真正运行的是部署在 Cloudflare（站长账号）上的 Worker
-// 「site-router」（版本 5e037630，2026-11-06 更新：ROUTES 新增 ui -> frontend/ui-design），守在通配路由 *.xxxxx.asia/*
+// 「site-router」（版本 1a924131，2026-11-07 更新：新增总汇短路径 HUB_SHORT，主域名短路径回总汇外壳），守在通配路由 *.xxxxx.asia/*
 // 与主域名路由 xxxxx.asia/* 上，按子域名前缀把七个项目分发到
 // GitHub Pages 对应目录；主域名（无前缀）分发到仓库根导航页（总体预览页）。
 // 把副本放在仓库里，是为了迁移时直接拿这一份部署，不用去控制台翻。
@@ -28,6 +28,8 @@ ip: "frontend/ip-check",
 ui: "frontend/ui-design",
 };
 
+const HUB_SHORT = { ai: 1, phone: 1, skill: 1, ip: 1, pan: 1, '2fa': 1, ui: 1 };
+
 export default {
 async fetch(request) {
 const url = new URL(request.url);
@@ -35,6 +37,11 @@ const labels = url.hostname.split(".");
 const sub = labels.slice(0, -2).join("."); // 前缀键，可多级，如 "a.b"
 // 主域名（无前缀）= 总体预览页：转发到 GitHub Pages 仓库根目录（导航页）
 if (sub === "") {
+// 总汇短路径：第一段命中短路径表时，直接回总汇外壳（仓库根 index.html）
+const seg = url.pathname.split('/')[1];
+if (seg && HUB_SHORT[seg]) {
+return fetch(new URL('https://kenguba.github.io/useful-budget/index.html'), { cf: { cacheEverything: false } });
+}
 let q = url.pathname;
 if (q !== "/useful-budget" && !q.startsWith("/useful-budget/")) {
 q = "/useful-budget" + (q === "/" ? "/" : q);
