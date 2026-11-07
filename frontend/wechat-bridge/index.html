@@ -3,29 +3,365 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F3F8FA">
 <link rel="icon" href="data:,">
 <title>微信接入可行方案</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script>
+/* early prefs: Cookie A > local, applied before first paint to avoid flash */
+(function(){try{
+  var m=document.cookie.match(/(?:^|;\s*)A=(\d{3,4})(?:;|$)/), a=null;
+  if(m){var v=m[1],t=parseInt(v.slice(2),10); if((v.charAt(1)==='0'||v.charAt(1)==='1')&&t>=1&&t<=12) a={l:v.charAt(0),m:v.charAt(1),t:t};}
+  var lt=null; try{var s=localStorage.getItem('wechat-aura-theme'); if(s!==null){var n=parseInt(s,10); if(n>=0&&n<=11) lt=n;}}catch(e){}
+  var idx=a?a.t-1:(lt!==null?lt:11);
+  document.documentElement.setAttribute('data-theme-idx', idx);
+  if(a){document.documentElement.setAttribute('data-lang-init', a.l==='1'?'en':'zh'); if(a.m==='0'){document.documentElement.setAttribute('data-dark','true'); var mt=document.querySelector('meta[name="theme-color"]'); if(mt)mt.setAttribute('content','#0B1120');}}
+}catch(e){}})();
+</script>
 <style>
+:root {
+      /* 顶部弥散渐变与三光斑色值（默认激活第12号：幻彩全息 Gemini Holo） */
+      --hero-bg-base: #FFFFFF;
+      --orb-color-1: #8FDBB8;
+      --orb-color-2: #9CC8F7;
+      
+      /* 按钮与组件专属联动色 */
+      --refresh-btn-bg: #4FA8F6;
+      --refresh-btn-text: #FFFFFF;
+      --send-circle-bg: #9EE0C5;
+      --send-circle-icon: #0F172A;
+      
+      /* 主题强调色与标签配比 */
+      --theme-accent: #1A73E8;
+      --theme-tab-text: #0F172A;
+      --theme-tag-bg: #E6F4EA;
+      --theme-tag-text: #137333;
+      --search-glow: rgba(143, 219, 184, 0.44);
+
+      /* 页面背景与卡片表面色（随主题微染 + 支持深色模式） */
+      --page-bg: #F3F8FA;
+      --card-bg: #FFFFFF;
+      --card-border: rgba(226, 232, 240, 0.82);
+      --input-bg: rgba(248, 250, 252, 0.85);
+      --sidebar-bg: rgba(255, 255, 255, 0.86);
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+      --pill-surface: #FFFFFF;
+      --pill-shadow: 0 6px 20px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03);
+      --card-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.03);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+
+      /* 同心圆角规范变量：外圈 = 里圈 + 缝 */
+      --card-outer-radius: 26px;
+      --card-pad: 14px;
+      --card-inner-radius: 12px; /* 26 - 14 = 12 */
+    }
+[data-dark="true"] {
+      --hero-bg-base: #0B1120;
+      --page-bg: #090D16;
+      --card-bg: #151F32;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --input-bg: rgba(15, 23, 42, 0.68);
+      --sidebar-bg: rgba(21, 31, 50, 0.88);
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --pill-surface: #1E293B;
+      --pill-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      --card-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.45);
+      --theme-tab-text: #F8FAFC;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+.aura-orb{position:absolute;border-radius:50%;filter:blur(48px);opacity:.82;transition:background-color .75s var(--ease-smooth),transform .85s var(--ease-spring)}
+.orb-left {
+      width: 280px;
+      height: 220px;
+      bottom: -60px;
+      left: -40px;
+      background-color: var(--orb-color-1);
+    }
+.orb-center {
+      width: 260px;
+      height: 190px;
+      bottom: -55px;
+      left: 24%;
+      background-color: #9EE0C5;
+      opacity: 0;
+      transition: opacity 0.6s ease, background-color 0.75s ease;
+    }
+.orb-right {
+      width: 300px;
+      height: 240px;
+      bottom: -75px;
+      right: -45px;
+      background-color: var(--orb-color-2);
+    }
+[data-holo="true"] .aura-orb.orb-left {
+      animation: videoHoloLeft 4.8s ease-in-out infinite;
+      filter: blur(42px);
+      opacity: 0.9;
+    }
+[data-holo="true"] .aura-orb.orb-right {
+      animation: videoHoloRight 4.8s ease-in-out infinite;
+      filter: blur(42px);
+      opacity: 0.9;
+    }
+[data-holo="true"] .aura-orb.orb-center {
+      opacity: 0.78;
+      animation: videoHoloCenter 4.8s ease-in-out infinite;
+      filter: blur(44px);
+    }
+[data-holo="true"] .aura-orb.orb-left,
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-right,
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-center {
+      opacity: 0.34;
+    }
+@keyframes videoHoloLeft {
+      0%   { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
+      25%  { background-color: #8FDBB8; transform: translate(16px, -12px) scale(1.1); }
+      50%  { background-color: #92C6F2; transform: translate(8px, 6px) scale(1.06); }
+      75%  { background-color: #B9CFF8; transform: translate(-12px, -6px) scale(1.02); }
+      100% { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
+    }
+@keyframes videoHoloRight {
+      0%   { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
+      25%  { background-color: #9CC8F7; transform: translate(-16px, -8px) scale(1.1); }
+      50%  { background-color: #A7D0F7; transform: translate(-8px, 8px) scale(1.04); }
+      75%  { background-color: #BDE7D5; transform: translate(14px, -6px) scale(1.08); }
+      100% { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
+    }
+@keyframes videoHoloCenter {
+      0%   { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
+      33%  { background-color: #9FCAF5; transform: translateY(-14px) scale(1.12); }
+      66%  { background-color: #CFE7FB; transform: translateY(6px) scale(0.98); }
+      100% { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
+    }
+@keyframes videoHoloBtn {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+/* 右侧日夜切换按钮（单击切换日夜，长按弹出12色主题面板） */
+    .theme-mode-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--pill-surface);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: var(--pill-shadow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-primary);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      position: relative;
+      z-index: 102;
+      flex-shrink: 0;
+      transition: transform 0.25s var(--ease-spring),
+                  background-color 0.4s ease,
+                  color 0.3s ease,
+                  box-shadow 0.3s ease;
+    }
+
+    .theme-mode-btn.pressing {
+      transform: scale(0.9);
+      box-shadow: 0 0 0 4px var(--search-glow);
+    }
+
+    .sun-moon-svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+      transition: transform 0.5s var(--ease-spring);
+    }
+
+    .theme-mode-btn.rotating .sun-moon-svg {
+      transform: rotate(180deg) scale(0.85);
+    }
+
+    /* ================= 4.2 长按弹出的 12 色主题悬浮面板（同心圆角：外圈 22 = 里圈 10 + 缝 12） ================= */
+    .theme-panel-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 98;
+      background: rgba(15, 23, 42, 0.06);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .theme-panel-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .theme-popover-panel {
+      position: absolute;
+      top: 46px;
+      right: 0;
+      width: min(300px, calc(100vw - 36px));
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      border-radius: 22px;
+      padding: 12px;
+      box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.18),
+                  0 4px 16px rgba(15, 23, 42, 0.06);
+      z-index: 101;
+      opacity: 0;
+      transform: translateY(-10px) scale(0.92);
+      transform-origin: top right;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      transition: opacity 0.26s var(--ease-smooth),
+                  transform 0.3s var(--ease-spring);
+    }
+
+    [data-dark="true"] .theme-popover-panel {
+      background: rgba(21, 31, 50, 0.96);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 22px 44px -8px rgba(0, 0, 0, 0.55);
+    }
+
+    .theme-popover-panel.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 0 2px;
+    }
+
+    .panel-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: 0.3px;
+    }
+
+    .panel-hint {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .theme-swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .theme-swatch-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(248, 250, 252, 0.82);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: transform 0.18s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    [data-dark="true"] .theme-swatch-item {
+      background: rgba(30, 41, 59, 0.78);
+    }
+
+    [data-dark="true"] .theme-swatch-item.active,
+    [data-dark="true"] .theme-swatch-item.sliding-hover {
+      background: rgba(30, 41, 59, 0.78);
+    }
+
+    .theme-swatch-item.active,
+    .theme-swatch-item.sliding-hover {
+      background: var(--theme-tag-bg);
+      border-color: var(--theme-accent);
+      transform: scale(1.04);
+      box-shadow: 0 6px 16px -4px var(--search-glow);
+    }
+
+    .swatch-orb-preview {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6), 0 2px 5px rgba(15, 23, 42, 0.1);
+    }
+
+    .swatch-orb-preview.holo-animated {
+      background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%) !important;
+      background-size: 220% 220% !important;
+      animation: videoHoloBtn 3.2s ease infinite;
+    }
+
+    .swatch-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+[data-dark="true"] .theme-mode-btn {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+[data-dark="true"] .theme-popover-panel {
+      background: rgba(21, 31, 50, 0.96);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 22px 44px -8px rgba(0, 0, 0, 0.55);
+    }
+[data-dark="true"] .theme-swatch-item {
+      background: rgba(30, 41, 59, 0.78);
+    }
+[data-dark="true"] .theme-swatch-item.active,
+    [data-dark="true"] .theme-swatch-item.sliding-hover {
+      background: rgba(30, 41, 59, 0.78);
+    }
+
+/* ===== 桥接变量：报告原有变量名映射到全站主题变量（随 12 色/日夜联动） ===== */
 :root{
---bg:#f4f5f1; --surface:#ffffff; --surface2:#eef1ea; --ink:#1a231c; --muted:#5b6a5e; --line:#dde3da;
---green:#07a24f; --green-deep:#056e36; --green-soft:#e3f5ea; --amber:#9a6a00; --amber-soft:#fdf0d3; --red:#b42318; --red-soft:#fdecea;
+--bg:var(--page-bg); --surface:var(--card-bg); --surface2:var(--input-bg); --ink:var(--text-primary); --muted:var(--text-secondary); --line:var(--card-border);
+--green:var(--theme-accent); --green-deep:var(--theme-accent); --green-soft:var(--theme-tag-bg);
+--amber:#9a6a00; --amber-soft:#fdf0d3; --red:#b42318; --red-soft:#fdecea;
 --radius:14px;
 }
-@media (prefers-color-scheme: dark){
-:root{ --bg:#121613; --surface:#1b201c; --surface2:#232a24; --ink:#e8efe9; --muted:#a3b3a6; --line:#2e3830; --green:#2fbf71; --green-deep:#7fe0a8; --green-soft:#1d3326; --amber:#e8b84b; --amber-soft:#3a2f14; --red:#ff8a80; --red-soft:#3d1f1c;}
-}
+[data-dark="true"]{ --amber:#e8b84b; --amber-soft:#3a2f14; --red:#ff8a80; --red-soft:#3d1f1c; }
+
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{transition:none!important}}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans SC",system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.75;font-size:16px}
+body{margin:0;background:var(--bg);color:var(--ink);transition:background-color .55s cubic-bezier(.4,0,.2,1),color .4s ease;overflow-x:hidden;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;line-height:1.75;font-size:16px}
 a{color:var(--green-deep);text-decoration-color:color-mix(in srgb,var(--green-deep) 40%,transparent);text-underline-offset:3px}
 a:hover{text-decoration-color:var(--green-deep)}
 .wrap{max-width:980px;margin:0 auto;padding:0 20px 72px}
-h1,h2,h3{font-family:"Noto Serif SC",serif;line-height:1.3;margin:0}
+h1,h2,h3{font-family:inherit;line-height:1.3;margin:0}
 code,.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.86em;background:var(--surface2);padding:.1em.4em;border-radius:5px;word-break:break-all}
 small{color:var(--muted)}
 
@@ -47,7 +383,7 @@ small{color:var(--muted)}
 .combo-item h3{font-size:17px;margin-bottom:6px}
 .combo-item p{margin:0;color:var(--muted);font-size:14.5px}
 .combo-item.tag{display:inline-block;font-size:12px;font-weight:700;color:var(--green-deep);background:var(--green-soft);border-radius:999px;padding:2px 9px;margin-bottom:8px}
-.combo-plus{display:flex;align-items:center;justify-content:center;font-family:"Noto Serif SC",serif;font-size:26px;color:var(--muted);padding:0 4px}
+.combo-plus{display:flex;align-items:center;justify-content:center;font-family:inherit;font-size:26px;color:var(--muted);padding:0 4px}
 .combo-foot{padding:14px 20px;border-top:1px dashed var(--line);font-size:14.5px;color:var(--muted)}
 .combo-foot strong{color:var(--ink)}
 @media(max-width:640px){.combo{grid-template-columns:1fr}.combo-plus{padding:2px 0}}
@@ -104,7 +440,7 @@ td.route{font-size:16px;padding-bottom:6px}
 /* dead list */
 .dead{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
 .dead-item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
-.dead-item h4{margin:0 0 4px;font-size:15.5px;font-family:"Noto Sans SC",sans-serif}
+.dead-item h4{margin:0 0 4px;font-size:15.5px;font-family:inherit}
 .dead-item p{margin:0;font-size:14px;color:var(--muted)}
 
 /* arch */
@@ -138,9 +474,38 @@ details p{margin:8px 0 2px;color:var(--muted);font-size:14.5px}
 .sources ul{margin:0;padding-left:1.2em}
 .foot{margin-top:56px;border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:13.5px}
 .hidden-row{display:none!important}
+
+/* ===== 全站同款弥散光晕背景（固定层，置于内容之下） ===== */
+.aura-backdrop{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orb-left{top:-90px;left:-70px;bottom:auto}
+.orb-center{top:-80px;left:30%;bottom:auto}
+.orb-right{top:-100px;right:-70px;bottom:auto}
+.wrap{position:relative;z-index:1}
+/* ===== 主题工具条（右上角固定，与其他站同款按钮/面板） ===== */
+.wb-toolbar{position:fixed;top:14px;right:14px;z-index:120}
+.wb-toolbar .theme-popover-panel{position:fixed;top:60px;right:14px}
+@media(max-width:640px){.wb-toolbar{top:10px;right:10px}.wb-toolbar .theme-popover-panel{top:54px;right:10px}}
+
 </style>
 </head>
 <body>
+<div class="aura-backdrop" aria-hidden="true">
+<div class="aura-orb orb-left" id="orbLeft"></div>
+<div class="aura-orb orb-center" id="orbCenter"></div>
+<div class="aura-orb orb-right" id="orbRight"></div>
+</div>
+<div class="wb-toolbar">
+<button class="theme-mode-btn" id="themeModeBtn" type="button" aria-label="切换日夜 / 长按选择主题"></button>
+<div class="theme-panel-backdrop" id="themeBackdrop"></div>
+<div class="theme-popover-panel" id="themePopover">
+<div class="panel-header">
+<span class="panel-title">12色弥散主题</span>
+<span class="panel-hint">滑动或点击选择</span>
+</div>
+<div class="theme-swatch-grid" id="themeSwatchGrid"></div>
+</div>
+</div>
+
 <div class="wrap">
 
 <header class="hero">
@@ -512,6 +877,283 @@ render(t.getAttribute('data-view'));
 });
 render('wecom');
 })();
+</script>
+
+<script>
+let currentLang = 'zh';
+(function(){ var a = readSharedA(); if (a && a.l === '1') currentLang = 'en'; })();
+function readSharedA(){try{var m=document.cookie.match(/(?:^|;\s*)A=(\d{3,4})(?:;|$)/);if(!m)return null;var v=m[1],t=parseInt(v.slice(2),10);if(v.charAt(1)!=='0'&&v.charAt(1)!=='1')return null;if(!(t>=1&&t<=12))return null;return{l:v.charAt(0),m:v.charAt(1),t:t};}catch(e){return null;}}
+function writeSharedA(){try{var s='A='+(currentLang==='en'?'1':'0')+(isDarkMode?'0':'1')+(currentThemeIdx+1)+';path=/;max-age=31536000;SameSite=Lax';var h=location.hostname;if(h==='jpedu.asia'||h.slice(-11)==='.jpedu.asia')s+=';domain=jpedu.asia';if(location.protocol==='https:')s+=';Secure';document.cookie=s;}catch(e){}}
+function persistTheme(){ try{ localStorage.setItem('wechat-aura-theme', String(currentThemeIdx)); }catch(e){} writeSharedA(); }
+const allThemes = [
+      {
+        name: "01 · 冰川晴空",
+        nameEn: "01 · Glacier Sky",
+        orb1: "#BCE0FD",
+        orb2: "#93C5FD",
+        refreshBg: "#60A5FA",
+        sendCircleBg: "#9CCAF9",
+        accent: "#2563EB",
+        tagBg: "#EBF5FF",
+        tagText: "#1D4ED8",
+        pageBg: "#F4F8FC",
+        glow: "rgba(147, 197, 253, 0.38)"
+      },
+      {
+        name: "02 · 薄荷微风",
+        nameEn: "02 · Mint Breeze",
+        orb1: "#A7F3D0",
+        orb2: "#6EE7B7",
+        refreshBg: "#34D399",
+        sendCircleBg: "#86EFAC",
+        accent: "#059669",
+        tagBg: "#ECFDF5",
+        tagText: "#047857",
+        pageBg: "#F2FBF7",
+        glow: "rgba(110, 231, 183, 0.36)"
+      },
+      {
+        name: "03 · 极光青蓝",
+        nameEn: "03 · Aurora Cyan",
+        orb1: "#A5F3FC",
+        orb2: "#818CF8",
+        refreshBg: "#6366F1",
+        sendCircleBg: "#A5B4FC",
+        accent: "#4F46E5",
+        tagBg: "#EEF2FF",
+        tagText: "#4338CA",
+        pageBg: "#F4F6FC",
+        glow: "rgba(129, 140, 248, 0.34)"
+      },
+      {
+        name: "04 · 抹茶森屿",
+        nameEn: "04 · Matcha Isle",
+        orb1: "#D9F99D",
+        orb2: "#86EFAC",
+        refreshBg: "#4ADE80",
+        sendCircleBg: "#BEF264",
+        accent: "#16A34A",
+        tagBg: "#F0FDF4",
+        tagText: "#15803D",
+        pageBg: "#F6FAF5",
+        glow: "rgba(134, 239, 172, 0.36)"
+      },
+      {
+        name: "05 · 碧海晴空",
+        nameEn: "05 · Azure Lagoon",
+        orb1: "#99F6E4",
+        orb2: "#7DD3FC",
+        refreshBg: "#2DD4BF",
+        sendCircleBg: "#67E8F9",
+        accent: "#0D9488",
+        tagBg: "#F0FDFA",
+        tagText: "#0F766E",
+        pageBg: "#F2F9FA",
+        glow: "rgba(125, 211, 252, 0.36)"
+      },
+      {
+        name: "06 · 深海星雾",
+        nameEn: "06 · Mist Slate",
+        orb1: "#CBD5E1",
+        orb2: "#93C5FD",
+        refreshBg: "#64748B",
+        sendCircleBg: "#CBD5E1",
+        accent: "#334155",
+        tagBg: "#F1F5F9",
+        tagText: "#1E293B",
+        pageBg: "#F5F7FA",
+        glow: "rgba(148, 163, 184, 0.32)"
+      },
+      {
+        name: "07 · 星云幻紫",
+        nameEn: "07 · Nebula Violet",
+        orb1: "#E9D5FF",
+        orb2: "#C4B5FD",
+        refreshBg: "#8B5CF6",
+        sendCircleBg: "#A396F8",
+        accent: "#6D28D9",
+        tagBg: "#F3E8FF",
+        tagText: "#6D28D9",
+        pageBg: "#F8F5FD",
+        glow: "rgba(167, 139, 250, 0.38)"
+      },
+      {
+        name: "08 · 蜜桃乌龙",
+        nameEn: "08 · Peach Oolong",
+        orb1: "#FBCFE8",
+        orb2: "#FDA4AF",
+        refreshBg: "#F472B6",
+        sendCircleBg: "#F9A8D4",
+        accent: "#DB2777",
+        tagBg: "#FDF2F8",
+        tagText: "#BE185D",
+        pageBg: "#FDF6F9",
+        glow: "rgba(244, 114, 182, 0.34)"
+      },
+      {
+        name: "09 · 晨曦微光",
+        nameEn: "09 · Dawn Amber",
+        orb1: "#FDE68A",
+        orb2: "#FDBA74",
+        refreshBg: "#FB923C",
+        sendCircleBg: "#FCD34D",
+        accent: "#EA580C",
+        tagBg: "#FFF7ED",
+        tagText: "#C2410C",
+        pageBg: "#FCF9F4",
+        glow: "rgba(251, 146, 60, 0.34)"
+      },
+      {
+        name: "10 · 落日粉紫",
+        nameEn: "10 · Sunset Glow",
+        orb1: "#F5D0FE",
+        orb2: "#FECDD3",
+        refreshBg: "#C084FC",
+        sendCircleBg: "#F0ABFC",
+        accent: "#9333EA",
+        tagBg: "#FAF5FF",
+        tagText: "#7E22CE",
+        pageBg: "#FAF6FC",
+        glow: "rgba(192, 132, 252, 0.35)"
+      },
+      {
+        name: "11 · 香槟流金",
+        nameEn: "11 · Champagne Gold",
+        orb1: "#FEF08A",
+        orb2: "#FDE047",
+        refreshBg: "#EAB308",
+        sendCircleBg: "#FDE047",
+        accent: "#CA8A04",
+        tagBg: "#FEFCE8",
+        tagText: "#A16207",
+        pageBg: "#FAF9F2",
+        glow: "rgba(234, 179, 8, 0.32)"
+      },
+      {
+        name: "12 · 幻彩全息",
+        nameEn: "12 · Gemini Holo",
+        isHolo: true,
+        orb1: "#8FDBB8",
+        orb2: "#9CC8F7",
+        refreshBg: "#4FA8F6",
+        sendCircleBg: "#9EE0C5",
+        accent: "#1A73E8",
+        tagBg: "#E6F4EA",
+        tagText: "#137333",
+        pageBg: "#F3F8FA",
+        glow: "rgba(143, 219, 184, 0.44)"
+      }
+    ];
+let currentThemeIdx = 11;
+(function(){ var ti = document.documentElement.getAttribute('data-theme-idx'); if (ti !== null){ var n = parseInt(ti, 10); if (n >= 0 && n <= 11) currentThemeIdx = n; } })();
+let isDarkMode = document.documentElement.getAttribute('data-dark') === 'true';
+
+function applyTheme(idx){
+  currentThemeIdx = idx;
+  const th = allThemes[idx]; if (!th) return;
+  const root = document.documentElement;
+  root.style.setProperty('--orb-color-1', th.orb1);
+  root.style.setProperty('--orb-color-2', th.orb2);
+  root.style.setProperty('--refresh-btn-bg', th.refreshBg);
+  root.style.setProperty('--send-circle-bg', th.sendCircleBg);
+  root.style.setProperty('--theme-accent', th.accent);
+  root.style.setProperty('--theme-tag-bg', th.tagBg);
+  root.style.setProperty('--theme-tag-text', th.tagText);
+  root.style.setProperty('--search-glow', th.glow);
+  if (th.isHolo) root.setAttribute('data-holo', 'true'); else root.removeAttribute('data-holo');
+  if (!isDarkMode){
+    root.style.setProperty('--page-bg', th.pageBg);
+    const mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute('content', th.pageBg);
+  }
+  const ol = document.getElementById('orbLeft'), or2 = document.getElementById('orbRight');
+  if (ol && or2){
+    if (!th.isHolo){ const sh = idx % 2 === 0 ? 1 : -1;
+      ol.style.transform = 'translate(' + (sh*14) + 'px,' + (-sh*8) + 'px) scale(' + (1+sh*0.05) + ')';
+      or2.style.transform = 'translate(' + (-sh*14) + 'px,' + (sh*8) + 'px) scale(' + (1-sh*0.05) + ')';
+    } else { ol.style.transform = ''; or2.style.transform = ''; }
+  }
+  updateSwatchActiveState();
+}
+function renderThemeSwatches(){
+  const zh = currentLang === 'zh';
+  document.getElementById('themeSwatchGrid').innerHTML = allThemes.map((t, idx) =>
+    '<div class="theme-swatch-item' + (idx === currentThemeIdx ? ' active' : '') + '" data-theme-idx="' + idx + '">' +
+      '<span class="swatch-orb-preview' + (t.isHolo ? ' holo-animated' : '') + '" style="background:linear-gradient(135deg,' + t.orb1 + ' 0%,' + t.orb2 + ' 65%,' + t.refreshBg + ' 100%)"></span>' +
+      '<span class="swatch-label">' + (zh ? t.name : t.nameEn) + '</span>' +
+    '</div>').join('');
+}
+function updateSwatchActiveState(){
+  document.querySelectorAll('.theme-swatch-item').forEach(el => {
+    el.classList.toggle('active', Number(el.getAttribute('data-theme-idx')) === currentThemeIdx);
+  });
+}
+function openThemePanel(){
+  document.getElementById('themePopover').classList.add('open');
+  document.getElementById('themeBackdrop').classList.add('open');
+  if (navigator.vibrate) navigator.vibrate(18);
+}
+function closeThemePanel(){
+  document.getElementById('themePopover').classList.remove('open');
+  document.getElementById('themeBackdrop').classList.remove('open');
+  document.querySelectorAll('.theme-swatch-item').forEach(el => el.classList.remove('sliding-hover'));
+}
+document.getElementById('themeBackdrop').addEventListener('click', closeThemePanel);
+document.getElementById('themeSwatchGrid').addEventListener('click', e => {
+  const item = e.target.closest('.theme-swatch-item'); if (!item) return;
+  applyTheme(Number(item.getAttribute('data-theme-idx'))); persistTheme(); closeThemePanel();
+});
+
+/* theme button: tap = day/night, long-press = open panel + slide to pick */
+const themeBtn = document.getElementById('themeModeBtn');
+function renderThemeBtnIcon(){
+  themeBtn.innerHTML =
+    '<svg class="sun-moon-svg icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4.5"></line><line x1="12" y1="19.5" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line><line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="4.5" y2="12"></line><line x1="19.5" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line><line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line></svg>' +
+    '<svg class="sun-moon-svg icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+}
+function toggleDarkMode(){
+  isDarkMode = !isDarkMode;
+  const root = document.documentElement;
+  themeBtn.classList.add('rotating'); setTimeout(() => themeBtn.classList.remove('rotating'), 450);
+  const mt = document.querySelector('meta[name="theme-color"]');
+  if (isDarkMode){ root.setAttribute('data-dark', 'true'); root.style.setProperty('--page-bg', '#090D16'); if (mt) mt.setAttribute('content', '#0B1120'); }
+  else { root.removeAttribute('data-dark'); const th = allThemes[currentThemeIdx]; root.style.setProperty('--page-bg', th.pageBg); if (mt) mt.setAttribute('content', th.pageBg); }
+  writeSharedA();
+}
+(function initThemeButtonGestures(){
+  let pressTimer = null, isLong = false, isDown = false, lastHover = null;
+  themeBtn.addEventListener('pointerdown', e => {
+    if (e.button && e.button !== 0) return;
+    isDown = true; isLong = false; lastHover = null;
+    themeBtn.classList.add('pressing');
+    try { themeBtn.setPointerCapture(e.pointerId); } catch(_){}
+    pressTimer = setTimeout(() => { if (!isDown) return; isLong = true; openThemePanel(); }, 340);
+  });
+  themeBtn.addEventListener('pointermove', e => {
+    if (!isDown || !isLong) return;
+    const target = document.elementFromPoint(e.clientX, e.clientY);
+    const item = target ? target.closest('.theme-swatch-item') : null;
+    document.querySelectorAll('.theme-swatch-item').forEach(el => el.classList.toggle('sliding-hover', el === item));
+    if (item){ const idx = Number(item.getAttribute('data-theme-idx'));
+      if (idx !== lastHover){ lastHover = idx; applyTheme(idx); if (navigator.vibrate) navigator.vibrate(8); } }
+  });
+  const finish = () => {
+    if (!isDown) return;
+    isDown = false; clearTimeout(pressTimer); themeBtn.classList.remove('pressing');
+    if (!isLong){
+      if (document.getElementById('themePopover').classList.contains('open')) closeThemePanel();
+      else toggleDarkMode();
+    } else if (lastHover !== null){ persistTheme(); closeThemePanel(); }
+  };
+  themeBtn.addEventListener('pointerup', finish);
+  themeBtn.addEventListener('pointercancel', finish);
+  themeBtn.addEventListener('contextmenu', e => e.preventDefault());
+})();
+
+
+renderThemeBtnIcon();
+renderThemeSwatches();
+applyTheme(currentThemeIdx);
+
 </script>
 </body>
 </html>
