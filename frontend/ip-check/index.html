@@ -3569,18 +3569,222 @@ function reportPrefetch(d){
   startReportProbes(false);
 }
 function closeReportSilent(){rptShot.active=false;spaState.rpt=false;spaSaveY();rptVisual(false)}
-let h2cPromise=null;
-function loadHtml2Canvas(){
-  if(window.html2canvas)return Promise.resolve();
-  if(h2cPromise)return h2cPromise;
-  h2cPromise=new Promise((res,rej)=>{
-    const sc=document.createElement("script");
-    sc.src="html2canvas.min.js";
-    sc.onload=()=>res();
-    sc.onerror=()=>{h2cPromise=null;rej(new Error("h2c load failed"))};
-    document.head.appendChild(sc);
+/* 原生迷你渲染：浏览器负责排版（克隆体已在文档中完成布局），这里只把每个盒子的
+   背景/渐变/边框/阴影/文字/图片/SVG 按最终几何位置画到 canvas 上，替代 html2canvas */
+function rrPath(ctx,x,y,w,h,radii){
+  const r=radii;
+  ctx.beginPath();
+  ctx.moveTo(x+r[0],y);
+  ctx.lineTo(x+w-r[1],y);ctx.arcTo(x+w,y,x+w,y+r[1],r[1]);
+  ctx.lineTo(x+w,y+h-r[2]);ctx.arcTo(x+w,y+h,x+w-r[2],y+h,r[2]);
+  ctx.lineTo(x+r[3],y+h);ctx.arcTo(x,y+h,x,y+h-r[3],r[3]);
+  ctx.lineTo(x,y+r[0]);ctx.arcTo(x,y,x+r[0],y,r[0]);
+  ctx.closePath();
+}
+function parseRadii(cs,w,h){
+  const parts=(cs.borderRadius||"0px").split(" ").map(v=>{
+    if(v.endsWith("%"))return parseFloat(v)/100*Math.min(w,h);
+    return parseFloat(v)||0;
   });
-  return h2cPromise;
+  let r;
+  if(parts.length===1)r=[parts[0],parts[0],parts[0],parts[0]];
+  else if(parts.length===2)r=[parts[0],parts[1],parts[0],parts[1]];
+  else if(parts.length===3)r=[parts[0],parts[1],parts[2],parts[1]];
+  else r=parts.slice(0,4);
+  // CSS 角重叠规则：相邻圆角之和超过边长时等比缩小，否则 arcTo 会画出溢出盒子的怪路径
+  let f=1;
+  const sums=[[r[0]+r[1],w],[r[1]+r[2],h],[r[2]+r[3],w],[r[3]+r[0],h]];
+  for(const [s,len] of sums){if(s>0&&len>0)f=Math.min(f,len/s)}
+  if(f<1)r=r.map(v=>v*f);
+  return r;
+}
+function loadPaintImg(src,cors){
+  return new Promise(res=>{
+    const im=new Image();
+    if(cors)im.crossOrigin="anonymous";
+    im.onload=()=>res(im);
+    im.onerror=()=>res(null);
+    im.src=src;
+  });
+}
+async function svgPaintImage(sv){
+  try{
+    const cl=sv.cloneNode(true);
+    const r=sv.getBoundingClientRect();
+    // 百分比宽高的 SVG 作图片时没有固有尺寸，显式给像素尺寸让 viewBox 正确映射
+    cl.setAttribute("width",Math.max(1,Math.round(r.width*3)));
+    cl.setAttribute("height",Math.max(1,Math.round(r.height*3)));
+    const xml=new XMLSerializer().serializeToString(cl);
+    const url=URL.createObjectURL(new Blob([xml],{type:"image/svg+xml;charset=utf-8"}));
+    const im=await loadPaintImg(url,false);
+    URL.revokeObjectURL(url);
+    return im;
+  }catch(e){return null}
+}
+async function paintBoardNative(board,scale){
+  const W=board.offsetWidth,H=board.offsetHeight;
+  const cv=document.createElement("canvas");
+  cv.width=Math.round(W*scale);cv.height=Math.round(H*scale);
+  const ctx=cv.getContext("2d");
+  ctx.scale(scale,scale);
+  ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()||"#EEF6FA";
+  ctx.fillRect(0,0,W,H);
+  const jobs=[];
+  board.querySelectorAll("img").forEach(im=>{
+    const src=im.currentSrc||im.src;
+    if(src)jobs.push(loadPaintImg(src,true).then(p=>{im.__pimg=p}));
+  });
+  board.querySelectorAll("svg").forEach(sv=>{
+    jobs.push(svgPaintImage(sv).then(p=>{sv.__pimg=p}));
+  });
+  await Promise.all(jobs);
+  const bRect=board.getBoundingClientRect();
+  const rel=r=>({x:r.left-bRect.left,y:r.top-bRect.top,w:r.width,h:r.height});
+  function shadowPass(cs,x,y,w,h,radii){
+    const sh=cs.boxShadow;
+    if(!sh||sh==="none")return;
+    const list=[];let depth=0,cur="";
+    for(const ch of sh){if(ch==="(")depth++;if(ch===")")depth--;if(ch===","&&depth===0){list.push(cur);cur=""}else cur+=ch}
+    if(cur)list.push(cur);
+    for(let i=list.length-1;i>=0;i--){
+      const m=list[i].trim().match(/^(rgba?\([^)]*\)|#[0-9a-fA-F]+)\s+(-?[\d.]+)px\s+(-?[\d.]+)px\s+([\d.]+)px/);
+      if(!m)continue;
+      ctx.save();
+      ctx.shadowColor=m[1];
+      ctx.shadowOffsetX=parseFloat(m[2]);ctx.shadowOffsetY=parseFloat(m[3]);
+      ctx.shadowBlur=parseFloat(m[4]);
+      ctx.fillStyle=m[1];
+      rrPath(ctx,x,y,w,h,radii);ctx.fill();
+      ctx.restore();
+    }
+  }
+  function paintBox(el,cs,rect){
+    const {x,y,w,h}=rect;if(w<=0||h<=0)return;
+    const radii=parseRadii(cs,w,h);
+    shadowPass(cs,x,y,w,h,radii);
+    const bgc=cs.backgroundColor;
+    if(bgc&&bgc!=="rgba(0, 0, 0, 0)"&&bgc!=="transparent"){
+      ctx.fillStyle=bgc;rrPath(ctx,x,y,w,h,radii);ctx.fill();
+    }
+    const bgi=cs.backgroundImage;
+    if(bgi&&bgi.indexOf("linear-gradient")===0){
+      const inner=bgi.slice(bgi.indexOf("(")+1,bgi.lastIndexOf(")"));
+      const parts=[];let depth=0,cur="";
+      for(const ch of inner){if(ch==="(")depth++;if(ch===")")depth--;if(ch===","&&depth===0){parts.push(cur.trim());cur=""}else cur+=ch}
+      if(cur)parts.push(cur.trim());
+      let angle=180;let startIdx=0;
+      if(/deg$/.test(parts[0])){angle=parseFloat(parts[0]);startIdx=1}
+      else if(parts[0].indexOf("to ")===0){angle={["to right"]:90,["to bottom"]:180,["to left"]:270,["to top"]:0}[parts[0]]||180;startIdx=1}
+      let x0,y0,x1,y1;
+      if(angle===90){x0=x;y0=y;x1=x+w;y1=y}
+      else if(angle===270){x0=x+w;y0=y;x1=x;y1=y}
+      else if(angle===0){x0=x;y0=y+h;x1=x;y1=y}
+      else{x0=x;y0=y;x1=x;y1=y+h}
+      const g=ctx.createLinearGradient(x0,y0,x1,y1);
+      const stops=parts.slice(startIdx);
+      stops.forEach((st,i)=>{
+        const mm=st.match(/^(rgba?\([^)]*\)|#[0-9a-fA-F]+)\s*([\d.]+%)?$/);
+        if(!mm)return;
+        const pos=mm[2]?parseFloat(mm[2])/100:(stops.length===1?0:i/(stops.length-1));
+        try{g.addColorStop(Math.min(1,Math.max(0,pos)),mm[1])}catch(e){}
+      });
+      ctx.fillStyle=g;rrPath(ctx,x,y,w,h,radii);ctx.fill();
+    }
+    const bw=[parseFloat(cs.borderTopWidth)||0,parseFloat(cs.borderRightWidth)||0,parseFloat(cs.borderBottomWidth)||0,parseFloat(cs.borderLeftWidth)||0];
+    const bc=[cs.borderTopColor,cs.borderRightColor,cs.borderBottomColor,cs.borderLeftColor];
+    const solid=cs.borderTopStyle==="solid"||cs.borderTopStyle==="none";
+    if(solid&&bw[0]>0&&bw[0]===bw[1]&&bw[1]===bw[2]&&bw[2]===bw[3]&&bc[0]===bc[1]&&bc[1]===bc[2]&&bc[2]===bc[3]){
+      ctx.strokeStyle=bc[0];ctx.lineWidth=bw[0];
+      rrPath(ctx,x+bw[0]/2,y+bw[0]/2,w-bw[0],h-bw[0],radii.map(r=>Math.max(0,r-bw[0]/2)));
+      ctx.stroke();
+    }else{
+      ctx.fillStyle=bc[2];
+      if(bw[0]>0&&cs.borderTopStyle==="solid")ctx.fillRect(x,y,w,bw[0]);
+      if(bw[2]>0&&cs.borderBottomStyle==="solid")ctx.fillRect(x,y+h-bw[2],w,bw[2]);
+      if(bw[3]>0&&cs.borderLeftStyle==="solid")ctx.fillRect(x,y,bw[3],h);
+      if(bw[1]>0&&cs.borderRightStyle==="solid")ctx.fillRect(x+w-bw[1],y,bw[1],h);
+    }
+  }
+  function paintTextNode(node,parentEl){
+    const text=node.nodeValue;
+    if(!text||!text.trim())return;
+    const cs=getComputedStyle(parentEl);
+    ctx.fillStyle=cs.color;
+    ctx.font=cs.fontWeight+" "+cs.fontSize+" "+cs.fontFamily;
+    try{ctx.letterSpacing=cs.letterSpacing==="normal"?"0px":cs.letterSpacing}catch(e){}
+    ctx.textBaseline="alphabetic";
+    const range=document.createRange();
+    let pos=0;
+    while(pos<text.length){
+      let end=pos+1;
+      range.setStart(node,pos);range.setEnd(node,end);
+      let rects=range.getClientRects();
+      if(!rects.length){pos++;continue}
+      const top0=rects[rects.length-1].top;
+      while(end<text.length){
+        range.setEnd(node,end+1);
+        const rs=range.getClientRects();
+        if(!rs.length||rs[rs.length-1].top!==top0)break;
+        end++;
+      }
+      range.setStart(node,pos);range.setEnd(node,end);
+      const lr=range.getClientRects();
+      if(lr.length){
+        const r0=rel(lr[0]);
+        const frag=text.slice(pos,end);
+        const m=ctx.measureText(frag);
+        const asc=m.fontBoundingBoxAscent||parseFloat(cs.fontSize)*0.8;
+        ctx.fillText(frag,r0.x,r0.y+asc);
+      }
+      pos=end;
+    }
+    try{ctx.letterSpacing="0px"}catch(e){}
+  }
+  function paintLeafEllipsis(el,cs,rect){
+    const text=el.textContent||"";
+    ctx.fillStyle=cs.color;
+    ctx.font=cs.fontWeight+" "+cs.fontSize+" "+cs.fontFamily;
+    try{ctx.letterSpacing=cs.letterSpacing==="normal"?"0px":cs.letterSpacing}catch(e){}
+    let t=text;
+    const maxW=rect.w;
+    if(ctx.measureText(t).width>maxW){
+      while(t.length&&ctx.measureText(t+"…").width>maxW)t=t.slice(0,-1);
+      t=t+"…";
+    }
+    const m=ctx.measureText(t);
+    const asc=m.fontBoundingBoxAscent||parseFloat(cs.fontSize)*0.8;
+    ctx.textBaseline="alphabetic";
+    ctx.fillText(t,rect.x,rect.y+asc);
+    try{ctx.letterSpacing="0px"}catch(e){}
+  }
+  function walk(el){
+    const cs=getComputedStyle(el);
+    if(cs.display==="none"||cs.visibility==="hidden")return;
+    const rect=rel(el.getBoundingClientRect());
+    const tag=el.tagName.toLowerCase();
+    if(tag==="img"){
+      if(el.__pimg){ctx.save();rrPath(ctx,rect.x,rect.y,rect.w,rect.h,parseRadii(cs,rect.w,rect.h));ctx.clip();ctx.drawImage(el.__pimg,rect.x,rect.y,rect.w,rect.h);ctx.restore()}
+      return;
+    }
+    if(tag==="svg"){
+      if(el.__pimg)ctx.drawImage(el.__pimg,rect.x,rect.y,rect.w,rect.h);
+      return;
+    }
+    paintBox(el,cs,rect);
+    const clipIt=cs.overflow==="hidden"||cs.overflowX==="hidden"||cs.overflowY==="hidden";
+    if(clipIt){ctx.save();rrPath(ctx,rect.x,rect.y,rect.w,rect.h,parseRadii(cs,rect.w,rect.h));ctx.clip()}
+    if(cs.textOverflow==="ellipsis"&&cs.whiteSpace==="nowrap"&&el.children.length===0&&el.scrollWidth>el.clientWidth+1){
+      paintLeafEllipsis(el,cs,rect);
+    }else{
+      for(const node of el.childNodes){
+        if(node.nodeType===3)paintTextNode(node,el);
+        else if(node.nodeType===1)walk(node);
+      }
+    }
+    if(clipIt)ctx.restore();
+  }
+  walk(board);
+  return cv;
 }
 const rptShot={active:false,busy:false,queued:false};
 let rptShotTimer=null;
@@ -3590,7 +3794,6 @@ async function renderReportImage(quiet){
   rptShot.busy=true;
   let data=null;
   try{
-    await loadHtml2Canvas();
     const liveWrap=$("reportScaleWrap");
     const clWrap=liveWrap.cloneNode(true);
     clWrap.querySelectorAll(".rpt-shot-img,.rpt-nocap").forEach(n=>n.remove());
@@ -3599,7 +3802,7 @@ async function renderReportImage(quiet){
     clWrap.style.cssText="position:fixed;left:-99999px;top:0;width:"+liveWrap.clientWidth+"px;height:auto;overflow:visible";
     document.body.appendChild(clWrap);
     try{
-      const cv=await html2canvas(clBoard,{scale:2,backgroundColor:getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()||"#EEF6FA",logging:false});
+      const cv=await paintBoardNative(clBoard,2);
       data=cv.toDataURL("image/png");
     }finally{clWrap.remove()}
     let img=root.querySelector(".rpt-shot-img");
