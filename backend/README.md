@@ -43,3 +43,9 @@
 - 本仓库公开，文档与注释里的真实域名一律打码写作 `xxxxx.asia`（如 `api.xxxxx.asia`）；功能代码里必须出现的真实地址不打码（打码即断站）。
 - 加新项目子域名：只改 site-router 代码里 `ROUTES` 表加一行并重新 Deploy，不用再动 DNS 和路由。
 - 主域名固定为总体预览页（根导航页 `index.html`），不给单个项目占用；换域名时主域名的 DNS 与路由按迁移清单第 2、3 步单独配。
+
+## 微信桥（wechat-bridge/）
+
+- `wechat-bridge/` 是 ken 的微信与 Muse 之间的桥：微信 ClawBot（iLink）↔ Muse 虚拟机上的网关 ↔ Muse 本人，2026-11-07 接通。
+- 目录内 gateway.py 与 wechat-gateway.service 为运行版的留档副本（真源在虚拟机 ~/workspace/wechat-bridge/，以运行版为准、改完同步回此）；凭据、收件箱、媒体文件只在虚拟机上，不进仓库。
+- 搭建细节见 wechat-bridge/ARCHITECTURE.md，选型调研见 wechat-bridge/可行方案.md。
