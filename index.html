@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="ken 的小站入口：便宜、有用的技能与资源导航">
   <title>KEN · USE · 便宜、有用的，都在这</title>
-  <style>/* ================= 1. 核心动态 CSS 变量体系（12 色弥散光晕 + 深色模式） ================= */
-    :root{
+  <style>
+    /* ================= 1. 核心动态 CSS 变量体系（12 色弥散光晕 + 深色模式） ================= */
+    :root {
       --hero-bg-base: #F4F8FC;
       --orb-color-1: #BCE0FD;
       --orb-color-2: #93C5FD;
@@ -31,7 +32,8 @@
       --pill-surface: #FFFFFF;
       --pill-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
     }
-[data-dark="true"]{
+
+    [data-dark="true"] {
       --hero-bg-base: #0B1120;
       --outer-desk-bg: #03060C;
       --page-bg: #0B111E;
@@ -46,22 +48,25 @@
       --pill-shadow: 0 8px 24px rgba(0, 0, 0, 0.42);
       --theme-tab-text: #F8FAFC;
     }
-html, body, #masterPhoneChassis, #masterPhoneChassis *{
+
+    * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
-/* 页面与手机界面严格锁定一屏，禁止滚动 */
-    html, body{
+
+    /* 页面与手机界面严格锁定一屏，禁止滚动 */
+    html, body {
       width: 100%;
       height: 100vh;
       height: 100dvh;
       overflow: hidden;
       overscroll-behavior: none;
     }
-body{
+
+    body {
       background-color: var(--outer-desk-bg);
       color: var(--text-primary);
       -webkit-font-smoothing: antialiased;
@@ -71,7 +76,9 @@ body{
       padding: clamp(6px, 1.4dvh, 14px) 16px;
       transition: background-color 0.35s ease, color 0.3s ease;
     }
-#masterPhoneChassis{
+
+    /* ================= 2. 唯一一台 iPhone 18 主机外壳（严格一屏自适应高度，内部绝不滚动） ================= */
+    .iphone18-master-chassis {
       position: relative;
       width: min(100%, 404px);
       height: 100%;
@@ -88,23 +95,30 @@ body{
                   max-width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
                   border-radius 0.35s ease;
     }
-#masterPhoneChassis.wide-grid-chassis{
+
+    .iphone18-master-chassis.wide-grid-chassis {
       width: 100%;
       max-width: 1200px;
     }
-#masterPhoneChassis.wide-grid-chassis .iphone18-master-screen{
+
+    /* 全览模式不锁头部（ken 定）：整屏一个滚动，头部跟列表一起滚走；
+       层叠模式不在此列，保持整屏锁定、头部钉住 */
+    .iphone18-master-chassis.wide-grid-chassis .iphone18-master-screen {
       overflow-y: auto;
       justify-content: flex-start;
       scrollbar-width: none;
     }
-#masterPhoneChassis.wide-grid-chassis .iphone18-master-screen::-webkit-scrollbar{
+
+    .iphone18-master-chassis.wide-grid-chassis .iphone18-master-screen::-webkit-scrollbar {
       display: none;
     }
-#masterPhoneChassis.wide-grid-chassis .flat-cards-grid.active-mode{
+
+    .iphone18-master-chassis.wide-grid-chassis .flat-cards-grid.active-mode {
       flex: none;
       overflow-y: visible;
     }
-#masterPhoneChassis::before{
+
+    .iphone18-master-chassis::before {
       content: "";
       position: absolute;
       left: -2px;
@@ -116,7 +130,8 @@ body{
       box-shadow: 0 44px 0 #1E293B, 0 84px 0 #1E293B;
       pointer-events: none;
     }
-#masterPhoneChassis::after{
+
+    .iphone18-master-chassis::after {
       content: "";
       position: absolute;
       right: -2px;
@@ -127,7 +142,8 @@ body{
       border-radius: 0 3px 3px 0;
       pointer-events: none;
     }
-#masterPhoneChassis .iphone18-master-screen{
+
+    .iphone18-master-screen {
       position: relative;
       background-color: var(--page-bg);
       border-radius: 45px;
@@ -141,7 +157,9 @@ body{
       overflow: hidden;
       transition: background-color 0.35s ease;
     }
-#masterPhoneChassis .aura-backdrop{
+
+    /* ================= 3. 手机屏幕顶部弥散极光背景层 ================= */
+    .aura-backdrop {
       position: absolute;
       top: 0;
       left: 0;
@@ -152,29 +170,34 @@ body{
       overflow: hidden;
       contain: strict;
     }
-#masterPhoneChassis .aura-orb{
+
+    .aura-orb {
       position: absolute;
       border-radius: 50%;
       opacity: 0.78;
       pointer-events: none;
       transition: background 0.45s ease, transform 0.45s ease;
     }
-[data-dark="true"] #masterPhoneChassis .aura-orb{ opacity: 0.25; }
-#masterPhoneChassis .aura-orb.orb-left{
+
+    [data-dark="true"] .aura-orb { opacity: 0.25; }
+
+    .aura-orb.orb-left {
       width: 300px;
       height: 240px;
       top: -60px;
       left: -70px;
       background: radial-gradient(circle, var(--orb-color-1) 0%, transparent 72%);
     }
-#masterPhoneChassis .aura-orb.orb-right{
+
+    .aura-orb.orb-right {
       width: 320px;
       height: 260px;
       top: -50px;
       right: -70px;
       background: radial-gradient(circle, var(--orb-color-2) 0%, transparent 72%);
     }
-#masterPhoneChassis .aura-orb.orb-center{
+
+    .aura-orb.orb-center {
       width: 280px;
       height: 200px;
       top: 0;
@@ -183,15 +206,20 @@ body{
       background: radial-gradient(circle, #9EE0C5 0%, transparent 72%);
       opacity: 0;
     }
-[data-holo="true"] #masterPhoneChassis .aura-orb.orb-center{ opacity: 0.65; }
-[data-dark="true"][data-holo="true"] #masterPhoneChassis .aura-orb.orb-center{ opacity: 0.25; }
-[data-holo="true"] #masterPhoneChassis .card-btn-primary{
+
+    [data-holo="true"] .aura-orb.orb-center { opacity: 0.65; }
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-center { opacity: 0.25; }
+
+    [data-holo="true"] .card-btn-primary {
       background: linear-gradient(120deg, #56C596 0%, #4FA8F6 100%);
     }
-[data-holo="true"] #masterPhoneChassis .action-circle-btn{
+
+    [data-holo="true"] .action-circle-btn {
       background: linear-gradient(135deg, #B2E2B4 0%, #98DBC5 50%, #9CC8F7 100%);
     }
-#masterPhoneChassis .iphone18-top-statusbar{
+
+    /* ================= 4. iPhone 18 顶部状态栏与灵动岛 ================= */
+    .iphone18-top-statusbar {
       position: relative;
       z-index: 20;
       display: flex;
@@ -200,14 +228,16 @@ body{
       padding: clamp(7px, 1.3dvh, 11px) 22px clamp(3px, 0.7dvh, 6px);
       flex-shrink: 0;
     }
-#masterPhoneChassis .ios18-clock{
+
+    .ios18-clock {
       font-size: 13px;
       font-weight: 800;
       color: var(--text-primary);
       letter-spacing: -0.2px;
       width: 58px;
     }
-#masterPhoneChassis .iphone18-dynamic-island{
+
+    .iphone18-dynamic-island {
       width: 92px;
       height: 22px;
       border-radius: 999px;
@@ -219,21 +249,25 @@ body{
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22), inset 0 0 0 0.8px rgba(255, 255, 255, 0.15);
       transition: width 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-#masterPhoneChassis .iphone18-dynamic-island:hover{ width: 110px; }
-#masterPhoneChassis .island-live-dot{
+
+    .iphone18-dynamic-island:hover { width: 110px; }
+
+    .island-live-dot {
       width: 6.5px;
       height: 6.5px;
       border-radius: 50%;
       background-color: #10B981;
       box-shadow: 0 0 5px #10B981;
     }
-#masterPhoneChassis .island-camera-eye{
+
+    .island-camera-eye {
       width: 7.5px;
       height: 7.5px;
       border-radius: 50%;
       background: radial-gradient(circle at 35% 35%, #38BDF8 0%, #1E1B4B 65%, #05070B 100%);
     }
-#masterPhoneChassis .ios18-status-right{
+
+    .ios18-status-right {
       display: flex;
       align-items: center;
       justify-content: flex-end;
@@ -243,7 +277,9 @@ body{
       font-size: 10.5px;
       font-weight: 800;
     }
-#masterPhoneChassis .hero-header{
+
+    /* ================= 5. 卡片之外的顶部布局（层叠/全览开关严格视觉居中，与灵动岛/主标题同轴对齐） ================= */
+    .hero-header {
       position: relative;
       z-index: 15;
       padding: clamp(2px, 0.6dvh, 6px) 14px clamp(4px, 0.8dvh, 8px);
@@ -252,7 +288,9 @@ body{
       width: 100%;
       flex-shrink: 0;
     }
-#masterPhoneChassis .top-nav-bar{
+
+    /* 第一层：左品牌标识 + 正中视觉居中的「层叠/全览」开关 + 右侧语言/日夜控件 */
+    .top-nav-bar {
       position: relative;
       display: flex;
       justify-content: space-between;
@@ -260,7 +298,8 @@ body{
       min-height: 36px;
       margin-bottom: 12px;
     }
-#masterPhoneChassis .brand-tag{
+
+    .brand-tag {
       display: inline-flex;
       align-items: center;
       font-size: 12px;
@@ -271,7 +310,8 @@ body{
       flex-shrink: 0;
       z-index: 2;
     }
-#masterPhoneChassis .brand-bar{
+
+    .brand-bar {
       width: 3.5px;
       height: 13px;
       background-color: var(--theme-accent);
@@ -279,12 +319,14 @@ body{
       margin-right: 5px;
       transition: background-color 0.4s ease;
     }
-#masterPhoneChassis .view-mode-row{
+
+    .view-mode-row {
       display: flex;
       justify-content: center;
       margin-bottom: 12px;
     }
-#masterPhoneChassis .view-mode-switch{
+
+    .view-mode-switch {
       position: relative;
       display: inline-grid;
       grid-template-columns: 1fr 1fr;
@@ -296,7 +338,8 @@ body{
       border: 1px solid rgba(255, 255, 255, 0.65);
       align-items: center;
     }
-#masterPhoneChassis .tab-glider{
+
+    .tab-glider {
       position: absolute;
       top: 4px;
       left: 4px;
@@ -307,13 +350,17 @@ body{
       box-shadow: 0 3px 12px rgba(15, 23, 42, 0.08);
       transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-[data-dark="true"] #masterPhoneChassis .view-mode-switch{
+
+    [data-dark="true"] .view-mode-switch {
       background: rgba(15, 23, 42, 0.45);
     }
-[data-dark="true"] #masterPhoneChassis .lang-pill-btn, [data-dark="true"] #masterPhoneChassis .theme-mode-btn{
+
+    [data-dark="true"] .lang-pill-btn,
+    [data-dark="true"] .theme-mode-btn {
       border-color: rgba(255, 255, 255, 0.1);
     }
-#masterPhoneChassis .view-mode-btn{
+
+    .view-mode-btn {
       position: relative;
       z-index: 1;
       border: none;
@@ -327,11 +374,13 @@ body{
       white-space: nowrap;
       transition: color 0.22s ease;
     }
-#masterPhoneChassis .view-mode-btn.active{
+
+    .view-mode-btn.active {
       color: var(--theme-tab-text);
       font-weight: 700;
     }
-#masterPhoneChassis .top-right-widgets{
+
+    .top-right-widgets {
       display: flex;
       align-items: center;
       gap: 5px;
@@ -339,7 +388,8 @@ body{
       flex-shrink: 0;
       z-index: 4;
     }
-#masterPhoneChassis .lang-pill-btn{
+
+    .lang-pill-btn {
       height: 36px;
       padding: 0 14px;
       border-radius: 999px;
@@ -353,8 +403,10 @@ body{
       user-select: none;
       transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-#masterPhoneChassis .lang-pill-btn:active{ transform: scale(0.93); }
-#masterPhoneChassis .globe-svg{
+
+    .lang-pill-btn:active { transform: scale(0.93); }
+
+    .globe-svg {
       width: 17px;
       height: 17px;
       stroke: var(--theme-accent);
@@ -363,12 +415,14 @@ body{
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-#masterPhoneChassis .lang-text{
+
+    .lang-text {
       font-size: 13px;
       font-weight: 700;
       color: var(--text-primary);
     }
-#masterPhoneChassis .theme-mode-btn{
+
+    .theme-mode-btn {
       width: 36px;
       height: 36px;
       border-radius: 50%;
@@ -386,11 +440,13 @@ body{
       z-index: 102;
       transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-#masterPhoneChassis .theme-mode-btn.pressing{
+
+    .theme-mode-btn.pressing {
       transform: scale(0.9);
       box-shadow: 0 0 0 4px var(--search-glow);
     }
-#masterPhoneChassis .sun-moon-svg{
+
+    .sun-moon-svg {
       width: 17px;
       height: 17px;
       stroke: currentColor;
@@ -401,10 +457,13 @@ body{
       pointer-events: none;
       transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-#masterPhoneChassis .theme-mode-btn.rotating .sun-moon-svg{
+
+    .theme-mode-btn.rotating .sun-moon-svg {
       transform: rotate(180deg) scale(0.85);
     }
-#masterPhoneChassis .theme-panel-backdrop{
+
+    /* 长按弹出的 12 色主题面板 */
+    .theme-panel-backdrop {
       position: fixed;
       inset: 0;
       z-index: 98;
@@ -413,11 +472,13 @@ body{
       pointer-events: none;
       transition: opacity 0.25s ease;
     }
-#masterPhoneChassis .theme-panel-backdrop.open{
+
+    .theme-panel-backdrop.open {
       opacity: 1;
       pointer-events: auto;
     }
-#masterPhoneChassis .theme-popover-panel{
+
+    .theme-popover-panel {
       position: absolute;
       top: 48px;
       right: 0;
@@ -439,35 +500,41 @@ body{
       touch-action: none;
       transition: opacity 0.24s ease, transform 0.28s cubic-bezier(.16, 1, .3, 1);
     }
-#masterPhoneChassis .theme-popover-panel.open{
+
+    .theme-popover-panel.open {
       opacity: 1;
       transform: translateY(0) scale(1);
       pointer-events: auto;
     }
-#masterPhoneChassis .panel-header{
+
+    .panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
       padding: 0 4px;
     }
-#masterPhoneChassis .panel-title{
+
+    .panel-title {
       font-size: 12px;
       font-weight: 800;
       color: var(--text-primary);
       letter-spacing: 0.3px;
     }
-#masterPhoneChassis .panel-hint{
+
+    .panel-hint {
       font-size: 11px;
       color: var(--text-secondary);
       font-weight: 500;
     }
-#masterPhoneChassis .theme-swatch-grid{
+
+    .theme-swatch-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 7px;
     }
-#masterPhoneChassis .theme-swatch-item{
+
+    .theme-swatch-item {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -478,31 +545,38 @@ body{
       cursor: pointer;
       transition: transform 0.18s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
-#masterPhoneChassis .theme-swatch-item.active, #masterPhoneChassis .theme-swatch-item.sliding-hover{
+
+    .theme-swatch-item.active,
+    .theme-swatch-item.sliding-hover {
       background: var(--theme-tag-bg);
       border-color: var(--theme-accent);
       transform: scale(1.04);
       box-shadow: 0 6px 16px -4px var(--search-glow);
     }
-[data-dark="true"] #masterPhoneChassis .theme-popover-panel{
+
+    [data-dark="true"] .theme-popover-panel {
       background: rgba(21, 31, 50, 0.94);
       border-color: rgba(255, 255, 255, 0.12);
       box-shadow: 0 22px 44px -8px rgba(0, 0, 0, 0.55);
     }
-[data-dark="true"] #masterPhoneChassis .theme-swatch-item{
+
+    [data-dark="true"] .theme-swatch-item {
       background: rgba(30, 41, 59, 0.75);
     }
-#masterPhoneChassis .swatch-orb-preview{
+
+    .swatch-orb-preview {
       width: 22px;
       height: 22px;
       border-radius: 50%;
       flex-shrink: 0;
       box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6), 0 2px 5px rgba(15, 23, 42, 0.1);
     }
-#masterPhoneChassis .swatch-orb-preview.holo-animated{
+
+    .swatch-orb-preview.holo-animated {
       background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%) !important;
     }
-#masterPhoneChassis .swatch-label{
+
+    .swatch-label {
       font-size: 12px;
       font-weight: 700;
       color: var(--text-primary);
@@ -511,15 +585,19 @@ body{
       text-overflow: ellipsis;
       pointer-events: none;
     }
-#masterPhoneChassis .hero-center-block{
+
+    /* 第二层：居中主标题与副标题（全宽无遮挡，舒展呼吸感） */
+    .hero-center-block {
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-bottom: 12px;
     }
-#masterPhoneChassis .hero-eyebrow{ display: none; }
-#masterPhoneChassis .portal-main-title{
+
+    .hero-eyebrow { display: none; }
+
+    .portal-main-title {
       font-size: clamp(16.5px, 2.5dvh, 19px);
       font-weight: 900;
       color: var(--text-primary);
@@ -528,14 +606,17 @@ body{
       margin-bottom: 5px;
       white-space: nowrap;
     }
-#masterPhoneChassis .portal-subtitle{
+
+    .portal-subtitle {
       font-size: 11px;
       color: var(--text-secondary);
       line-height: 1.35;
       font-weight: 500;
       white-space: nowrap;
     }
-#masterPhoneChassis .gemini-search-card{
+
+    /* 第三层：舒展的胶囊搜索框 */
+    .gemini-search-card {
       background-color: var(--pill-surface);
       border-radius: 26px;
       padding: 6px 8px 6px 12px;
@@ -547,10 +628,12 @@ body{
       border: 1px solid rgba(255, 255, 255, 0.92);
       transition: box-shadow 0.35s ease, transform 0.25s ease;
     }
-[data-dark="true"] #masterPhoneChassis .gemini-search-card{
+
+    [data-dark="true"] .gemini-search-card {
       border-color: rgba(255, 255, 255, 0.1);
     }
-#masterPhoneChassis .plus-action-btn{
+
+    .plus-action-btn {
       width: 30px;
       height: 30px;
       border-radius: 50%;
@@ -563,11 +646,13 @@ body{
       cursor: pointer;
       flex-shrink: 0;
     }
-[data-dark="true"] #masterPhoneChassis .plus-action-btn{
+
+    [data-dark="true"] .plus-action-btn {
       background: rgba(255, 255, 255, 0.08);
       color: var(--orb-color-2);
     }
-#masterPhoneChassis .search-input{
+
+    .search-input {
       border: none;
       outline: none;
       width: 100%;
@@ -577,11 +662,13 @@ body{
       font-weight: 500;
       min-width: 0;
     }
-#masterPhoneChassis .search-input::placeholder{
+
+    .search-input::placeholder {
       color: var(--text-muted);
       font-weight: 400;
     }
-#masterPhoneChassis .clear-input-btn{
+
+    .clear-input-btn {
       border: none;
       background: rgba(148, 163, 184, 0.18);
       color: var(--text-secondary);
@@ -595,8 +682,10 @@ body{
       cursor: pointer;
       flex-shrink: 0;
     }
-#masterPhoneChassis .clear-input-btn.visible{ display: inline-flex; }
-#masterPhoneChassis .action-circle-btn{
+
+    .clear-input-btn.visible { display: inline-flex; }
+
+    .action-circle-btn {
       width: 32px;
       height: 32px;
       border-radius: 50%;
@@ -609,7 +698,8 @@ body{
       cursor: pointer;
       flex-shrink: 0;
     }
-#masterPhoneChassis .arrow-up-svg{
+
+    .arrow-up-svg {
       width: 13px;
       height: 13px;
       stroke: currentColor;
@@ -618,7 +708,9 @@ body{
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-#masterPhoneChassis .app-window-card{
+
+    /* ================= 6. 手机内部的「纯净 App 窗口卡片」（高度自由伸缩自适应，内部紧凑无空洞） ================= */
+    .app-window-card {
       background-color: #FFFFFF;
       border-radius: 22px;
       padding: clamp(9px, 1.6dvh, 13px) 13px clamp(9px, 1.5dvh, 12px);
@@ -634,13 +726,15 @@ body{
       transform: translate3d(0, 0, 0);
       transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
     }
-[data-dark="true"] #masterPhoneChassis .app-window-card{
+
+    [data-dark="true"] .app-window-card {
       background-color: #151F32;
       border-color: #26334D;
       box-shadow: -10px 2px 22px rgba(0, 0, 0, 0.45),
                   0 8px 20px rgba(0, 0, 0, 0.3);
     }
-#masterPhoneChassis .floating-card-app-header{
+
+    .floating-card-app-header {
       position: absolute;
       top: clamp(-46px, -5.8dvh, -40px);
       left: 2px;
@@ -654,7 +748,8 @@ body{
       transform-origin: left center;
       will-change: transform, opacity;
     }
-#masterPhoneChassis .floating-squircle-icon{
+
+    .floating-squircle-icon {
       width: clamp(23px, 3.4dvh, 27px);
       height: clamp(23px, 3.4dvh, 27px);
       border-radius: 8px;
@@ -667,19 +762,22 @@ body{
       font-size: 13.5px;
       flex-shrink: 0;
     }
-#masterPhoneChassis .floating-app-name{
+
+    .floating-app-name {
       font-size: 12px;
       font-weight: 800;
       color: var(--text-primary);
       letter-spacing: -0.2px;
       transition: opacity 0.2s ease, transform 0.2s ease;
     }
-#masterPhoneChassis .app-window-card.is-non-focus .floating-app-name{
+
+    .app-window-card.is-non-focus .floating-app-name {
       opacity: 0;
       pointer-events: none;
       transform: translateX(-4px);
     }
-#masterPhoneChassis .app-card-body{
+
+    .app-card-body {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -687,14 +785,16 @@ body{
       flex: 1;
       min-height: 0;
     }
-#masterPhoneChassis .card-meta-row{
+
+    .card-meta-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 6px;
       flex-shrink: 0;
     }
-#masterPhoneChassis .card-serial-pill{
+
+    .card-serial-pill {
       font-size: 10px;
       font-weight: 800;
       letter-spacing: 0.2px;
@@ -704,11 +804,13 @@ body{
       border-radius: 7px;
       white-space: nowrap;
     }
-[data-dark="true"] #masterPhoneChassis .card-serial-pill{
+
+    [data-dark="true"] .card-serial-pill {
       background: rgba(255, 255, 255, 0.08);
       color: var(--orb-color-1);
     }
-#masterPhoneChassis .card-status-pill{
+
+    .card-status-pill {
       display: inline-flex;
       align-items: center;
       font-size: 10px;
@@ -717,19 +819,23 @@ body{
       border-radius: 999px;
       white-space: nowrap;
     }
-#masterPhoneChassis .card-status-pill.status-online{ background: #DCFCE7; color: #15803D; }
-#masterPhoneChassis .card-status-pill.status-replica{ background: #DBEAFE; color: #1D4ED8; }
-#masterPhoneChassis .card-status-pill.status-prep{ background: #FEF3C7; color: #B45309; }
-[data-dark="true"] #masterPhoneChassis .card-status-pill.status-online{ background: rgba(34, 197, 94, 0.18); color: #86EFAC; }
-[data-dark="true"] #masterPhoneChassis .card-status-pill.status-replica{ background: rgba(59, 130, 246, 0.2); color: #93C5FD; }
-[data-dark="true"] #masterPhoneChassis .card-status-pill.status-prep{ background: rgba(245, 158, 11, 0.18); color: #FCD34D; }
-#masterPhoneChassis .card-identity-row{
+
+    .card-status-pill.status-online { background: #DCFCE7; color: #15803D; }
+    .card-status-pill.status-replica { background: #DBEAFE; color: #1D4ED8; }
+    .card-status-pill.status-prep { background: #FEF3C7; color: #B45309; }
+
+    [data-dark="true"] .card-status-pill.status-online { background: rgba(34, 197, 94, 0.18); color: #86EFAC; }
+    [data-dark="true"] .card-status-pill.status-replica { background: rgba(59, 130, 246, 0.2); color: #93C5FD; }
+    [data-dark="true"] .card-status-pill.status-prep { background: rgba(245, 158, 11, 0.18); color: #FCD34D; }
+
+    .card-identity-row {
       display: flex;
       align-items: center;
       gap: 9px;
       flex-shrink: 0;
     }
-#masterPhoneChassis .card-icon-box{
+
+    .card-icon-box {
       width: clamp(32px, 4.6dvh, 38px);
       height: clamp(32px, 4.6dvh, 38px);
       border-radius: 10px;
@@ -740,25 +846,30 @@ body{
       font-size: clamp(16px, 2.3dvh, 19px);
       flex-shrink: 0;
     }
-[data-dark="true"] #masterPhoneChassis .card-icon-box{ background: rgba(255, 255, 255, 0.08); }
-#masterPhoneChassis .card-title-wrap{
+
+    [data-dark="true"] .card-icon-box { background: rgba(255, 255, 255, 0.08); }
+
+    .card-title-wrap {
       flex: 1;
       min-width: 0;
     }
-#masterPhoneChassis .card-title{
+
+    .card-title {
       font-size: clamp(13.5px, 2dvh, 15px);
       font-weight: 800;
       color: var(--text-primary);
       line-height: 1.2;
       margin-bottom: 1px;
     }
-#masterPhoneChassis .card-route-text{
+
+    .card-route-text {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       font-size: 9.5px;
       color: var(--text-muted);
       line-height: 1.15;
     }
-#masterPhoneChassis .live-snapshot-box{
+
+    .live-snapshot-box {
       background-color: var(--screen-widget-bg);
       border: 1px solid var(--card-border);
       border-radius: 11px;
@@ -769,7 +880,8 @@ body{
       gap: clamp(3px, 0.6dvh, 5px);
       flex-shrink: 0;
     }
-#masterPhoneChassis .snapshot-mini-row{
+
+    .snapshot-mini-row {
       background-color: var(--screen-subcard-bg);
       border: 1px solid var(--card-border);
       border-radius: 7.5px;
@@ -779,7 +891,8 @@ body{
       justify-content: space-between;
       gap: 6px;
     }
-#masterPhoneChassis .snap-left-title{
+
+    .snap-left-title {
       font-size: 10px;
       font-weight: 700;
       color: var(--text-primary);
@@ -791,15 +904,19 @@ body{
       flex: 1;
       min-width: 0;
     }
-#masterPhoneChassis .snap-right-val{
+
+    .snap-right-val {
       font-size: 10px;
       font-weight: 800;
       color: var(--theme-accent);
       white-space: nowrap;
       flex-shrink: 0;
     }
-[data-dark="true"] #masterPhoneChassis .snap-right-val{ color: var(--orb-color-1); }
-#masterPhoneChassis .ios-widget-box{
+
+    [data-dark="true"] .snap-right-val { color: var(--orb-color-1); }
+
+    /* 描述与标签区：紧凑贴合内容，不留生硬空白 */
+    .ios-widget-box {
       background-color: var(--screen-widget-bg);
       border: 1px solid var(--card-border);
       border-radius: 12px;
@@ -812,19 +929,22 @@ body{
       gap: 6px;
       overflow: hidden;
     }
-#masterPhoneChassis .card-desc{
+
+    .card-desc {
       font-size: clamp(10px, 1.45dvh, 11.5px);
       line-height: clamp(1.32, 0.2dvh + 1.25, 1.48);
       color: var(--text-secondary);
       overflow: hidden;
     }
-#masterPhoneChassis .card-tags-row{
+
+    .card-tags-row {
       display: flex;
       flex-wrap: wrap;
       gap: 4px;
       flex-shrink: 0;
     }
-#masterPhoneChassis .card-tag-chip{
+
+    .card-tag-chip {
       font-size: 9.5px;
       font-weight: 700;
       padding: 2px 6.5px;
@@ -834,7 +954,8 @@ body{
       border: 1px solid var(--card-border);
       white-space: nowrap;
     }
-#masterPhoneChassis .card-action-bar{
+
+    .card-action-bar {
       width: 100%;
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -844,7 +965,8 @@ body{
       border-top: 1px solid var(--card-border);
       flex-shrink: 0;
     }
-#masterPhoneChassis .card-btn-secondary{
+
+    .card-btn-secondary {
       height: clamp(27px, 4.2dvh, 33px);
       border-radius: 9px;
       border: 1px solid var(--card-border);
@@ -858,12 +980,15 @@ body{
       justify-content: center;
       transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     }
-#masterPhoneChassis .card-btn-secondary:hover{
+
+    .card-btn-secondary:hover {
       border-color: var(--theme-accent);
       color: var(--theme-accent);
     }
-#masterPhoneChassis .card-btn-secondary:active{ transform: scale(0.96); }
-#masterPhoneChassis .card-btn-primary{
+
+    .card-btn-secondary:active { transform: scale(0.96); }
+
+    .card-btn-primary {
       height: clamp(27px, 4.2dvh, 33px);
       border-radius: 9px;
       border: none;
@@ -879,15 +1004,19 @@ body{
       box-shadow: 0 3px 8px var(--search-glow);
       transition: transform 0.2s ease, filter 0.2s ease;
     }
-#masterPhoneChassis .card-btn-primary:hover{ filter: brightness(1.04); }
-#masterPhoneChassis .card-btn-primary:active{ transform: scale(0.96); }
-#masterPhoneChassis .card-btn-primary.is-disabled{
+
+    .card-btn-primary:hover { filter: brightness(1.04); }
+    .card-btn-primary:active { transform: scale(0.96); }
+
+    .card-btn-primary.is-disabled {
       background: rgba(148, 163, 184, 0.22) !important;
       color: var(--text-muted) !important;
       box-shadow: none !important;
       pointer-events: none;
     }
-#masterPhoneChassis .stack-stage-wrapper{
+
+    /* ================= 7. 模式一（默认）：手机屏幕内的层叠卡片流舞台（卡片高度自由自适应） ================= */
+    .stack-stage-wrapper {
       display: none;
       flex-direction: column;
       align-items: center;
@@ -898,14 +1027,17 @@ body{
       flex: 1;
       min-height: 0;
     }
-#masterPhoneChassis .stack-stage-wrapper.active-mode{ display: flex; }
-#masterPhoneChassis .floating-squircle-icon svg{ width: 15px; height: 15px; display: block; }
-#masterPhoneChassis .card-icon-box svg{ width: 21px; height: 21px; display: block; }
-#masterPhoneChassis .snap-ico svg{ width: 13px; height: 13px; vertical-align: -2px; }
-#masterPhoneChassis .modal-title svg{ width: 17px; height: 17px; vertical-align: -3px; margin-right: 5px; }
-#masterPhoneChassis .view-mode-btn svg{ width: 15px; height: 15px; vertical-align: -2px; margin-right: 5px; }
-#masterPhoneChassis .stack-carousel-viewport .app-window-card{ will-change: transform; }
-#masterPhoneChassis .stack-carousel-viewport{
+
+    .stack-stage-wrapper.active-mode { display: flex; }
+
+    /* 视口占满中间剩余高度，内部卡片高度自适应且保持黄金比例上限 */
+    .floating-squircle-icon svg { width: 15px; height: 15px; display: block; }
+    .card-icon-box svg { width: 21px; height: 21px; display: block; }
+    .snap-ico svg { width: 13px; height: 13px; vertical-align: -2px; }
+    .modal-title svg { width: 17px; height: 17px; vertical-align: -3px; margin-right: 5px; }
+    .view-mode-btn svg { width: 15px; height: 15px; vertical-align: -2px; margin-right: 5px; }
+    .stack-carousel-viewport .app-window-card { will-change: transform; }
+    .stack-carousel-viewport {
       position: relative;
       width: 100%;
       flex: 1;
@@ -918,8 +1050,10 @@ body{
       touch-action: none;
       cursor: grab;
     }
-#masterPhoneChassis .stack-carousel-viewport:active{ cursor: grabbing; }
-#masterPhoneChassis .stack-carousel-viewport .app-window-card{
+
+    .stack-carousel-viewport:active { cursor: grabbing; }
+
+    .stack-carousel-viewport .app-window-card {
       position: absolute;
       width: 76%;
       max-width: 290px;
@@ -935,12 +1069,16 @@ body{
       will-change: transform, opacity;
       transition: none;
     }
-#masterPhoneChassis .stack-carousel-viewport .floating-app-name{
+
+    .stack-carousel-viewport .floating-app-name {
       transition: none;
       will-change: opacity, transform;
     }
-#masterPhoneChassis .stack-carousel-viewport .app-window-card.is-stacked-card{ cursor: pointer; }
-#masterPhoneChassis .stack-bottom-controls{
+
+    .stack-carousel-viewport .app-window-card.is-stacked-card { cursor: pointer; }
+
+    /* 卡片下方的切换控制区 */
+    .stack-bottom-controls {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -949,12 +1087,14 @@ body{
       z-index: 30;
       flex-shrink: 0;
     }
-#masterPhoneChassis .stack-dots-bar{
+
+    .stack-dots-bar {
       display: flex;
       align-items: center;
       gap: 5px;
     }
-#masterPhoneChassis .stack-dot{
+
+    .stack-dot {
       width: 5.5px;
       height: 5.5px;
       border-radius: 999px;
@@ -964,17 +1104,20 @@ body{
       cursor: pointer;
       transition: width 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease, background-color 0.25s ease;
     }
-#masterPhoneChassis .stack-dot.active{
+
+    .stack-dot.active {
       width: 17px;
       opacity: 1;
       background-color: var(--theme-accent);
     }
-#masterPhoneChassis .video-frosted-action-row{
+
+    .video-frosted-action-row {
       display: flex;
       align-items: center;
       gap: 9px;
     }
-#masterPhoneChassis .stack-nav-circle{
+
+    .stack-nav-circle {
       width: clamp(26px, 3.8dvh, 30px);
       height: clamp(26px, 3.8dvh, 30px);
       border-radius: 50%;
@@ -990,17 +1133,21 @@ body{
       box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
       transition: transform 0.2s ease;
     }
-#masterPhoneChassis .stack-nav-circle:active{ transform: scale(0.92); }
-@keyframes home-pillLand{
+
+    .stack-nav-circle:active { transform: scale(0.92); }
+
+        @keyframes pillLand {
       0% { transform: scale(1); }
       35% { transform: scale(1.14); }
       65% { transform: scale(0.96); }
       100% { transform: scale(1); }
     }
-#masterPhoneChassis .video-clear-pill-btn.pill-land{
-      animation: home-pillLand 0.38s cubic-bezier(.16, 1, .3, 1);
+
+    .video-clear-pill-btn.pill-land {
+      animation: pillLand 0.38s cubic-bezier(.16, 1, .3, 1);
     }
-#masterPhoneChassis .video-clear-pill-btn{
+
+.video-clear-pill-btn {
       height: clamp(26px, 3.8dvh, 30px);
       padding: 0 16px;
       border-radius: 999px;
@@ -1018,11 +1165,15 @@ body{
       white-space: nowrap;
       transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-[data-dark="true"] #masterPhoneChassis .video-clear-pill-btn{
+
+    [data-dark="true"] .video-clear-pill-btn {
       border-color: rgba(255, 255, 255, 0.14);
     }
-#masterPhoneChassis .video-clear-pill-btn:active{ transform: scale(0.94); }
-#masterPhoneChassis .flat-cards-grid{
+
+    .video-clear-pill-btn:active { transform: scale(0.94); }
+
+    /* ================= 8. 模式二：横排平铺自适应网格 ================= */
+    .flat-cards-grid {
       display: none;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 12px;
@@ -1034,15 +1185,19 @@ body{
       overflow-y: auto;
       transition: opacity 0.22s ease, transform 0.22s ease;
     }
-#masterPhoneChassis .flat-cards-grid.active-mode{ display: grid; }
-#masterPhoneChassis .flat-cards-grid .app-window-card{
+
+    .flat-cards-grid.active-mode { display: grid; }
+
+    .flat-cards-grid .app-window-card {
       box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.06);
     }
-#masterPhoneChassis .flat-cards-grid .app-window-card:hover{
+
+    .flat-cards-grid .app-window-card:hover {
       transform: translateY(-3px);
       box-shadow: 0 14px 30px -8px var(--search-glow);
     }
-#masterPhoneChassis .empty-state{
+
+    .empty-state {
       grid-column: 1 / -1;
       text-align: center;
       padding: 28px 14px;
@@ -1055,7 +1210,9 @@ body{
       margin: auto;
       width: 100%;
     }
-#masterPhoneChassis .iphone18-bottom-system-bar{
+
+    /* ================= 9. 手机屏幕底部：原版双行圆角仓库卡片 + Home Indicator ================= */
+    .iphone18-bottom-system-bar {
       position: relative;
       z-index: 15;
       padding: 4px 14px clamp(7px, 1.3dvh, 10px);
@@ -1064,14 +1221,16 @@ body{
       align-items: center;
       flex-shrink: 0;
     }
-#masterPhoneChassis .footer-left-info{
+
+    .footer-left-info {
       display: flex;
       flex-direction: column;
       gap: 1.5px;
       min-width: 0;
       flex: 1;
     }
-#masterPhoneChassis .footer-title{
+
+    .footer-title {
       font-size: 11px;
       font-weight: 800;
       color: var(--text-primary);
@@ -1079,14 +1238,16 @@ body{
       overflow: hidden;
       text-overflow: ellipsis;
     }
-#masterPhoneChassis .footer-desc{
+
+    .footer-desc {
       font-size: 9.5px;
       color: var(--text-secondary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-#masterPhoneChassis .repo-pill-link{
+
+    .repo-pill-link {
       display: inline-flex;
       align-items: center;
       gap: 3px;
@@ -1100,18 +1261,22 @@ body{
       white-space: nowrap;
       flex-shrink: 0;
     }
-[data-dark="true"] #masterPhoneChassis .repo-pill-link{
+
+    [data-dark="true"] .repo-pill-link {
       background: rgba(255, 255, 255, 0.08);
       color: var(--orb-color-2);
     }
-#masterPhoneChassis .master-home-indicator{
+
+    .master-home-indicator {
       width: 116px;
       height: 4px;
       border-radius: 999px;
       background-color: var(--text-primary);
       opacity: 0.25;
     }
-#masterPhoneChassis .same-source-modal-backdrop{
+
+    /* ================= 10. 居中项目功能速览弹窗 Modal ================= */
+    .same-source-modal-backdrop {
       position: fixed;
       inset: 0;
       background: rgba(15, 23, 42, 0.48);
@@ -1121,8 +1286,10 @@ body{
       justify-content: center;
       padding: 18px;
     }
-#masterPhoneChassis .same-source-modal-backdrop.open{ display: flex; }
-#masterPhoneChassis .same-source-modal{
+
+    .same-source-modal-backdrop.open { display: flex; }
+
+    .same-source-modal {
       width: 100%;
       max-width: 420px;
       background-color: var(--card-bg);
@@ -1134,14 +1301,16 @@ body{
       display: flex;
       flex-direction: column;
     }
-#masterPhoneChassis .modal-head{
+
+    .modal-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 10px;
       margin-bottom: 5px;
     }
-#masterPhoneChassis .modal-title{
+
+    .modal-title {
       font-size: 15px;
       font-weight: 800;
       color: var(--text-primary);
@@ -1149,7 +1318,8 @@ body{
       overflow: hidden;
       text-overflow: ellipsis;
     }
-#masterPhoneChassis .modal-close-btn{
+
+    .modal-close-btn {
       border: none;
       background: var(--page-bg);
       color: var(--text-secondary);
@@ -1159,18 +1329,21 @@ body{
       font-size: 13px;
       cursor: pointer;
     }
-#masterPhoneChassis .modal-sub{
+
+    .modal-sub {
       font-size: 11.5px;
       color: var(--text-secondary);
       margin-bottom: 12px;
     }
-#masterPhoneChassis .modal-seller-list{
+
+    .modal-seller-list {
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
-#masterPhoneChassis .modal-seller-item{
+
+    .modal-seller-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -1182,17 +1355,20 @@ body{
       text-decoration: none;
       color: inherit;
     }
-#masterPhoneChassis .modal-seller-price{
+
+    .modal-seller-price {
       font-size: 11.5px;
       font-weight: 800;
       color: var(--theme-accent);
       white-space: nowrap;
     }
-#masterPhoneChassis .modal-seller-info{
+
+    .modal-seller-info {
       flex: 1;
       min-width: 0;
     }
-#masterPhoneChassis .modal-seller-shop{
+
+    .modal-seller-shop {
       font-size: 12.5px;
       font-weight: 700;
       color: var(--text-primary);
@@ -1200,12 +1376,14 @@ body{
       overflow: hidden;
       text-overflow: ellipsis;
     }
-#masterPhoneChassis .modal-seller-meta{
+
+    .modal-seller-meta {
       font-size: 11px;
       color: var(--text-secondary);
       margin-top: 2px;
     }
-#masterPhoneChassis .site-offer-link{
+
+    .site-offer-link {
       display: inline-flex;
       justify-content: center;
       align-items: center;
@@ -1217,9 +1395,11 @@ body{
       font-weight: 800;
       white-space: nowrap;
     }
-@media (max-width: 540px){/* 真机窄屏无框满屏：去掉机身外壳与假状态栏，其余与桌面同一套 */
-      body{ padding: 0; }
-#masterPhoneChassis{
+
+    @media (max-width: 540px) {
+      /* 真机窄屏无框满屏：去掉机身外壳与假状态栏，其余与桌面同一套 */
+      body { padding: 0; }
+      .iphone18-master-chassis {
         width: 100%;
         height: 100%;
         max-height: none;
@@ -1228,14 +1408,18 @@ body{
         padding: 0;
         box-shadow: none;
       }
-#masterPhoneChassis::before, #masterPhoneChassis::after{ display: none; }
-#masterPhoneChassis .iphone18-master-screen{ border-radius: 0; }
-#masterPhoneChassis .iphone18-top-statusbar{ display: none; }
-#masterPhoneChassis .hero-header{ padding-top: 16px; }
-#masterPhoneChassis .stack-carousel-viewport .app-window-card{
+      .iphone18-master-chassis::before,
+      .iphone18-master-chassis::after { display: none; }
+      .iphone18-master-screen { border-radius: 0; }
+      .iphone18-top-statusbar { display: none; }
+      /* 无框时假状态栏拿掉，它的约 30px 顶部留白由 hero 顶内边距补回，与各站 hero 的 16px 对齐 */
+      .hero-header { padding-top: 16px; }
+      .stack-carousel-viewport .app-window-card {
         width: 76%;
         margin-left: 0;
-      }}</style>
+      }
+    }
+  </style>
 
   <script>
     // 首帧偏好：先读本站 localStorage、再读共享 Cookie A（A 优先），在渲染前定版主题/日夜，避免闪色
@@ -1259,7 +1443,6 @@ body{
     r.style.setProperty('--theme-accent',th[4]);r.style.setProperty('--theme-tag-bg',th[5]);
     r.style.setProperty('--theme-tag-text',th[6]);r.style.setProperty('--search-glow',th[8]);})();
   </script>
-<link rel="stylesheet" href="hub/hub.css">
 </head>
 <body>
 
@@ -1393,6 +1576,8 @@ body{
       </footer>
 
     </div>
+  </div>
+
   <!-- 子项目功能模块速览弹窗 Modal -->
   <div class="same-source-modal-backdrop" id="sameSourceModalBackdrop" onclick="closeSameSourceModal(event)">
     <div class="same-source-modal" onclick="event.stopPropagation()">
@@ -1403,7 +1588,6 @@ body{
       <div class="modal-sub" id="modalItemSub"></div>
       <div class="modal-seller-list" id="modalSellerList"></div>
     </div>
-  </div>
   </div>
 
   <script>
@@ -1655,7 +1839,12 @@ body{
     }
 
     // ================= 4. 双模式切换 =================
+    // 每个模式各自记住滚动位置：切走时存、切回时在本函数同一同步段里
+    // （浏览器重绘之前）就恢复到位，眼睛看不到任何跳动或滚动过程
+    const savedScrollByMode = { stack: 0, grid: 0 };
     function setDisplayMode(mode) {
+      const screenEl = document.querySelector('.iphone18-master-screen');
+      if (screenEl) savedScrollByMode[currentDisplayMode] = screenEl.scrollTop;
       currentDisplayMode = mode;
       document.getElementById('modeStackBtn').classList.toggle('active', mode === 'stack');
       document.getElementById('modeGridBtn').classList.toggle('active', mode === 'grid');
@@ -1663,8 +1852,8 @@ body{
       document.getElementById('contentGrid').classList.toggle('active-mode', mode === 'grid');
       document.getElementById('masterPhoneChassis').classList.toggle('wide-grid-chassis', mode === 'grid');
       document.getElementById('viewGlider').style.transform = mode === 'grid' ? 'translateX(100%)' : 'translateX(0)';
-      document.querySelector('.iphone18-master-screen').scrollTop = 0;
       renderPortalCards();
+      if (screenEl) screenEl.scrollTop = savedScrollByMode[mode] || 0;
     }
 
     // ================= 5. 生成卡片 HTML =================
@@ -1919,7 +2108,7 @@ body{
             void pill.offsetWidth;
             pill.classList.add('pill-land');
           }
-          setTimeout(() => { if (window.__hubTryEnter && window.__hubTryEnter(proj)) return; window.location.href = proj.url; }, 200);
+          setTimeout(() => { window.location.href = proj.url; }, 200);
           return;
         }
         if (stage) stage.style.zIndex = '';
@@ -2632,6 +2821,5 @@ body{
     document.getElementById('sunMoonIcon').innerHTML = isDarkMode ? MOON_SVG : SUN_SVG;
     syncStaticUIText();
   </script>
-<script src="hub/hub.js"></script>
 </body>
 </html>
