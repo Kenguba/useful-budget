@@ -48,4 +48,4 @@
 
 - `wechat-bridge/` 是 ken 的微信与 Muse 之间的桥：微信 ClawBot（iLink）↔ Muse 虚拟机上的网关 ↔ Muse 本人，2026-11-07 接通。
 - 目录内 gateway.py 与 wechat-gateway.service 为运行版的留档副本（真源在虚拟机 ~/workspace/wechat-bridge/，以运行版为准、改完同步回此）；凭据、收件箱、媒体文件只在虚拟机上，不进仓库。
-- 搭建细节见 wechat-bridge/ARCHITECTURE.md，选型调研见 wechat-bridge/可行方案.md（网页版为同目录 可行方案.html）。
+- 搭建细节见 wechat-bridge/ARCHITECTURE.md，选型调研见 wechat-bridge/可行方案.md（网页版在 frontend/wechat-bridge/）。
