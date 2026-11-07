@@ -376,7 +376,18 @@
    * ken's phone off-card pulls were claimed and cancelled before any
    * move reached this tracker. hub.css therefore declares the whole
    * stack-mode home screen touch-action:none (lifted in grid mode,
-   * where the screen scrolls natively and the scrollTop gate rules). */
+   * where the screen scrolls natively and the scrollTop gate rules).
+   * Phase 10 (ken): the mirror-image correction — a pull that STARTS
+   * on a home card must never refresh. The card surface is card
+   * business (damped sink and spring-back, swipe, fly-out, tap), and
+   * phases 8/9 arming the tracker there was overreach. The shell
+   * tracker therefore takes a skipStart predicate and drops such a
+   * touch at touchstart, before any tracking state is set — no disc,
+   * no reload, the card's own gestures exactly as standalone. The
+   * exclusion covers the focus card and every stacked neighbour's
+   * exposed slice, in grid mode too; off-card starts keep the
+   * phase-8/9 behaviour. Module views and the pan frame pass no
+   * predicate and are tracked exactly as before. */
   var ptrEl = document.createElement('div'); ptrEl.id = 'hubPtr';
   ptrEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/></svg>';
   document.body.appendChild(ptrEl);
@@ -404,10 +415,11 @@
       location.reload();
     }, 380);
   }
-  function trackPull(doc, scrollTopsOf, activeWhen) {
+  function trackPull(doc, scrollTopsOf, activeWhen, skipStart) {
     var startY = null, startX = 0, engX = 0, engaged = false, lastDy = 0, target = null;
     doc.addEventListener('touchstart', function (ev) {
       if (!activeWhen() || ev.touches.length !== 1) { engaged = false; startY = null; return; }
+      if (skipStart && skipStart(ev.target)) { engaged = false; startY = null; return; }
       target = ev.target; startY = ev.touches[0].clientY; startX = ev.touches[0].clientX; engaged = false; lastDy = 0;
     }, { passive: true });
     doc.addEventListener('touchmove', function (ev) {
@@ -463,7 +475,8 @@
    * qualifies (the screen is overflow:hidden; the grid-mode chassis class
    * is what turns it into a scroller), so the returned list is empty and
    * "all at top" holds vacuously — a pull may engage anywhere on the
-   * stack, including the pinned header ken circled. In grid mode the
+   * stack, including the pinned header ken circled (subject to the
+   * phase-10 on-card exclusion at touchstart, below). In grid mode the
    * screen itself is in the list and gates the pull to scrollTop 0. */
   function homeScrollTops(target) {
     var modal = document.getElementById('sameSourceModalBackdrop');
@@ -480,7 +493,23 @@
   function shellScrollTops(target) {
     return current ? rootScrollTops(target) : homeScrollTops(target);
   }
-  trackPull(document, shellScrollTops, function () { return true; });
+  /* phase 10: is this touch starting on one of the home view's own
+   * cards? The cards are the .app-window-card articles inside the
+   * chassis — the stack's <article data-stack-idx> in #stackViewport
+   * and the grid's <article> in #contentGrid (root index markup,
+   * verified). Module roots live in #hubView and use no such class,
+   * and the predicate is additionally gated on the home view being
+   * current, so module PTR is untouched by construction. */
+  function onHomeCard(target) {
+    if (!target || !target.closest) return false;
+    var card = target.closest('.app-window-card');
+    if (!card) return false;
+    var chassis = document.getElementById('masterPhoneChassis');
+    return !!chassis && chassis.contains(card);
+  }
+  trackPull(document, shellScrollTops, function () { return true; }, function (target) {
+    return !current && onHomeCard(target);
+  });
   /* pan: touches land in the frame's own document, so the same tracker is
    * attached there after every frame load (each reload swaps in a fresh
    * document). The frame is same-origin (its src is the site's own
