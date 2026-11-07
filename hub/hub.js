@@ -150,25 +150,66 @@
    * assets/data resolve against its real directory by construction, and
    * its config.js host table sees the hub hostname (jpedu.asia), misses
    * RELAY_BY_HOST and falls back to https://api.jpedu.asia directly —
-   * no config change and no main-domain /api router rule needed. */
+   * no config change and no main-domain /api router rule needed.
+   * Boot cover (phase 8): pan's static HTML is an empty #main — every
+   * pixel of its UI is rendered by its app.js after it fetches data, so
+   * "document loaded" (the old skeleton-removal trigger) comes long
+   * before "UI rendered": measured at 60KB/s, load fired at ~7.2s and
+   * first render at ~8.1s, and in between the frame was a full-screen
+   * pale blank (its own page background over an empty #main) — the
+   * exact blank ken screenshotted. The skeleton also sat IN FLOW above
+   * the frame, covering only the top ~252px and shoving the frame down
+   * (it snapped up when the skeleton was removed). Now the skeleton is
+   * a full-root overlay ABOVE the frame, shaped like pan's home layout,
+   * and it is removed only when the frame document actually renders
+   * (polled: #main filled, or any visible body text — pan's access
+   * gate also counts). If the frame never renders, the skeleton stays:
+   * a loading UI in place beats a blank screen (the UI-first rule). */
   function enterSubapp(name, root, st) {
     if (st.frame) { st.status = 'ready'; return Promise.resolve(true); }
     st.status = 'loading';
     root.classList.add('subappRoot');
-    root.innerHTML = '<div id="hubSkeleton"><div class="skblock" style="width:52%;height:22px"></div>' +
-      '<div class="skblock" style="width:100%;height:46px;margin-top:14px;border-radius:23px"></div>' +
-      '<div class="skblock" style="width:100%;height:120px;margin-top:14px;border-radius:16px"></div></div>';
+    root.innerHTML = '';
+    var ov = document.createElement('div');
+    ov.id = 'hubSkeleton'; ov.className = 'panBoot';
+    ov.innerHTML =
+      '<div style="display:flex;align-items:center;gap:10px"><div class="skblock" style="width:34px;height:34px;border-radius:10px"></div>' +
+      '<div class="skblock" style="width:38%;height:20px"></div>' +
+      '<div class="skblock" style="width:18%;height:20px;margin-left:auto"></div></div>' +
+      '<div class="skblock" style="width:100%;height:48px;margin-top:18px;border-radius:24px"></div>' +
+      '<div style="display:flex;gap:8px;margin-top:16px"><div class="skblock" style="width:23%;height:26px;border-radius:13px"></div>' +
+      '<div class="skblock" style="width:19%;height:26px;border-radius:13px"></div>' +
+      '<div class="skblock" style="width:27%;height:26px;border-radius:13px"></div></div>' +
+      '<div class="skblock" style="width:56%;height:17px;margin-top:24px"></div>' +
+      '<div class="skblock" style="width:88%;height:13px;margin-top:9px"></div>' +
+      '<div class="skblock" style="width:56%;height:17px;margin-top:22px"></div>' +
+      '<div class="skblock" style="width:92%;height:13px;margin-top:9px"></div>' +
+      '<div class="skblock" style="width:56%;height:17px;margin-top:22px"></div>' +
+      '<div class="skblock" style="width:84%;height:13px;margin-top:9px"></div>';
+    root.appendChild(ov);
     var f = document.createElement('iframe');
     f.className = 'subappFrame';
     f.title = name;
     f.src = MODULES[name].dir;
-    f.addEventListener('load', function () {
-      st.status = 'ready';
-      var sk = root.querySelector('#hubSkeleton'); if (sk) sk.remove();
-      attachPanPtr(f);
-    });
+    f.addEventListener('load', function () { attachPanPtr(f); });
     root.appendChild(f);
     st.frame = f;
+    st.bootPoll = setInterval(function () {
+      var rendered = false;
+      try {
+        var d = f.contentDocument;
+        if (d && d.body) {
+          var main = d.querySelector('#main');
+          rendered = !!((main && main.innerHTML.length > 100) ||
+            (d.body.innerText && d.body.innerText.trim().length > 0));
+        }
+      } catch (e) {}
+      if (rendered) {
+        clearInterval(st.bootPoll); st.bootPoll = null;
+        st.status = 'ready';
+        ov.remove();
+      }
+    }, 120);
     return Promise.resolve(true);
   }
 
@@ -285,18 +326,30 @@
     }, 650);
   });
 
-  /* ---------- pull-to-refresh (phase 6, ken request) ----------
+  /* ---------- pull-to-refresh (phase 6 modules, phase 8 home) ----------
    * Standalone, each site scrolls at document level, so Android Chrome's
    * native pull-to-refresh works. In the hub the shell document never
    * scrolls (the root page pins it: overflow hidden + overscroll-behavior
    * none) and module content scrolls inside .modRoot instead — the native
    * gesture has nothing to grab and no in-page gesture replaced it, so
    * pulling at a module's top did nothing at all. The shell therefore
-   * tracks the gesture itself and refreshes the current module the way
-   * the standalone site would: pipeline modules via location.reload()
+   * tracks the gesture itself and refreshes the current view the way the
+   * standalone site would: pipeline modules via location.reload()
    * (a standalone refresh is the same full reload; the deep-link boot
    * then re-mounts the module through the normal path and re-fetches its
    * data), the pan sub-application by reloading only its frame.
+   * Phase 8 (ken, on his home screenshot): the home view itself was the
+   * last surface without it — trackPull gated on a current module, so a
+   * pull on the home stack did literally nothing. The same tracker now
+   * runs on the home view too (refresh = location.reload(), identical
+   * semantics), gated by the home scroll model instead: the master
+   * screen is the only scroller and only in grid mode (in stack mode it
+   * is overflow:hidden and gesture-driven, so nothing can be scrolled
+   * away from the top and a pull may engage anywhere). The stack's own
+   * pointer gestures are unaffected: a downward drag still sinks the
+   * focus card at its 0.25 ratio and springs back — and a pull must
+   * stay predominantly vertical (see the dominance guard in trackPull),
+   * so horizontal card swipes never arm the refresh.
    * A pull engages only while EVERY scrollable ancestor of the touched
    * element sits at its top (checked live on each move, so a gesture that
    * first scrolls a nested list up to its top starts counting from there),
@@ -318,34 +371,39 @@
     ptrEl.classList.remove('spin');
   }
   function refreshCurrent() {
-    if (!current) return;
-    var name = current;
+    var name = current;   /* null = the home view itself */
     ptrShow(0, true);
     setTimeout(function () {
-      var st = state[name];
-      if (MODULES[name].subapp && st && st.frame) {
+      var st = name && state[name];
+      if (name && MODULES[name].subapp && st && st.frame) {
         try { st.frame.contentWindow.location.reload(); ptrHide(); return; } catch (e) {}
       }
       location.reload();
     }, 380);
   }
-  function trackPull(doc, scrollTopsOf) {
-    var startY = null, engaged = false, lastDy = 0, target = null;
+  function trackPull(doc, scrollTopsOf, activeWhen) {
+    var startY = null, startX = 0, engX = 0, engaged = false, lastDy = 0, target = null;
     doc.addEventListener('touchstart', function (ev) {
-      if (!current || ev.touches.length !== 1) { engaged = false; startY = null; return; }
-      target = ev.target; startY = ev.touches[0].clientY; engaged = false; lastDy = 0;
+      if (!activeWhen() || ev.touches.length !== 1) { engaged = false; startY = null; return; }
+      target = ev.target; startY = ev.touches[0].clientY; startX = ev.touches[0].clientX; engaged = false; lastDy = 0;
     }, { passive: true });
     doc.addEventListener('touchmove', function (ev) {
-      if (startY === null || !current || ev.touches.length !== 1) return;
-      var y = ev.touches[0].clientY;
+      if (startY === null || !activeWhen() || ev.touches.length !== 1) return;
+      var y = ev.touches[0].clientY, x = ev.touches[0].clientX;
       if (!engaged) {
         var tops = scrollTopsOf(target);
-        if (tops && tops.every(function (t) { return t <= 0; }) && y > startY + 8) { engaged = true; startY = y - 8; }
+        if (tops && tops.every(function (t) { return t <= 0; }) && y > startY + 8) { engaged = true; startY = y - 8; engX = x; }
         else if (y < startY - 4) startY = null;   /* upward gesture: not a pull */
         return;
       }
       lastDy = y - startY;
       if (lastDy <= 0) { ptrHide(); return; }
+      /* predominantly-vertical guard: a diagonal drag (e.g. a stack
+       * card swipe with downward drift, or a chip-row flick inside a
+       * module) disarms instead of riding along toward a refresh */
+      if (Math.abs(x - engX) > 40 && Math.abs(x - engX) > lastDy * 1.15) {
+        ptrHide(); engaged = false; startY = null; lastDy = 0; return;
+      }
       ptrShow(lastDy, false);
     }, { passive: true });
     function end() {
@@ -370,7 +428,31 @@
     }
     return tops.length ? tops : null;
   }
-  trackPull(document, rootScrollTops);
+  /* home view: the pull must start inside the phone chassis, the preview
+   * modal must be closed (its seller list is a scroller of its own and a
+   * pull there is modal business, not a page refresh), and every
+   * scrollable ancestor must be at its top. In stack mode no ancestor
+   * qualifies (the screen is overflow:hidden; the grid-mode chassis class
+   * is what turns it into a scroller), so the returned list is empty and
+   * "all at top" holds vacuously — a pull may engage anywhere on the
+   * stack, including the pinned header ken circled. In grid mode the
+   * screen itself is in the list and gates the pull to scrollTop 0. */
+  function homeScrollTops(target) {
+    var modal = document.getElementById('sameSourceModalBackdrop');
+    if (modal && modal.classList.contains('open')) return null;
+    var tops = [], el = target, inHome = false;
+    while (el && el !== document.body) {
+      if (el.id === 'masterPhoneChassis') { inHome = true; break; }
+      var cs = getComputedStyle(el);
+      if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight + 1) tops.push(el.scrollTop);
+      el = el.parentElement;
+    }
+    return inHome ? tops : null;
+  }
+  function shellScrollTops(target) {
+    return current ? rootScrollTops(target) : homeScrollTops(target);
+  }
+  trackPull(document, shellScrollTops, function () { return true; });
   /* pan: touches land in the frame's own document, so the same tracker is
    * attached there after every frame load (each reload swaps in a fresh
    * document). The frame is same-origin (its src is the site's own
@@ -383,7 +465,7 @@
       trackPull(doc, function () {
         var w = frame.contentWindow; if (!w) return null;
         return [w.scrollY || 0];
-      });
+      }, function () { return current === 'pan'; });
     } catch (e) {}
   }
 

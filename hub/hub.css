@@ -5,9 +5,9 @@
 #hubView .modRoot{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;background:inherit}
 #hubView .modRoot.on{display:block}
 /* pull-to-refresh indicator (hub.js tracks the gesture): a plain spinner
-   disc that follows the pull down from the top centre of the module view
-   and spins while the refresh runs. Shell chrome only — it exists solely
-   while a module is current, and never intercepts touches. */
+   disc that follows the pull down from the top centre and spins while
+   the refresh runs. Shell chrome only — it serves the home view and the
+   module views alike (phase 8), and never intercepts touches. */
 #hubPtr{position:fixed;left:50%;top:0;z-index:9600;width:38px;height:38px;margin-left:-19px;
   border-radius:50%;background:rgba(20,24,32,.88);box-shadow:0 6px 18px rgba(10,20,40,.25);
   display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;
@@ -38,3 +38,7 @@
 /* sub-application root (pan, phase 4): the frame owns its own scroll */
 #hubView .modRoot.subappRoot{overflow:hidden}
 #hubView .modRoot .subappFrame{width:100%;height:100%;border:0;display:block;background:#f3f8fa}
+/* pan boot cover (phase 8): full-root skeleton overlay above the frame,
+   on pan's own page background so the hand-off is seamless; hub.js
+   removes it only when the frame document actually renders its UI */
+#hubView .modRoot .panBoot{position:absolute;inset:0;z-index:2;background:#f3f8fa;padding:20px 16px;overflow:hidden}
