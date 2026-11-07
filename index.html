@@ -1119,7 +1119,18 @@
 
     .stack-nav-circle:active { transform: scale(0.92); }
 
-    .video-clear-pill-btn {
+        @keyframes pillLand {
+      0% { transform: scale(1); }
+      35% { transform: scale(1.14); }
+      65% { transform: scale(0.96); }
+      100% { transform: scale(1); }
+    }
+
+    .video-clear-pill-btn.pill-land {
+      animation: pillLand 0.38s cubic-bezier(.16, 1, .3, 1);
+    }
+
+.video-clear-pill-btn {
       height: clamp(26px, 3.8dvh, 30px);
       padding: 0 16px;
       border-radius: 999px;
@@ -2067,7 +2078,14 @@
 
       const finish = () => {
         if (proj.url) {
-          window.location.href = proj.url;
+          // 落点反馈（ken 定）：卡吸进胶囊钮的瞬间，钮要弹一下再跳转
+          const pill = document.getElementById('stackBottomPillBtn');
+          if (pill) {
+            pill.classList.remove('pill-land');
+            void pill.offsetWidth;
+            pill.classList.add('pill-land');
+          }
+          setTimeout(() => { window.location.href = proj.url; }, 200);
           return;
         }
         if (stage) stage.style.zIndex = '';
@@ -2086,8 +2104,12 @@
       const target = document.getElementById('stackBottomPillBtn') || document.querySelector('#stackDotsBar .stack-dot.active') || document.querySelector('.gemini-search-card');
       const r = el.getBoundingClientRect();
       const tr = target.getBoundingClientRect();
-      flyShrinkDX = (tr.left + tr.width / 2) - (r.left + r.width / 2);
-      flyShrinkDY = (tr.top + tr.height / 2) - (r.top + r.height / 2);
+      // 落点口径：层叠卡的 transform-origin 是 left center，收缩时整卡向
+      // 「渲染后的左中点」塌缩，所以要让这个点落到胶囊钮中心，而不是卡片中心；
+      // 位移还会被卡片当前的层叠缩放乘一次，先除掉
+      const baseScale = el.offsetWidth ? (r.width / el.offsetWidth) : 1;
+      flyShrinkDX = ((tr.left + tr.width / 2) - r.left) / baseScale;
+      flyShrinkDY = ((tr.top + tr.height / 2) - (r.top + r.height / 2)) / baseScale;
       if (stage) stage.style.zIndex = '60';
 
       stopFlyAnimation();
