@@ -12,7 +12,7 @@ ken 的微信与 Muse（逗包）之间的双向通道，2026-11-07 接通。
 - wechat-gateway.service — systemd 单元留档（开机自启、崩溃自拉）
 - ARCHITECTURE.md — 整体搭建说明（组件、脚本读写、故障自愈、边界）
 - 可行方案.md — 接入前的选型调研报告（14 条路线对比）
-- 可行方案.html — 上述方案的网页版（Muse 页面导出，单文件可直接打开）
+- 可行方案的网页版在仓库 frontend/wechat-bridge/（GitHub Pages 可直接打开，本目录只留文字版）
 
 ## 同步约定
 
