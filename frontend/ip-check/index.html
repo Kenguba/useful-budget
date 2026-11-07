@@ -1983,6 +1983,10 @@
     .rpt-ip-top { display: flex; justify-content: space-between; align-items: center; }
     .rpt-ip-label { font-size: 13.5px; font-weight: 700; color: var(--text-secondary); }
     .rpt-eye { border: none; background: none; padding: 9px; margin: -9px -9px -9px 0; cursor: pointer; display: inline-flex; }
+    #reportRoot { position: relative; }
+    .rpt-shot-img { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 6; display: block; }
+    .rpt-eye { position: relative; z-index: 7; }
+    #rptConfirmBtn, #rptCloseBtn { position: relative; z-index: 7; }
     .rpt-ip-main { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
     .rpt-ip-main .flag-badge { display: inline-flex; }
     .rpt-ip-main .flag-badge img { width: 30px; border-radius: 3px; display: block; }
@@ -2379,19 +2383,6 @@
     </footer>
   </div>
 
-  <!-- ================= 快照预览与导出弹窗 Modal ================= -->
-  <div class="modal-backdrop" id="snapshotModalBackdrop">
-    <div class="modal-card">
-      <div class="modal-head">
-        <span class="modal-title" id="snapshotModalTitle" data-i18n="snapTitle">IPPure 检测报告快照</span>
-        <button type="button" class="modal-close-btn">✕</button>
-      </div>
-      <div class="snapshot-preview-box" id="snapshotPreviewContent"></div>
-      <a class="modal-action-btn" id="snapDl" download="ip-info.png" data-i18n="snapDownload">下载图片</a>
-    </div>
-  </div>
-
-
   <div class="modal-backdrop" id="reportModalBackdrop">
     <div class="modal-card">
       <div class="rpt-scale-wrap" id="reportScaleWrap"><div class="rpt-board" id="reportRoot"></div></div>
@@ -2738,7 +2729,7 @@ function closeNavMenu(){
 /* ================= Toast / 快照弹窗 ================= */
 function showToast(msg){const t=$("toastBanner");if(!t)return;t.textContent=msg;t.classList.add("show");clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove("show"),1900)}
 const toast=showToast;
-function modalVisual(open){$("snapshotModalBackdrop").classList.toggle("open",open)}
+function modalVisual(open){const b=$("snapshotModalBackdrop");if(b)b.classList.toggle("open",open)}
 function openSnapshotModal(){spaPush({modal:true});modalVisual(true)}
 function closeSnapshotModal(){
   if(history.state&&history.state.spa&&history.state.spa.modal){history.back();return}
@@ -2747,7 +2738,7 @@ function closeSnapshotModal(){
 function rptVisual(open){$("reportModalBackdrop").classList.toggle("open",open)}
 function closeReportModal(){
   if(history.state&&history.state.spa&&history.state.spa.rpt){history.back();return}
-  spaState.rpt=false;rptVisual(false);
+  rptShot.active=false;spaState.rpt=false;rptVisual(false);
 }
 /* ================= 中英双语 ================= */
 const STR={
@@ -3373,49 +3364,6 @@ const NUM_EYE_OFF='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="r
 function syncNumEye(){$("numEyeBtn").innerHTML=state.numVisible?NUM_EYE_ON:NUM_EYE_OFF}
 $("numEyeBtn").addEventListener("click",()=>{state.numVisible=!state.numVisible;$("valDecimalIp").textContent=state.numVisible?$("valDecimalIp").dataset.num:"********";syncNumEye()});
 $("refreshCardBtn").addEventListener("click",()=>{$("refreshCardBtn").classList.remove("spinning");void $("refreshCardBtn").offsetWidth;$("refreshCardBtn").classList.add("spinning");bootSelf()});
-function showSnap(data){
-  const box=$("snapshotPreviewContent");
-  box.innerHTML="<img id='snapImg' style='max-width:100%;border-radius:10px;display:block;margin:0 auto' alt='IP snapshot'>";
-  box.querySelector("#snapImg").src=data;
-  $("snapDl").href=data;
-  openSnapshotModal();
-}
-async function renderNodeToPng(node){
-  const wrap=document.createElement("div");
-  wrap.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
-  wrap.style.cssText="width:"+node.offsetWidth+"px;background:"+getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()+";position:absolute;left:-99999px;top:0";
-  const cl=node.cloneNode(true);
-  wrap.appendChild(cl);
-  document.body.appendChild(wrap);
-  const walk=(o,n)=>{const cs=getComputedStyle(o);let t="";for(let i=0;i<cs.length;i++){const k=cs[i];t+=k+":"+cs.getPropertyValue(k)+";"}n.style.cssText=t;const oc=o.children,nc=n.children;for(let i=0;i<oc.length&&i<nc.length;i++)walk(oc[i],nc[i])};
-  walk(node,cl);
-  cl.querySelectorAll(".rpt-nocap").forEach(n=>n.remove());
-  wrap.querySelectorAll("svg").forEach(sv=>{if(!sv.getAttribute("xmlns"))sv.setAttribute("xmlns","http://www.w3.org/2000/svg")});
-  const imgs=wrap.querySelectorAll("img");
-  await Promise.all([...imgs].map(async im=>{try{const r=await fetch(im.src,{mode:"cors"});const b=await r.blob();im.src=await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>res("");fr.readAsDataURL(b)})}catch(e){im.src=""}}));
-  wrap.querySelectorAll("img").forEach(im=>{if(!im.src||im.src.indexOf("data:")!==0)im.remove()});
-  const draw=async()=>{
-    const W=wrap.offsetWidth,H=wrap.offsetHeight;
-    const xml=new XMLSerializer().serializeToString(wrap);
-    const svg="<svg xmlns='http://www.w3.org/2000/svg' width='"+W+"' height='"+H+"'><foreignObject width='100%' height='100%'>"+xml+"</foreignObject></svg>";
-    const url=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml;charset=utf-8"}));
-    const img=new Image();
-    try{await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url})}finally{URL.revokeObjectURL(url)}
-    const scale=2,cv=document.createElement("canvas");cv.width=W*scale;cv.height=H*scale;
-    const cx=cv.getContext("2d");cx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()||"#EEF6FA";cx.fillRect(0,0,cv.width,cv.height);cx.scale(scale,scale);cx.drawImage(img,0,0);
-    return cv.toDataURL("image/png");
-  };
-  try{
-    const data=await draw();
-    wrap.remove();
-    return data;
-  }catch(e){
-    wrap.querySelectorAll("img").forEach(im=>im.remove());
-    const data=await draw();
-    wrap.remove();
-    return data;
-  }
-}
 /* ---------- 截图报告（弹窗预览 → 确认出图） ---------- */
 const RPT_EYE_ON='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M1 12s4-7.5 11-7.5S23 12 23 12s-4 7.5-11 7.5S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const RPT_EYE_OFF='<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;stroke:#9aa1a9;fill:none"><path d="M17.94 17.94A10.6 10.6 0 0 1 12 19.5c-7 0-11-7.5-11-7.5a17.6 17.6 0 0 1 4.06-4.44M9.9 4.24A9.5 9.5 0 0 1 12 4.5c7 0 11 7.5 11 7.5a17.7 17.7 0 0 1-2.16 3.19M14.12 14.12A3 3 0 1 1 9.88 9.88"/><path d="M1 1l22 22"/></svg>';
@@ -3447,6 +3395,7 @@ function updateReportDynamic(d){
   const tb=$("rptTrustBody");if(tb)tb.innerHTML=fillTrustHtml(d);
   const av=$("rptAttrVal");if(av)av.innerHTML=attrValHtml(d);
   fitReportScale();
+  scheduleReportImage();
 }
 function fitReportScale(){
   const wrap=$("reportScaleWrap"),board=$("reportRoot");
@@ -3458,6 +3407,7 @@ function fitReportScale(){
 }
 function buildReport(){
   const d=state.data;if(!d)return;
+  rptShot.active=false;
   rptIps={v4:myIpState.v4||"",v6:myIpState.v6||"",ip:d.ip||""};
   rptVis={v4:myIpState.vis4!==false,v6:myIpState.vis6!==false,ip:state.ipVisible!==false};
   const place=[d.country,d.region,d.city].filter(Boolean).join(", ");
@@ -3513,7 +3463,7 @@ function buildReport(){
 }
 const rptData={ip:"",vendors:null,dns:null,rtc:null};
 const rptRun={vendors:0,dns:0,rtc:0,rtcActive:false};
-function rptRefit(){if($("reportModalBackdrop").classList.contains("open"))fitReportScale()}
+function rptRefit(){if($("reportModalBackdrop").classList.contains("open"))fitReportScale();scheduleReportImage()}
 function paintRptVendors(){
   if(!rptData.vendors)return;
   VENDORS.forEach((v,i)=>{const el=$("rptLat"+i);if(el&&rptData.vendors[i]!=null)el.textContent=rptData.vendors[i]});
@@ -3618,7 +3568,7 @@ function reportPrefetch(d){
   }
   startReportProbes(false);
 }
-function closeReportSilent(){spaState.rpt=false;spaSaveY();rptVisual(false)}
+function closeReportSilent(){rptShot.active=false;spaState.rpt=false;spaSaveY();rptVisual(false)}
 let h2cPromise=null;
 function loadHtml2Canvas(){
   if(window.html2canvas)return Promise.resolve();
@@ -3632,32 +3582,46 @@ function loadHtml2Canvas(){
   });
   return h2cPromise;
 }
-async function captureReport(){
-  const btn=$("rptConfirmBtn");
-  if(!btn||btn.dataset.busy)return;
-  btn.dataset.busy="1";
+const rptShot={active:false,busy:false,queued:false};
+let rptShotTimer=null;
+async function renderReportImage(quiet){
+  if(rptShot.busy){rptShot.queued=true;return}
+  const root=$("reportRoot");if(!root)return;
+  rptShot.busy=true;
   try{
-    toast(TD("rptGenerating"));
     await loadHtml2Canvas();
-    const wrap=$("reportScaleWrap"),board=$("reportRoot");
+    const wrap=$("reportScaleWrap");
     wrap.classList.add("capturing");
     let data;
     try{
-      const cv=await html2canvas(board,{scale:2,backgroundColor:getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()||"#EEF6FA",logging:false,ignoreElements:el=>!!(el.classList&&el.classList.contains("rpt-nocap"))});
+      const cv=await html2canvas(root,{scale:2,backgroundColor:getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim()||"#EEF6FA",logging:false,ignoreElements:el=>!!(el.classList&&(el.classList.contains("rpt-nocap")||el.classList.contains("rpt-shot-img")))});
       data=cv.toDataURL("image/png");
     }finally{
       wrap.classList.remove("capturing");
       fitReportScale();
     }
-    closeReportSilent();
-    showSnap(data);
+    let img=root.querySelector(".rpt-shot-img");
+    if(!img){img=document.createElement("img");img.className="rpt-shot-img";img.alt="IP snapshot";root.appendChild(img)}
+    img.src=data;
   }catch(e){
-    try{
-      const data=await renderNodeToPng($("reportRoot"));
-      closeReportSilent();
-      showSnap(data);
-    }catch(e2){toast(TD("snapFail"))}
+    if(!root.querySelector(".rpt-shot-img"))rptShot.active=false;
+    if(!quiet)toast(TD("snapFail"));
   }
+  rptShot.busy=false;
+  if(rptShot.queued){rptShot.queued=false;if(rptShot.active)renderReportImage(true)}
+}
+function scheduleReportImage(){
+  if(!rptShot.active)return;
+  clearTimeout(rptShotTimer);
+  rptShotTimer=setTimeout(()=>renderReportImage(true),700);
+}
+async function captureReport(){
+  const btn=$("rptConfirmBtn");
+  if(!btn||btn.dataset.busy)return;
+  btn.dataset.busy="1";
+  rptShot.active=true;
+  toast(TD("rptGenerating"));
+  await renderReportImage(false);
   delete btn.dataset.busy;
 }
 function openReport(){
@@ -3672,6 +3636,7 @@ $("reportRoot").addEventListener("click",e=>{
     const val=$("reportRoot").querySelector("[data-ipval='"+key+"']");
     if(val){val.textContent=rptVis[key]?rptIps[key]:starMask(rptIps[key]);val.classList.toggle("masked",!rptVis[key])}
     eye.innerHTML=rptVis[key]?RPT_EYE_ON:RPT_EYE_OFF;
+    scheduleReportImage();
     return;
   }
   const valEl=e.target.closest("[data-ipval]");
@@ -3836,8 +3801,6 @@ $("langBtn").addEventListener("click",toggleLanguage);
 $("themeBackdrop").addEventListener("click",closeThemePanel);
 $("hamburgerBtn").addEventListener("click",toggleNavMenu);
 $("navMenuBackdrop").addEventListener("click",closeNavMenu);
-$("snapshotModalBackdrop").addEventListener("click",e=>{if(e.target===$("snapshotModalBackdrop"))closeSnapshotModal()});
-document.querySelector(".modal-close-btn").addEventListener("click",closeSnapshotModal);
 
 const q=new URLSearchParams(location.search);
 const qip=(q.get("ip")||"").trim();
