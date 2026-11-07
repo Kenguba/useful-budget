@@ -1,0 +1,221 @@
+{
+ "site": "ai",
+ "dir": "ai-shop",
+ "source_bytes": 434985,
+ "script_blocks": [
+  {
+   "idx": 0,
+   "offset": 397,
+   "line": 10,
+   "region": "head",
+   "bytes": 2478,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  },
+  {
+   "idx": 1,
+   "offset": 65247,
+   "line": 1925,
+   "region": "body",
+   "bytes": 299827,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  },
+  {
+   "idx": 2,
+   "offset": 320069,
+   "line": 1926,
+   "region": "body",
+   "bytes": 57624,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  },
+  {
+   "idx": 3,
+   "offset": 375370,
+   "line": 2608,
+   "region": "body",
+   "bytes": 9104,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  }
+ ],
+ "bootstrap_hazards": [],
+ "head_scripts": [
+  {
+   "idx": 0,
+   "offset": 397,
+   "line": 10,
+   "region": "head",
+   "bytes": 2478,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  }
+ ],
+ "global_listeners": [
+  {
+   "target": "window",
+   "event": "resize",
+   "line": 250,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "popstate",
+   "line": 313,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "popstate",
+   "line": 320,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "popstate",
+   "line": 411,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "document",
+   "event": "click",
+   "line": 413,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "document",
+   "event": "keydown",
+   "line": 414,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "document",
+   "event": "click",
+   "line": 416,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "document",
+   "event": "keydown",
+   "line": 421,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "document",
+   "event": "click",
+   "line": 586,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "hashchange",
+   "line": 600,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "touchstart",
+   "line": 605,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "wheel",
+   "line": 606,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "keydown",
+   "line": 607,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "scroll",
+   "line": 610,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "pageshow",
+   "line": 617,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "resize",
+   "line": 660,
+   "recycled_on_unmount": true
+  }
+ ],
+ "element_listeners_count": 19,
+ "dangers": {
+  "document_write": [],
+  "eval": [],
+  "new_function": [],
+  "location_nav": [],
+  "history_writes": [
+   {
+    "line": 99,
+    "text": " history.scrollRestoration='manual'; history.replaceState({leaderNavSession,y:window.scrollY},'',location.href); }catch(e){} fu"
+   },
+   {
+    "line": 104,
+    "text": "eaderNavSession||st.y===y)return; try{history.replaceState({...st,y},'',location.href);}catch(e){} } /* 历史只记录滚动位置；最后点击的卡片只由用户点击改"
+   },
+   {
+    "line": 192,
+    "text": " saveLeaderPosition(); try{ history.pushState({leaderNavSession,y:window.scrollY},'','#grp-'+gid); }catch(e){} "
+   },
+   {
+    "line": 282,
+    "text": "activeElement; srcPrevSR=null; try{ history.pushState({museSrcPopup:1},''); srcHist=true; }catch(e){ srcHist=false; } window"
+   },
+   {
+    "line": 380,
+    "text": "ner=btn||document.activeElement; try{ history.pushState({musePcPopup:1},''); pcHist=true; }catch(e){ pcHist=false; } window.__"
+   },
+   {
+    "line": 588,
+    "text": "losest('a[data-anchor]'); if(a){ try{ history.pushState(null,'','#'+a.dataset.anchor); }catch(err){} } }); function jumpToHash()"
+   }
+  ],
+  "window_assignments": [
+   "INLINE_BOARD",
+   "__applyTabTheme",
+   "__srcSettleUntil"
+  ],
+  "service_worker": [],
+  "set_interval": []
+ },
+ "timers_note": "setInterval/setTimeout are NOT suspended on unmount (modules are never unloaded; intervals keep running against hidden DOM — see audit.md)",
+ "fetch_points": {
+  "literal_urls": [
+   "data/board-prices.json?t=",
+   "data/board.json",
+   "data/board.json?t=",
+   "data/shops.json",
+   "data/shops.json?t="
+  ],
+  "dynamic_fetch_calls": 8,
+  "xhr": 0,
+  "rule": "all fetch() calls in module scope pass the generated __fetch shadow: relative URLs resolve against /frontend/ai-shop/"
+ },
+ "shadow_name_declarations": [],
+ "inline_handler_bridge": {
+  "names": [],
+  "declared_in_source": [],
+  "not_found_as_declaration": []
+ },
+ "localstorage_keys": [
+  "aishop.theme.v1"
+ ],
+ "ui_relative_assets_rebased": []
+}

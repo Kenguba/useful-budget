@@ -1,0 +1,35 @@
+/* Hub shell overlay: sits above the home stack, below nothing else.
+   Module roots carry [data-mod] and their own scoped module.css. */
+#hubView{position:fixed;inset:0;z-index:9000;background:#f4f8fc;display:none}
+#hubView.on{display:block}
+#hubView .modRoot{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;background:inherit}
+#hubView .modRoot.on{display:block}
+#hubBack{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:9500;
+  display:none;align-items:center;gap:6px;border:0;border-radius:999px;padding:11px 18px;
+  background:rgba(20,24,32,.88);color:#fff;font-size:14px;font-weight:600;
+  box-shadow:0 8px 24px rgba(10,20,40,.28);backdrop-filter:blur(6px);cursor:pointer}
+#hubBack.on{display:flex}
+#hubBack svg{width:16px;height:16px;flex:none}
+#hubSkeleton{padding:18px 16px}
+#hubSkeleton .skblock{border-radius:8px;background:linear-gradient(100deg,#e6ecf3 40%,#f4f8fb 50%,#e6ecf3 60%);
+  background-size:200% 100%;animation:hubShim 1.2s infinite linear}
+@keyframes hubShim{to{background-position:-200% 0}}
+/* prototype-grade module rendering helpers (production port reuses each
+   site's own row markup; these only carry the prototype) */
+.hubGroup{background:#fff;border-radius:16px;margin:12px;padding:6px 14px 10px;box-shadow:0 1px 4px rgba(20,40,80,.06)}
+.hubGroup h3{font-size:15px;margin:12px 0 4px;color:#12233f}
+.hubGroup .cnt{color:#7a8799;font-size:12px;font-weight:400}
+.hubItem{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #eef2f6;cursor:pointer}
+.hubItem .tt{flex:1;min-width:0;font-size:13.5px;color:#1c2b45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hubItem .shop{display:block;color:#8494ab;font-size:11.5px;margin-top:2px}
+.hubItem .pr{font-weight:700;color:#0a7d4f;font-size:15px;white-space:nowrap}
+.hubItem .stk{font-size:11px;color:#b26a00;background:#fff4e0;border-radius:6px;padding:2px 6px;white-space:nowrap}
+.hubShopRow{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid #eef2f6;font-size:13.5px;color:#1c2b45}
+.hubShopRow span:last-child{color:#8494ab;font-size:12px;white-space:nowrap}
+.hubBrand{background:#fff;border-radius:16px;margin:12px;padding:14px 16px;box-shadow:0 1px 4px rgba(20,40,80,.06)}
+.hubBrand h3{margin:0 0 4px;font-size:15px;color:#12233f}
+.hubBrand p{margin:2px 0;font-size:12.5px;color:#5a6b84;line-height:1.55}
+.hubBrand .pr{color:#2456c8;font-weight:700}
+/* sub-application root (pan, phase 4): the frame owns its own scroll */
+#hubView .modRoot.subappRoot{overflow:hidden}
+#hubView .modRoot .subappFrame{width:100%;height:100%;border:0;display:block;background:#f3f8fa}
