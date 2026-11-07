@@ -1,0 +1,71 @@
+{
+ "site": "ui",
+ "dir": "ui-design",
+ "source_bytes": 99853,
+ "script_blocks": [
+  {
+   "idx": 0,
+   "offset": 65358,
+   "line": 2177,
+   "region": "body",
+   "bytes": 31930,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  }
+ ],
+ "bootstrap_hazards": [],
+ "head_scripts": [],
+ "global_listeners": [
+  {
+   "target": "window",
+   "event": "hashchange",
+   "line": 575,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "popstate",
+   "line": 576,
+   "recycled_on_unmount": true
+  }
+ ],
+ "element_listeners_count": 28,
+ "dangers": {
+  "document_write": [],
+  "eval": [],
+  "new_function": [],
+  "location_nav": [],
+  "history_writes": [
+   {
+    "line": 566,
+    "text": "ew) { showView(view, true); return; } history.pushState(null, \"\", \"#\" + view); showView(view, true); } document.querySelectorA"
+   }
+  ],
+  "window_assignments": [],
+  "service_worker": [],
+  "set_interval": []
+ },
+ "timers_note": "setInterval/setTimeout are NOT suspended on unmount (modules are never unloaded; intervals keep running against hidden DOM — see audit.md)",
+ "fetch_points": {
+  "literal_urls": [
+   "data/",
+   "data/finds.json"
+  ],
+  "dynamic_fetch_calls": 2,
+  "xhr": 0,
+  "rule": "all fetch() calls in module scope pass the generated __fetch shadow: relative URLs resolve against /frontend/ui-design/"
+ },
+ "shadow_name_declarations": [],
+ "inline_handler_bridge": {
+  "names": [],
+  "declared_in_source": [],
+  "not_found_as_declaration": []
+ },
+ "localstorage_keys": [
+  "ui-dark",
+  "ui-lang",
+  "ui-theme-idx"
+ ],
+ "ui_relative_assets_rebased": []
+}

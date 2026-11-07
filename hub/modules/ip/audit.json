@@ -1,0 +1,90 @@
+{
+ "site": "ip",
+ "dir": "ip-check",
+ "source_bytes": 191067,
+ "script_blocks": [
+  {
+   "idx": 0,
+   "offset": 81105,
+   "line": 2399,
+   "region": "body",
+   "bytes": 106757,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  }
+ ],
+ "bootstrap_hazards": [],
+ "head_scripts": [],
+ "global_listeners": [
+  {
+   "target": "window",
+   "event": "popstate",
+   "line": 293,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "pageshow",
+   "line": 304,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "scroll",
+   "line": 306,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "resize",
+   "line": 926,
+   "recycled_on_unmount": true
+  }
+ ],
+ "element_listeners_count": 35,
+ "dangers": {
+  "document_write": [],
+  "eval": [],
+  "new_function": [],
+  "location_nav": [],
+  "history_writes": [
+   {
+    "line": 278,
+    "text": "Y(){ spaState.y=window.scrollY; try{history.replaceState({spa:spaState},\"\",spaURL())}catch(e){} } function spaPush(patch){ s"
+   },
+   {
+    "line": 284,
+    "text": "ch); spaState.y=window.scrollY; try{history.pushState({spa:spaState},\"\",spaURL())}catch(e){} } function spaApply(st){ spaSta"
+   },
+   {
+    "line": 302,
+    "text": "; spaState.sec=($(id)?id:null); try{history.replaceState({spa:spaState},\"\",location.href)}catch(e){} })(); window.addEventList"
+   }
+  ],
+  "window_assignments": [],
+  "service_worker": [],
+  "set_interval": []
+ },
+ "timers_note": "setInterval/setTimeout are NOT suspended on unmount (modules are never unloaded; intervals keep running against hidden DOM — see audit.md)",
+ "fetch_points": {
+  "literal_urls": [
+   "https://"
+  ],
+  "dynamic_fetch_calls": 5,
+  "xhr": 0,
+  "rule": "all fetch() calls in module scope pass the generated __fetch shadow: relative URLs resolve against /frontend/ip-check/"
+ },
+ "shadow_name_declarations": [],
+ "inline_handler_bridge": {
+  "names": [],
+  "declared_in_source": [],
+  "not_found_as_declaration": []
+ },
+ "localstorage_keys": [
+  "ip-dark",
+  "ip-lang",
+  "ip-theme-idx"
+ ],
+ "ui_relative_assets_rebased": []
+}

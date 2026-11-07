@@ -1,0 +1,81 @@
+{
+ "site": "2fa",
+ "dir": "2fa-auth",
+ "source_bytes": 90934,
+ "script_blocks": [
+  {
+   "idx": 0,
+   "offset": 361,
+   "line": 10,
+   "region": "head",
+   "bytes": 824,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  },
+  {
+   "idx": 1,
+   "offset": 54770,
+   "line": 1946,
+   "region": "body",
+   "bytes": 34181,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  }
+ ],
+ "bootstrap_hazards": [],
+ "head_scripts": [
+  {
+   "idx": 0,
+   "offset": 361,
+   "line": 10,
+   "region": "head",
+   "bytes": 824,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  }
+ ],
+ "global_listeners": [
+  {
+   "target": "document",
+   "event": "click",
+   "line": 64,
+   "recycled_on_unmount": true
+  }
+ ],
+ "element_listeners_count": 18,
+ "dangers": {
+  "document_write": [],
+  "eval": [],
+  "new_function": [],
+  "location_nav": [],
+  "history_writes": [],
+  "window_assignments": [],
+  "service_worker": [],
+  "set_interval": [
+   {
+    "line": 600,
+    "text": "t window rollover (same as original) */ setInterval(() => { renderOtpCodes(false); }, 1000); /* ================= Init =========="
+   }
+  ]
+ },
+ "timers_note": "setInterval/setTimeout are NOT suspended on unmount (modules are never unloaded; intervals keep running against hidden DOM — see audit.md)",
+ "fetch_points": {
+  "literal_urls": [],
+  "dynamic_fetch_calls": 0,
+  "xhr": 0,
+  "rule": "all fetch() calls in module scope pass the generated __fetch shadow: relative URLs resolve against /frontend/2fa-auth/"
+ },
+ "shadow_name_declarations": [],
+ "inline_handler_bridge": {
+  "names": [],
+  "declared_in_source": [],
+  "not_found_as_declaration": []
+ },
+ "localstorage_keys": [
+  "2fa-aura-theme"
+ ],
+ "ui_relative_assets_rebased": []
+}
