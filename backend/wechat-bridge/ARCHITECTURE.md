@@ -57,3 +57,15 @@ ken 的微信 ↔ 腾讯 iLink（ClawBot 官方通道）↔ 这台虚拟机上�
 ## 当前实测状态（2026-11-07 19:05）
 
 - 服务 active、自启 enabled；inbox 累计 16 条；文字收发、报价点单、图片下载识别（陈都灵照片）均已实测通过
+
+## 迁移 / 从零重建
+
+换机器时照这个顺序走，就能把微信桥原样搭回来：
+
+1. 取文件：把本目录的 gateway.py、run-gateway.sh、wechat-gateway.service 放到新机 ~/workspace/wechat-bridge/gateway/；两个 hook 脚本（wechat-inbox.sh、wechat-gateway-guard.sh）放到新机 ~/hooks/scripts/
+2. Python 环境：在 gateway/ 下建虚拟环境装依赖——python3 -m venv .venv，然后 .venv/bin/pip install requests qrcode pillow cryptography
+3. 凭据：旧机 gateway/creds.json 还在就拷回原位并设权限 600；没有或已过期，在 gateway/ 下跑 .venv/bin/python gateway.py login，ken 微信扫码确认后自动生成
+4. 常驻服务：wechat-gateway.service 拷到 /etc/systemd/system/（里面的 WorkingDirectory 与 ExecStart 路径按新机实际改），再 systemctl daemon-reload 与 systemctl enable --now wechat-gateway；注意单元里写了当前运行时的出口代理变量（hatch-egress-proxy:3128），换到能直连外网的环境要删掉那几行
+5. 两个 hook：wechat-inbox 注册为 10 秒轮询、wechat-gateway-guard 注册为 30 秒轮询并启用；它们的状态文件在 ~/hooks/state/，首次运行自动创建
+6. 数据文件不用迁：inbox.jsonl、state.json、processed.json、outbox/、sent/、media/ 都是运行时状态，新机首次启动自动生成；想保留历史才把 inbox.jsonl 与 media/ 一起拷过去
+7. 验证：systemctl is-active wechat-gateway 显示 active、gateway.log 里长轮询在滚动；ken 微信发一条消息，能落盘、能唤醒 agent、能收到回复就是通了
