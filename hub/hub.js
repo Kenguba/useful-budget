@@ -12,7 +12,10 @@
   var MODULES = {
     phone: { proj: 'cloud-phone', dir: '/frontend/cloud-phone/', tier: 'light' },
     '2fa': { proj: '2fa-auth',    dir: '/frontend/2fa-auth/',    tier: 'light' },
-    skill: { proj: 'skill-board', dir: '/frontend/skill-board/', tier: 'light' },
+    /* backLeft: skill's own floating-quick-dock (position:fixed, bottom
+     * right) is a permanent resident of the bottom-right corner, so the
+     * shell puts its back capsule on the left while skill is current. */
+    skill: { proj: 'skill-board', dir: '/frontend/skill-board/', tier: 'light', backLeft: true },
     /* ai is on-demand (heaviest: code 320KB + board ~424KB): never in the
      * idle preload order; the focus-card warm path downloads ui/css/js only.
      * lazyShops is a SWITCH POSITION ONLY (phase 3, not implemented):
@@ -104,6 +107,7 @@
     if (current && current !== name) suspend(current);
     current = name;
     view.classList.add('on'); back.classList.add('on');
+    back.classList.toggle('hubBackLeft', !!cfg.backLeft);
     var root = rootFor(name);
     showRoot(name);
     if (push !== false) {
@@ -181,7 +185,7 @@
   function exitModule(push) {
     if (current) suspend(current);
     current = null;
-    view.classList.remove('on'); back.classList.remove('on');
+    view.classList.remove('on'); back.classList.remove('on'); back.classList.remove('hubBackLeft');
     if (push) { try { history.pushState(stamp(null), '', '/'); } catch (e) {} }
   }
 
