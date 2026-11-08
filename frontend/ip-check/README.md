@@ -11,3 +11,7 @@
 - **数据（全实时，无写死示例、无编造数值）**：定位 = ipwho.is / ipinfo.io / ipapi.co 三源实时结果逐行展示 + 共识定位；ASN / 前缀 / 持有人 / WHOIS / 路由历史 / BGP 邻居 / 地理库 = RIPEstat 实时接口；主机名 = ipinfo.io 实时 rDNS（缺失时 dns.google PTR 补查）；黑名单 = 经 dns.google 实时查 Spamhaus ZEN / Barracuda / SpamCop 三个 DNSBL。纯净度 / 风控值 = 本站按真实信号透明计算（类型基线 + 黑名单命中 + 注册地与定位一致性 + rDNS），公式逐项写在展开区「检测说明」；纯净 / 风险比、网段规模（前缀地址数）均由实时数据换算。大模型检测 = 实时定位国家与各厂商官方支持地区名单核对。
 - **示例锚点**：`172.105.*.*` 与 `1.170.*.*` 两组数据与参考截图逐字段对齐；也支持 `?ip=1.2.*.*` 直查、`?demo=1` 只看示例不自动检测。
 - 子域名：`ip.xxxxx.asia`（经 site-router 转发，ROUTES 加 `ip: "ip-check"` 一行）。
+
+## Cookie A 实现细则
+
+ip-check 是单槽：主题只有一个槽，读 `A` 后主题号 1–12 直接作为本站主题，语言、日夜也全部跟 `A` 走；ip-check 的 localStorage 键为 `ip-theme-idx` / `ip-dark` / `ip-lang`，与 `A` 双写
