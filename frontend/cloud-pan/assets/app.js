@@ -1317,15 +1317,18 @@
       : load("app").catch(function () { return {}; });
     return appLive.then(function (a) { dataCache.app = a || {}; state.appInfo = dataCache.app; });
   }
-  function loadAndRender(key) {
-    if (key === "home") return Promise.all([getHot(), getUpdates(), getDiscovery()]).then(function () { renderHome(); });
-    if (key === "search") return Promise.all([getHot(), getUpdates(), getDiscovery()]).then(function () { renderSearch(); });
-    if (key === "discover") return getDiscovery().then(function () { renderDiscover(); });
-    if (key === "today") return getUpdates().then(function () { renderToday(); });
-    if (key === "hot") return getHot().then(function () { renderHot(); });
-    if (key === "resource") return load("updates").then(function (u) { fillUpdates(u); renderResource(); }).catch(function () { renderResource(); });
-    if (key === "app") return getApp().then(function () { renderApp(); });
-    if (key === "apply") return getFriend().then(function () { renderApply(); });
+  function loadAndRender(key, seq) {
+    /* 渲染前必须确认这次导航仍是最新一次：数据谁先回不一定，旧视图的数据迟到时
+       不许再往 #main 里写，否则会出现标签高亮与正文对不上的错位（2026-11-09 实测定位） */
+    function live(fn) { return function () { if (seq === renderSeq) fn(); }; }
+    if (key === "home") return Promise.all([getHot(), getUpdates(), getDiscovery()]).then(live(renderHome));
+    if (key === "search") return Promise.all([getHot(), getUpdates(), getDiscovery()]).then(live(renderSearch));
+    if (key === "discover") return getDiscovery().then(live(renderDiscover));
+    if (key === "today") return getUpdates().then(live(renderToday));
+    if (key === "hot") return getHot().then(live(renderHot));
+    if (key === "resource") return load("updates").then(function (u) { fillUpdates(u); if (seq === renderSeq) renderResource(); }).catch(function () { if (seq === renderSeq) renderResource(); });
+    if (key === "app") return getApp().then(live(renderApp));
+    if (key === "apply") return getFriend().then(live(renderApply));
     renderHome();
     return Promise.resolve();
   }
@@ -1380,6 +1383,7 @@
     if (m) m.innerHTML = key === "home" ? "" : '<div class="wrap"></div>';
   }
   var routerReady = false, currentKey = null, lastHref = location.href, renderedHref = location.href, scrollCache = {};
+  var renderSeq = 0;
   function navigate(url, push) {
     var u;
     try { u = new URL(url, location.href); } catch (e) { location.href = url; return; }
@@ -1396,7 +1400,9 @@
     currentKey = key;
     updateShell(key);
     mountReset(key);
-    loadAndRender(key).then(function () {
+    var seq = ++renderSeq;
+    loadAndRender(key, seq).then(function () {
+      if (seq !== renderSeq) return;
       if (push === false) window.scrollTo(0, scrollCache[u.href] || 0);
       else window.scrollTo(0, 0);
     });
@@ -1431,6 +1437,6 @@
     if (state.site.presentation) state.site.presentation.contact_image = absolutize(state.site.presentation.contact_image);
     renderShell(page);
     currentKey = page;
-    loadAndRender(page).then(function () { installRouter(); });
+    loadAndRender(page, ++renderSeq).then(function () { installRouter(); });
   });
 })();
