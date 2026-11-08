@@ -3,6 +3,8 @@
 配套脚本：同目录 `jpcard-server-init.sh`
 用途：新服务器初始化——建组、建 deployer 用户、配 Git 与 GitHub SSH 密钥、拉取 Kenguba/jpcard 仓库、设置项目共享权限
 
+图为 Mermaid 版，在 GitHub 打开自动渲染成图形；每张图下方附 ASCII 版，纯文本打开也能看
+
 ## 一、先分清三种东西
 
 | 概念 | 是什么 | 例子 |
@@ -14,6 +16,26 @@
 grp 只是英文 group 的缩写前缀，一眼区分谁是组、谁是人；Linux 本身不认前缀
 
 ## 二、拿 deployer 解剖
+
+```mermaid
+flowchart LR
+    U["deployer 用户<br/>能登录 · 家目录 /home/deployer"]
+    P["主组（只能 1 个）<br/>grp_employees"]
+    S["附加组（可多个）<br/>grp_deploy"]
+    R["角色：部署"]
+    U -->|"-g 指定"| P
+    U -->|"-aG 追加"| S
+    P --> R
+    S --> R
+    classDef user fill:#dbeafe,stroke:#4a90d9,color:#111
+    classDef grp fill:#fef3c7,stroke:#e0a63f,color:#111
+    classDef role fill:#ede9fe,stroke:#9a6ee8,color:#111
+    class U user
+    class P,S grp
+    class R role
+```
+
+ASCII 版：
 
 ```
 deployer            ← 用户，能登录，有家目录 /home/deployer
@@ -31,6 +53,27 @@ deployer（人）＋ grp_deploy（标签）＝ 扮演「部署」角色
 
 ## 三、全员结构：一个地基组 + 四张角色标签
 
+```mermaid
+flowchart TD
+    E["grp_employees<br/>全员主组 · 共享地基"]
+    D["deployer"] -->|"附加 grp_deploy"| RD["角色：部署"]
+    F["frontend"] -->|"附加 grp_frontend"| RF["角色：前端"]
+    B["backend"] -->|"附加 grp_backend"| RB["角色：后端"]
+    O["ops"] -->|"附加 grp_ops"| RO["角色：运维"]
+    E --- D
+    E --- F
+    E --- B
+    E --- O
+    classDef grp fill:#fef3c7,stroke:#e0a63f,color:#111
+    classDef user fill:#dbeafe,stroke:#4a90d9,color:#111
+    classDef role fill:#ede9fe,stroke:#9a6ee8,color:#111
+    class E grp
+    class D,F,B,O user
+    class RD,RF,RB,RO role
+```
+
+ASCII 版：
+
 ```
 grp_employees ← 全员主组（共享地基）
 ├── deployer（主组）+ 附加 grp_deploy  → 部署
@@ -42,6 +85,20 @@ grp_employees ← 全员主组（共享地基）
 注意：脚本只真正创建 deployer 这一个用户；frontend、backend、ops 三个用户脚本不建，只先建好对应的组占位，以后要用人时再建用户、贴标签
 
 ## 四、这套组落到 jpcard 项目上的权限
+
+```mermaid
+flowchart LR
+    D["deployer<br/>所有者"] -->|"读 + 写 + 进入"| PJ["/home/deployer/jpcard"]
+    G["grp_employees<br/>组员"] -->|"只读 + 进入"| PJ
+    X["其他人"] -->|"全拒"| PJ
+    D -.->|"私钥锁 700，组员摸不到"| K["~/.ssh 拉仓库的密钥"]
+    classDef user fill:#dbeafe,stroke:#4a90d9,color:#111
+    classDef grp fill:#fef3c7,stroke:#e0a63f,color:#111
+    classDef proj fill:#dcfce7,stroke:#3aa655,color:#111
+    class D,X user
+    class G grp
+    class PJ,K proj
+```
 
 项目目录 `/home/deployer/jpcard`：
 
@@ -58,6 +115,20 @@ grp_employees ← 全员主组（共享地基）
 - 例外隔离：deployer 的 `~/.ssh` 锁 700、私钥 600，组员能进项目，摸不到拉仓库的私钥
 
 ## 五、另一层：系统管理权（与上面的组无关）
+
+```mermaid
+flowchart TD
+    R["root<br/>最高权限 · 默认锁远程登录"]
+    SG["sudo 组"] --> R
+    UB["ubuntu<br/>组里唯一成员"] --> SG
+    UB -.->|"sudo -i 亮证"| R
+    classDef sys fill:#fee2e2,stroke:#d94a4a,color:#111
+    classDef user fill:#dbeafe,stroke:#4a90d9,color:#111
+    class R,SG sys
+    class UB user
+```
+
+ASCII 版：
 
 ```
 root 最高权限（默认锁远程登录）
