@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# WireGuard for UCloud Singapore 128.1.x.x, Ubuntu 24.04, run via sudo
+# WireGuard for UCloud Singapore, Ubuntu 24.04, run via sudo
+# 公开版已打码：SERVER_IP 只写前两段，实操前把 x.x 换成真实公网 IP 后两段（实操版在本地工作区）
+SERVER_IP="128.1.x.x"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update && apt-get install -y wireguard qrencode iptables
 sysctl -w net.ipv4.ip_forward=1
@@ -33,7 +35,7 @@ DNS = 1.1.1.1
 [Peer]
 PublicKey = $(cat /etc/wireguard/server.pub)
 PresharedKey = $(cat /etc/wireguard/client1.psk)
-Endpoint = 128.1.x.x:51820
+Endpoint = $SERVER_IP:51820
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 25
 EOF
