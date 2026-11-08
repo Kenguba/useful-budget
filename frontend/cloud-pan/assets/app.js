@@ -169,17 +169,33 @@
   }
   /* 优先实时（经中转），失败回退快照；live=true 表示本次走的是实时数据。
      实时请求加 10 秒上限：中转慢/挂起时不等死，按失败口径回退快照先把页面渲染出来，避免长时间白屏 */
+  var staleMap = {};
+  function snapDate(d) {
+    if (!d) return "";
+    if (d.updated_at) return String(d.updated_at).slice(0, 10);
+    var arr = d.items || (Array.isArray(d) ? d : []), mx = "";
+    for (var i = 0; i < arr.length; i++) { var t = arr[i] && arr[i].updated_at; if (t && t > mx) mx = t; }
+    return mx ? mx.slice(0, 10) : "";
+  }
+  function markStale(name, d) { staleMap[name] = snapDate(d); }
+  /* 回退快照时必须明示（ken 口径：旧数据冒充实时是误导）：渲染层在对应区块上方挂这条 */
+  function staleNote(name) {
+    if (!(name in staleMap)) return "";
+    var d = staleMap[name];
+    return '<div class="stale-note">实时数据暂不可用，以下为历史快照' + (d ? "（截至 " + d + "）" : "") + "，恢复后自动更新</div>";
+  }
   function liveOr(path, snapName, onLive) {
-    if (!relayReady()) return load(snapName).catch(function () { return null; });
+    if (!relayReady()) return load(snapName).then(function (d) { markStale(snapName, d); return d; }).catch(function () { return null; });
     var api = apiGet(path).then(function (d) {
       if (onLive) onLive();
+      delete staleMap[snapName];
       return d;
     });
     var slow = new Promise(function (resolve, reject) {
       setTimeout(function () { reject(new Error("api timeout")); }, 10000);
     });
     return Promise.race([api, slow]).catch(function () {
-      return load(snapName).catch(function () { return null; });
+      return load(snapName).then(function (d) { markStale(snapName, d); return d; }).catch(function () { return null; });
     });
   }
   function toast(msg) {
@@ -716,7 +732,7 @@
     html += '<div class="section"><div class="cols">' +
       '<div class="card"><div class="card-head"><span class="ic ic-green">🕐</span><div><h2>每日更新</h2>' +
       '<div class="desc">新发布与追更内容，随时发现更新</div></div>' +
-      '<a class="more" href="' + BASE + 'today/">全部更新 →</a></div>' + upd8 +
+      '<a class="more" href="' + BASE + 'today/">全部更新 →</a></div>' + staleNote("updates") + upd8 +
       '<div class="card-foot"><a href="' + BASE + 'today/">浏览每日更新 →</a></div></div>' +
       '<div class="card"><div class="card-head"><span class="ic ic-orange">🔥</span><div><h2>热门搜索</h2>' +
       '<div class="desc">看看大家正在寻找什么</div></div>' +
@@ -766,7 +782,7 @@
       updLine = '<div style="color:var(--faint);font-size:13px;margin-top:14px">更新于 ' + bj + " 00:00</div>";
     }
     main.innerHTML =
-      '<div class="page-head"><h1>发现</h1><div class="desc">近期值得关注的影视作品。</div></div>' +
+      '<div class="page-head"><h1>发现</h1><div class="desc">近期值得关注的影视作品。</div></div>' + staleNote("discovery") +
       '<div class="card" style="padding:24px 26px;margin-top:14px">' +
       '<div class="filters">' +
       '<div class="frow"><span class="fl">影视分类</span><span id="dCat"></span></div>' +
@@ -800,7 +816,7 @@
     main.innerHTML =
       '<div class="page-head page-head-flex"><div><h1>每日更新</h1><div class="desc">新发布与追更内容 · 共 ' +
       '<span id="tTotal">' + total + "</span> 项</div></div>" +
-      '</div>' +
+      '</div>' + staleNote("updates") +
       '<div class="today-tools"><div class="t-search"><input id="tKw" placeholder="搜索每日更新">' +
       '<button class="btn-small blue" id="tSearchBtn">搜索</button><button class="btn-small view-toggle-btn" id="tViewBtn" type="button" aria-label="切换视图" title="切换视图"></button></div></div>' +
       '<div class="frow" style="margin:4px 0 14px"><span id="tPan"></span></div>' +
@@ -921,7 +937,7 @@
         '<span class="hot-count">' + cnt + "</span></div>";
     }).join("");
     main.innerHTML =
-      '<div class="page-head"><h1>热搜榜</h1><div class="desc">查看站内用户最近搜索最多的内容。</div></div>' +
+      '<div class="page-head"><h1>热搜榜</h1><div class="desc">查看站内用户最近搜索最多的内容。</div></div>' + staleNote("hot") +
       '<div class="card" style="margin-top:14px"><div class="hot-grid">' + cells + "</div></div>";
   }
 
