@@ -747,7 +747,7 @@ def main():
                 data = d.get('data') or {}
                 q = data.get('stock_available_quantity')
                 lq = data.get('limit_quantity')
-                return (int(q) if isinstance(q, (int, float)) else None,
+                return (int(q) if isinstance(q, (int, float)) and q >= 0 else None,
                         lq if isinstance(lq, int) and lq > 1 else None)
             if 'aicdks.com' in url or '/item/' in url:
                 txt = strip_tags(fetch(url, retries=0).decode('utf-8', 'ignore'))

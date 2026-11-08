@@ -1933,7 +1933,7 @@ let shopsFailed=false, shopsRetry=0;
 const SKEL_SHOPS='<div class="skrow"><div style="flex:1;min-width:0"><div class="skblock" style="width:34%;height:14px"></div><div class="skblock" style="width:22%;height:11px;margin-top:6px"></div></div></div><div class="skrow"><div style="flex:1;min-width:0"><div class="skblock" style="width:34%;height:14px"></div><div class="skblock" style="width:22%;height:11px;margin-top:6px"></div></div></div><div class="skrow"><div style="flex:1;min-width:0"><div class="skblock" style="width:34%;height:14px"></div><div class="skblock" style="width:22%;height:11px;margin-top:6px"></div></div></div><div class="skrow"><div style="flex:1;min-width:0"><div class="skblock" style="width:34%;height:14px"></div><div class="skblock" style="width:22%;height:11px;margin-top:6px"></div></div></div><div class="skrow"><div style="flex:1;min-width:0"><div class="skblock" style="width:34%;height:14px"></div><div class="skblock" style="width:22%;height:11px;margin-top:6px"></div></div></div><div class="skrow"><div style="flex:1;min-width:0"><div class="skblock" style="width:34%;height:14px"></div><div class="skblock" style="width:22%;height:11px;margin-top:6px"></div></div></div>';
 
 function stockTxt(it){
-  if(it.stock===null||it.stock===undefined) return '有货';
+  if(it.stock===null||it.stock===undefined||it.stock<0) return '有货';
   if(it.stock===0) return '库存 0';
   if(it.stock<=2) return '<span class="stk-urgent">只剩 '+it.stock+' 个</span>';
   if(it.stock===3) return '<span class="stk-low">库存 3</span>';

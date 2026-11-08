@@ -126,7 +126,7 @@ def detail_stock(it):
             if not d.get('data') and '不存在' in str(d.get('msg') or ''):
                 return NOT_FOUND
             q = (d.get('data') or {}).get('stock_available_quantity')
-            return int(q) if isinstance(q, (int, float)) else None
+            return int(q) if isinstance(q, (int, float)) and q >= 0 else None
         if 'aicdks.com' in url or '/item/' in url:
             txt = strip_tags(fetch(url).decode('utf-8', 'ignore'))
             if '售罄' in txt or '已售完' in txt:
