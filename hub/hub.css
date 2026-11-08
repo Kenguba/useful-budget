@@ -63,24 +63,25 @@
    removes it only when the frame document actually renders its UI */
 #hubView .modRoot .panBoot{position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,#e9fbf2 0%,#f2fbf7 46%,#f6fbf9 100%);padding:14px 16px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:#0f172a}
 /* static-first boot cover (ken 2026-11-08): real static chrome, skeleton only in data zones */
-.panBoot .pb-head{display:flex;align-items:center;gap:10px}
-.panBoot .pb-logo{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#2fd08c,#17b978);display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 6px 14px rgba(23,185,120,.28)}
-.panBoot .pb-logo svg{width:26px;height:26px}
-.panBoot .pb-name{font-size:21px;font-weight:800;letter-spacing:.5px}
-.panBoot .pb-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
-.panBoot .pb-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.82);border:1px solid rgba(15,23,42,.05);border-radius:999px;padding:7px 12px;font-size:13.5px;font-weight:700;box-shadow:0 3px 10px rgba(15,60,40,.06)}
+.panBoot .pb-head{display:flex;align-items:center;gap:8px}
+.panBoot .pb-logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#2fd08c,#17b978);display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 6px 14px rgba(23,185,120,.28)}
+.panBoot .pb-logo svg{width:23px;height:23px}
+.panBoot .pb-name{font-size:19px;font-weight:800;letter-spacing:.5px;white-space:nowrap;flex:none}
+.panBoot .pb-actions{margin-left:auto;display:flex;align-items:center;gap:6px;flex:none}
+.panBoot .pb-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.82);border:1px solid rgba(15,23,42,.05);border-radius:999px;padding:7px 10px;font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 3px 10px rgba(15,60,40,.06)}
 .panBoot .pb-pill svg{width:15px;height:15px}
-.panBoot .pb-sun{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.82);border:1px solid rgba(15,23,42,.05);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(15,60,40,.06)}
+.panBoot .pb-sun{width:34px;height:34px;flex:none;border-radius:50%;background:rgba(255,255,255,.82);border:1px solid rgba(15,23,42,.05);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(15,60,40,.06)}
 .panBoot .pb-sun svg{width:19px;height:19px}
 .panBoot .pb-tabs{display:flex;gap:6px;margin-top:16px}
-.panBoot .pb-tab{font-size:15.5px;font-weight:600;color:#1e293b;padding:8px 13px;border-radius:999px}
+.panBoot .pb-tab{font-size:15px;font-weight:600;color:#1e293b;padding:8px 11px;border-radius:999px;white-space:nowrap;flex:none}
+@media (max-width:340px){.panBoot .pb-tab{padding:8px 8px;font-size:14px}.panBoot .pb-pill{padding:7px 8px}.panBoot .pb-name{font-size:18px}}
 .panBoot .pb-tab.on{background:#fff;font-weight:800;box-shadow:0 4px 12px rgba(15,60,40,.09)}
-.panBoot .pb-promo{display:inline-flex;align-items:center;gap:6px;margin-top:18px;background:rgba(209,250,229,.75);color:#047857;font-size:13px;font-weight:700;border-radius:999px;padding:7px 13px}
+.panBoot .pb-promo{display:inline-flex;align-items:center;gap:6px;margin-top:18px;white-space:nowrap;max-width:100%;background:rgba(209,250,229,.75);color:#047857;font-size:13px;font-weight:700;border-radius:999px;padding:7px 13px}
 .panBoot .pb-promo svg{width:13px;height:13px}
 .panBoot .pb-title{font-size:34px;font-weight:800;letter-spacing:1px;margin-top:12px;color:#0b1526}
 .panBoot .pb-title span{background:linear-gradient(92deg,#10b981,#06b6d4);-webkit-background-clip:text;background-clip:text;color:transparent}
 .panBoot .pb-search{display:flex;align-items:center;gap:10px;background:#fff;border-radius:999px;height:56px;padding:6px 6px 6px 8px;margin-top:16px;box-shadow:0 10px 26px rgba(13,84,60,.10)}
-.panBoot .pb-scope{display:inline-flex;align-items:center;gap:3px;background:#f1f5f9;border-radius:999px;padding:9px 12px;font-size:14.5px;font-weight:700;flex:none}
+.panBoot .pb-scope{display:inline-flex;align-items:center;gap:3px;background:#f1f5f9;border-radius:999px;padding:9px 12px;font-size:14.5px;font-weight:700;flex:none;white-space:nowrap}
 .panBoot .pb-scope svg{width:14px;height:14px}
 .panBoot .pb-ph{flex:1;color:#94a3b8;font-size:15px;white-space:nowrap;overflow:hidden}
 .panBoot .pb-go{width:44px;height:44px;border-radius:50%;background:#9ee0c5;display:flex;align-items:center;justify-content:center;flex:none}
