@@ -1,7 +1,7 @@
 # VPN 协议图文说明
 
 > 同一台手机、同一台服务器，区别只在路上穿什么衣服
-> 本目录脚本：`install-wireguard.sh`（WireGuard 服务端一键安装，UDP 51820）
+> 本目录脚本：[install-wireguard.sh](./install-wireguard.sh)（WireGuard 服务端一键安装，UDP 51820）
 
 ## 一、总图：手机怎么连到新加坡
 
