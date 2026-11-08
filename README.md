@@ -5,7 +5,7 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 - 仓库：https://github.com/Kenguba/useful-budget
 - 网站：https://kenguba.github.io/useful-budget/
 
-**读取口径（先看这条）**：本文件是索引，不是全文。每次先读「目录规范」与「约定」；其余各节按任务读——「新增项目规范」只在新建或下线项目时读，「子域名」只在动域名、路由、首页收录时读，页面规范（在 frontend/README.md）只在做页面时读，「现有项目」只查当前项目那一行。各子目录文档（如 backend 与各项目 README）按需沿链接只读一层，读到能办事为止，不逐个打开、不链式通读
+**读取口径（先看这条）**：本文件是索引，不是全文。每次先读「目录规范」与「约定」；其余各节按任务读——「新增项目规范」只在新建或下线项目时读，「子域名」只在动域名、路由、首页收录时读，页面规范（即 UI 规范，在 frontend/README.md）只在做页面时读，「现有项目」只查当前项目那一行。各子目录文档（如 backend 与各项目 README）按需沿链接只读一层，读到能办事为止，不逐个打开、不链式通读
 
 ## 目录规范
 
@@ -80,4 +80,4 @@ frontend/<project>/           # 例：frontend/skill-board/
 
 ## 页面规范
 
-页面与 UI 的通用规范（加载顺序、列表触底、移动端、Cookie A 总框架、图标与主题高亮等）统一放在 [frontend/README.md](frontend/README.md)，做页面时读那一份；各站实现细则在各站 README
+页面与 UI 的通用规范（即 UI 规范，含加载顺序、列表触底、移动端、Cookie A 总框架、图标与主题高亮等）统一放在 [frontend/README.md](frontend/README.md)，做页面时读那一份；各站实现细则在各站 README
