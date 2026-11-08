@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-08 11:31",
+ "updated_at": "2026-11-08 11:37",
  "source": "AI价网 + cardnav + PriceAI + 16688 直拉 按商家遍历合并",
  "groups": [
   {
@@ -122,6 +122,82 @@
      "kind": "",
      "same_source": 1,
      "pc": "2026-11-06"
+    },
+    {
+     "price": 22.0,
+     "shop": "圆梦AI",
+     "platform": "16688",
+     "stock": 3,
+     "title": "Plus | 成品号 |11.7 新| iCloud||一号一住宅IP| UPI | 未绑定手机 | 邮箱+G密码+2FA | 质保首登",
+     "url": "https://www.16688.com.cn/goods/G96934996",
+     "kind": "",
+     "same_source": 9,
+     "sources": [
+      {
+       "price": 22.0,
+       "shop": "圆梦AI",
+       "platform": "16688",
+       "stock": 3,
+       "url": "https://www.16688.com.cn/goods/G96934996"
+      },
+      {
+       "price": 27.0,
+       "shop": "open-store",
+       "platform": "16688",
+       "stock": 3,
+       "url": "https://www.16688.com.cn/goods/G99545992"
+      },
+      {
+       "price": 27.1,
+       "shop": "凌小创ai",
+       "platform": "16688",
+       "stock": 3,
+       "url": "https://www.16688.com.cn/goods/G46680355"
+      },
+      {
+       "price": 27.5,
+       "shop": "北橘号铺-对接:DC260818VOY2Y7AD",
+       "platform": "16688",
+       "stock": 3,
+       "url": "https://www.16688.com.cn/goods/G95699575"
+      },
+      {
+       "price": 27.5,
+       "shop": "珠世AI",
+       "platform": "16688",
+       "stock": 3,
+       "url": "https://www.16688.com.cn/goods/G40868068"
+      },
+      {
+       "price": 27.5,
+       "shop": "一梦AI货源 招代理 对接马yimeng",
+       "platform": "16688",
+       "stock": 3,
+       "url": "https://www.16688.com.cn/goods/G63833842"
+      },
+      {
+       "price": 28.9,
+       "shop": "AI批量部",
+       "platform": "16688",
+       "stock": 3,
+       "url": "https://www.16688.com.cn/goods/G97564590"
+      },
+      {
+       "price": 31.25,
+       "shop": "YUJI",
+       "platform": "16688",
+       "stock": 3,
+       "url": "https://www.16688.com.cn/goods/G13827198"
+      },
+      {
+       "price": 31.9,
+       "shop": "源头ai",
+       "platform": "16688",
+       "stock": 3,
+       "url": "https://www.16688.com.cn/goods/G17064740"
+      }
+     ],
+     "pc": "2026-11-08"
     },
     {
      "price": 22.0,
@@ -1384,82 +1460,6 @@
       }
      ],
      "pc": "2026-11-06"
-    },
-    {
-     "price": 24.5,
-     "shop": "圆梦AI",
-     "platform": "16688",
-     "stock": 3,
-     "title": "Plus | 成品号 |11.7 新| iCloud||一号一住宅IP| UPI | 未绑定手机 | 邮箱+G密码+2FA | 质保首登",
-     "url": "https://www.16688.com.cn/goods/G96934996",
-     "kind": "",
-     "same_source": 9,
-     "sources": [
-      {
-       "price": 24.5,
-       "shop": "圆梦AI",
-       "platform": "16688",
-       "stock": 3,
-       "url": "https://www.16688.com.cn/goods/G96934996"
-      },
-      {
-       "price": 27.0,
-       "shop": "open-store",
-       "platform": "16688",
-       "stock": 3,
-       "url": "https://www.16688.com.cn/goods/G99545992"
-      },
-      {
-       "price": 27.1,
-       "shop": "凌小创ai",
-       "platform": "16688",
-       "stock": 3,
-       "url": "https://www.16688.com.cn/goods/G46680355"
-      },
-      {
-       "price": 27.5,
-       "shop": "北橘号铺-对接:DC260818VOY2Y7AD",
-       "platform": "16688",
-       "stock": 3,
-       "url": "https://www.16688.com.cn/goods/G95699575"
-      },
-      {
-       "price": 27.5,
-       "shop": "珠世AI",
-       "platform": "16688",
-       "stock": 3,
-       "url": "https://www.16688.com.cn/goods/G40868068"
-      },
-      {
-       "price": 27.5,
-       "shop": "一梦AI货源 招代理 对接马yimeng",
-       "platform": "16688",
-       "stock": 3,
-       "url": "https://www.16688.com.cn/goods/G63833842"
-      },
-      {
-       "price": 28.9,
-       "shop": "AI批量部",
-       "platform": "16688",
-       "stock": 3,
-       "url": "https://www.16688.com.cn/goods/G97564590"
-      },
-      {
-       "price": 31.25,
-       "shop": "YUJI",
-       "platform": "16688",
-       "stock": 3,
-       "url": "https://www.16688.com.cn/goods/G13827198"
-      },
-      {
-       "price": 31.9,
-       "shop": "源头ai",
-       "platform": "16688",
-       "stock": 3,
-       "url": "https://www.16688.com.cn/goods/G17064740"
-      }
-     ],
-     "pc": "2026-11-07"
     },
     {
      "price": 25.0,
@@ -6454,7 +6454,7 @@
      "price": 7.7,
      "shop": "AI批发的杂货店",
      "platform": "16688",
-     "stock": 435,
+     "stock": 434,
      "title": "Gemini pro CDK充值6个月 pixle 都支持gemini4 opus5.5（关闭支付资料）假人机多次提交即可",
      "url": "https://www.16688.com.cn/goods/G33874344",
      "kind": "人机号",
@@ -6464,28 +6464,28 @@
        "price": 7.7,
        "shop": "AI批发的杂货店",
        "platform": "16688",
-       "stock": 435,
+       "stock": 434,
        "url": "https://www.16688.com.cn/goods/G33874344"
       },
       {
        "price": 7.7,
        "shop": "梦泽Ai",
        "platform": "16688",
-       "stock": 435,
+       "stock": 434,
        "url": "https://www.16688.com.cn/goods/G51598046"
       },
       {
        "price": 7.7,
        "shop": "👑XAI店铺（全品类✨超市）🔥",
        "platform": "16688",
-       "stock": 435,
+       "stock": 434,
        "url": "https://www.16688.com.cn/goods/G41071568"
       },
       {
        "price": 8.0,
        "shop": "S485596",
        "platform": "16688",
-       "stock": 435,
+       "stock": 434,
        "url": "https://www.16688.com.cn/goods/G36810516"
       },
       {
@@ -6499,7 +6499,7 @@
        "price": 11.0,
        "shop": "大鳄鱼官方代充",
        "platform": "16688",
-       "stock": 435,
+       "stock": 434,
        "url": "https://www.16688.com.cn/goods/G13839622"
       },
       {
@@ -6513,7 +6513,7 @@
        "price": 17.0,
        "shop": "ai跑起来(开发票咨询客服)",
        "platform": "16688",
-       "stock": 435,
+       "stock": 434,
        "url": "https://www.16688.com.cn/goods/G97737091"
       }
      ]
@@ -6980,7 +6980,7 @@
        "price": 12.0,
        "shop": "奶龙Gemini订阅(源头招代理)",
        "platform": "16688",
-       "stock": 18,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G89750228"
       },
       {
@@ -7029,14 +7029,14 @@
        "price": 13.2,
        "shop": "👑XAI店铺（全品类✨超市）🔥",
        "platform": "16688",
-       "stock": 17,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G72790326"
       },
       {
        "price": 13.2,
        "shop": "一梦AI货源 招代理 对接马yimeng",
        "platform": "16688",
-       "stock": 17,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G78722815"
       },
       {
@@ -7050,7 +7050,7 @@
        "price": 13.5,
        "shop": "源头厂家 - AI代冲",
        "platform": "16688",
-       "stock": 18,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G95023054"
       },
       {
@@ -7106,7 +7106,7 @@
        "price": 15.0,
        "shop": "ai小铺",
        "platform": "16688",
-       "stock": 18,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G42538812"
       },
       {
@@ -7162,21 +7162,21 @@
        "price": 18.0,
        "shop": "大鳄鱼官方代充",
        "platform": "16688",
-       "stock": 18,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G44767761"
       },
       {
        "price": 18.0,
        "shop": "梦泽Ai",
        "platform": "16688",
-       "stock": 17,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G17587399"
       },
       {
        "price": 18.0,
        "shop": "天才AI",
        "platform": "16688",
-       "stock": 18,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G83331757"
       },
       {
@@ -7218,14 +7218,14 @@
        "price": 22.0,
        "shop": "ai跑起来(开发票咨询客服)",
        "platform": "16688",
-       "stock": 18,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G64699874"
       },
       {
        "price": 22.0,
        "shop": "源头ai",
        "platform": "16688",
-       "stock": 18,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G83725408"
       },
       {
@@ -7239,14 +7239,14 @@
        "price": 24.0,
        "shop": "绘梦小铺",
        "platform": "16688",
-       "stock": 18,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G64669897"
       },
       {
        "price": 25.0,
        "shop": "安安",
        "platform": "16688",
-       "stock": 17,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G10252975"
       },
       {
@@ -7260,7 +7260,7 @@
        "price": 28.0,
        "shop": "一元 AI",
        "platform": "16688",
-       "stock": 18,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G32761463"
       },
       {
@@ -7274,7 +7274,7 @@
        "price": 30.0,
        "shop": "良心小铺",
        "platform": "16688",
-       "stock": 19,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G97185890"
       },
       {
@@ -7295,7 +7295,7 @@
        "price": 36.0,
        "shop": "清酒的AI小店",
        "platform": "16688",
-       "stock": 19,
+       "stock": 14,
        "url": "https://www.16688.com.cn/goods/G16453862"
       },
       {
@@ -12609,7 +12609,7 @@
        "price": 0.45,
        "shop": "喵喵ai",
        "platform": "16688",
-       "stock": 515,
+       "stock": 514,
        "url": "https://www.16688.com.cn/goods/G12469792"
       },
       {
@@ -12623,77 +12623,77 @@
        "price": 0.5,
        "shop": "梦泽Ai",
        "platform": "16688",
-       "stock": 515,
+       "stock": 514,
        "url": "https://www.16688.com.cn/goods/G34215937"
       },
       {
        "price": 0.5,
        "shop": "👑XAI店铺（全品类✨超市）🔥",
        "platform": "16688",
-       "stock": 515,
+       "stock": 514,
        "url": "https://www.16688.com.cn/goods/G14218682"
       },
       {
        "price": 0.56,
        "shop": "AI OPC",
        "platform": "16688",
-       "stock": 515,
+       "stock": 514,
        "url": "https://www.16688.com.cn/goods/G77033937"
       },
       {
        "price": 0.59,
        "shop": "xueluon",
        "platform": "16688",
-       "stock": 515,
+       "stock": 514,
        "url": "https://www.16688.com.cn/goods/G44146534"
       },
       {
        "price": 0.75,
        "shop": "华润",
        "platform": "16688",
-       "stock": 515,
+       "stock": 514,
        "url": "https://www.16688.com.cn/goods/G33685746"
       },
       {
        "price": 0.85,
        "shop": "珠世AI",
        "platform": "16688",
-       "stock": 515,
+       "stock": 514,
        "url": "https://www.16688.com.cn/goods/G48299883"
       },
       {
        "price": 0.9,
        "shop": "ai聚合--分销码 ADEFAI",
        "platform": "16688",
-       "stock": 515,
+       "stock": 514,
        "url": "https://www.16688.com.cn/goods/G74358182"
       },
       {
        "price": 0.95,
        "shop": "爱搜 AISO",
        "platform": "16688",
-       "stock": 515,
+       "stock": 514,
        "url": "https://www.16688.com.cn/goods/G53658383"
       },
       {
        "price": 1.0,
        "shop": "天才AI",
        "platform": "16688",
-       "stock": 515,
+       "stock": 514,
        "url": "https://www.16688.com.cn/goods/G11374294"
       },
       {
        "price": 1.45,
        "shop": "AI批量部",
        "platform": "16688",
-       "stock": 515,
+       "stock": 514,
        "url": "https://www.16688.com.cn/goods/G45649680"
       },
       {
        "price": 2.05,
        "shop": "x会员ai订阅（可用u）",
        "platform": "16688",
-       "stock": 515,
+       "stock": 514,
        "url": "https://www.16688.com.cn/goods/G89374803"
       }
      ]
@@ -12712,7 +12712,7 @@
      "price": 0.48,
      "shop": "词生量",
      "platform": "链动小铺",
-     "stock": 500,
+     "stock": 498,
      "title": "🔥 CDK 美国实卡codex 长效 单次接马 可以二验 支持api",
      "url": "https://wzyp.cn/item/85qtcu",
      "kind": "",
@@ -13622,10 +13622,10 @@
        "url": "https://www.16688.com.cn/goods/G58654213"
       },
       {
-       "price": 0.57,
+       "price": 0.51,
        "shop": "自营AI接马源头招代理",
        "platform": "16688",
-       "stock": 56,
+       "stock": 19,
        "url": "https://16688.com.cn/goods/G58654213"
       }
      ],
@@ -13785,7 +13785,7 @@
      "price": 1.5,
      "shop": "S609525",
      "platform": "16688",
-     "stock": 72,
+     "stock": 71,
      "title": "Muse AI 成品号 10亿token（不稳定，按需购买，质保1小时）",
      "url": "https://www.16688.com.cn/goods/G47448446",
      "kind": "10亿·成品号",
@@ -13795,84 +13795,84 @@
        "price": 1.5,
        "shop": "S609525",
        "platform": "16688",
-       "stock": 72,
+       "stock": 71,
        "url": "https://www.16688.com.cn/goods/G47448446"
       },
       {
        "price": 1.65,
        "shop": "👑XAI店铺（全品类✨超市）🔥",
        "platform": "16688",
-       "stock": 72,
+       "stock": 71,
        "url": "https://www.16688.com.cn/goods/G97777993"
       },
       {
        "price": 1.65,
        "shop": "珠世AI",
        "platform": "16688",
-       "stock": 72,
+       "stock": 71,
        "url": "https://www.16688.com.cn/goods/G75919032"
       },
       {
        "price": 1.66,
        "shop": "梦泽Ai",
        "platform": "16688",
-       "stock": 72,
+       "stock": 71,
        "url": "https://www.16688.com.cn/goods/G18196472"
       },
       {
        "price": 1.8,
        "shop": "逐梦AI",
        "platform": "16688",
-       "stock": 72,
+       "stock": 71,
        "url": "https://www.16688.com.cn/goods/G58119148"
       },
       {
        "price": 2.5,
        "shop": "凌小创ai",
        "platform": "16688",
-       "stock": 72,
+       "stock": 71,
        "url": "https://www.16688.com.cn/goods/G95914261"
       },
       {
        "price": 3.0,
        "shop": "派大星（4000人群）",
        "platform": "16688",
-       "stock": 72,
+       "stock": 71,
        "url": "https://www.16688.com.cn/goods/G36815922"
       },
       {
        "price": 3.0,
        "shop": "阿文的小店",
        "platform": "16688",
-       "stock": 72,
+       "stock": 71,
        "url": "https://www.16688.com.cn/goods/G62529273"
       },
       {
        "price": 3.5,
        "shop": "福利吧",
        "platform": "16688",
-       "stock": 72,
+       "stock": 71,
        "url": "https://www.16688.com.cn/goods/G39346582"
       },
       {
        "price": 4.5,
        "shop": "大鳄鱼官方代充",
        "platform": "16688",
-       "stock": 72,
+       "stock": 71,
        "url": "https://www.16688.com.cn/goods/G46333735"
       },
       {
        "price": 6.5,
        "shop": "XAI",
        "platform": "16688",
-       "stock": 72,
+       "stock": 71,
        "url": "https://www.16688.com.cn/goods/G19809060"
       },
       {
        "price": 7.0,
        "shop": "源头ai",
        "platform": "16688",
-       "stock": 72,
+       "stock": 71,
        "url": "https://www.16688.com.cn/goods/G78576578"
       }
      ],
@@ -14115,7 +14115,7 @@
      "price": 2.19,
      "shop": "👑XAI店铺（全品类✨超市）🔥",
      "platform": "16688",
-     "stock": 21,
+     "stock": 20,
      "title": "【8号新批次】Muse成品号|10亿token 纯美区注册 支持账密登录 质保首登  对 接｜码:kako",
      "url": "https://www.16688.com.cn/goods/G20609355",
      "kind": "10亿·成品号",
@@ -14738,7 +14738,7 @@
      "price": 3.5,
      "shop": "源头厂家 - AI代冲",
      "platform": "16688",
-     "stock": 146,
+     "stock": 145,
      "title": "muse 10亿成品号 质保首登，24小时内被封不退只换一次",
      "url": "https://www.16688.com.cn/goods/G25248413",
      "kind": "10亿·成品号",
