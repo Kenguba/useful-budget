@@ -5,17 +5,19 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 - 仓库：https://github.com/Kenguba/useful-budget
 - 网站：https://kenguba.github.io/useful-budget/
 
-**读取口径（先看这条）**：本文件是索引，不是全文。每次先读「目录规范」与「约定」；其余各节按任务读——「新增项目规范」只在新建或下线项目时读，「子域名」只在动域名、路由、首页收录时读，页面规范（即 UI 规范，在 frontend/README.md）只在做页面时读，「现有项目」只查当前项目那一行。各子目录文档（如 backend 与各项目 README）按需沿链接只读一层，读到能办事为止，不逐个打开、不链式通读
+**读取口径（先看这条）**：本文件是索引，不是全文。每次先读「目录规范」与「约定」；其余各节按任务读——「新增项目规范」只在新建或下线项目时读，「子域名」只在动域名、路由、首页收录时读，页面规范（即 UI 规范，在 frontend/README.md）只在做页面时读，后端规范（在 backend/README.md）只在动 Worker、路由、迁移时读，「现有项目」只查当前项目那一行。各子目录文档（如 backend 与各项目 README）按需沿链接只读一层，读到能办事为止，不逐个打开、不链式通读
 
 ## 目录规范
 
-根目录只保留三样东西，其余一律进项目目录：
+根目录就保留下面几样，其余一律进项目目录：
 
 | 路径 | 用途 |
 | --- | --- |
 | `.github/workflows/` | 自动化（定时刷新 + 发布 Pages），必须在根目录，GitHub 的硬性要求 |
 | `index.html` | 全站入口导航页，只放项目卡片链接，不放具体业务内容 |
 | `README.md` | 本规范文件 |
+| `frontend/` | 全部前端项目与 UI 规范（入口 [frontend/README.md](frontend/README.md)） |
+| `backend/` | 后端 Worker 源码留档与后端规范（入口 [backend/README.md](backend/README.md)） |
 
 每个项目 = 一级目录一个，自带全套文件（页面、数据、脚本、图标等），互不引用、互不依赖：
 
