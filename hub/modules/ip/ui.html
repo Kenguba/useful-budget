@@ -98,6 +98,7 @@
         <span class="proto-badge fam" id="famV4">IPv4</span>
         <a class="proto-ip-link" id="myV4" href="#">检测中…</a>
         <div class="ip-Quick-actions">
+            <button type="button" class="square-icon-btn" id="copyIpBtn" title="复制 IP"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
             <button type="button" class="square-icon-btn" id="maskIpBtn" title="切换 IP 脱敏显示">
               <svg id="eyeSvgIcon" viewBox="0 0 24 24">
                 <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"></path>
@@ -121,6 +122,9 @@
       <div class="proto-row" id="rowV6">
         <span class="proto-badge fam" id="famV6">IPv6</span>
         <a class="proto-ip-link" id="myV6" href="#">未检测到</a>
+        <div class="ip-Quick-actions">
+            <button type="button" class="square-icon-btn" id="copyIp6Btn" title="复制 IP"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        </div>
       </div>
     </section>
 
@@ -337,4 +341,4 @@
   <div class="flash" id="flash"></div>
 
   <!-- 轻提示 Toast -->
-  <div class="toast-banner" id="toastBanner">已复制到剪贴板</div>
+  <div class="toast-banner" id="toastBanner"></div>

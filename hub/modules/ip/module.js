@@ -539,7 +539,7 @@ function toggleLanguage(){
   applyLanguage();
 }
 const DYN={
-  detecting:{zh:"检测中…",en:"Detecting…"},checking:{zh:"查询中",en:"Checking"},regUnknown:{zh:"注册地未知",en:"Registry unknown"},notDetected:{zh:"未检测到",en:"Not Detected"},
+  detecting:{zh:"检测中…",en:"Detecting…"},noHostname:{zh:"无主机名",en:"No hostname"},checking:{zh:"查询中",en:"Checking"},regUnknown:{zh:"注册地未知",en:"Registry unknown"},notDetected:{zh:"未检测到",en:"Not Detected"},
   copied:{zh:"已复制 ",en:"Copied "},copyFail:{zh:"复制失败，请手动复制",en:"Copy failed, please copy manually"},
   nativeIp:{zh:"原生IP",en:"Native IP"},broadcastIp:{zh:"广播IP",en:"Broadcast IP"},nonNative:{zh:"非原生 IP",en:"Non-native IP"},
   residential:{zh:"住宅IP",en:"Residential IP"},business:{zh:"商宽IP",en:"Business IP"},hosting:{zh:"机房IP",en:"Datacenter IP"},
@@ -808,7 +808,7 @@ function render(d,final){
   badge.className="attr-pill-tag "+(d.score==null?"tag-gray":d.score<=25?"tag-green":d.score<=60?"tag-amber":"tag-red");
   const rp=$("riskPointer");if(d.score==null){rp.style.visibility="hidden"}else{rp.style.visibility="visible";rp.style.left=Math.min(97,Math.max(3,d.score))+"%"}
   document.querySelector(".risk-bar-track").classList.toggle("geo-skl",d.score==null);
-  $("valHostname").textContent=d.host||TD("detecting");
+  $("valHostname").textContent=d.host||(d.hostDone?TD("noHostname"):TD("detecting"));
   $("valDetectTime").textContent=fmtTime(new Date());
   $("detailConfidence").textContent=TD("confLabel")+" "+"●".repeat(Math.min(5,d.conf||0))+"○".repeat(Math.max(0,5-(d.conf||0)));
   $("valTimezone").textContent=(d.tz||"—")+(d.postal?" • "+d.postal:"");
@@ -981,9 +981,10 @@ async function runQuery(ip,selfMode,fromHist){
     if(seq===state.querySeq)setBusy(false);
     // 第三阶段（不阻塞主结果）：ASN 历史 / BGP 邻居最后加载，到齐后补进详情
     (async()=>{
-      const[routing,neigh]=await settled([ripe("routing-history",targetIp,12000),asn?ripe("asn-neighbours",asn,12000):Promise.resolve(null)]);
+      const routingP=ripe("routing-history",targetIp,12000),neighP=asn?ripe("asn-neighbours",asn,12000):Promise.resolve(null);
+      if(!d.host){const ptrHost=await ptrP;if(seq===state.querySeq){if(ptrHost)d.host=ptrHost;d.hostDone=true;$("valHostname").textContent=d.host||TD("noHostname")}}
+      const[routing,neigh]=await settled([routingP,neighP]);
       if(seq!==state.querySeq)return;
-      if(!d.host){const ptrHost=await ptrP;if(seq===state.querySeq&&ptrHost){d.host=ptrHost;renderDetails(d)}}
     if(routing&&routing.by_origin){
       const items=[];
       routing.by_origin.forEach(o=>{
@@ -1024,7 +1025,7 @@ async function runQuery(ip,selfMode,fromHist){
       if(rows.length){d.locRows=rows;d.conf=rows.filter(r=>r.cc&&r.cc===d.cc).length}
     }
       if(d._why)d.note="纯净度按实时信号计算："+d._why.join("；")+"；定位 "+(d.locRows?d.locRows.length:0)+" 源共识（"+(d.conf||0)+" 个一致）";
-      renderDetails(d);
+      render(d);
     });
   }catch(e){
     showErr(TD("errFail"));
@@ -1055,16 +1056,18 @@ function setBusy(b){state.busy=b;$("searchBtnText").disabled=b;$("searchBtnText"
 const myIpState={v4:"",v6:"",primary6:false};
 function starMask(ip){return ip.includes(":")?"****:****:****:****":"***.***.***.***"}
 function renderMyIp(){
-  const row=(aid,rid,ip,vis,key)=>{
+  const row=(aid,rid,cid,ip,vis,key)=>{
     const el=$(aid);el.textContent=ip?(vis?ip:starMask(ip)):TD("notDetected");
     el.classList.toggle("none",!ip);
     const rowEl=$(rid);rowEl.classList.toggle("on",!!(ip&&vis));
     rowEl.onclick=null;
     rowEl.querySelector(".fam").onclick=ip?e=>{e.stopPropagation();myIpState[key]=!vis;renderMyIp()}:null;
-    el.onclick=ip?async e=>{e.preventDefault();try{await navigator.clipboard.writeText(ip);toast(TD("copied")+ip)}catch(err){toast(TD("copyFail"))}}:e=>e.preventDefault();
+    /* 复制只挂显式图标按钮：IP 文本本身不再是按钮，点检数值不会误触复制（2026-11-09 修） */
+    el.onclick=e=>e.preventDefault();
+    const cb=$(cid);if(cb)cb.onclick=ip?async e=>{e.stopPropagation();try{await navigator.clipboard.writeText(ip);toast(TD("copied")+ip)}catch(err){toast(TD("copyFail"))}}:null;
   };
-  row("myV4","rowV4",myIpState.v4,myIpState.vis4!==false,"vis4");
-  row("myV6","rowV6",myIpState.v6,myIpState.vis6!==false,"vis6");
+  row("myV4","rowV4","copyIpBtn",myIpState.v4,myIpState.vis4!==false,"vis4");
+  row("myV6","rowV6","copyIp6Btn",myIpState.v6,myIpState.vis6!==false,"vis6");
   $("rowV6").style.order=myIpState.primary6?"1":"2";
   $("rowV4").style.order=myIpState.primary6?"2":"1";
   fitProtoFont();
@@ -1598,7 +1601,7 @@ function openReport(){
   if(!state.data){toast(TD("rptWait"));return}
   spaPush({rpt:true});rptVisual(true);buildReport();
 }
-$("reportRoot").addEventListener("click",e=>{
+$("reportRoot").addEventListener("click",async e=>{
   const eye=e.target.closest("[data-eye]");
   if(eye){
     const key=eye.getAttribute("data-eye");
@@ -1612,7 +1615,7 @@ $("reportRoot").addEventListener("click",e=>{
   const valEl=e.target.closest("[data-ipval]");
   if(valEl){
     const ip=rptIps[valEl.getAttribute("data-ipval")];
-    if(ip){try{navigator.clipboard.writeText(ip);toast(TD("copied")+ip)}catch(err){toast(TD("copyFail"))}}
+    if(ip){try{await navigator.clipboard.writeText(ip);toast(TD("copied")+ip)}catch(err){toast(TD("copyFail"))}}
   }
 });
 $("shotBtn").addEventListener("click",()=>{const f=$("flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");openReport()});
@@ -1632,7 +1635,7 @@ function userToggleDetails(){
   spaPush({details:!detailsOpen});toggleDetails();
 }
 $("asnHead").addEventListener("click",e=>{
-  if(e.target.closest("#maskIpBtn,#shotBtn,#refreshCardBtn"))return;
+  if(e.target.closest("#maskIpBtn,#shotBtn,#refreshCardBtn,#copyIpBtn,#copyIp6Btn"))return;
   userToggleDetails();
   if(detailsOpen){
     $("detailsCollapsible").classList.add("jump-open");
