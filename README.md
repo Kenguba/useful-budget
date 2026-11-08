@@ -66,14 +66,14 @@ frontend/<project>/           # 例：frontend/skill-board/
 
 **首页（总汇）收录规则（2026-11-07 ken 定）**：进总汇首页的只有 7 个——ai、skill、phone、pan、ip、2fa、ui。wechat 只开子域名 `wechat.xxxxx.asia`，不进总汇：不加短路径、不上首页卡片。以后新增项目先定类别：进首页的，子域名、总汇短路径、首页卡片三样一起加；不进首页的，只加子域名，并在子域名清单里登记注明，免得误加。
 
-完整域名不写入本仓库（公开仓库，避免暴露站长域名）；解析与 Worker 配置在站长的 Cloudflare 账号里维护。全部后端 Worker 的源码留档统一放在仓库根目录的 `backend/` 里（说明见 [backend/README.md](backend/README.md)）（`backend-proxy.js.back`、`site-router.js.back`、`jpcard.js.back`），迁移时直接取用，配套的通配 DNS/路由配置清单写在 site-router 留档的文件头。
+完整域名不写入本仓库（公开仓库，避免暴露站长域名）；解析与 Worker 配置在站长的 Cloudflare 账号里维护。后端 Worker 的留档、迁移与配置清单统一见 [backend/README.md](backend/README.md)
 
 ## 约定
 
 - 链接与仓库名绑定：Pages 地址为 `kenguba.github.io/useful-budget/frontend/<project>/`，项目目录名即网址路径段，改目录名 = 改网址，慎重。
 - **xxxx 占位命名**：文件名与文档中连续 3 个以上 x（`xxxx`）表示占位，代替真实或未定的部分；需要占位的文件直接以占位名命名，如 `xxxxx.md`。
 - 数据文件与代码分开提交：自动刷新只提交 `data/` 变更，提交信息形如 `data: refresh YYYY-MM-DD`。
-- 脚本一致性：仓库内脚本必须与线上实际运行的版本保持一致。项目脚本（如各项目 `scripts/refresh.py`）以仓库 main 为准，本地镜像/工作副本改完必须推送，禁止只改本地；后端 Worker 以 Cloudflare 已部署版为准，先部署、再把源码同步回 `backend/` 留档。发现不一致时以线上为准，并立即对齐。
+- 脚本一致性：仓库内脚本必须与线上实际运行的版本保持一致。项目脚本（如各项目 `scripts/refresh.py`）以仓库 main 为准，本地镜像/工作副本改完必须推送，禁止只改本地；发现不一致时以线上为准，并立即对齐。后端 Worker 的一致性规则见 [backend/README.md](backend/README.md)
 - 本规范有变更时，先改本文件，再改实际结构，保持两者一致。
 - **冲突选择**：有冲突需要 ken 决定时，先标序号：每个冲突一个系列号（1、2、3…），每个冲突下的方案用字母 a、b、c 标出；ken 回复「系列号+字母」（如 1a、2C）即为选定，大小写不敏感
 - **规范写法**：写入本规范的条目，短语要简洁、节省 token，但意思必须完整、能看懂；不为压缩而省略关键信息
