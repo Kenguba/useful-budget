@@ -2534,6 +2534,25 @@ otpList.addEventListener('click', async e => {
 setInterval(() => { renderOtpCodes(false); }, 1000);
 
 /* ================= Init ================= */
+/* Link-in: secret carried at the end of the URL is filled in and generated on load.
+   Supported: #tok/<secret>, #<secret>, ?tok=<secret>, and /tok/<secret> when a host rewrites it to this page.
+   The # form never leaves the browser; all codes are computed locally as usual. */
+(function(){
+  var cand = '';
+  try { cand = decodeURIComponent(location.hash.replace(/^#\/?/, '').replace(/^tok\//, '')); } catch(e){}
+  if (!parseSecrets(cand).length){
+    cand = '';
+    try { var q = new URLSearchParams(location.search); cand = q.get('tok') || q.get('key') || q.get('secret') || ''; } catch(e){}
+  }
+  if (!parseSecrets(cand).length){
+    cand = '';
+    var pm = location.pathname.match(/\/tok\/([^\/\?#]+)\/?$/);
+    if (pm){ try { cand = decodeURIComponent(pm[1]); } catch(e){ cand = pm[1]; } }
+  }
+  if (parseSecrets(cand).length){ textarea.value = cand; activated = true; codesGenerated = true; }
+})();
+/* A # link opened in a tab already showing this page fires hashchange without reloading; reload so the new secret takes effect. */
+window.addEventListener('hashchange', function(){ location.reload(); });
 renderThemeBtnIcon();
 applyTheme(currentThemeIdx);
 if (isDarkMode){ document.documentElement.style.setProperty('--page-bg', '#090D16'); const mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute('content', '#0B1120'); }
