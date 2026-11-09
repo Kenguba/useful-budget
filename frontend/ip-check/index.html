@@ -1122,6 +1122,7 @@
 
     /* 轻量化彩色属性胶囊 */
     .attr-pill-tag {
+      flex: none;
       display: inline-flex;
       align-items: center;
       font-size: 11.5px;
@@ -1195,6 +1196,7 @@
     }
 
     .risk-scale-ticks {
+      font-variant-numeric: tabular-nums;
       display: flex;
       justify-content: space-between;
       font-size: 10.5px;
@@ -2655,12 +2657,12 @@ function toggleDarkMode(){
 })();
 /* ================= 顶部导航菜单 ================= */
 const NAV_ITEMS=[
-  {icon:"📍",zh:"IP 定位信息",en:"IP Geolocation",dzh:"多源共识定位与 ASN",den:"Multi-source geolocation & ASN",target:"mainIpCard"},
-  {icon:"🛡️",zh:"IP 风险检测",en:"IP Risk Score",dzh:"纯净度、黑名单与风险信号",den:"Purity, DNSBL & risk signals",target:"riskSection"},
-  {icon:"🎯",zh:"适用场景",en:"Scenarios",dzh:"四大场景星级评定",den:"Star ratings for 4 scenarios",target:"scenarioCard"},
-  {icon:"🤖",zh:"AI 厂商支持",en:"AI Vendor Support",dzh:"四大模型可用性判定",den:"Availability of 4 AI vendors",target:"aiSupportCard"},
-  {icon:"🗺️",zh:"IP 出口地图",en:"IP Exit Map",dzh:"出口城市与经纬度",den:"Exit city & coordinates",target:"mapSection",expand:true},
-  {icon:"🧬",zh:"本机环境",en:"Local Environment",dzh:"指纹与 WebRTC 泄露检测",den:"Fingerprint & WebRTC leak test",target:"localEnvCard"}
+  {icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M12 21.2S5 15.9 5 10a7 7 0 1 1 14 0c0 5.9-7 11.2-7 11.2z"/><circle cx="12" cy="10" r="2.6"/></svg>',zh:"IP 定位信息",en:"IP Geolocation",dzh:"多源共识定位与 ASN",den:"Multi-source geolocation & ASN",target:"mainIpCard"},
+  {icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M12 3l7 2.8v5.4c0 4.4-2.9 7.4-7 9.3-4.1-1.9-7-4.9-7-9.3V5.8z"/><path d="M9.3 11.8l2 2 3.6-4.1"/></svg>',zh:"IP 风险检测",en:"IP Risk Score",dzh:"纯净度、黑名单与风险信号",den:"Purity, DNSBL & risk signals",target:"riskSection"},
+  {icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.8"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg>',zh:"适用场景",en:"Scenarios",dzh:"四大场景星级评定",den:"Star ratings for 4 scenarios",target:"scenarioCard"},
+  {icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><rect x="4" y="8.5" width="16" height="10.5" rx="2.5"/><path d="M12 8.5V5"/><circle cx="12" cy="3.8" r="1.2"/><circle cx="9" cy="13.5" r="0.7" fill="currentColor" stroke="none"/><circle cx="15" cy="13.5" r="0.7" fill="currentColor" stroke="none"/><path d="M9.5 16.5h5"/></svg>',zh:"AI 厂商支持",en:"AI Vendor Support",dzh:"四大模型可用性判定",den:"Availability of 4 AI vendors",target:"aiSupportCard"},
+  {icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M9 4.5L3.5 6.3v13.2L9 17.7l6 1.8 5.5-1.8V4.5L15 6.3 9 4.5z"/><path d="M9 4.5v13.2"/><path d="M15 6.3v13.2"/></svg>',zh:"IP 出口地图",en:"IP Exit Map",dzh:"出口城市与经纬度",den:"Exit city & coordinates",target:"mapSection",expand:true},
+  {icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M6.2 5.6A8 8 0 0 1 20 12c0 2.5-.4 4.7-1.2 6.7"/><path d="M4.5 9.5A8 8 0 0 0 4 12c0 3.2.8 6 2.3 8.4"/><path d="M8.6 8.2A5.2 5.2 0 0 1 17 12c0 3-.5 5.6-1.5 8"/><path d="M9 12a3.2 3.2 0 0 1 6.4.6c.2 3-.2 5.7-1.1 8.1"/><path d="M12.2 15.2c.1 2.3-.2 4.4-.9 6.3"/></svg>',zh:"本机环境",en:"Local Environment",dzh:"指纹与 WebRTC 泄露检测",den:"Fingerprint & WebRTC leak test",target:"localEnvCard"}
 ];
 function renderNavMenu(){
   const list=$("navMenuList");if(!list)return;

@@ -797,7 +797,7 @@ body{
       color: var(--theme-accent);
       white-space: nowrap;
       flex-shrink: 0;
-    }
+    ;font-variant-numeric:tabular-nums}
 [data-dark="true"] #masterPhoneChassis .snap-right-val{ color: var(--orb-color-1); }
 #masterPhoneChassis .ios-widget-box{
       background-color: var(--screen-widget-bg);
@@ -817,6 +817,9 @@ body{
       line-height: clamp(1.32, 0.2dvh + 1.25, 1.48);
       color: var(--text-secondary);
       overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
     }
 #masterPhoneChassis .card-tags-row{
       display: flex;
@@ -1259,7 +1262,7 @@ body{
     r.style.setProperty('--theme-accent',th[4]);r.style.setProperty('--theme-tag-bg',th[5]);
     r.style.setProperty('--theme-tag-text',th[6]);r.style.setProperty('--search-glow',th[8]);})();
   </script>
-<link rel="stylesheet" href="hub/hub.css?v=20261109b">
+<link rel="stylesheet" href="hub/hub.css?v=20261109c">
 </head>
 <body>
 
@@ -2677,6 +2680,6 @@ body{
     document.getElementById('sunMoonIcon').innerHTML = isDarkMode ? MOON_SVG : SUN_SVG;
     syncStaticUIText();
   </script>
-<script src="hub/hub.js?v=20261109b"></script>
+<script src="hub/hub.js?v=20261109c"></script>
 </body>
 </html>

@@ -1448,7 +1448,7 @@ function __boot() {
         <div class="special-card" id="ganganSpecialCard">
           <div class="special-card-head">
             <div class="special-card-title">
-              <span>🔍 甘甘云手机（第 30 家 · “欢畅版”专章）</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px;vertical-align:-3px;margin-right:5px"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5L16.6 16.6"/></svg>甘甘云手机（第 30 家 · “欢畅版”专章）</span>
             </div>
             <a class="site-offer-link" href="https://ggyphone.com" target="_blank" rel="noopener noreferrer">ggyphone.com ↗</a>
           </div>
@@ -1507,7 +1507,7 @@ function __boot() {
         <div class="special-card" id="selfTestSpecialCard">
           <div class="special-card-head">
             <div class="special-card-title">
-              <span>🧪 用户自测真机方法清单（8 步交互核验）</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px;margin-right:5px"><path d="M10 3h4"/><path d="M10.8 3v5.2L5 17.6A2.2 2.2 0 0 0 6.9 21h10.2A2.2 2.2 0 0 0 19 17.6L13.2 8.2V3"/><path d="M7.6 14.5h8.8"/></svg>用户自测真机方法清单（8 步交互核验）</span>
             </div>
             <span class="site-list-count">已完成 ${completedSteps.size} / 8 步</span>
           </div>
@@ -1521,7 +1521,7 @@ function __boot() {
 
         <div class="special-card">
           <div class="special-card-head" style="margin-bottom:4px;">
-            <div class="special-card-title"><span>🔗 官网实测与索引来源直达（可横向滑动）</span></div>
+            <div class="special-card-title"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px;margin-right:5px"><path d="M10.2 13.8a5 5 0 0 0 7.1 0l2.9-2.9a5 5 0 0 0-7.1-7.1l-1.6 1.6"/><path d="M13.8 10.2a5 5 0 0 0-7.1 0l-2.9 2.9a5 5 0 0 0 7.1 7.1l1.6-1.6"/></svg>官网实测与索引来源直达（可横向滑动）</span></div>
           </div>
           <div class="source-links-wrap">
             <a class="site-offer-link" href="https://ggyphone.com" target="_blank" rel="noopener noreferrer">甘甘云 ggyphone.com ↗</a>
