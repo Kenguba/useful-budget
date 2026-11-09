@@ -55,9 +55,7 @@
     }
 
     [data-dark="true"] body {
-      background-image:
-        radial-gradient(90% 880px at 8% 0%, color-mix(in srgb, var(--orb-color-1) 9%, transparent) 0%, transparent 70%),
-        radial-gradient(90% 880px at 92% 0%, color-mix(in srgb, var(--orb-color-2) 9%, transparent) 0%, transparent 70%);
+      background-image: none;
     }
 
     * {
@@ -106,9 +104,7 @@
     }
 
     [data-dark="true"] .hero-header {
-      background-image:
-        radial-gradient(130% 105% at 10% 112%, color-mix(in srgb, var(--orb-color-1) 30%, transparent) 0%, transparent 62%),
-        radial-gradient(130% 105% at 90% 112%, color-mix(in srgb, var(--orb-color-2) 30%, transparent) 0%, transparent 62%);
+      background-image: none;
     }
 
 
@@ -444,9 +440,9 @@
       background-color: var(--refresh-btn-bg);
       color: var(--refresh-btn-text);
       border: none;
-      padding: 8px 15px;
+      padding: 6px 11px;
       border-radius: 999px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       cursor: pointer;
       display: inline-flex;
@@ -1742,7 +1738,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC"
     </div>
     <p class="shop-subtitle">10 分组 · 有货最低价 · 详情页直达</p>
     <div class="status-row">
-      <span class="update-time"><span id="metaTime" class="skl skl-time"></span> 更新 · 共 <span id="metaCount" class="skl skl-num"></span> 条报价</span>
+      <span class="update-time"><span id="metaTime" class="skl skl-time"></span> 更新 · <span id="metaCount" class="skl skl-num"></span> 条</span>
       <button class="refresh-btn" id="refreshBtn" type="button">
         <svg class="refresh-svg" viewBox="0 0 24 24">
           <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
@@ -2501,7 +2497,7 @@ function fitStatusRow(){
 }
 let statusRsz;
 window.addEventListener('resize',()=>{ clearTimeout(statusRsz); statusRsz=setTimeout(fitStatusRow,150); });
-function fillMeta(b){const mt=$('#metaTime'),mc=$('#metaCount');mt.textContent=b.updated_at;mt.className='';mc.textContent=b.groups.reduce((a,g)=>a+g.items.length,0);mc.className='';const lc=$('#listCount');if(lc&&$('#viewShops').classList.contains('hide'))lc.textContent=b.groups.length+' 组 · '+mc.textContent+' 条报价';requestAnimationFrame(fitStatusRow);}
+function fillMeta(b){const mt=$('#metaTime'),mc=$('#metaCount');mt.textContent=b.updated_at.replace(/^\d{4}-/,'');mt.className='';mc.textContent=b.groups.reduce((a,g)=>a+g.items.length,0);mc.className='';const lc=$('#listCount');if(lc&&$('#viewShops').classList.contains('hide'))lc.textContent=b.groups.length+' 组 · '+mc.textContent+' 条报价';requestAnimationFrame(fitStatusRow);}
 if(window.INLINE_BOARD){
   board=window.INLINE_BOARD;
   fillMeta(board);
