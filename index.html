@@ -1262,7 +1262,30 @@ body{
     r.style.setProperty('--theme-accent',th[4]);r.style.setProperty('--theme-tag-bg',th[5]);
     r.style.setProperty('--theme-tag-text',th[6]);r.style.setProperty('--search-glow',th[8]);})();
   </script>
-<link rel="stylesheet" href="hub/hub.css?v=20261109d">
+<link rel="stylesheet" href="hub/hub.css?v=20261110a">
+  <style>html.hub-deep #masterPhoneChassis{visibility:hidden}</style>
+  <script>
+    /* 深链首帧防闪：直达 /pan、/ai 等短路径时，总汇外壳 hub.js 在 body 末尾才执行，
+       它接管前浏览器会先把总汇首页画出来再切走，就是用户看到的那一下闪。
+       这里在 head 里按 hub.js 同一口径（路径正则 + 模块名）先判断：命中就把首页壳藏住，
+       等模块视图亮起（#hubView.on）自动撤下；hub.js 万一没加载，6 秒后放回首页不留黑屏 */
+    (function () {
+      var m = /^\/(\w+)$/.exec(location.pathname || "");
+      var mods = { ai: 1, skill: 1, phone: 1, pan: 1, ip: 1, "2fa": 1, ui: 1 };
+      if (!m || !mods[m[1]]) return;
+      var de = document.documentElement;
+      de.classList.add("hub-deep");
+      function off() { de.classList.remove("hub-deep"); }
+      var mo = new MutationObserver(function () {
+        var v = document.getElementById("hubView");
+        if (v && v.classList.contains("on")) { off(); mo.disconnect(); }
+      });
+      document.addEventListener("DOMContentLoaded", function () {
+        mo.observe(de, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+      });
+      setTimeout(function () { mo.disconnect(); off(); }, 6000);
+    })();
+  </script>
 </head>
 <body>
 
@@ -2680,6 +2703,6 @@ body{
     document.getElementById('sunMoonIcon').innerHTML = isDarkMode ? MOON_SVG : SUN_SVG;
     syncStaticUIText();
   </script>
-<script src="hub/hub.js?v=20261109d"></script>
+<script src="hub/hub.js?v=20261110a"></script>
 </body>
 </html>
