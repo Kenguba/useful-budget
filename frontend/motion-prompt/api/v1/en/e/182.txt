@@ -1,4 +1,4 @@
-// Motion Prompt #182 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#182
+// Motion Prompt #182 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#182
 //
 // Deep focus / ディープフォーカス
 // Pack: camera2 (Camera moves & transitions, part 2) · element 14 · Category: Angles & Framing
@@ -13,7 +13,7 @@
 // Tags: deep focus, depth of field, everything sharp, f/16, small aperture, pan focus, focus
 // Size: 539x208 px · Cycle: 9.4 s
 // Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
-// Live demo: https://showheyohtaki.github.io/motion-prompt/#182
+// Live demo: https://motion.jpedu.asia/#182
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
 // Element code starts here. CELLS, constants and helpers live in the kit.

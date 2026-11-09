@@ -1,4 +1,4 @@
-// Motion Prompt #117 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#117
+// Motion Prompt #117 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#117
 //
 // Teal and orange / ティール＆オレンジ
 // Pack: photo (Photo looks, lighting & styles) · element 21 · Category: Tones & finishing looks
@@ -12,7 +12,7 @@
 // Tags: teal and orange, orange and teal, cinematic, color grading, blockbuster, film look
 // Size: 539x208 px · Cycle: 5 s
 // Needs: kit photo -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/photo.js
-// Live demo: https://showheyohtaki.github.io/motion-prompt/#117
+// Live demo: https://motion.jpedu.asia/#117
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
 // Element code starts here. CELLS, constants and helpers live in the kit.

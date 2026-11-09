@@ -1,4 +1,4 @@
-// Motion Prompt #145-168 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#145
+// Motion Prompt #145-168 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#145
 //
 // Kit for pack "lp2" (Landing page & web effects, part 2 / LP・Webサイトの演出 第2弾): the constants and helpers its elements share.
 // Elements #145-168 · 539x208 px · cycle 9.4 s. Element code: https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/<id>.txt (or /ja/).

@@ -1,4 +1,4 @@
-// Motion Prompt #112 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#112
+// Motion Prompt #112 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#112
 //
 // 周辺減光（ビネット） / Vignette
 // パック: photo (写真の表現・光と画風) · element 16 · カテゴリ: レンズ・カメラの効果
@@ -12,7 +12,7 @@
 // タグ: vignette, vignetting, dark corners, edge darkening, lens falloff, focus
 // サイズ: 539x208 px · 1周: 5 s
 // Needs: kit photo -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/photo.js
-// 動く見本: https://showheyohtaki.github.io/motion-prompt/#112
+// 動く見本: https://motion.jpedu.asia/#112
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
 // ここから要素のコード。CELLS や定数・補助関数は kit にある。

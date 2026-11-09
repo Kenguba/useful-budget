@@ -1,4 +1,4 @@
-// Motion Prompt #108 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#108
+// Motion Prompt #108 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#108
 //
 // 流し撮り / Panning shot
 // パック: photo (写真の表現・光と画風) · element 12 · カテゴリ: レンズ・カメラの効果
@@ -14,7 +14,7 @@
 // タグ: panning, panning shot, motion blur, speed, sports photography, slow shutter
 // サイズ: 539x208 px · 1周: 5 s
 // Needs: kit photo -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/photo.js
-// 動く見本: https://showheyohtaki.github.io/motion-prompt/#108
+// 動く見本: https://motion.jpedu.asia/#108
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
 // ここから要素のコード。CELLS や定数・補助関数は kit にある。

@@ -1,4 +1,4 @@
-// Motion Prompt #129 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#129
+// Motion Prompt #129 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#129
 //
 // Text scramble / テキストスクランブル
 // Pack: motion2 (Motion graphics moves, part 2) · element 09 · Category: Text & shapes
@@ -13,7 +13,7 @@
 // Tags: text-scramble, scramble, decode, shuffle, random, text, hacker
 // Size: 539x208 px · Cycle: 4.7 s
 // Needs: kit motion2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/motion2.js
-// Live demo: https://showheyohtaki.github.io/motion-prompt/#129
+// Live demo: https://motion.jpedu.asia/#129
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
 // Element code starts here. CELLS, constants and helpers live in the kit.

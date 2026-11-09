@@ -1,4 +1,4 @@
-// Motion Prompt #188 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#188
+// Motion Prompt #188 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#188
 //
 // アイリスアウト / Iris out
 // パック: camera2 (カメラワークと切り替え 第2弾) · element 20 · カテゴリ: 切り替え・編集
@@ -14,7 +14,7 @@
 // タグ: iris out, iris in, iris wipe, circle, old film, cartoon, transition
 // サイズ: 539x208 px · 1周: 9.4 s
 // Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
-// 動く見本: https://showheyohtaki.github.io/motion-prompt/#188
+// 動く見本: https://motion.jpedu.asia/#188
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
 // ここから要素のコード。CELLS や定数・補助関数は kit にある。

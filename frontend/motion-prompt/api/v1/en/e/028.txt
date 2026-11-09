@@ -1,4 +1,4 @@
-// Motion Prompt #028 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#028
+// Motion Prompt #028 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#028
 //
 // Zoom in / ズームイン
 // Pack: camera (Camera moves & transitions) · element 04 · Category: Camera Movement
@@ -14,7 +14,7 @@
 // Tags: zoom, zoom in, focal length, lens, magnify, telephoto, camera move
 // Size: 539x208 px · Cycle: 9.4 s
 // Needs: kit camera -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera.js
-// Live demo: https://showheyohtaki.github.io/motion-prompt/#028
+// Live demo: https://motion.jpedu.asia/#028
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
 // Element code starts here. CELLS, constants and helpers live in the kit.

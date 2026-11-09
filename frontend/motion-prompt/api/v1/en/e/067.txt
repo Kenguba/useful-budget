@@ -1,4 +1,4 @@
-// Motion Prompt #067 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#067
+// Motion Prompt #067 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#067
 //
 // Mega menu / メガメニュー
 // Pack: ui (UI component names) · element 19 · Category: Navigation & status
@@ -13,7 +13,7 @@
 // Tags: mega-menu, megamenu, dropdown-navigation, navigation, header-menu, multi-column
 // Size: 542x191 px · Cycle: 4.5 s
 // Needs: kit ui -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/ui.js
-// Live demo: https://showheyohtaki.github.io/motion-prompt/#067
+// Live demo: https://motion.jpedu.asia/#067
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
 // Element code starts here. CELLS, constants and helpers live in the kit.

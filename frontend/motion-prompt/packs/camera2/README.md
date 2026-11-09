@@ -12,40 +12,40 @@ Find the name, then say it to your AI. Add how long, how strong and what moves, 
 
 | # | Name | What it is | How to ask an AI |
 |---|---|---|---|
-| [#169](https://showheyohtaki.github.io/motion-prompt/#169) | **Pedestal** | Move the whole camera straight up or down | Pedestal up from eye level to about 3 meters, keeping the camera pointed straight ahead. |
-| [#170](https://showheyohtaki.github.io/motion-prompt/#170) | **Barrel roll** | Roll the camera a full turn on its axis | Barrel roll the drone shot through one full rotation over 3 seconds. |
-| [#171](https://showheyohtaki.github.io/motion-prompt/#171) | **Hyperlapse** | A time-lapse shot while the camera travels | Hyperlapse walking from the station to the park, clouds streaming and people in fast forward. |
-| [#172](https://showheyohtaki.github.io/motion-prompt/#172) | **Long take** | One continuous shot with no cuts | Shoot from the preparation to the departure as one long take, following the person without a cut. |
-| [#173](https://showheyohtaki.github.io/motion-prompt/#173) | **Steadicam** | Smooth, floating movement with no shake | Follow the person down the corridor with a Steadicam: smooth, no shake. |
-| [#174](https://showheyohtaki.github.io/motion-prompt/#174) | **Follow shot** | Follow behind the subject as they move | Follow shot behind the person walking through the woods, trailing a little behind. |
-| [#175](https://showheyohtaki.github.io/motion-prompt/#175) | **Locked-off shot** | Camera fixed; only the subject moves | Locked-off shot of the crossing: camera fixed on a tripod, only the people and cars pass through. |
-| [#176](https://showheyohtaki.github.io/motion-prompt/#176) | **Fly-through** | Fly through an opening into the next space | Fly-through from the window into the room and over to the table. |
+| [#169](https://motion.jpedu.asia/#169) | **Pedestal** | Move the whole camera straight up or down | Pedestal up from eye level to about 3 meters, keeping the camera pointed straight ahead. |
+| [#170](https://motion.jpedu.asia/#170) | **Barrel roll** | Roll the camera a full turn on its axis | Barrel roll the drone shot through one full rotation over 3 seconds. |
+| [#171](https://motion.jpedu.asia/#171) | **Hyperlapse** | A time-lapse shot while the camera travels | Hyperlapse walking from the station to the park, clouds streaming and people in fast forward. |
+| [#172](https://motion.jpedu.asia/#172) | **Long take** | One continuous shot with no cuts | Shoot from the preparation to the departure as one long take, following the person without a cut. |
+| [#173](https://motion.jpedu.asia/#173) | **Steadicam** | Smooth, floating movement with no shake | Follow the person down the corridor with a Steadicam: smooth, no shake. |
+| [#174](https://motion.jpedu.asia/#174) | **Follow shot** | Follow behind the subject as they move | Follow shot behind the person walking through the woods, trailing a little behind. |
+| [#175](https://motion.jpedu.asia/#175) | **Locked-off shot** | Camera fixed; only the subject moves | Locked-off shot of the crossing: camera fixed on a tripod, only the people and cars pass through. |
+| [#176](https://motion.jpedu.asia/#176) | **Fly-through** | Fly through an opening into the next space | Fly-through from the window into the room and over to the table. |
 
 ## Angles & Framing
 
 | # | Name | What it is | How to ask an AI |
 |---|---|---|---|
-| [#177](https://showheyohtaki.github.io/motion-prompt/#177) | **Low angle** | Shoot from low down, looking up | Shoot the hero's entrance from a low angle, looking up from near the ground. |
-| [#178](https://showheyohtaki.github.io/motion-prompt/#178) | **High angle** | Shoot from above, looking down | Use a high angle for the lost-child scene, looking down from above so they look small. |
-| [#179](https://showheyohtaki.github.io/motion-prompt/#179) | **POV shot** | See through a character's eyes | The moment of opening the door and entering the room as a POV shot, through their eyes. |
-| [#180](https://showheyohtaki.github.io/motion-prompt/#180) | **Over-the-shoulder** | Frame one person over another's shoulder | Shoot the conversation over the shoulder, with the foreground shoulder slightly out of focus. |
-| [#181](https://showheyohtaki.github.io/motion-prompt/#181) | **Bird's-eye view** | Straight down from directly overhead | Bird's-eye view of the crossing from directly above, people and cars moving as seen from the top. |
-| [#182](https://showheyohtaki.github.io/motion-prompt/#182) | **Deep focus** | Near and far all in sharp focus | Deep focus, so the cup in front and the person behind are both sharp. |
-| [#183](https://showheyohtaki.github.io/motion-prompt/#183) | **Establishing shot** | A wide opening shot that shows the place | Open with an establishing shot of the whole town, with the location name on screen. |
-| [#184](https://showheyohtaki.github.io/motion-prompt/#184) | **Extreme close-up** | Fill the frame with one small detail | Extreme close-up on just the eye at the moment the tear falls. |
+| [#177](https://motion.jpedu.asia/#177) | **Low angle** | Shoot from low down, looking up | Shoot the hero's entrance from a low angle, looking up from near the ground. |
+| [#178](https://motion.jpedu.asia/#178) | **High angle** | Shoot from above, looking down | Use a high angle for the lost-child scene, looking down from above so they look small. |
+| [#179](https://motion.jpedu.asia/#179) | **POV shot** | See through a character's eyes | The moment of opening the door and entering the room as a POV shot, through their eyes. |
+| [#180](https://motion.jpedu.asia/#180) | **Over-the-shoulder** | Frame one person over another's shoulder | Shoot the conversation over the shoulder, with the foreground shoulder slightly out of focus. |
+| [#181](https://motion.jpedu.asia/#181) | **Bird's-eye view** | Straight down from directly overhead | Bird's-eye view of the crossing from directly above, people and cars moving as seen from the top. |
+| [#182](https://motion.jpedu.asia/#182) | **Deep focus** | Near and far all in sharp focus | Deep focus, so the cup in front and the person behind are both sharp. |
+| [#183](https://motion.jpedu.asia/#183) | **Establishing shot** | A wide opening shot that shows the place | Open with an establishing shot of the whole town, with the location name on screen. |
+| [#184](https://motion.jpedu.asia/#184) | **Extreme close-up** | Fill the frame with one small detail | Extreme close-up on just the eye at the moment the tear falls. |
 
 ## Transitions & Editing
 
 | # | Name | What it is | How to ask an AI |
 |---|---|---|---|
-| [#185](https://showheyohtaki.github.io/motion-prompt/#185) | **Insert shot** | Cut in to a detail of the same scene | Insert shot of the hand turning the key, then straight back to the scene. |
-| [#186](https://showheyohtaki.github.io/motion-prompt/#186) | **Morph cut** | Blend two takes so the join disappears | Remove the repeated sentence in the interview with a morph cut, so the join is invisible. |
-| [#187](https://showheyohtaki.github.io/motion-prompt/#187) | **Fade to black** | The picture darkens to black | End the scene with a 1-second fade to black, then fade in from black. |
-| [#188](https://showheyohtaki.github.io/motion-prompt/#188) | **Iris out** | A circle closes down to black | Old-film style: iris out, closing on the hero to end the scene. |
-| [#189](https://showheyohtaki.github.io/motion-prompt/#189) | **Cutaway** | Cut to something else, then back | Cut away to the audience reaction in the middle of the talk, then back. |
-| [#190](https://showheyohtaki.github.io/motion-prompt/#190) | **Cross-cutting** | Alternate between two simultaneous scenes | Cross-cut between the runner and the chasing car, with the cuts getting shorter. |
-| [#191](https://showheyohtaki.github.io/motion-prompt/#191) | **Bullet time** | Time stands still while the camera circles | Bullet time at the top of the jump: freeze the moment and circle the camera around. |
-| [#192](https://showheyohtaki.github.io/motion-prompt/#192) | **Montage** | A run of short shots condensing time | A one-month training montage: about seven short shots in a row. |
+| [#185](https://motion.jpedu.asia/#185) | **Insert shot** | Cut in to a detail of the same scene | Insert shot of the hand turning the key, then straight back to the scene. |
+| [#186](https://motion.jpedu.asia/#186) | **Morph cut** | Blend two takes so the join disappears | Remove the repeated sentence in the interview with a morph cut, so the join is invisible. |
+| [#187](https://motion.jpedu.asia/#187) | **Fade to black** | The picture darkens to black | End the scene with a 1-second fade to black, then fade in from black. |
+| [#188](https://motion.jpedu.asia/#188) | **Iris out** | A circle closes down to black | Old-film style: iris out, closing on the hero to end the scene. |
+| [#189](https://motion.jpedu.asia/#189) | **Cutaway** | Cut to something else, then back | Cut away to the audience reaction in the middle of the talk, then back. |
+| [#190](https://motion.jpedu.asia/#190) | **Cross-cutting** | Alternate between two simultaneous scenes | Cross-cut between the runner and the chasing car, with the cuts getting shorter. |
+| [#191](https://motion.jpedu.asia/#191) | **Bullet time** | Time stands still while the camera circles | Bullet time at the top of the jump: freeze the moment and circle the camera around. |
+| [#192](https://motion.jpedu.asia/#192) | **Montage** | A run of short shots condensing time | A one-month training montage: about seven short shots in a row. |
 
 Each number opens the moving sample in the gallery. Timings, easing values and reference code for one name: `api/v1/en/e/<id>.txt` ([#169](../../api/v1/en/e/169.txt)).
 

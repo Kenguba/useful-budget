@@ -12,40 +12,40 @@ Find the name, then say it to your AI. Add how long, how strong and what moves, 
 
 | # | Name | What it is | How to ask an AI |
 |---|---|---|---|
-| [#145](https://showheyohtaki.github.io/motion-prompt/#145) | **Timeline on scroll** | A timeline line grows as you scroll | Turn the company history into a timeline on scroll: grow the vertical line with the scroll and reveal each year as the line reaches it. |
-| [#146](https://showheyohtaki.github.io/motion-prompt/#146) | **Scroll text reveal** | Text darkens letter by letter as you scroll | Add a scroll text reveal to the concept statement: start in light gray and darken it one character at a time as the page scrolls. |
-| [#147](https://showheyohtaki.github.io/motion-prompt/#147) | **Stacking cards** | Cards stack on top of each other on scroll | Show the three service steps as stacking cards: on scroll, each card slides up and stacks 12 px below the top of the one before. |
-| [#148](https://showheyohtaki.github.io/motion-prompt/#148) | **Background color change on scroll** | The page background changes color by section | Add a background color change on scroll: blend smoothly from cream for the morning section to navy for night and light blue for the holiday section. |
-| [#149](https://showheyohtaki.github.io/motion-prompt/#149) | **Hide-on-scroll header** | Hides on scroll down, returns on scroll up | Make the header hide on scroll: slide it up out of view over 0.3 s when scrolling down, and bring it back as soon as the user scrolls up. |
-| [#150](https://showheyohtaki.github.io/motion-prompt/#150) | **Scrollspy** | Highlights the current section in the menu | Add scrollspy to the article's table of contents: highlight the item for the section being read in orange, switching over 0.25 s. |
-| [#151](https://showheyohtaki.github.io/motion-prompt/#151) | **Back-to-top button** | Appears lower down and returns you to the top | Add a back-to-top button to the article page: show it at the bottom right once the reader has scrolled a little, and scroll to the top in 0.6 s when clicked. |
-| [#152](https://showheyohtaki.github.io/motion-prompt/#152) | **Zoom on scroll** | An image grows to fill the screen as you scroll | Use zoom on scroll for the hero image: grow the small centered photo to fill the viewport as the user scrolls, then fade a headline in over it. |
+| [#145](https://motion.jpedu.asia/#145) | **Timeline on scroll** | A timeline line grows as you scroll | Turn the company history into a timeline on scroll: grow the vertical line with the scroll and reveal each year as the line reaches it. |
+| [#146](https://motion.jpedu.asia/#146) | **Scroll text reveal** | Text darkens letter by letter as you scroll | Add a scroll text reveal to the concept statement: start in light gray and darken it one character at a time as the page scrolls. |
+| [#147](https://motion.jpedu.asia/#147) | **Stacking cards** | Cards stack on top of each other on scroll | Show the three service steps as stacking cards: on scroll, each card slides up and stacks 12 px below the top of the one before. |
+| [#148](https://motion.jpedu.asia/#148) | **Background color change on scroll** | The page background changes color by section | Add a background color change on scroll: blend smoothly from cream for the morning section to navy for night and light blue for the holiday section. |
+| [#149](https://motion.jpedu.asia/#149) | **Hide-on-scroll header** | Hides on scroll down, returns on scroll up | Make the header hide on scroll: slide it up out of view over 0.3 s when scrolling down, and bring it back as soon as the user scrolls up. |
+| [#150](https://motion.jpedu.asia/#150) | **Scrollspy** | Highlights the current section in the menu | Add scrollspy to the article's table of contents: highlight the item for the section being read in orange, switching over 0.25 s. |
+| [#151](https://motion.jpedu.asia/#151) | **Back-to-top button** | Appears lower down and returns you to the top | Add a back-to-top button to the article page: show it at the bottom right once the reader has scrolled a little, and scroll to the top in 0.6 s when clicked. |
+| [#152](https://motion.jpedu.asia/#152) | **Zoom on scroll** | An image grows to fill the screen as you scroll | Use zoom on scroll for the hero image: grow the small centered photo to fill the viewport as the user scrolls, then fade a headline in over it. |
 
 ## Mouse & input interactions
 
 | # | Name | What it is | How to ask an AI |
 |---|---|---|---|
-| [#153](https://showheyohtaki.github.io/motion-prompt/#153) | **3D tilt on hover** | The card tilts in 3D following the cursor | Add a 3D tilt on hover to the member card: tilt it up to 18° following the cursor, with a moving glare. |
-| [#154](https://showheyohtaki.github.io/motion-prompt/#154) | **Spotlight hover** | Only the area around the cursor lights up | Add a spotlight hover to the feature cards: on the dark cards, light up only a circle of about 120 px around the cursor and make the borders glow too. |
-| [#155](https://showheyohtaki.github.io/motion-prompt/#155) | **Image swap on hover** | Hovering swaps the photo for another shot | Add an image swap on hover to the product grid: cross-fade to the back view over 0.3 s when the cursor is on a card. |
-| [#156](https://showheyohtaki.github.io/motion-prompt/#156) | **Text roll on hover** | Letters roll up and swap on hover | Give the main menu a text roll on hover: the letters roll up one by one, 0.035 s apart, revealing the same word in orange from below. |
-| [#157](https://showheyohtaki.github.io/motion-prompt/#157) | **Hover image reveal** | Hovering a list item shows its photo | Turn the property list into a hover image reveal: when the cursor is on a row, show its photo beside the cursor over 0.25 s and let it follow the cursor. |
-| [#158](https://showheyohtaki.github.io/motion-prompt/#158) | **Floating label** | The label floats up when you start typing | Use floating labels in the form: on focus, shrink each label and move it onto the top border over 0.24 s. |
-| [#159](https://showheyohtaki.github.io/motion-prompt/#159) | **Inline validation** | Shows right or wrong while you type | Add inline validation to the contact form: while the email address is incomplete show a red "invalid format" message, and switch to a green check once it is valid. |
-| [#160](https://showheyohtaki.github.io/motion-prompt/#160) | **Loading button** | Shows loading, then done, inside the button | Make the submit button a loading button: on click, shrink it to a circle with a spinner over 0.3 s, then turn it green with a check and "Done". |
+| [#153](https://motion.jpedu.asia/#153) | **3D tilt on hover** | The card tilts in 3D following the cursor | Add a 3D tilt on hover to the member card: tilt it up to 18° following the cursor, with a moving glare. |
+| [#154](https://motion.jpedu.asia/#154) | **Spotlight hover** | Only the area around the cursor lights up | Add a spotlight hover to the feature cards: on the dark cards, light up only a circle of about 120 px around the cursor and make the borders glow too. |
+| [#155](https://motion.jpedu.asia/#155) | **Image swap on hover** | Hovering swaps the photo for another shot | Add an image swap on hover to the product grid: cross-fade to the back view over 0.3 s when the cursor is on a card. |
+| [#156](https://motion.jpedu.asia/#156) | **Text roll on hover** | Letters roll up and swap on hover | Give the main menu a text roll on hover: the letters roll up one by one, 0.035 s apart, revealing the same word in orange from below. |
+| [#157](https://motion.jpedu.asia/#157) | **Hover image reveal** | Hovering a list item shows its photo | Turn the property list into a hover image reveal: when the cursor is on a row, show its photo beside the cursor over 0.25 s and let it follow the cursor. |
+| [#158](https://motion.jpedu.asia/#158) | **Floating label** | The label floats up when you start typing | Use floating labels in the form: on focus, shrink each label and move it onto the top border over 0.24 s. |
+| [#159](https://motion.jpedu.asia/#159) | **Inline validation** | Shows right or wrong while you type | Add inline validation to the contact form: while the email address is incomplete show a red "invalid format" message, and switch to a green check once it is valid. |
+| [#160](https://motion.jpedu.asia/#160) | **Loading button** | Shows loading, then done, inside the button | Make the submit button a loading button: on click, shrink it to a circle with a spinner over 0.3 s, then turn it green with a check and "Done". |
 
 ## Showcase effects
 
 | # | Name | What it is | How to ask an AI |
 |---|---|---|---|
-| [#161](https://showheyohtaki.github.io/motion-prompt/#161) | **View transition (shared element)** | A list photo expands into the detail page | Use a view transition from the works list to the detail page: the clicked photo should grow into the top of the detail page over 0.6 s. |
-| [#162](https://showheyohtaki.github.io/motion-prompt/#162) | **Lightbox** | Opens an image large over a dimmed page | Let visitors view the case-study photos in a lightbox: on click, dim the page and enlarge the photo in the center, with arrows to go to the previous or next photo. |
-| [#163](https://showheyohtaki.github.io/motion-prompt/#163) | **Hotspots** | Dots on an image open notes when clicked | Add hotspots to the product photo: put pulsing dots on the key features and open a tooltip over 0.25 s when one is clicked. |
-| [#164](https://showheyohtaki.github.io/motion-prompt/#164) | **Countdown timer** | Counts down the time left to a deadline | Add a countdown timer for the campaign deadline: hours, minutes and seconds, with each changing digit rolling in from below over 0.3 s. |
-| [#165](https://showheyohtaki.github.io/motion-prompt/#165) | **Animated shape divider** | A wavy section divider that keeps moving | Add an animated shape divider between the hero and the next section: two white wave layers drifting slowly in opposite directions. |
-| [#166](https://showheyohtaki.github.io/motion-prompt/#166) | **Like button animation** | The heart pops with a burst when liked | Add a like button animation to posts: fill the heart red, bounce it up to 1.45×, scatter a few small particles and count up by one. |
-| [#167](https://showheyohtaki.github.io/motion-prompt/#167) | **Scroll-down cue** | A looping cue that invites you to scroll down | Add a scroll-down cue below the hero: a dot inside a mouse outline slides down and fades about every 1.5 s, on repeat. |
-| [#168](https://showheyohtaki.github.io/motion-prompt/#168) | **Background video** | A video plays behind the hero section | Give the hero a background video: muted and looping, with a dark gradient on the left so the headline stays readable. |
+| [#161](https://motion.jpedu.asia/#161) | **View transition (shared element)** | A list photo expands into the detail page | Use a view transition from the works list to the detail page: the clicked photo should grow into the top of the detail page over 0.6 s. |
+| [#162](https://motion.jpedu.asia/#162) | **Lightbox** | Opens an image large over a dimmed page | Let visitors view the case-study photos in a lightbox: on click, dim the page and enlarge the photo in the center, with arrows to go to the previous or next photo. |
+| [#163](https://motion.jpedu.asia/#163) | **Hotspots** | Dots on an image open notes when clicked | Add hotspots to the product photo: put pulsing dots on the key features and open a tooltip over 0.25 s when one is clicked. |
+| [#164](https://motion.jpedu.asia/#164) | **Countdown timer** | Counts down the time left to a deadline | Add a countdown timer for the campaign deadline: hours, minutes and seconds, with each changing digit rolling in from below over 0.3 s. |
+| [#165](https://motion.jpedu.asia/#165) | **Animated shape divider** | A wavy section divider that keeps moving | Add an animated shape divider between the hero and the next section: two white wave layers drifting slowly in opposite directions. |
+| [#166](https://motion.jpedu.asia/#166) | **Like button animation** | The heart pops with a burst when liked | Add a like button animation to posts: fill the heart red, bounce it up to 1.45×, scatter a few small particles and count up by one. |
+| [#167](https://motion.jpedu.asia/#167) | **Scroll-down cue** | A looping cue that invites you to scroll down | Add a scroll-down cue below the hero: a dot inside a mouse outline slides down and fades about every 1.5 s, on repeat. |
+| [#168](https://motion.jpedu.asia/#168) | **Background video** | A video plays behind the hero section | Give the hero a background video: muted and looping, with a dark gradient on the left so the headline stays readable. |
 
 Each number opens the moving sample in the gallery. Timings, easing values and reference code for one name: `api/v1/en/e/<id>.txt` ([#145](../../api/v1/en/e/145.txt)).
 

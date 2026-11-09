@@ -613,7 +613,7 @@
   // ------------------------------------------------------------------ picks (choose → copy, share, or send to the waiting agent)
   // The "pick" command of the skill opens this page with ?cb=http://127.0.0.1:<port>/?t=<token>. "Send to AI" then
   // navigates the whole tab there (a top-level GET, not fetch: an https page may not fetch from 127.0.0.1).
-  var SITE = CAT.site || 'https://showheyohtaki.github.io/motion-prompt/';
+  var SITE = CAT.site || 'https://motion.jpedu.asia/';
   var PICK_KEY = 'mp-pick', PICK_CB_KEY = 'mp-pick-cb', NOTE_MAX = 300;
   var CHECK_SVG = '<svg viewBox="0 0 16 16" width="14" height="14"><path d="M3.5 8.4l3 3 6-6.6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var X_SVG = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';

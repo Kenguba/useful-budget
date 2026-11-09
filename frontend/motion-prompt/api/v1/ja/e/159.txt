@@ -1,4 +1,4 @@
-// Motion Prompt #159 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#159
+// Motion Prompt #159 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#159
 //
 // インラインバリデーション / Inline validation
 // パック: lp2 (LP・Webサイトの演出 第2弾) · element 15 · カテゴリ: マウス・入力への反応
@@ -12,7 +12,7 @@
 // タグ: validation, form, inline-validation, error-message, input, feedback
 // サイズ: 539x208 px · 1周: 9.4 s
 // Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
-// 動く見本: https://showheyohtaki.github.io/motion-prompt/#159
+// 動く見本: https://motion.jpedu.asia/#159
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
 // ここから要素のコード。CELLS や定数・補助関数は kit にある。

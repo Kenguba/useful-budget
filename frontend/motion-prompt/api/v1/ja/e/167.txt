@@ -1,4 +1,4 @@
-// Motion Prompt #167 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#167
+// Motion Prompt #167 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#167
 //
 // スクロールダウンの合図 / Scroll-down cue
 // パック: lp2 (LP・Webサイトの演出 第2弾) · element 23 · カテゴリ: 見せ場の演出
@@ -11,7 +11,7 @@
 // タグ: scroll-cue, scroll-indicator, scroll-down, hero, arrow, loop
 // サイズ: 539x208 px · 1周: 9.4 s
 // Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
-// 動く見本: https://showheyohtaki.github.io/motion-prompt/#167
+// 動く見本: https://motion.jpedu.asia/#167
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
 // ここから要素のコード。CELLS や定数・補助関数は kit にある。

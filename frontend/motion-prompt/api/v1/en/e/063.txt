@@ -1,4 +1,4 @@
-// Motion Prompt #063 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#063
+// Motion Prompt #063 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#063
 //
 // Stepper (+/−) / ステッパー
 // Pack: ui (UI component names) · element 15 · Category: Choosing & switching
@@ -12,7 +12,7 @@
 // Tags: stepper, quantity, number-input, increment, decrement, plus-minus, spin-button
 // Size: 542x191 px · Cycle: 4.5 s
 // Needs: kit ui -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/ui.js
-// Live demo: https://showheyohtaki.github.io/motion-prompt/#063
+// Live demo: https://motion.jpedu.asia/#063
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
 // Element code starts here. CELLS, constants and helpers live in the kit.

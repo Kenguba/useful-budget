@@ -1,4 +1,4 @@
-// Motion Prompt #149 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#149
+// Motion Prompt #149 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#149
 //
 // Hide-on-scroll header / 隠れるヘッダー
 // Pack: lp2 (Landing page & web effects, part 2) · element 05 · Category: Scroll effects
@@ -12,7 +12,7 @@
 // Tags: header, hide-on-scroll, headroom, navigation, sticky-header, scroll-direction
 // Size: 539x208 px · Cycle: 9.4 s
 // Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
-// Live demo: https://showheyohtaki.github.io/motion-prompt/#149
+// Live demo: https://motion.jpedu.asia/#149
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
 // Element code starts here. CELLS, constants and helpers live in the kit.

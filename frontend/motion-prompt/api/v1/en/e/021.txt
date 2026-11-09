@@ -1,4 +1,4 @@
-// Motion Prompt #021 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#021
+// Motion Prompt #021 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#021
 //
 // Flip / フリップ
 // Pack: motion (Motion graphics moves) · element 21 · Category: Transitions & highlights
@@ -13,7 +13,7 @@
 // Tags: flip, card, 3d, rotate, turn, reveal, question-answer
 // Size: 539x208 px · Cycle: 4.7 s
 // Needs: kit motion -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/motion.js
-// Live demo: https://showheyohtaki.github.io/motion-prompt/#021
+// Live demo: https://motion.jpedu.asia/#021
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
 // Element code starts here. CELLS, constants and helpers live in the kit.

@@ -1,4 +1,4 @@
-// Motion Prompt #097-120 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#097
+// Motion Prompt #097-120 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#097
 //
 // Kit for pack "photo" (Photo looks, lighting & styles / 写真の表現・光と画風): the constants and helpers its elements share.
 // Elements #097-120 · 539x208 px · cycle 5 s. Element code: https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/<id>.txt (or /ja/).

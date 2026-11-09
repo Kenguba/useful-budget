@@ -1,4 +1,4 @@
-// Motion Prompt #130 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#130
+// Motion Prompt #130 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#130
 //
 // Wave text / ウェーブテキスト
 // Pack: motion2 (Motion graphics moves, part 2) · element 10 · Category: Text & shapes
@@ -12,7 +12,7 @@
 // Tags: wave-text, wave, text, letters, stagger, bounce, kinetic-type
 // Size: 539x208 px · Cycle: 4.7 s
 // Needs: kit motion2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/motion2.js
-// Live demo: https://showheyohtaki.github.io/motion-prompt/#130
+// Live demo: https://motion.jpedu.asia/#130
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
 // Element code starts here. CELLS, constants and helpers live in the kit.

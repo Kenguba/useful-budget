@@ -1,4 +1,4 @@
-// Motion Prompt #114 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#114
+// Motion Prompt #114 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#114
 //
 // Low-key / ローキー
 // Pack: photo (Photo looks, lighting & styles) · element 18 · Category: Tones & finishing looks
@@ -13,7 +13,7 @@
 // Tags: low-key, low key, dark, black background, moody, dramatic, chiaroscuro
 // Size: 539x208 px · Cycle: 5 s
 // Needs: kit photo -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/photo.js
-// Live demo: https://showheyohtaki.github.io/motion-prompt/#114
+// Live demo: https://motion.jpedu.asia/#114
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
 // Element code starts here. CELLS, constants and helpers live in the kit.

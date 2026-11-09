@@ -1,4 +1,4 @@
-// Motion Prompt #104 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#104
+// Motion Prompt #104 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#104
 //
 // ブルーアワー / Blue hour
 // パック: photo (写真の表現・光と画風) · element 08 · カテゴリ: 光の当て方・時間帯
@@ -14,7 +14,7 @@
 // タグ: blue hour, twilight, dusk, night city, cityscape, deep blue sky
 // サイズ: 539x208 px · 1周: 5 s
 // Needs: kit photo -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/photo.js
-// 動く見本: https://showheyohtaki.github.io/motion-prompt/#104
+// 動く見本: https://motion.jpedu.asia/#104
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
 // ここから要素のコード。CELLS や定数・補助関数は kit にある。

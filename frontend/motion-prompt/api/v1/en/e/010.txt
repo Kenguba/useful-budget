@@ -1,4 +1,4 @@
-// Motion Prompt #010 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#010
+// Motion Prompt #010 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#010
 //
 // Overshoot / オーバーシュート
 // Pack: motion (Motion graphics moves) · element 10 · Category: Motion polish
@@ -13,7 +13,7 @@
 // Tags: overshoot, spring, bounce, settle, elastic, gauge, meter, needle
 // Size: 539x208 px · Cycle: 4.7 s
 // Needs: kit motion -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/motion.js
-// Live demo: https://showheyohtaki.github.io/motion-prompt/#010
+// Live demo: https://motion.jpedu.asia/#010
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
 // Element code starts here. CELLS, constants and helpers live in the kit.

@@ -1,4 +1,4 @@
-// Motion Prompt #146 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#146
+// Motion Prompt #146 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#146
 //
 // スクロールテキストリビール / Scroll text reveal
 // パック: lp2 (LP・Webサイトの演出 第2弾) · element 02 · カテゴリ: スクロールで起きる演出
@@ -12,7 +12,7 @@
 // タグ: scroll, text-reveal, scroll-driven, typography, opacity, storytelling
 // サイズ: 539x208 px · 1周: 9.4 s
 // Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
-// 動く見本: https://showheyohtaki.github.io/motion-prompt/#146
+// 動く見本: https://motion.jpedu.asia/#146
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
 // ここから要素のコード。CELLS や定数・補助関数は kit にある。

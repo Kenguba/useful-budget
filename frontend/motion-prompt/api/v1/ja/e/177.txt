@@ -1,4 +1,4 @@
-// Motion Prompt #177 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#177
+// Motion Prompt #177 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#177
 //
 // ローアングル / Low angle
 // パック: camera2 (カメラワークと切り替え 第2弾) · element 09 · カテゴリ: アングル・画づくり
@@ -13,7 +13,7 @@
 // タグ: low angle, worm's eye, look up, from below, power, heroic, angle
 // サイズ: 539x208 px · 1周: 9.4 s
 // Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
-// 動く見本: https://showheyohtaki.github.io/motion-prompt/#177
+// 動く見本: https://motion.jpedu.asia/#177
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
 // ここから要素のコード。CELLS や定数・補助関数は kit にある。

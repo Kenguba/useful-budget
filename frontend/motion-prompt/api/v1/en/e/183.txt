@@ -1,4 +1,4 @@
-// Motion Prompt #183 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#183
+// Motion Prompt #183 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#183
 //
 // Establishing shot / エスタブリッシングショット
 // Pack: camera2 (Camera moves & transitions, part 2) · element 15 · Category: Angles & Framing
@@ -13,7 +13,7 @@
 // Tags: establishing shot, wide shot, location, opening, scene setting, aerial, framing
 // Size: 539x208 px · Cycle: 9.4 s
 // Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
-// Live demo: https://showheyohtaki.github.io/motion-prompt/#183
+// Live demo: https://motion.jpedu.asia/#183
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
 // Element code starts here. CELLS, constants and helpers live in the kit.

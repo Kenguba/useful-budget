@@ -1,4 +1,4 @@
-// Motion Prompt #156 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#156
+// Motion Prompt #156 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#156
 //
 // Text roll on hover / テキストロール
 // Pack: lp2 (Landing page & web effects, part 2) · element 12 · Category: Mouse & input interactions
@@ -12,7 +12,7 @@
 // Tags: text-roll, hover, menu, link, stagger, typography
 // Size: 539x208 px · Cycle: 9.4 s
 // Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
-// Live demo: https://showheyohtaki.github.io/motion-prompt/#156
+// Live demo: https://motion.jpedu.asia/#156
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
 // Element code starts here. CELLS, constants and helpers live in the kit.

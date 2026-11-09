@@ -1,4 +1,4 @@
-// Motion Prompt #098 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#098
+// Motion Prompt #098 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#098
 //
 // Rim light / リムライト
 // Pack: photo (Photo looks, lighting & styles) · element 02 · Category: Lighting & time of day
@@ -13,7 +13,7 @@
 // Tags: rim light, rim lighting, edge light, backlight, kicker, outline, studio
 // Size: 539x208 px · Cycle: 5 s
 // Needs: kit photo -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/photo.js
-// Live demo: https://showheyohtaki.github.io/motion-prompt/#098
+// Live demo: https://motion.jpedu.asia/#098
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
 // Element code starts here. CELLS, constants and helpers live in the kit.
