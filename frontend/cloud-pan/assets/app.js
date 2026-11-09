@@ -260,7 +260,8 @@
     }
     (function initPosition() {
       var vh = window.innerHeight;
-      currentTop = Math.max(80, vh - 220);
+      var dh = dockEl.getBoundingClientRect().height || 96;
+      currentTop = Math.max(80, vh - dh - 20);
       dockEdgeSide = "right"; stashedSide = null;
       try {
         var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
