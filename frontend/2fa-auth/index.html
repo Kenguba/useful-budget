@@ -367,12 +367,21 @@
     .hero-header {
       position: relative;
       background-color: var(--hero-bg-base);
+      background-image:
+        radial-gradient(130% 105% at 10% 112%, color-mix(in srgb, var(--orb-color-1) 52%, transparent) 0%, transparent 62%),
+        radial-gradient(130% 105% at 90% 112%, color-mix(in srgb, var(--orb-color-2) 52%, transparent) 0%, transparent 62%);
       padding: 14px;
       border-radius: 28px;
       box-shadow: 0 14px 34px -12px var(--search-glow);
       border: 1px solid var(--card-border);
       transition: background-color 0.55s ease, box-shadow 0.6s ease;
       z-index: 20;
+    }
+
+    [data-dark="true"] .hero-header {
+      background-image:
+        radial-gradient(130% 105% at 10% 112%, color-mix(in srgb, var(--orb-color-1) 30%, transparent) 0%, transparent 62%),
+        radial-gradient(130% 105% at 90% 112%, color-mix(in srgb, var(--orb-color-2) 30%, transparent) 0%, transparent 62%);
     }
 
     @keyframes videoHoloBtn {
