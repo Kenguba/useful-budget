@@ -131,11 +131,14 @@
       z-index: 140;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.28s ease;
+      visibility: hidden;
+      transition: opacity 0.28s ease, visibility 0s linear 0.3s;
     }
 
     .sidebar-drawer-backdrop.open {
       opacity: 1;
+      visibility: visible;
+      transition: opacity 0.28s ease, visibility 0s;
       pointer-events: auto;
       touch-action: none;
       overscroll-behavior: none;
@@ -372,108 +375,10 @@
       z-index: 20;
     }
 
-    /* 动态弥散光斑层（独立裁切圆角，避免遮挡下拉12色主题面板） */
-    .aura-backdrop {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: -1;
-      overflow: hidden;
-      border-radius: 28px;
-    }
-
-    .aura-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(48px);
-      opacity: 0.82;
-      transition: background-color 0.75s var(--ease-smooth),
-                  transform 0.85s var(--ease-spring);
-    }
-
-    [data-dark="true"] .aura-orb {
-      opacity: 0.28;
-      filter: blur(56px);
-    }
-
-    .aura-orb.orb-left {
-      width: 280px;
-      height: 220px;
-      bottom: -60px;
-      left: -40px;
-      background-color: var(--orb-color-1);
-    }
-
-    .aura-orb.orb-right {
-      width: 300px;
-      height: 240px;
-      bottom: -75px;
-      right: -45px;
-      background-color: var(--orb-color-2);
-    }
-
-    .aura-orb.orb-center {
-      width: 260px;
-      height: 190px;
-      bottom: -55px;
-      left: 24%;
-      background-color: #9EE0C5;
-      opacity: 0;
-      transition: opacity 0.6s ease, background-color 0.75s ease;
-    }
-
-    /* 第12号主题「幻彩全息」专属呼吸极光动画 */
-    @keyframes videoHoloLeft {
-      0%   { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
-      25%  { background-color: #8FDBB8; transform: translate(16px, -12px) scale(1.1); }
-      50%  { background-color: #92C6F2; transform: translate(8px, 6px) scale(1.06); }
-      75%  { background-color: #B9CFF8; transform: translate(-12px, -6px) scale(1.02); }
-      100% { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
-    }
-
-    @keyframes videoHoloRight {
-      0%   { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
-      25%  { background-color: #9CC8F7; transform: translate(-16px, -8px) scale(1.1); }
-      50%  { background-color: #A7D0F7; transform: translate(-8px, 8px) scale(1.04); }
-      75%  { background-color: #BDE7D5; transform: translate(14px, -6px) scale(1.08); }
-      100% { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
-    }
-
-    @keyframes videoHoloCenter {
-      0%   { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
-      33%  { background-color: #9FCAF5; transform: translateY(-14px) scale(1.12); }
-      66%  { background-color: #CFE7FB; transform: translateY(6px) scale(0.98); }
-      100% { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
-    }
-
     @keyframes videoHoloBtn {
       0%   { background-position: 0% 50%; }
       50%  { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
-    }
-
-    [data-holo="true"] .aura-orb.orb-left {
-      animation: videoHoloLeft 4.8s ease-in-out infinite;
-      filter: blur(42px);
-      opacity: 0.9;
-    }
-
-    [data-holo="true"] .aura-orb.orb-right {
-      animation: videoHoloRight 4.8s ease-in-out infinite;
-      filter: blur(42px);
-      opacity: 0.9;
-    }
-
-    [data-holo="true"] .aura-orb.orb-center {
-      opacity: 0.78;
-      animation: videoHoloCenter 4.8s ease-in-out infinite;
-      filter: blur(44px);
-    }
-
-    [data-dark="true"][data-holo="true"] .aura-orb.orb-left,
-    [data-dark="true"][data-holo="true"] .aura-orb.orb-right,
-    [data-dark="true"][data-holo="true"] .aura-orb.orb-center {
-      opacity: 0.34;
     }
 
     [data-holo="true"] .primary-aura-btn {
@@ -1623,10 +1528,14 @@
         border-radius: 0 26px 26px 0;
         transform: translateX(-104%);
         overscroll-behavior-y: contain;
+        visibility: hidden;
+        transition: background-color 0.45s ease, border-color 0.45s ease, transform 0.35s var(--ease-smooth), visibility 0s linear 0.4s;
       }
 
       .app-sidebar.open {
         transform: translateX(0);
+        visibility: visible;
+        transition: background-color 0.45s ease, border-color 0.45s ease, transform 0.35s var(--ease-smooth), visibility 0s;
       }
 
       .mobile-close-drawer {
@@ -1655,13 +1564,6 @@
         border-left: none;
         border-right: none;
         padding: 14px;
-      }
-
-      .aura-backdrop {
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-        border-bottom-left-radius: 28px;
-        border-bottom-right-radius: 28px;
       }
 
       .workspace-grid {
@@ -1848,12 +1750,6 @@
 
   <div class="main-stage" id="top">
     <header class="hero-header">
-      <div class="aura-backdrop">
-        <div class="aura-orb orb-left" id="orbLeft"></div>
-        <div class="aura-orb orb-center" id="orbCenter"></div>
-        <div class="aura-orb orb-right" id="orbRight"></div>
-      </div>
-
       <div class="top-nav-bar">
         <div class="brand-tag">
           <button class="drawer-trigger-btn" id="drawerTriggerBtn" type="button" aria-label="打开功能菜单">
@@ -2228,13 +2124,6 @@ function applyTheme(idx){
   if (!isDarkMode){
     root.style.setProperty('--page-bg', th.pageBg);
     const mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute('content', th.pageBg);
-  }
-  const ol = document.getElementById('orbLeft'), or2 = document.getElementById('orbRight');
-  if (ol && or2){
-    if (!th.isHolo){ const sh = idx % 2 === 0 ? 1 : -1;
-      ol.style.transform = 'translate(' + (sh*14) + 'px,' + (-sh*8) + 'px) scale(' + (1+sh*0.05) + ')';
-      or2.style.transform = 'translate(' + (-sh*14) + 'px,' + (sh*8) + 'px) scale(' + (1-sh*0.05) + ')';
-    } else { ol.style.transform = ''; or2.style.transform = ''; }
   }
   updateSwatchActiveState();
 }
