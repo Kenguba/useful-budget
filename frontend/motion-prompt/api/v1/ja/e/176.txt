@@ -1,0 +1,34 @@
+// Motion Prompt #176 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#176
+//
+// フライスルー / Fly-through
+// パック: camera2 (カメラワークと切り替え 第2弾) · element 08 · カテゴリ: カメラの動き
+// 何が起きるか: 窓のあいた壁へ向かって進み、窓を通り抜けて向こう側の場所へ出る。
+// 動きの仕様:
+//   - カメラ: 前へ 0m → 12.5m 進む（高さ1.3m、向き固定）。8m先に窓のあいた壁があり、通り抜ける
+//   - 時間: 0.5秒から3.6秒まで3.1秒。3次のイーズインアウト（cubic-bezier(0.65,0,0.35,1) 相当）
+//   - 壁: 幅80m・高さ14mの薄い灰色の面に、幅2.4m・高さ2.2m（下端0.15m）の窓。窓の向こうに人物（右0.3m・奥14.5m）・木・建物・山が見える
+//   - 通過: 壁はカメラの0.25m手前で描画をやめる。そのとき窓の縁は画面の外（半幅約1580px）なので、消えるのは見えない
+//   - 通過後は向こう側の場所が全画面になり、人物に2mまで近づく（#035 FPV は木の間を抜け続ける）
+//   - 戻り: 3.6〜4.2秒は止め、最後の0.5秒で開始状態へクロスフェード。右上に窓までの距離（窓まで 8.0m → 通過）
+// 使いどころ: 建物の中へ入る導入、場所から場所への移動を1つの動きで見せるとき。
+// タグ: fly-through, flythrough, through the window, pass through, drone, interior, camera move
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#176
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 08
+// 08 フライスルー: 壁の窓へ向かって飛び、通り抜けて向こうの場所へ出る（#035 FPV は木の間を抜けていく）
+CELLS[7] = shot(camCell((k, w, h, p) => {
+  const z = lerp(0, 12.5, p), WZ = 8;
+  world(k, w, h, cam({ z, y: 1.3 }), {
+    buildings: true, person: { x: 0.3, z: 14.5 },
+    extra: [[0, 0, WZ, (kk, s) => {   // 窓のあいた壁（偶奇塗り）
+      kk.fillStyle = C.g1; kk.beginPath(); kk.rect(-40, 0, 80, 14); kk.rect(-1.2, 0.15, 2.4, 2.2); kk.fill('evenodd');
+      kk.strokeStyle = C.g3; kk.lineWidth = 1.6 / s; kk.strokeRect(-1.2, 0.15, 2.4, 2.2);
+      kk.strokeStyle = C.g2; kk.lineWidth = 1.2 / s; kk.beginPath(); kk.moveTo(-40, 14); kk.lineTo(40, 14); kk.stroke();
+    }]]
+  });
+}, p => { const d = 8 - lerp(0, 12.5, p); return d > 0 ? `窓まで ${d.toFixed(1)}m` : '通過'; }, 0.5, 3.6));

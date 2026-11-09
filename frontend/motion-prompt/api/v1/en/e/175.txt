@@ -1,0 +1,35 @@
+// Motion Prompt #175 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#175
+//
+// Locked-off shot / ロックオフ
+// Pack: camera2 (Camera moves & transitions, part 2) · element 07 · Category: Camera Movement
+// What happens: A person crosses in front of a tripod-fixed camera and a car passes behind; the camera does not move by a pixel.
+// Motion spec:
+//   - Camera: completely fixed (height 1.4 m, facing forward, focal length 330 px); only the subjects move
+//   - Subject: a person crosses left to right at constant speed 6.5 m ahead (x = -6.2 m → +6.2 m in 4.7 s); legs and arms swing by sin(u×7)×0.42 rad
+//   - A grey car crosses right to left 15 m away (x = +16 m → -16 m in 4.7 s)
+//   - Both start and end outside the frame, so it loops seamlessly every 4.7 s
+//   - A grey tripod mark at bottom left; top-right readout shows "LOCKED" (#040 Freeze frame stops the footage time; here time runs and only the camera is still)
+// When to use it: To make the subject stand out by contrast, for fixed-point observation, or as a base for time-lapse and compositing.
+// Tags: locked-off, locked off, static shot, fixed camera, tripod, static, still camera
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#175
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 07
+// 07 ロックオフ: 三脚で固定したカメラの前を人物が横切り、奥を車が通る。カメラは1pxも動かない（#040 フリーズフレームは映像が止まる）
+CELLS[6] = shot((k, w, h, u) => {
+  const q = u / CYC;
+  world(k, w, h, cam({ y: 1.4 }), {
+    person: { x: lerp(-6.2, 6.2, q), z: 6.5, walk: u * 7 },
+    extra: [[lerp(16, -16, q), 0, 15, (kk) => { kk.fillStyle = C.g4; rr(kk, -1.9, 0.35, 3.8, 0.75, 0.25); kk.fill(); rr(kk, -1.1, 0.95, 2.1, 0.62, 0.28); kk.fill(); kk.fillStyle = C.ink; [-1.15, 1.15].forEach(x => { kk.beginPath(); kk.arc(x, 0.34, 0.34, 0, 7); kk.fill(); }); }]],
+    after: (kk) => {   // 三脚の印（左下）
+      kk.strokeStyle = C.g4; kk.lineWidth = 2.2; kk.lineCap = 'round'; const x = -w / 2 + 38, y = h / 2 - 20;
+      kk.beginPath(); kk.moveTo(x, y - 30); kk.lineTo(x - 12, y); kk.moveTo(x, y - 30); kk.lineTo(x + 12, y); kk.moveTo(x, y - 30); kk.lineTo(x, y - 2); kk.stroke();
+      kk.fillStyle = C.g4; rr(kk, x - 9, y - 42, 18, 12, 3); kk.fill();
+    }
+  });
+  return 'LOCKED';
+});

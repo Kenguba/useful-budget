@@ -1,0 +1,35 @@
+// Motion Prompt #172 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#172
+//
+// Long take / 長回し
+// Pack: camera2 (Camera moves & transitions, part 2) · element 04 · Category: Camera Movement
+// What happens: One continuous shot follows a walking person with no cut; the bar at the bottom stays a single unbroken strip.
+// Motion spec:
+//   - Join: none; for 4.2 s one shot keeps following the person (#041 Jump cut splits it into five)
+//   - Subject: a person walks at constant speed from front left (x = -3.4 m, 5.2 m deep) to back right (x = 2.8 m, 9.6 m deep); legs and arms swing by sin(t×7)×0.42 rad
+//   - Camera: trucks right 0 m → 1.4 m after the person while turning, yaw = atan2(person x - camera x, depth)×0.8; height 1.4 m
+//   - Bottom strip: one blue bar labelled "1ショット・カットなし" (one shot, no cut) with a playhead, showing there is no break
+//   - Return: stops at 4.2 s, then cross-fades back to the start over the last 0.5 s (one pass = 4.7 s)
+//   - Top-right readout shows the elapsed time (NO CUT 0.0s → 4.2s)
+// When to use it: To keep tension and presence unbroken, or to show a sequence of movement as one flow.
+// Tags: long take, oner, one shot, continuous, no cut, sequence shot, camera move
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#172
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 04
+// 04 長回し: 歩く人物をカットなしで追い続ける1ショット。画面下の帯は1本のまま（#041 ジャンプカットのように割れない）
+CELLS[3] = shot((k, w, h, u) => {
+  const uu = Math.min(u, CYC - RESET);
+  const draw = (kk, t) => {
+    const p = t / (CYC - RESET);
+    const x = lerp(-3.4, 2.8, p), z = lerp(5.2, 9.6, p), cx = lerp(0, 1.4, p);
+    world(kk, w, h, cam({ x: cx, y: 1.4, yaw: Math.atan2(x - cx, z) * 0.8 }), { person: { x, z, walk: t * 7 }, fg: [[-2.6, 3.4], [3.6, 4.6, 'rock']] });
+    strip(kk, w, h, [[0, CYC, '1ショット・カットなし', C.blue]], t);
+  };
+  const r = P(u, CYC - RESET, CYC);
+  blend(k, kk => draw(kk, uu), kk => draw(kk, 0), eIOs(r));
+  return `NO CUT ${(r > .5 ? 0 : uu).toFixed(1)}s`;
+});

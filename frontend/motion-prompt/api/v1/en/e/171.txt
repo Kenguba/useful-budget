@@ -1,0 +1,37 @@
+// Motion Prompt #171 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#171
+//
+// Hyperlapse / ハイパーラプス
+// Pack: camera2 (Camera moves & transitions, part 2) · element 03 · Category: Camera Movement
+// What happens: The camera travels forward along a street while the sun, clouds and passers-by run in fast forward: a time-lapse that moves.
+// Motion spec:
+//   - Camera: moves forward 0 m → 22 m (height 1.6 m, pitch +0.05 rad) while the sun, clouds and figures fast-forward through 12 hours (#039 Time-lapse keeps the camera still)
+//   - Timing: 0.4 s to 4.1 s (3.7 s), cubic ease-in-out (about cubic-bezier(0.65,0,0.35,1))
+//   - Street: 12 buildings at x = ±7.5 m (5–55 m deep, 8–16 m tall) approach the camera and leave the frame
+//   - Sun: travels left to right along an arc, angle -1.25 rad → +1.25 rad, always 170 m ahead of the camera; three clouds drift 140 m right in total, wrapping every 80 m; six small figures cross an 11 m wide street
+//   - Building shadows fall away from the sun and swing as it moves (translucent grey); the mountains move with the camera so they keep their size
+//   - Return: cross-fade back to the start over the last 0.5 s; top-right readout shows the clock and the distance travelled (06:00 · 0m → 18:00 · 22m)
+// When to use it: To cover a long distance and a long stretch of time in one sweep through a city or a building.
+// Tags: hyperlapse, time-lapse, moving timelapse, fast forward, travel, city, camera move
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#171
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 03
+// 03 ハイパーラプス: 街路を前へ進みながらのタイムラプス（太陽・雲・人影が早送り）。#039 タイムラプスはカメラが動かない
+const HL_BLD = [[-7.5, 4, 9, 5], [7.5, 3.4, 12, 9], [-7.5, 3.6, 14, 13], [7.5, 4, 8, 18], [-7.5, 3.2, 11, 22], [7.5, 3.6, 15, 27], [-7.5, 4, 9, 31], [7.5, 3.2, 12, 36], [-7.5, 3.6, 13, 40], [7.5, 4, 10, 45], [-7.5, 3.4, 16, 50], [7.5, 3.6, 9, 55]];
+CELLS[2] = shot(camCell((k, w, h, p) => {
+  const z = lerp(0, 22, p), a = lerp(-1.25, 1.25, p);
+  const clouds = [[-20 + mod(p * 140, 80) - 10, 18, z + 90, 2.2], [-50 + mod(p * 140 + 40, 80), 24, z + 120, 3], [-10 + mod(p * 140 + 20, 80) - 30, 13, z + 70, 1.6]];
+  const ex = HL_BLD.map(([x, bw, bh, zz]) => [x, 0, zz, (kk, s) => building(kk, s, bw, bh)]);
+  for (let i = 0; i < 6; i++) { const ph = mod(p * 6 + i / 6, 1), dir = i % 2 ? 1 : -1; ex.push([dir * lerp(-5.5, 5.5, ph), 0, 7 + i * 7, (kk) => { kk.fillStyle = i % 3 ? C.g4 : C.blueM; kk.fillRect(-0.12, 0, 0.24, 0.9); kk.beginPath(); kk.arc(0, 1.05, 0.13, 0, 7); kk.fill(); }]); }
+  world(k, w, h, cam({ z, y: 1.6, pitch: 0.05 }), {
+    buildings: false, trees: false, mtnZ: z, sun: [Math.sin(a) * 120, Math.cos(a) * 60 - 8, z + 170], sunCol: C.blueM, clouds, extra: ex, gridX: 24,
+    after: (kk, cc) => {   // 建物の影（太陽と反対側へ）
+      kk.fillStyle = 'rgba(160,160,165,.22)';
+      HL_BLD.forEach(([x, bw, bh, zz]) => { if (zz < cc.z + 1) return; const L = bh * 0.9; const q1 = proj(cc, x - bw / 2, 0, zz), q2 = proj(cc, x + bw / 2, 0, zz), q3 = proj(cc, x + bw / 2 - Math.sin(a) * L, 0, zz - Math.cos(a) * L * 0.4 - 1), q4 = proj(cc, x - bw / 2 - Math.sin(a) * L, 0, zz - Math.cos(a) * L * 0.4 - 1); if (q3.z < NEAR || q4.z < NEAR) return; kk.beginPath(); kk.moveTo(q1.x, q1.y); kk.lineTo(q2.x, q2.y); kk.lineTo(q3.x, q3.y); kk.lineTo(q4.x, q4.y); kk.fill(); });
+    }
+  });
+}, p => { const m = Math.round(lerp(6 * 60, 18 * 60, p) / 10) * 10; return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')} · ${Math.round(lerp(0, 22, p))}m`; }, 0.4, 4.1));

@@ -1,0 +1,24 @@
+// Motion Prompt #177 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#177
+//
+// Low angle / ローアングル
+// Pack: camera2 (Camera moves & transitions, part 2) · element 09 · Category: Angles & Framing
+// What happens: The camera drops to near the ground and looks up; the person looks big and the buildings tower.
+// Motion spec:
+//   - Camera: lowers from 1.5 m to 0.35 m while the pitch goes 0 → +0.32 rad (about 18° up); no movement forward or back
+//   - Timing: 0.6 s to 2.2 s (1.6 s), cubic ease-in-out (about cubic-bezier(0.65,0,0.35,1))
+//   - Subject: a person stands still 4.5 m ahead; an 11.8 m tower stands 3 m left, 22 m away. As the camera looks up, person and tower stretch upward and the horizon drops
+//   - Hold: stays at the low angle from 2.2 s to 4.2 s (time to read the composition itself)
+//   - Return: cross-fade back to eye level over the last 0.5 s (one pass = 4.7 s); top-right readout shows angle and height (↗ 0° · 1.5m → ↗ 18° · 0.4m)
+// When to use it: To make a person look powerful or large, or to emphasise the height of a building.
+// Tags: low angle, worm's eye, look up, from below, power, heroic, angle
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#177
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 09
+// 09 ローアングル: カメラを地面近くに下げ、見上げる。人物が大きく、建物が高く見える
+CELLS[8] = shot(camCell((k, w, h, p) => world(k, w, h, cam({ y: lerp(1.5, 0.35, p), pitch: lerp(0, 0.32, p) }), { person: { z: 4.5 }, tower: [-3, 22] }),
+  p => `↗ ${Math.round(lerp(0, 0.32, p) * 57.3)}° · ${lerp(1.5, 0.35, p).toFixed(1)}m`, 0.6, 2.2));

@@ -1,0 +1,28 @@
+// Motion Prompt #187 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#187
+//
+// Fade to black / フェードアウト
+// Pack: camera2 (Camera moves & transitions, part 2) · element 19 · Category: Transitions & Editing
+// What happens: The whole picture sinks to black, and the next scene brightens out of the black.
+// Motion spec:
+//   - Fade out: from 1.4 s to 2.6 s (1.2 s) black (rgb(20,20,24)) is laid over the outgoing picture with opacity 0 → 100%, quadratic ease-in-out (about cubic-bezier(0.45,0,0.55,1))
+//   - Black: fully black from 2.6 s to 3.1 s; at 2.9 s the incoming picture is swapped in unseen, with a straight cut
+//   - Fade in: from 3.1 s to 4.3 s (1.2 s) the black goes from 100% → 0 with the same easing
+//   - Camera: fixed in both pictures (A at height 1.4 m; B at height 1.6 m, pitch +0.1 rad); the subjects do not move either
+//   - Alternates A→B and B→A every 4.7 s (9.4 s for the round trip); top-right readout shows "FADE OUT" / "FADE IN"; the viewfinder marks stay over the black
+// When to use it: For a chapter break, a long passage of time, or the end of a story.
+// Tags: fade to black, fade out, fade in, black, ending, transition
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#187
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 19
+// 19 フェードアウト: 画面全体が黒へ沈んで終わり、黒から次の場面が明けてくる
+CELLS[18] = shot(abCell((k, w, h, u, A, B) => {
+  const out = eIOs(P(u, 1.4, 2.6)), inn = eIOs(P(u, 3.1, 4.3));
+  if (u < 2.9) A(k, w, h); else B(k, w, h);
+  const a = u < 2.9 ? out : 1 - inn;
+  if (a > 0) { k.fillStyle = `rgba(20,20,24,${a.toFixed(3)})`; k.fillRect(0, 0, w, h); }
+}, u => u < 2.9 ? 'FADE OUT' : 'FADE IN'));

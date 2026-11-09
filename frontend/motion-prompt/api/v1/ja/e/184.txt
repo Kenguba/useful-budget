@@ -1,0 +1,32 @@
+// Motion Prompt #184 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#184
+//
+// エクストリームクローズアップ / Extreme close-up
+// パック: camera2 (カメラワークと切り替え 第2弾) · element 16 · カテゴリ: アングル・画づくり
+// 何が起きるか: 顔のクローズアップから、目だけが画面を埋めるまで寄る。
+// 動きの仕様:
+//   - カメラ: 1.3m先の顔の右目（中心から左0.06m・高さ1.66m）を画面の中心に置き、位置は動かさない
+//   - 焦点距離: 610px → 2040px（44mm → 148mm表示、約3.3倍）。f = 610 × (2040/610)^p、p は 0.5秒〜3.4秒の3次のイーズインアウト（cubic-bezier(0.65,0,0.35,1) 相当）
+//   - 顔: 青い頭（半径0.16m）に白目（楕円 0.045×0.028m）・黒目（半径0.016m）・ハイライト・白い眉。開始は顔全体のクローズアップ（頭の直径約150px）、終わりは目だけが画面を埋める
+//   - 背景: 木と建物は3pxのぼかし。寄るにつれ画面の外へ出る
+//   - 戻り: 3.4〜4.2秒は止め、最後の0.5秒で開始状態へクロスフェード。右上に焦点距離と略語（44mm CU → 148mm ECU）
+// 使いどころ: 感情の一番の山場、小さな細部に注目させたいとき。
+// タグ: extreme close-up, ecu, close-up, eye, detail, macro, framing
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#184
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 16
+// 16 エクストリームクローズアップ: 顔のクローズアップから、目だけが画面を埋めるまで寄る
+CELLS[15] = shot(camCell((k, w, h, p) => {
+  const f = 610 * Math.pow(2040 / 610, p);
+  world(k, w, h, cam({ f, x: -0.06, y: 1.66 }), {
+    blurBg: 3, trees: true,
+    extra: [[0, 0, 1.3, (kk) => {   // 目のある顔
+      person(kk, 1);
+      [[-0.06, 1.66], [0.06, 1.66]].forEach(([x, y]) => { kk.fillStyle = '#fff'; kk.beginPath(); kk.ellipse(x, y, 0.045, 0.028, 0, 0, 7); kk.fill(); kk.fillStyle = C.ink; kk.beginPath(); kk.arc(x + 0.008, y, 0.016, 0, 7); kk.fill(); kk.fillStyle = '#fff'; kk.beginPath(); kk.arc(x + 0.014, y + 0.007, 0.005, 0, 7); kk.fill(); kk.strokeStyle = '#fff'; kk.lineWidth = 0.012; kk.beginPath(); kk.arc(x, y + 0.02, 0.05, Math.PI * 1.15, Math.PI * 1.85); kk.stroke(); });
+    }]]
+  });
+}, p => `${mm(610 * Math.pow(2040 / 610, p))} ${p > 0.85 ? 'ECU' : 'CU'}`));

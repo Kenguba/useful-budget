@@ -1,0 +1,39 @@
+// Motion Prompt #167 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#167
+//
+// Scroll-down cue / スクロールダウンの合図
+// Pack: lp2 (Landing page & web effects, part 2) · element 23 · Category: Showcase effects
+// What happens: Below the hero, the word "SCROLL", a dot inside a mouse outline and arrows on either side keep repeating a downward motion.
+// Motion spec:
+//   - A 511 × 168 viewport. Centered below the hero: "SCROLL" (11 px, 3 px letter spacing) and a mouse outline (24 × 38, radius 12, line width 2.2). One beat takes 1.57 s (three per 4.7 s, six per 9.4 s pack cycle).
+//   - The orange dot inside (5 × 9) drops 14 px over the first 70% of the beat (quadratic ease-in-out), fades out between 45% and 75%, and reappears at the top on the next beat.
+//   - 40 px to each side, two down-chevrons (line width 2.5) per side, half a beat apart, drift 24 px downward; their opacity follows a sine, 0 → 0.8 → 0.
+// When to use it: Use it when the hero fills the screen and people need a hint that the page goes on below.
+// Tags: scroll-cue, scroll-indicator, scroll-down, hero, arrow, loop
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#167
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 23
+// 23 スクロールダウンの合図（ファーストビューの下で「SCROLL」とマウスの形の中の点が、下へ促す動きをくり返す）
+CELLS[22] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const T = CYC / 3, f = mod(u, T) / T;
+  view(k, () => {
+    k.fillStyle = '#FFF4EA'; k.fillRect(0, 0, VW, VH);
+    txt(k, 'ようこそ、', 40, 40, `800 22px ${JP}`, C.ink); txt(k, '山の上の宿へ。', 40, 70, `800 22px ${JP}`, C.ink);
+    bars(k, 40, 84, 170, 2, '#EAD9CB');
+    pic(k, 286, 10, 200, 92, 1, 10);
+    // 合図
+    const mx = VW / 2;
+    txt(k, 'SCROLL', mx, 116, `800 11px ${EN}`, C.ink, 'center', 'middle', '3px');
+    k.strokeStyle = C.ink; k.lineWidth = 2.2; rr(k, mx - 12, 126, 24, 38, 12); k.stroke();
+    const dy = eIOs(clamp(f / 0.7)) * 14, da = 1 - clamp((f - 0.45) / 0.3);
+    k.fillStyle = `rgba(255,90,44,${da})`; rr(k, mx - 2.5, 133 + dy, 5, 9, 2.5); k.fill();
+    // 両わきの矢印も下へ流れる
+    [mx - 40, mx + 40].forEach(x => { for (let j = 0; j < 2; j++) { const ff = mod(f + j * 0.5, 1), yy = 128 + ff * 24, al = Math.sin(Math.PI * ff); k.strokeStyle = `rgba(28,35,51,${0.8 * al})`; k.lineWidth = 2.5; k.lineCap = 'round'; k.lineJoin = 'round'; k.beginPath(); k.moveTo(x - 8, yy); k.lineTo(x, yy + 8); k.lineTo(x + 8, yy); k.stroke(); } });
+  });
+};

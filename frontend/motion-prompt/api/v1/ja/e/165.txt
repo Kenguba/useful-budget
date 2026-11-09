@@ -1,0 +1,36 @@
+// Motion Prompt #165 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#165
+//
+// シェイプディバイダー / Animated shape divider
+// パック: lp2 (LP・Webサイトの演出 第2弾) · element 21 · カテゴリ: 見せ場の演出
+// 何が起きるか: 青いセクションと白いセクションの境目にある波の形が、2枚重なってゆっくりゆれ続ける。
+// 動きの仕様:
+//   - 表示域 511×168。上は青のグラデーション（#3B64E8→#8FA9F7）のセクション、下は白のセクション。境目に波の形を2枚重ねる。4.7秒で1周（パックの周期9.4秒で2周）
+//   - 奥の波（白・不透明度0.45）: 高さ y=100 を中心に、波長260px・振れ幅8px と 波長130px・振れ幅4px の正弦波を足した形
+//   - 手前の波（白）: y=110 を中心に、波長300px・振れ幅9px と 波長110px・振れ幅3.5px の正弦波を足した形。下は白のセクションにつながる
+//   - 位相 a = 2π·t/4.7 として、奥は a+1 と −2a、手前は −a と 2a+0.5 で動かす。1枚の中の2つの正弦波が逆向きに流れるので形が変わり続け、4.7秒ごとに元の形に戻る
+// 使いどころ: セクションの境目をまっすぐな線でなく柔らかく見せたい、海・夏・子ども向けなどのサイトに。
+// タグ: shape-divider, wave, section-divider, svg, ambient, loop
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#165
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 21
+// 21 シェイプディバイダー（セクションの境目の波の形が、ゆっくりゆれ続ける）
+CELLS[20] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const a = 2 * Math.PI * u / CYC;
+  const wave = (base, A1, L1, p1, A2, L2, p2) => { k.beginPath(); k.moveTo(0, VH + 1); for (let x = 0; x <= VW + 4; x += 4) k.lineTo(x, base + A1 * Math.sin(2 * Math.PI * x / L1 + p1) + A2 * Math.sin(2 * Math.PI * x / L2 + p2)); k.lineTo(VW, VH + 1); k.closePath(); };
+  view(k, () => {
+    const g = k.createLinearGradient(0, 0, 0, 120); g.addColorStop(0, '#3B64E8'); g.addColorStop(1, '#8FA9F7'); k.fillStyle = g; k.fillRect(0, 0, VW, VH);
+    k.fillStyle = 'rgba(255,255,255,.9)'; k.beginPath(); k.arc(430, 44, 22, 0, 7); k.fill();
+    txt(k, '夏のキャンペーン', 34, 42, `800 22px ${JP}`, '#fff'); btn(k, 34, 56, 96, 24, '詳しく見る', '#fff', C.blue, 11);
+    k.fillStyle = 'rgba(255,255,255,.45)'; wave(100, 8, 260, a + 1, 4, 130, -2 * a); k.fill();
+    k.fillStyle = '#fff'; wave(110, 9, 300, -a, 3.5, 110, 2 * a + 0.5); k.fill();
+    txt(k, 'おすすめプラン', 34, 146, `800 15px ${JP}`, C.ink); bars(k, 170, 140, 290, 1, C.faint, 6);
+    bars(k, 34, 156, 200, 1, C.faint, 5);
+  });
+};

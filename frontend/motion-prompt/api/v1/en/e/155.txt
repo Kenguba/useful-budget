@@ -1,0 +1,56 @@
+// Motion Prompt #155 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#155
+//
+// Image swap on hover / ホバーで画像切り替え
+// Pack: lp2 (Landing page & web effects, part 2) · element 11 · Category: Mouse & input interactions
+// What happens: With the cursor on a product card, the front photo of the T-shirt cross-fades to a back view; it returns to the front when the cursor leaves.
+// Motion spec:
+//   - A 511 × 168 viewport with two product cards (photo frame 196 × 112, radius 8, name and price below). The cursor rests on the left card, then the right one, for about 1.3 s each. One pass takes 4.7 s (twice per 9.4 s pack cycle).
+//   - On hover, over 0.3 s (quadratic ease-in-out), the front photo (small dot on the chest) cross-fades to the back photo (large star on the back); on leave it fades back over the same 0.3 s.
+//   - Two dots under the photo (radius 3) show which photo is showing (the dark dot is the current one).
+//   - The hover area is the whole card, including the name. The frame, name and price do not move.
+// When to use it: Use it on e-commerce product grids to show another angle or an on-model shot without leaving the list.
+// Tags: image-swap, hover, crossfade, product-card, ecommerce, thumbnail
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#155
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 11
+// 11 ホバーで画像切り替え（商品カードにカーソルを乗せると、写真が別の角度＝後ろ姿に切り替わる）
+function tee(k, x, y, s, col, back) {
+  k.save(); k.translate(x, y); k.scale(s, s);
+  k.fillStyle = col; k.beginPath();
+  k.moveTo(-0.36, -0.5); k.quadraticCurveTo(0, back ? -0.44 : -0.3, 0.36, -0.5);
+  [[0.66, -0.3], [0.52, -0.08], [0.38, -0.18], [0.38, 0.56], [-0.38, 0.56], [-0.38, -0.18], [-0.52, -0.08], [-0.66, -0.3]].forEach(([a, b]) => k.lineTo(a, b));
+  k.closePath(); k.fill();
+  k.strokeStyle = 'rgba(28,35,51,.18)'; k.lineWidth = 0.025; k.beginPath(); k.moveTo(-0.36, -0.5); k.quadraticCurveTo(0, back ? -0.44 : -0.3, 0.36, -0.5); k.stroke();
+  k.restore();
+}
+CELLS[10] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const CX = [44, 271], CY = 10, CWD = 196, IH = 112;
+  const PRODS = [['Tシャツ', '¥3,980', '#FFFFFF', C.blueL, C.blue], ['ロゴTシャツ', '¥4,280', C.acc, C.accL, '#fff']];
+  const cur = t => path([[0, 60, 200], [0.4, 150, 70], [1.6, 160, 80], [2.0, 370, 70], [3.3, 380, 82], [3.8, 470, 200], [4.7, 60, 200]], t);
+  view(k, () => {
+    for (let i = 0; i < 2; i++) {
+      const [nm, pr, col, bg, mark] = PRODS[i], x = CX[i];
+      const inside = t => { const [a, b] = cur(t); return a > x && a < x + CWD && b > CY && b < CY + IH + 40; };
+      const q = trans(inside, u, 0.3, eIOs);
+      k.save(); rr(k, x, CY, CWD, IH, 8); k.clip(); k.fillStyle = bg; k.fillRect(x, CY, CWD, IH);
+      // 正面（胸に小さな丸い印）→ 後ろ姿（背中に大きな星の柄）
+      k.globalAlpha = 1 - q; tee(k, x + CWD / 2, CY + IH / 2 + 4, 108, col, false);
+      k.fillStyle = mark; k.beginPath(); k.arc(x + CWD / 2 + 18, CY + IH / 2 - 16, 7, 0, 7); k.fill();
+      k.globalAlpha = q; tee(k, x + CWD / 2, CY + IH / 2 + 4, 108, col, true);
+      { const sx = x + CWD / 2, sy = CY + IH / 2 + 12; k.fillStyle = mark; k.beginPath(); for (let j = 0; j < 10; j++) { const r = j % 2 ? 8 : 19, a = -Math.PI / 2 + j * Math.PI / 5; j ? k.lineTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r) : k.moveTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r); } k.closePath(); k.fill(); }
+      k.globalAlpha = 1; k.restore();
+      for (let j = 0; j < 2; j++) { k.fillStyle = (j ? q : 1 - q) > 0.5 ? C.ink : C.faint; k.beginPath(); k.arc(x + CWD / 2 - 6 + j * 12, CY + IH - 10, 3, 0, 7); k.fill(); }
+      txt(k, nm, x + 4, CY + IH + 22, `800 14px ${JP}`, C.ink);
+      txt(k, pr, x + CWD - 4, CY + IH + 22, `800 14px ${EN}`, C.ink, 'right');
+      bars(k, x + 4, CY + IH + 32, 90, 1, C.faint, 5);
+    }
+    const [cx, cy] = cur(u); cursor(k, cx, cy);
+  });
+};

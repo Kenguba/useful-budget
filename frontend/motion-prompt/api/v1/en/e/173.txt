@@ -1,0 +1,30 @@
+// Motion Prompt #173 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#173
+//
+// Steadicam / ステディカム
+// Pack: camera2 (Camera moves & transitions, part 2) · element 05 · Category: Camera Movement
+// What happens: The camera glides forward after a walking person with only a slow, gentle sway and no jitter, unlike handheld.
+// Motion spec:
+//   - Camera: moves forward at a constant 1.7 m/s (8 m per 4.7 s); height 1.45 m, pitch -0.02 rad; no easing
+//   - Sway: height ±3.5 cm (2 cycles per 4.7 s), sideways ±5 cm (1 cycle), yaw ±0.012 rad, roll ±0.006 rad, all sine waves with integer periods, slow and wide (#034 Handheld is fast and irregular)
+//   - Subject: a person walks 5 m ahead of the camera at the same speed; legs and arms take 5 strides per 4.7 s
+//   - Trees: 3.6 m tall at x = -5 m and 3.2 m tall at x = +5 m, every 8 m (the two rows offset by 4 m); the mountains and sun move with the camera
+//   - 8 m is a multiple of the grid (2 m) and tree (8 m) spacing, so it loops seamlessly every 4.7 s; top-right readout shows "STEADICAM"
+// When to use it: To make a walking move look smooth and cinematic.
+// Tags: steadicam, gimbal, stabilizer, smooth, glide, floating, camera move
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#173
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 05
+// 05 ステディカム: 低い周波数の小さなうねりだけで、なめらかに前進しながら人物を追う（#034 手持ちの細かい揺れとの違い）
+CELLS[4] = shot((k, w, h, u) => {
+  const v = 8 / CYC, z = u * v, T = u * 2 * Math.PI / CYC;   // 1周で8m進む＝格子（2m）と木（8m）の並びが継ぎ目なく戻る
+  const c = cam({ z, y: 1.45 + 0.035 * Math.sin(T * 2), x: 0.05 * Math.sin(T), yaw: 0.012 * Math.sin(T + 1), roll: 0.006 * Math.sin(T * 2 + 0.5), pitch: -0.02 });
+  const ex = [], L = 8, base = Math.floor(z / L) * L;
+  for (let i = 0; i < 10; i++) { const zz = base + i * L; ex.push([-5, 0, zz + 2, (kk, s) => tree(kk, s, 3.6)]); ex.push([5, 0, zz + 6, (kk, s) => tree(kk, s, 3.2, C.blueXL)]); }
+  world(k, w, h, c, { buildings: false, trees: false, extra: ex, mtnZ: z, sun: [30, 30, z + 170], gridX: 20, person: { z: z + 5, walk: T * 5 } });
+  return 'STEADICAM';
+});

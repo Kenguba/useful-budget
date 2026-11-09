@@ -1,0 +1,44 @@
+// Motion Prompt #146 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#146
+//
+// スクロールテキストリビール / Scroll text reveal
+// パック: lp2 (LP・Webサイトの演出 第2弾) · element 02 · カテゴリ: スクロールで起きる演出
+// 何が起きるか: 薄いグレーの見出しの文字が、スクロールに合わせて左上から1文字ずつ濃くなり、戻すと後ろから薄くなる。
+// 動きの仕様:
+//   - 表示域 511×168。スクロールの進み p: 0.3〜2.6秒で 0→1、3.2〜4.4秒で 1→0（easeInOut 3乗）。ページは p×40px だけ上へ動く。4.7秒でひと回り（パックの周期9.4秒で2回）
+//   - 見出し3行・計24文字（27px・太さ800・行送り38px）。最初は全部薄いグレー（#D6DBE4）
+//   - n文字目（0から数える）の濃さ = clamp(p×26 − n)。スクロールに比例して、1文字あたり進みの1/26で文字色（#1C2333）まで濃くなる
+//   - 戻すと同じ式で後ろの文字から薄くなる。下の本文の棒と右端のスクロールバーも連動
+// 使いどころ: コンセプトや代表メッセージなど、1文ずつ読んでほしい短い文章に。
+// タグ: scroll, text-reveal, scroll-driven, typography, opacity, storytelling
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#146
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 02
+// 02 スクロールテキストリビール（薄い見出しの文字が、スクロールに合わせて左から1文字ずつ濃くなる）
+CELLS[1] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const p = steps([[0.3, 0], [2.6, 1], [3.2, 1], [4.4, 0]], u), y = p * 40;
+  const LINES = ['毎日の小さな工夫が、', '暮らしを少しずつ', '変えていく。'], F = `800 27px ${JP}`;
+  const total = LINES.join('').length;
+  view(k, () => {
+    k.save(); k.translate(0, -y);
+    txt(k, 'ABOUT US', 40, 34, `800 11px ${EN}`, C.acc, 'left', 'alphabetic', '2px');
+    let n = 0;
+    LINES.forEach((s, li) => {
+      let x = 40; k.font = F;
+      for (const ch of s) {
+        const f = clamp(p * (total + 2) - n);
+        txt(k, ch, x, 72 + li * 38, F, mix('#D6DBE4', C.ink, f));
+        k.font = F; x += k.measureText(ch).width; n++;
+      }
+    });
+    bars(k, 40, 168, 300, 3, C.faint, 6, 12, 0.7);
+    k.restore();
+    sbar(k, p, 0.55);
+  });
+};

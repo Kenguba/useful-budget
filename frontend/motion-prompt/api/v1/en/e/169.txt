@@ -1,0 +1,25 @@
+// Motion Prompt #169 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#169
+//
+// Pedestal / ペデスタル
+// Pack: camera2 (Camera moves & transitions, part 2) · element 01 · Category: Camera Movement
+// What happens: The camera moves straight up without changing its direction; the horizon stays centred while the person and buildings slide down.
+// Motion spec:
+//   - Camera: moves straight up from 1.0 m to 3.2 m; direction (yaw, pitch) and focal length (330 px) stay fixed
+//   - Timing: 0.5 s to 3.4 s (2.9 s), cubic ease-in-out (about cubic-bezier(0.65,0,0.35,1))
+//   - Subject: a person stands still 7 m ahead and slides down the frame, leaving at the bottom feet first; a tower stands 3.5 m right, 26 m away
+//   - Because the pitch does not change, the horizon stays at the centre of the frame (#031 Crane up tilts down while rising)
+//   - Return: hold 3.4–4.2 s, then cross-fade back to the start over the last 0.5 s (one pass = 4.7 s)
+//   - Top-right readout shows the height (↕ 1.0m → ↕ 3.2m)
+// When to use it: To show a shelf or a building from bottom to top smoothly, or to change the eye level without tilting.
+// Tags: pedestal, boom, vertical move, rise, elevate, camera move, no tilt
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#169
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 01
+// 01 ペデスタル: カメラごと真上へ平行移動。向き（ピッチ）は変えないので地平線は画面の中央のまま（#031 クレーンアップとの違い）
+CELLS[0] = shot(camCell((k, w, h, p) => world(k, w, h, cam({ y: lerp(1.0, 3.2, p) }), { person: { z: 7 }, tower: [3.5, 26], buildings: true }),
+  p => `↕ ${lerp(1.0, 3.2, p).toFixed(1)}m`));

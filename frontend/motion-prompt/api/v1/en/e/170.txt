@@ -1,0 +1,24 @@
+// Motion Prompt #170 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#170
+//
+// Barrel roll / バレルロール
+// Pack: camera2 (Camera moves & transitions, part 2) · element 02 · Category: Camera Movement
+// What happens: The camera rolls a full turn around its lens axis; the horizon goes all the way round and comes back level.
+// Motion spec:
+//   - Camera: position fixed (height 1.5 m); roll only, 0 → 2π rad (360°); the whole picture turns around the frame centre
+//   - Timing: 0.5 s to 3.6 s (3.1 s), cubic ease-in-out (about cubic-bezier(0.65,0,0.35,1))
+//   - Subject: a person stands still 7 m ahead; horizon, buildings and person all turn by the same angle, and white shows in the corners while turning
+//   - Hold: 3.6–4.2 s. After a full turn the picture equals the start, so the final 0.5 s cross-fade is invisible (one pass = 4.7 s)
+//   - Top-right readout shows the angle (↻ 0° → ↻ 360°)
+// When to use it: For aerial or drone footage that needs energy, or to show dizziness and confusion.
+// Tags: barrel roll, roll, 360, rotate, spin, aerial, camera move
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#170
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 02
+// 02 バレルロール: レンズの軸（画面の中央）でカメラを1回転
+CELLS[1] = shot(camCell((k, w, h, p) => world(k, w, h, cam({ roll: p * Math.PI * 2 }), { person: { z: 7 } }),
+  p => `↻ ${Math.round(p * 360)}°`, 0.5, 3.6));

@@ -1,0 +1,35 @@
+// Motion Prompt #190 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#190
+//
+// Cross-cutting / クロスカッティング
+// Pack: camera2 (Camera moves & transitions, part 2) · element 22 · Category: Transitions & Editing
+// What happens: Two scenes happening at the same time, a runner and a car, alternate in shorter and shorter cuts.
+// Motion spec:
+//   - Two scenes share one clock: A is a runner (0.3 m left, depth 15 m → 4.5 m, legs at u×12), B is a car in the city (1 m right, depth 17 m → 4.5 m); both close in over 4.7 s
+//   - Cuts: straight cuts between A and B at 0 / 1.1 / 2.0 / 2.7 / 3.3 / 3.8 / 4.2 / 4.5 s; the shots shorten 1.1 → 0.9 → 0.7 → 0.6 → 0.5 → 0.4 → 0.3 s to raise the tension
+//   - Each scene keeps running while the other is on screen (when it comes back, its subject has moved on)
+//   - Camera: A at height 1.3 m, fixed, with four posts in the foreground; B at height 1.6 m, pitch +0.06 rad, fixed, with the city and sun
+//   - Bottom strip: eight alternating sections A (grey) and B (blue) with a playhead; the last 0.3 s cross-fades back to the start of A
+//   - Top-right readout shows "SCENE A" / "SCENE B"
+// When to use it: To build tension between things happening at once, such as a chase or a rescue.
+// Tags: cross-cutting, parallel editing, intercut, parallel action, chase, edit
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#190
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 22
+// 22 クロスカッティング: 同時に進む2つの場面（走る人物・走る車）を、だんだん短く交互に見せる
+const XC = [0, 1.1, 2.0, 2.7, 3.3, 3.8, 4.2, 4.5, CYC];
+CELLS[21] = shot((k, w, h, u) => {
+  const r = P(u, CYC - 0.3, CYC);
+  const runA = (kk, t) => world(kk, w, h, cam({ y: 1.3 }), { person: { x: -0.3, z: lerp(15, 4.5, t / CYC), walk: t * 12 }, fg: [[-2.2, 3.5], [-2.2, 6.5], [-2.2, 9.5], [-2.2, 12.5]] });
+  const carB = (kk, t) => world(kk, w, h, cam({ y: 1.6, pitch: 0.06 }), { city: true, mountains: false, trees: false, sun: [-26, 40, 150], extra: [[1.0, 0, lerp(17, 4.5, t / CYC), CAR[3]]] });
+  let i = 0; while (u >= XC[i + 1]) i++;
+  const isA = i % 2 === 0;
+  blend(k, kk => (isA ? runA : carB)(kk, u), kk => runA(kk, 0), eIOs(r));   // 最後の0.3秒で A の開始状態へ戻す
+  const segs = []; for (let j = 0; j < XC.length - 1; j++) segs.push([XC[j], XC[j + 1], j % 2 ? 'B' : 'A', j % 2 ? C.blue : C.g2]);
+  strip(k, w, h, segs, u);
+  return r > .5 || isA ? 'SCENE A' : 'SCENE B';
+});

@@ -1,0 +1,33 @@
+// Motion Prompt #182 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#182
+//
+// Deep focus / ディープフォーカス
+// Pack: camera2 (Camera moves & transitions, part 2) · element 14 · Category: Angles & Framing
+// What happens: From the flower in front to the person and buildings behind, everything comes into sharp focus at the same time.
+// Motion spec:
+//   - Camera: position, direction and focal length all fixed (height 1.1 m); only the blur amounts change
+//   - Blur: the foreground flower (0.75 m left, 2 m away) goes 5 px → 0 px and the background (person 0.9 m right, 9 m away; buildings; mountains) goes 6 px → 0 px, both sharpening together (#033 Rack focus blurs one side)
+//   - Timing: 0.5 s to 3.4 s (2.9 s), cubic ease-in-out (about cubic-bezier(0.65,0,0.35,1))
+//   - Focus markers: blue corner brackets on both the flower (half-width 46 px) and the person (half-width 30 px), opacity 0 → 1 as focus arrives
+//   - Return: hold 3.4–4.2 s, then cross-fade back to the start over the last 0.5 s; top-right readout shows the aperture (f/1.8 → f/16)
+// When to use it: When the viewer may look anywhere in the frame, or to show several things happening at different depths at once.
+// Tags: deep focus, depth of field, everything sharp, f/16, small aperture, pan focus, focus
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#182
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 14
+// 14 ディープフォーカス: 手前の花から奥の建物まで、全部に同時にピントが合う（#033 ラックフォーカスは片方ずつ）
+CELLS[13] = shot(camCell((k, w, h, p) => {
+  world(k, w, h, cam({ y: 1.1 }), {
+    person: { x: 0.9, z: 9 }, blurFg: 5 * (1 - p), blurBg: 6 * (1 - p),
+    extra: [[-0.75, 0, 2.0, (kk, s) => { kk.fillStyle = C.g3; kk.fillRect(-0.025, 0, 0.05, 0.75); kk.fillStyle = C.blueM; for (let i = 0; i < 6; i++) { kk.beginPath(); kk.ellipse(Math.cos(i) * 0.09, 0.8 + Math.sin(i) * 0.09, 0.08, 0.05, i, 0, 7); kk.fill(); } kk.fillStyle = C.blue; kk.beginPath(); kk.arc(0, 0.8, 0.05, 0, 7); kk.fill(); }, true]],
+    after: (kk, cc) => {   // ピントの枠を手前と奥の両方に（合うにつれて濃く）
+      kk.globalAlpha = p; kk.strokeStyle = C.blue; kk.lineWidth = 2; kk.beginPath();
+      [[proj(cc, -0.75, 0.8, 2.0), 46], [proj(cc, 0.9, 0.9, 9), 30]].forEach(([q, r]) => [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sy]) => { kk.moveTo(q.x + sx * r, q.y + sy * r - sy * 9); kk.lineTo(q.x + sx * r, q.y + sy * r); kk.lineTo(q.x + sx * r - sx * 9, q.y + sy * r); }));
+      kk.stroke(); kk.globalAlpha = 1;
+    }
+  });
+}, p => { const a = lerp(1.8, 16, p); return `f/${a < 10 ? a.toFixed(1) : Math.round(a)}`; }));

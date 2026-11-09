@@ -1,0 +1,39 @@
+// Motion Prompt #185 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#185
+//
+// インサートショット / Insert shot
+// パック: camera2 (カメラワークと切り替え 第2弾) · element 17 · カテゴリ: 切り替え・編集
+// 何が起きるか: 人物の場面に、同じ場面の手元の時計の大写しを1.3秒だけ差し込み、元の画へ戻る。
+// 動きの仕様:
+//   - つなぎ方: 直結（0フレーム）が2回。1.6秒で細部へ、2.9秒で元の画へ戻る（細部は1.3秒）
+//   - 元の画（A）: 固定カメラ（高さ1.4m）。人物（左0.6m・奥6m）が立ち、手首に時計（黒い点）。右2.2m・奥4mに杭
+//   - 細部（INSERT）: 同じ場面の手元の大写し。薄い青の地に青い袖（600×92px・-0.35rad）、白い文字盤（半径58px）、黒い針、青い秒針が1.3秒で1周
+//   - 画面下の帯: A（灰）・細部（青）・A（灰）の3区間と再生ヘッド。同じ場面の一部を差し込んでいる（21 カットアウェイは別の対象）
+//   - 右上に「SHOT A」→「INSERT」→「SHOT A」。4.7秒で直結で最初に戻る
+// 使いどころ: 小さな物や手元の動作を見せるとき、重要な小道具を強調するとき。
+// タグ: insert shot, insert, detail, close-up, cut in, prop, edit
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#185
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 17
+// 17 インサートショット: 同じ場面の細部（手元の時計）を1.3秒だけ差し込み、元の画に戻る
+const INS = [1.6, 2.9];
+CELLS[16] = shot((k, w, h, u) => {
+  const ins = u >= INS[0] && u < INS[1];
+  if (!ins) world(k, w, h, cam({ y: 1.4 }), { person: { x: -0.6, z: 6, walk: 0 }, fg: [[2.2, 4]], after: (kk, cc) => { const q = proj(cc, -0.35, 1.08, 6); kk.fillStyle = C.ink; kk.beginPath(); kk.arc(q.x, q.y, 1.6 * q.s / 10, 0, 7); kk.fill(); } });
+  else {   // 手首の時計の大写し
+    k.save(); k.translate(w / 2, h / 2);
+    k.fillStyle = C.blueXL; k.fillRect(-w, -h, w * 2, h * 2);
+    k.fillStyle = C.blue; k.save(); k.rotate(-0.35); rr(k, -300, -46, 600, 92, 30); k.fill(); k.restore();
+    k.fillStyle = '#fff'; k.beginPath(); k.arc(0, 0, 58, 0, 7); k.fill(); k.strokeStyle = C.ink; k.lineWidth = 5; k.stroke();
+    k.strokeStyle = C.ink; k.lineWidth = 4; k.lineCap = 'round'; k.beginPath(); k.moveTo(0, 0); k.lineTo(0, -34); k.moveTo(0, 0); k.lineTo(26, 14); k.stroke();
+    const a = (u - INS[0]) / (INS[1] - INS[0]) * Math.PI * 2 - Math.PI / 2;   // 秒針が1周
+    k.strokeStyle = C.blue; k.lineWidth = 2; k.beginPath(); k.moveTo(0, 0); k.lineTo(Math.cos(a) * 44, Math.sin(a) * 44); k.stroke();
+    k.restore();
+  }
+  strip(k, w, h, [[0, INS[0], 'A', C.g2], [INS[0], INS[1], '細部', C.blue], [INS[1], CYC, 'A', C.g2]], u);
+  return ins ? 'INSERT' : 'SHOT A';
+});

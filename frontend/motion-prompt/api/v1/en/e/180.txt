@@ -1,0 +1,28 @@
+// Motion Prompt #180 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#180
+//
+// Over-the-shoulder / オーバーザショルダー
+// Pack: camera2 (Camera moves & transitions, part 2) · element 12 · Category: Angles & Framing
+// What happens: The back of one person's head and shoulder sit at the edge of frame and the other person is seen past them; the foreground is soft, the subject sharp.
+// Motion spec:
+//   - Framing: the back of the foreground person's head and shoulder (grey, 0.62 m left, 1.15 m away) fill the left edge; the other person (blue, 0.32 m right, 3.1 m away) is seen past the shoulder
+//   - Focus: the foreground shoulder is blurred 2.6 px, the other person is sharp and framed from the chest up
+//   - Camera: height 1.55 m, yaw +0.05 rad; pushes in slowly 0 m → 0.35 m from 0.5 s to 3.4 s (cubic ease-in-out (about cubic-bezier(0.65,0,0.35,1)))
+//   - The other person sways arms and legs by 0.35·sin(u×5) rad, as if talking
+//   - Return: hold 3.4–4.2 s, then cross-fade back to the start over the last 0.5 s; top-right readout shows "OTS"
+// When to use it: To show who is facing whom in a conversation and to focus on the other person's expression.
+// Tags: over-the-shoulder, ots, dialogue, conversation, shoulder, two shot, angle
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#180
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 12
+// 12 オーバーザショルダー: 手前の人物の肩と後頭部を画面の端に入れ、肩越しに相手を撮る。手前はぼけ、相手にピント
+CELLS[11] = shot(camCell((k, w, h, p, u) => {
+  world(k, w, h, cam({ z: lerp(0, 0.35, p), y: 1.55, yaw: 0.05 }), {
+    person: { x: 0.32, z: 3.1, walk: 0.35 * Math.sin(u * 5) }, blurFg: 2.6,
+    extra: [[-0.62, 0, 1.15, (kk) => { kk.fillStyle = C.g4; kk.beginPath(); kk.arc(0, 1.63, 0.17, 0, 7); kk.fill(); rr(kk, -0.34, 0.9, 0.68, 0.6, 0.14); kk.fill(); }, true]]
+  });
+}, p => 'OTS'));

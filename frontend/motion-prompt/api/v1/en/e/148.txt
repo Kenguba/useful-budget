@@ -1,0 +1,52 @@
+// Motion Prompt #148 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#148
+//
+// Background color change on scroll / 背景色の切り替え
+// Pack: lp2 (Landing page & web effects, part 2) · element 04 · Category: Scroll effects
+// What happens: Each time the scroll moves into a new section, the whole page background blends from cream to navy to light blue; on the dark background the text turns white.
+// Motion spec:
+//   - A 511 × 168 viewport with three sections, each 168 px (one screen). Scroll: 0→168 px over 0.3–1.2 s, 168→336 over 1.8–2.7 s, 336→0 over 3.3–4.4 s (cubic ease-in-out). One pass takes 4.7 s (twice per 9.4 s pack cycle).
+//   - Background colors: morning #FFEBD9 → night #1E2A4A → holiday #DDE6FF, painted as one color behind the whole page and blended while crossing a section boundary.
+//   - Blend: 0→1 between 5% and 95% of the scroll to the next section (quadratic ease-in-out), driven by scroll position, not by time.
+//   - Toward night the headline blends from navy to white and the body bars from beige to blue-gray; the section labels (01 MORNING …) stay orange.
+//   - Each section's picture (sun, moon and stars, mountain photo) moves with the page. The scrollbar thumb follows the scroll.
+// When to use it: Use it on story-style pages where each chapter has its own mood, or to contrast scenes such as day and night or the seasons.
+// Tags: background-color, scroll, section, color-transition, scroll-driven, storytelling
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#148
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 04
+// 04 背景色の切り替え（スクロールでセクションが変わるたび、ページ全体の背景色がなめらかに変わる）
+CELLS[3] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const y = steps([[0.3, 0], [1.2, VH], [1.8, VH], [2.7, 2 * VH], [3.3, 2 * VH], [4.4, 0]], u), s = y / VH;
+  const BG = ['#FFEBD9', '#1E2A4A', '#DDE6FF'], DK = [0, 1, 0];
+  const i0 = Math.min(1, Math.floor(s)), t = eIOs(clamp((s - i0 - 0.05) / 0.9));
+  const bg = mix(BG[i0], BG[i0 + 1], t), dk = lerp(DK[i0], DK[i0 + 1], t);
+  const fg = mix(C.ink, '#FFFFFF', dk), bc = mix('#E3C9B4', '#45507A', dk);
+  view(k, () => {
+    k.fillStyle = bg; k.fillRect(0, 0, VW, VH);
+    k.save(); k.translate(0, -y);
+    const S = [['01  MORNING', '朝のひととき'], ['02  NIGHT', '夜のくつろぎ'], ['03  HOLIDAY', '休日のおでかけ']];
+    S.forEach(([no, ttl], i) => {
+      const y0 = i * VH;
+      txt(k, no, 40, y0 + 58, `800 12px ${EN}`, C.acc, 'left', 'alphabetic', '2px');
+      txt(k, ttl, 40, y0 + 92, `800 24px ${JP}`, fg);
+      k.fillStyle = bc; for (let j = 0; j < 2; j++) { rr(k, 40, y0 + 108 + j * 12, j ? 110 : 180, 6, 3); k.fill(); }
+    });
+    // 朝: 太陽 / 夜: 月と星 / 休日: 山の写真
+    k.fillStyle = C.acc; k.beginPath(); k.arc(380, 84, 34, 0, 7); k.fill();
+    k.strokeStyle = C.acc; k.lineWidth = 4; k.lineCap = 'round';
+    for (let j = 0; j < 8; j++) { const a = j * Math.PI / 4; k.beginPath(); k.moveTo(380 + Math.cos(a) * 44, 84 + Math.sin(a) * 44); k.lineTo(380 + Math.cos(a) * 54, 84 + Math.sin(a) * 54); k.stroke(); }
+    k.fillStyle = '#FFE5DB'; k.beginPath(); k.arc(380, VH + 84, 36, 0, 7); k.fill();
+    k.fillStyle = bg; k.beginPath(); k.arc(396, VH + 72, 32, 0, 7); k.fill();
+    k.fillStyle = '#FFE5DB';[[300, 50], [450, 40], [330, 130], [470, 120]].forEach(([a, b]) => { k.beginPath(); k.arc(a, VH + b, 2.5, 0, 7); k.fill(); });
+    pic(k, 300, 2 * VH + 28, 180, 112, 0, 10);
+    k.restore();
+    sbar(k, s / 2, 0.34);
+  });
+};

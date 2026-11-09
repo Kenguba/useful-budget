@@ -1,0 +1,772 @@
+{
+  "pack": "motion",
+  "order": 1,
+  "title": { "ja": "モーショングラフィックスの動き", "en": "Motion graphics moves", "zh-Hant": "Motion Graphics 動態手法", "es": "Movimientos de motion graphics", "zh-Hans": "动态图形" },
+  "categories": [
+    { "slug": "entrances-text", "ja": "登場・文字の演出", "en": "Entrances & text", "zh-Hant": "登場與文字動態", "es": "Entradas y texto", "zh-Hans": "入场与文字" },
+    { "slug": "motion-polish", "ja": "動きの味付け", "en": "Motion polish", "zh-Hant": "動態質感", "es": "Acabado del movimiento", "zh-Hans": "运动细节" },
+    { "slug": "transitions-highlights", "ja": "切り替え・見せ場", "en": "Transitions & highlights", "zh-Hant": "轉場與吸睛效果", "es": "Transiciones y realces", "zh-Hans": "转场与强调" }
+  ],
+  "elements": [
+    {
+      "no": "01", "slug": "pop-in", "category": "entrances-text",
+      "name": { "ja": "ポップイン", "en": "Pop-in", "zh-Hant": "Pop-in", "es": "Pop-in", "zh-Hans": "弹性入场" },
+      "meaning": { "ja": "ポンと弾んで現れる", "en": "Pops into view with a small bounce", "zh-Hant": "彈跳一下出現", "es": "Aparece de golpe con un pequeño rebote", "zh-Hans": "元素弹跳着出现" },
+      "ask": { "ja": "ロゴをポップインで出して。0.4秒で、行き過ぎは少しだけ。", "en": "Bring the logo in with a pop-in, about 0.4 s, with a slight overshoot.", "zh-Hant": "請用 Pop-in 讓 Logo 出現，大約 0.4 秒，Overshoot 只要一點點。", "es": "Haz que el logo entre con un pop-in, de unos 0,4 s, con un leve overshoot.", "zh-Hans": "让标志以弹性入场出现，时长约 0.4 s，略微超出目标尺寸后回弹。" },
+      "summary": {
+        "ja": "アプリのアイコンがポンと弾んで現れ、通知バッジが遅れてポンと出る。",
+        "en": "An app icon pops in with a bounce, then a notification badge pops in a moment later."
+      },
+      "spec": {
+        "ja": [
+          "2.35秒で1回（1周期4.7秒に2回。1回目はコーラル地に星、2回目は青地にハート）",
+          "アイコン: 116pxの角丸四角（角丸30）。0.28秒から拡大率 0→1 をばねで出す: 1 − e^(−6.5t)·cos(15t)（最大およそ1.26まで行き過ぎる）",
+          "同時に傾き −0.35rad（約−20°）→ 0 をばね（1 − e^(−6t)·cos(11t)）で戻す",
+          "通知バッジ: 半径25の黄色い丸に「1」。アイコン右上（+52, −52）に 0.62秒から ばね 1 − e^(−7t)·cos(17t) で出す",
+          "退場: 1.86〜2.12秒。拡大率に (1 − backIn(s=2.2)) を掛ける（少しふくらんでから 0 へ縮む）",
+          "床の影: 横62×縦8の楕円をアイコンの拡大率（0〜1に制限）に合わせて伸縮"
+        ],
+        "en": [
+          "One pop per 2.35 s (twice per 4.7 s cycle: a star on coral first, then a heart on blue).",
+          "Icon: 116 px rounded square (radius 30). From 0.28 s, scale 0→1 with a spring: 1 − e^(−6.5t)·cos(15t), peaking at about 1.26.",
+          "At the same time, rotation −0.35 rad (about −20°) → 0 with a spring: 1 − e^(−6t)·cos(11t).",
+          "Badge: yellow circle, radius 25, with \"1\", at the icon's top-right (+52, −52). Starts at 0.62 s with spring 1 − e^(−7t)·cos(17t).",
+          "Exit: 1.86–2.12 s. Scale is multiplied by (1 − backIn, s = 2.2), so it swells slightly and then shrinks to 0.",
+          "Floor shadow: 62 × 8 ellipse that scales with the icon (clamped to 0–1)."
+        ]
+      },
+      "use": {
+        "ja": "アイコン・ボタン・バッジなど、小さな要素を軽く目立たせて出したいとき。",
+        "en": "Use it to bring in a small element such as an icon, button or badge with a light accent."
+      },
+      "tags": ["pop", "pop-in", "spring", "bounce", "scale", "icon", "badge", "entrance"]
+    },
+    {
+      "no": "02", "slug": "stagger", "category": "entrances-text",
+      "name": { "ja": "スタガー", "en": "Stagger", "zh-Hant": "Stagger", "es": "Stagger (escalonado)", "zh-Hans": "交错动画" },
+      "meaning": { "ja": "少しずつ時間をずらして順に出す", "en": "Items appear one after another, slightly offset in time", "zh-Hant": "項目依序錯開時間逐一出現", "es": "Los elementos aparecen uno tras otro, con un pequeño desfase", "zh-Hans": "多个元素错开时间依次出现" },
+      "ask": { "ja": "5枚のカードをスタガーで出して。左から0.08秒ずつずらして。", "en": "Bring in the five cards with a stagger, 0.08 s apart, left to right.", "zh-Hant": "請用 Stagger 讓 5 張卡片出現，由左至右每張間隔 0.08 秒。", "es": "Haz entrar las cinco tarjetas en stagger, con 0,08 s entre cada una, de izquierda a derecha.", "zh-Hans": "用交错动画让五张卡片从左到右依次入场，每张间隔 0.08 s。" },
+      "summary": {
+        "ja": "グラフの棒が、少しずつ時間をずらして左から順に立ち上がる。",
+        "en": "Chart bars rise one after another from the left, each slightly delayed."
+      },
+      "spec": {
+        "ja": [
+          "2.35秒で1回。棒7本（幅44・間隔20・高さ 52, 84, 68, 112, 92, 136, 158）。色は青・コーラル・黄・ミントの順で繰り返す",
+          "i本目（0始まり）は 0.15 + 0.12×i 秒に開始。0.5秒かけて高さ 0→100% を backOut（s=2.6）で伸ばす（底辺固定・行き過ぎてから戻る）",
+          "棒の上の白い点（半径6.5・棒の上端から16px上）: 棒の開始から 0.34秒遅れて ばね 1 − e^(−7t)·cos(16t) で出す",
+          "退場: 棒は 1.78 + 0.045×i 秒から0.26秒で easeIn（3乗）で縮む。点は 1.70 + 0.045×i 秒から0.2秒で先に消える"
+        ],
+        "en": [
+          "One pass per 2.35 s. Seven bars (width 44, gap 20, heights 52, 84, 68, 112, 92, 136, 158), coloured blue, coral, yellow, mint in rotation.",
+          "Bar i (0-based) starts at 0.15 + 0.12·i s and grows from 0 to full height in 0.5 s with backOut (s = 2.6), anchored at the baseline, overshooting and settling.",
+          "White dot (radius 6.5, 16 px above the bar top): starts 0.34 s after its bar with spring 1 − e^(−7t)·cos(16t).",
+          "Exit: bars shrink with cubic ease-in over 0.26 s starting at 1.78 + 0.045·i s; dots vanish first, over 0.2 s from 1.70 + 0.045·i s."
+        ]
+      },
+      "use": {
+        "ja": "リスト・グラフ・カードなど、複数の要素を順番に出して視線を流したいとき。",
+        "en": "Use it to bring in several items (list rows, chart bars, cards) in sequence and lead the eye across them."
+      },
+      "tags": ["stagger", "sequence", "delay", "cascade", "bar-chart", "list", "entrance"]
+    },
+    {
+      "no": "03", "slug": "burst", "category": "entrances-text",
+      "name": { "ja": "バースト", "en": "Burst", "zh-Hant": "Burst", "es": "Burst (estallido)", "zh-Hans": "放射爆发" },
+      "meaning": { "ja": "登場に合わせて線や粒が弾ける", "en": "Lines and dots burst outward as something appears", "zh-Hant": "出現時線條與粒子向外迸開", "es": "Líneas y puntos salen disparados cuando algo aparece", "zh-Hans": "元素出现时向外迸出线条和圆点" },
+      "ask": { "ja": "ハートが出る瞬間に、まわりへバーストを入れて。短い線を8本、0.3秒で消す。", "en": "Add a burst around the heart the moment it appears: 8 short lines that fade in 0.3 s.", "zh-Hant": "愛心出現的瞬間，在周圍加上 Burst：8 條短線，0.3 秒內淡出消失。", "es": "Agrega un burst alrededor del corazón cuando aparece: 8 líneas cortas que se desvanecen en 0,3 s.", "zh-Hans": "爱心出现时加一次放射爆发：8 根短线在 0.3 s 内淡出。" },
+      "summary": {
+        "ja": "「いいね」のハートが点くと同時に、まわりに輪・線・粒が弾ける。",
+        "en": "A like heart fills in, and a ring, lines and dots burst outward at the same moment."
+      },
+      "spec": {
+        "ja": [
+          "2.35秒で1回。ハート（サイズ46・線幅7の輪郭）が中央にある",
+          "予備動作: 0.3〜0.5秒で拡大率 1→0.7（easeInOut 2乗）",
+          "0.5秒に発火: ハートをコーラルで塗り、拡大率 0.7→1 を ばね 1 − e^(−6.5t)·cos(16t) で戻す",
+          "輪: 黄色。半径 44→90、線幅 16→0 を0.6秒で easeOut（5乗）",
+          "放射の線10本（黄・ミント交互、線幅9）: 先端の半径 64→130（縦は0.82倍）。長さ36を発火後0.22〜0.7秒で0へ",
+          "粒10個（コーラル・青交互、半径 8→4.8）: 半径 58→150（横1.45倍・縦0.78倍の楕円状）。発火後0.3〜0.72秒でフェードアウト。塗りは 1.92〜2.2秒で消える"
+        ],
+        "en": [
+          "One burst per 2.35 s. A heart (size 46, 7 px outline) sits in the centre.",
+          "Anticipation: 0.3–0.5 s, scale 1→0.7 (quadratic ease-in-out).",
+          "Trigger at 0.5 s: the heart fills with coral and scale returns 0.7→1 with spring 1 − e^(−6.5t)·cos(16t).",
+          "Ring: yellow, radius 44→90 while line width goes 16→0, over 0.6 s with quintic ease-out.",
+          "10 radial lines (yellow/mint alternating, width 9): outer end radius 64→130 (y scaled 0.82); length 36 shrinks to 0 between 0.22 and 0.7 s after the trigger.",
+          "10 dots (coral/blue alternating, radius 8→4.8): radius 58→150 on an ellipse (x ×1.45, y ×0.78), fading out 0.3–0.72 s after the trigger. The heart fill fades at 1.92–2.2 s."
+        ]
+      },
+      "use": {
+        "ja": "いいね・達成・正解など、押した瞬間や決まった瞬間を強調したいとき。",
+        "en": "Use it to mark the instant something is triggered or achieved, such as a like, a success or a correct answer."
+      },
+      "tags": ["burst", "explosion", "radial", "like", "heart", "celebrate", "accent", "sparkle"]
+    },
+    {
+      "no": "04", "slug": "line-draw", "category": "entrances-text",
+      "name": { "ja": "ラインドロー", "en": "Line draw", "zh-Hant": "線條動畫", "es": "Line draw (trazo de línea)", "zh-Hans": "线条描绘" },
+      "meaning": { "ja": "線が描かれるように伸びる", "en": "A line extends as if it were being drawn", "zh-Hant": "線條像被畫出來般延伸", "es": "Una línea se extiende como si se estuviera dibujando", "zh-Hans": "线条像被画出来一样逐渐延伸" },
+      "ask": { "ja": "グラフの折れ線を、ラインドローで左から描いて。1.2秒かけて。", "en": "Reveal the chart line with a line draw from the left, over 1.2 s.", "zh-Hant": "請用線條動畫從左邊畫出折線圖的線條，花 1.2 秒。", "es": "Revela la línea del gráfico con un line draw desde la izquierda, en 1,2 s.", "zh-Hans": "让图表曲线从左侧开始，在 1.2 s 内逐渐描绘出来。" },
+      "summary": {
+        "ja": "グラフの線が描かれるように伸び、消えるときは後ろから追いかけて消える。",
+        "en": "A chart line draws itself on, and is later erased from its starting end."
+      },
+      "spec": {
+        "ja": [
+          "4.7秒で1回。線の見える範囲（始点側の割合〜終点側の割合）を動かして描く（トリムパス）",
+          "軸（L字・線幅6）: 0.08〜0.7秒で描く。折れ線（ミント・線幅11・7点を通るなめらかな曲線・端は丸）: 0.4〜1.95秒で描く。どちらも easeInOut（3乗）",
+          "描いている間、先端に黄色い丸（半径12、中心に白の半径5）を付ける",
+          "矢じり: 1.9〜2.2秒に backOut（s=2.5）で開く（羽の長さ26・開き20）",
+          "山の1点を囲む丸（コーラル・半径26・線幅7）: 2.2〜2.8秒に真上から時計回りに描く",
+          "消去: 丸 3.5〜4.0秒、折れ線 3.65〜4.45秒、軸 3.85〜4.55秒。いずれも始点側から縮めて消す。矢じりは 4.3〜4.45秒で消す"
+        ],
+        "en": [
+          "One pass per 4.7 s. Drawn as a trim path: animate the visible range (start fraction to end fraction) of each stroke.",
+          "Axes (L shape, width 6) draw at 0.08–0.7 s; the line (mint, width 11, a smooth curve through 7 points, round caps) draws at 0.4–1.95 s. Both use cubic ease-in-out.",
+          "While drawing, a yellow dot (radius 12, white centre radius 5) rides the leading tip.",
+          "Arrowhead: opens at 1.9–2.2 s with backOut (s = 2.5); wings 26 long, 20 wide.",
+          "A coral circle (radius 26, width 7) is drawn around one peak at 2.2–2.8 s, clockwise from the top.",
+          "Erase: circle 3.5–4.0 s, line 3.65–4.45 s, axes 3.85–4.55 s, each shrinking from its starting end. The arrowhead fades at 4.3–4.45 s."
+        ]
+      },
+      "use": {
+        "ja": "グラフ・経路・下線・囲み線など、線そのものを見せ場にしたいとき。",
+        "en": "Use it when the stroke itself is the point: charts, routes, underlines, hand-drawn circles."
+      },
+      "tags": ["line-draw", "trim-path", "stroke", "draw-on", "chart", "path", "write-on"]
+    },
+    {
+      "no": "05", "slug": "mask-reveal", "category": "entrances-text",
+      "name": { "ja": "マスクリビール", "en": "Mask reveal", "zh-Hant": "Mask Reveal", "es": "Mask reveal (revelado con máscara)", "zh-Hans": "遮罩显现" },
+      "meaning": { "ja": "見えない枠の中から文字がせり上がる", "en": "Text rises into view from behind an invisible edge", "zh-Hant": "文字從看不見的邊界後方升起", "es": "El texto sube desde detrás de un borde invisible", "zh-Hans": "文字从不可见的边界后移出" },
+      "ask": { "ja": "タイトルをマスクリビールで下からせり上げて。0.6秒、行ごとに少しずらして。", "en": "Bring the title in with a mask reveal from below, 0.6 s, each line slightly after the one before.", "zh-Hant": "標題請用 Mask Reveal 從下方升起，0.6 秒，每一行稍微錯開。", "es": "Haz entrar el título con un mask reveal desde abajo, en 0,6 s, cada línea un poco después de la anterior.", "zh-Hans": "让标题从下方通过遮罩显现，时长 0.6 s，各行稍微错开。" },
+      "summary": {
+        "ja": "1本の線を境に、見えない枠の向こうから見出しがせり上がる。",
+        "en": "Headline text slides out from behind an invisible edge marked by a single line."
+      },
+      "spec": {
+        "ja": [
+          "2.35秒で1回。境目の線（コーラル・380×6・y=124）: 0.1〜0.5秒で中央から左右へ伸ばす（easeInOut 3乗）。2.05〜2.3秒で縮めて消す",
+          "上の文字（太字98px・白）: 線より上だけ見える切り抜き（y=8〜119）の中で、120px下から定位置へ。0.35〜1.0秒・easeOut（5乗）",
+          "下の文字（32px・黄）: 線より下だけ見える切り抜き（y=129〜181）の中で、60px上から定位置へ。0.55〜1.15秒・easeOut（5乗）",
+          "退場: 上の文字は 1.7〜2.05秒に上へ150px（backIn s=1.2・いったん少し下がる）。下の文字は 1.75〜2.05秒に下へ70px（easeIn 3乗）",
+          "文字の透明度は変えない。切り抜きの外に出ると見えなくなるだけ"
+        ],
+        "en": [
+          "One pass per 2.35 s. Divider line (coral, 380 × 6, y = 124): grows from the centre at 0.1–0.5 s (cubic ease-in-out), shrinks away at 2.05–2.3 s.",
+          "Top text (bold 98 px, white): clipped to the area above the line (y 8–119); moves up into place from 120 px below at 0.35–1.0 s, quintic ease-out.",
+          "Bottom text (32 px, yellow): clipped to the area below the line (y 129–181); moves down into place from 60 px above at 0.55–1.15 s, quintic ease-out.",
+          "Exit: top text moves 150 px up at 1.7–2.05 s (backIn, s = 1.2, dipping slightly first); bottom text moves 70 px down at 1.75–2.05 s (cubic ease-in).",
+          "Opacity never changes; the text is hidden only by leaving the clip area."
+        ]
+      },
+      "use": {
+        "ja": "タイトルや見出しを、落ち着いた印象で出したいとき。",
+        "en": "Use it for titles and headings that should appear in a clean, composed way."
+      },
+      "tags": ["mask", "reveal", "clip", "wipe", "title", "text", "slide-up", "headline"]
+    },
+    {
+      "no": "06", "slug": "typewriter", "category": "entrances-text",
+      "name": { "ja": "タイプライター", "en": "Typewriter", "zh-Hant": "打字機效果", "es": "Máquina de escribir", "zh-Hans": "打字机效果" },
+      "meaning": { "ja": "1文字ずつ打たれるように出る", "en": "Text appears one character at a time, as if typed", "zh-Hant": "文字像一個字一個字打出來", "es": "El texto aparece letra por letra, como si se tecleara", "zh-Hans": "文字像打字一样逐字出现" },
+      "ask": { "ja": "この一文をタイプライターで出して。1文字0.05秒、末尾にカーソルを付けて。", "en": "Show this sentence with a typewriter effect, 0.05 s per character, with a cursor at the end.", "zh-Hant": "這句話請用打字機效果呈現，每個字 0.05 秒，結尾加上游標。", "es": "Muestra esta frase con efecto máquina de escribir, 0,05 s por carácter, con un cursor al final.", "zh-Hans": "给这句话添加打字机效果，每个字 0.05 s，末尾保留光标。" },
+      "summary": {
+        "ja": "入力欄に1文字ずつ打たれ、打ち終わると送信ボタンが点いて押される。",
+        "en": "Text is typed into an input field one character at a time, then the send button lights up and is pressed."
+      },
+      "spec": {
+        "ja": [
+          "4.7秒で1回。白い入力欄（471×92・角丸30）に9文字を、0.3秒から0.24秒おきに1文字ずつ出す（2.46秒で打ち終わり）",
+          "出た文字は拡大率 1.35→1 に落ち着く: 1 + 0.35·e^(−16t)",
+          "カーソル（コーラル・5×44）: 最後の文字の右。打っている間は点灯、それ以外は0.94秒周期（0.5秒点灯）で点滅",
+          "送信ボタン（半径30）: 灰色 → 2.58秒から青の丸を ばね 1 − e^(−6.5t)·cos(15t) で出す",
+          "押下: 2.96〜3.21秒にボタンを最大20%縮める（sin の山）。3.13〜3.41秒に文字が上へ70px動きながら消える",
+          "文字が半分消えた時点（約3.27秒）でカーソルは先頭に戻り、3.51〜3.81秒にボタンの青が消える"
+        ],
+        "en": [
+          "One pass per 4.7 s. Nine characters appear in a white input field (471 × 92, radius 30), one every 0.24 s starting at 0.3 s (typing ends at 2.46 s).",
+          "Each new character settles from scale 1.35 to 1: 1 + 0.35·e^(−16t).",
+          "Cursor (coral, 5 × 44) sits after the last character: solid while typing, otherwise blinking with a 0.94 s period (on for 0.5 s).",
+          "Send button (radius 30): grey, then a blue disc appears from 2.58 s with spring 1 − e^(−6.5t)·cos(15t).",
+          "Press: the button shrinks by up to 20% at 2.96–3.21 s (half sine). At 3.13–3.41 s the text moves 70 px up while fading out.",
+          "The cursor returns to the start once the text is half faded (about 3.27 s); at 3.51–3.81 s the blue fades."
+        ]
+      },
+      "use": {
+        "ja": "プロンプト入力・検索・チャットなど、文字を打つ操作を見せたいとき。",
+        "en": "Use it to show someone typing: a prompt, a search query, a chat message."
+      },
+      "tags": ["typewriter", "typing", "text", "cursor", "input", "prompt", "chat", "type-on"]
+    },
+    {
+      "no": "07", "slug": "count-up", "category": "entrances-text",
+      "name": { "ja": "カウントアップ", "en": "Count-up", "zh-Hant": "數字跳動", "es": "Contador (count-up)", "zh-Hans": "数字递增" },
+      "meaning": { "ja": "数字が勢いよく増えていく", "en": "A number runs up quickly to its final value", "zh-Hant": "數字快速累加到最終數值", "es": "Un número sube rápido hasta su valor final", "zh-Hans": "数字快速增长到目标值" },
+      "ask": { "ja": "数字を0から1,280までカウントアップさせて。1.5秒で、最後はゆっくり止めて。", "en": "Count the figure up from 0 to 1,280 in 1.5 s, slowing down at the end.", "zh-Hant": "請用數字跳動讓數字從 0 跳到 1,280，花 1.5 秒，最後慢慢停下來。", "es": "Haz que la cifra suba de 0 a 1.280 en 1,5 s, frenando al final.", "zh-Hans": "用数字递增让数字在 1.5 s 内从 0 增长到 1,280，末尾减速。" },
+      "summary": {
+        "ja": "数字が勢いよく増えて、最後にピタッと決まる。",
+        "en": "A number races upward and locks onto its final value."
+      },
+      "spec": {
+        "ja": [
+          "4.7秒で1回。0.1〜0.4秒でフェードイン、4.0〜4.4秒でフェードアウト",
+          "数字（太字104px）: 0.45〜2.9秒で 0→2,480。値 = 目標 × (1 − (1 − p)^4) を四捨五入（最初は速く、最後はゆっくり）",
+          "桁区切りのカンマ付き。各桁は同じ幅で右そろえ（数字が変わっても横に揺れない）",
+          "2.9秒に確定: 色を白→黄に変え、拡大率を 1 + 0.07·e^(−7t)·cos(15t) で小さく弾ませる",
+          "左の上向き矢印（ミントの丸・半径34）: 0.35秒から ばね 1 − e^(−7t)·cos(14t)。数えている間は上下に 6px × (1 − p)^3 × sin(30u) で震える",
+          "下のバー（330×12・青→ミントのグラデーション）: 値 ÷ 目標 の割合で伸びる"
+        ],
+        "en": [
+          "One pass per 4.7 s. Fades in at 0.1–0.4 s and out at 4.0–4.4 s.",
+          "Number (bold 104 px): 0→2,480 over 0.45–2.9 s. Value = round(target × (1 − (1 − p)^4)): fast at first, slow at the end.",
+          "Thousands separator included. Every digit has the same width and the number is right-aligned, so it does not jitter sideways.",
+          "Lands at 2.9 s: colour switches white→yellow and scale does a small bounce, 1 + 0.07·e^(−7t)·cos(15t).",
+          "Up-arrow chip on the left (mint circle, radius 34): appears from 0.35 s with spring 1 − e^(−7t)·cos(14t); while counting it shakes vertically by 6 px × (1 − p)^3 × sin(30u).",
+          "Bar below (330 × 12, blue→mint gradient): fills in proportion to value ÷ target."
+        ]
+      },
+      "use": {
+        "ja": "売上・人数・達成率など、数字の大きさや伸びを印象づけたいとき。",
+        "en": "Use it to make a figure feel big or growing: revenue, user counts, completion rates."
+      },
+      "tags": ["count-up", "counter", "number", "odometer", "stats", "kpi", "progress"]
+    },
+    {
+      "no": "08", "slug": "kinetic-typography", "category": "entrances-text",
+      "name": { "ja": "キネティックタイポグラフィ", "en": "Kinetic typography", "zh-Hant": "Kinetic Typography", "es": "Tipografía cinética", "zh-Hans": "动态排版" },
+      "meaning": { "ja": "言葉に合わせて文字が動き回る", "en": "Words move, scale and turn in time with what is said", "zh-Hant": "文字隨著話語移動、縮放、旋轉", "es": "Las palabras se mueven, crecen y giran al ritmo de lo que se dice", "zh-Hans": "文字随含义和节奏移动、缩放与旋转" },
+      "ask": { "ja": "このナレーションをキネティックタイポグラフィにして。強調する語は大きく、拍に合わせて出して。", "en": "Turn this narration into kinetic typography: make the stressed words larger and land them on the beat.", "zh-Hant": "請把這段旁白做成 Kinetic Typography：強調的詞放大，並配合節拍出現。", "es": "Convierte esta narración en tipografía cinética: las palabras con énfasis más grandes y cayendo en el beat.", "zh-Hans": "把旁白做成动态排版，重读词放大，并对齐节拍出现。" },
+      "summary": {
+        "ja": "言葉の意味に合わせて文字が動く（のびる／はねる／まわる／ドン！）。",
+        "en": "Words move the way they mean: one stretches, one bounces, one spins, one slams down."
+      },
+      "spec": {
+        "ja": [
+          "4語を1.175秒ずつ（太字88px）。各語は最後の0.2秒でフェードアウトしながら上へ46px（easeIn 3乗）",
+          "のびる（青）: 横の拡大率 0.3→1 を ばね 1 − e^(−4.2t)·cos(12t) で。縦は 1/√(横) で少し縮める",
+          "はねる（黄）: 1文字ずつ0.1秒ずらす。高さ 78px × |sin(πt/0.4)| × e^(−2.6t) で弾む。接地の瞬間は縦に最大16%つぶす",
+          "まわる（ミント）: 1文字ずつ0.12秒ずらす。0.62秒で −360°→0° を backOut（s=1.3）。拡大率 0→1 を0.25秒で easeOut（3乗）",
+          "ドン!（コーラル・100px・斜体風に傾ける）: 0.02〜0.2秒で拡大率 3.4→1（easeIn 3乗）で叩きつける",
+          "着地後: 横揺れ 10px × e^(−9t) × sin(38t)、縦つぶれ 20% × e^(−11t)、放射の線8本を0.4秒"
+        ],
+        "en": [
+          "Four words, 1.175 s each (bold 88 px). Each exits in its last 0.2 s, fading out while moving 46 px up (cubic ease-in).",
+          "Stretch (blue): horizontal scale 0.3→1 with spring 1 − e^(−4.2t)·cos(12t); vertical scale is 1/√(horizontal).",
+          "Bounce (yellow): characters staggered by 0.1 s; height 78 px × |sin(πt/0.4)| × e^(−2.6t); squashed vertically by up to 16% at each contact.",
+          "Spin (mint): characters staggered by 0.12 s; rotation −360°→0° over 0.62 s with backOut (s = 1.3); scale 0→1 over 0.25 s, cubic ease-out.",
+          "Slam (coral, 100 px, slanted): scale 3.4→1 at 0.02–0.2 s with cubic ease-in.",
+          "After impact: horizontal shake 10 px × e^(−9t) × sin(38t), vertical squash 20% × e^(−11t), and 8 radial lines for 0.4 s."
+        ]
+      },
+      "use": {
+        "ja": "ナレーションや歌詞のキーワードを、意味ごと印象に残したいとき。",
+        "en": "Use it to make key words from narration or lyrics memorable through how they move."
+      },
+      "tags": ["kinetic-typography", "text", "typography", "lyric", "word", "bounce", "spin", "slam"]
+    },
+    {
+      "no": "09", "slug": "easing", "category": "motion-polish",
+      "name": { "ja": "イージング", "en": "Easing", "zh-Hant": "Easing", "es": "Easing (aceleración)", "zh-Hans": "缓动" },
+      "meaning": { "ja": "緩急をつけて気持ちよく動かす", "en": "Motion speeds up and slows down instead of moving at one speed", "zh-Hant": "速度有快有慢，而不是等速移動", "es": "El movimiento acelera y frena en lugar de ir a velocidad constante", "zh-Hans": "动作通过加减速变化而非匀速移动" },
+      "ask": { "ja": "この移動にイージングをかけて。イーズアウトで、止まり際をゆっくりに。", "en": "Add easing to this move: ease-out, slowing down as it stops.", "zh-Hant": "這段移動請加上 Easing，用 Ease-out，讓停下來之前慢慢減速。", "es": "Ponle easing a este movimiento: ease-out, que vaya frenando al detenerse.", "zh-Hans": "为这段移动添加缓出，使其逐渐减速停下。" },
+      "summary": {
+        "ja": "同じ距離を同じ時間で動く2つの四角。上は一定の速さ、下は緩急あり。",
+        "en": "Two squares cover the same distance in the same time: the top one at constant speed, the bottom one eased."
+      },
+      "spec": {
+        "ja": [
+          "4.7秒で1往復。62pxの四角（角丸16）2つが横に316px動く。行き 0.2〜1.75秒（1.55秒）、0.8秒止まり、戻り 2.55〜4.1秒",
+          "上（一定）: 直線的に動く（linear）。形も色も変えない",
+          "下（緩急）: cubic-bezier(.86, 0, .14, 1)。ゆっくり出て、中盤で一気に速くなり、ゆっくり止まる",
+          "下は速さに比例して横に最大1.5倍のび、縦は0.8倍まで縮む（速さを3.6で割り 0〜1 に制限した値を使う）",
+          "下の後ろに速度線3本（最長150px×0.8〜1.25倍）と、0.035秒ずつ遅れた残像4枚",
+          "レールには等しい時間間隔での位置を12個の点で表示（上は等間隔、下は両端に詰まる）"
+        ],
+        "en": [
+          "One round trip per 4.7 s. Two 62 px squares (radius 16) travel 316 px horizontally: out at 0.2–1.75 s (1.55 s), hold 0.8 s, back at 2.55–4.1 s.",
+          "Top (constant): linear motion; shape and colour never change.",
+          "Bottom (eased): cubic-bezier(.86, 0, .14, 1). Slow start, very fast middle, slow stop.",
+          "The bottom square stretches horizontally up to 1.5× and flattens to 0.8× in proportion to speed (speed ÷ 3.6, clamped to 0–1).",
+          "Behind it: 3 speed lines (up to 150 px × 0.8–1.25) and 4 ghost copies lagging 0.035 s each.",
+          "Each rail shows 12 dots marking positions at equal time intervals (evenly spaced on top, bunched at both ends below)."
+        ]
+      },
+      "use": {
+        "ja": "移動・拡大・回転など、あらゆる動きに緩急を付けて機械的に見えないようにしたいとき。",
+        "en": "Use it on any move, scale or rotation so the motion accelerates and decelerates instead of looking mechanical."
+      },
+      "tags": ["easing", "ease-in-out", "cubic-bezier", "linear", "timing", "curve", "acceleration"]
+    },
+    {
+      "no": "10", "slug": "overshoot", "category": "motion-polish",
+      "name": { "ja": "オーバーシュート", "en": "Overshoot", "zh-Hant": "Overshoot", "es": "Overshoot (pasarse y volver)", "zh-Hans": "过冲回弹" },
+      "meaning": { "ja": "行き過ぎてから戻って止まる", "en": "Goes a little past the target, then settles back", "zh-Hant": "衝過目標一點，再回彈停住", "es": "Se pasa un poco del objetivo y luego se acomoda", "zh-Hans": "越过目标后回到目标位置并停稳" },
+      "ask": { "ja": "メーターの針をオーバーシュートさせて。目標を1割ほど越えてから戻して。", "en": "Give the gauge needle an overshoot: about 10% past the target, then back.", "zh-Hant": "請讓儀表的指針加上 Overshoot，衝過目標約 10% 之後再回到目標。", "es": "Dale overshoot a la aguja del indicador: un 10 % más allá del objetivo y luego de vuelta.", "zh-Hans": "给仪表指针加上过冲回弹：先超出目标约 10%，再回弹到位。" },
+      "summary": {
+        "ja": "メーターの針が、目標を行き過ぎてから戻って止まる。",
+        "en": "A gauge needle swings past its target, comes back and settles."
+      },
+      "spec": {
+        "ja": [
+          "4.7秒で1回。半円のメーター（半径128・線幅26）。目標は全体の0.7（左端から126°）",
+          "0.25秒に開始: 値 = 0.7 × (1 − e^(−4.6t)·cos(10.5t))。約0.3秒後に目標を約25%行き過ぎ、揺れながら目標に落ち着く",
+          "行き過ぎた分（目標より先の弧）はコーラルで塗る。目標の位置に黄色の印",
+          "弧の塗りは青→ミントのグラデーション。針は白・線幅9",
+          "戻り: 3.7秒から 値 = 0.7 × e^(−7.5t)·cos(8.5t) で 0 へ（0 をわずかに下回ってから止まる）"
+        ],
+        "en": [
+          "One pass per 4.7 s. Semicircular gauge (radius 128, stroke 26). Target is 0.7 of the sweep (126° from the left end).",
+          "Starts at 0.25 s: value = 0.7 × (1 − e^(−4.6t)·cos(10.5t)). About 0.3 s later it is roughly 25% past the target, then it oscillates and settles on the target.",
+          "The part beyond the target is drawn in coral. A yellow tick marks the target.",
+          "The filled arc is a blue→mint gradient; the needle is white, width 9.",
+          "Return: from 3.7 s, value = 0.7 × e^(−7.5t)·cos(8.5t) back to 0 (dipping slightly below 0 before it stops)."
+        ]
+      },
+      "use": {
+        "ja": "要素が到着する動きに勢いと弾力を出したいとき。",
+        "en": "Use it to give an arriving element energy and a springy feel."
+      },
+      "tags": ["overshoot", "spring", "bounce", "settle", "elastic", "gauge", "meter", "needle"]
+    },
+    {
+      "no": "11", "slug": "squash-and-stretch", "category": "motion-polish",
+      "name": { "ja": "スクワッシュ＆ストレッチ", "en": "Squash & stretch", "zh-Hant": "擠壓與伸展", "es": "Squash & stretch (aplastar y estirar)", "zh-Hans": "挤压与拉伸" },
+      "meaning": { "ja": "つぶれて伸びて弾力を出す", "en": "Squashes and stretches so that it feels elastic", "zh-Hant": "物體擠壓再拉長，帶出彈性感", "es": "Se aplasta y se estira para sentirse elástico", "zh-Hans": "通过压扁和拉长表现弹性" },
+      "ask": { "ja": "ボールの着地にスクワッシュ＆ストレッチを入れて。つぶれは弱めに。", "en": "Add squash and stretch when the ball lands; keep the squash subtle.", "zh-Hant": "球落地時請加上擠壓與伸展，擠壓的幅度要小一點。", "es": "Agrega squash and stretch cuando la pelota cae; que el aplastamiento sea sutil.", "zh-Hans": "给球落地时加上轻微的挤压与拉伸。" },
+      "summary": {
+        "ja": "弾むキャラクターが、着地でつぶれ、飛ぶときに伸びる。",
+        "en": "A bouncing character squashes on landing and stretches as it takes off."
+      },
+      "spec": {
+        "ja": [
+          "半径37の丸いキャラクター。1.175秒で1回弾み（4.7秒で4回）、高さ92pxの放物線。左右には ±150px をsin波で1周期かけて往復",
+          "接地中（各バウンドの最初と最後の10%）: 縦の拡大率 0.52（着地の瞬間）⇄ 1.28（離れる瞬間）を2乗カーブで",
+          "空中: 縦の拡大率 = 1 + 0.28 × s^3。s は頂点からの時間のずれ（頂点で0、離れる瞬間と着く瞬間で1）（速いところで伸びる）",
+          "横の拡大率は常に 1 ÷ 縦（体積を保つ）。変形の基準は足元",
+          "影は高さに応じて小さく・細く。着地のたびに左右へ黄色い短い線が飛ぶ（1バウンドの約18%の間）"
+        ],
+        "en": [
+          "A round character, radius 37. One bounce per 1.175 s (four per 4.7 s), a 92 px parabola. It drifts ±150 px sideways on a sine wave over the cycle.",
+          "On the ground (first and last 10% of each bounce): vertical scale goes between 0.52 (moment of impact) and 1.28 (moment of leaving) on a quadratic curve.",
+          "In the air: vertical scale = 1 + 0.28 × s^3, where s is the time offset from the apex (0 at the apex, 1 at take-off and touchdown), so it is stretched where it moves fast.",
+          "Horizontal scale is always 1 ÷ vertical (volume is preserved). The transform is anchored at the feet.",
+          "The shadow gets smaller and thinner with height. Short yellow lines flick out left and right at each landing (for about 18% of a bounce)."
+        ]
+      },
+      "use": {
+        "ja": "キャラクターやロゴの動きに、重さとやわらかさを出したいとき。",
+        "en": "Use it to give a character or logo weight and softness."
+      },
+      "tags": ["squash", "stretch", "squash-and-stretch", "bounce", "character", "ball", "animation-principle"]
+    },
+    {
+      "no": "12", "slug": "shape-morph", "category": "motion-polish",
+      "name": { "ja": "モーフィング", "en": "Shape morph", "zh-Hant": "形狀變形", "es": "Morphing de formas", "zh-Hans": "形状变形" },
+      "meaning": { "ja": "形が別の形に変わる", "en": "One shape turns smoothly into another", "zh-Hant": "一個形狀平滑變成另一個形狀", "es": "Una forma se transforma suavemente en otra", "zh-Hans": "一种形状平滑变成另一种" },
+      "ask": { "ja": "丸を星にモーフィングさせて。0.8秒で、途中で色も青から黄へ。", "en": "Morph the circle into a star in 0.8 s, changing the color from blue to yellow on the way.", "zh-Hant": "請用形狀變形把圓形變成星形，0.8 秒，過程中顏色也從藍色漸變成黃色。", "es": "Transforma el círculo en estrella en 0,8 s, cambiando el color de azul a amarillo en el camino.", "zh-Hans": "用形状变形让圆形在 0.8 s 内变成星形，同时由蓝色变成黄色。" },
+      "summary": {
+        "ja": "丸 → 四角 → 星 → ハートと、形と色がなめらかに変わる。",
+        "en": "A shape changes smoothly from circle to square to star to heart, with its colour."
+      },
+      "spec": {
+        "ja": [
+          "4つの形を1.175秒ずつ（丸 → 角を丸く落とした四角 → 星 → ハート → 丸に戻る）。基準の半径64",
+          "各区間は前半で止まり、最後の0.62〜0.04秒前（0.58秒間）で次の形へ変形",
+          "形は輪郭上の240点で持ち、同じ番号の点どうしを直線補間する。進み具合は backOut（s=1.6）で少し行き過ぎる",
+          "色: 青 → コーラル → 黄 → ミント。easeInOut（2乗）で混ぜる",
+          "変形中は拡大率を 1 + 0.07 × sin(π × 進み具合) でふくらませる",
+          "下に4つの点。今の形の点が大きく色付きになる"
+        ],
+        "en": [
+          "Four shapes, 1.175 s each: circle → square with rounded-off corners → star → heart → back to circle. Base radius 64.",
+          "Each segment holds first, then morphs to the next shape between 0.62 s and 0.04 s before its end (0.58 s).",
+          "Every outline is stored as 240 points; points with the same index are linearly interpolated. Progress uses backOut (s = 1.6), so it overshoots slightly.",
+          "Colour: blue → coral → yellow → mint, blended with quadratic ease-in-out.",
+          "During the morph the scale swells by 1 + 0.07 × sin(π × progress).",
+          "Four dots below; the dot for the current shape is larger and coloured."
+        ]
+      },
+      "use": {
+        "ja": "アイコンやロゴを別の形へ、切らずにつなげて変えたいとき。",
+        "en": "Use it to turn one icon or logo into another without a cut."
+      },
+      "tags": ["morph", "morphing", "shape", "path", "interpolate", "transform", "icon"]
+    },
+    {
+      "no": "13", "slug": "liquid-motion", "category": "motion-polish",
+      "name": { "ja": "リキッドモーション", "en": "Liquid motion", "zh-Hant": "液態動畫", "es": "Movimiento líquido", "zh-Hans": "液态动效" },
+      "meaning": { "ja": "液体のようにぬるっと動く", "en": "Shapes move and merge like liquid", "zh-Hant": "像液體一樣黏滑地流動、融合", "es": "Las formas se mueven y se unen como un líquido", "zh-Hans": "形状像液体一样流动和融合" },
+      "ask": { "ja": "ロゴの登場をリキッドモーションにして。しずくが集まってロゴの形になるように。", "en": "Make the logo entrance a liquid motion: drops gather and form the shape.", "zh-Hant": "Logo 的登場請用液態動畫，像水滴聚在一起組成 Logo 的形狀。", "es": "Haz la entrada del logo con movimiento líquido: gotas que se juntan y forman la figura.", "zh-Hans": "让标志以液态动效入场，由液滴汇聚成形。" },
+      "summary": {
+        "ja": "しずくが伸びて、ちぎれて、ぬるっと1つにまとまる。",
+        "en": "A blob stretches out, breaks into drops and merges back into one."
+      },
+      "spec": {
+        "ja": [
+          "先頭の丸（半径44）: 0.35〜1.45秒で右へ300px、cubic-bezier(.7, 0, .2, 1)。移動中は sin の山で34px浮く。2.7〜3.8秒で同じ動きで戻る",
+          "後ろに7つの丸が0.065秒ずつ遅れて同じ経路を追う。半径は44→15へ小さく、上下に±6px揺れる",
+          "止まっている間も、まわりで小さな丸3つ（半径15・13・11）が距離34〜64pxを1周期に2回出入りする",
+          "つながる質感: 丸を白で描く → 9pxぼかす → 透明度をしきい値（112〜144の間だけなだらか）で切る → 残った形に色を塗る",
+          "色はミント → 青 → 紫（#7C5CFF）の斜めグラデーション。先頭に白い楕円のハイライト"
+        ],
+        "en": [
+          "Lead circle (radius 44): moves 300 px right at 0.35–1.45 s with cubic-bezier(.7, 0, .2, 1), rising 34 px on a sine arc while moving; returns the same way at 2.7–3.8 s.",
+          "Seven circles follow the same path, each 0.065 s later, radius tapering 44→15, wobbling ±6 px vertically.",
+          "Even while it rests, three small circles (radius 15, 13, 11) move in and out between 34 and 64 px from it, twice per cycle.",
+          "Merged look: draw the circles in white → blur 9 px → threshold the alpha (soft only between 112 and 144) → fill what remains with colour.",
+          "Fill is a diagonal gradient mint → blue → violet (#7C5CFF), with a white elliptical highlight on the lead circle."
+        ]
+      },
+      "use": {
+        "ja": "有機的でやわらかい印象を出したいとき。ロゴ・背景・切り替えのつなぎに。",
+        "en": "Use it for an organic, soft look in logos, backgrounds and connecting moves."
+      },
+      "tags": ["liquid", "blob", "goo", "gooey", "metaball", "fluid", "organic", "drip"]
+    },
+    {
+      "no": "14", "slug": "motion-trail", "category": "motion-polish",
+      "name": { "ja": "モーショントレイル", "en": "Motion trail", "zh-Hant": "動態殘影", "es": "Estela de movimiento (motion trail)", "zh-Hans": "运动拖尾" },
+      "meaning": { "ja": "動いた跡に残像が尾を引く", "en": "A fading trail follows a moving object", "zh-Hant": "移動的物體後方拖著漸淡的殘影", "es": "Una estela que se desvanece sigue al objeto en movimiento", "zh-Hans": "运动物体身后留下逐渐淡去的轨迹" },
+      "ask": { "ja": "飛んでいく丸にモーショントレイルを付けて。残像は5個、後ろほど薄く。", "en": "Add a motion trail to the flying circle: five copies that fade out behind it.", "zh-Hant": "飛行中的圓形請加上動態殘影，5 個殘影，越後面越淡。", "es": "Agrega una estela al círculo que vuela: cinco copias que se desvanecen detrás.", "zh-Hans": "给飞行圆球添加五层逐渐淡出的拖尾。" },
+      "summary": {
+        "ja": "8の字に動く丸の跡に、残像が尾を引く。",
+        "en": "A ball moving in a figure eight leaves a fading trail of copies behind it."
+      },
+      "spec": {
+        "ja": [
+          "丸（コーラル・半径25、中心に白の半径11）が8の字を4.7秒で1周: x = 196·sin(a)、y = 62·sin(2a)。a は一定の速さで進む",
+          "残像15個: 0.105rad（約0.079秒）ずつ過去の位置に置く",
+          "残像の半径は 22→6、透明度は 0.9 × (1 − i/15) + 0.05 で古いほど薄く小さい",
+          "残像の色は新しい順にコーラル → 黄 → 青",
+          "古い残像から先に描き、本体を最後に重ねる"
+        ],
+        "en": [
+          "A ball (coral, radius 25, white centre radius 11) traces a figure eight once per 4.7 s: x = 196·sin(a), y = 62·sin(2a), with a advancing at constant speed.",
+          "15 copies, each placed 0.105 rad (about 0.079 s) further back along the path.",
+          "Copy radius goes 22→6 and opacity is 0.9 × (1 − i/15) + 0.05, so older copies are smaller and fainter.",
+          "Copy colour runs coral → yellow → blue from newest to oldest.",
+          "Draw the oldest copy first and the ball itself last."
+        ]
+      },
+      "use": {
+        "ja": "速さや軌道を見せたいとき。飛ぶ物・カーソル・光の点に。",
+        "en": "Use it to show speed or a path: flying objects, cursors, points of light."
+      },
+      "tags": ["trail", "motion-trail", "echo", "afterimage", "ghost", "path", "speed"]
+    },
+    {
+      "no": "15", "slug": "particles", "category": "motion-polish",
+      "name": { "ja": "パーティクル", "en": "Particles", "zh-Hant": "粒子特效", "es": "Partículas", "zh-Hans": "粒子效果" },
+      "meaning": { "ja": "粒が飛び散る", "en": "Many small pieces fly out and scatter", "zh-Hant": "許多小粒子向外飛散", "es": "Muchas piezas pequeñas salen volando y se dispersan", "zh-Hans": "大量小碎片喷出并散开" },
+      "ask": { "ja": "達成の瞬間に、下からパーティクルを噴き上げて。4色で、1.5秒で落ちきるように。", "en": "At the moment of success, shoot particles up from the bottom: four colors, all fallen within 1.5 s.", "zh-Hant": "達成的瞬間，請用粒子特效從下方往上噴出，4 種顏色，1.5 秒內全部落完。", "es": "En el momento del éxito, lanza partículas desde abajo: cuatro colores, todas caídas en 1,5 s.", "zh-Hans": "成功时从底部喷出四种颜色的粒子，在 1.5 s 内全部落下。" },
+      "summary": {
+        "ja": "粒が下の口から次々と噴き出して、飛び散って落ちる。",
+        "en": "Particles keep shooting up from an emitter, spread out and fall."
+      },
+      "spec": {
+        "ja": [
+          "粒84個。下中央（横の中央・下端から20px上）から出る",
+          "初速: 横 ±190px/秒、上向き 250〜400px/秒。重力 470px/秒²（放物線）",
+          "各粒は 2.35秒 または 約1.57秒 の周期で繰り返し、開始のずれは乱数（シード固定なので毎回同じ絵になる）",
+          "寿命は最長1.5秒。出た直後0.06秒でフェードイン、寿命の最後30%でフェードアウト。拡大率 1.15→0.7",
+          "形は丸・四角・三角（大きさ5〜11px）、色は青・コーラル・黄・ミント。最大 ±4.5rad/秒で回転"
+        ],
+        "en": [
+          "84 particles, emitted from the bottom centre (horizontal centre, 20 px above the bottom edge).",
+          "Initial velocity: ±190 px/s horizontally, 250–400 px/s upward. Gravity 470 px/s² (parabolic paths).",
+          "Each particle repeats with a period of 2.35 s or about 1.57 s, with a random start offset (fixed seed, so every run looks the same).",
+          "Lifetime up to 1.5 s: fade in over the first 0.06 s, fade out over the last 30%. Scale 1.15→0.7.",
+          "Shapes are circles, squares and triangles (size 5–11 px) in blue, coral, yellow and mint, spinning at up to ±4.5 rad/s."
+        ]
+      },
+      "use": {
+        "ja": "お祝い・達成・にぎやかさを足したいとき。紙吹雪や火花の代わりに。",
+        "en": "Use it to add celebration or liveliness, in place of confetti or sparks."
+      },
+      "tags": ["particles", "confetti", "emitter", "fountain", "gravity", "celebration", "sparks"]
+    },
+    {
+      "no": "16", "slug": "parallax", "category": "motion-polish",
+      "name": { "ja": "パララックス", "en": "Parallax", "zh-Hant": "Parallax", "es": "Paralaje", "zh-Hans": "视差" },
+      "meaning": { "ja": "手前と奥をずらして動かし奥行きを出す", "en": "Near and far layers move at different speeds to show depth", "zh-Hant": "近景與遠景速度不同，營造景深", "es": "Las capas cercanas y lejanas se mueven a distinta velocidad para dar profundidad", "zh-Hans": "远近图层以不同速度移动形成纵深" },
+      "ask": { "ja": "この風景を3層に分けて、パララックスで横に流して。手前ほど速く。", "en": "Split this landscape into three layers and scroll them with parallax, nearer layers faster.", "zh-Hant": "請把這張風景分成 3 層，以 Parallax 橫向平移，越近的圖層移動越快。", "es": "Divide este paisaje en tres capas y desplázalas con paralaje, las más cercanas más rápido.", "zh-Hans": "把风景拆成三层，近层滚动更快，形成视差。" },
+      "summary": {
+        "ja": "横に動く景色。手前ほど大きく、奥ほど小さく動いて、奥行きが出る。",
+        "en": "A landscape pans sideways; near layers move more and far layers move less, creating depth."
+      },
+      "spec": {
+        "ja": [
+          "カメラの横移動: ±108px を sin波で4.7秒に1往復",
+          "各層は 移動量 × 係数 だけ逆向きにずらす。係数は奥から: 星 0.05、月 0.1、遠い山 0.28、中間の山 0.6、手前の丘と木 1.25、いちばん手前の暗い丸 2.1",
+          "奥の層ほど暗く背景に近い色、手前ほど明るい色。いちばん手前は暗い影として画面下に大きく置く",
+          "各層は画面の左右に200px以上はみ出して描き、端が見えないようにする"
+        ],
+        "en": [
+          "Camera pan: ±108 px on a sine wave, one round trip per 4.7 s.",
+          "Each layer is offset by pan × factor in the opposite direction. Factors from back to front: stars 0.05, moon 0.1, far ridge 0.28, middle ridge 0.6, front hill and trees 1.25, nearest dark shapes 2.1.",
+          "Far layers use darker colours close to the background, nearer layers brighter ones; the nearest layer is a large dark silhouette along the bottom.",
+          "Every layer is drawn at least 200 px beyond both sides of the frame so its ends never show."
+        ]
+      },
+      "use": {
+        "ja": "平面の絵や写真に奥行きを出したいとき。背景・風景・スクロール表現に。",
+        "en": "Use it to give flat artwork or photos depth: backgrounds, landscapes, scrolling scenes."
+      },
+      "tags": ["parallax", "depth", "layers", "pan", "2.5d", "background", "landscape"]
+    },
+    {
+      "no": "17", "slug": "mask-transition", "category": "transitions-highlights",
+      "name": { "ja": "マスクトランジション", "en": "Mask transition", "zh-Hant": "遮罩轉場", "es": "Transición con máscara", "zh-Hans": "遮罩转场" },
+      "meaning": { "ja": "形の中から次の画面が現れる", "en": "The next scene appears inside a growing shape", "zh-Hant": "下一個畫面從擴大的形狀中現出", "es": "La escena siguiente aparece dentro de una forma que crece", "zh-Hans": "扩大的形状内部显现下一场景" },
+      "ask": { "ja": "次の場面へはマスクトランジションで。中央の丸が0.7秒で広がって切り替わるように。", "en": "Go to the next scene with a mask transition: a circle grows from the center in 0.7 s.", "zh-Hant": "切換到下一個場景請用遮罩轉場，中央的圓形在 0.7 秒內擴大並完成切換。", "es": "Pasa a la siguiente escena con una transición con máscara: un círculo que crece desde el centro en 0,7 s.", "zh-Hans": "用遮罩转场切换场景，让圆从中心在 0.7 s 内扩展开。" },
+      "summary": {
+        "ja": "丸や星の形の「窓」が広がり、その中に次の画面が見える。",
+        "en": "A circle- or star-shaped window grows, showing the next scene inside it."
+      },
+      "spec": {
+        "ja": [
+          "昼の画面 → 夜の画面 → 昼の画面を2.35秒ずつ。各区間の 0.45〜1.6秒（1.15秒）で切り替え、easeInOut（3乗）",
+          "今の画面の上に、形で切り抜いた次の画面を重ねる。形を広げて画面全体を覆ったら完了",
+          "昼→夜: 丸。太陽の中心（112, 104）から半径 0→470",
+          "夜→昼: 5角の星。月の中心（427, 104）から外側の半径 0→1150、同時に1.2rad（約69°）回す",
+          "広がっている間、形のふちに白い線（線幅7）を付ける"
+        ],
+        "en": [
+          "Day scene → night scene → day scene, 2.35 s each. The change runs at 0.45–1.6 s of each half (1.15 s), cubic ease-in-out.",
+          "The next scene is drawn on top of the current one, clipped to a shape; the shape grows until it covers the frame.",
+          "Day→night: a circle from the sun's centre (112, 104), radius 0→470.",
+          "Night→day: a five-point star from the moon's centre (427, 104), outer radius 0→1150, rotating 1.2 rad (about 69°) as it grows.",
+          "While it grows, the edge of the shape has a white outline (width 7)."
+        ]
+      },
+      "use": {
+        "ja": "画面の中の物（太陽・ロゴ・ボタン）を起点に、次の場面へ切り替えたいとき。",
+        "en": "Use it to change scenes starting from an object in the frame, such as a sun, logo or button."
+      },
+      "tags": ["mask", "transition", "iris", "wipe", "shape-wipe", "reveal", "scene-change"]
+    },
+    {
+      "no": "18", "slug": "shape-transition", "category": "transitions-highlights",
+      "name": { "ja": "シェイプトランジション", "en": "Shape transition", "zh-Hant": "形狀轉場", "es": "Transición de formas", "zh-Hans": "图形转场" },
+      "meaning": { "ja": "図形が画面を覆って切り替わる", "en": "Shapes cover the screen and uncover the next scene", "zh-Hant": "形狀覆蓋畫面後露出下一個場景", "es": "Unas formas cubren la pantalla y descubren la escena siguiente", "zh-Hans": "图形覆盖画面后揭示下一场景" },
+      "ask": { "ja": "場面の切り替えはシェイプトランジションで。4色の斜めの帯が左から覆うように。", "en": "Change scenes with a shape transition: four diagonal color bands sweep in from the left.", "zh-Hant": "場景切換請用形狀轉場，4 種顏色的斜向色帶從左邊掃過來覆蓋畫面。", "es": "Cambia de escena con una transición de formas: cuatro franjas diagonales de color que entran desde la izquierda.", "zh-Hans": "用四条斜向色带从左侧扫入，完成图形转场。" },
+      "summary": {
+        "ja": "色のついた帯が画面を覆い隠し、抜けると次の画面になっている。",
+        "en": "Coloured bands sweep across and cover the frame; when they leave, the next scene is there."
+      },
+      "spec": {
+        "ja": [
+          "昼 → 夜 → 昼を2.35秒ずつ。横長の帯4本（高さ52・青、コーラル、黄、ミント）。帯の左右の端は80px斜め",
+          "覆う: 0.38〜1.0秒。各帯の先端が画面の端から反対の端まで進む。帯ごとに全体の14%ずつ遅らせ、1本あたり全体の58%の長さで easeInOut（3乗）",
+          "1.0秒（全部覆った瞬間）に下の画面を次の画面へ差し替える",
+          "抜ける: 1.12〜1.75秒。各帯の後ろの端が同じ遅れ・同じカーブで追いかけ、次の画面が現れる",
+          "向き: 昼→夜は左から右、夜→昼は左右反転"
+        ],
+        "en": [
+          "Day → night → day, 2.35 s each. Four horizontal bands (height 52; blue, coral, yellow, mint) whose ends are slanted by 80 px.",
+          "Cover: 0.38–1.0 s. Each band's leading edge travels from one side of the frame to the other. Bands are delayed by 14% of the phase each, and each uses cubic ease-in-out over 58% of the phase.",
+          "At 1.0 s, when everything is covered, the scene underneath is swapped for the next one.",
+          "Uncover: 1.12–1.75 s. Each band's trailing edge follows with the same delays and curve, exposing the next scene.",
+          "Direction: left to right for day→night, mirrored for night→day."
+        ]
+      },
+      "use": {
+        "ja": "ブランドカラーの図形で場面を切り替えたいとき。章の区切りや話題の転換に。",
+        "en": "Use it to change scenes with shapes in brand colours: chapter breaks, topic changes."
+      },
+      "tags": ["shape-transition", "transition", "wipe", "bands", "stripes", "cover", "scene-change"]
+    },
+    {
+      "no": "19", "slug": "liquid-transition", "category": "transitions-highlights",
+      "name": { "ja": "リキッドトランジション", "en": "Liquid transition", "zh-Hant": "液態轉場", "es": "Transición líquida", "zh-Hans": "液态转场" },
+      "meaning": { "ja": "液体が流れ込んで切り替わる", "en": "Liquid flows in and replaces the scene", "zh-Hant": "液體流入並取代原本的畫面", "es": "Un líquido entra y reemplaza la escena", "zh-Hans": "液体流入画面并替换场景" },
+      "ask": { "ja": "ここはリキッドトランジションで。上から青いインクが垂れて画面を満たすように。", "en": "Use a liquid transition here: blue ink drips down from the top and fills the frame.", "zh-Hant": "這裡請用液態轉場，藍色墨水從上方滴下來填滿畫面。", "es": "Usa aquí una transición líquida: tinta azul que gotea desde arriba y llena el cuadro.", "zh-Hans": "用蓝色墨水从顶部滴落铺满画面，完成液态转场。" },
+      "summary": {
+        "ja": "ペンキのような液体が上から垂れて流れ込み、次の画面になる。",
+        "en": "Paint-like liquid drips down from the top and fills the frame, becoming the next scene."
+      },
+      "spec": {
+        "ja": [
+          "昼 → 夜 → 昼を2.35秒ずつ。液体は2層。どちらも上から下へ、easeInOut（2乗）",
+          "1層目（単色。昼→夜は青、夜→昼はコーラル）: 0.35〜1.5秒。2層目（次の画面そのものを液体の形で切り抜く）: 0.7〜1.8秒",
+          "液面は y = −110 から 画面下端+130 まで下がる。ふちは2つのsin波（振幅13pxと8px）で波打ち、波の大きさは途中で最大になる",
+          "しずく7本（太さ30〜54px・先端は丸）を液面から垂らす。長さは 基準30〜110px × (0.25 + 0.9 × 波の強さ) で、途中で最大になる",
+          "つながる質感: 形を白で描く → 7pxぼかす → 透明度をしきい値で切る → 色（または次の画面）を塗る"
+        ],
+        "en": [
+          "Day → night → day, 2.35 s each. Two liquid layers, both moving top to bottom with quadratic ease-in-out.",
+          "Layer 1 (flat colour: blue for day→night, coral for night→day): 0.35–1.5 s. Layer 2 (the next scene itself, clipped to the liquid shape): 0.7–1.8 s.",
+          "The liquid front moves from y = −110 to 130 px below the bottom edge. Its edge waves with two sine waves (amplitudes 13 px and 8 px), strongest midway.",
+          "Seven drips (30–54 px wide, round tips) hang from the front; length = base 30–110 px × (0.25 + 0.9 × wave strength), greatest midway.",
+          "Merged look: draw the shape in white → blur 7 px → threshold the alpha → fill with the colour (or the next scene)."
+        ]
+      },
+      "use": {
+        "ja": "やわらかく有機的に場面を切り替えたいとき。食品・美容・クリエイティブ系の映像に。",
+        "en": "Use it for a soft, organic scene change, for example in food, beauty or creative videos."
+      },
+      "tags": ["liquid", "transition", "drip", "paint", "goo", "fluid", "wipe", "scene-change"]
+    },
+    {
+      "no": "20", "slug": "zoom-through", "category": "transitions-highlights",
+      "name": { "ja": "ズームスルー", "en": "Zoom through", "zh-Hant": "Zoom Through 穿越轉場", "es": "Zoom through (zoom a través)", "zh-Hans": "穿越缩放" },
+      "meaning": { "ja": "物の中へ突き抜けて次へ", "en": "Zooms into an object and passes through it into the next scene", "zh-Hant": "鑽進物體裡穿過去，進入下一個場景", "es": "Hace zoom hacia un objeto y lo atraviesa hasta la escena siguiente", "zh-Hans": "放大并穿过物体进入下一场景" },
+      "ask": { "ja": "ロゴの「O」の穴へズームスルーして、次の場面へ。0.6秒で、加速しながら。", "en": "Zoom through the hole of the \"O\" in the logo into the next scene, 0.6 s, accelerating.", "zh-Hant": "請用 Zoom Through 穿越轉場鑽進 Logo「O」的洞，進入下一個場景，0.6 秒，逐漸加速。", "es": "Haz un zoom through por el hueco de la \"O\" del logo hacia la siguiente escena, en 0,6 s, acelerando.", "zh-Hans": "用穿越缩放加速穿过标志中字母 O 的孔洞，进入下一场景，时长 0.6 s。" },
+      "summary": {
+        "ja": "文字の「O」の穴へ突っ込んで、その先の画面へ抜ける。",
+        "en": "The camera pushes into the hole of a letter O and comes out in the next scene."
+      },
+      "spec": {
+        "ja": [
+          "画面X（黄地に ZOOM）→ 画面Y（青地に GO!）→ 画面X を2.35秒ずつ",
+          "今の画面を「O」の穴の中心（半径24.5）を基準に拡大する。最大倍率は穴が画面全体を覆う値の1.08倍（約14倍）",
+          "倍率 = 最大倍率^p（指数で拡大。速さが一定に見える）",
+          "p = 0.8 × easeIn（3乗・0.25〜1.2秒）+ 0.2 × easeOut（3乗・1.2〜1.65秒）。加速して突っ込み、最後に減速",
+          "穴の中には次の画面を 1/最大倍率 に縮めて置く。拡大が終わるとちょうど等倍になり、そのまま次の画面に切り替わる"
+        ],
+        "en": [
+          "Scene X (ZOOM on yellow) → scene Y (GO! on blue) → scene X, 2.35 s each.",
+          "The current scene is scaled around the centre of an O's hole (radius 24.5). Maximum scale is 1.08× the value at which the hole covers the whole frame (about 14×).",
+          "Scale = maxScale^p (exponential zoom, which reads as constant speed).",
+          "p = 0.8 × cubic ease-in (0.25–1.2 s) + 0.2 × cubic ease-out (1.2–1.65 s): accelerate in, slow down at the end.",
+          "Inside the hole the next scene is placed at 1/maxScale. When the zoom ends it is exactly at full size, and the view switches to the next scene."
+        ]
+      },
+      "use": {
+        "ja": "ロゴや文字の中へ入り込んで、勢いよく次の場面へ進みたいとき。",
+        "en": "Use it to dive into a logo or letter and move to the next scene with momentum."
+      },
+      "tags": ["zoom", "zoom-through", "transition", "push-in", "scale", "tunnel", "scene-change"]
+    },
+    {
+      "no": "21", "slug": "flip", "category": "transitions-highlights",
+      "name": { "ja": "フリップ", "en": "Flip", "zh-Hant": "卡片翻轉", "es": "Flip (volteo)", "zh-Hans": "翻转" },
+      "meaning": { "ja": "カードのように裏返る", "en": "Turns over like a card to show the other side", "zh-Hant": "像卡片一樣翻到背面", "es": "Se da vuelta como una tarjeta para mostrar el otro lado", "zh-Hans": "像卡片翻面一样展示另一侧" },
+      "ask": { "ja": "料金カードをフリップで裏返して、裏に詳細を出して。0.5秒で。", "en": "Flip the pricing card to show the details on its back, in 0.5 s.", "zh-Hant": "請用卡片翻轉讓價格卡片翻到背面，並在背面顯示詳細內容，0.5 秒。", "es": "Voltea la tarjeta de precios con un flip para mostrar los detalles al reverso, en 0,5 s.", "zh-Hans": "让价格卡片在 0.5 s 内翻转，展示背面的详情。" },
+      "summary": {
+        "ja": "カードが縦の軸で回って裏返り、裏の面が出る。",
+        "en": "A card turns over around its vertical axis and shows its other side."
+      },
+      "spec": {
+        "ja": [
+          "カード（300×156・角丸22）。表（青・Q）⇄ 裏（黄・A）を2.35秒ずつ",
+          "0.45〜1.5秒（1.05秒）で180°回す。backOut（s=1.5）で180°を少し行き過ぎてから戻る",
+          "カードの幅 = 元の幅 × |cos θ|。90°を越えたところで面の絵を差し替える",
+          "遠近感: カードを縦に細く切り、左右で高さを最大±20% × sin θ 変える（奥が低く、手前が高い）",
+          "回転中は sin の山で8%拡大し6px浮かせる。面に暗い色を透明度 0.34 × |sin θ| で重ねる。床に楕円の影"
+        ],
+        "en": [
+          "A card (300 × 156, radius 22). Front (blue, Q) ⇄ back (yellow, A), 2.35 s each.",
+          "Rotates 180° at 0.45–1.5 s (1.05 s) with backOut (s = 1.5), going slightly past 180° and coming back.",
+          "Card width = original width × |cos θ|. The face artwork is swapped as it passes 90°.",
+          "Perspective: the card is drawn in thin vertical slices whose height varies by up to ±20% × sin θ from one side to the other (far side shorter, near side taller).",
+          "During the turn it scales up 8% and lifts 6 px on a sine curve; a dark overlay with opacity 0.34 × |sin θ| shades the face. An elliptical shadow sits on the floor."
+        ]
+      },
+      "use": {
+        "ja": "問いと答え、ビフォーとアフターなど、表と裏の関係にある2つを見せたいとき。",
+        "en": "Use it for two things that are sides of one another: question and answer, before and after."
+      },
+      "tags": ["flip", "card", "3d", "rotate", "turn", "reveal", "question-answer"]
+    },
+    {
+      "no": "22", "slug": "light-sweep", "category": "transitions-highlights",
+      "name": { "ja": "ライトスイープ", "en": "Light sweep", "zh-Hant": "掃光", "es": "Barrido de luz (light sweep)", "zh-Hans": "扫光" },
+      "meaning": { "ja": "光が表面を横切る", "en": "A band of light crosses a surface", "zh-Hant": "一道光掃過表面", "es": "Una franja de luz cruza una superficie", "zh-Hans": "光带扫过物体表面" },
+      "ask": { "ja": "ロゴが止まったあとに、ライトスイープを1回。左上から右下へ、弱めに。", "en": "After the logo settles, add one light sweep from top-left to bottom-right, subtle.", "zh-Hant": "Logo 停住之後，請加一次掃光，由左上掃到右下，亮度淡一點。", "es": "Cuando el logo se acomode, agrega un barrido de luz de arriba a la izquierda hacia abajo a la derecha, sutil.", "zh-Hans": "标志停稳后，让一道柔和扫光从左上移到右下。" },
+      "summary": {
+        "ja": "ロゴの表面を、光の帯が斜めに横切る。",
+        "en": "A band of light crosses the surface of a logo badge at an angle."
+      },
+      "spec": {
+        "ja": [
+          "2.35秒で1回。バッジ（400×112・角丸28・青のグラデーション）の形で切り抜いた中だけ光を描く",
+          "光の帯: 幅116pxの白いグラデーション（中央の透明度0.72、両端0）＋ 78px離れた幅12pxの細い帯（透明度0.5）。0.42rad（約24°）傾ける",
+          "0.45〜1.5秒でバッジの左130px外から右130px外まで（660px）進む。easeInOut（2乗）",
+          "きらめき: 1.38〜1.98秒、右上の角に4角の星。大きさ 30 × sin(πq) × (1 + 0.2(1 − q))、0.9rad回す",
+          "バッジ自体は動かさない"
+        ],
+        "en": [
+          "One sweep per 2.35 s. The light is drawn only inside a clip of the badge (400 × 112, radius 28, blue gradient).",
+          "Light band: a 116 px wide white gradient (opacity 0.72 in the middle, 0 at the edges) plus a thin 12 px band (opacity 0.5) 78 px away, rotated 0.42 rad (about 24°).",
+          "It moves from 130 px left of the badge to 130 px right of it (660 px) at 0.45–1.5 s, quadratic ease-in-out.",
+          "Sparkle: a four-point star at the top-right corner at 1.38–1.98 s; size 30 × sin(πq) × (1 + 0.2(1 − q)), rotating 0.9 rad.",
+          "The badge itself does not move."
+        ]
+      },
+      "use": {
+        "ja": "ロゴ・バッジ・ボタンに上質な印象を足したいとき。",
+        "en": "Use it to give a logo, badge or button a premium finish."
+      },
+      "tags": ["light-sweep", "shine", "sheen", "glint", "highlight", "logo", "badge", "premium"]
+    },
+    {
+      "no": "23", "slug": "glitch", "category": "transitions-highlights",
+      "name": { "ja": "グリッチ", "en": "Glitch", "zh-Hant": "Glitch", "es": "Glitch", "zh-Hans": "故障效果" },
+      "meaning": { "ja": "映像がバグったように乱れる", "en": "The picture breaks up as if it were malfunctioning", "zh-Hant": "畫面像故障一樣失真跳動", "es": "La imagen se rompe como si fallara", "zh-Hans": "画面像发生故障一样错位和分色" },
+      "ask": { "ja": "タイトルに一瞬だけグリッチを入れて。0.3秒、色ずれは弱めで、点滅はさせないで。", "en": "Add a brief glitch to the title: 0.3 s, a mild color split, no flashing.", "zh-Hant": "標題請加上短暫的 Glitch，0.3 秒，RGB 分離輕微，不要閃爍。", "es": "Agrega un glitch breve al título: 0,3 s, una separación de color leve, sin destellos.", "zh-Hans": "给标题添加 0.3 s 的轻微故障效果，少量分色，不要闪屏。" },
+      "summary": {
+        "ja": "文字が横にずれ、色がずれ、帯が走る。明るさの点滅はさせない。",
+        "en": "Text slices shift sideways, colours split and small bars appear, with no brightness flashing."
+      },
+      "spec": {
+        "ja": [
+          "白い太字（104px）。4.7秒に2回乱れる: 0.55〜1.25秒（5コマ）と 2.9〜3.74秒（6コマ）。それ以外は静止",
+          "1コマ0.14秒。コマごとに決め打ちの乱れを表示する（なめらかに動かさず、コマ送りで切り替える）",
+          "色ずれ: コーラルの文字を左へ7〜16px・下へ2px、シアン（#22D3EE）の文字を右へ同じ量・上へ2px、白の文字を上に重ねる",
+          "横ずれ: 高さ10〜35pxの横帯2〜4本（y=40〜150）を、左右どちらかへ18〜64pxずらす",
+          "小さな色の帯3本（コーラル・シアン・黄、幅30〜120×高さ5〜12）をランダムな位置に置く",
+          "背景の明るさは変えない（画面全体の点滅をしない）。乱数はシード固定"
+        ],
+        "en": [
+          "White bold text (104 px). It glitches twice per 4.7 s: 0.55–1.25 s (5 steps) and 2.9–3.74 s (6 steps); otherwise it is still.",
+          "Each step lasts 0.14 s and shows one fixed disturbance (stepped, not smoothly animated).",
+          "Colour split: a coral copy shifted 7–16 px left and 2 px down, a cyan (#22D3EE) copy shifted the same amount right and 2 px up, with the white text on top.",
+          "Slice shift: 2–4 horizontal strips (10–35 px tall, y 40–150) are displaced 18–64 px to the left or right.",
+          "Three small colour bars (coral, cyan, yellow; 30–120 wide × 5–12 tall) at random positions.",
+          "Background brightness never changes (no full-frame flashing). The random values use a fixed seed."
+        ]
+      },
+      "use": {
+        "ja": "デジタル感・エラー・不穏さを出したいとき。タイトルや場面転換のアクセントに。",
+        "en": "Use it for a digital, error or uneasy feel, as an accent on titles and scene changes."
+      },
+      "tags": ["glitch", "rgb-split", "chromatic-aberration", "distortion", "digital", "error", "slice"]
+    },
+    {
+      "no": "24", "slug": "impact-shake", "category": "transitions-highlights",
+      "name": { "ja": "インパクトシェイク", "en": "Impact shake", "zh-Hant": "畫面震動", "es": "Sacudida de impacto (impact shake)", "zh-Hans": "冲击震动" },
+      "meaning": { "ja": "着地の衝撃で画面が揺れる", "en": "The whole frame shakes when something lands", "zh-Hant": "落地的衝擊讓整個畫面震動", "es": "Todo el cuadro tiembla cuando algo cae", "zh-Hans": "物体落下时带动整个画面震动" },
+      "ask": { "ja": "見出しがドンと落ちた瞬間に、インパクトシェイクを入れて。0.4秒で収まる程度に。", "en": "Add an impact shake when the headline lands; it should settle within 0.4 s.", "zh-Hant": "標題砰地落下的瞬間，請加上畫面震動，0.4 秒內要平息。", "es": "Agrega una sacudida de impacto cuando cae el titular; que se calme en 0,4 s.", "zh-Hans": "标题落地时添加冲击震动，在 0.4 s 内停稳。" },
+      "summary": {
+        "ja": "重い見出しの板がドンと落ち、その衝撃で画面ごと揺れる。",
+        "en": "A heavy headline slab drops with a thud and the whole frame shakes from the impact."
+      },
+      "spec": {
+        "ja": [
+          "2.35秒で1回（1回目は黄色の板、2回目はコーラルの板）。板は250×100・角丸18",
+          "落下: 0.3〜0.62秒で画面上の外から床へ。easeIn（3乗）で加速。落下中は縦に1.12倍のびる",
+          "0.62秒に着地。画面全体を1.1秒揺らす: 横 15px × e^(−5t) × sin(2π·5t)、縦 11px × e^(−5t) × cos(2π·6.5t)、傾き 0.02rad × e^(−5t) × sin(2π·5t + 0.6)",
+          "板は着地後0.3秒、縦に最大22%つぶれて戻る（横はその分ひろがる。基準は底辺）",
+          "背景の箱4つは0.03〜0.06秒遅れて最大24px跳ねる（0.5秒）。床から白い線6本と、ほこりの丸6個が0.55秒で広がって消える",
+          "退場: 1.85〜2.2秒に板が上へ300px（backIn s=1.6）"
+        ],
+        "en": [
+          "One drop per 2.35 s (a yellow slab first, then a coral one). The slab is 250 × 100, radius 18.",
+          "Fall: 0.3–0.62 s from above the frame to the floor, cubic ease-in (accelerating). While falling it is stretched 1.12× vertically.",
+          "Lands at 0.62 s. The whole frame shakes for 1.1 s: x 15 px × e^(−5t) × sin(2π·5t), y 11 px × e^(−5t) × cos(2π·6.5t), rotation 0.02 rad × e^(−5t) × sin(2π·5t + 0.6).",
+          "For 0.3 s after landing the slab squashes vertically by up to 22% and recovers (it widens by the same amount; anchored at its base).",
+          "Four background blocks hop up to 24 px, 0.03–0.06 s late, over 0.5 s. Six white lines and six dust puffs spread from the floor and fade within 0.55 s.",
+          "Exit: the slab moves 300 px up at 1.85–2.2 s (backIn, s = 1.6)."
+        ]
+      },
+      "use": {
+        "ja": "重要な見出しや数字を、重さと衝撃で強く印象づけたいとき。",
+        "en": "Use it to land an important headline or number with weight and force."
+      },
+      "tags": ["shake", "impact", "camera-shake", "slam", "drop", "thud", "headline", "emphasis"]
+    }
+  ]
+}

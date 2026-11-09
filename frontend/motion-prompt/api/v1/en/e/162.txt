@@ -1,0 +1,49 @@
+// Motion Prompt #162 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#162
+//
+// Lightbox / ライトボックス
+// Pack: lp2 (Landing page & web effects, part 2) · element 18 · Category: Showcase effects
+// What happens: Clicking a thumbnail in the gallery dims the page and shows that photo large in the center; the × shrinks it back into its thumbnail.
+// Motion spec:
+//   - A 511 × 168 viewport with four thumbnails (108 × 72, radius 6). The third is clicked at 0.75 s, and the × at the top right at 3.0 s. One pass takes 4.7 s (twice per 9.4 s pack cycle).
+//   - Open: over 0.85–1.3 s (0.45 s, cubic ease-out) a dark overlay (rgb(14,18,28), opacity 0 → 0.82) covers the page and the clicked thumbnail grows to 261 × 128 in the center.
+//   - Over the second half of the open, "3 / 4" appears below the photo, previous/next arrows at the sides and a × at the top right.
+//   - Close: over 3.05–3.4 s (0.35 s, cubic ease-in-out) the same move runs in reverse and the photo returns to its thumbnail.
+// When to use it: Use it for case studies, portfolios or product photos that should be seen large without leaving the page.
+// Tags: lightbox, modal, gallery, image, overlay, zoom
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#162
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 18
+// 18 ライトボックス（サムネを押すと周りが暗くなり、その上に写真が大きく表示される）
+CELLS[17] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const e = u < 2.0 ? eOut(P(u, 0.85, 1.3)) : 1 - eIO(P(u, 3.05, 3.4));
+  const TX = [24, 142, 260, 378], TY = 72, TW = 108, THt = 72, PV = [2, 0, 1, 0];
+  const B = { x: 125, y: 12, w: 261, h: 128 };
+  const cur = t => path([[0, 430, 205], [0.5, 318, 110], [0.95, 318, 110], [1.6, 445, 120], [2.5, 445, 120], [2.85, 487, 19], [3.15, 487, 19], [3.8, 430, 205], [4.7, 430, 205]], t);
+  const [cx, cy] = cur(u);
+  view(k, () => {
+    header(k, 0);
+    txt(k, 'ギャラリー', 24, 60, `800 15px ${JP}`, C.ink);
+    for (let i = 0; i < 4; i++) pic(k, TX[i], TY, TW, THt, PV[i], 6);
+    bars(k, 24, 154, 300, 1, C.faint, 6);
+    if (e > 0) {
+      k.fillStyle = `rgba(14,18,28,${0.82 * e})`; k.fillRect(0, 0, VW, VH);
+      const x = lerp(TX[2], B.x, e), y = lerp(TY, B.y, e), ww = lerp(TW, B.w, e), hh = lerp(THt, B.h, e);
+      pic(k, x, y, ww, hh, 1, 6);
+      k.save(); k.globalAlpha = clamp((e - 0.5) / 0.5);
+      txt(k, '3 / 4', VW / 2, 156, `700 12px ${EN}`, 'rgba(255,255,255,.85)', 'center', 'middle', '1px');
+      k.strokeStyle = '#fff'; k.lineWidth = 2.4; k.lineCap = 'round'; k.lineJoin = 'round';
+      k.beginPath(); k.moveTo(481, 13); k.lineTo(493, 25); k.moveTo(493, 13); k.lineTo(481, 25); k.stroke();
+      k.beginPath(); k.moveTo(98, 66); k.lineTo(90, 76); k.lineTo(98, 86); k.stroke();
+      k.beginPath(); k.moveTo(413, 66); k.lineTo(421, 76); k.lineTo(413, 86); k.stroke();
+      k.restore();
+    }
+    click(k, cx, cy, u, [0.75, 3.0]);
+  });
+};

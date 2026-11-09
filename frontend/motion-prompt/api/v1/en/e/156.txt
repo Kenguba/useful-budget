@@ -1,0 +1,50 @@
+// Motion Prompt #156 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#156
+//
+// Text roll on hover / テキストロール
+// Pack: lp2 (Landing page & web effects, part 2) · element 12 · Category: Mouse & input interactions
+// What happens: With the cursor on a menu word, its letters roll up and out one by one while the same word rolls in from below in orange; it rolls back when the cursor leaves.
+// Motion spec:
+//   - A 511 × 168 viewport with three menu words (WORKS, ABOUT, CONTACT; 30 px, weight 800, 1 px letter spacing). The cursor rests on each, left to right, for about 0.85 s. One pass takes 4.7 s (twice per 9.4 s pack cycle).
+//   - An orange copy of each word sits 40 px below it, and both are clipped to a 39 px tall box (overflow: hidden).
+//   - On hover each letter, staggered by 0.035 s, moves 40 px up and out over 0.36 s (cubic ease-in-out) while its orange copy rises into place.
+//   - On leave the letters roll back down with the same stagger and timing.
+// When to use it: Use it on header menus or buttons to give short text links a tactile response.
+// Tags: text-roll, hover, menu, link, stagger, typography
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#156
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 12
+// 12 テキストロール（メニューの文字にカーソルを乗せると、文字が上に回って同じ文字が下から出てくる）
+CELLS[11] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const LINKS = ['WORKS', 'ABOUT', 'CONTACT'], F = `800 30px ${EN}`, GAP = 44, LY = 100, LH = 40;
+  const cur = t => path([[0, 110, 200], [0.4, 120, 92], [1.25, 140, 96], [1.5, 252, 92], [2.35, 268, 96], [2.6, 380, 92], [3.45, 400, 96], [3.9, 450, 200], [4.7, 110, 200]], t);
+  view(k, () => {
+    k.fillStyle = '#FFF3EA'; k.fillRect(0, 0, VW, VH);
+    logo(k, 24, 28); txt(k, 'MENU', VW - 26, 28.5, `800 11px ${EN}`, C.sub, 'right', 'middle', '2px');
+    k.font = F; k.letterSpacing = '1px'; const ws = LINKS.map(s => k.measureText(s).width); k.letterSpacing = '0px';
+    let x = (VW - ws.reduce((a, b) => a + b, 0) - GAP * (LINKS.length - 1)) / 2;
+    LINKS.forEach((s, i) => {
+      const x0 = x, x1 = x + ws[i], inside = t => { const [a, b] = cur(t); return a > x0 - 6 && a < x1 + 6 && b > LY - 30 && b < LY + 10; };
+      const on = inside(u), tc = lastSwitch(inside, u);
+      k.save(); k.beginPath(); k.rect(x0 - 4, LY - 31, ws[i] + 8, 39); k.clip();
+      let cxp = x0;
+      [...s].forEach((ch, j) => {
+        const f = tc === null ? (on ? 1 : 0) : eIO(P(u, tc + 0.035 * j, tc + 0.035 * j + 0.36)), q = on ? f : 1 - f;
+        k.font = F; k.letterSpacing = '1px'; const cw = k.measureText(ch).width; k.letterSpacing = '0px';
+        txt(k, ch, cxp, LY - LH * q, F, C.ink, 'left', 'alphabetic', '1px');
+        txt(k, ch, cxp, LY + LH - LH * q, F, C.acc, 'left', 'alphabetic', '1px');
+        cxp += cw;
+      });
+      k.restore();
+      x += ws[i] + GAP;
+    });
+    bars(k, VW / 2 - 110, 132, 220, 1, '#F1D9C9', 6);
+    const [cx, cy] = cur(u); cursor(k, cx, cy);
+  });
+};

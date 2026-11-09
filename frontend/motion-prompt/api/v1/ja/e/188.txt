@@ -1,0 +1,36 @@
+// Motion Prompt #188 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#188
+//
+// アイリスアウト / Iris out
+// パック: camera2 (カメラワークと切り替え 第2弾) · element 20 · カテゴリ: 切り替え・編集
+// 何が起きるか: 人物を中心に丸い窓が閉じて黒になり、次の場面は丸い窓が開いて現れる。
+// 動きの仕様:
+//   - アイリスアウト: 1.3秒から2.7秒までの1.4秒で、丸い窓の半径を 340px → 0 に縮める（2次のイーズインアウト（cubic-bezier(0.45,0,0.55,1) 相当））。窓の外は黒（#141418）
+//   - 窓の中心: 映っている場面の主役。Aは人物の頭（左0.6m・高さ1.63m・奥7m）、Bは車（右1.2m・高さ0.9m・奥9m）を投影した位置
+//   - 黒: 2.7〜3.1秒。2.9秒に次の絵へ直結で切り替える
+//   - アイリスイン: 3.1秒から4.4秒までの1.3秒で、次の絵の主役を中心に半径 0 → 340px に広げる
+//   - 縁: 半径1px以上のとき、幅2pxの青い円で窓の縁を描く。カメラは両方の絵とも固定
+//   - 4.7秒ごとに A→B、B→A を交互に行う（往復で9.4秒）。右上に「IRIS OUT」「IRIS IN」
+// 使いどころ: 無声映画やアニメ風の終わり方、コミカルな区切り。
+// タグ: iris out, iris in, iris wipe, circle, old film, cartoon, transition
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#188
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 20
+// 20 アイリスアウト: 人物を中心に丸い窓が閉じて黒になり、次の場面は丸い窓が開いて現れる
+CELLS[19] = shot(abCell((k, w, h, u, A, B) => {
+  const out = eIOs(P(u, 1.3, 2.7)), inn = eIOs(P(u, 3.1, 4.4));
+  const first = u < 2.9, cur = first ? A : B;
+  cur(k, w, h);
+  // 窓の中心は、いま映っている場面の主役（Aは人物の頭、Bは車）
+  const c = cur === sceneA ? proj(cam({ y: 1.4 }), -0.6, 1.63, 7) : proj(cam({ y: 1.6, pitch: 0.1 }), 1.2, 0.9, 9);
+  const rad = first ? lerp(340, 0, out) : lerp(0, 340, inn);
+  const cx = w / 2 + c.x, cy = h / 2 + c.y;
+  if (rad < 339) {
+    k.fillStyle = '#141418'; k.beginPath(); k.rect(0, 0, w, h); k.arc(cx, cy, Math.max(0, rad), 0, Math.PI * 2, true); k.fill('evenodd');
+    if (rad > 1) { k.strokeStyle = C.blue; k.lineWidth = 2; k.beginPath(); k.arc(cx, cy, rad, 0, 7); k.stroke(); }
+  }
+}, u => u < 2.9 ? 'IRIS OUT' : 'IRIS IN'));

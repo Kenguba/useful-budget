@@ -1,0 +1,28 @@
+// Motion Prompt #183 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#183
+//
+// Establishing shot / エスタブリッシングショット
+// Pack: camera2 (Camera moves & transitions, part 2) · element 15 · Category: Angles & Framing
+// What happens: A wide, high view of the whole town; the camera pushes in slowly and a location caption appears at bottom left.
+// Motion spec:
+//   - Camera: wide lens (focal length 220 px, shown as 16mm), height 4.5 m, pitch -0.06 rad; pushes in slowly from -5 m to -2.5 m
+//   - Timing: 0.3 s to 4.2 s (3.9 s), cubic ease-in-out (about cubic-bezier(0.65,0,0.35,1))
+//   - Scene: eight city buildings 30 m away, a tower 16 m right and 36 m away, three clouds and mountains; a small person 1 m left, 12 m away gives the scale
+//   - Location caption: from 0.9 s to 1.3 s a white card reading "EXT. CITY – DAY" (158×30 px, blue bar on its left) fades in at bottom left while moving up 8 px, then stays
+//   - Return: cross-fade back to the start over the last 0.5 s (one pass = 4.7 s); top-right readout shows "16mm WIDE"
+// When to use it: At the start of a scene to say where we are, or whenever the place or time changes.
+// Tags: establishing shot, wide shot, location, opening, scene setting, aerial, framing
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#183
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 15
+// 15 エスタブリッシングショット: 広角・高い位置から街全体を見せる引きの画。ゆっくり寄りながら場所の表示が出る
+CELLS[14] = shot(camCell((k, w, h, p, u) => {
+  const clouds = [[-30, 20, 110, 2.6], [20, 26, 150, 3.2], [60, 17, 95, 2]];
+  world(k, w, h, cam({ f: 220, y: 4.5, pitch: -0.06, z: lerp(-5, -2.5, p) }), { city: true, clouds, tower: [16, 36], person: { x: -1, z: 12 } });
+  const a = P(u, 0.9, 1.3);   // 場所の表示（左下）
+  if (a > 0) { k.save(); k.globalAlpha = a; k.translate(30, h - 52 + (1 - a) * 8); k.fillStyle = 'rgba(255,255,255,.9)'; rr(k, 0, 0, 158, 30, 6); k.fill(); k.fillStyle = C.blue; k.fillRect(0, 0, 4, 30); txt(k, 'EXT. CITY – DAY', 14, 15.5, `600 14px ${MONO}`, C.ink, 'left', 'middle'); k.restore(); }
+}, p => `${mm(220)} WIDE`, 0.3, 4.2));

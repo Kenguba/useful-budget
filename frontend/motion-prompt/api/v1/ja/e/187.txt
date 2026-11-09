@@ -1,0 +1,28 @@
+// Motion Prompt #187 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#187
+//
+// フェードアウト / Fade to black
+// パック: camera2 (カメラワークと切り替え 第2弾) · element 19 · カテゴリ: 切り替え・編集
+// 何が起きるか: 画面全体が黒へ沈んで終わり、黒から次の場面が明けてくる。
+// 動きの仕様:
+//   - フェードアウト: 1.4秒から2.6秒までの1.2秒で、前の絵の上に黒（rgb(20,20,24)）を不透明度 0 → 100% で重ねる。2次のイーズインアウト（cubic-bezier(0.45,0,0.55,1) 相当）
+//   - 黒: 2.6〜3.1秒は真っ黒。2.9秒に、見えないまま次の絵へ直結で切り替える
+//   - フェードイン: 3.1秒から4.3秒までの1.2秒で黒の不透明度を 100% → 0 に。同じイージング
+//   - カメラ: 両方の絵とも固定（Aは高さ1.4m、Bは高さ1.6m・ピッチ+0.1rad）。被写体も動かない
+//   - 4.7秒ごとに A→B、B→A を交互に行う（往復で9.4秒）。右上に「FADE OUT」「FADE IN」。ファインダーの枠は黒の上にも残す
+// 使いどころ: 章の区切り、時間の大きな経過、物語の終わり。
+// タグ: fade to black, fade out, fade in, black, ending, transition
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#187
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 19
+// 19 フェードアウト: 画面全体が黒へ沈んで終わり、黒から次の場面が明けてくる
+CELLS[18] = shot(abCell((k, w, h, u, A, B) => {
+  const out = eIOs(P(u, 1.4, 2.6)), inn = eIOs(P(u, 3.1, 4.3));
+  if (u < 2.9) A(k, w, h); else B(k, w, h);
+  const a = u < 2.9 ? out : 1 - inn;
+  if (a > 0) { k.fillStyle = `rgba(20,20,24,${a.toFixed(3)})`; k.fillRect(0, 0, w, h); }
+}, u => u < 2.9 ? 'FADE OUT' : 'FADE IN'));

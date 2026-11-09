@@ -1,0 +1,28 @@
+// Motion Prompt #180 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#180
+//
+// オーバーザショルダー / Over-the-shoulder
+// パック: camera2 (カメラワークと切り替え 第2弾) · element 12 · カテゴリ: アングル・画づくり
+// 何が起きるか: 手前の人物の後頭部と肩を画面の端に入れ、その肩越しに相手を撮る。手前はぼけ、相手にピント。
+// 動きの仕様:
+//   - 構図: 手前の人物の後頭部と肩（灰色、左0.62m・奥1.15m）を画面の左端に入れ、その肩越しに相手（青、右0.32m・奥3.1m）を撮る
+//   - ピント: 手前の肩は2.6pxのぼかし、相手はぼかしなし。相手は胸から上が画面に入る
+//   - カメラ: 高さ1.55m、ヨー +0.05rad。0.5秒から3.4秒まで前へ 0m → 0.35m ゆっくり寄る（3次のイーズインアウト（cubic-bezier(0.65,0,0.35,1) 相当））
+//   - 相手は腕と脚を 0.35·sin(u×5) rad 揺らして、話している様子
+//   - 戻り: 3.4〜4.2秒は止め、最後の0.5秒で開始状態へクロスフェード。右上に「OTS」
+// 使いどころ: 会話の場面で2人の位置関係を見せるとき、相手の表情に集中させるとき。
+// タグ: over-the-shoulder, ots, dialogue, conversation, shoulder, two shot, angle
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#180
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 12
+// 12 オーバーザショルダー: 手前の人物の肩と後頭部を画面の端に入れ、肩越しに相手を撮る。手前はぼけ、相手にピント
+CELLS[11] = shot(camCell((k, w, h, p, u) => {
+  world(k, w, h, cam({ z: lerp(0, 0.35, p), y: 1.55, yaw: 0.05 }), {
+    person: { x: 0.32, z: 3.1, walk: 0.35 * Math.sin(u * 5) }, blurFg: 2.6,
+    extra: [[-0.62, 0, 1.15, (kk) => { kk.fillStyle = C.g4; kk.beginPath(); kk.arc(0, 1.63, 0.17, 0, 7); kk.fill(); rr(kk, -0.34, 0.9, 0.68, 0.6, 0.14); kk.fill(); }, true]]
+  });
+}, p => 'OTS'));

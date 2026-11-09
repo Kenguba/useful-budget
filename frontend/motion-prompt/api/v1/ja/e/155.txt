@@ -1,0 +1,56 @@
+// Motion Prompt #155 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#155
+//
+// ホバーで画像切り替え / Image swap on hover
+// パック: lp2 (LP・Webサイトの演出 第2弾) · element 11 · カテゴリ: マウス・入力への反応
+// 何が起きるか: 商品カードにカーソルを乗せると、Tシャツの正面の写真が後ろ姿の写真にふわっと切り替わり、離れると正面に戻る。
+// 動きの仕様:
+//   - 表示域 511×168。商品カード2枚（写真の枠 196×112・角丸8、下に商品名と価格）。カーソルは左のカード、右のカードの順に約1.3秒ずつ乗る。4.7秒でひと回り（パックの周期9.4秒で2回）
+//   - 乗ったら0.3秒（easeInOut 2乗）で、正面の写真（胸に小さな丸）から後ろ姿の写真（背中に大きな星）へクロスフェード。離れたら同じ0.3秒で正面に戻す
+//   - 写真の下の点2つ（半径3）で、今どちらの写真かを示す（濃い点が今の写真）
+//   - 判定は写真と商品名を含むカード全体。枠・商品名・価格は動かない
+// 使いどころ: ECの商品一覧で、一覧のまま別の角度や着用写真を見せたいとき。
+// タグ: image-swap, hover, crossfade, product-card, ecommerce, thumbnail
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#155
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 11
+// 11 ホバーで画像切り替え（商品カードにカーソルを乗せると、写真が別の角度＝後ろ姿に切り替わる）
+function tee(k, x, y, s, col, back) {
+  k.save(); k.translate(x, y); k.scale(s, s);
+  k.fillStyle = col; k.beginPath();
+  k.moveTo(-0.36, -0.5); k.quadraticCurveTo(0, back ? -0.44 : -0.3, 0.36, -0.5);
+  [[0.66, -0.3], [0.52, -0.08], [0.38, -0.18], [0.38, 0.56], [-0.38, 0.56], [-0.38, -0.18], [-0.52, -0.08], [-0.66, -0.3]].forEach(([a, b]) => k.lineTo(a, b));
+  k.closePath(); k.fill();
+  k.strokeStyle = 'rgba(28,35,51,.18)'; k.lineWidth = 0.025; k.beginPath(); k.moveTo(-0.36, -0.5); k.quadraticCurveTo(0, back ? -0.44 : -0.3, 0.36, -0.5); k.stroke();
+  k.restore();
+}
+CELLS[10] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const CX = [44, 271], CY = 10, CWD = 196, IH = 112;
+  const PRODS = [['Tシャツ', '¥3,980', '#FFFFFF', C.blueL, C.blue], ['ロゴTシャツ', '¥4,280', C.acc, C.accL, '#fff']];
+  const cur = t => path([[0, 60, 200], [0.4, 150, 70], [1.6, 160, 80], [2.0, 370, 70], [3.3, 380, 82], [3.8, 470, 200], [4.7, 60, 200]], t);
+  view(k, () => {
+    for (let i = 0; i < 2; i++) {
+      const [nm, pr, col, bg, mark] = PRODS[i], x = CX[i];
+      const inside = t => { const [a, b] = cur(t); return a > x && a < x + CWD && b > CY && b < CY + IH + 40; };
+      const q = trans(inside, u, 0.3, eIOs);
+      k.save(); rr(k, x, CY, CWD, IH, 8); k.clip(); k.fillStyle = bg; k.fillRect(x, CY, CWD, IH);
+      // 正面（胸に小さな丸い印）→ 後ろ姿（背中に大きな星の柄）
+      k.globalAlpha = 1 - q; tee(k, x + CWD / 2, CY + IH / 2 + 4, 108, col, false);
+      k.fillStyle = mark; k.beginPath(); k.arc(x + CWD / 2 + 18, CY + IH / 2 - 16, 7, 0, 7); k.fill();
+      k.globalAlpha = q; tee(k, x + CWD / 2, CY + IH / 2 + 4, 108, col, true);
+      { const sx = x + CWD / 2, sy = CY + IH / 2 + 12; k.fillStyle = mark; k.beginPath(); for (let j = 0; j < 10; j++) { const r = j % 2 ? 8 : 19, a = -Math.PI / 2 + j * Math.PI / 5; j ? k.lineTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r) : k.moveTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r); } k.closePath(); k.fill(); }
+      k.globalAlpha = 1; k.restore();
+      for (let j = 0; j < 2; j++) { k.fillStyle = (j ? q : 1 - q) > 0.5 ? C.ink : C.faint; k.beginPath(); k.arc(x + CWD / 2 - 6 + j * 12, CY + IH - 10, 3, 0, 7); k.fill(); }
+      txt(k, nm, x + 4, CY + IH + 22, `800 14px ${JP}`, C.ink);
+      txt(k, pr, x + CWD - 4, CY + IH + 22, `800 14px ${EN}`, C.ink, 'right');
+      bars(k, x + 4, CY + IH + 32, 90, 1, C.faint, 5);
+    }
+    const [cx, cy] = cur(u); cursor(k, cx, cy);
+  });
+};

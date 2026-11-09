@@ -1,0 +1,71 @@
+// Motion Prompt #153 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#153
+//
+// 3D tilt on hover / 3Dチルト
+// Pack: lp2 (Landing page & web effects, part 2) · element 09 · Category: Mouse & input interactions
+// What happens: As the cursor moves over the card, the card tilts in depth to match the cursor position and a glare moves across its surface; it settles flat when the cursor leaves.
+// Motion spec:
+//   - A 511 × 168 viewport with a 220 × 132 card (radius 14) in the middle. The cursor comes in, visits points near the card's corners every 0.6 s and leaves (cubic ease-in-out). One pass takes 4.7 s (twice per 9.4 s pack cycle).
+//   - Tilt: the cursor offset from the card center is divided by half the width and height to give −1…1; the horizontal offset × 0.32 rad (about 18°) is the rotation about Y, the vertical offset × 0.32 rad the rotation about X. The side under the cursor tips away.
+//   - Depth: viewer distance 520 px (like perspective: 520px); nearer parts are drawn larger.
+//   - On hover the tilt and glare ramp up over 0.4 s (cubic ease-out); on leave the card returns flat over the same 0.4 s.
+//   - Glare: a white radial light of radius 130 px at the cursor (opacity 0.42 at the center). The floor shadow shifts up to 10 px against the tilt.
+// When to use it: Use it on member cards, product packaging or pricing cards to make them feel like objects you can pick up.
+// Tags: tilt, 3d, hover, perspective, card, glare, parallax
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#153
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 09
+// 09 3Dチルト（カーソルの動きに合わせて、カードが奥行きをもって傾く）
+// カードの面（TC）と縦に傾けた面（TD）を描く下書き用の canvas。拡大して描くときは、その倍率ぶん細かく描く
+const TC = document.createElement('canvas'); TC.width = 220; TC.height = 132; const TCK = TC.getContext('2d');
+const TD = document.createElement('canvas'); TD.width = 300; TD.height = 190; const TDK = TD.getContext('2d');
+const TDW = 300, TDH = 190;
+CELLS[8] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const BX = VW / 2, BY = 82, BW = 220, BH = 132, MAXA = 0.32, D = 520;
+  const cur = t => path([[0, 80, 190], [0.6, 190, 40], [1.2, 335, 50], [1.8, 330, 125], [2.4, 180, 122], [3.0, 258, 80], [3.6, 470, 190], [4.7, 80, 190]], t);
+  const inside = t => { const [x, y] = cur(t); return Math.abs(x - BX) < BW / 2 && Math.abs(y - BY) < BH / 2; };
+  const q = trans(inside, u, 0.4, eOut), [cx, cy] = cur(u);
+  const nx = clamp((cx - BX) / (BW / 2), -1, 1), ny = clamp((cy - BY) / (BH / 2), -1, 1);
+  const ry = nx * MAXA * q, rx = ny * MAXA * q;
+  // 呼び出し側の拡大率 S（詳細表示などで2倍・3倍に描かれるとき）。下書きの canvas を S 倍の細かさにする
+  const m = k.getTransform(), S = Math.min(4, Math.max(1, Math.hypot(m.a, m.b)));
+  const cw = Math.ceil(BW * S), ch = Math.ceil(BH * S), dw = Math.ceil(TDW * S), dh = Math.ceil(TDH * S);
+  if (TC.width !== cw || TC.height !== ch) { TC.width = cw; TC.height = ch; }
+  if (TD.width !== dw || TD.height !== dh) { TD.width = dw; TD.height = dh; }
+  // カードの面
+  const g = TCK; g.clearRect(0, 0, TC.width, TC.height);
+  g.save(); g.scale(S, S); rr(g, 0, 0, BW, BH, 14); g.clip();
+  const gr = g.createLinearGradient(0, 0, BW, BH); gr.addColorStop(0, '#2B4FD6'); gr.addColorStop(1, '#7D9AF4'); g.fillStyle = gr; g.fillRect(0, 0, BW, BH);
+  g.fillStyle = 'rgba(255,255,255,.12)'; g.beginPath(); g.arc(BW - 30, 20, 70, 0, 7); g.fill();
+  logo(g, 18, 26, '#fff');
+  g.fillStyle = '#FFD9C9'; rr(g, 18, 52, 34, 26, 5); g.fill();
+  txt(g, 'MEMBER CARD', 18, 104, `700 11px ${EN}`, 'rgba(255,255,255,.8)', 'left', 'alphabetic', '2px');
+  txt(g, '0123  4567  8910', 18, 122, `700 13px ${EN}`, '#fff', 'left', 'alphabetic', '1px');
+  const gx = (nx * 0.5 + 0.5) * BW, gy = (ny * 0.5 + 0.5) * BH, gl = g.createRadialGradient(gx, gy, 0, gx, gy, 130);
+  gl.addColorStop(0, `rgba(255,255,255,${0.42 * q})`); gl.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gl; g.fillRect(0, 0, BW, BH);
+  g.restore();
+  // 縦の傾き（横の帯で描く）→ 横の傾き（縦の帯で描く）
+  const d = TDK; d.clearRect(0, 0, TD.width, TD.height);
+  const N = 44;
+  for (let i = 0; i < N; i++) {
+    const v0 = i / N - 0.5, v1 = (i + 1) / N - 0.5, z0 = v0 * BH * Math.sin(rx), z1 = v1 * BH * Math.sin(rx), s0 = D / (D + z0), s1 = D / (D + z1);
+    const y0 = TDH / 2 + v0 * BH * Math.cos(rx) * s0, y1 = TDH / 2 + v1 * BH * Math.cos(rx) * s1, sw = BW * (s0 + s1) / 2;
+    d.drawImage(TC, 0, i * BH / N * S, BW * S, (BH / N + 0.6) * S, (TDW / 2 - sw / 2) * S, y0 * S, sw * S, (y1 - y0 + 0.6) * S);
+  }
+  view(k, () => {
+    k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
+    k.fillStyle = `rgba(28,35,51,${0.1 + 0.05 * q})`; k.beginPath(); k.ellipse(BX - nx * 10 * q, 158, 96, 7, 0, 0, 7); k.fill();
+    for (let i = 0; i < N; i++) {
+      const f0 = i / N - 0.5, f1 = (i + 1) / N - 0.5, z0 = f0 * TDW * Math.sin(ry), z1 = f1 * TDW * Math.sin(ry), s0 = D / (D + z0), s1 = D / (D + z1);
+      const x0 = BX + f0 * TDW * Math.cos(ry) * s0, x1 = BX + f1 * TDW * Math.cos(ry) * s1, sh = TDH * (s0 + s1) / 2;
+      k.drawImage(TD, i * TDW / N * S, 0, (TDW / N + 0.6) * S, TDH * S, x0, BY - sh / 2, x1 - x0 + 0.6, sh);
+    }
+    cursor(k, cx, cy);
+  });
+};

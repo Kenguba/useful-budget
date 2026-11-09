@@ -1,0 +1,33 @@
+// Motion Prompt #179 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#179
+//
+// POV shot / POVショット
+// Pack: camera2 (Camera moves & transitions, part 2) · element 11 · Category: Angles & Framing
+// What happens: Seen through a character's eyes: the walking sway and the hands at the bottom say first person, and the person ahead waves at you.
+// Motion spec:
+//   - Camera: walks forward 0 m → 3.2 m at the character's eye height of 1.6 m; 0.3 s to 4.2 s (3.9 s), cubic ease-in-out (about cubic-bezier(0.65,0,0.35,1))
+//   - Walking sway: height ±3 cm (6 cycles per 4.7 s), roll ±0.008 rad (3 cycles), added only while moving
+//   - Hands: blue rounded hands at both bottom corners (±178 px from centre), a white phone in the right one; they move with the body, so the hands stay still and the world sways
+//   - The other person, 7.5 m ahead, raises both arms and waves only from 1.6 s to 3.4 s (looking at you); two posts in the foreground
+//   - Return: cross-fade back to the start over the last 0.5 s (one pass = 4.7 s); top-right readout shows "POV"
+// When to use it: To put the viewer in the character's place, or for a game-like or VR-like feel.
+// Tags: pov, point of view, first person, subjective, eyes, hands, angle
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#179
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 11
+// 11 POVショット: 登場人物の目で見た画。歩く上下動と画面下の両手で一人称だと分かる。前の人物が振り向いて手を振る
+CELLS[10] = shot(camCell((k, w, h, p, u) => {
+  const z = lerp(0, 3.2, p), T = u * 2 * Math.PI / CYC;
+  const bob = Math.sin(T * 6) * 0.03 * (p > 0 && p < 1 ? 1 : 0);
+  world(k, w, h, cam({ z, y: 1.6 + bob, roll: Math.sin(T * 3) * 0.008 * (p > 0 && p < 1 ? 1 : 0) }), {
+    person: { z: 7.5, armUp: u > 1.6 && u < 3.4, walk: 0 }, fg: [[-1.8, 2.6], [2.2, 3.8]],
+    after: (kk) => {   // 両手（画面の下の両端から入る。体と一緒に動くので、揺れるのは世界のほう）
+      kk.fillStyle = C.blue;
+      [-1, 1].forEach(sx => { kk.save(); kk.translate(sx * 178, 64); kk.rotate(sx * -0.5); kk.fillStyle = C.blue; rr(kk, -34, -28, 68, 120, 30); kk.fill(); if (sx > 0) { kk.fillStyle = '#fff'; rr(kk, -17, -62, 34, 54, 6); kk.fill(); kk.strokeStyle = C.blue; kk.lineWidth = 3; rr(kk, -17, -62, 34, 54, 6); kk.stroke(); } kk.restore(); });
+    }
+  });
+}, p => 'POV', 0.3, 4.2));

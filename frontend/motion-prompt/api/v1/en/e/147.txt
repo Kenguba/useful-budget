@@ -1,0 +1,45 @@
+// Motion Prompt #147 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#147
+//
+// Stacking cards / スタッキングカード
+// Pack: lp2 (Landing page & web effects, part 2) · element 03 · Category: Scroll effects
+// What happens: On scroll, the next card rises from below and stacks over the previous one with a small offset; the cards underneath shrink a little and darken.
+// Motion spec:
+//   - A 511 × 168 viewport. Scroll step s: 0→1 over 0.3–1.1 s, 1→2 over 1.6–2.4 s, 2→0 over 3.2–4.4 s (cubic ease-in-out). One pass takes 4.7 s (twice per 9.4 s pack cycle).
+//   - Three cards (371 × 124, radius 12, centered), 170 px apart on the page; each step of s moves them up 170 px.
+//   - They stop 14, 26 and 38 px from the top (position: sticky with the top offset 12 px larger for each card), so each new card covers the one before.
+//   - For each card stacked on top, the card underneath shrinks 4.5% (9% for two) around the middle of its top edge and darkens under a navy layer (up to 16%).
+//   - Card shadow: 14 px blur, 2 px upward. The scrollbar thumb follows the scroll.
+// When to use it: Use it for steps, features or plans that should be shown one card at a time, in order.
+// Tags: stacking-cards, sticky, scroll, cards, position-sticky, steps
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#147
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 03
+// 03 スタッキングカード（スクロールすると、次のカードが下から来て前のカードに少しずらして重なる）
+CELLS[2] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const s = steps([[0.3, 0], [1.1, 1], [1.6, 1], [2.4, 2], [3.2, 2], [4.4, 0]], u);
+  const CARDS = [[C.blueL, C.ink, C.acc, '01', '企画する', 0], [C.ink, '#fff', C.acc, '02', 'つくる', 2], [C.acc, '#fff', '#fff', '03', '届ける', 1]];
+  const X = 70, CWD = 371, CHT = 124, STEP = 170;
+  view(k, () => {
+    k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
+    CARDS.forEach(([bg, fg, nc, no, ttl, pv], i) => {
+      const top = Math.max(14 + i * 12, 16 + i * STEP - s * STEP);
+      const cov = clamp(s - i), sc = 1 - 0.045 * cov - 0.045 * clamp(s - i - 1);
+      k.save(); k.translate(VW / 2, top); k.scale(sc, sc); k.translate(-VW / 2, 0);
+      k.save(); k.shadowColor = 'rgba(28,35,51,.22)'; k.shadowBlur = 14; k.shadowOffsetY = -2; k.fillStyle = bg; rr(k, X, 0, CWD, CHT, 12); k.fill(); k.restore();
+      txt(k, no, X + 24, 44, `800 26px ${EN}`, nc);
+      txt(k, ttl, X + 24, 78, `800 20px ${JP}`, fg);
+      bars(k, X + 24, 92, 140, 2, i === 0 ? '#C3CDEA' : 'rgba(255,255,255,.35)');
+      pic(k, X + CWD - 160, 14, 144, CHT - 28, pv, 8);
+      if (cov > 0) { k.fillStyle = `rgba(28,35,51,${0.16 * cov})`; rr(k, X, 0, CWD, CHT, 12); k.fill(); }
+      k.restore();
+    });
+    sbar(k, s / 2, 0.4);
+  });
+};

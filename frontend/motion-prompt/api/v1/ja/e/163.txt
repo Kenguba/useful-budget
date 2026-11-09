@@ -1,0 +1,60 @@
+// Motion Prompt #163 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#163
+//
+// ホットスポット / Hotspots
+// パック: lp2 (LP・Webサイトの演出 第2弾) · element 19 · カテゴリ: 見せ場の演出
+// 何が起きるか: 製品の絵の上で白い点が脈打ち、点を押すとその部分の説明が吹き出しで出る。別の点を押すと吹き出しが入れ替わる。
+// 動きの仕様:
+//   - 表示域 511×168。左に製品の絵（リュック）、右に商品名と価格。絵の上に点2つ（白い丸 半径8・影、中に朱の点 半径4）。4.7秒でひと回り（パックの周期9.4秒で2回）
+//   - 脈打つ輪: 各点から白い輪（線幅2）が半径8→20に広がりながら不透明度0.75→0で消える。1.57秒（4.7秒の1/3）ごとに、2本を半周期ずらして出し続ける
+//   - 0.9秒に上の点をクリックすると、点の左に吹き出し（136×48・角丸8・点を指す三角）が0.25秒（easeOut 3乗）で現れ、6px下から上がる
+//   - 2.4秒に下の点をクリックすると、上の吹き出しが同じ0.25秒で消え、下の点の右に次の吹き出しが出る。3.8秒にもう一度押すと閉じる
+// 使いどころ: 製品・間取り・地図など、1枚の絵の中で場所ごとに説明したいとき。
+// タグ: hotspots, image, tooltip, pulse, product, interactive-image
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#163
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 19
+// 19 ホットスポット（製品写真の上で点が脈打ち、押すと説明の吹き出しが出る）
+CELLS[18] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const D1 = [186, 52], D2 = [150, 122];
+  const o1 = t => { t = mod(t, CYC); return t >= 0.9 && t < 2.4; }, o2 = t => { t = mod(t, CYC); return t >= 2.4 && t < 3.8; };
+  const q1 = trans(o1, u, 0.25), q2 = trans(o2, u, 0.25);
+  const cur = t => path([[0, 280, 205], [0.6, D1[0], D1[1]], [1.15, D1[0], D1[1]], [2.05, D2[0], D2[1]], [3.95, D2[0], D2[1]], [4.45, 280, 205], [4.7, 280, 205]], t);
+  const [cx, cy] = cur(u);
+  view(k, () => {
+    k.fillStyle = '#EEF1F6'; k.fillRect(0, 0, 300, VH);
+    // リュック（平面の絵）
+    k.strokeStyle = C.ink; k.lineWidth = 6; k.lineCap = 'round'; k.beginPath(); k.arc(150, 30, 16, Math.PI, 0); k.stroke();
+    k.fillStyle = '#3B64E8'; rr(k, 92, 26, 116, 134, 28); k.fill();
+    k.fillStyle = '#2E50C2'; rr(k, 108, 92, 84, 56, 14); k.fill();
+    k.strokeStyle = '#FFD9C9'; k.lineWidth = 2.5; k.beginPath(); k.moveTo(116, 104); k.lineTo(184, 104); k.stroke();
+    k.fillStyle = C.acc; rr(k, 140, 54, 20, 8, 4); k.fill();
+    txt(k, 'トラベルリュック', 322, 58, `800 16px ${JP}`, C.ink);
+    txt(k, '¥12,800', 322, 88, `800 19px ${EN}`, C.acc);
+    bars(k, 322, 104, 160, 3);
+    [D1, D2].forEach(([x, y], i) => {
+      for (let r = 0; r < 2; r++) { const f = mod(u / (CYC / 3) + r * 0.5, 1); k.strokeStyle = `rgba(255,255,255,${0.75 * (1 - f)})`; k.lineWidth = 2; k.beginPath(); k.arc(x, y, 8 + 12 * f, 0, 7); k.stroke(); }
+      k.save(); k.shadowColor = 'rgba(28,35,51,.3)'; k.shadowBlur = 6; k.shadowOffsetY = 2; k.fillStyle = '#fff'; k.beginPath(); k.arc(x, y, 8, 0, 7); k.fill(); k.restore();
+      k.fillStyle = C.acc; k.beginPath(); k.arc(x, y, 4, 0, 7); k.fill();
+    });
+    const tip = (x, y, q, title, left) => {
+      if (q <= 0) return;
+      k.save(); k.globalAlpha = q; k.translate(x, y + 6 * (1 - q));
+      const L = left ? 0 : 1;   // 吹き出しを点の左（left）か右に出す
+      const bx = L ? 0 : -136;
+      k.save(); k.shadowColor = 'rgba(28,35,51,.22)'; k.shadowBlur = 12; k.shadowOffsetY = 4; k.fillStyle = '#fff'; rr(k, bx, -24, 136, 48, 8); k.fill();
+      k.beginPath(); if (L) { k.moveTo(0, -6); k.lineTo(-8, 0); k.lineTo(0, 6); } else { k.moveTo(0, -6); k.lineTo(8, 0); k.lineTo(0, 6); } k.fill(); k.restore();
+      txt(k, title, bx + 12, -6, `800 13px ${JP}`, C.ink); bars(k, bx + 12, 6, 100, 1, C.faint, 5);
+      k.restore();
+    };
+    tip(D1[0] - 16, D1[1], q1, '雨をはじく布', true);
+    tip(D2[0] + 16, D2[1], q2, 'PCが入るポケット', false);
+    click(k, cx, cy, u, [0.9, 2.4, 3.8]);
+  });
+};

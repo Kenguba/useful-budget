@@ -1,0 +1,27 @@
+// Motion Prompt #174 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#174
+//
+// Follow shot / フォローショット
+// Pack: camera2 (Camera moves & transitions, part 2) · element 06 · Category: Camera Movement
+// What happens: The camera trails a weaving walker along the same path a few metres behind; the person stays near the centre, seen from the back.
+// Motion spec:
+//   - Path: the person walks the curve x = 1.8·sin(2.2s), depth z = 4 + 9s (s from 0 to 1), from 4 m to 13 m away
+//   - Camera: follows on the same curve at s-0.4 (about 3.6–3.9 m behind) and always faces the person, yaw = atan2(person x - camera x, person z - camera z); height 1.5 m
+//   - Timing: 0.3 s to 4.2 s (3.9 s), cubic ease-in-out (about cubic-bezier(0.65,0,0.35,1)); legs and arms swing by sin(s×30)×0.42 rad
+//   - The person stays near the centre of frame, seen from behind; posts and a rock beside the path sweep past in the foreground (#029 Tracking shot runs alongside)
+//   - Return: cross-fade back to the start over the last 0.5 s (one pass = 4.7 s); top-right readout shows the distance to the person (FOLLOW 3.6–3.9m)
+// When to use it: To enter a place together with a character, or for a third-person, game-like view.
+// Tags: follow shot, follow, behind, third person, trail, walk, camera move
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#174
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 06
+// 06 フォローショット: 蛇行して歩く人物の後ろを、少し遅れて同じ道筋でついていく（#029 トラッキングは真横に並ぶ）
+CELLS[5] = shot(camCell((k, w, h, p) => {
+  const path = s => [1.8 * Math.sin(s * 2.2), 4 + s * 9];
+  const [px, pz] = path(p), [cx, cz] = path(p - 0.4);
+  world(k, w, h, cam({ x: cx, z: cz, y: 1.5, yaw: Math.atan2(px - cx, pz - cz) }), { person: { x: px, z: pz, walk: p * 30 }, fg: [[-2.4, 7], [2.6, 9.5, 'rock'], [-1.5, 12]] });
+}, p => `FOLLOW ${Math.hypot(1.8 * Math.sin(p * 2.2) - 1.8 * Math.sin((p - 0.4) * 2.2), 3.6).toFixed(1)}m`, 0.3, 4.2));

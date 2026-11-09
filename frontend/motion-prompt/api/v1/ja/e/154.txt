@@ -1,0 +1,46 @@
+// Motion Prompt #154 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#154
+//
+// スポットライトホバー / Spotlight hover
+// パック: lp2 (LP・Webサイトの演出 第2弾) · element 10 · カテゴリ: マウス・入力への反応
+// 何が起きるか: 暗いカードの上をカーソルが動くと、カーソルの周りだけが丸く明るく照らされ、近くのカードの縁も光る。
+// 動きの仕様:
+//   - 表示域 511×168。暗い地（#121828）に暗いカード3枚（147×116・角丸10）。4.7秒でひと回り（パックの周期9.4秒で2回）
+//   - カーソルは8の字に動き続ける: x = 255 + 190·sin(2πt/4.7)、y = 92 + 40·sin(4πt/4.7)
+//   - 各カードの中だけに、カーソルを中心とした半径115pxの白い光（中心の不透明度0.34→外で0）を重ねる。カードの外には漏れない
+//   - カードの縁（線幅2）もカーソルからの距離で光る: 半径120pxの朱の光（rgb(255,122,82)）。遠い縁は元の薄い線（白8%）だけ
+//   - 遅れはない。光はカーソルの位置にそのまま付いてくる（座標を CSS 変数に入れて radial-gradient の中心にする作り方と同じ）
+// 使いどころ: 暗い配色のサイトで特長や料金のカードを並べるとき、触っている場所を目立たせたいとき。
+// タグ: spotlight, hover, glow, cursor, radial-gradient, dark-mode, card
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#154
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 10
+// 10 スポットライトホバー（暗いカードの上で、カーソルの周りだけが丸く明るく光る）
+CELLS[9] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const cx = 255 + 190 * Math.sin(2 * Math.PI * u / CYC), cy = 92 + 40 * Math.sin(4 * Math.PI * u / CYC);
+  view(k, () => {
+    k.fillStyle = '#121828'; k.fillRect(0, 0, VW, VH);
+    txt(k, 'FEATURES', VW / 2, 26, `800 11px ${EN}`, 'rgba(255,255,255,.45)', 'center', 'alphabetic', '3px');
+    const LAB = ['かんたん', 'あんしん', 'はやい'];
+    for (let i = 0; i < 3; i++) {
+      const x = 22 + i * 160, y = 40, cw = 147, ch = 116;
+      k.fillStyle = '#1C2335'; rr(k, x, y, cw, ch, 10); k.fill();
+      k.save(); rr(k, x, y, cw, ch, 10); k.clip();
+      const g = k.createRadialGradient(cx, cy, 0, cx, cy, 115); g.addColorStop(0, 'rgba(255,255,255,.34)'); g.addColorStop(1, 'rgba(255,255,255,0)'); k.fillStyle = g; k.fillRect(x, y, cw, ch);
+      k.restore();
+      k.lineWidth = 1.5; k.strokeStyle = 'rgba(255,255,255,.08)'; rr(k, x + 0.75, y + 0.75, cw - 1.5, ch - 1.5, 10); k.stroke();
+      const sg = k.createRadialGradient(cx, cy, 0, cx, cy, 120); sg.addColorStop(0, 'rgba(255,122,82,1)'); sg.addColorStop(1, 'rgba(255,122,82,0)');
+      k.lineWidth = 2; k.strokeStyle = sg; rr(k, x + 1, y + 1, cw - 2, ch - 2, 10); k.stroke();
+      k.strokeStyle = 'rgba(255,255,255,.75)'; k.lineWidth = 2; k.beginPath(); k.arc(x + 30, y + 32, 12, 0, 7); k.stroke();
+      txt(k, LAB[i], x + 18, y + 72, `800 16px ${JP}`, 'rgba(255,255,255,.9)');
+      bars(k, x + 18, y + 86, 110, 2, 'rgba(255,255,255,.16)', 5, 10);
+    }
+    cursor(k, cx, cy);
+  });
+};

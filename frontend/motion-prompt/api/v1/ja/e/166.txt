@@ -1,0 +1,61 @@
+// Motion Prompt #166 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#166
+//
+// いいねアニメーション / Like button animation
+// パック: lp2 (LP・Webサイトの演出 第2弾) · element 22 · カテゴリ: 見せ場の演出
+// 何が起きるか: ハートを押すと赤く塗られてポンと弾み、周りに小さな粒が散って、横の数字が1つ増える。もう一度押すと元に戻る。
+// 動きの仕様:
+//   - 表示域 511×168。投稿カードの右にハート（輪郭・線幅2.4）と数字「128」。0.9秒にハートをクリック、3.3秒にもう一度クリックして取り消す。4.7秒でひと回り（パックの周期9.4秒で2回）
+//   - 押す直前の0.1秒でハートを0.78倍まで縮め、押した瞬間に赤（#F23D5C）で塗る。0.12秒で 0.78→1.45倍（easeOut 3乗）、そこから 1 + 0.45·e^(−7t)·cos(15t) で揺れながら1倍に戻す
+//   - 押して0.08〜0.58秒: ハートの周りに赤い輪（半径15→33・不透明度0.5→0）、6方向に小さな粒（赤・黄・朱、半径24→37の位置へ飛びながら消える）
+//   - 数字: 押して0.05〜0.35秒（easeOut 3乗）で 128 が上へ抜け、赤い 129 が下から入る。取り消しでは逆に下へ動いて 128 に戻る
+//   - 取り消し: 輪郭だけのハートに戻し、押す前後の0.4秒で0.84倍まで沈んで戻る（粒は出さない）
+// 使いどころ: お気に入り・いいね・保存など、押したことをはっきり、気持ちよく伝えたいボタンに。
+// タグ: like-button, heart, microinteraction, burst, favorite, counter
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#166
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 22
+// 22 いいねアニメーション（ハートを押すと赤く塗られてポンと弾み、小さな粒が散る。数字が1増える）
+CELLS[21] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const ON = 0.9, OFF = 3.3, HX = 266, HY = 118;
+  const liked = u >= ON && u < OFF, d = u - ON, d2 = u - OFF;
+  let sc = 1;
+  if (d >= 0 && d < 1.2) sc = d < 0.12 ? lerp(0.78, 1.45, eOut(d / 0.12)) : 1 + 0.45 * Math.exp(-7 * (d - 0.12)) * Math.cos((d - 0.12) * 15);
+  else if (d < 0 && d > -0.1) sc = 1 - 0.22 * (1 + d / 0.1);
+  if (d2 >= -0.1 && d2 < 0.3) sc = 1 - 0.16 * Math.sin(Math.PI * clamp((d2 + 0.1) / 0.4));
+  const cur = t => path([[0, 430, 205], [0.5, 276, 130], [1.25, 276, 130], [1.8, 430, 160], [2.75, 430, 160], [3.1, 276, 130], [3.55, 276, 130], [4.1, 430, 205], [4.7, 430, 205]], t);
+  const [cx, cy] = cur(u);
+  view(k, () => {
+    k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
+    k.fillStyle = '#fff'; rr(k, 16, 12, 479, 144, 12); k.fill();
+    pic(k, 28, 24, 200, 120, 1, 8);
+    k.fillStyle = C.blueL; k.beginPath(); k.arc(258, 40, 11, 0, 7); k.fill();
+    txt(k, 'sample_trip', 276, 44.5, `700 13px ${EN}`, C.ink);
+    bars(k, 248, 62, 220, 2, C.faint, 6, 12, 0.7);
+    // 粒（小さく添える）とリング
+    if (d >= 0.08 && d < 0.6) {
+      const f = (d - 0.08) / 0.5;
+      k.strokeStyle = `rgba(242,61,92,${0.5 * (1 - f)})`; k.lineWidth = 2; k.beginPath(); k.arc(HX, HY, 15 + 18 * eOut(f), 0, 7); k.stroke();
+      for (let i = 0; i < 6; i++) { const an = -Math.PI / 2 + i * Math.PI / 3, r = 24 + 13 * eOut(f); k.fillStyle = [HEART, '#FFB020', C.acc][i % 3]; k.globalAlpha = 1 - f; k.beginPath(); k.arc(HX + Math.cos(an) * r, HY + Math.sin(an) * r, 2.4 * (1 - 0.5 * f), 0, 7); k.fill(); }
+      k.globalAlpha = 1;
+    }
+    k.save(); k.translate(HX, HY + 2); k.scale(sc, sc); heartPath(k, 14.5);
+    if (liked) { k.fillStyle = HEART; k.fill(); } else { k.lineWidth = 2.4; k.strokeStyle = C.ink; k.lineJoin = 'round'; k.stroke(); }
+    k.restore();
+    // 数字（128 ⇄ 129 が縦に入れ替わる）
+    const nf = liked ? eOut(P(d, 0.05, 0.35)) : eOut(P(d2, 0.05, 0.35)), up = liked;
+    k.save(); k.beginPath(); k.rect(292, HY - 13, 60, 26); k.clip();
+    const A = up ? '128' : '129', Bn = up ? '129' : '128', dir = up ? -1 : 1, sh = 26 * nf * dir;
+    const fA = `800 18px ${EN}`;
+    if (u < ON || (d2 >= 0 && nf >= 1) || (liked && nf >= 1)) txt(k, liked ? '129' : '128', 294, HY + 1, fA, liked ? HEART : C.ink, 'left', 'middle');
+    else { txt(k, A, 294, HY + 1 + sh, fA, up ? C.ink : HEART, 'left', 'middle'); txt(k, Bn, 294, HY + 1 + sh - 26 * dir, fA, up ? HEART : C.ink, 'left', 'middle'); }
+    k.restore();
+    click(k, cx, cy, u, [ON, OFF]);
+  });
+};

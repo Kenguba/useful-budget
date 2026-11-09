@@ -1,0 +1,37 @@
+// Motion Prompt #186 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#186
+//
+// Morph cut / モーフカット
+// Pack: camera2 (Camera moves & transitions, part 2) · element 18 · Category: Transitions & Editing
+// What happens: Two takes of the same person are joined by smoothly interpolating position and pose, so nothing jumps as in a jump cut.
+// Motion spec:
+//   - Take 1 (0–2.0 s): fixed camera (height 1.45 m); the person stands 0.4 m left, 3.3 m away, arms and legs at -0.45 rad. Take 2 (from 2.45 s): 0.35 m right, +0.55 rad. Both sway slightly by 0.12·sin(t×3) rad
+//   - Morph (2.0–2.45 s, 0.45 s): the position is interpolated with a quadratic ease-in-out (about cubic-bezier(0.45,0,0.55,1)), and the two poses are drawn at the same interpolated position and cross-faded
+//   - Only during the morph a blur of sin(q×π)×2.2 px is applied to the whole frame to soften the join (#041 Jump cut lets the position jump)
+//   - Bottom strip: take 1 (grey), morph (blue, narrow), take 2 (grey) with a playhead
+//   - Return: cross-fade back to the start of take 1 over the last 0.5 s; top-right readout shows "TAKE 1" → "MORPH" → "TAKE 2"
+// When to use it: To tighten an interview or narration, or to remove a slip without drawing attention.
+// Tags: morph cut, morph, seamless, interview, talking head, edit, transition
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#186
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 18
+// 18 モーフカット: 同じ人物の2テイクを、位置と姿勢をなめらかに補間してつなぐ（#041 ジャンプカットは飛ぶ）
+CELLS[17] = shot((k, w, h, u) => {
+  const T0 = 2.0, T1 = 2.45, r = P(u, CYC - RESET, CYC);
+  const draw = (kk, t) => {
+    const q = eIOs(P(t, T0, T1));
+    // テイク1とテイク2は姿勢が違う。モーフ中は同じ（補間した）位置に2つの姿勢を重ねて溶かす
+    const pose = (k2, m) => world(k2, w, h, cam({ y: 1.45, z: 0 }), { person: { x: lerp(-0.4, 0.35, q), z: 3.3, walk: (m ? 0.55 : -0.45) + 0.12 * Math.sin(t * 3) }, trees: true, buildings: true });
+    const bl = Math.sin(q * Math.PI) * 2.2;
+    kk.save(); kk.filter = bl > 0.05 ? `blur(${bl.toFixed(2)}px)` : 'none';
+    blend(kk, k2 => pose(k2, false), k2 => pose(k2, true), q);
+    kk.restore();
+    strip(kk, w, h, [[0, T0, 'テイク1', C.g2], [T0, T1, '', C.blue], [T1, CYC, 'テイク2', C.g2]], t);
+  };
+  blend(k, kk => draw(kk, u), kk => draw(kk, 0), eIOs(r));
+  return r > .5 || u < T0 ? 'TAKE 1' : u < T1 ? 'MORPH' : 'TAKE 2';
+});

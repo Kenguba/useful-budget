@@ -1,0 +1,61 @@
+// Motion Prompt #166 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#166
+//
+// Like button animation / いいねアニメーション
+// Pack: lp2 (Landing page & web effects, part 2) · element 22 · Category: Showcase effects
+// What happens: Clicking the heart fills it red with a springy pop, small particles burst around it and the count beside it goes up by one; clicking again undoes it.
+// Motion spec:
+//   - A 511 × 168 viewport: a post card with an outlined heart (line width 2.4) and the count "128" on the right. The heart is clicked at 0.9 s and clicked again at 3.3 s to undo. One pass takes 4.7 s (twice per 9.4 s pack cycle).
+//   - In the 0.1 s before the click it squeezes to 0.78×; at the click it fills red (#F23D5C), grows 0.78 → 1.45× in 0.12 s (cubic ease-out), then settles to 1× as 1 + 0.45·e^(−7t)·cos(15t).
+//   - 0.08–0.58 s after the click: a red ring (radius 15 → 33, opacity 0.5 → 0) and six small particles in six directions (red, yellow, orange) flying out from radius 24 to 37 as they fade.
+//   - Count: 0.05–0.35 s after the click (cubic ease-out) 128 slides up and out and a red 129 comes in from below; undoing slides it back down to 128.
+//   - Undo: the heart goes back to an outline and dips to 0.84× and back over 0.4 s around the click (no particles).
+// When to use it: Use it on like, favorite or save buttons, to confirm the tap clearly and pleasantly.
+// Tags: like-button, heart, microinteraction, burst, favorite, counter
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#166
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 22
+// 22 いいねアニメーション（ハートを押すと赤く塗られてポンと弾み、小さな粒が散る。数字が1増える）
+CELLS[21] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const ON = 0.9, OFF = 3.3, HX = 266, HY = 118;
+  const liked = u >= ON && u < OFF, d = u - ON, d2 = u - OFF;
+  let sc = 1;
+  if (d >= 0 && d < 1.2) sc = d < 0.12 ? lerp(0.78, 1.45, eOut(d / 0.12)) : 1 + 0.45 * Math.exp(-7 * (d - 0.12)) * Math.cos((d - 0.12) * 15);
+  else if (d < 0 && d > -0.1) sc = 1 - 0.22 * (1 + d / 0.1);
+  if (d2 >= -0.1 && d2 < 0.3) sc = 1 - 0.16 * Math.sin(Math.PI * clamp((d2 + 0.1) / 0.4));
+  const cur = t => path([[0, 430, 205], [0.5, 276, 130], [1.25, 276, 130], [1.8, 430, 160], [2.75, 430, 160], [3.1, 276, 130], [3.55, 276, 130], [4.1, 430, 205], [4.7, 430, 205]], t);
+  const [cx, cy] = cur(u);
+  view(k, () => {
+    k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
+    k.fillStyle = '#fff'; rr(k, 16, 12, 479, 144, 12); k.fill();
+    pic(k, 28, 24, 200, 120, 1, 8);
+    k.fillStyle = C.blueL; k.beginPath(); k.arc(258, 40, 11, 0, 7); k.fill();
+    txt(k, 'sample_trip', 276, 44.5, `700 13px ${EN}`, C.ink);
+    bars(k, 248, 62, 220, 2, C.faint, 6, 12, 0.7);
+    // 粒（小さく添える）とリング
+    if (d >= 0.08 && d < 0.6) {
+      const f = (d - 0.08) / 0.5;
+      k.strokeStyle = `rgba(242,61,92,${0.5 * (1 - f)})`; k.lineWidth = 2; k.beginPath(); k.arc(HX, HY, 15 + 18 * eOut(f), 0, 7); k.stroke();
+      for (let i = 0; i < 6; i++) { const an = -Math.PI / 2 + i * Math.PI / 3, r = 24 + 13 * eOut(f); k.fillStyle = [HEART, '#FFB020', C.acc][i % 3]; k.globalAlpha = 1 - f; k.beginPath(); k.arc(HX + Math.cos(an) * r, HY + Math.sin(an) * r, 2.4 * (1 - 0.5 * f), 0, 7); k.fill(); }
+      k.globalAlpha = 1;
+    }
+    k.save(); k.translate(HX, HY + 2); k.scale(sc, sc); heartPath(k, 14.5);
+    if (liked) { k.fillStyle = HEART; k.fill(); } else { k.lineWidth = 2.4; k.strokeStyle = C.ink; k.lineJoin = 'round'; k.stroke(); }
+    k.restore();
+    // 数字（128 ⇄ 129 が縦に入れ替わる）
+    const nf = liked ? eOut(P(d, 0.05, 0.35)) : eOut(P(d2, 0.05, 0.35)), up = liked;
+    k.save(); k.beginPath(); k.rect(292, HY - 13, 60, 26); k.clip();
+    const A = up ? '128' : '129', Bn = up ? '129' : '128', dir = up ? -1 : 1, sh = 26 * nf * dir;
+    const fA = `800 18px ${EN}`;
+    if (u < ON || (d2 >= 0 && nf >= 1) || (liked && nf >= 1)) txt(k, liked ? '129' : '128', 294, HY + 1, fA, liked ? HEART : C.ink, 'left', 'middle');
+    else { txt(k, A, 294, HY + 1 + sh, fA, up ? C.ink : HEART, 'left', 'middle'); txt(k, Bn, 294, HY + 1 + sh - 26 * dir, fA, up ? HEART : C.ink, 'left', 'middle'); }
+    k.restore();
+    click(k, cx, cy, u, [ON, OFF]);
+  });
+};

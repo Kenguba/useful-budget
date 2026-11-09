@@ -1,0 +1,57 @@
+// Motion Prompt #164 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#164
+//
+// カウントダウンタイマー / Countdown timer
+// パック: lp2 (LP・Webサイトの演出 第2弾) · element 20 · カテゴリ: 見せ場の演出
+// 何が起きるか: 「キャンペーン終了まで」の 時:分:秒 が1秒ごとに減り、変わった数字だけが上へ抜けて新しい数字が下から入る。
+// 動きの仕様:
+//   - 表示域 511×168。朱のグラデーションの帯に「キャンペーン終了まで」と、時・分・秒の数字のタイル6枚（各34×50・角丸6・数字32px）。このカードだけ9.4秒で1回（パックの周期と同じ）
+//   - 02:15:04 から始め、0.4秒から1秒ごとに9回、1秒ずつ減らして 02:14:55 まで進める。4.4秒の 02:15:00 → 02:14:59 で分が1つ繰り下がる
+//   - 変わる桁のタイルだけ、0.32秒（easeInOut 3乗）で古い数字が上へ抜け、新しい数字が下から入る。タイルの外は切り抜く
+//   - 9.4秒で最初の 02:15:04 に戻る（動きを付けずに切り替わる）
+// 使いどころ: 期間限定のキャンペーンや申し込み締切の前で、残り時間をはっきり見せたいとき。
+// タグ: countdown, timer, deadline, campaign, flip, urgency
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#164
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 20
+// 20 カウントダウンタイマー（「キャンペーン終了まで」の 時:分:秒 が1秒ごとに入れ替わって減っていく）
+// このカードだけ1回の動きが9.4秒（パックの周期と同じ）。tp（0〜9.4秒）で描く。1秒ごとに9回減り、途中で分が1回繰り下がる
+CELLS[19] = (k, w, h, u) => {
+  const tp = mod(Math.round(u * 1e6) / 1e6, LOOP);
+  frame(k);
+  const T0 = 0.4, START = 2 * 3600 + 15 * 60 + 4;    // 02:15:04 → 02:14:55
+  const n = clamp(Math.floor(tp - T0) + 1, 0, 9), fp = n === 0 ? 1 : clamp((tp - T0 - (n - 1)) / 0.32);
+  const dg = v => { const hh = Math.floor(v / 3600), mm = Math.floor(v / 60) % 60, ss = v % 60; return [hh, mm, ss].map(x => String(x).padStart(2, '0')).join(''); };
+  const now = dg(START - n), was = dg(START - Math.max(0, n - 1));
+  const TW = 34, TH = 50, TY = 50, GW = 2 * TW + 4, SEP = 30, X0 = (VW - (3 * GW + 2 * SEP)) / 2;
+  const tile = (x, d, clipHalf) => {
+    k.save(); k.beginPath(); if (clipHalf === 0) k.rect(x, TY, TW, TH / 2); else if (clipHalf === 1) k.rect(x, TY + TH / 2, TW, TH / 2); else k.rect(x, TY, TW, TH); k.clip();
+    k.fillStyle = C.ink; rr(k, x, TY, TW, TH, 6); k.fill();
+    txt(k, String(d), x + TW / 2, TY + TH / 2 + 1.5, `800 32px ${EN}`, '#fff', 'center', 'middle');
+    k.restore();
+  };
+  // 入れ替わり: 古い数字が上へ抜け、新しい数字が下から入る
+  const flip = (x, a, b, f) => {
+    k.fillStyle = C.ink; rr(k, x, TY, TW, TH, 6); k.fill();
+    k.save(); rr(k, x, TY, TW, TH, 6); k.clip();
+    const o = eIO(clamp(f)) * TH;
+    txt(k, String(a), x + TW / 2, TY + TH / 2 + 1.5 - o, `800 32px ${EN}`, '#fff', 'center', 'middle');
+    txt(k, String(b), x + TW / 2, TY + TH / 2 + 1.5 + TH - o, `800 32px ${EN}`, '#fff', 'center', 'middle');
+    k.restore();
+  };
+  view(k, () => {
+    const g = k.createLinearGradient(0, 0, VW, VH); g.addColorStop(0, '#FF6A3D'); g.addColorStop(1, '#FF4A2C'); k.fillStyle = g; k.fillRect(0, 0, VW, VH);
+    txt(k, 'キャンペーン終了まで', VW / 2, 34, `800 15px ${JP}`, '#fff', 'center');
+    ['時間', '分', '秒'].forEach((lab, gi) => {
+      const x = X0 + gi * (GW + SEP);
+      for (let j = 0; j < 2; j++) { const p = gi * 2 + j, xx = x + j * (TW + 4); if (was[p] !== now[p]) flip(xx, was[p], now[p], fp); else tile(xx, now[p], 2); }
+      txt(k, lab, x + GW / 2, TY + TH + 16, `700 11px ${JP}`, 'rgba(255,255,255,.9)', 'center', 'middle');
+      if (gi < 2) txt(k, ':', x + GW + SEP / 2, TY + TH / 2, `800 26px ${EN}`, '#fff', 'center', 'middle');
+    });
+    btn(k, VW / 2 - 75, 132, 150, 28, '今すぐ申し込む', '#fff', C.acc, 12);
+  });
+};

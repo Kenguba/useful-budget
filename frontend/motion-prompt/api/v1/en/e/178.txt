@@ -1,0 +1,24 @@
+// Motion Prompt #178 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#178
+//
+// High angle / ハイアングル
+// Pack: camera2 (Camera moves & transitions, part 2) · element 10 · Category: Angles & Framing
+// What happens: The camera rises and looks down; the person looks small and the ground fills most of the frame.
+// Motion spec:
+//   - Camera: rises from 1.5 m to 4.5 m while the pitch goes 0 → -0.5 rad (about 29° down); no movement forward or back
+//   - Timing: 0.6 s to 2.2 s (1.6 s), cubic ease-in-out (about cubic-bezier(0.65,0,0.35,1))
+//   - Subject: a person stands still 5 m ahead; as the camera looks down they shrink and move lower, the ground grid fills most of the frame and the horizon leaves at the top
+//   - Hold: stays at the high angle from 2.2 s to 4.2 s (#031 Crane up keeps rising to 9 m; 13 Bird's-eye view looks straight down at 90°)
+//   - Return: cross-fade back to eye level over the last 0.5 s (one pass = 4.7 s); top-right readout shows angle and height (↘ 0° · 1.5m → ↘ 29° · 4.5m)
+// When to use it: To make a person look vulnerable or small, or to explain a situation from above.
+// Tags: high angle, look down, from above, overhead, vulnerable, angle
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#178
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 10
+// 10 ハイアングル: カメラを高い位置へ上げ、見下ろす。人物が小さく見える（#031 クレーンアップは上がり続けて全体を見せる）
+CELLS[9] = shot(camCell((k, w, h, p) => world(k, w, h, cam({ y: lerp(1.5, 4.5, p), pitch: lerp(0, -0.5, p) }), { person: { z: 5 } }),
+  p => `↘ ${Math.round(lerp(0, 0.5, p) * 57.3)}° · ${lerp(1.5, 4.5, p).toFixed(1)}m`, 0.6, 2.2));

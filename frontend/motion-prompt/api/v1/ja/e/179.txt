@@ -1,0 +1,33 @@
+// Motion Prompt #179 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#179
+//
+// POVショット / POV shot
+// パック: camera2 (カメラワークと切り替え 第2弾) · element 11 · カテゴリ: アングル・画づくり
+// 何が起きるか: 登場人物の目で見た画。歩く揺れと画面下の両手で一人称だと分かり、前の人物がこちらに手を振る。
+// 動きの仕様:
+//   - カメラ: 登場人物の目の高さ1.6mで前へ 0m → 3.2m 歩く。0.3秒から4.2秒まで3.9秒、3次のイーズインアウト（cubic-bezier(0.65,0,0.35,1) 相当）
+//   - 歩きの揺れ: 高さ ±3cm（4.7秒に6回）、ロール ±0.008rad（3回）。動いている間だけ加える
+//   - 両手: 画面の下の両端（中央から±178px）に青い丸い手を描き、右手に白いスマホ。体と一緒に動くので手は止まり、世界のほうが揺れる
+//   - 相手: 7.5m先の人物が1.6〜3.4秒の間だけ両腕を上げて手を振る（こちらを見ている）。手前に杭2本
+//   - 戻り: 最後の0.5秒で開始状態へクロスフェード（1周4.7秒）。右上に「POV」
+// 使いどころ: 観客に登場人物と同じ体験をさせたいとき、ゲームやVR風の見せ方。
+// タグ: pov, point of view, first person, subjective, eyes, hands, angle
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#179
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 11
+// 11 POVショット: 登場人物の目で見た画。歩く上下動と画面下の両手で一人称だと分かる。前の人物が振り向いて手を振る
+CELLS[10] = shot(camCell((k, w, h, p, u) => {
+  const z = lerp(0, 3.2, p), T = u * 2 * Math.PI / CYC;
+  const bob = Math.sin(T * 6) * 0.03 * (p > 0 && p < 1 ? 1 : 0);
+  world(k, w, h, cam({ z, y: 1.6 + bob, roll: Math.sin(T * 3) * 0.008 * (p > 0 && p < 1 ? 1 : 0) }), {
+    person: { z: 7.5, armUp: u > 1.6 && u < 3.4, walk: 0 }, fg: [[-1.8, 2.6], [2.2, 3.8]],
+    after: (kk) => {   // 両手（画面の下の両端から入る。体と一緒に動くので、揺れるのは世界のほう）
+      kk.fillStyle = C.blue;
+      [-1, 1].forEach(sx => { kk.save(); kk.translate(sx * 178, 64); kk.rotate(sx * -0.5); kk.fillStyle = C.blue; rr(kk, -34, -28, 68, 120, 30); kk.fill(); if (sx > 0) { kk.fillStyle = '#fff'; rr(kk, -17, -62, 34, 54, 6); kk.fill(); kk.strokeStyle = C.blue; kk.lineWidth = 3; rr(kk, -17, -62, 34, 54, 6); kk.stroke(); } kk.restore(); });
+    }
+  });
+}, p => 'POV', 0.3, 4.2));

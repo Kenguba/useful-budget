@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motion Prompt｜给 AI 下指令用的「名字」库</title>
+<meta name="description" content="给 AI 下指令用的「名字」库：动态图形、镜头运动、UI 组件、落地页与网页效果、摄影效果的名字，每个都带动态示例、一句话释义和给 AI 的说法，MIT 许可证">
+<link rel="canonical" href="https://showheyohtaki.github.io/motion-prompt/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Motion Prompt">
+<meta property="og:title" content="Motion Prompt｜AIに頼むための「名前」のライブラリ">
+<meta property="og:description" content="AIを指揮するクリエイティブディレクターへ。モーショングラフィックス、カメラワーク、UIパーツ、LP・Webサイトの演出、写真の表現の名前を、動く見本つきで並べました。">
+<meta property="og:url" content="https://showheyohtaki.github.io/motion-prompt/">
+<meta property="og:image" content="https://showheyohtaki.github.io/motion-prompt/assets/og.png">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@showheyohtaki">
+<meta name="twitter:image" content="https://showheyohtaki.github.io/motion-prompt/assets/og.png">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<script>
+/* Apply the saved theme and language before first paint. */
+(function () {
+  var d = document.documentElement, t = null, l = null, m = /[?&]lang=(ja|en|zh)(?:&|$)/.exec(location.search);
+  try { t = localStorage.getItem('mp-theme'); l = localStorage.getItem('mp-lang'); } catch (e) {}
+  if (m) l = m[1]; /* ?lang= (set when an agent opens the gallery) wins for this visit */
+  if (t === 'light' || t === 'dark') d.setAttribute('data-theme', t);
+  if (l !== 'ja' && l !== 'en' && l !== 'zh') l = /^ja\b/i.test(navigator.language || '') ? 'ja' : 'zh';
+  d.lang = l;
+})();
+</script>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#gallery" data-t="skip">見本の一覧へ移動</a>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="logo" href="./" aria-label="Motion Prompt">Motion Prompt</a>
+    <nav class="top-nav" aria-label="サイト内" data-t-attr="aria-label:navLabel">
+      <a class="top-link top-how" href="#how" data-t="navHow">使い方</a>
+      <a class="top-link" href="found.html" data-t="navFound">事例</a>
+      <a class="top-link top-gh" href="https://github.com/showheyohtaki/motion-prompt" rel="noopener">GitHub</a>
+      <div class="seg" role="group" aria-label="言語" data-t-attr="aria-label:langLabel">
+        <button type="button" class="seg-b" data-lang="ja" aria-pressed="false" aria-label="日本語">JA</button>
+        <button type="button" class="seg-b" data-lang="en" aria-pressed="false" aria-label="English">EN</button>
+        <button type="button" class="seg-b" data-lang="zh" aria-pressed="true" aria-label="简体中文">中文</button>
+      </div>
+      <button type="button" class="icon-b" id="theme" aria-label="ダークモードに切り替える">
+        <svg class="i-moon" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M16.5 12.3A7 7 0 0 1 7.7 3.5a.6.6 0 0 0-.8-.7 7.6 7.6 0 1 0 10.3 10.3.6.6 0 0 0-.7-.8z" fill="currentColor"/></svg>
+        <svg class="i-sun" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="3.6" fill="currentColor"/><g stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.3 4.3l1.4 1.4M14.3 14.3l1.4 1.4M4.3 15.7l1.4-1.4M14.3 5.7l1.4-1.4"/></g></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap" aria-labelledby="hero-h">
+    <div class="hero-copy">
+      <p class="eyebrow" data-t="eyebrow">AIに頼むための「名前」のライブラリ</p>
+      <h1 id="hero-h" data-t-html="h1">AIを<wbr>指揮する<wbr>クリエイティブ<wbr>ディレクターへ</h1>
+      <p class="lead" data-t="lead">モーショングラフィックス、カメラワーク、UIパーツ、LP・Webサイトの演出、写真の表現の名前を、動く見本つきで並べました。プロンプトをコピーすれば、動きの仕様と参考実装も一緒に渡せます。</p>
+      <dl class="facts">
+        <div><dt data-t="factMoves">名前</dt><dd id="fact-count"></dd></div>
+        <div><dt data-t="factPacks">パック</dt><dd id="fact-packs"></dd></div>
+        <div><dt data-t="factLicense">ライセンス</dt><dd>MIT</dd></div>
+      </dl>
+    </div>
+    <div class="hero-install">
+      <div class="install">
+        <h2 class="install-h" data-t="installSkillH">スキルで導入</h2>
+        <p class="install-p" data-t="installSkillP">ターミナルで実行します。入れたあとは、AIに「motion-prompt のライブラリ出して」と頼むと、このギャラリーが開きます。選んで「AIに渡す」を押すと、AIに届きます。</p>
+        <div class="copyfield">
+          <code id="cmd">npx skills add showheyohtaki/motion-prompt</code>
+          <button type="button" class="btn btn-s" data-copy="#cmd" data-t="copy" data-t-attr="aria-label:copyCmdLabel" aria-label="導入コマンドをコピー">コピー</button>
+        </div>
+      </div>
+      <div class="install">
+        <h2 class="install-h" data-t="installPromptH">プロンプトで導入</h2>
+        <p class="install-p" data-t="installPromptP">下の文を Claude Code や Codex に貼ると、AIがスキルを入れて使い方を教えてくれます。</p>
+        <div class="copyfield copyfield-text">
+          <p id="install-prompt" data-t="installPrompt">https://github.com/showheyohtaki/motion-prompt を読んで、motion-prompt スキルをこの環境に入れてください。入れたら、使い方を3行で教えてください。</p>
+          <button type="button" class="btn btn-s" data-copy="#install-prompt" data-t="copy" data-t-attr="aria-label:copyInstallLabel" aria-label="導入用のプロンプトをコピー">コピー</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery" class="gallery" aria-labelledby="gallery-h">
+    <h2 id="gallery-h" class="sr" data-t="galleryH">見本の一覧</h2>
+    <div class="tools">
+      <div class="wrap tools-in">
+        <div class="chips" id="packs" role="group" aria-label="パックで絞り込む" data-t-attr="aria-label:packFilterLabel"></div>
+        <div class="tools-side">
+          <label class="search">
+            <span class="sr" data-t="searchLabel">見本を探す</span>
+            <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <input type="search" id="q" autocomplete="off" spellcheck="false" placeholder="名前・番号・タグで探す" data-t-attr="placeholder:searchPh">
+          </label>
+          <button type="button" class="btn btn-ghost playtoggle" id="play" aria-pressed="true">
+            <svg class="i-pause" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="2.5" width="3.6" height="11" rx="1" fill="currentColor"/><rect x="9.4" y="2.5" width="3.6" height="11" rx="1" fill="currentColor"/></svg>
+            <svg class="i-play" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 2.6v10.8a.6.6 0 0 0 .9.5l9-5.4a.6.6 0 0 0 0-1l-9-5.4a.6.6 0 0 0-.9.5z" fill="currentColor"/></svg>
+            <span id="play-t">一時停止</span>
+          </button>
+        </div>
+        <div class="chips chips-sub" id="cats" role="group" aria-label="カテゴリで絞り込む" data-t-attr="aria-label:catFilterLabel" hidden></div>
+      </div>
+    </div>
+    <div class="wrap">
+      <p class="count" id="count" role="status" aria-live="polite"></p>
+      <div id="grid"></div>
+      <p class="empty" id="empty" hidden data-t="empty">見つかりませんでした。別の言葉や番号で探してみてください。</p>
+      <noscript><p class="empty">示例的播放需要 JavaScript，完整列表也可以在 <a href="api/v1/en/catalog.tsv">catalog.tsv</a> 里读</p></noscript>
+    </div>
+  </section>
+
+  <section id="how" class="how wrap" aria-labelledby="how-h">
+    <h2 id="how-h" class="sec-h" data-t="howH">使い方</h2>
+    <ol class="steps">
+      <li><span class="step-n" aria-hidden="true">1</span><h3 data-t="s1h">ライブラリを出してもらう</h3><p data-t="s1p">motion-prompt スキルを入れたAIに「motion-prompt のライブラリ出して」と頼みます。このギャラリーがブラウザで開きます。</p></li>
+      <li><span class="step-n" aria-hidden="true">2</span><h3 data-t="s2h">見ながら選ぶ</h3><p data-t="s2p">使いたい見本の「選ぶ」を押します。いくつでも選べます。選んだ物は画面の下に並び、「冒頭のタイトルに」のような一言のメモも書けます。</p></li>
+      <li><span class="step-n" aria-hidden="true">3</span><h3 data-t="s3h">AIに渡して、頼む</h3><p data-t="s3p">「AIに渡す」を押すと、選んだ物がAIに届きます。あとは「この動画の冒頭をこんな感じに編集して」と頼みます。このボタンは、AIがライブラリを開いたときに出ます。</p></li>
+    </ol>
+    <div class="how-more how-more-3">
+      <div class="how-col">
+        <h3 data-t="skillH">こう話しかけます</h3>
+        <p data-t="skillP">名前や番号を覚えていなくてかまいません。分からないときは、辞書を引くようにライブラリを出してもらってください。</p>
+        <ul class="says">
+          <li data-t="say1">motion-prompt のライブラリ出して</li>
+          <li data-t="say2">どんなカメラワークがある？一覧見せて</li>
+          <li data-t="say3">（選んで渡したあと）この動画の冒頭をこんな感じに編集して</li>
+        </ul>
+      </div>
+      <div class="how-col">
+        <h3 data-t="altH">スキルが無いとき・番号が分かるとき</h3>
+        <p data-t="altP1">スキルを入れていないAIには、画面の下の「選んだ物をコピー」で作った文を貼ってください。見本と仕様のURLが入っています。1つだけなら、詳細の「プロンプトをコピー」も使えます。</p>
+        <p data-t="altP2">番号が分かっていれば、「motion-prompt で #012 と #045 を使って」のように直接頼むこともできます。</p>
+      </div>
+      <div class="how-col">
+        <h3 data-t="implH">参考実装について</h3>
+        <p data-t="implP">見本はすべて Canvas 2D で書いた、時刻だけで絵が決まる関数です。外部ライブラリは使っていません。1コマずつ描けるので、動画の書き出しにも使えます。</p>
+        <p><a href="api/v1/catalog.json">catalog.json</a> · <a id="tsv-link" href="api/v1/en/catalog.tsv">catalog.tsv</a> · <a href="https://github.com/showheyohtaki/motion-prompt" rel="noopener">GitHub</a></p>
+      </div>
+    </div>
+    <p class="how-own"><span data-t="ownP">ここにあるのは見本です。同じような名前の見本を、自分の分野・自分の言語でも作れます。</span> <a href="https://github.com/showheyohtaki/motion-prompt/blob/main/make-your-own/README.ja.md" data-href-ja="https://github.com/showheyohtaki/motion-prompt/blob/main/make-your-own/README.ja.md" data-href-en="https://github.com/showheyohtaki/motion-prompt/tree/main/make-your-own" rel="noopener" data-t="ownLink">作り方とプロンプト（make-your-own）</a></p>
+    <p class="how-own"><span data-t="langsP">名前の一覧は、スペイン語・中国語（簡体字・繁体字）でも読めます。</span> <a href="https://github.com/showheyohtaki/motion-prompt/tree/main/packs" rel="noopener" data-t="langsLink">5言語の一覧（GitHub）</a></p>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <p><strong>Motion Prompt</strong> · MIT License · <span data-t="author">作者</span> <span data-t="authorName">大滝昇平</span>（<a href="https://x.com/showheyohtaki" rel="noopener">@showheyohtaki</a>）</p>
+    <p class="foot-links">
+      <a href="https://github.com/showheyohtaki/motion-prompt/blob/main/README.ja.md#なぜ作ったか" data-href-ja="https://github.com/showheyohtaki/motion-prompt/blob/main/README.ja.md#なぜ作ったか" data-href-en="https://github.com/showheyohtaki/motion-prompt#why-i-made-this" rel="noopener" data-t="whyLink">なぜ作ったか</a>
+      <a href="https://github.com/showheyohtaki/motion-prompt/tree/main/packs" data-href-ja="https://github.com/showheyohtaki/motion-prompt/tree/main/packs" data-href-en="https://github.com/showheyohtaki/motion-prompt/tree/main/packs" rel="noopener" data-t="listLink">名前の一覧（GitHub）</a>
+      <a href="https://github.com/showheyohtaki/motion-prompt/blob/main/make-your-own/README.ja.md" data-href-ja="https://github.com/showheyohtaki/motion-prompt/blob/main/make-your-own/README.ja.md" data-href-en="https://github.com/showheyohtaki/motion-prompt/tree/main/make-your-own" rel="noopener" data-t="makeLink">自分の分野・自分の言語で作る</a>
+      <a href="https://github.com/showheyohtaki/motion-prompt/blob/main/CONTRIBUTING.ja.md" data-href-ja="https://github.com/showheyohtaki/motion-prompt/blob/main/CONTRIBUTING.ja.md" data-href-en="https://github.com/showheyohtaki/motion-prompt/blob/main/CONTRIBUTING.md" rel="noopener" data-t="addLink">あなたの分野の名前を足す</a>
+    </p>
+    <p class="foot-remove"><span data-t="removeP1">掲載の削除・訂正は</span><a href="https://github.com/showheyohtaki/motion-prompt/issues/new?template=3-removal.yml" rel="noopener" data-t="removeLink">GitHub の Issue のフォーム</a><span data-t="removeP2">から依頼できます。確認後、すみやかに対応します。</span></p>
+    <p>本页是开源项目 Motion Prompt 的本地复刻版 · 原作者 Shohei Ohtaki · <a href="https://github.com/showheyohtaki/motion-prompt" rel="noopener">原仓库</a> · <a href="https://showheyohtaki.github.io/motion-prompt/" rel="noopener">原画廊</a> · MIT License</p>
+    <p class="foot-thanks"><span data-t="thanks1">動く見本を並べて、プロンプトをコピーして使う形は</span> <a href="https://lucianlabs.dev/uxui-prompt/" rel="noopener">Lucian UX/UI Prompt</a> <span data-t="thanks2">から着想を得ました。ありがとうございます。</span></p>
+  </div>
+</footer>
+
+<aside class="tray" id="tray" aria-labelledby="tray-count" hidden>
+  <div class="wrap tray-in">
+    <div class="tray-top">
+      <button type="button" class="tray-toggle" id="tray-toggle" aria-expanded="true" aria-controls="tray-body">
+        <span class="tray-count" id="tray-count">選んだ物 0個</span>
+        <svg class="tray-chev" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 10l4.5-4.5 4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <p class="tray-wait" id="tray-wait" data-t="trayWait" hidden>AIが待っています。選んだら「AIに渡す」を押してください。</p>
+      <button type="button" class="btn btn-s btn-main tray-main" id="tray-main">選んだ物をコピー</button>
+    </div>
+    <div class="tray-body" id="tray-body">
+      <ol class="tray-list" id="tray-list"></ol>
+      <p class="tray-empty" id="tray-empty" data-t="trayEmpty" hidden>見本の「選ぶ」を押すと、ここに並びます。</p>
+      <div class="tray-row">
+        <label class="tray-note">
+          <span class="tray-note-l" data-t="noteLabel">メモ（任意）</span>
+          <input type="text" id="tray-note" maxlength="300" autocomplete="off" placeholder="例: 冒頭のタイトルに" data-t-attr="placeholder:notePh">
+        </label>
+        <div class="tray-acts">
+          <button type="button" class="btn btn-s" id="tray-copy" data-t="copyPicked" hidden>選んだ物をコピー</button>
+          <button type="button" class="btn btn-s" id="tray-share" data-t="shareUrl">選択を共有するURL</button>
+          <button type="button" class="btn btn-s btn-ghost" id="tray-clear" data-t="clearAll">すべて外す</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<dialog class="detail" id="detail" aria-labelledby="d-name">
+  <div class="d-bar">
+    <p class="d-id"><span id="d-id">#000</span><span class="d-where" id="d-where"></span></p>
+    <div class="d-nav">
+      <button type="button" class="icon-b playtoggle" id="d-play" aria-pressed="true" aria-label="一時停止">
+        <svg class="i-pause" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="2.5" width="3.6" height="11" rx="1" fill="currentColor"/><rect x="9.4" y="2.5" width="3.6" height="11" rx="1" fill="currentColor"/></svg>
+        <svg class="i-play" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 2.6v10.8a.6.6 0 0 0 .9.5l9-5.4a.6.6 0 0 0 0-1l-9-5.4a.6.6 0 0 0-.9.5z" fill="currentColor"/></svg>
+      </button>
+      <button type="button" class="icon-b" id="d-prev" aria-label="前の名前"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="icon-b" id="d-next" aria-label="次の名前"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="icon-b" id="d-close" aria-label="閉じる"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+  </div>
+  <div class="d-body">
+    <div class="d-stage"><canvas id="d-canvas" aria-hidden="true"></canvas></div>
+    <div class="d-head">
+      <h2 id="d-name" tabindex="-1"></h2>
+      <p class="d-sub" id="d-sub"></p>
+      <p class="d-meaning" id="d-meaning"></p>
+      <p class="d-summary" id="d-summary"></p>
+    </div>
+    <div class="d-main">
+      <h3 id="d-ask-h" data-t="dAsk">AIへの頼み方の例</h3>
+      <p class="d-ask" id="d-ask"></p>
+      <h3 data-t="dSpec">動きの仕様</h3>
+      <ul class="d-spec" id="d-spec"></ul>
+      <h3 data-t="dUse">使いどころ</h3>
+      <p id="d-use"></p>
+      <ul class="d-tags" id="d-tags" aria-label="タグ" data-t-attr="aria-label:tagsLabel"></ul>
+    </div>
+    <div class="d-side">
+      <button type="button" class="btn btn-pick" id="d-pick" aria-pressed="false"><span class="pick-box" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M3.5 8.4l3 3 6-6.6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span id="d-pick-t">選ぶ</span></button>
+      <button type="button" class="btn btn-main" id="d-copy-prompt" data-t="copyPrompt">プロンプトをコピー</button>
+      <button type="button" class="btn" id="d-copy-code" data-t="copyCode">コードをコピー</button>
+      <pre class="d-prompt" id="d-prompt" tabindex="0" aria-label="コピーされるプロンプト" data-t-attr="aria-label:promptLabel"></pre>
+      <details class="d-code">
+        <summary data-t="showCode">コードを見る</summary>
+        <pre id="d-code" tabindex="0"></pre>
+      </details>
+      <p class="d-links"><a id="d-kit" href="#"></a><a id="d-txt" href="#"></a></p>
+      <p class="sr" id="d-live" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</dialog>
+
+<p class="sr" id="live" role="status" aria-live="polite"></p>
+
+<script src="assets/runtime.js"></script>
+<script src="assets/catalog.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>

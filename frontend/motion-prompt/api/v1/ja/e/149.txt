@@ -1,0 +1,42 @@
+// Motion Prompt #149 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#149
+//
+// 隠れるヘッダー / Hide-on-scroll header
+// パック: lp2 (LP・Webサイトの演出 第2弾) · element 05 · カテゴリ: スクロールで起きる演出
+// 何が起きるか: 下へスクロールするとヘッダーが上へ引っ込んで読む場所が広くなり、少し上へ戻すとすぐに出てくる。
+// 動きの仕様:
+//   - 表示域 511×168。ヘッダー（高さ34px）を上に固定。スクロール量: 0.3〜1.1秒 0→170px（下へ）、1.5〜1.9秒 170→100（上へ）、2.4〜2.9秒 100→230（下へ）、3.3〜4.3秒 230→0（上へ）。各区間 easeInOut 3乗。4.7秒でひと回り（パックの周期9.4秒で2回）
+//   - 最後に動いた向きが下なら隠し、上なら出す。ページの先頭から34px以内では常に出す
+//   - 隠すときも出すときも0.3秒（easeInOut 2乗）で上へ36px動かす（transform: translateY と transition の組み合わせと同じ）
+//   - スクロールしている間はヘッダーの下に12pxの影（濃さはスクロール量30pxまでで0→0.14）。右端のスクロールバーも連動
+// 使いどころ: スマホなど画面が狭いときに読む場所を広く取りつつ、メニューにすぐ戻れるようにしたいとき。
+// タグ: header, hide-on-scroll, headroom, navigation, sticky-header, scroll-direction
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#149
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 05
+// 05 隠れるヘッダー（下へスクロールするとヘッダーが上へ引っ込み、上へ戻すとすっと出てくる）
+CELLS[4] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const SY = t => steps([[0.3, 0], [1.1, 170], [1.5, 170], [1.9, 100], [2.4, 100], [2.9, 230], [3.3, 230], [4.3, 0]], t), y = SY(u);
+  // 最後に動いた向きが「下」なら隠す（ページの一番上にいるときは出す）
+  const hidden = t => { const yt = SY(t); if (yt < 34) return false; for (let i = 0, tt = t; i < 600; i++, tt -= 1 / 120) { const d = SY(tt) - SY(tt - 1 / 120); if (Math.abs(d) > 1e-4) return d > 0; } return false; };
+  const q = trans(hidden, u, 0.3, eIOs);
+  view(k, () => {
+    k.save(); k.translate(0, -y);
+    pic(k, 24, 48, 214, 110, 1, 8);
+    txt(k, '旅の準備を、', 262, 84, `800 22px ${JP}`, C.ink); txt(k, 'まとめて。', 262, 114, `800 22px ${JP}`, C.ink); bars(k, 262, 128, 200, 2); btn(k, 262, 152, 100, 24, '詳しく見る');
+    k.fillStyle = C.soft; k.fillRect(0, 196, VW, 260);
+    txt(k, '人気のプラン', VW / 2, 232, `800 17px ${JP}`, C.ink, 'center');
+    for (let r = 0; r < 2; r++) for (let i = 0; i < 3; i++) { const x = 34 + i * 152, y0 = 250 + r * 100; k.fillStyle = '#fff'; rr(k, x, y0, 136, 88, 8); k.fill(); pic(k, x + 8, y0 + 8, 120, 46, (i + r) % 3, 5); bars(k, x + 10, y0 + 64, 100, 2, C.faint, 5, 10); }
+    k.restore();
+    const hy = -36 * q;
+    if (y > 0 && q < 1) { const g = k.createLinearGradient(0, hy + 34, 0, hy + 46); g.addColorStop(0, `rgba(28,35,51,${0.14 * clamp(y / 30)})`); g.addColorStop(1, 'rgba(28,35,51,0)'); k.fillStyle = g; k.fillRect(0, hy + 34, VW, 12); }
+    header(k, hy);
+    sbar(k, y / 230, 0.42);
+  });
+};

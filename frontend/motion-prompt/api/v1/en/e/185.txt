@@ -1,0 +1,39 @@
+// Motion Prompt #185 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#185
+//
+// Insert shot / インサートショット
+// Pack: camera2 (Camera moves & transitions, part 2) · element 17 · Category: Transitions & Editing
+// What happens: A big close-up of the watch on the person's wrist is cut into the scene for 1.3 s, then it returns to the same shot.
+// Motion spec:
+//   - Join: two straight cuts (0 frames); to the detail at 1.6 s and back to the scene at 2.9 s (the detail lasts 1.3 s)
+//   - Main shot (A): fixed camera (height 1.4 m); a person stands 0.6 m left, 6 m away, with a watch (dark dot) on the wrist; a post 2.2 m right, 4 m away
+//   - Detail (INSERT): a big close-up of the wrist from the same scene; a blue sleeve (600×92 px, rotated -0.35 rad) on pale blue, a white dial (radius 58 px), dark hands and a blue second hand that makes one turn in 1.3 s
+//   - Bottom strip: three sections A (grey), detail (blue), A (grey) with a playhead; what is cut in belongs to the same scene (21 Cutaway shows a different subject)
+//   - Top-right readout shows "SHOT A" → "INSERT" → "SHOT A"; at 4.7 s it cuts straight back to the start
+// When to use it: To show a small object or a hand action, or to point out an important prop.
+// Tags: insert shot, insert, detail, close-up, cut in, prop, edit
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#185
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 17
+// 17 インサートショット: 同じ場面の細部（手元の時計）を1.3秒だけ差し込み、元の画に戻る
+const INS = [1.6, 2.9];
+CELLS[16] = shot((k, w, h, u) => {
+  const ins = u >= INS[0] && u < INS[1];
+  if (!ins) world(k, w, h, cam({ y: 1.4 }), { person: { x: -0.6, z: 6, walk: 0 }, fg: [[2.2, 4]], after: (kk, cc) => { const q = proj(cc, -0.35, 1.08, 6); kk.fillStyle = C.ink; kk.beginPath(); kk.arc(q.x, q.y, 1.6 * q.s / 10, 0, 7); kk.fill(); } });
+  else {   // 手首の時計の大写し
+    k.save(); k.translate(w / 2, h / 2);
+    k.fillStyle = C.blueXL; k.fillRect(-w, -h, w * 2, h * 2);
+    k.fillStyle = C.blue; k.save(); k.rotate(-0.35); rr(k, -300, -46, 600, 92, 30); k.fill(); k.restore();
+    k.fillStyle = '#fff'; k.beginPath(); k.arc(0, 0, 58, 0, 7); k.fill(); k.strokeStyle = C.ink; k.lineWidth = 5; k.stroke();
+    k.strokeStyle = C.ink; k.lineWidth = 4; k.lineCap = 'round'; k.beginPath(); k.moveTo(0, 0); k.lineTo(0, -34); k.moveTo(0, 0); k.lineTo(26, 14); k.stroke();
+    const a = (u - INS[0]) / (INS[1] - INS[0]) * Math.PI * 2 - Math.PI / 2;   // 秒針が1周
+    k.strokeStyle = C.blue; k.lineWidth = 2; k.beginPath(); k.moveTo(0, 0); k.lineTo(Math.cos(a) * 44, Math.sin(a) * 44); k.stroke();
+    k.restore();
+  }
+  strip(k, w, h, [[0, INS[0], 'A', C.g2], [INS[0], INS[1], '細部', C.blue], [INS[1], CYC, 'A', C.g2]], u);
+  return ins ? 'INSERT' : 'SHOT A';
+});

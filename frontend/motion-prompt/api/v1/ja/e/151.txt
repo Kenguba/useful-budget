@@ -1,0 +1,48 @@
+// Motion Prompt #151 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#151
+//
+// トップへ戻るボタン / Back-to-top button
+// パック: lp2 (LP・Webサイトの演出 第2弾) · element 07 · カテゴリ: スクロールで起きる演出
+// 何が起きるか: 下までスクロールすると右下に丸い矢印のボタンが現れ、押すとページが一気に先頭まで戻る。
+// 動きの仕様:
+//   - 表示域 511×168。0.2〜1.7秒でスクロール量 0→300px（ページの一番下まで・easeInOut 3乗）。4.7秒でひと回り（パックの周期9.4秒で2回）
+//   - ボタン: 右下（中心 x=472, y=138）の朱の丸（半径19・白い上向きの矢印・影ぼかし10）。スクロール量80〜140pxの間に透明から現れ、10px下から上がる（easeOut 3乗）
+//   - 2.6秒にボタンをクリック。カーソルが乗っている間は0.2秒で色を濃くする（#FF5A2C→#D9431C）
+//   - クリックの後 2.66〜3.26秒（0.6秒）でスクロール量 300→0（easeInOut 3乗）。80pxを切るとボタンは同じ式で消える
+// 使いどころ: ブログ・長いLP・商品一覧など、縦に長いページで先頭のメニューへすぐ戻れるようにしたいとき。
+// タグ: back-to-top, scroll-to-top, button, navigation, floating-button, smooth-scroll
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#151
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 07
+// 07 トップへ戻るボタン（下までスクロールすると右下に丸いボタンが出て、押すと一気に先頭へ戻る）
+CELLS[6] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const CLK = 2.6, MAX = 300;
+  const y = u < CLK + 0.02 ? steps([[0.2, 0], [1.7, MAX]], u) : MAX * (1 - eIO(P(u, CLK + 0.06, CLK + 0.66)));
+  const cur = t => path([[0, 340, 205], [1.6, 340, 205], [2.35, 472, 138], [2.95, 472, 138], [3.6, 340, 205], [4.7, 340, 205]], t);
+  const [cx, cy] = cur(u);
+  view(k, () => {
+    k.save(); k.translate(0, -y);
+    txt(k, 'BLOG', 70, 32, `800 11px ${EN}`, C.acc, 'left', 'alphabetic', '2px');
+    txt(k, '週末にできる、小さな旅', 70, 58, `800 19px ${JP}`, C.ink);
+    pic(k, 70, 72, 371, 100, 2, 8);
+    for (let b = 0; b < 3; b++) { const y0 = 192 + b * 82; k.fillStyle = C.ink; rr(k, 70, y0, 150, 9, 4.5); k.fill(); bars(k, 70, y0 + 22, 371, 4, C.faint, 6, 12); }
+    k.fillStyle = C.ink; k.fillRect(0, 438, VW, 80); logo(k, 70, 454, '#fff'); bars(k, 300, 451, 140, 1, 'rgba(255,255,255,.3)');
+    k.restore();
+    const tb = eOut(clamp((y - 80) / 60));
+    if (tb > 0) {
+      const hov = trans(t => { const [a, b] = cur(t); return Math.hypot(a - 472, b - 138) < 20; }, u, 0.2);
+      k.save(); k.globalAlpha = tb; k.translate(0, 10 * (1 - tb));
+      k.save(); k.shadowColor = 'rgba(28,35,51,.3)'; k.shadowBlur = 10; k.shadowOffsetY = 3; k.fillStyle = mix(C.acc, '#D9431C', hov); k.beginPath(); k.arc(472, 138, 19, 0, 7); k.fill(); k.restore();
+      k.strokeStyle = '#fff'; k.lineWidth = 2.6; k.lineCap = 'round'; k.lineJoin = 'round'; k.beginPath(); k.moveTo(465, 142); k.lineTo(472, 134.5); k.lineTo(479, 142); k.stroke();
+      k.restore();
+    }
+    sbar(k, y / MAX, 0.34);
+    click(k, cx, cy, u, [CLK]);
+  });
+};

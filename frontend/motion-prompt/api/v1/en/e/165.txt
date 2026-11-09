@@ -1,0 +1,36 @@
+// Motion Prompt #165 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#165
+//
+// Animated shape divider / シェイプディバイダー
+// Pack: lp2 (Landing page & web effects, part 2) · element 21 · Category: Showcase effects
+// What happens: Where a blue section meets a white one, two layered wave shapes keep swaying slowly.
+// Motion spec:
+//   - A 511 × 168 viewport: a blue gradient section on top (#3B64E8 → #8FA9F7) and a white section below, with two wave shapes layered at the boundary. One loop takes 4.7 s (two per 9.4 s pack cycle).
+//   - Back wave (white, opacity 0.45): centered at y = 100, the sum of a sine with wavelength 260 px, amplitude 8 px and one with wavelength 130 px, amplitude 4 px.
+//   - Front wave (white): centered at y = 110, wavelength 300 px / amplitude 9 px plus wavelength 110 px / amplitude 3.5 px; it runs into the white section below.
+//   - With phase a = 2π·t/4.7, the back wave uses a + 1 and −2a, the front wave −a and 2a + 0.5. The two sines in each wave run in opposite directions, so the shape keeps changing and returns to where it started every 4.7 s.
+// When to use it: Use it where section edges should look soft rather than ruled, on sites about the sea, summer or children, for example.
+// Tags: shape-divider, wave, section-divider, svg, ambient, loop
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#165
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 21
+// 21 シェイプディバイダー（セクションの境目の波の形が、ゆっくりゆれ続ける）
+CELLS[20] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const a = 2 * Math.PI * u / CYC;
+  const wave = (base, A1, L1, p1, A2, L2, p2) => { k.beginPath(); k.moveTo(0, VH + 1); for (let x = 0; x <= VW + 4; x += 4) k.lineTo(x, base + A1 * Math.sin(2 * Math.PI * x / L1 + p1) + A2 * Math.sin(2 * Math.PI * x / L2 + p2)); k.lineTo(VW, VH + 1); k.closePath(); };
+  view(k, () => {
+    const g = k.createLinearGradient(0, 0, 0, 120); g.addColorStop(0, '#3B64E8'); g.addColorStop(1, '#8FA9F7'); k.fillStyle = g; k.fillRect(0, 0, VW, VH);
+    k.fillStyle = 'rgba(255,255,255,.9)'; k.beginPath(); k.arc(430, 44, 22, 0, 7); k.fill();
+    txt(k, '夏のキャンペーン', 34, 42, `800 22px ${JP}`, '#fff'); btn(k, 34, 56, 96, 24, '詳しく見る', '#fff', C.blue, 11);
+    k.fillStyle = 'rgba(255,255,255,.45)'; wave(100, 8, 260, a + 1, 4, 130, -2 * a); k.fill();
+    k.fillStyle = '#fff'; wave(110, 9, 300, -a, 3.5, 110, 2 * a + 0.5); k.fill();
+    txt(k, 'おすすめプラン', 34, 146, `800 15px ${JP}`, C.ink); bars(k, 170, 140, 290, 1, C.faint, 6);
+    bars(k, 34, 156, 200, 1, C.faint, 5);
+  });
+};

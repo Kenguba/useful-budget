@@ -1,0 +1,47 @@
+// Motion Prompt #158 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#158
+//
+// フローティングラベル / Floating label
+// パック: lp2 (LP・Webサイトの演出 第2弾) · element 14 · カテゴリ: マウス・入力への反応
+// 何が起きるか: 入力欄をクリックするとラベルが小さくなって欄の上の線へ移り、空いた欄に文字を打てる。空にして外すとラベルが中に戻る。
+// 動きの仕様:
+//   - 表示域 511×168。入力欄 300×46（角丸8）の中にラベル「メールアドレス」（15px）。0.65秒に欄をクリック、3.95秒に欄の外をクリックしてフォーカスを外す。4.7秒でひと回り（パックの周期9.4秒で2回）
+//   - フォーカスがあるか文字があるとき、0.24秒（easeOut 3乗）でラベルを 15px→11.5px に縮め、欄の中央の高さから上の線の上へ動かす（左の余白 14→10px）。線はラベルの後ろだけ白で切る
+//   - フォーカス中は0.15秒（easeOut 3乗）で枠線を灰色→朱・太さ1.5→2.2px、ラベルを灰色→朱にする
+//   - 1.0秒から0.075秒に1文字ずつ「hello@example.com」を入力し、3.2秒から0.03秒に1文字ずつ消す。空になってフォーカスが外れると、ラベルは同じ0.24秒で欄の中に戻る
+//   - 入力位置の縦線は0.9秒ごとに点滅（打っている間は点けたまま）
+// 使いどころ: 入力欄の多いフォームで、ラベルを残したまま場所を取らないようにしたいとき。
+// タグ: floating-label, form, input, label, focus, material-design
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#158
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 14
+// 14 フローティングラベル（入力欄の中のラベルが、入力を始めると小さくなって欄の上へ移る）
+CELLS[13] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const TEXT = 'hello@example.com', F = { x: 106, y: 58, w: 300, h: 46 };
+  const len = t => { t = mod(t, CYC); return t < 1.0 ? 0 : t < 3.2 ? Math.min(TEXT.length, Math.floor((t - 1.0) / 0.075)) : Math.max(0, TEXT.length - Math.floor((t - 3.2) / 0.03)); };
+  const focused = t => { t = mod(t, CYC); return t >= 0.65 && t < 3.95; };
+  const q = trans(t => focused(t) || len(t) > 0, u, 0.24, eOut), fo = trans(focused, u, 0.15);
+  const cur = t => path([[0, 445, 205], [0.45, 262, 82], [0.85, 262, 82], [1.4, 452, 142], [3.5, 452, 142], [3.85, 470, 26], [4.05, 470, 26], [4.6, 445, 205], [4.7, 445, 205]], t);
+  const [cx, cy] = cur(u);
+  view(k, () => {
+    k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
+    k.save(); k.shadowColor = 'rgba(28,35,51,.1)'; k.shadowBlur = 12; k.shadowOffsetY = 3; k.fillStyle = '#fff'; rr(k, 80, 12, 352, 148, 12); k.fill(); k.restore();
+    txt(k, '会員登録', F.x, 40, `800 15px ${JP}`, C.ink);
+    k.lineWidth = lerp(1.5, 2.2, fo); k.strokeStyle = mix('#C9D0DC', C.acc, fo); rr(k, F.x, F.y, F.w, F.h, 8); k.stroke();
+    const s = TEXT.slice(0, len(u));
+    txt(k, s, F.x + 14, F.y + 30, `600 15px ${EN}`, C.ink);
+    if (focused(u) && (mod(u, 0.9) < 0.5 || (u > 1 && u < 2.4))) { k.font = `600 15px ${EN}`; const xw = k.measureText(s).width; k.fillStyle = C.ink; k.fillRect(F.x + 14 + xw + 1, F.y + 14, 1.6, 20); }
+    const fs = lerp(15, 11.5, q), ly = lerp(F.y + F.h / 2, F.y, q), lx = F.x + lerp(14, 10, q), LAB = 'メールアドレス';
+    k.font = `600 ${fs}px ${JP}`; const lw = k.measureText(LAB).width;
+    if (q > 0) { k.fillStyle = '#fff'; k.fillRect(lx - 4, ly - 3, lw + 8, 6); }
+    txt(k, LAB, lx, ly + 0.5, `600 ${fs}px ${JP}`, mix('#8B94A6', C.acc, fo), 'left', 'middle');
+    btn(k, F.x, 118, F.w, 30, '次へ', C.ink, '#fff', 12);
+    click(k, cx, cy, u, [0.65, 3.95]);
+  });
+};

@@ -1,0 +1,24 @@
+// Motion Prompt #178 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#178
+//
+// ハイアングル / High angle
+// パック: camera2 (カメラワークと切り替え 第2弾) · element 10 · カテゴリ: アングル・画づくり
+// 何が起きるか: カメラを高い位置へ上げて見下ろす。人物が小さく、地面が画面の大半を占める。
+// 動きの仕様:
+//   - カメラ: 高さ 1.5m → 4.5m へ上げながら、ピッチ 0 → -0.5rad（約29°下向き）。位置の前後は動かない
+//   - 時間: 0.6秒から2.2秒まで1.6秒。3次のイーズインアウト（cubic-bezier(0.65,0,0.35,1) 相当）
+//   - 被写体: 人物は5m先で動かない。見下ろすにつれ人物が小さく下がり、地面の格子が画面の大半を占め、地平線は上へ抜ける
+//   - 止め: 2.2〜4.2秒はハイアングルのまま保つ（#031 クレーンアップは9mまで上がり続ける。13 バーズアイは真下90°）
+//   - 戻り: 最後の0.5秒で目の高さへクロスフェード（1周4.7秒）。右上に角度と高さ（↘ 0° · 1.5m → ↘ 29° · 4.5m）
+// 使いどころ: 人物を弱く・小さく見せたいとき、状況を俯瞰で説明するとき。
+// タグ: high angle, look down, from above, overhead, vulnerable, angle
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#178
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 10
+// 10 ハイアングル: カメラを高い位置へ上げ、見下ろす。人物が小さく見える（#031 クレーンアップは上がり続けて全体を見せる）
+CELLS[9] = shot(camCell((k, w, h, p) => world(k, w, h, cam({ y: lerp(1.5, 4.5, p), pitch: lerp(0, -0.5, p) }), { person: { z: 5 } }),
+  p => `↘ ${Math.round(lerp(0, 0.5, p) * 57.3)}° · ${lerp(1.5, 4.5, p).toFixed(1)}m`, 0.6, 2.2));

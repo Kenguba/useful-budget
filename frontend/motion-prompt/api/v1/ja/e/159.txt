@@ -1,0 +1,57 @@
+// Motion Prompt #159 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#159
+//
+// インラインバリデーション / Inline validation
+// パック: lp2 (LP・Webサイトの演出 第2弾) · element 15 · カテゴリ: マウス・入力への反応
+// 何が起きるか: メールアドレスを打っている途中は欄が赤くなって「形式が正しくありません」と出て、正しく打ち終わった瞬間に緑のチェックとOKに変わる。
+// 動きの仕様:
+//   - 表示域 511×168。メールアドレスの入力欄 300×44（角丸8）。0.45秒にクリック、4.2秒に外をクリック。0.75秒から0.115秒に1文字ずつ「hana@example.com」（16文字）を打ち、3.6秒から0.03秒に1文字ずつ消す。4.7秒でひと回り（パックの周期9.4秒で2回）
+//   - 2文字目から打ち終わる直前まではエラー: 0.15秒（easeOut 3乗）で枠を赤（#E5383B）・地を薄い赤（#FFF1F1）にし、欄の下に赤い丸の「!」と「形式が正しくありません」（13px）を出す
+//   - 最後の1文字で正しい形式になったら、0.25秒で枠を緑（#1E9E5A）にし、欄の右端に緑の丸（半径11・GSAP の elastic.out(1, 0.3) で弾んで出る）と白いチェック、欄の下に「OK」を出す
+//   - フォーカス中は0.15秒で枠を灰色→濃紺・太さ1.5→2.2pxにする。消し始めると表示は元に戻る
+// 使いどころ: 会員登録やお問い合わせのフォームで、送信する前に入力の間違いに気づかせたいとき。
+// タグ: validation, form, inline-validation, error-message, input, feedback
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#159
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 15
+// 15 インラインバリデーション（打っている途中は赤で「形式が正しくありません」、正しく打ち終わると緑のチェックとOK）
+CELLS[14] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const TEXT = 'hana@example.com', F = { x: 106, y: 56, w: 300, h: 44 };
+  const len = t => { t = mod(t, CYC); return t < 0.75 ? 0 : t < 3.6 ? Math.min(TEXT.length, Math.floor((t - 0.75) / 0.115)) : Math.max(0, TEXT.length - Math.floor((t - 3.6) / 0.03)); };
+  const err = t => { const n = len(t); return mod(t, CYC) < 3.6 && n >= 2 && n < TEXT.length; };
+  const ok = t => mod(t, CYC) < 3.6 && len(t) === TEXT.length;
+  const focused = t => { t = mod(t, CYC); return t >= 0.45 && t < 4.2; };
+  const qe = trans(err, u, 0.15), qo = trans(ok, u, 0.25), fo = trans(focused, u, 0.15);
+  const cur = t => path([[0, 445, 205], [0.3, 262, 80], [0.6, 262, 80], [1.1, 455, 146], [3.8, 455, 146], [4.1, 470, 26], [4.3, 470, 26], [4.65, 445, 205], [4.7, 445, 205]], t);
+  const [cx, cy] = cur(u);
+  view(k, () => {
+    txt(k, 'お問い合わせ', F.x, 26, `800 15px ${JP}`, C.ink);
+    txt(k, 'メールアドレス', F.x, 47, `700 12px ${JP}`, C.ink);
+    k.fillStyle = mix('#FFFFFF', '#FFF1F1', qe); rr(k, F.x, F.y, F.w, F.h, 8); k.fill();
+    const bc = mix(mix(mix('#C9D0DC', C.ink, fo), RED, qe), GREEN, qo);
+    k.lineWidth = lerp(1.5, 2.2, Math.max(fo, qe, qo)); k.strokeStyle = bc; rr(k, F.x, F.y, F.w, F.h, 8); k.stroke();
+    const s = TEXT.slice(0, len(u));
+    txt(k, s, F.x + 14, F.y + 28, `600 15px ${EN}`, C.ink);
+    if (focused(u) && !ok(u) && (mod(u, 0.9) < 0.5 || (u > 0.75 && u < 2.6))) { k.font = `600 15px ${EN}`; const xw = k.measureText(s).width; k.fillStyle = C.ink; k.fillRect(F.x + 14 + xw + 1, F.y + 12, 1.6, 20); }
+    if (qe > 0) {
+      k.save(); k.globalAlpha = qe;
+      k.fillStyle = RED; k.beginPath(); k.arc(F.x + 7, F.y + F.h + 20, 7, 0, 7); k.fill(); txt(k, '!', F.x + 7, F.y + F.h + 20.5, `800 11px ${EN}`, '#fff', 'center', 'middle');
+      txt(k, '形式が正しくありません', F.x + 20, F.y + F.h + 20.5, `700 13px ${JP}`, RED, 'left', 'middle');
+      k.restore();
+    }
+    if (qo > 0) {
+      k.save(); k.globalAlpha = qo;
+      k.fillStyle = GREEN; k.beginPath(); k.arc(F.x + F.w - 22, F.y + F.h / 2, 11 * eEl(qo), 0, 7); k.fill(); check(k, F.x + F.w - 22, F.y + F.h / 2, 12, '#fff', 2.4);
+      k.fillStyle = GREEN; k.beginPath(); k.arc(F.x + 7, F.y + F.h + 20, 7, 0, 7); k.fill(); check(k, F.x + 7, F.y + F.h + 20, 8, '#fff', 1.8);
+      txt(k, 'OK', F.x + 20, F.y + F.h + 20.5, `800 13px ${EN}`, GREEN, 'left', 'middle');
+      k.restore();
+    }
+    click(k, cx, cy, u, [0.45, 4.2]);
+  });
+};

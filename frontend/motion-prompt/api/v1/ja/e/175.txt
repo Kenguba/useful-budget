@@ -1,0 +1,35 @@
+// Motion Prompt #175 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#175
+//
+// ロックオフ / Locked-off shot
+// パック: camera2 (カメラワークと切り替え 第2弾) · element 07 · カテゴリ: カメラの動き
+// 何が起きるか: 三脚で固定したカメラの前を人物が横切り、奥を車が通る。カメラは1pxも動かない。
+// 動きの仕様:
+//   - カメラ: 完全に固定（高さ1.4m、正面向き、焦点距離330px）。動くのは被写体だけ
+//   - 被写体: 人物が6.5m先を左から右へ等速で横切る（x = -6.2m → +6.2m、4.7秒）。脚と腕は sin(u×7)×0.42rad
+//   - 奥15mを灰色の車が右から左へ横切る（x = +16m → -16m、4.7秒）
+//   - どちらも開始と終了の位置は画面の外なので、4.7秒ごとに継ぎ目なくくり返す
+//   - 左下に三脚の印（灰色）。右上に「LOCKED」（#040 フリーズフレームは映像の時間が止まる。ここは時間が流れ、カメラだけが止まっている）
+// 使いどころ: 動きの対比で被写体を目立たせるとき、定点観測、タイムラプスや合成の土台にするとき。
+// タグ: locked-off, locked off, static shot, fixed camera, tripod, static, still camera
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#175
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 07
+// 07 ロックオフ: 三脚で固定したカメラの前を人物が横切り、奥を車が通る。カメラは1pxも動かない（#040 フリーズフレームは映像が止まる）
+CELLS[6] = shot((k, w, h, u) => {
+  const q = u / CYC;
+  world(k, w, h, cam({ y: 1.4 }), {
+    person: { x: lerp(-6.2, 6.2, q), z: 6.5, walk: u * 7 },
+    extra: [[lerp(16, -16, q), 0, 15, (kk) => { kk.fillStyle = C.g4; rr(kk, -1.9, 0.35, 3.8, 0.75, 0.25); kk.fill(); rr(kk, -1.1, 0.95, 2.1, 0.62, 0.28); kk.fill(); kk.fillStyle = C.ink; [-1.15, 1.15].forEach(x => { kk.beginPath(); kk.arc(x, 0.34, 0.34, 0, 7); kk.fill(); }); }]],
+    after: (kk) => {   // 三脚の印（左下）
+      kk.strokeStyle = C.g4; kk.lineWidth = 2.2; kk.lineCap = 'round'; const x = -w / 2 + 38, y = h / 2 - 20;
+      kk.beginPath(); kk.moveTo(x, y - 30); kk.lineTo(x - 12, y); kk.moveTo(x, y - 30); kk.lineTo(x + 12, y); kk.moveTo(x, y - 30); kk.lineTo(x, y - 2); kk.stroke();
+      kk.fillStyle = C.g4; rr(kk, x - 9, y - 42, 18, 12, 3); kk.fill();
+    }
+  });
+  return 'LOCKED';
+});

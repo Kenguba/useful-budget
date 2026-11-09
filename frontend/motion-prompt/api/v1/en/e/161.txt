@@ -1,0 +1,48 @@
+// Motion Prompt #161 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#161
+//
+// View transition (shared element) / ビュートランジション
+// Pack: lp2 (Landing page & web effects, part 2) · element 17 · Category: Showcase effects
+// What happens: Clicking a photo in the list grows that same photo into the image at the top of the detail page while the rest changes to the detail page; going back shrinks it into place.
+// Motion spec:
+//   - A 511 × 168 viewport with three photos in a list (143 × 80, radius 6). The middle photo is clicked at 0.75 s, and "← 一覧へ" (back to list) on the detail page at 3.05 s. One pass takes 4.7 s (twice per 9.4 s pack cycle).
+//   - Forward: over 0.85–1.45 s (0.6 s, cubic ease-in-out) the clicked photo moves and resizes continuously from its list slot to the 479 × 94 image at the top of the detail page (radius 8). It stays one photo throughout.
+//   - The other photos and the heading fade out over the first 62% of the move; the detail title, text and back button fade in over the last 40%. At 50% the URL changes from /works to /works/02.
+//   - Back: over 3.15–3.75 s (0.6 s) the same move runs in reverse to the list slot.
+//   - This is how the View Transitions API looks when the list photo and the detail photo share the same view-transition-name.
+// When to use it: Use it on galleries or product pages that go back and forth between a list and a detail view, so people never lose track of what they opened.
+// Tags: view-transition, shared-element, page-transition, morph, gallery, navigation
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#161
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 17
+// 17 ビュートランジション（一覧の写真を押すと、その写真がそのまま大きくなって詳細ページの上部になる）
+CELLS[16] = (k, w, h, u) => {
+  u = snapU(u);
+  const e = u < 2.0 ? eIO(P(u, 0.85, 1.45)) : 1 - eIO(P(u, 3.15, 3.75));
+  frame(k, e > 0.5 ? 'example.com/works/02' : 'example.com/works');
+  const G = [24, 184, 344], GY = 44, GW = 143, GH = 80, NM = ['雪の山小屋', '海辺のカフェ', '夜の展望台'], PV = [0, 1, 2];
+  const T = { x: 16, y: 10, w: VW - 32, h: 94 };
+  const cur = t => path([[0, 420, 205], [0.5, 262, 88], [0.95, 262, 88], [1.6, 380, 150], [2.55, 380, 150], [2.9, 62, 30], [3.2, 62, 30], [3.9, 420, 205], [4.7, 420, 205]], t);
+  const [cx, cy] = cur(u);
+  view(k, () => {
+    const ga = 1 - clamp(e * 1.6);
+    k.save(); k.globalAlpha = ga;
+    txt(k, 'WORKS', 24, 30, `800 15px ${EN}`, C.ink, 'left', 'alphabetic', '2px');
+    for (let i = 0; i < 3; i++) { if (i !== 1) pic(k, G[i], GY, GW, GH, PV[i], 6); txt(k, NM[i], G[i], GY + GH + 20, `800 13px ${JP}`, C.ink); bars(k, G[i], GY + GH + 30, 90, 1, C.faint, 5); }
+    k.restore();
+    const x = lerp(G[1], T.x, e), y = lerp(GY, T.y, e), ww = lerp(GW, T.w, e), hh = lerp(GH, T.h, e);
+    pic(k, x, y, ww, hh, 1, lerp(6, 8, e));
+    const da = clamp((e - 0.6) / 0.4);
+    if (da > 0) {
+      k.save(); k.globalAlpha = da;
+      k.fillStyle = 'rgba(255,255,255,.92)'; rr(k, 26, 19, 74, 22, 11); k.fill(); txt(k, '← 一覧へ', 63, 30.5, `700 11px ${JP}`, C.ink, 'center', 'middle');
+      txt(k, '海辺のカフェ', 24, 134, `800 19px ${JP}`, C.ink); bars(k, 200, 122, 280, 3, C.faint, 6, 12, 0.7);
+      k.restore();
+    }
+    click(k, cx, cy, u, [0.75, 3.05]);
+  });
+};

@@ -1,0 +1,46 @@
+// Motion Prompt #150 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#150
+//
+// Scrollspy / スクロールスパイ
+// Pack: lp2 (Landing page & web effects, part 2) · element 06 · Category: Scroll effects
+// What happens: As the article scrolls, the table-of-contents item for the section being read lights up, and the highlight moves on when the next heading comes in.
+// Motion spec:
+//   - A 511 × 168 viewport: a table of contents on the left (150 px wide, 4 items) and the article on the right, with headings 100 px apart. Scroll: 0→100 over 0.3–0.9 s, →200 over 1.35–1.95 s, →300 over 2.4–3.0 s, 300→0 over 3.5–4.4 s (cubic ease-in-out). One pass takes 4.7 s (twice per 9.4 s pack cycle).
+//   - Current item = the last heading whose top is above scroll + 40 px (a trigger line 40 px below the top of the viewport).
+//   - When it changes, over 0.25 s (cubic ease-out) the item gets a pale orange background (126 × 26, radius 6) and an orange bar on its left (width 4), and its text turns from gray to bold orange; the previous item reverts over the same 0.25 s.
+//   - The table of contents stays put; only the article scrolls. The scrollbar thumb follows the scroll.
+// When to use it: Use it on long articles, documentation or FAQs to show where the reader is within the whole page.
+// Tags: scrollspy, table-of-contents, toc, navigation, active-state, scroll
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#150
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 06
+// 06 スクロールスパイ（左の目次のうち、いま読んでいる見出しの項目が光る）
+CELLS[5] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const y = steps([[0.3, 0], [0.9, 100], [1.35, 100], [1.95, 200], [2.4, 200], [3.0, 300], [3.5, 300], [4.4, 0]], u);
+  const NAMES = ['はじめに', '使い方', '料金', 'よくある質問'], TX = 160;
+  const act = t => { const yy = steps([[0.3, 0], [0.9, 100], [1.35, 100], [1.95, 200], [2.4, 200], [3.0, 300], [3.5, 300], [4.4, 0]], t); let a = 0; for (let i = 0; i < 4; i++) if (i * 100 <= yy + 40) a = i; return a; };
+  view(k, () => {
+    k.save(); k.beginPath(); k.rect(TX - 10, 0, VW, VH); k.clip(); k.translate(0, -y);
+    NAMES.forEach((s, i) => {
+      const y0 = i * 100 + 14;
+      txt(k, `${i + 1}. ${s}`, TX + 14, y0 + 22, `800 16px ${JP}`, C.ink);
+      bars(k, TX + 14, y0 + 38, 300, 3, C.faint, 6, 12, 0.6);
+    });
+    k.restore();
+    k.fillStyle = C.soft; k.fillRect(0, 0, TX - 10, VH);
+    txt(k, '目次', 20, 30, `800 12px ${JP}`, C.sub);
+    const a = act(u);
+    NAMES.forEach((s, i) => {
+      const q = trans(t => act(t) === i, u, 0.25), iy = 54 + i * 30;
+      if (q > 0) { k.fillStyle = `rgba(255,229,219,${q})`; rr(k, 12, iy - 13, TX - 34, 26, 6); k.fill(); k.fillStyle = C.acc; k.globalAlpha = q; rr(k, 12, iy - 13, 4, 26, 2); k.fill(); k.globalAlpha = 1; }
+      txt(k, s, 26, iy + 1, `${a === i ? 800 : 600} 13px ${JP}`, mix('#7D879B', C.acc, q), 'left', 'middle');
+    });
+    sbar(k, y / 300, 0.36);
+  });
+};

@@ -1,0 +1,49 @@
+// Motion Prompt #162 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#162
+//
+// ライトボックス / Lightbox
+// パック: lp2 (LP・Webサイトの演出 第2弾) · element 18 · カテゴリ: 見せ場の演出
+// 何が起きるか: ギャラリーのサムネを押すと周りが暗くなり、その写真が画面の中央で大きく表示される。×を押すと元のサムネへ縮んで戻る。
+// 動きの仕様:
+//   - 表示域 511×168。ギャラリーにサムネ4枚（108×72・角丸6）。0.75秒に3枚目をクリック、3.0秒に右上の×をクリック。4.7秒でひと回り（パックの周期9.4秒で2回）
+//   - 開く: 0.85〜1.3秒（0.45秒・easeOut 3乗）で、ページ全体に暗い幕（rgb(14,18,28)・不透明度0→0.82）をかけ、押したサムネを中央の 261×128 まで拡大する
+//   - 進み50〜100%で、写真の下に「3 / 4」、左右に前後の矢印、右上に×を出す
+//   - 閉じる: 3.05〜3.4秒（0.35秒・easeInOut 3乗）で同じ動きを逆にたどり、写真はサムネの位置へ戻る
+// 使いどころ: 施工事例・作品・商品写真など、ページを移らずに写真を大きく見せたいとき。
+// タグ: lightbox, modal, gallery, image, overlay, zoom
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#162
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 18
+// 18 ライトボックス（サムネを押すと周りが暗くなり、その上に写真が大きく表示される）
+CELLS[17] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const e = u < 2.0 ? eOut(P(u, 0.85, 1.3)) : 1 - eIO(P(u, 3.05, 3.4));
+  const TX = [24, 142, 260, 378], TY = 72, TW = 108, THt = 72, PV = [2, 0, 1, 0];
+  const B = { x: 125, y: 12, w: 261, h: 128 };
+  const cur = t => path([[0, 430, 205], [0.5, 318, 110], [0.95, 318, 110], [1.6, 445, 120], [2.5, 445, 120], [2.85, 487, 19], [3.15, 487, 19], [3.8, 430, 205], [4.7, 430, 205]], t);
+  const [cx, cy] = cur(u);
+  view(k, () => {
+    header(k, 0);
+    txt(k, 'ギャラリー', 24, 60, `800 15px ${JP}`, C.ink);
+    for (let i = 0; i < 4; i++) pic(k, TX[i], TY, TW, THt, PV[i], 6);
+    bars(k, 24, 154, 300, 1, C.faint, 6);
+    if (e > 0) {
+      k.fillStyle = `rgba(14,18,28,${0.82 * e})`; k.fillRect(0, 0, VW, VH);
+      const x = lerp(TX[2], B.x, e), y = lerp(TY, B.y, e), ww = lerp(TW, B.w, e), hh = lerp(THt, B.h, e);
+      pic(k, x, y, ww, hh, 1, 6);
+      k.save(); k.globalAlpha = clamp((e - 0.5) / 0.5);
+      txt(k, '3 / 4', VW / 2, 156, `700 12px ${EN}`, 'rgba(255,255,255,.85)', 'center', 'middle', '1px');
+      k.strokeStyle = '#fff'; k.lineWidth = 2.4; k.lineCap = 'round'; k.lineJoin = 'round';
+      k.beginPath(); k.moveTo(481, 13); k.lineTo(493, 25); k.moveTo(493, 13); k.lineTo(481, 25); k.stroke();
+      k.beginPath(); k.moveTo(98, 66); k.lineTo(90, 76); k.lineTo(98, 86); k.stroke();
+      k.beginPath(); k.moveTo(413, 66); k.lineTo(421, 76); k.lineTo(413, 86); k.stroke();
+      k.restore();
+    }
+    click(k, cx, cy, u, [0.75, 3.0]);
+  });
+};

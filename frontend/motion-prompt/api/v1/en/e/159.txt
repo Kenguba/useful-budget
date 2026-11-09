@@ -1,0 +1,57 @@
+// Motion Prompt #159 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#159
+//
+// Inline validation / インラインバリデーション
+// Pack: lp2 (Landing page & web effects, part 2) · element 15 · Category: Mouse & input interactions
+// What happens: While the email address is half typed the field turns red with an "invalid format" message; the moment it is complete it switches to a green check and "OK".
+// Motion spec:
+//   - A 511 × 168 viewport with a 300 × 44 email field (radius 8). Clicked at 0.45 s, clicked away at 4.2 s. "hana@example.com" (16 characters) is typed one character per 0.115 s from 0.75 s and deleted one per 0.03 s from 3.6 s. One pass takes 4.7 s (twice per 9.4 s pack cycle).
+//   - From the second character until the last one is typed it is invalid: over 0.15 s (cubic ease-out) the border turns red (#E5383B), the fill pale red (#FFF1F1), and a red "!" circle with "形式が正しくありません" (invalid format, 13 px) appears below.
+//   - When the last character makes it valid, over 0.25 s the border turns green (#1E9E5A), a green circle (radius 11, bouncing in with GSAP elastic.out(1, 0.3)) with a white check appears at the right end, and "OK" appears below.
+//   - While focused, the border turns from gray to navy and 1.5 → 2.2 px wide over 0.15 s. Once deletion starts, the messages go away.
+// When to use it: Use it on sign-up or contact forms so people notice mistakes before they submit.
+// Tags: validation, form, inline-validation, error-message, input, feedback
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#159
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 15
+// 15 インラインバリデーション（打っている途中は赤で「形式が正しくありません」、正しく打ち終わると緑のチェックとOK）
+CELLS[14] = (k, w, h, u) => {
+  u = snapU(u);
+  frame(k);
+  const TEXT = 'hana@example.com', F = { x: 106, y: 56, w: 300, h: 44 };
+  const len = t => { t = mod(t, CYC); return t < 0.75 ? 0 : t < 3.6 ? Math.min(TEXT.length, Math.floor((t - 0.75) / 0.115)) : Math.max(0, TEXT.length - Math.floor((t - 3.6) / 0.03)); };
+  const err = t => { const n = len(t); return mod(t, CYC) < 3.6 && n >= 2 && n < TEXT.length; };
+  const ok = t => mod(t, CYC) < 3.6 && len(t) === TEXT.length;
+  const focused = t => { t = mod(t, CYC); return t >= 0.45 && t < 4.2; };
+  const qe = trans(err, u, 0.15), qo = trans(ok, u, 0.25), fo = trans(focused, u, 0.15);
+  const cur = t => path([[0, 445, 205], [0.3, 262, 80], [0.6, 262, 80], [1.1, 455, 146], [3.8, 455, 146], [4.1, 470, 26], [4.3, 470, 26], [4.65, 445, 205], [4.7, 445, 205]], t);
+  const [cx, cy] = cur(u);
+  view(k, () => {
+    txt(k, 'お問い合わせ', F.x, 26, `800 15px ${JP}`, C.ink);
+    txt(k, 'メールアドレス', F.x, 47, `700 12px ${JP}`, C.ink);
+    k.fillStyle = mix('#FFFFFF', '#FFF1F1', qe); rr(k, F.x, F.y, F.w, F.h, 8); k.fill();
+    const bc = mix(mix(mix('#C9D0DC', C.ink, fo), RED, qe), GREEN, qo);
+    k.lineWidth = lerp(1.5, 2.2, Math.max(fo, qe, qo)); k.strokeStyle = bc; rr(k, F.x, F.y, F.w, F.h, 8); k.stroke();
+    const s = TEXT.slice(0, len(u));
+    txt(k, s, F.x + 14, F.y + 28, `600 15px ${EN}`, C.ink);
+    if (focused(u) && !ok(u) && (mod(u, 0.9) < 0.5 || (u > 0.75 && u < 2.6))) { k.font = `600 15px ${EN}`; const xw = k.measureText(s).width; k.fillStyle = C.ink; k.fillRect(F.x + 14 + xw + 1, F.y + 12, 1.6, 20); }
+    if (qe > 0) {
+      k.save(); k.globalAlpha = qe;
+      k.fillStyle = RED; k.beginPath(); k.arc(F.x + 7, F.y + F.h + 20, 7, 0, 7); k.fill(); txt(k, '!', F.x + 7, F.y + F.h + 20.5, `800 11px ${EN}`, '#fff', 'center', 'middle');
+      txt(k, '形式が正しくありません', F.x + 20, F.y + F.h + 20.5, `700 13px ${JP}`, RED, 'left', 'middle');
+      k.restore();
+    }
+    if (qo > 0) {
+      k.save(); k.globalAlpha = qo;
+      k.fillStyle = GREEN; k.beginPath(); k.arc(F.x + F.w - 22, F.y + F.h / 2, 11 * eEl(qo), 0, 7); k.fill(); check(k, F.x + F.w - 22, F.y + F.h / 2, 12, '#fff', 2.4);
+      k.fillStyle = GREEN; k.beginPath(); k.arc(F.x + 7, F.y + F.h + 20, 7, 0, 7); k.fill(); check(k, F.x + 7, F.y + F.h + 20, 8, '#fff', 1.8);
+      txt(k, 'OK', F.x + 20, F.y + F.h + 20.5, `800 13px ${EN}`, GREEN, 'left', 'middle');
+      k.restore();
+    }
+    click(k, cx, cy, u, [0.45, 4.2]);
+  });
+};

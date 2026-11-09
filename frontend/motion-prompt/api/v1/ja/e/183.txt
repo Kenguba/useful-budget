@@ -1,0 +1,28 @@
+// Motion Prompt #183 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#183
+//
+// エスタブリッシングショット / Establishing shot
+// パック: camera2 (カメラワークと切り替え 第2弾) · element 15 · カテゴリ: アングル・画づくり
+// 何が起きるか: 広角・高い位置から街全体を見せる引きの画。ゆっくり寄りながら、場所の表示が左下に出る。
+// 動きの仕様:
+//   - カメラ: 広角（焦点距離220px＝16mm表示）、高さ4.5m、ピッチ -0.06rad。前へ -5m → -2.5m とゆっくり寄る
+//   - 時間: 0.3秒から4.2秒まで3.9秒。3次のイーズインアウト（cubic-bezier(0.65,0,0.35,1) 相当）
+//   - 場面: 奥30mの街並み8棟、右16m・奥36mの塔、雲3つ、山。人物は左1m・奥12mに小さく（場所の広さを見せる）
+//   - 場所の表示: 0.9〜1.3秒で左下に「EXT. CITY – DAY」の白い札（158×30px、左端に青い縦線）が8px上へ動きながら現れ、そのまま残る
+//   - 戻り: 最後の0.5秒で開始状態へクロスフェード（1周4.7秒）。右上に「16mm WIDE」
+// 使いどころ: 場面の冒頭でどこにいるかを伝えるとき、場所や時間が変わったとき。
+// タグ: establishing shot, wide shot, location, opening, scene setting, aerial, framing
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#183
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 15
+// 15 エスタブリッシングショット: 広角・高い位置から街全体を見せる引きの画。ゆっくり寄りながら場所の表示が出る
+CELLS[14] = shot(camCell((k, w, h, p, u) => {
+  const clouds = [[-30, 20, 110, 2.6], [20, 26, 150, 3.2], [60, 17, 95, 2]];
+  world(k, w, h, cam({ f: 220, y: 4.5, pitch: -0.06, z: lerp(-5, -2.5, p) }), { city: true, clouds, tower: [16, 36], person: { x: -1, z: 12 } });
+  const a = P(u, 0.9, 1.3);   // 場所の表示（左下）
+  if (a > 0) { k.save(); k.globalAlpha = a; k.translate(30, h - 52 + (1 - a) * 8); k.fillStyle = 'rgba(255,255,255,.9)'; rr(k, 0, 0, 158, 30, 6); k.fill(); k.fillStyle = C.blue; k.fillRect(0, 0, 4, 30); txt(k, 'EXT. CITY – DAY', 14, 15.5, `600 14px ${MONO}`, C.ink, 'left', 'middle'); k.restore(); }
+}, p => `${mm(220)} WIDE`, 0.3, 4.2));

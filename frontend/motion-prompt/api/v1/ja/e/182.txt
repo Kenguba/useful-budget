@@ -1,0 +1,33 @@
+// Motion Prompt #182 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#182
+//
+// ディープフォーカス / Deep focus
+// パック: camera2 (カメラワークと切り替え 第2弾) · element 14 · カテゴリ: アングル・画づくり
+// 何が起きるか: 手前の花から奥の人物・建物まで、同時に全部にピントが合っていく。
+// 動きの仕様:
+//   - カメラ: 位置・向き・焦点距離すべて固定（高さ1.1m）。変わるのはぼかしの量だけ
+//   - ぼかし: 手前の花（左0.75m・奥2m）を 5px → 0px、奥（人物は右0.9m・奥9m、建物、山）を 6px → 0px。両方同時にはっきりしていく（#033 ラックフォーカスは片方がぼける）
+//   - 時間: 0.5秒から3.4秒まで2.9秒。3次のイーズインアウト（cubic-bezier(0.65,0,0.35,1) 相当）
+//   - ピント枠: 花（半辺46px）と人物（半辺30px）の両方に青い四隅の枠を、ピントが合うにつれ不透明度 0 → 1 で出す
+//   - 戻り: 3.4〜4.2秒は止め、最後の0.5秒で開始状態へクロスフェード。右上に絞り値（f/1.8 → f/16）
+// 使いどころ: 画面のどこを見てもよい場面、奥行きの中で複数の出来事を同時に見せるとき。
+// タグ: deep focus, depth of field, everything sharp, f/16, small aperture, pan focus, focus
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#182
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 14
+// 14 ディープフォーカス: 手前の花から奥の建物まで、全部に同時にピントが合う（#033 ラックフォーカスは片方ずつ）
+CELLS[13] = shot(camCell((k, w, h, p) => {
+  world(k, w, h, cam({ y: 1.1 }), {
+    person: { x: 0.9, z: 9 }, blurFg: 5 * (1 - p), blurBg: 6 * (1 - p),
+    extra: [[-0.75, 0, 2.0, (kk, s) => { kk.fillStyle = C.g3; kk.fillRect(-0.025, 0, 0.05, 0.75); kk.fillStyle = C.blueM; for (let i = 0; i < 6; i++) { kk.beginPath(); kk.ellipse(Math.cos(i) * 0.09, 0.8 + Math.sin(i) * 0.09, 0.08, 0.05, i, 0, 7); kk.fill(); } kk.fillStyle = C.blue; kk.beginPath(); kk.arc(0, 0.8, 0.05, 0, 7); kk.fill(); }, true]],
+    after: (kk, cc) => {   // ピントの枠を手前と奥の両方に（合うにつれて濃く）
+      kk.globalAlpha = p; kk.strokeStyle = C.blue; kk.lineWidth = 2; kk.beginPath();
+      [[proj(cc, -0.75, 0.8, 2.0), 46], [proj(cc, 0.9, 0.9, 9), 30]].forEach(([q, r]) => [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sy]) => { kk.moveTo(q.x + sx * r, q.y + sy * r - sy * 9); kk.lineTo(q.x + sx * r, q.y + sy * r); kk.lineTo(q.x + sx * r - sx * 9, q.y + sy * r); }));
+      kk.stroke(); kk.globalAlpha = 1;
+    }
+  });
+}, p => { const a = lerp(1.8, 16, p); return `f/${a < 10 ? a.toFixed(1) : Math.round(a)}`; }));

@@ -1,0 +1,34 @@
+// Motion Prompt #176 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#176
+//
+// Fly-through / フライスルー
+// Pack: camera2 (Camera moves & transitions, part 2) · element 08 · Category: Camera Movement
+// What happens: The camera flies toward a wall with a window, passes through the opening and comes out into the place beyond.
+// Motion spec:
+//   - Camera: moves forward 0 m → 12.5 m (height 1.3 m, direction fixed); a wall with a window stands 8 m ahead and the camera passes through it
+//   - Timing: 0.5 s to 3.6 s (3.1 s), cubic ease-in-out (about cubic-bezier(0.65,0,0.35,1))
+//   - Wall: a pale grey plane 80 m wide and 14 m tall with a window 2.4 m wide and 2.2 m tall (sill at 0.15 m); through it a person (0.3 m right, 14.5 m away), trees, buildings and mountains are visible
+//   - Pass-through: the wall stops being drawn 0.25 m in front of the camera; by then the window edge is outside the frame (half-width about 1580 px), so it vanishes unseen
+//   - After the pass the place beyond fills the frame and the camera closes to 2 m from the person (#035 FPV drone shot keeps weaving between trees)
+//   - Return: hold 3.6–4.2 s, then cross-fade back to the start over the last 0.5 s; top-right readout shows the distance to the window ("窓まで 8.0m" → "通過", passed)
+// When to use it: To enter a building as an opening move, or to travel from one place to another in a single move.
+// Tags: fly-through, flythrough, through the window, pass through, drone, interior, camera move
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#176
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 08
+// 08 フライスルー: 壁の窓へ向かって飛び、通り抜けて向こうの場所へ出る（#035 FPV は木の間を抜けていく）
+CELLS[7] = shot(camCell((k, w, h, p) => {
+  const z = lerp(0, 12.5, p), WZ = 8;
+  world(k, w, h, cam({ z, y: 1.3 }), {
+    buildings: true, person: { x: 0.3, z: 14.5 },
+    extra: [[0, 0, WZ, (kk, s) => {   // 窓のあいた壁（偶奇塗り）
+      kk.fillStyle = C.g1; kk.beginPath(); kk.rect(-40, 0, 80, 14); kk.rect(-1.2, 0.15, 2.4, 2.2); kk.fill('evenodd');
+      kk.strokeStyle = C.g3; kk.lineWidth = 1.6 / s; kk.strokeRect(-1.2, 0.15, 2.4, 2.2);
+      kk.strokeStyle = C.g2; kk.lineWidth = 1.2 / s; kk.beginPath(); kk.moveTo(-40, 14); kk.lineTo(40, 14); kk.stroke();
+    }]]
+  });
+}, p => { const d = 8 - lerp(0, 12.5, p); return d > 0 ? `窓まで ${d.toFixed(1)}m` : '通過'; }, 0.5, 3.6));

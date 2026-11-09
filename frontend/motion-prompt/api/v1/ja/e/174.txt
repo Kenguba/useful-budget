@@ -1,0 +1,27 @@
+// Motion Prompt #174 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#174
+//
+// フォローショット / Follow shot
+// パック: camera2 (カメラワークと切り替え 第2弾) · element 06 · カテゴリ: カメラの動き
+// 何が起きるか: 蛇行して歩く人物の後ろを、同じ道筋で少し遅れてついていく。人物は中央付近に留まり、背中が見える。
+// 動きの仕様:
+//   - 道筋: 人物は x = 1.8·sin(2.2s)、奥行き z = 4 + 9s（s は 0→1）の曲線を歩く（4m先から13m先へ）
+//   - カメラ: 同じ曲線上を s-0.4 の位置（人物の約3.6〜3.9m後ろ）でついていき、ヨー = atan2(人物x-カメラx, 人物z-カメラz) で常に人物を向く。高さ1.5m
+//   - 時間: 0.3秒から4.2秒まで3.9秒。3次のイーズインアウト（cubic-bezier(0.65,0,0.35,1) 相当）。脚と腕は sin(s×30)×0.42rad
+//   - 人物は画面の中央付近から離れず、背中が見える。道の脇の杭と岩が手前を流れて移動を見せる（#029 トラッキングは真横に並ぶ）
+//   - 戻り: 最後の0.5秒で開始状態へクロスフェード（1周4.7秒）。右上に人物までの距離（FOLLOW 3.6〜3.9m）
+// 使いどころ: 人物と一緒に場所へ入っていく感じを出すとき、ゲームのような三人称視点。
+// タグ: follow shot, follow, behind, third person, trail, walk, camera move
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#174
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 06
+// 06 フォローショット: 蛇行して歩く人物の後ろを、少し遅れて同じ道筋でついていく（#029 トラッキングは真横に並ぶ）
+CELLS[5] = shot(camCell((k, w, h, p) => {
+  const path = s => [1.8 * Math.sin(s * 2.2), 4 + s * 9];
+  const [px, pz] = path(p), [cx, cz] = path(p - 0.4);
+  world(k, w, h, cam({ x: cx, z: cz, y: 1.5, yaw: Math.atan2(px - cx, pz - cz) }), { person: { x: px, z: pz, walk: p * 30 }, fg: [[-2.4, 7], [2.6, 9.5, 'rock'], [-1.5, 12]] });
+}, p => `FOLLOW ${Math.hypot(1.8 * Math.sin(p * 2.2) - 1.8 * Math.sin((p - 0.4) * 2.2), 3.6).toFixed(1)}m`, 0.3, 4.2));

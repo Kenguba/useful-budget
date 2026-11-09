@@ -1,0 +1,36 @@
+// Motion Prompt #188 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#188
+//
+// Iris out / アイリスアウト
+// Pack: camera2 (Camera moves & transitions, part 2) · element 20 · Category: Transitions & Editing
+// What happens: A circle closes down on the person until the frame is black, then opens again on the next scene.
+// Motion spec:
+//   - Iris out: from 1.3 s to 2.7 s (1.4 s) the circular window shrinks from radius 340 px to 0 (quadratic ease-in-out (about cubic-bezier(0.45,0,0.55,1))); outside the circle is black (#141418)
+//   - Centre of the window: the current picture's subject, the person's head in A (0.6 m left, 1.63 m high, 7 m away) or the car in B (1.2 m right, 0.9 m high, 9 m away), projected to the screen
+//   - Black: 2.7–3.1 s; at 2.9 s the incoming picture is swapped in with a straight cut
+//   - Iris in: from 3.1 s to 4.4 s (1.3 s) the circle grows from 0 to 340 px around the incoming picture's subject
+//   - Edge: while the radius is at least 1 px, a 2 px blue circle marks the rim; the camera is fixed in both pictures
+//   - Alternates A→B and B→A every 4.7 s (9.4 s for the round trip); top-right readout shows "IRIS OUT" / "IRIS IN"
+// When to use it: For a silent-film or cartoon-style ending, or a playful break.
+// Tags: iris out, iris in, iris wipe, circle, old film, cartoon, transition
+// Size: 539x208 px · Cycle: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Live demo: https://showheyohtaki.github.io/motion-prompt/#188
+//
+// cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.
+// Element code starts here. CELLS, constants and helpers live in the kit.
+
+// @element 20
+// 20 アイリスアウト: 人物を中心に丸い窓が閉じて黒になり、次の場面は丸い窓が開いて現れる
+CELLS[19] = shot(abCell((k, w, h, u, A, B) => {
+  const out = eIOs(P(u, 1.3, 2.7)), inn = eIOs(P(u, 3.1, 4.4));
+  const first = u < 2.9, cur = first ? A : B;
+  cur(k, w, h);
+  // 窓の中心は、いま映っている場面の主役（Aは人物の頭、Bは車）
+  const c = cur === sceneA ? proj(cam({ y: 1.4 }), -0.6, 1.63, 7) : proj(cam({ y: 1.6, pitch: 0.1 }), 1.2, 0.9, 9);
+  const rad = first ? lerp(340, 0, out) : lerp(0, 340, inn);
+  const cx = w / 2 + c.x, cy = h / 2 + c.y;
+  if (rad < 339) {
+    k.fillStyle = '#141418'; k.beginPath(); k.rect(0, 0, w, h); k.arc(cx, cy, Math.max(0, rad), 0, Math.PI * 2, true); k.fill('evenodd');
+    if (rad > 1) { k.strokeStyle = C.blue; k.lineWidth = 2; k.beginPath(); k.arc(cx, cy, rad, 0, 7); k.stroke(); }
+  }
+}, u => u < 2.9 ? 'IRIS OUT' : 'IRIS IN'));

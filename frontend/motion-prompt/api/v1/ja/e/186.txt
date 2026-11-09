@@ -1,0 +1,37 @@
+// Motion Prompt #186 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#186
+//
+// モーフカット / Morph cut
+// パック: camera2 (カメラワークと切り替え 第2弾) · element 18 · カテゴリ: 切り替え・編集
+// 何が起きるか: 同じ人物の2つのテイクを、位置と姿勢をなめらかに補間してつなぐ。ジャンプカットのように飛ばない。
+// 動きの仕様:
+//   - テイク1（0〜2.0秒）: 固定カメラ（高さ1.45m）、人物は左0.4m・奥3.3mで腕と脚が -0.45rad の姿勢。テイク2（2.45秒〜）: 右0.35m、+0.55rad の姿勢。どちらも 0.12·sin(t×3) rad で小さく揺れる
+//   - モーフ（2.0〜2.45秒・0.45秒）: 位置を2次のイーズインアウト（cubic-bezier(0.45,0,0.55,1) 相当）で補間し、同じ補間位置にテイク1の姿勢とテイク2の姿勢を重ねてクロスフェード
+//   - モーフ中だけ全体に sin(q×π)×2.2px のぼかしを加えて、つなぎ目をなじませる（#041 ジャンプカットは位置が飛ぶ）
+//   - 画面下の帯: テイク1（灰）・モーフ（青、細い）・テイク2（灰）と再生ヘッド
+//   - 戻り: 最後の0.5秒でテイク1の開始状態へクロスフェード。右上に「TAKE 1」→「MORPH」→「TAKE 2」
+// 使いどころ: インタビューや語りの間を詰めるとき、言い間違いを目立たずに消すとき。
+// タグ: morph cut, morph, seamless, interview, talking head, edit, transition
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#186
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 18
+// 18 モーフカット: 同じ人物の2テイクを、位置と姿勢をなめらかに補間してつなぐ（#041 ジャンプカットは飛ぶ）
+CELLS[17] = shot((k, w, h, u) => {
+  const T0 = 2.0, T1 = 2.45, r = P(u, CYC - RESET, CYC);
+  const draw = (kk, t) => {
+    const q = eIOs(P(t, T0, T1));
+    // テイク1とテイク2は姿勢が違う。モーフ中は同じ（補間した）位置に2つの姿勢を重ねて溶かす
+    const pose = (k2, m) => world(k2, w, h, cam({ y: 1.45, z: 0 }), { person: { x: lerp(-0.4, 0.35, q), z: 3.3, walk: (m ? 0.55 : -0.45) + 0.12 * Math.sin(t * 3) }, trees: true, buildings: true });
+    const bl = Math.sin(q * Math.PI) * 2.2;
+    kk.save(); kk.filter = bl > 0.05 ? `blur(${bl.toFixed(2)}px)` : 'none';
+    blend(kk, k2 => pose(k2, false), k2 => pose(k2, true), q);
+    kk.restore();
+    strip(kk, w, h, [[0, T0, 'テイク1', C.g2], [T0, T1, '', C.blue], [T1, CYC, 'テイク2', C.g2]], t);
+  };
+  blend(k, kk => draw(kk, u), kk => draw(kk, 0), eIOs(r));
+  return r > .5 || u < T0 ? 'TAKE 1' : u < T1 ? 'MORPH' : 'TAKE 2';
+});

@@ -1,0 +1,35 @@
+// Motion Prompt #172 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#172
+//
+// 長回し / Long take
+// パック: camera2 (カメラワークと切り替え 第2弾) · element 04 · カテゴリ: カメラの動き
+// 何が起きるか: 歩く人物をカットなしで追い続ける1ショット。画面下の帯は切れ目のない1本のまま。
+// 動きの仕様:
+//   - つなぎ: なし。4.2秒間、1ショットで人物を追い続ける（#041 ジャンプカットは5つに割る）
+//   - 被写体: 人物が左手前（x=-3.4m・奥5.2m）から右奥（x=2.8m・奥9.6m）へ等速で歩く。脚と腕は sin(t×7)×0.42rad
+//   - カメラ: 人物を追って右へ 0m → 1.4m 横移動しながら、ヨー = atan2(人物x-カメラx, 奥行き)×0.8 で首を振る。高さ1.4m
+//   - 画面下の帯: 1本の青い帯「1ショット・カットなし」と再生ヘッド。切れ目がないことを示す
+//   - 戻り: 4.2秒で止め、最後の0.5秒で開始状態へクロスフェード（1周4.7秒）
+//   - 右上に経過秒数（NO CUT 0.0s → 4.2s）
+// 使いどころ: 緊張感や臨場感を切らさずに見せたいとき、動きの流れを1本で見せるとき。
+// タグ: long take, oner, one shot, continuous, no cut, sequence shot, camera move
+// サイズ: 539x208 px · 1周: 9.4 s
+// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// 動く見本: https://showheyohtaki.github.io/motion-prompt/#172
+//
+// cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
+// ここから要素のコード。CELLS や定数・補助関数は kit にある。
+
+// @element 04
+// 04 長回し: 歩く人物をカットなしで追い続ける1ショット。画面下の帯は1本のまま（#041 ジャンプカットのように割れない）
+CELLS[3] = shot((k, w, h, u) => {
+  const uu = Math.min(u, CYC - RESET);
+  const draw = (kk, t) => {
+    const p = t / (CYC - RESET);
+    const x = lerp(-3.4, 2.8, p), z = lerp(5.2, 9.6, p), cx = lerp(0, 1.4, p);
+    world(kk, w, h, cam({ x: cx, y: 1.4, yaw: Math.atan2(x - cx, z) * 0.8 }), { person: { x, z, walk: t * 7 }, fg: [[-2.6, 3.4], [3.6, 4.6, 'rock']] });
+    strip(kk, w, h, [[0, CYC, '1ショット・カットなし', C.blue]], t);
+  };
+  const r = P(u, CYC - RESET, CYC);
+  blend(k, kk => draw(kk, uu), kk => draw(kk, 0), eIOs(r));
+  return `NO CUT ${(r > .5 ? 0 : uu).toFixed(1)}s`;
+});
