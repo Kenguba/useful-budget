@@ -47,7 +47,9 @@ frontend/<project>/           # 例：frontend/skill-board/
 | `frontend/cloud-pan/` | 基德盘搜（pan）1:1 复刻：搜索首页 / 热播榜 / 每日更新 / 热搜榜 / APP / 申请友链 / 资源详情 | 手动跑 `scripts/refresh.py` 拉原站公开接口快照（`data/`），页面纯静态渲染 |
 | `frontend/ip-check/` | IP 纯净度检测（IPPure 风格 1:1 复刻，融合 ping0 字段）：ASN / 多源位置 / 人机流量比 / 来源 / 属性 / 纯净度系数 + 风控值 / 原生 IP / 大模型检测 / 共享人数 / 适用场景 | 纯静态单文件，浏览器端直查公开 IP 情报接口，无后端、无定时刷新 |
 | `frontend/2fa-auth/` | 2FA 验证码工具（2fa.fun 1:1 复刻）：谷歌验证器网页版，批量粘贴 2FA 密钥生成 6 位 TOTP 动态验证码，30 秒自动刷新、一键复制，毛玻璃侧边栏 + 深浅主题 + 中英切换 | 纯静态单文件，浏览器端本地计算（Web Crypto HMAC-SHA1），密钥不上传，无后端、无定时刷新 |
+| `frontend/ui-design/` | Designeer 设计目录复刻站（设计资源目录 + Finds 海报，署名 Designeer 并链回原页） | 手动跑 `scripts/refresh.py` 重拉官方目录数据，页面纯静态渲染 |
 | `frontend/wechat-bridge/` | 微信接入可行方案（调研报告页） | 静态页，手动维护 |
+| `frontend/motion-prompt/` | Motion Prompt 动效画廊（192 条命名动效/运镜/UI/网页特效，原画廊原样复刻，署名原作者 Shohei Ohtaki，MIT） | 纯静态站，手动维护（数据随上游原仓同步） |
 
 ## 子域名（Cloudflare 转发）
 
@@ -64,6 +66,7 @@ frontend/<project>/           # 例：frontend/skill-board/
 | `frontend/cloud-pan/` | `pan.xxxxx.asia` |
 | `frontend/ip-check/` | `ip.xxxxx.asia` |
 | `frontend/2fa-auth/` | `2fa.xxxxx.asia` |
+| `frontend/ui-design/` | `ui.xxxxx.asia` |
 | `frontend/wechat-bridge/` | `wechat.xxxxx.asia`（仅子域名，不进总汇） |
 | `frontend/motion-prompt/` | `motion.xxxxx.asia`（仅子域名，不进总汇） |
 
