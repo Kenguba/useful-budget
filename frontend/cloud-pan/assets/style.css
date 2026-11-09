@@ -296,6 +296,7 @@ body[data-page="search"] .searchbar:focus-within{box-shadow:0 10px 24px -10px va
 /* 热门搜索榜 */
 .hot-row{display:flex;align-items:center;gap:12px;padding:9.5px 2px}
 .hot-rank{width:24px;flex:none;text-align:center;font-size:16px;font-weight:800;color:var(--text-muted);font-variant-numeric:tabular-nums}
+#tTotal{font-variant-numeric:tabular-nums}
 .hot-row:nth-child(1) .hot-rank{color:#F59E0B}
 .hot-row:nth-child(2) .hot-rank{color:#94A3B8}
 .hot-row:nth-child(3) .hot-rank{color:#D97706}
@@ -320,7 +321,7 @@ body[data-page="search"] .searchbar:focus-within{box-shadow:0 10px 24px -10px va
 .poster .ph{position:relative;aspect-ratio:2/3;background:var(--sub-surface);overflow:hidden}
 .poster .ph img{width:100%;height:100%;object-fit:cover;display:block}
 .poster .rank{position:absolute;top:0;left:0;min-width:26px;height:26px;padding:0 6px;background:rgba(17,24,39,.55);color:#fff;
-  font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;border-bottom-right-radius:10px}
+  font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;border-bottom-right-radius:10px;font-variant-numeric:tabular-nums}
 .poster .rank.top{background:var(--refresh-btn-bg)}
 .poster .meta{padding:9px 10px 11px}
 .poster .t{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -422,13 +423,14 @@ details.about summary{cursor:pointer;color:var(--text-secondary);font-weight:600
 .contact-card img{width:128px;height:128px;object-fit:cover;border-radius:8px}
 .contact-card .cc-c{color:var(--mut);font-size:12.5px;margin-top:9px;line-height:1.6}
 /* 联系我们磁吸竖签（新稿 11 节：竖排贴边 + 自由拖拽 + 边缘磁吸 + 半收起耳片） */
-.floating-contact-dock{position:fixed;right:0;bottom:20px;z-index:95;display:flex;align-items:center;justify-content:center;
+.floating-contact-dock{position:fixed;right:0;bottom:40px;z-index:95;display:flex;align-items:center;justify-content:center;
   background:rgba(255,255,255,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   padding:8px 4px;border-radius:14px 0 0 14px;
   box-shadow:-2px 6px 22px -2px var(--search-glow),-2px 2px 10px rgba(15,23,42,.08);
   user-select:none !important;-webkit-user-select:none !important;-webkit-touch-callout:none !important;
   touch-action:none;cursor:grab;will-change:left,top,transform,opacity,border-radius;
   transition:left .42s cubic-bezier(.22,1,.36,1),top .38s cubic-bezier(.22,1,.36,1),border-radius .28s ease,opacity .28s ease,transform .32s cubic-bezier(.22,1,.36,1),box-shadow .28s ease,background-color .35s ease}
+@media (max-width:860px){.floating-contact-dock{bottom:36px}}
 [data-dark="true"] .floating-contact-dock{background:rgba(23,35,61,.96);box-shadow:-2px 6px 24px -2px var(--search-glow),-2px 2px 12px rgba(0,0,0,.45)}
 .floating-contact-dock.docked-left{border-radius:0 14px 14px 0;box-shadow:2px 6px 22px -2px var(--search-glow),2px 2px 10px rgba(15,23,42,.08)}
 .floating-contact-dock.docked-right{border-radius:14px 0 0 14px}

@@ -261,7 +261,8 @@
     (function initPosition() {
       var vh = window.innerHeight;
       var dh = dockEl.getBoundingClientRect().height || 96;
-      currentTop = Math.max(80, vh - dh - 20);
+      var dockGap = window.innerWidth <= 860 ? 36 : 40;
+      currentTop = Math.max(80, vh - dh - dockGap);
       dockEdgeSide = "right"; stashedSide = null;
       try {
         var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
@@ -355,7 +356,7 @@
       '<a class="logo" href="' + BASE + 'index.html">' + logoGrid() + '<span class="logo-name" id="brandNameText">' + esc(name) + "</span></a>" +
       topSearch +
       '<div class="top-right-widgets">' +
-      '<button class="btn-app' + (active === "app" ? " on" : "") + '" id="btnAppNav">📱<span class="app-txt">APP</span></button>' +
+      '<button class="btn-app' + (active === "app" ? " on" : "") + '" id="btnAppNav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:3px"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M10.8 18.6h2.4"/></svg><span class="app-txt">APP</span></button>' +
       '<button class="lang-pill-btn" id="langBtn" type="button" title="切换语言 / Switch Language">' + globeSvg + '<span class="lang-text" id="langText">中文</span></button>' +
       '<button class="theme-mode-btn" id="darkModeBtn" type="button" title="单击切换日夜 / 长按滑动选12色主题" aria-label="切换日夜或选择主题">' +
       '<svg class="sun-moon-svg" id="sunMoonIcon" viewBox="0 0 24 24">' + sunPaths + "</svg></button>" +
@@ -720,7 +721,7 @@
       searchbarHtml("") +
       hotBar + "</section>";
     if (content.announcement_enabled && content.announcement) {
-      html += '<div class="announce"><div class="announce-in"><span class="ic">📣</span><b>站点公告</b><span>' +
+      html += '<div class="announce"><div class="announce-in"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px"><path d="M3 10.5v3h3l6 4.5v-12L6 10.5H3z"/><path d="M15.5 9.8a3.6 3.6 0 0 1 0 4.4"/><path d="M18.2 7.2a7.4 7.4 0 0 1 0 9.6"/></svg></span><b>站点公告</b><span>' +
         esc(content.announcement) + "</span></div></div>";
     }
     // 两栏：每日更新 + 热门搜索
@@ -783,7 +784,7 @@
       updLine = '<div style="color:var(--faint);font-size:13px;margin-top:14px">更新于 ' + bj + " 00:00</div>";
     }
     main.innerHTML =
-      '<div class="page-head"><h1>发现</h1><div class="desc">近期值得关注的影视作品。</div></div>' + staleNote("discovery") +
+      '<div class="page-head"><h1>发现</h1><div class="desc">近期值得关注的影视作品</div></div>' + staleNote("discovery") +
       '<div class="card" style="padding:24px 26px;margin-top:14px">' +
       '<div class="filters">' +
       '<div class="frow"><span class="fl">影视分类</span><span id="dCat"></span></div>' +
@@ -938,7 +939,7 @@
         '<span class="hot-count">' + cnt + "</span></div>";
     }).join("");
     main.innerHTML =
-      '<div class="page-head"><h1>热搜榜</h1><div class="desc">查看站内用户最近搜索最多的内容。</div></div>' + staleNote("hot") +
+      '<div class="page-head"><h1>热搜榜</h1><div class="desc">查看站内用户最近搜索最多的内容</div></div>' + staleNote("hot") +
       '<div class="card" style="margin-top:14px"><div class="hot-grid">' + cells + "</div></div>";
   }
 
@@ -1181,21 +1182,21 @@
       '<div style="color:var(--mut);font-size:13.5px">网盘直达 · 本地历史</div>' +
       '<div style="color:var(--faint);font-size:13px;margin:12px 0 18px">' + esc(params.join(" · ")) + "</div>" +
       '<div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn-primary" style="display:inline-block" href="' + ORIGIN + '/app" target="_blank" rel="noopener">打开 APP · 连接本站 →</a>' + dlBtn + "</div>" +
-      '<p style="color:var(--mut);font-size:13.5px;line-height:1.8;margin:16px 0 0">首次安装后，回到这里点「打开 APP」，确认连接本站。</p>' +
-      '<details class="about"><summary>打开或安装遇到问题？</summary><p>安装时按系统提示允许当前浏览器安装应用。<br>已安装但打不开，可「换一种方式打开」。<br>后续在 APP「设置 → 检查更新」升级，安装时需系统确认。</p></details></div>' +
+      '<p style="color:var(--mut);font-size:13.5px;line-height:1.8;margin:16px 0 0">首次安装后，回到这里点「打开 APP」，确认连接本站</p>' +
+      '<details class="about"><summary>打开或安装遇到问题？</summary><p>安装时按系统提示允许当前浏览器安装应用<br>已安装但打不开，可「换一种方式打开」<br>后续在 APP「设置 → 检查更新」升级，安装时需系统确认</p></details></div>' +
       '<div class="card"><h2 style="font-size:19px;margin:0 0 4px">苹果桌面版</h2>' +
       '<div style="color:var(--mut);font-size:13.5px">本站图标 · 随网站更新</div>' +
       '<div style="margin:12px 0 18px"><span class="tag-hot" style="font-size:12px;padding:4px 10px">网页版 · 无需自签</span></div>' +
       '<a class="btn-primary" style="display:inline-block" href="' + ORIGIN + '/api/public/app/ios.mobileconfig">下载桌面版 ↓</a>' +
       '<div><button class="btn-install" id="btnInstall" type="button">安装到桌面</button></div>' +
-      '<p style="color:var(--mut);font-size:13.5px;line-height:1.8;margin:16px 0 0">下载后打开「设置 → 已下载描述文件 → 安装」。</p>' +
-      '<details class="about"><summary>也可以直接添加到主屏幕</summary><p>用 Safari 或支持此功能的 Chrome 打开本站，在分享菜单中选择「添加到主屏幕」。<br>描述文件仅添加本站图标，系统可能显示「未签名」。<br>桌面版使用网页，网盘唤起以手机实际支持为准。</p></details></div>' +
+      '<p style="color:var(--mut);font-size:13.5px;line-height:1.8;margin:16px 0 0">下载后打开「设置 → 已下载描述文件 → 安装」</p>' +
+      '<details class="about"><summary>也可以直接添加到主屏幕</summary><p>用 Safari 或支持此功能的 Chrome 打开本站，在分享菜单中选择「添加到主屏幕」<br>描述文件仅添加本站图标，系统可能显示「未签名」<br>桌面版使用网页，网盘唤起以手机实际支持为准</p></details></div>' +
       "</div>" +
       '<div class="card" style="max-width:520px;margin:24px auto 0;text-align:center;padding:28px">' +
       '<img src="https://api.qrserver.com/v1/create-qr-code/?size=168x168&data=' + encodeURIComponent(appUrl) +
       '" alt="本站 APP 下载页面二维码" style="width:168px;height:168px" onerror="this.style.display=\'none\'">' +
       '<div style="font-weight:800;font-size:16px;margin-top:12px">用手机扫码打开</div>' +
-      '<div style="color:var(--mut);font-size:13.5px;margin-top:5px">在手机上下载，连接本站。</div></div>';
+      '<div style="color:var(--mut);font-size:13.5px;margin-top:5px">在手机上下载，连接本站</div></div>';
     // PWA 安装钮（从顶栏收进本页）：浏览器已给出安装提示、或 iOS 未安装时才显示；已安装（standalone）不显示
     var btnInstall = document.getElementById("btnInstall");
     if (btnInstall) {
