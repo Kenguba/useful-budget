@@ -8,10 +8,18 @@
  */
 (function () {
   'use strict';
+  /* 入口分工（ken 2026-11-09）：总汇只在域名根部署时启用（jpedu.asia——模块
+     与短路径全是根绝对路径）；在 github.io 的 /useful-budget/ 子路径部署下
+     整体不激活，卡片走页面自带的相对链接跳各自单站，两边跳转逻辑不同。 */
+  var hubPrefix = '';
+  if (document.currentScript && document.currentScript.src) {
+    try { hubPrefix = new URL(document.currentScript.src).pathname.replace(/\/hub\/hub\.js$/, ''); } catch (e) {}
+  }
+  if (hubPrefix) return;
   var BASE = '/hub/modules/';
   /* 资源版本戳：改任何 hub/模块文件，必须同步 bump 这里的 MV 与根 index.html 里 hub.js/hub.css 的 ?v=，
      否则 CDN 对 .js 有 4 小时缓存，会出现新 ui.html 配旧 module.js 的混搭（2026-11-09 实测 ip 模块中招） */
-  var MV = '20261109c';
+  var MV = '20261109d';
   var MODULES = {
     phone: { proj: 'cloud-phone', dir: '/frontend/cloud-phone/', tier: 'light' },
     '2fa': { proj: '2fa-auth',    dir: '/frontend/2fa-auth/',    tier: 'light' },
