@@ -2535,7 +2535,7 @@ setInterval(() => { renderOtpCodes(false); }, 1000);
 
 /* ================= Init ================= */
 /* Link-in: secret carried at the end of the URL is filled in and generated on load.
-   Supported: #tok/<secret>, #<secret>, ?tok=<secret>, and /tok/<secret> when a host rewrites it to this page.
+   Supported: #tok/<secret>, #<secret>, ?tok=<secret>, and path forms /tok/<secret> or /<secret> when a host rewrites them to this page.
    The # form never leaves the browser; all codes are computed locally as usual. */
 (function(){
   var cand = '';
@@ -2546,8 +2546,9 @@ setInterval(() => { renderOtpCodes(false); }, 1000);
   }
   if (!parseSecrets(cand).length){
     cand = '';
-    var pm = location.pathname.match(/\/tok\/([^\/\?#]+)\/?$/);
-    if (pm){ try { cand = decodeURIComponent(pm[1]); } catch(e){ cand = pm[1]; } }
+    var segs = location.pathname.split('/').filter(function(x){ return x; });
+    var last = segs.length ? segs[segs.length - 1] : '';
+    if (last && last !== 'tok'){ try { cand = decodeURIComponent(last); } catch(e){ cand = last; } }
   }
   if (parseSecrets(cand).length){ textarea.value = cand; activated = true; codesGenerated = true; }
 })();
