@@ -65,6 +65,7 @@ frontend/<project>/           # 例：frontend/skill-board/
 | `frontend/ip-check/` | `ip.xxxxx.asia` |
 | `frontend/2fa-auth/` | `2fa.xxxxx.asia` |
 | `frontend/wechat-bridge/` | `wechat.xxxxx.asia`（仅子域名，不进总汇） |
+| `frontend/motion-prompt/` | `motion.xxxxx.asia`（仅子域名，不进总汇） |
 
 **首页（总汇）收录规则（2026-11-07 ken 定）**：进总汇首页的只有 7 个——ai、skill、phone、pan、ip、2fa、ui。wechat 只开子域名 `wechat.xxxxx.asia`，不进总汇：不加短路径、不上首页卡片。以后新增项目先定类别：进首页的，子域名、总汇短路径、首页卡片三样一起加；不进首页的，只加子域名，并在子域名清单里登记注明，免得误加。
 

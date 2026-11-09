@@ -1,7 +1,7 @@
 // ============================================================
 // 子域名分发服务 site-router 的源码留档副本。
 // 真正运行的是部署在 Cloudflare（站长账号）上的 Worker
-// 「site-router」（版本 a8c58bab，2026-11-07 更新：新增总汇短路径 HUB_SHORT，主域名短路径回总汇外壳；同日晚再更新：ROUTES 新增 wechat 子域名，仅子域名、不进总汇，HUB_SHORT 未动）；2026-11-10 再更新：新增 2fa 专属规则（/<密钥> 与 /tok/<密钥> 直达 2fa 首页，密钥由页面本地解析），守在通配路由 *.xxxxx.asia/*
+// 「site-router」（版本 b382c868，2026-11-07 更新：新增总汇短路径 HUB_SHORT，主域名短路径回总汇外壳；同日晚再更新：ROUTES 新增 wechat 子域名，仅子域名、不进总汇，HUB_SHORT 未动）；2026-11-10 再更新：新增 2fa 专属规则（/<密钥> 与 /tok/<密钥> 直达 2fa 首页，密钥由页面本地解析），守在通配路由 *.xxxxx.asia/*
 // 与主域名路由 xxxxx.asia/* 上，按子域名前缀把七个项目分发到
 // GitHub Pages 对应目录；主域名（无前缀）分发到仓库根导航页（总体预览页）。
 // 把副本放在仓库里，是为了迁移时直接拿这一份部署，不用去控制台翻。
@@ -27,6 +27,7 @@ ip: "frontend/ip-check",
 "2fa": "frontend/2fa-auth",
 ui: "frontend/ui-design",
 wechat: "frontend/wechat-bridge",
+motion: "frontend/motion-prompt",
 };
 
 const HUB_SHORT = { ai: 1, phone: 1, skill: 1, ip: 1, pan: 1, '2fa': 1, ui: 1 };
