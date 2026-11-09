@@ -1,75 +1,56 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#F3F8FA">
-<link rel="icon" href="data:,">
-<title>微信接入可行方案</title>
-<script>
-/* early prefs: Cookie A > local, applied before first paint to avoid flash */
-(function(){try{
-  var m=document.cookie.match(/(?:^|;\s*)A=(\d{3,4})(?:;|$)/), a=null;
-  if(m){var v=m[1],t=parseInt(v.slice(2),10); if((v.charAt(1)==='0'||v.charAt(1)==='1')&&t>=1&&t<=12) a={l:v.charAt(0),m:v.charAt(1),t:t};}
-  var lt=null; try{var s=localStorage.getItem('wechat-aura-theme'); if(s!==null){var n=parseInt(s,10); if(n>=0&&n<=11) lt=n;}}catch(e){}
-  var idx=a?a.t-1:(lt!==null?lt:11);
-  document.documentElement.setAttribute('data-theme-idx', idx);
-  if(a){document.documentElement.setAttribute('data-lang-init', a.l==='1'?'en':'zh'); if(a.m==='0'){document.documentElement.setAttribute('data-dark','true'); var mt=document.querySelector('meta[name="theme-color"]'); if(mt)mt.setAttribute('content','#0B1120');}}
-}catch(e){}})();
-</script>
-<style>
-:root {
-      /* 顶部弥散渐变与三光斑色值（默认激活第12号：幻彩全息 Gemini Holo） */
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:,">
+  <title>微信接入可行方案 · KEN · USE 12色弥散光晕终极版</title>
+  <style>
+    /* ================= 1. 核心动态 CSS 变量体系（100% 同步 Ai比价.html 12色弥散光晕系统） ================= */
+    :root {
+      /* 顶部弥散渐变与双/三光斑色值（默认首屏激活 12 号：幻彩全息 Gemini Holo，支持持久化） */
       --hero-bg-base: #FFFFFF;
       --orb-color-1: #8FDBB8;
       --orb-color-2: #9CC8F7;
-      
-      /* 按钮与组件专属联动色 */
-      --refresh-btn-bg: #4FA8F6;
-      --refresh-btn-text: #FFFFFF;
-      --send-circle-bg: #9EE0C5;
-      --send-circle-icon: #0F172A;
-      
-      /* 主题强调色与标签配比 */
-      --theme-accent: #1A73E8;
-      --theme-tab-text: #0F172A;
-      --theme-tag-bg: #E6F4EA;
-      --theme-tag-text: #137333;
-      --search-glow: rgba(143, 219, 184, 0.44);
 
-      /* 页面背景与卡片表面色（随主题微染 + 支持深色模式） */
+      /* 按钮与组件专属联动色 */
+      --refresh-btn-bg: #4FA8F6;       /* 刷新/切换按钮底色 */
+      --refresh-btn-text: #FFFFFF;     /* 刷新按钮文字色 */
+      --send-circle-bg: #9EE0C5;       /* 搜索框右侧圆形按钮色 */
+      --send-circle-icon: #0F172A;     /* 搜索框右侧圆形按钮箭头色 */
+
+      /* 主题强调色与标签配比（联动下方列表、品牌竖条与右上角地球图标） */
+      --theme-accent: #1A73E8;         /* 核心强调色、价格/星级、地球图标、品牌竖条 */
+      --theme-tab-text: #0F172A;       /* Tab 选中文字色 */
+      --theme-tag-bg: #E6F4EA;         /* 卡片主题标签底色 */
+      --theme-tag-text: #137333;       /* 卡片主题标签文字色 */
+      --search-glow: rgba(143, 219, 184, 0.44); /* 搜索框与卡片弥散光晕阴影 */
+
+      /* 下方页面背景与卡片表面色（随主题微染 + 支持深色模式） */
       --page-bg: #F3F8FA;
       --card-bg: #FFFFFF;
-      --card-border: rgba(226, 232, 240, 0.82);
-      --input-bg: rgba(248, 250, 252, 0.85);
-      --sidebar-bg: rgba(255, 255, 255, 0.86);
+      --sub-surface: #F8FAFC;
+      --card-border: rgba(226, 232, 240, 0.78);
       --text-primary: #0F172A;
-      --text-secondary: #475569;
+      --text-secondary: #64748B;
       --text-muted: #94A3B8;
       --pill-surface: #FFFFFF;
       --pill-shadow: 0 6px 20px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03);
-      --card-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.03);
-      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-      --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
-
-      /* 同心圆角规范变量：外圈 = 里圈 + 缝 */
-      --card-outer-radius: 26px;
-      --card-pad: 14px;
-      --card-inner-radius: 12px; /* 26 - 14 = 12 */
     }
-[data-dark="true"] {
+
+    /* 深色模式覆盖变量（单击右上角太阳按钮切换） */
+    [data-dark="true"] {
       --hero-bg-base: #0B1120;
       --page-bg: #090D16;
       --card-bg: #151F32;
+      --sub-surface: #1E293B;
       --card-border: rgba(255, 255, 255, 0.08);
-      --input-bg: rgba(15, 23, 42, 0.68);
-      --sidebar-bg: rgba(21, 31, 50, 0.88);
       --text-primary: #F8FAFC;
       --text-secondary: #94A3B8;
       --text-muted: #64748B;
       --pill-surface: #1E293B;
       --pill-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-      --card-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.45);
       --theme-tab-text: #F8FAFC;
     }
 
@@ -77,20 +58,111 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Noto Sans SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
       -webkit-tap-highlight-color: transparent;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
     }
-.aura-orb{position:absolute;border-radius:50%;filter:blur(48px);opacity:.82;transition:background-color .75s var(--ease-smooth),transform .85s var(--ease-spring)}
-.orb-left {
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    body {
+      background-color: var(--page-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.65;
+      transition: background-color 0.55s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s ease;
+    }
+
+    code, .mono {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.86em;
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      padding: 2px 6px;
+      border-radius: 6px;
+      overflow-wrap: break-word;
+    }
+
+    [data-dark="true"] code,
+    [data-dark="true"] .mono {
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--orb-color-2);
+    }
+
+    /* 居中自适应容器（宽敞单列流，兼顾桌面与移动端舒适阅读） */
+    .app-container {
+      max-width: 640px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      padding-bottom: 52px;
+    }
+
+    /* ================= 2. 顶部弥散渐变区域 ================= */
+    .hero-header {
+      position: relative;
+      background-color: var(--hero-bg-base);
+      padding: 16px 18px 26px;
+      border-bottom-left-radius: 32px;
+      border-bottom-right-radius: 32px;
+      box-shadow: 0 14px 34px -12px var(--search-glow);
+      transition: background-color 0.55s ease, box-shadow 0.6s ease;
+      z-index: 10;
+    }
+
+    /* 动态弥散光斑层（独立裁切圆角，避免遮挡下拉主题面板） */
+    .aura-backdrop {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+      border-bottom-left-radius: 32px;
+      border-bottom-right-radius: 32px;
+    }
+
+    .aura-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(48px);
+      opacity: 0.82;
+      transition: background-color 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-dark="true"] .aura-orb {
+      opacity: 0.28;
+      filter: blur(56px);
+    }
+
+    .aura-orb.orb-left {
       width: 280px;
       height: 220px;
       bottom: -60px;
       left: -40px;
       background-color: var(--orb-color-1);
     }
-.orb-center {
+
+    .aura-orb.orb-right {
+      width: 300px;
+      height: 240px;
+      bottom: -75px;
+      right: -45px;
+      background-color: var(--orb-color-2);
+    }
+
+    .aura-orb.orb-center {
       width: 260px;
       height: 190px;
       bottom: -55px;
@@ -99,62 +171,158 @@
       opacity: 0;
       transition: opacity 0.6s ease, background-color 0.75s ease;
     }
-.orb-right {
-      width: 300px;
-      height: 240px;
-      bottom: -75px;
-      right: -45px;
-      background-color: var(--orb-color-2);
-    }
-[data-holo="true"] .aura-orb.orb-left {
-      animation: videoHoloLeft 4.8s ease-in-out infinite;
-      filter: blur(42px);
-      opacity: 0.9;
-    }
-[data-holo="true"] .aura-orb.orb-right {
-      animation: videoHoloRight 4.8s ease-in-out infinite;
-      filter: blur(42px);
-      opacity: 0.9;
-    }
-[data-holo="true"] .aura-orb.orb-center {
-      opacity: 0.78;
-      animation: videoHoloCenter 4.8s ease-in-out infinite;
-      filter: blur(44px);
-    }
-[data-holo="true"] .aura-orb.orb-left,
-    [data-dark="true"][data-holo="true"] .aura-orb.orb-right,
-    [data-dark="true"][data-holo="true"] .aura-orb.orb-center {
-      opacity: 0.34;
-    }
-@keyframes videoHoloLeft {
+
+    /* ================= 2.5 第12号主题「视频同款·流光幻彩」专属动态呼吸极光 ================= */
+    @keyframes videoHoloLeft {
       0%   { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
       25%  { background-color: #8FDBB8; transform: translate(16px, -12px) scale(1.1); }
       50%  { background-color: #92C6F2; transform: translate(8px, 6px) scale(1.06); }
       75%  { background-color: #B9CFF8; transform: translate(-12px, -6px) scale(1.02); }
       100% { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
     }
-@keyframes videoHoloRight {
+
+    @keyframes videoHoloRight {
       0%   { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
       25%  { background-color: #9CC8F7; transform: translate(-16px, -8px) scale(1.1); }
       50%  { background-color: #A7D0F7; transform: translate(-8px, 8px) scale(1.04); }
       75%  { background-color: #BDE7D5; transform: translate(14px, -6px) scale(1.08); }
       100% { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
     }
-@keyframes videoHoloCenter {
+
+    @keyframes videoHoloCenter {
       0%   { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
       33%  { background-color: #9FCAF5; transform: translateY(-14px) scale(1.12); }
       66%  { background-color: #CFE7FB; transform: translateY(6px) scale(0.98); }
       100% { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
     }
-@keyframes videoHoloBtn {
+
+    @keyframes videoHoloBtn {
       0%   { background-position: 0% 50%; }
       50%  { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-/* 右侧日夜切换按钮（单击切换日夜，长按弹出12色主题面板） */
+
+    [data-holo="true"] .aura-orb.orb-left {
+      animation: videoHoloLeft 4.8s ease-in-out infinite;
+      filter: blur(42px);
+      opacity: 0.9;
+    }
+
+    [data-holo="true"] .aura-orb.orb-right {
+      animation: videoHoloRight 4.8s ease-in-out infinite;
+      filter: blur(42px);
+      opacity: 0.9;
+    }
+
+    [data-holo="true"] .aura-orb.orb-center {
+      opacity: 0.78;
+      animation: videoHoloCenter 4.8s ease-in-out infinite;
+      filter: blur(44px);
+    }
+
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-left,
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-center,
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-right {
+      opacity: 0.34;
+    }
+
+    [data-holo="true"] .action-circle-btn {
+      background: linear-gradient(135deg, #B2E2B4 0%, #98DBC5 45%, #9CC8F7 100%);
+      background-size: 200% 200%;
+      animation: videoHoloBtn 4.2s ease infinite;
+    }
+
+    /* 顶部第一行：左侧品牌标识 + 右上角组件 */
+    .top-nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .brand-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1.6px;
+      color: var(--text-secondary);
+    }
+
+    .brand-bar {
+      width: 4px;
+      height: 15px;
+      background-color: var(--theme-accent);
+      border-radius: 3px;
+      margin-right: 8px;
+      transition: background-color 0.45s ease;
+    }
+
+    /* ================= 3. 右上角语言胶囊 + 日夜圆形按钮（支持单击&长按） ================= */
+    .top-right-widgets {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+
+    .lang-pill-btn {
+      height: 38px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background-color: var(--pill-surface);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: var(--pill-shadow);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.3s ease,
+                  background-color 0.4s ease;
+    }
+
+    [data-dark="true"] .lang-pill-btn,
+    [data-dark="true"] .theme-mode-btn {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .lang-pill-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .lang-pill-btn:active {
+      transform: scale(0.93);
+    }
+
+    .globe-svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--theme-accent);
+      fill: none;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: stroke 0.45s ease, transform 0.4s ease;
+    }
+
+    .lang-pill-btn:hover .globe-svg {
+      transform: rotate(15deg);
+    }
+
+    .lang-text {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.5px;
+      transition: color 0.3s ease;
+    }
+
     .theme-mode-btn {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       background-color: var(--pill-surface);
       border: 1px solid rgba(255, 255, 255, 0.85);
@@ -169,8 +337,7 @@
       touch-action: none;
       position: relative;
       z-index: 102;
-      flex-shrink: 0;
-      transition: transform 0.25s var(--ease-spring),
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
                   background-color 0.4s ease,
                   color 0.3s ease,
                   box-shadow 0.3s ease;
@@ -182,22 +349,22 @@
     }
 
     .sun-moon-svg {
-      width: 18px;
-      height: 18px;
+      width: 19px;
+      height: 19px;
       stroke: currentColor;
       fill: none;
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
       pointer-events: none;
-      transition: transform 0.5s var(--ease-spring);
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .theme-mode-btn.rotating .sun-moon-svg {
       transform: rotate(180deg) scale(0.85);
     }
 
-    /* ================= 4.2 长按弹出的 12 色主题悬浮面板（同心圆角：外圈 22 = 里圈 10 + 缝 12） ================= */
+    /* ================= 3.5 长按弹出的 12 色主题悬浮面板 ================= */
     .theme-panel-backdrop {
       position: fixed;
       inset: 0;
@@ -215,15 +382,15 @@
 
     .theme-popover-panel {
       position: absolute;
-      top: 46px;
+      top: 48px;
       right: 0;
-      width: min(300px, calc(100vw - 36px));
-      background: rgba(255, 255, 255, 0.96);
+      width: 292px;
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.92);
-      border-radius: 22px;
-      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 24px;
+      padding: 14px;
       box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.18),
                   0 4px 16px rgba(15, 23, 42, 0.06);
       z-index: 101;
@@ -234,12 +401,12 @@
       user-select: none;
       -webkit-user-select: none;
       touch-action: none;
-      transition: opacity 0.26s var(--ease-smooth),
-                  transform 0.3s var(--ease-spring);
+      transition: opacity 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     [data-dark="true"] .theme-popover-panel {
-      background: rgba(21, 31, 50, 0.96);
+      background: rgba(21, 31, 50, 0.94);
       border-color: rgba(255, 255, 255, 0.12);
       box-shadow: 0 22px 44px -8px rgba(0, 0, 0, 0.55);
     }
@@ -255,11 +422,11 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
-      padding: 0 2px;
+      padding: 0 4px;
     }
 
     .panel-title {
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 800;
       color: var(--text-primary);
       letter-spacing: 0.3px;
@@ -274,7 +441,7 @@
     .theme-swatch-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      gap: 7px;
     }
 
     .theme-swatch-item {
@@ -282,33 +449,28 @@
       align-items: center;
       gap: 8px;
       padding: 8px 10px;
-      border-radius: 10px;
-      background: rgba(248, 250, 252, 0.82);
+      border-radius: 14px;
+      background: rgba(248, 250, 252, 0.75);
       border: 1.5px solid transparent;
       cursor: pointer;
       transition: transform 0.18s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
     [data-dark="true"] .theme-swatch-item {
-      background: rgba(30, 41, 59, 0.78);
-    }
-
-    [data-dark="true"] .theme-swatch-item.active,
-    [data-dark="true"] .theme-swatch-item.sliding-hover {
-      background: rgba(30, 41, 59, 0.78);
+      background: rgba(30, 41, 59, 0.75);
     }
 
     .theme-swatch-item.active,
     .theme-swatch-item.sliding-hover {
-      background: var(--theme-tag-bg);
+      background: var(--card-bg);
       border-color: var(--theme-accent);
       transform: scale(1.04);
       box-shadow: 0 6px 16px -4px var(--search-glow);
     }
 
     .swatch-orb-preview {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
       flex-shrink: 0;
       box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6), 0 2px 5px rgba(15, 23, 42, 0.1);
@@ -329,832 +491,3225 @@
       text-overflow: ellipsis;
       pointer-events: none;
     }
-[data-dark="true"] .theme-mode-btn {
+
+    /* ================= 4. 主标题、调研画像胶囊与刷新行 ================= */
+    .hero-meta-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .hero-meta-pills span {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.66);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      border-radius: 999px;
+      padding: 2.5px 10px;
+    }
+
+    [data-dark="true"] .hero-meta-pills span {
+      background: rgba(30, 41, 59, 0.72);
       border-color: rgba(255, 255, 255, 0.1);
     }
-[data-dark="true"] .theme-popover-panel {
-      background: rgba(21, 31, 50, 0.96);
-      border-color: rgba(255, 255, 255, 0.12);
-      box-shadow: 0 22px 44px -8px rgba(0, 0, 0, 0.55);
-    }
-[data-dark="true"] .theme-swatch-item {
-      background: rgba(30, 41, 59, 0.78);
-    }
-[data-dark="true"] .theme-swatch-item.active,
-    [data-dark="true"] .theme-swatch-item.sliding-hover {
-      background: rgba(30, 41, 59, 0.78);
+
+    .shop-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
     }
 
-/* ===== 桥接变量：报告原有变量名映射到全站主题变量（随 12 色/日夜联动） ===== */
-:root{
---bg:var(--page-bg); --surface:var(--card-bg); --surface2:var(--input-bg); --ink:var(--text-primary); --muted:var(--text-secondary); --line:var(--card-border);
---green:var(--theme-accent); --green-deep:var(--theme-accent); --green-soft:var(--theme-tag-bg);
---amber:#9a6a00; --amber-soft:#fdf0d3; --red:#b42318; --red-soft:#fdecea;
---radius:14px;
-}
-[data-dark="true"]{ --amber:#e8b84b; --amber-soft:#3a2f14; --red:#ff8a80; --red-soft:#3d1f1c; }
+    .shop-title {
+      font-size: 25px;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.3px;
+    }
 
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{transition:none!important}}
-body{margin:0;background:var(--bg);color:var(--ink);transition:background-color .55s cubic-bezier(.4,0,.2,1),color .4s ease;overflow-x:hidden;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;line-height:1.75;font-size:16px}
-a{color:var(--green-deep);text-decoration-color:color-mix(in srgb,var(--green-deep) 40%,transparent);text-underline-offset:3px}
-a:hover{text-decoration-color:var(--green-deep)}
-.wrap{max-width:980px;margin:0 auto;padding:0 20px 72px}
-h1,h2,h3{font-family:inherit;line-height:1.3;margin:0}
-code,.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.86em;background:var(--surface2);padding:.1em.4em;border-radius:5px;word-break:break-all}
-small{color:var(--muted)}
+    .shop-subtitle {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 12px;
+    }
 
-/* hero */
-.hero{padding:44px 0 8px}
-.hero.meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font-size:13px;margin-bottom:16px}
-.hero.meta span{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px}
-.hero h1{font-size:clamp(30px,6vw,46px);font-weight:900;letter-spacing:.01em}
-.hero.lead{margin:16px 0 0;font-size:17px;color:var(--muted);max-width:46em}
-.hero.lead strong{color:var(--ink)}
+    .shop-subtitle strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
 
-/* verdict */
-.verdict{margin-top:28px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
-.verdict-head{display:flex;gap:12px;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line);background:var(--surface2)}
-.verdict-head svg{flex:none}
-.verdict-head h2{font-size:19px}
-.combo{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch}
-.combo-item{padding:20px}
-.combo-item h3{font-size:17px;margin-bottom:6px}
-.combo-item p{margin:0;color:var(--muted);font-size:14.5px}
-.combo-item.tag{display:inline-block;font-size:12px;font-weight:700;color:var(--green-deep);background:var(--green-soft);border-radius:999px;padding:2px 9px;margin-bottom:8px}
-.combo-plus{display:flex;align-items:center;justify-content:center;font-family:inherit;font-size:26px;color:var(--muted);padding:0 4px}
-.combo-foot{padding:14px 20px;border-top:1px dashed var(--line);font-size:14.5px;color:var(--muted)}
-.combo-foot strong{color:var(--ink)}
-@media(max-width:640px){.combo{grid-template-columns:1fr}.combo-plus{padding:2px 0}}
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
 
-/* sections */
-section{margin-top:48px}
-.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
-.sec-head .no{font-variant-numeric:tabular-nums}
-.sec-head.no{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--green);font-weight:600}
-.sec-head h2{font-size:24px;font-weight:900}
-.sec-sub{color:var(--muted);margin:0 0 18px;max-width:46em}
+    .update-time {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
 
-/* filters + table */
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-.filters button{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color.18s,background.18s}
-.filters button[aria-pressed="true"]{background:var(--green-soft);border-color:var(--green);color:var(--green-deep);font-weight:700}
-.table-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
-table{border-collapse:collapse;width:100%;font-size:14px}
-th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line)}
-thead th{background:var(--surface2);font-size:13px;white-space:nowrap}
-tbody tr:last-child td{border-bottom:none}
-td.route{font-weight:700;min-width:150px}
-td.route small{display:block;font-weight:400}
-.badge{display:inline-block;font-size:12px;font-weight:700;border-radius:6px;padding:1px 8px;white-space:nowrap}
-.b-good{background:var(--green-soft);color:var(--green-deep)}
-.b-warn{background:var(--amber-soft);color:var(--amber)}
-.b-bad{background:var(--red-soft);color:var(--red)}
-.b-mute{background:var(--surface2);color:var(--muted)}
-.stars{color:var(--green-deep);font-weight:700;white-space:nowrap}
-@media(max-width:760px){
-table,thead,tbody,tr,td{display:block}
-thead{display:none}
-tr{padding:14px 16px;border-bottom:1px solid var(--line)}
-tr:last-child{border-bottom:none}
-td{border:none;padding:3px 0}
-td::before{content:attr(data-l);display:inline-block;min-width:64px;color:var(--muted);font-size:12.5px;margin-right:8px}
-td.route::before{display:none}
-td.route{font-size:16px;padding-bottom:6px}
-}
+    .refresh-svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
 
-/* route cards */
-.cards{display:grid;gap:16px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
-.card-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:4px}
-.card-head h3{font-size:19px}
-.card.one{color:var(--muted);margin:6px 0 14px}
-.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:0 0 12px}
-.fact{background:var(--surface2);border-radius:10px;padding:10px 12px;font-size:14px}
-.fact b{display:block;font-size:12.5px;color:var(--muted);margin-bottom:2px;font-weight:500}
-.card ul{margin:8px 0;padding-left:1.2em}
-.card li{margin:4px 0}
-.src{font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px;margin-top:12px}
-.src a{word-break:break-all}
+    /* ================= 5. 悬浮滑动胶囊 Tab ================= */
+    .gemini-tab-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 16px;
+    }
 
-/* dead list */
-.dead{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.dead-item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
-.dead-item h4{margin:0 0 4px;font-size:15.5px;font-family:inherit}
-.dead-item p{margin:0;font-size:14px;color:var(--muted)}
+    .gemini-tabs {
+      position: relative;
+      display: inline-grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+    }
 
-/* arch */
-.arch{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
-.arch-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-.arch-tabs button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.arch-tabs button[aria-selected="true"]{background:var(--green-soft);border-color:var(--green);color:var(--green-deep);font-weight:700}
-.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-.node{border:1.5px solid var(--line);background:var(--surface2);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:500;text-align:center}
-.node.hot{border-color:var(--green);background:var(--green-soft)}
-.node small{display:block;font-weight:400;color:var(--muted);font-size:12px}
-.arrow{color:var(--muted);font-family:"JetBrains Mono",monospace}
-.arch-note{margin:16px 0 0;color:var(--muted);font-size:14.5px}
+    [data-dark="true"] .gemini-tabs {
+      background: rgba(15, 23, 42, 0.45);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
 
-/* steps */
-.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:st}
-.steps li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px 14px 52px;position:relative}
-.steps li::before{counter-increment:st;content:counter(st);position:absolute;left:14px;top:14px;width:26px;height:26px;border-radius:50%;background:var(--green-soft);color:var(--green-deep);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
-.steps b{display:block}
-.steps span{color:var(--muted);font-size:14.5px}
+    .tab-glider {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: calc(50% - 4px);
+      height: calc(100% - 8px);
+      background-color: var(--pill-surface);
+      border-radius: 999px;
+      box-shadow: 0 3px 12px rgba(15, 23, 42, 0.08);
+      transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background-color 0.4s ease;
+      z-index: 0;
+    }
 
-/* doubts */
-details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:10px}
-summary{cursor:pointer;font-weight:700;-webkit-tap-highlight-color:transparent}
-details p{margin:8px 0 2px;color:var(--muted);font-size:14.5px}
+    .gemini-tabs[data-active="shop"] .tab-glider {
+      transform: translateX(100%);
+    }
 
-/* sources */
-.sources{columns:1;font-size:13.5px}
-@media(min-width:760px){.sources{columns:2;column-gap:32px}}
-.sources li{margin:0 0 8px;break-inside:avoid}
-.sources ul{margin:0;padding-left:1.2em}
-.foot{margin-top:56px;border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:13.5px}
-.hidden-row{display:none!important}
+    .gemini-tab-btn {
+      position: relative;
+      z-index: 1;
+      border: none;
+      background: transparent;
+      padding: 8px 22px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: color 0.3s ease;
+      white-space: nowrap;
+    }
 
-/* ===== 全站同款弥散光晕背景（固定层，置于内容之下） ===== */
-.aura-backdrop{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.orb-left{top:-90px;left:-70px;bottom:auto}
-.orb-center{top:-80px;left:30%;bottom:auto}
-.orb-right{top:-100px;right:-70px;bottom:auto}
-.wrap{position:relative;z-index:1}
-/* ===== 主题工具条（右上角固定，与其他站同款按钮/面板） ===== */
-.wb-toolbar{position:fixed;top:14px;right:14px;z-index:120}
-.wb-toolbar .theme-popover-panel{position:fixed;top:60px;right:14px}
-@media(max-width:640px){.wb-toolbar{top:10px;right:10px}.wb-toolbar .theme-popover-panel{top:54px;right:10px}}
+    .gemini-tab-btn.active {
+      color: var(--theme-tab-text);
+      font-weight: 700;
+    }
 
-</style>
+    /* ================= 6. 大圆角悬浮搜索框 + 变色圆形发送按钮 ================= */
+    .gemini-search-card {
+      background-color: var(--pill-surface);
+      border-radius: 26px;
+      padding: 10px 10px 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 28px -6px var(--search-glow),
+                  0 2px 6px rgba(15, 23, 42, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      transition: box-shadow 0.45s ease,
+                  transform 0.25s ease,
+                  border-color 0.35s ease,
+                  background-color 0.4s ease;
+    }
+
+    [data-dark="true"] .gemini-search-card {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .gemini-search-card:focus,
+    .gemini-search-card:focus-within {
+      transform: translateY(-1px);
+      outline: none;
+      box-shadow: 0 14px 32px -4px var(--search-glow);
+    }
+
+    .gemini-search-card *:focus,
+    .gemini-search-card *:focus-visible {
+      outline: none;
+    }
+
+    .plus-action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .plus-action-btn:hover {
+      background-color: var(--theme-tag-bg);
+    }
+
+    .plus-action-btn:active {
+      background-color: rgba(15, 23, 42, 0.08);
+      transform: scale(0.9);
+    }
+
+    [data-dark="true"] .plus-action-btn:hover {
+      background-color: rgba(255, 255, 255, 0.10);
+    }
+
+    .search-input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 14px;
+      color: var(--text-primary);
+      background: transparent;
+      font-weight: 500;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .clear-input-btn {
+      border: none;
+      background: rgba(148, 163, 184, 0.18);
+      color: var(--text-secondary);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 12px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .clear-input-btn.visible {
+      display: inline-flex;
+    }
+
+    .action-circle-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: none;
+      background-color: var(--send-circle-bg);
+      color: var(--send-circle-icon);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background-color 0.5s ease,
+                  transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .action-circle-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .action-circle-btn:active {
+      transform: scale(0.92);
+    }
+
+    .arrow-up-svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ================= 7. 下方分类胶囊栏 ================= */
+    .category-bar {
+      display: flex;
+      gap: 8px;
+      padding: 16px 18px 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .category-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cat-chip {
+      flex: none;
+      border: 1px solid var(--card-border);
+      background-color: var(--card-bg);
+      color: var(--text-secondary);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.28s ease;
+    }
+
+    .cat-chip.active {
+      background-color: var(--theme-accent);
+      color: #FFFFFF;
+      border-color: var(--theme-accent);
+      box-shadow: 0 4px 12px var(--search-glow);
+    }
+
+    /* ================= 7.5 推荐组合（结论先行）双核联动卡 ================= */
+    .verdict-card {
+      margin: 12px 18px 4px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      box-shadow: 0 6px 20px -8px var(--search-glow), 0 4px 14px rgba(15, 23, 42, 0.03);
+      overflow: hidden;
+      transition: background-color 0.4s ease, border-color 0.35s ease, box-shadow 0.45s ease;
+    }
+
+    .verdict-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 13px 16px;
+      background: var(--sub-surface);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .verdict-head-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .verdict-head-left svg {
+      stroke: var(--theme-accent);
+      flex-shrink: 0;
+    }
+
+    .verdict-combo {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .verdict-item {
+      padding: 15px 16px;
+    }
+
+    .verdict-item h3 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 6px 0 5px;
+    }
+
+    .verdict-item p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    .verdict-plus {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--theme-accent);
+      padding: 0 16px;
+      position: relative;
+    }
+
+    .verdict-plus::before,
+    .verdict-plus::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--card-border);
+    }
+
+    .verdict-plus::before { margin-right: 10px; }
+    .verdict-plus::after { margin-left: 10px; }
+
+    .verdict-foot {
+      padding: 11px 15px;
+      border-top: 1px dashed var(--card-border);
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .verdict-foot strong {
+      color: var(--text-primary);
+    }
+
+    @media (max-width: 500px) {
+      .verdict-combo {
+        grid-template-columns: 1fr;
+      }
+      .verdict-plus {
+        padding: 2px 0;
+      }
+    }
+
+    /* ================= 8. 顶部分组摘要双列卡片网格 ================= */
+    .content-grid {
+      padding: 12px 18px 20px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 11px;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .content-grid.switching {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .product-card {
+      background-color: var(--card-bg);
+      border-radius: 20px;
+      padding: 14px 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 120px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.035);
+      border: 1px solid var(--card-border);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.3s ease,
+                  border-color 0.35s ease,
+                  background-color 0.4s ease;
+    }
+
+    .product-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--refresh-btn-bg);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px -6px var(--search-glow);
+      border-color: var(--orb-color-2);
+    }
+
+    .product-card:hover::before {
+      opacity: 1;
+    }
+
+    .product-card:active {
+      transform: scale(0.97);
+    }
+
+    .card-top {
+      margin-bottom: 10px;
+    }
+
+    .product-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.42;
+      margin-bottom: 7px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .product-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--theme-tag-text);
+      background-color: var(--theme-tag-bg);
+      padding: 2.5px 8.5px;
+      border-radius: 6px;
+      transition: background-color 0.45s ease, color 0.45s ease;
+    }
+
+    [data-dark="true"] .product-tag {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: var(--orb-color-2);
+    }
+
+    .card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-top: 2px;
+      gap: 6px;
+    }
+
+    .product-price {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--theme-accent);
+      letter-spacing: -0.2px;
+      transition: color 0.45s ease;
+      flex-shrink: 0;
+    }
+
+    [data-dark="true"] .product-price {
+      color: var(--orb-color-1);
+    }
+
+    .shop-name {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 36px 20px;
+      color: var(--text-secondary);
+      font-size: 13.5px;
+    }
+
+    /* ================= 9. 真实标签体系、章节手风琴卡片与三栏列表布局 ================= */
+    .featured-list-hint {
+      margin: -4px 18px 18px;
+      padding: 11px 14px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      border-radius: 14px;
+      color: var(--text-secondary);
+      font-size: 11.5px;
+      line-height: 1.5;
+    }
+
+    .featured-go-link {
+      color: var(--theme-accent);
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .site-list-section {
+      padding: 4px 18px 24px;
+    }
+
+    .site-list-topline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .sec-no-pill {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--theme-accent);
+      background: var(--theme-tag-bg);
+      padding: 2px 8px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+
+    [data-dark="true"] .sec-no-pill {
+      background: rgba(147, 197, 253, 0.13);
+      color: var(--orb-color-1);
+    }
+
+    .site-list-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+      line-height: 1.35;
+    }
+
+    .site-list-count {
+      margin-left: auto;
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    [data-dark="true"] .site-list-count {
+      background: rgba(147, 197, 253, 0.13);
+      color: var(--orb-color-2);
+    }
+
+    .site-list-subhead {
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin: 0 0 12px;
+    }
+
+    /* 路线类型筛选胶囊条（全部路线 / 只看官方通道 / 只看逆向框架） */
+    .shop-platform-filter {
+      display: flex;
+      gap: 7px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+
+    .shop-platform-filter::-webkit-scrollbar {
+      display: none;
+    }
+
+    .platform-filter-chip {
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text-secondary);
+      padding: 6px 13px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.22s ease;
+    }
+
+    .platform-filter-chip.active,
+    .platform-filter-chip[aria-pressed="true"] {
+      background: var(--theme-accent);
+      color: #FFFFFF;
+      border-color: var(--theme-accent);
+      box-shadow: 0 4px 12px var(--search-glow);
+    }
+
+    .site-list-groups {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+    }
+
+    .site-list-group {
+      border-radius: 22px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      box-shadow: 0 4px 15px rgba(15, 23, 42, 0.035);
+      overflow: hidden;
+      transition: box-shadow 0.36s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  border-color 0.36s ease,
+                  background-color 0.4s ease;
+    }
+
+    .site-list-group:hover,
+    .site-list-group:focus,
+    .site-list-group:focus-within {
+      box-shadow: 0 8px 22px -10px var(--search-glow), 0 4px 14px rgba(15, 23, 42, 0.04);
+      outline: none;
+    }
+
+    .site-list-trigger {
+      outline: none;
+      display: flex;
+      width: 100%;
+      border: 0;
+      background: transparent;
+      padding: 15px 15px 14px;
+      align-items: center;
+      text-align: left;
+      cursor: pointer;
+      gap: 11px;
+      color: inherit;
+    }
+
+    .site-list-brand-icon {
+      flex: 0 0 38px;
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      border-radius: 12px;
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      font-weight: 800;
+    }
+
+    [data-dark="true"] .site-list-brand-icon {
+      background: rgba(147, 197, 253, 0.12);
+      color: var(--orb-color-2);
+    }
+
+    .site-list-main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .site-list-name {
+      font-size: 14.5px;
+      font-weight: 800;
+      line-height: 1.35;
+      color: var(--text-primary);
+    }
+
+    .site-list-detail {
+      margin-top: 4px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .site-list-minimum {
+      margin-left: auto;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .site-list-minimum small {
+      display: block;
+      font-size: 10px;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+    }
+
+    .site-list-minimum strong {
+      color: var(--theme-accent);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+    }
+
+    [data-dark="true"] .site-list-minimum strong {
+      color: var(--orb-color-1);
+    }
+
+    .site-list-arrow {
+      display: inline-flex;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .site-list-group.open .site-list-arrow {
+      transform: rotate(180deg);
+    }
+
+    .site-list-collapsible {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .site-list-group.open .site-list-collapsible {
+      grid-template-rows: 1fr;
+    }
+
+    .site-list-inner {
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .site-list-offers {
+      border-top: 1px solid var(--card-border);
+      padding: 6px 14px 12px;
+    }
+
+    /* === 全宽单列上下分层排版（消除三列横向挤压，释放完整阅读宽度） === */
+    .real-offer-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 15px 4px;
+    }
+
+    .real-offer-row + .real-offer-row {
+      border-top: 1px solid var(--card-border);
+    }
+
+    .real-offer-row.hidden-row {
+      display: none !important;
+    }
+
+    .offer-head-bar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .offer-title-group {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 6px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .offer-price-val {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--theme-accent);
+      letter-spacing: -0.2px;
+      line-height: 1.25;
+      white-space: nowrap;
+    }
+
+    [data-dark="true"] .offer-price-val {
+      color: var(--orb-color-1);
+    }
+
+    .platform-source-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748B;
+      background: #F1F5F9;
+      border-radius: 6px;
+      padding: 2px 7.5px;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+
+    [data-dark="true"] .platform-source-badge {
+      background: rgba(255, 255, 255, 0.08);
+      color: #94A3B8;
+    }
+
+    .offer-col-mid {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .offer-item-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .offer-item-title a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .offer-item-title a:hover {
+      color: var(--theme-accent);
+    }
+
+    .offer-sub-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .offer-item-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.68;
+      background: var(--sub-surface);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .offer-footer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 2px;
+    }
+
+    .offer-badges-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .attr-pill-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 7.5px;
+      border-radius: 6px;
+      line-height: 1.35;
+      max-width: 100%;
+      word-break: break-word;
+    }
+
+    .attr-pill-tag.tag-green  { background: #DCFCE7; color: #15803D; }
+    .attr-pill-tag.tag-teal   { background: #CCFBF1; color: #0F766E; }
+    .attr-pill-tag.tag-amber  { background: #FEF3C7; color: #B45309; }
+    .attr-pill-tag.tag-orange { background: #FFEDD5; color: #C2410C; }
+    .attr-pill-tag.tag-blue   { background: #DBEAFE; color: #1D4ED8; }
+    .attr-pill-tag.tag-purple { background: #F3E8FF; color: #6D28D9; }
+    .attr-pill-tag.tag-gray   { background: #F1F5F9; color: #475569; }
+    .attr-pill-tag.tag-red    { background: #FEE2E2; color: #B91C1C; }
+
+    [data-dark="true"] .attr-pill-tag.tag-green  { background: rgba(34, 197, 94, 0.18); color: #86EFAC; }
+    [data-dark="true"] .attr-pill-tag.tag-teal   { background: rgba(20, 184, 166, 0.18); color: #5EEAD4; }
+    [data-dark="true"] .attr-pill-tag.tag-amber  { background: rgba(245, 158, 11, 0.18); color: #FCD34D; }
+    [data-dark="true"] .attr-pill-tag.tag-orange { background: rgba(249, 115, 22, 0.18); color: #FDBA74; }
+    [data-dark="true"] .attr-pill-tag.tag-blue   { background: rgba(59, 130, 246, 0.20); color: #93C5FD; }
+    [data-dark="true"] .attr-pill-tag.tag-purple { background: rgba(168, 85, 247, 0.20); color: #D8B4FE; }
+    [data-dark="true"] .attr-pill-tag.tag-gray   { background: rgba(148, 163, 184, 0.16); color: #CBD5E1; }
+    [data-dark="true"] .attr-pill-tag.tag-red    { background: rgba(239, 68, 68, 0.20); color: #FCA5A5; }
+
+    .offer-shop-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+
+    .same-source-btn {
+      border: 1px solid var(--card-border);
+      background: var(--page-bg);
+      color: var(--text-secondary);
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      transition: all 0.2s ease;
+    }
+
+    .same-source-btn:hover {
+      color: var(--theme-accent);
+      background: var(--theme-tag-bg);
+    }
+
+    .offer-col-right {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      text-align: right;
+      min-width: 68px;
+    }
+
+    .stock-badge {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .stock-badge.low-stock {
+      color: #DC2626;
+      font-weight: 800;
+    }
+
+    [data-dark="true"] .stock-badge.low-stock {
+      color: #F87171;
+    }
+
+    .site-offer-link {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      padding: 5px 8.5px;
+      border-radius: 9px;
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      font-size: 10.5px;
+      font-weight: 800;
+      transition: transform 0.22s ease, filter 0.22s ease;
+      white-space: nowrap;
+    }
+
+    .site-offer-link:active {
+      transform: scale(0.94);
+    }
+
+    [data-dark="true"] .site-offer-link {
+      background: rgba(147, 197, 253, 0.12);
+      color: var(--orb-color-2);
+    }
+
+    /* ================= 9.2 路线详情 四宫格参数与要点列表 ================= */
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin: 8px 0 12px;
+    }
+
+    @media (max-width: 440px) {
+      .facts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .fact-box {
+      background: var(--sub-surface);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12.5px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .fact-box b {
+      display: block;
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 3px;
+      font-weight: 700;
+    }
+
+    .detail-bullets {
+      padding-left: 1.15em;
+      margin: 8px 0;
+      font-size: 12.8px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    .detail-bullets li {
+      margin: 5px 0;
+    }
+
+    .detail-bullets strong {
+      color: var(--text-primary);
+    }
+
+    .card-src-bar {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      border-top: 1px dashed var(--card-border);
+      padding-top: 9px;
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    .card-src-bar a {
+      color: var(--theme-accent);
+      font-weight: 600;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .card-src-bar a:hover {
+      text-decoration: underline;
+    }
+
+    /* 退场逆向框架 2 列小卡 */
+    .dead-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 9px;
+      margin: 10px 0;
+    }
+
+    @media (max-width: 460px) {
+      .dead-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .dead-card {
+      background: var(--sub-surface);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .dead-card h4 {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .dead-card p {
+      font-size: 11.8px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* ================= 9.4 04 中转层：交互式架构流切换器 ================= */
+    .arch-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 4px 15px rgba(15, 23, 42, 0.035);
+      margin-bottom: 12px;
+    }
+
+    .arch-tabs {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .arch-tabs button {
+      border: 1px solid var(--card-border);
+      background: var(--sub-surface);
+      color: var(--text-secondary);
+      border-radius: 999px;
+      padding: 6px 13px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.22s ease;
+    }
+
+    .arch-tabs button[aria-selected="true"] {
+      background: var(--theme-accent);
+      color: #FFFFFF;
+      border-color: var(--theme-accent);
+      box-shadow: 0 4px 12px var(--search-glow);
+    }
+
+    .flow-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .flow-node {
+      border: 1.5px solid var(--card-border);
+      background: var(--sub-surface);
+      border-radius: 12px;
+      padding: 8px 11px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-align: center;
+      transition: border-color 0.3s ease, background-color 0.3s ease;
+    }
+
+    .flow-node.hot {
+      border-color: var(--theme-accent);
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+    }
+
+    [data-dark="true"] .flow-node.hot {
+      background: rgba(147, 197, 253, 0.14);
+      color: var(--orb-color-1);
+    }
+
+    .flow-node small {
+      display: block;
+      font-weight: 500;
+      color: var(--text-secondary);
+      font-size: 10.5px;
+      margin-top: 2px;
+    }
+
+    .flow-arrow {
+      color: var(--theme-accent);
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .arch-note {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--card-border);
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ================= 9.6 06 落地顺序步骤条 & 08 来源列表 ================= */
+    .steps-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      counter-reset: st;
+    }
+
+    .steps-list li {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 13px 15px 13px 48px;
+      position: relative;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);
+    }
+
+    .steps-list li::before {
+      counter-increment: st;
+      content: counter(st);
+      position: absolute;
+      left: 13px;
+      top: 13px;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      font-weight: 800;
+      font-size: 12.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    [data-dark="true"] .steps-list li::before {
+      background: rgba(147, 197, 253, 0.15);
+      color: var(--orb-color-1);
+    }
+
+    .steps-list b {
+      display: block;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .steps-list span {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .sources-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 14px 16px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .sources-card ul {
+      padding-left: 1.2em;
+      display: grid;
+      gap: 6px;
+    }
+
+    .sources-card a {
+      color: var(--theme-accent);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .sources-card a:hover {
+      text-decoration: underline;
+    }
+
+    .site-list-footer {
+      padding: 14px 2px 0;
+      font-size: 11.5px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    /* ================= 10. 详情/口径对比弹窗 Modal（100% 还原 Ai比价.html 玻璃态弹窗） ================= */
+    .same-source-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.42);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .same-source-modal-backdrop.open {
+      display: flex;
+    }
+
+    .same-source-modal {
+      width: 100%;
+      max-width: 460px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.28);
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .modal-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+
+    .modal-close-btn {
+      border: none;
+      background: var(--page-bg);
+      color: var(--text-secondary);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 14px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .modal-sub {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .modal-seller-list {
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .modal-seller-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: var(--page-bg);
+      border: 1px solid var(--card-border);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .modal-seller-price {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--theme-accent);
+      min-width: 64px;
+    }
+
+    .modal-seller-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .modal-seller-shop {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .modal-seller-meta {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 370px) {
+      .site-list-section { padding-left: 13px; padding-right: 13px; }
+      .site-list-trigger { padding: 14px 11px; gap: 8px; }
+      .offer-col-left { width: 60px; }
+      .offer-price-val { font-size: 13.5px; }
+    }
+  </style>
 </head>
 <body>
-<div class="aura-backdrop" aria-hidden="true">
-<div class="aura-orb orb-left" id="orbLeft"></div>
-<div class="aura-orb orb-center" id="orbCenter"></div>
-<div class="aura-orb orb-right" id="orbRight"></div>
-</div>
-<div class="wb-toolbar">
-<button class="theme-mode-btn" id="themeModeBtn" type="button" aria-label="切换日夜 / 长按选择主题"></button>
-<div class="theme-panel-backdrop" id="themeBackdrop"></div>
-<div class="theme-popover-panel" id="themePopover">
-<div class="panel-header">
-<span class="panel-title">12色弥散主题</span>
-<span class="panel-hint">滑动或点击选择</span>
-</div>
-<div class="theme-swatch-grid" id="themeSwatchGrid"></div>
-</div>
-</div>
 
-<div class="wrap">
+  <div class="app-container">
+    <!-- ================= 顶部弥散渐变 Hero Header ================= -->
+    <header class="hero-header">
+      <!-- 动态光斑背景（第12主题激活时启用视频同款三光斑流光渐变） -->
+      <div class="aura-backdrop">
+        <div class="aura-orb orb-left" id="orbLeft"></div>
+        <div class="aura-orb orb-center" id="orbCenter"></div>
+        <div class="aura-orb orb-right" id="orbRight"></div>
+      </div>
 
-<header class="hero">
-<div class="meta"><span>调研日期 2026-11-07</span><span>适用画像：中国大陆个人用户 · 无营业执照</span><span>需求：微信内聊天 · 1 分钟内回复 · 主动推送提醒</span></div>
-<h1>微信接入可行方案</h1>
-<p class="lead">2026 年的格局和 2024 年完全不同：逆向个人号的老框架集体退场，腾讯自己下场推出了官方个人微信 Bot 通道。对你这种个人自用场景，答案不是找一条万能路线，而是<strong>聊天和提醒拆开走两条官方通道</strong>——日常聊天用官方 ClawBot，定时和冷启动提醒用企业微信应用消息，两条互不干扰、都不碰封号红线</p>
-</header>
+      <!-- 第一行：左侧品牌 + 右上角组件（语言胶囊 + 单击日夜/长按滑选12主题） -->
+      <div class="top-nav-bar">
+        <div class="brand-tag">
+          <span class="brand-bar"></span>
+          <span>KEN · USE</span>
+        </div>
 
-<div class="verdict" role="region" aria-label="推荐组合">
-<div class="verdict-head">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-<h2>推荐组合（结论先行）</h2>
-</div>
-<div class="combo">
-<div class="combo-item">
-<span class="tag">负责日常聊天</span>
-<h3>微信官方 ClawBot（iLink）</h3>
-<p>2026-03 前后腾讯官方推出的个人微信 Bot 插件，扫码登录、长轮询收消息，不需要公网回调；文字、图片、语音、文件、视频私聊都支持，体验最像和好友聊天，零封号风险</p>
-</div>
-<div class="combo-plus" aria-hidden="true">+</div>
-<div class="combo-item">
-<span class="tag">负责主动提醒</span>
-<h3>企业微信自建应用 + 微信插件</h3>
-<p>个人可注册未认证企业微信并建自建应用，<code>message/send</code> 没有时间窗口限制，可以真正主动发消息；代价是会话长得像企业应用，且需要一台固定公网 IP 的服务器</p>
-</div>
-</div>
-<p class="combo-foot"><strong>为什么必须拆两条：</strong>ClawBot 的回复必须带入站消息的 <code>context_token</code>，社区实测约 24 小时窗口、下发约 10 条后要用户再互动一次，做不了「三天后冷启动提醒」；企微应用消息恰好补上这一块。只想要聊天可以只上 ClawBot，只想要可靠提醒可以只上企微</p>
-</div>
+        <div class="top-right-widgets">
+          <!-- 语言胶囊按钮 -->
+          <button class="lang-pill-btn" id="langBtn" type="button" onclick="toggleLanguage()" title="切换语言 / Switch Language">
+            <svg class="globe-svg" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            <span class="lang-text" id="langText">中文</span>
+          </button>
 
-<section aria-labelledby="t1">
-<div class="sec-head"><span class="no">01</span><h2 id="t1">全路线对比</h2></div>
-<p class="sec-sub">按「个人门槛 / 实时性 / 主动推送 / 风险 / 维护成本」横向比一遍，逆向框架一行都不值得用主力号试</p>
-<div class="filters" role="group" aria-label="筛选路线类型">
-<button type="button" data-f="all" aria-pressed="true">全部路线</button>
-<button type="button" data-f="official" aria-pressed="false">只看官方通道</button>
-<button type="button" data-f="reverse" aria-pressed="false">只看逆向框架</button>
-</div>
-<div class="table-wrap">
-<table>
-<thead><tr><th>路线</th><th>个人门槛</th><th>主动推送</th><th>风险</th><th>维护</th><th>推荐度</th></tr></thead>
-<tbody>
-<tr data-kind="official">
-<td class="route" data-l="">官方 ClawBot（iLink）<small>腾讯官方 · 2026-03 上线</small></td>
-<td data-l="门槛">无，扫码即可；手机微信 iOS ≥ 8.0.70 / Android ≥ 8.0.69 且含 ClawBot 插件</td>
-<td data-l="推送"><span class="badge b-warn">受限</span> 需 context_token，社区称约 24h / 10 条窗口</td>
-<td data-l="风险"><span class="badge b-good">无</span> 官方通道</td>
-<td data-l="维护">低，网关常驻即可；会话过期需重新扫码</td>
-<td data-l="推荐"><span class="stars">★★★</span> 聊天首选</td>
-</tr>
-<tr data-kind="official">
-<td class="route" data-l="">企业微信自建应用 + 微信插件<small>官方 API</small></td>
-<td data-l="门槛">可，个人可注册未认证企业并建自建应用；认证才需执照 + 300 元</td>
-<td data-l="推送"><span class="badge b-good">真主动</span> 无窗口，仅频控 30 次/分、1000 次/时</td>
-<td data-l="风险"><span class="badge b-good">无</span> 官方 API，勿填虚假企业资料</td>
-<td data-l="维护">中，需固定公网 IP + 企业可信 IP 配置</td>
-<td data-l="推荐"><span class="stars">★★★</span> 推送首选</td>
-</tr>
-<tr data-kind="official">
-<td class="route" data-l="">微信客服 kf<small>官方 · 依托企业微信</small></td>
-<td data-l="门槛">须先有企业微信；未验证可开通但咨询用户数受限</td>
-<td data-l="推送"><span class="badge b-bad">不行</span> 用户发消息后 48 小时内最多 5 条</td>
-<td data-l="风险"><span class="badge b-good">无</span> 官方通道</td>
-<td data-l="维护">中，回调通知 + 游标拉取 + 会话状态机</td>
-<td data-l="推荐"><span class="stars">★★</span> 只适合客服式问答</td>
-</tr>
-<tr data-kind="official">
-<td class="route" data-l="">公众号 · 个人订阅号<small>官方</small></td>
-<td data-l="门槛">可，身份证即可，1 个身份证 1 个号</td>
-<td data-l="推送"><span class="badge b-bad">不行</span> 个人未认证用不了客服消息接口</td>
-<td data-l="风险"><span class="badge b-good">无</span> 官方通道</td>
-<td data-l="维护">低，但能力天花板低，消息还折叠在订阅号文件夹</td>
-<td data-l="推荐"><span class="stars">★</span> 只适合秒回问答</td>
-</tr>
-<tr data-kind="official">
-<td class="route" data-l="">公众号 · 个人服务号<small>2024-10 开放个人注册</small></td>
-<td data-l="门槛">可，经「服务号助手」小程序以个人注册</td>
-<td data-l="推送"><span class="badge b-bad">不行</span> 个人不能微信认证，仍无客服消息</td>
-<td data-l="风险"><span class="badge b-good">无</span></td>
-<td data-l="维护">低</td>
-<td data-l="推荐"><span class="stars">★</span> 名字是服务号，权限不是</td>
-</tr>
-<tr data-kind="official">
-<td class="route" data-l="">公众号测试号<small>官方 · 开发测试定位</small></td>
-<td data-l="门槛">可，扫码即得，带客服接口额度 5 万次/日</td>
-<td data-l="推送"><span class="badge b-warn">窗口内</span> 同样受 48 小时窗口约束</td>
-<td data-l="风险"><span class="badge b-warn">灰色</span> 长期当生产用属超定位使用</td>
-<td data-l="维护">低</td>
-<td data-l="推荐"><span class="stars">★</span> 适合先跑通链路验证</td>
-</tr>
-<tr data-kind="reverse">
-<td class="route" data-l="">WeChatFerry（wcferry）<small>Hook PC 微信</small></td>
-<td data-l="门槛">需常驻 Windows + 旧版 PC 微信 3.9.12.x</td>
-<td data-l="推送"><span class="badge b-good">可以</span> 以本人号身份任意发</td>
-<td data-l="风险"><span class="badge b-bad">高</span> 社区集中反馈警告、强制下线</td>
-<td data-l="维护">极高，仓库已归档停维，旧版微信被强制升级挡住</td>
-<td data-l="推荐"><span class="stars">✕</span> 已退场</td>
-</tr>
-<tr data-kind="reverse">
-<td class="route" data-l="">wxauto / wxautox4<small>Windows UI 自动化</small></td>
-<td data-l="门槛">需常驻 Windows，微信窗口保持在桌面</td>
-<td data-l="推送"><span class="badge b-good">可以</span> 低频可用</td>
-<td data-l="风险"><span class="badge b-warn">中</span> 不注入不改协议，相对温和但仍非官方认可</td>
-<td data-l="维护">高，原版已停维，付费版跟着微信版本追</td>
-<td data-l="推荐"><span class="stars">△</span> 特定场景可用，别作主力桥</td>
-</tr>
-<tr data-kind="reverse">
-<td class="route" data-l="">Wechaty + PadLocal<small>iPad 协议 · 付费</small></td>
-<td data-l="门槛">付费 Token，7 天试用，长期价格社区口径不一（约 200 元/月，另有约 50 元/月说法）</td>
-<td data-l="推送"><span class="badge b-good">可以</span></td>
-<td data-l="风险"><span class="badge b-bad">高</span> 协议非官方，长期用户亦有被踢下线案例</td>
-<td data-l="维护">中，可跑云端，需一台手机保持该号在线</td>
-<td data-l="推荐"><span class="stars">△</span> 花钱买风险</td>
-</tr>
-<tr data-kind="reverse">
-<td class="route" data-l="">Gewechat / Gewe 付费版<small>iPad 协议</small></td>
-<td data-l="门槛">免费版已停维；付费版按节点/在线时长计费，官网未公示固定单价</td>
-<td data-l="推送"><span class="badge b-good">可以</span></td>
-<td data-l="风险"><span class="badge b-bad">高</span> 账号登录在第三方闭源服务器上</td>
-<td data-l="维护">低（托管）但不可控</td>
-<td data-l="推荐"><span class="stars">△ / ✕</span> 免费版已死，付费版不建议托付主力号</td>
-</tr>
-<tr data-kind="reverse">
-<td class="route" data-l="">itchat / Web 协议<small>网页版微信协议</small></td>
-<td data-l="门槛">—</td>
-<td data-l="推送"><span class="badge b-mute">—</span></td>
-<td data-l="风险"><span class="badge b-bad">高</span> 扫码即被警告、限制甚至封 1 天（社区反馈）</td>
-<td data-l="维护">基本已死，多数账号登录直接报「暂不支持使用网页版微信」</td>
-<td data-l="推荐"><span class="stars">✕</span> 不要再列入方案</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p><small>参照项：认证企业服务号个人无资格注册（需企业/个体户执照 + 认证 300 元/年），不在上表；其客服消息同样是 48 小时 / 5 条窗口，长期触达要靠订阅通知</small></p>
-</section>
+          <!-- 日夜模式 & 12色主题呼出按钮（单击切换日夜，长按弹出并滑动选择12种配色） -->
+          <button class="theme-mode-btn" id="darkModeBtn" type="button" title="单击切换日夜 / 长按滑动选主题">
+            <svg class="sun-moon-svg" id="sunMoonIcon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="4"></circle>
+              <line x1="12" y1="2" x2="12" y2="4.5"></line>
+              <line x1="12" y1="19.5" x2="12" y2="22"></line>
+              <line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line>
+              <line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line>
+              <line x1="2" y1="12" x2="4.5" y2="12"></line>
+              <line x1="19.5" y1="12" x2="22" y2="12"></line>
+              <line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line>
+              <line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line>
+            </svg>
+          </button>
 
-<section aria-labelledby="t2">
-<div class="sec-head"><span class="no">02</span><h2 id="t2">两条首选路线，说细一点</h2></div>
-<p class="sec-sub">以下标注区分来源性质：为微信/腾讯官方文档原文，为开源项目官方文档，为论坛与实测反馈，仅作经验参考</p>
-<div class="cards">
-<article class="card">
-<div class="card-head"><h3>路线 A · 官方 ClawBot（iLink 协议）</h3><span class="badge b-good">零封号 · 体验最佳</span></div>
-<p class="one">你在微信里聊天的对象是一个新增的 ClawBot 机器人会话，不是「你的号被程序接管」——这是它和所有逆向框架的本质区别</p>
-<div class="facts">
-<div class="fact"><b>接入方式</b>腾讯官方仓库 <code>Tencent/openclaw-weixin</code>，扫码登录；要求 OpenClaw ≥ 2026.3.22、Node ≥ 22.13</div>
-<div class="fact"><b>收消息</b><code>POST /ilink/bot/getupdates</code> 长轮询，服务端 hold 约 35 秒，游标推进，无需公网回调</div>
-<div class="fact"><b>发消息</b><code>POST /ilink/bot/sendmessage</code>，域名 <code>ilinkai.weixin.qq.com</code>，纯 HTTP/JSON</div>
-<div class="fact"><b>支持范围</b>仅私聊；文本、图片、语音、文件、视频均可收发，语音由微信云端转文字</div>
-</div>
-<ul>
-<li><strong>实时性：</strong>长轮询近实时，AI 生成多久就多久，没有公众号那种 5 秒被动回复限制，你要的「1 分钟内回复」天然成立</li>
-<li><strong>主动推送的真实边界：</strong>发送必须回带入站消息的 <code>context_token</code>，第一句话必须由用户先发；PushPlus 的渠道说明称每下发 10 次后需再主动发起一次对话、每隔 24 小时也需要一次；也有社区实现称文本用空 token 可长期推送、被拒后需用户发消息激活——口径互相有出入，<strong>按「不可靠」规划，重要提醒不要压在这一条上</strong></li>
-<li><strong>运维注意：</strong>网关停机数小时后 token 失效（errcode -14 会话过期），需重新扫码；CowAgent 的客户端会自动清凭证重新拉起扫码流程</li>
-<li><strong>上手最快的方式：</strong>CowAgent、AstrBot、LangBot 均已接入此通道；若只做桥不想引入全家桶，可直接照官方协议文档用 HTTP/JSON 对接自己的 Webhook</li>
-</ul>
-<p class="src">来源：<a href="https://github.com/Tencent/openclaw-weixin" target="_blank" rel="noopener">github.com/Tencent/openclaw-weixin</a> · <a href="https://github.com/Tencent/openclaw-weixin/blob/24de5c9eb0dd5e595d7e2d090ed8a3f82870d42c/docs/protocol_zh_CN.md" target="_blank" rel="noopener">iLink 协议文档</a> · <a href="https://docs.openclaw.ai/zh-CN/channels" target="_blank" rel="noopener">OpenClaw 渠道文档</a> · <a href="https://docs.astrbot.app/platform/weixin_oc.html" target="_blank" rel="noopener">AstrBot 个人微信适配器</a> · <a href="https://www.pushplus.plus/doc/channel/clawbot.html" target="_blank" rel="noopener">PushPlus ClawBot 渠道说明（社区口径）</a></p>
-</article>
+          <!-- 遮罩与弹窗同处顶部层叠上下文 -->
+          <div class="theme-panel-backdrop" id="themeBackdrop" onclick="closeThemePanel()"></div>
 
-<article class="card">
-<div class="card-head"><h3>路线 B · 企业微信自建应用 + 微信插件</h3><span class="badge b-good">真主动推送 · 官方 API</span></div>
-<p class="one">唯一同时满足「1 分钟内异步回复 + 无窗口真主动推送 + 个人可注册」的老牌官方路线，代价是形态像企业应用、且出站调用必须走固定 IP</p>
-<div class="facts">
-<div class="fact"><b>注册门槛</b>帮助中心有「个人组建团队」入口，一个微信号可建 5 个企业；企业验证费 300 元起，不验证也能建自建应用</div>
-<div class="fact"><b>未认证限制</b>通讯录成员上限 100、通讯录上限 1000、内部群上限 500、外部联系人全企业共享 100——1 人自用基本无感</div>
-<div class="fact"><b>收消息</b>回调验证须 1 秒内返回明文 echostr；消息以加密 XML 推送，5 秒不响应重试 3 次，可先回空串再异步补发</div>
-<div class="fact"><b>发消息</b><code>message/send</code> 支持文本/图片/文件/markdown/模板卡片等，无 48 小时窗口；频控同应用同成员 30 次/分、1000 次/时</div>
-</div>
-<ul>
-<li><strong>在个人微信里用：</strong>管理后台「我的企业 → 微信插件」生成邀请二维码（有效期 7 天），个人微信扫码关注后，在微信「通讯录 → 我的企业」里就能收应用消息并回复；2025–2026 该功能仍然存在，企微开发者中心 FAQ 至今在维护其排障条目</li>
-<li><strong>配置避坑：</strong>不要勾「仅在企业微信中接收消息」；不要给应用设「在微工作台中始终进入主页」，否则微信端只能收到文本且截断为 20 字节，其余类型变成「去企业微信查看」提示</li>
-<li><strong>硬性前提：</strong>新自建应用必须把调用方 IP 配进「企业可信 IP」，否则报 60020；未认证企业可用 <code>http://公网IP:端口</code> 做回调，认证企业则要求与主体一致的备案域名</li>
-<li><strong>别填虚假企业资料</strong>注册未认证企业，多方实测消息接口无需认证即可使用，以管理后台当日显示为准</li>
-</ul>
-<p class="src">来源：<a href="https://open.work.weixin.qq.com/help2/pc/15422" target="_blank" rel="noopener">企微注册帮助（个人组建团队）</a> · <a href="https://developer.work.weixin.qq.com/document/path/90238" target="_blank" rel="noopener">自建应用接收消息</a> · <a href="https://developer.work.weixin.qq.com/document/path/96458" target="_blank" rel="noopener">发送应用消息</a> · <a href="https://developer.work.weixin.qq.com/document/path/90315" target="_blank" rel="noopener">微信插件 FAQ</a> · <a href="https://work.weixin.qq.com/nl/act/p/32d807ad4c554975" target="_blank" rel="noopener">企业可信 IP 安全升级公告</a> · <a href="https://docs.cowagent.ai/zh/channels/wecom" target="_blank" rel="noopener">CowAgent 企微文档</a></p>
-</article>
-</div>
-</section>
+          <!-- 长按弹出的 12 色主题选择面板 -->
+          <div class="theme-popover-panel" id="themePopover">
+            <div class="panel-header">
+              <span class="panel-title" id="panelTitle">12色弥散主题</span>
+              <span class="panel-hint" id="panelHint">滑动或点击选择</span>
+            </div>
+            <div class="theme-swatch-grid" id="themeSwatchGrid"></div>
+          </div>
+        </div>
+      </div>
 
-<section aria-labelledby="t3">
-<div class="sec-head"><span class="no">03</span><h2 id="t3">能用但不推荐当主力的三条</h2></div>
-<div class="cards">
-<article class="card">
-<div class="card-head"><h3>微信客服 kf</h3><span class="badge b-warn">窗口内异步可以 · 冷启动不行</span></div>
-<p class="one">用户侧体验是微信内最像原生聊天的客服会话，不用加好友、不用关注公众号，点客服链接或扫码即进会话，可发文本/图片/语音/视频/文件</p>
-<ul>
-<li><strong>门槛：</strong>必须先注册企业微信再开通微信客服；未完成企业验证且未绑定视频号时，可咨询的微信用户数量有上限（具体数字官方未公开，条款称以页面展示为准），验证并绑定视频号后不限量</li>
-<li><strong>收消息有个坑：</strong>回调只推 <code>kf_msg_or_event</code> 事件通知，消息正文不在回调里，必须再调 <code>sync_msg</code> 用游标增量拉取（仅近 3 天消息，游标要入库保存）</li>
-<li><strong>发消息被锁死：</strong>仅当客户处于「新接入待处理」或「由智能助手接待」状态可发；客户发消息后 48 小时内最多 5 条，条款 2.4 明说 48 小时后无法主动发送——定时提醒不成立</li>
-<li><strong>口径冲突，须实测：</strong>CowAgent 的微信客服通道把「已认证企业微信」列为前提，与条款「未验证可开通但限人数」不一致；只有自己一个人咨询的话限量版大概率够用，但能否以未认证主体开启 API 收发，建议注册后在后台当日实测</li>
-</ul>
-<p class="src">来源：<a href="https://kf.weixin.qq.com/kf/eula" target="_blank" rel="noopener">微信客服功能服务条款</a> · <a href="https://developer.work.weixin.qq.com/document/path/94670" target="_blank" rel="noopener">kf 接收消息</a> · <a href="https://developer.work.weixin.qq.com/document/path/94677" target="_blank" rel="noopener">kf 发送消息</a> · <a href="https://docs.cowagent.ai/zh/channels/wechat-kf" target="_blank" rel="noopener">CowAgent 微信客服通道</a></p>
-</article>
+      <!-- 调研元数据胶囊 -->
+      <div class="hero-meta-pills" id="heroMetaPills">
+        <span>调研日期 2026-11-07</span>
+        <span>适用画像：中国大陆个人用户 · 无营业执照</span>
+        <span>需求：微信内聊天 · 1 分钟内回复 · 主动推送提醒</span>
+      </div>
 
-<article class="card">
-<div class="card-head"><h3>公众号（个人订阅号 / 个人服务号）</h3><span class="badge b-bad">死穴：没有异步下发通道</span></div>
-<p class="one">能开服务器配置、能被动回复，卡点只有一个但致命：个人未认证号用不了客服消息接口，AI 慢慢想出来的答案没有任何 API 能推给用户</p>
-<ul>
-<li><strong>被动回复 5 秒：</strong>微信服务器 5 秒内收不到响应就断开并重试，共 3 次；处理不完时官方要求直接回 <code>success</code> 或空串，后续靠客服消息异步回复——而这一步个人号做不到</li>
-<li><strong>客服消息的适用范围写死了：</strong>公众号、服务号均为「仅认证」，定义为「仅允许企业主体已认证账号调用」；个人主体无法完成企业主体认证，个人订阅号、个人服务号都拿不到</li>
-<li><strong>框架的实际玩法：</strong>CowAgent 等对个人订阅号采用「先回一句『正在思考中』，生成完攒着，等用户再发任意一条消息，再把答案作为被动回复带出」——慢回复不会自动到达，必须用户再戳一下，不满足「1 分钟内自动回复」</li>
-<li><strong>文档里的「15 秒」别信：</strong>那是把 3 次重试累计成的经验窗口，不是官方单次时限承诺，依赖它攒 AI 回复并不可靠</li>
-<li><strong>个人服务号（2024-10 开放）救不了：</strong>个人不能做微信认证，高级接口仍无权限，接口能力与个人订阅号基本相同</li>
-</ul>
-<p class="src">来源：<a href="https://developers.weixin.qq.com/doc/subscription/guide/product/message/Passive_user_reply_message.html" target="_blank" rel="noopener">被动回复官方文档</a> · <a href="https://developers.weixin.qq.com/doc/subscription/api/customer/message/api_sendcustommessage" target="_blank" rel="noopener">客服消息发送（仅企业认证）</a> · <a href="https://developers.weixin.qq.com/doc/subscription/guide/dev/push/" target="_blank" rel="noopener">消息推送配置</a> · <a href="https://docs.cowagent.ai/zh/channels/wechatmp" target="_blank" rel="noopener">CowAgent 公众号通道</a></p>
-</article>
+      <!-- 主标题 -->
+      <div class="shop-title-row">
+        <h1 class="shop-title" id="mainTitle">微信接入可行方案</h1>
+      </div>
+      <p class="shop-subtitle" id="subTitle">
+        2026 年的格局和 2024 年完全不同：逆向个人号的老框架集体退场，腾讯自己下场推出了官方个人微信 Bot 通道。对你这种个人自用场景，答案不是找一条万能路线，而是<strong>聊天和提醒拆开走两条官方通道</strong>——日常聊天用官方 ClawBot，定时和冷启动提醒用企业微信应用消息，两条互不干扰、都不碰封号红线
+      </p>
 
-<article class="card">
-<div class="card-head"><h3>逆向个人号框架</h3><span class="badge b-bad">集体退场或高风险</span></div>
-<p class="one">AstrBot 在 Issue 里把社区共识说得很直白：不再主动集成新的微信个人账号接入方案，因为官方对第三方自动化接入个人账号有严格限制，相关方案经常失效或不稳定——这也是三家开源项目齐齐转向官方 ClawBot 的原因</p>
-<div class="dead">
-<div class="dead-item"><h4>WeChatFerry — 已退场</h4><p>DLL 注入 Hook 旧版 PC 微信 3.9.12.x；仓库已归档只读，作者 2025-06 宣布停维，旧版客户端登录正被「版本过低」拦截；2025-04 社区集中反馈 1 天被警告、强制下线</p></div>
-<div class="dead-item"><h4>Gewechat — 已停维</h4><p>仓库自称「技术归档」、不含完整服务端实现，2025-05 起停止维护、无法登录；AstrBot 已改接 WeChatPadPro 替代</p></div>
-<div class="dead-item"><h4>itchat / Web 协议 — 基本已死</h4><p>多数账号登录直接报「暂不支持使用网页版微信」；社区反馈 Web 端登录会被认定为外挂，警告、限制甚至封号</p></div>
-<div class="dead-item"><h4>wxauto — 原版停维</h4><p>微信 4.0 起渲染架构从 Qt Widgets 迁到 Qt Quick，控件树变黑盒，原版 2025-10-28 停维；现行付费版 wxautox4 适配 4.1.x，要常驻 Windows 且窗口保持在桌面</p></div>
-<div class="dead-item"><h4>PadLocal — 付费续命</h4><p>iPad 协议 Token 制，7 天试用；价格社区口径冲突（约 200 元/月 vs 约 50 元/月），官网未公示，下单前以 pad-local.com 为准；协议被官方调整时只能等服务商修复</p></div>
-<div class="dead-item"><h4>Gewe 付费版 — 闭源 SaaS</h4><p>按节点/在线时长计费，官网未公示固定单价，社区 2025-01 称约 100 元/号/月；账号登录在第三方服务器上，隐私、停服、协议被修复三重风险都在，未证实「跑路」，但不建议托付主力号</p></div>
-</div>
-<p class="src">来源：<a href="https://github.com/lich0821/WeChatFerry" target="_blank" rel="noopener">WeChatFerry 仓库（已归档）</a> · <a href="https://github.com/Devo919/Gewechat" target="_blank" rel="noopener">Gewechat 仓库（技术归档）</a> · <a href="https://github.com/AstrBotDevs/AstrBot/issues/4234" target="_blank" rel="noopener">AstrBot 对个人号接入的表态</a> · <a href="https://wechaty.js.org/docs/puppet-services/padlocal" target="_blank" rel="noopener">Wechaty PadLocal 说明</a> · <a href="https://www.geweapi.com/pricing" target="_blank" rel="noopener">Gewe 定价页</a> · <a href="https://docs.wxauto.org/" target="_blank" rel="noopener">wxauto 文档站</a></p>
-</article>
-</div>
-</section>
+      <!-- 更新时间 与 刷新按钮 -->
+      <div class="status-row">
+        <span class="update-time" id="updateTime">2026-11-07 调研快照 · 11 条路线 · 8 大章节</span>
+      </div>
 
-<section aria-labelledby="t4">
-<div class="sec-head"><span class="no">04</span><h2 id="t4">中转层：Cloudflare 怎么摆</h2></div>
-<p class="sec-sub">结论：入站回调放 Worker 完全可行且有成熟做法；出站调微信 API 这一步不能放 Worker，必须落回固定 IP 的云服务器——这是整条链路最容易忽略的一坑</p>
-<div class="arch">
-<div class="arch-tabs" role="tablist" aria-label="链路视图">
-<button type="button" role="tab" data-view="wecom" aria-selected="true">企微异步链路（推荐架构）</button>
-<button type="button" role="tab" data-view="claw" aria-selected="false">ClawBot 链路</button>
-<button type="button" role="tab" data-view="mp" aria-selected="false">公众号链路（断在哪）</button>
-</div>
-<div id="archBody"></div>
-<p class="arch-note" id="archNote"></p>
-</div>
-<ul style="padding-left:1.2em">
-<li><strong>域名坑：</strong>回调地址优先绑自己的域名到 Worker，不要用 <code>*.workers.dev</code>——Cloudflare 官方文档明说该域名强制 Browser Integrity Check 且无法关闭，部分客户端会在 Worker 运行前被 1010 拦截，且其在大陆的连通性历来不稳定，微信服务器能否稳定回调未获任何官方保证</li>
-<li><strong>白名单坑：</strong>公众号只有白名单 IP 能调取 access_token（错误 61004/40164），企微只有「企业可信 IP」能调任何接口（60020）；而 Worker 出站 IP 不固定、会变化，所以取 token 和一切回推调用都由固定 IP 服务器执行，Worker 只做验签、解密、入队</li>
-<li><strong>去重必做：</strong>微信 3 次重试会重复投递，入队前按 MsgId（事件用 FromUserName + CreateTime）排重，这是官方明确推荐的做法</li>
-<li><strong>图片也要走服务器出站：</strong>公众号/企微/kf 回图片不是发图片 URL，要先调素材上传接口换 MediaId；ClawBot 则有自己的 CDN 上传接口，由网关完成</li>
-</ul>
-<p><small>来源：<a href="https://developers.cloudflare.com/workers/configuration/routing/workers-dev/" target="_blank" rel="noopener">Cloudflare workers.dev 说明</a> · <a href="https://developers.weixin.qq.com/doc/subscription/guide/dev/api/" target="_blank" rel="noopener">公众号 API 与 IP 白名单</a> · <a href="https://www.xugj520.cn/en/archives/cloudflare-serverless-wechat-backend.html" target="_blank" rel="noopener">Cloudflare 构建公众号后端教程（2025，社区实现）</a></small></p>
-</section>
+      <!-- 无边框滑动胶囊切换栏（路线对比 ⇄ 架构与开源） -->
+      <div class="gemini-tab-section">
+        <div class="gemini-tabs" id="geminiTabs" data-active="quote">
+          <div class="tab-glider"></div>
+          <button class="gemini-tab-btn active" id="tabQuote" type="button" onclick="switchTab('quote')">路线对比 (11)</button>
+          <button class="gemini-tab-btn" id="tabShop" type="button" onclick="switchTab('shop')">架构与开源 (6)</button>
+        </div>
+      </div>
 
-<section aria-labelledby="t5">
-<div class="sec-head"><span class="no">05</span><h2 id="t5">要少写胶水代码：现成开源项目</h2></div>
-<p class="sec-sub">三家都在活跃维护，且不约而同完成了同一次迁移：个人号通道从 Gewechat 切到官方 ClawBot</p>
-<div class="table-wrap">
-<table>
-<thead><tr><th>项目</th><th>微信通道（当前）</th><th>部署难度</th><th>适合谁</th></tr></thead>
-<tbody>
-<tr><td class="route" data-l="">CowAgent<small>原 chatgpt-on-wechat</small></td><td data-l="通道">官方扫码微信通道、公众号（个人订阅号戳取 + 企业服务号推送）、企微自建应用、企微智能机器人、微信客服；文档更新至 2026-10</td><td data-l="难度">最低，Python/Docker + 配置文件或 Web 控制台点选</td><td data-l="适合">单机自用首选，通道与本页路线一一对应</td></tr>
-<tr><td class="route" data-l="">LangBot</td><td data-l="通道">个人微信主推 OpenClaw 适配器扫码登录、公众号、企微内部应用、企微智能机器人（流式）、企微客服</td><td data-l="难度">中，Docker + WebUI 配置</td><td data-l="适合">想接 Dify / Coze / n8n 等工作流的，集成最全</td></tr>
-<tr><td class="route" data-l="">AstrBot</td><td data-l="通道">公众号、企微应用 + 微信客服、企微 AI 机器人、个人微信双轨（WeChatPadPro 协议方案 + 官方 openclaw-weixin）</td><td data-l="难度">中，Docker/WebUI，平台和概念较多</td><td data-l="适合">想要 1000+ 插件生态的</td></tr>
-</tbody>
-</table>
-</div>
-<p style="color:var(--muted)">提醒：三家都是「自带 Agent 大脑」的全家桶，如果你只需要把现成的助手桥过去，可能比需求重——直接用 iLink 协议或企微 API 对接自己的 Webhook 反而更干净</p>
-<p><small>来源：<a href="https://docs.cowagent.ai/zh/channels/index" target="_blank" rel="noopener">CowAgent 通道总览</a> · <a href="https://docs.langbot.app/zh/insight/features" target="_blank" rel="noopener">LangBot 特性</a> · <a href="https://docs.astrbot.app/platform/wecom.html" target="_blank" rel="noopener">AstrBot 企微文档</a></small></p>
-</section>
+      <!-- 分类快捷筛选栏（规范：筛选条放搜索框上方，单行横滚） -->
+<!-- ================= 下方分类快捷筛选栏 ================= -->
+    <nav class="category-bar" id="categoryBar">
+      <button class="cat-chip active" type="button" data-cat="all" onclick="selectCategory('all', this)">全部 (01–08)</button>
+      <button class="cat-chip" type="button" data-cat="preferred" onclick="selectCategory('preferred', this)">首选双通道</button>
+      <button class="cat-chip" type="button" data-cat="official" onclick="selectCategory('official', this)">官方次选</button>
+      <button class="cat-chip" type="button" data-cat="reverse" onclick="selectCategory('reverse', this)">逆向框架</button>
+      <button class="cat-chip" type="button" data-cat="arch" onclick="selectCategory('arch', this)">Cloudflare 中转</button>
+      <button class="cat-chip" type="button" data-cat="oss" onclick="selectCategory('oss', this)">开源项目 & 疑点</button>
+    </nav>
 
-<section aria-labelledby="t6">
-<div class="sec-head"><span class="no">06</span><h2 id="t6">落地顺序建议</h2></div>
-<ol class="steps">
-<li><b>先上 ClawBot 聊天（半天内可跑通）</b><span>用 CowAgent 的微信通道或直接照腾讯官方 iLink 协议对接，扫码即通，先把「在微信里聊天、发图、1 分钟内回复」这条主体验落地</span></li>
-<li><b>再补企微提醒通道</b><span>注册未认证企业微信（个人组建团队）→ 建自建应用 → 配回调与企业可信 IP → 个人微信扫码关注微信插件；定时提醒、冷启动通知全走 <code>message/send</code></span></li>
-<li><b>中转层按分工摆</b><span>回调入站可放 Cloudflare Worker（绑自有域名、验签入队、立即回 success），出站调用一律回固定 IP 服务器执行，不要把 access_token 和回推放在 Worker 上</span></li>
-<li><b>正式投入前做一次端到端实测</b><span>本次为案头调研，未实测任何路线；企微未认证链路有多方社区教程背书，但微信后台策略调整频繁，建议按 CowAgent 企微文档实际跑一遍再定型</span></li>
-<li><b>主力微信号不碰逆向框架</b><span>WeChatFerry、Gewechat、itchat 已退场，PadLocal / Gewe 付费版是花钱买封号与隐私风险，与上面两条官方通道没有可比性</span></li>
-</ol>
-</section>
+      <!-- 大圆角悬浮搜索框 -->
+      <div class="gemini-search-card">
+        <button class="plus-action-btn" type="button" onclick="resetCategoryFilter()" title="重置全部筛选">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
 
-<section aria-labelledby="t7">
-<div class="sec-head"><span class="no">07</span><h2 id="t7">还没查实 / 口径有出入的点</h2></div>
-<details>
-<summary>ClawBot 主动推送的精确规则到底是多少</summary>
-<p>官方协议文档只规定发送需带 context_token；「约 24 小时」「约 10 条」「文本能否空 token 冷发」均为社区拆解且互相有出入，无法证实为官方规则。规划上按不可靠处理，重要提醒配企微兜底</p>
-</details>
-<details>
-<summary>未认证企业微信能不能开微信客服 API 接管</summary>
-<p>kf 官方条款说未验证可开通（限咨询人数，具体数字未公开）；CowAgent 文档要求已认证企业微信。两者不一致，只能注册后在后台当日实测，不要预设</p>
-</details>
-<details>
-<summary>个人服务号的接口权限有没有官方说法</summary>
-<p>「2024-10 开放个人注册、权限等同个人订阅号」来自壹伴等二手来源与博客，未找到官方文档单列；结论与「客服消息仅企业认证」的官方规则自洽、可信度高，但建议在公众平台后台「接口权限」页实测确认</p>
-</details>
-<details>
-<summary>PadLocal 和 Gewe 付费版现在到底多少钱</summary>
-<p>PadLocal 社区口径 200 元/月与约 50 元/月冲突、官网未公示；Gewe 定价页只有计费模式没有单价。下单前以各自控制台实时价格为准</p>
-</details>
-<details>
-<summary>WeChatFerry 归档的准确时间点</summary>
-<p>仓库现状为已归档只读（2026-11-07 打开确认），搜索索引显示归档于 2026-07-10；作者宣布停维的最早公开信号是 2025-06 的 V2EX 帖。两个时间点含义不同，本页分别表述</p>
-</details>
-</section>
+        <input
+          type="text"
+          class="search-input"
+          id="searchInput"
+          placeholder="搜路线、框架或关键词，如 ClawBot、企微、Worker"
+          oninput="handleSearchInput()"
+        >
 
-<section aria-labelledby="t8">
-<div class="sec-head"><span class="no">08</span><h2 id="t8">主要来源</h2></div>
-<div class="sources"><ul>
-<li>公众号被动回复（5 秒/重试）：<a href="https://developers.weixin.qq.com/doc/subscription/guide/product/message/Passive_user_reply_message.html" target="_blank" rel="noopener">developers.weixin.qq.com</a></li>
-<li>公众号客服消息（48h/5 条/仅企业认证）：<a href="https://developers.weixin.qq.com/doc/subscription/api/customer/message/api_sendcustommessage" target="_blank" rel="noopener">developers.weixin.qq.com</a></li>
-<li>公众号消息推送配置（80/443、验签）：<a href="https://developers.weixin.qq.com/doc/subscription/guide/dev/push/" target="_blank" rel="noopener">developers.weixin.qq.com</a></li>
-<li>企微自建应用接收消息：<a href="https://developer.work.weixin.qq.com/document/path/90238" target="_blank" rel="noopener">developer.work.weixin.qq.com</a></li>
-<li>企微发送应用消息（无窗口/频控）：<a href="https://developer.work.weixin.qq.com/document/path/96458" target="_blank" rel="noopener">developer.work.weixin.qq.com</a></li>
-<li>企微微信插件 FAQ：<a href="https://developer.work.weixin.qq.com/document/path/90315" target="_blank" rel="noopener">developer.work.weixin.qq.com</a></li>
-<li>微信客服发送 / 接收消息：<a href="https://developer.work.weixin.qq.com/document/path/94677" target="_blank" rel="noopener">path/94677</a> · <a href="https://developer.work.weixin.qq.com/document/path/94670" target="_blank" rel="noopener">path/94670</a></li>
-<li>微信客服服务条款：<a href="https://kf.weixin.qq.com/kf/eula" target="_blank" rel="noopener">kf.weixin.qq.com/kf/eula</a></li>
-<li>企微注册帮助（个人组建团队）：<a href="https://open.work.weixin.qq.com/help2/pc/15422" target="_blank" rel="noopener">open.work.weixin.qq.com</a></li>
-<li>企微未认证限制：<a href="https://open.work.weixin.qq.com/help2/pc/14936" target="_blank" rel="noopener">成员/通讯录上限</a> · <a href="https://open.work.weixin.qq.com/help2/pc/20172?person_id=0" target="_blank" rel="noopener">外部联系人 100</a></li>
-<li>腾讯官方 openclaw-weixin：<a href="https://github.com/Tencent/openclaw-weixin" target="_blank" rel="noopener">github.com/Tencent/openclaw-weixin</a></li>
-<li>CowAgent 通道文档：<a href="https://docs.cowagent.ai/zh/channels/index" target="_blank" rel="noopener">docs.cowagent.ai</a></li>
-<li>AstrBot 个人微信（官方通道）：<a href="https://docs.astrbot.app/platform/weixin_oc.html" target="_blank" rel="noopener">docs.astrbot.app</a></li>
-<li>LangBot 个人微信：<a href="https://docs.langbot.app/zh/usage/platforms/wechat/weixin" target="_blank" rel="noopener">docs.langbot.app</a></li>
-<li>Cloudflare workers.dev 限制说明：<a href="https://developers.cloudflare.com/workers/configuration/routing/workers-dev/" target="_blank" rel="noopener">developers.cloudflare.com</a></li>
-</ul></div>
-<p class="foot">本页为 2026-11-07 的案头调研快照，未实测任何路线；微信后台策略调整频繁，正式投入前请按文中链接回官方文档与后台当日页面复核。文中数值凡标注者为实测反馈口径，不构成官方承诺</p>
-</section>
+        <button class="clear-input-btn" id="clearBtn" type="button" onclick="clearSearch()">✕</button>
 
-</div>
-<script>
-(function(){
-// route filter
-var btns=document.querySelectorAll('.filters button');
-var rows=document.querySelectorAll('tbody tr[data-kind]');
-btns.forEach(function(b){
-b.addEventListener('click',function(){
-btns.forEach(function(x){x.setAttribute('aria-pressed','false')});
-b.setAttribute('aria-pressed','true');
-var f=b.getAttribute('data-f');
-rows.forEach(function(r){
-r.classList.toggle('hidden-row', f!=='all' && r.getAttribute('data-kind')!==f);
-});
-});
-});
+        <button class="action-circle-btn" type="button" onclick="triggerSearchFocus()" title="立即检索">
+          <svg class="arrow-up-svg" viewBox="0 0 24 24">
+            <line x1="12" y1="19" x2="12" y2="5"></line>
+            <polyline points="5 12 12 5 19 12"></polyline>
+          </svg>
+        </button>
+      </div>
+    </header>
 
-// architecture switcher
-var views={
-wecom:{
-flow:[['微信（插件入口）','用户在微信里发消息',0],['企业微信回调','加密 XML 推送',0],['Cloudflare Worker','验签/解密 → 入队 → 立即回空串',1],['Queue / D1','按 MsgId 去重后落库',0],['你的服务器','固定 IP · 轮询取消息',1],['AI 助手','生成回复',0],['message/send','服务器以白名单 IP 直调，无窗口推送',1]],
-note:'成立条件：接收与生成解耦，5 秒内只做入队；回推走 message/send 所以没有 48 小时窗口。Worker 只碰入站，出站 token 与发送全部在固定 IP 服务器上'
-},
-claw:{
-flow:[['微信 ClawBot 会话','用户先发一条消息',0],['iLink 长轮询','getupdates · hold 约 35 秒',1],['你的网关','直接收到消息，无需公网回调',1],['AI 助手','生成多久都行',0],['sendmessage','回带 context_token 发送',1]],
-note:'这条路线根本不需要 Worker 和队列——出站长轮询天然异步。短板只在主动推送：没有新的入站 context_token 时，冷启动下发不可靠，所以提醒另走企微'
-},
-mp:{
-flow:[['微信用户','在订阅号里发消息',0],['公众号回调','POST 到服务器配置 URL',0],['5 秒被动回复','超时重试 3 次',1],['AI 生成（超过 5 秒）','答案攒在队列里',0],['客服消息接口','个人未认证号无权限',1],['用户再发一条','答案才能被动带出',0]],
-note:'链路断点不在队列、不在 Worker，在权限：个人号没有客服消息接口，攒好的答案没有任何 API 能推出去。这就是公众号路线对慢回复不合格的根本原因'
-}
-};
-var body=document.getElementById('archBody'), note=document.getElementById('archNote');
-var tabs=document.querySelectorAll('.arch-tabs button');
-function render(key){
-var v=views[key]; body.innerHTML='';
-var flow=document.createElement('div'); flow.className='flow';
-v.flow.forEach(function(n,i){
-if(i>0){var a=document.createElement('span');a.className='arrow';a.textContent='→';flow.appendChild(a);}
-var d=document.createElement('div'); d.className='node'+(n[2]?' hot':'');
-d.appendChild(document.createTextNode(n[0]));
-var s=document.createElement('small'); s.textContent=n[1]; d.appendChild(s);
-flow.appendChild(d);
-});
-body.appendChild(flow); note.textContent=v.note;
-}
-tabs.forEach(function(t){
-t.addEventListener('click',function(){
-tabs.forEach(function(x){x.setAttribute('aria-selected','false')});
-t.setAttribute('aria-selected','true');
-render(t.getAttribute('data-view'));
-});
-});
-render('wecom');
-})();
-</script>
+    <!-- ================= 推荐组合（结论先行） ================= -->
+    <div class="verdict-card" role="region" aria-label="推荐组合">
+      <div class="verdict-head">
+        <div class="verdict-head-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <span id="verdictTitle">推荐组合（结论先行）</span>
+        </div>
+        <span class="attr-pill-tag tag-green" id="verdictBadge">零封号 · 双通道互补</span>
+      </div>
+      <div class="verdict-combo">
+        <div class="verdict-item">
+          <span class="product-tag">负责日常聊天</span>
+          <h3>微信官方 ClawBot（iLink）</h3>
+          <p>2026-03 前后腾讯官方推出的个人微信 Bot 插件，扫码登录、长轮询收消息，不需要公网回调；文字、图片、语音、文件、视频私聊都支持，体验最像和好友聊天，零封号风险</p>
+        </div>
+        <div class="verdict-plus" aria-hidden="true">+</div>
+        <div class="verdict-item">
+          <span class="product-tag">负责主动提醒</span>
+          <h3>企业微信自建应用 + 微信插件</h3>
+          <p>个人可注册未认证企业微信并建自建应用，<code>message/send</code> 没有时间窗口限制，可以真正主动发消息；代价是会话长得像企业应用，且需要一台固定公网 IP 的服务器</p>
+        </div>
+      </div>
+      <p class="verdict-foot">
+        <strong>为什么必须拆两条：</strong>ClawBot 的回复必须带入站消息的 <code>context_token</code>，社区实测约 24 小时窗口、下发约 10 条后要用户再互动一次，做不了「三天后冷启动提醒」；企微应用消息恰好补上这一块。只想要聊天可以只上 ClawBot，只想要可靠提醒可以只上企微
+      </p>
+    </div>
 
-<script>
-let currentLang = 'zh';
-(function(){ var a = readSharedA(); if (a && a.l === '1') currentLang = 'en'; })();
-function readSharedA(){try{var m=document.cookie.match(/(?:^|;\s*)A=(\d{3,4})(?:;|$)/);if(!m)return null;var v=m[1],t=parseInt(v.slice(2),10);if(v.charAt(1)!=='0'&&v.charAt(1)!=='1')return null;if(!(t>=1&&t<=12))return null;return{l:v.charAt(0),m:v.charAt(1),t:t};}catch(e){return null;}}
-function writeSharedA(){try{var s='A='+(currentLang==='en'?'1':'0')+(isDarkMode?'0':'1')+(currentThemeIdx+1)+';path=/;max-age=31536000;SameSite=Lax';var h=location.hostname;if(h==='jpedu.asia'||h.slice(-11)==='.jpedu.asia')s+=';domain=jpedu.asia';if(location.protocol==='https:')s+=';Secure';document.cookie=s;}catch(e){}}
-function persistTheme(){ try{ localStorage.setItem('wechat-aura-theme', String(currentThemeIdx)); }catch(e){} writeSharedA(); }
-const allThemes = [
+    <!-- ================= 顶部核心卡片速览网格（点击跳转对应章节并展开） ================= -->
+    <main class="content-grid" id="contentGrid"></main>
+
+    <div class="featured-list-hint" id="featuredListHint">
+      <span id="featuredCountLabel">顶部核心方案速览 · 点击任意卡片直达下方对应章节明细</span>
+      <a href="#sec-01" class="featured-go-link" id="featuredJumpLink">查看全路线明细 ↓</a>
+    </div>
+
+    <!-- ================= 01 全路线对比 ================= -->
+    <section class="site-list-section" id="sec-01" aria-labelledby="t1">
+      <div class="site-list-topline">
+        <span class="sec-no-pill">01</span>
+        <h2 class="site-list-title" id="t1">全路线对比</h2>
+        <span class="site-list-count" id="routeCountBadge">11 条路线</span>
+      </div>
+      <p class="site-list-subhead">按「个人门槛 / 实时性 / 主动推送 / 风险 / 维护成本」横向比一遍，逆向框架一行都不值得用主力号试</p>
+
+      <!-- 路线类型筛选按钮（全部路线 / 只看官方通道 / 只看逆向框架） -->
+      <div class="shop-platform-filter" role="group" aria-label="筛选路线类型">
+        <button type="button" class="platform-filter-chip active" data-f="all" aria-pressed="true" onclick="filterRouteTable('all', this)">全部路线 (11)</button>
+        <button type="button" class="platform-filter-chip" data-f="official" aria-pressed="false" onclick="filterRouteTable('official', this)">只看官方通道 (6)</button>
+        <button type="button" class="platform-filter-chip" data-f="reverse" aria-pressed="false" onclick="filterRouteTable('reverse', this)">只看逆向框架 (5)</button>
+      </div>
+
+      <div class="site-list-group open" id="site-group-all-routes">
+        <div class="site-list-offers" id="routeComparisonRows"></div>
+      </div>
+      <p class="site-list-footer">
+        参照项：认证企业服务号个人无资格注册（需企业/个体户执照 + 认证 300 元/年），不在上表；其客服消息同样是 48 小时 / 5 条窗口，长期触达要靠订阅通知
+      </p>
+    </section>
+
+    <!-- ================= 02 两条首选路线，说细一点 ================= -->
+    <section class="site-list-section" id="sec-02" aria-labelledby="t2">
+      <div class="site-list-topline">
+        <span class="sec-no-pill">02</span>
+        <h2 class="site-list-title" id="t2">两条首选路线，说细一点</h2>
+        <span class="site-list-count">2 条主力通道</span>
+      </div>
+      <p class="site-list-subhead">以下标注区分来源性质：为微信/腾讯官方文档原文，为开源项目官方文档，为论坛与实测反馈，仅作经验参考</p>
+
+      <div class="site-list-groups">
+        <!-- 路线 A -->
+        <article class="site-list-group open" id="site-group-route-a">
+          <button class="site-list-trigger" type="button" onclick="toggleSiteGroup('route-a')" aria-expanded="true" aria-controls="offers-route-a">
+            <span class="site-list-brand-icon" aria-hidden="true">A</span>
+            <span class="site-list-main">
+              <span class="site-list-name" style="display:block">路线 A · 官方 ClawBot（iLink 协议）</span>
+              <span class="site-list-detail" style="display:block">你在微信里聊天的对象是一个新增的 ClawBot 机器人会话，不是「你的号被程序接管」</span>
+            </span>
+            <span class="site-list-minimum"><small>聊天首选</small><strong>零封号</strong></span>
+            <span class="site-list-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+          </button>
+          <div class="site-list-collapsible" id="offers-route-a">
+            <div class="site-list-inner">
+              <div class="site-list-offers">
+                <div class="facts-grid">
+                  <div class="fact-box"><b>接入方式</b>腾讯官方仓库 <code>Tencent/openclaw-weixin</code>，扫码登录；要求 OpenClaw ≥ 2026.3.22、Node ≥ 22.13</div>
+                  <div class="fact-box"><b>收消息</b><code>POST /ilink/bot/getupdates</code> 长轮询，服务端 hold 约 35 秒，游标推进，无需公网回调</div>
+                  <div class="fact-box"><b>发消息</b><code>POST /ilink/bot/sendmessage</code>，域名 <code>ilinkai.weixin.qq.com</code>，纯 HTTP/JSON</div>
+                  <div class="fact-box"><b>支持范围</b>仅私聊；文本、图片、语音、文件、视频均可收发，语音由微信云端转文字</div>
+                </div>
+                <ul class="detail-bullets">
+                  <li><strong>实时性：</strong>长轮询近实时，AI 生成多久就多久，没有公众号那种 5 秒被动回复限制，你要的「1 分钟内回复」天然成立</li>
+                  <li><strong>主动推送的真实边界：</strong>发送必须回带入站消息的 <code>context_token</code>，第一句话必须由用户先发；PushPlus 的渠道说明称每下发 10 次后需再主动发起一次对话、每隔 24 小时也需要一次；也有社区实现称文本用空 token 可长期推送、被拒后需用户发消息激活——口径互相有出入，<strong>按「不可靠」规划，重要提醒不要压在这一条上</strong></li>
+                  <li><strong>运维注意：</strong>网关停机数小时后 token 失效（errcode -14 会话过期），需重新扫码；CowAgent 的客户端会自动清凭证重新拉起扫码流程</li>
+                  <li><strong>上手最快的方式：</strong>CowAgent、AstrBot、LangBot 均已接入此通道；若只做桥不想引入全家桶，可直接照官方协议文档用 HTTP/JSON 对接自己的 Webhook</li>
+                </ul>
+                <p class="card-src-bar">
+                  来源：<a href="https://github.com/Tencent/openclaw-weixin" target="_blank" rel="noopener">github.com/Tencent/openclaw-weixin</a> ·
+                  <a href="https://github.com/Tencent/openclaw-weixin/blob/24de5c9eb0dd5e595d7e2d090ed8a3f82870d42c/docs/protocol_zh_CN.md" target="_blank" rel="noopener">iLink 协议文档</a> ·
+                  <a href="https://docs.openclaw.ai/zh-CN/channels" target="_blank" rel="noopener">OpenClaw 渠道文档</a> ·
+                  <a href="https://docs.astrbot.app/platform/weixin_oc.html" target="_blank" rel="noopener">AstrBot 个人微信适配器</a> ·
+                  <a href="https://www.pushplus.plus/doc/channel/clawbot.html" target="_blank" rel="noopener">PushPlus ClawBot 渠道说明（社区口径）</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- 路线 B -->
+        <article class="site-list-group open" id="site-group-route-b">
+          <button class="site-list-trigger" type="button" onclick="toggleSiteGroup('route-b')" aria-expanded="true" aria-controls="offers-route-b">
+            <span class="site-list-brand-icon" aria-hidden="true">B</span>
+            <span class="site-list-main">
+              <span class="site-list-name" style="display:block">路线 B · 企业微信自建应用 + 微信插件</span>
+              <span class="site-list-detail" style="display:block">唯一同时满足「1 分钟内异步回复 + 无窗口真主动推送 + 个人可注册」的老牌官方路线</span>
+            </span>
+            <span class="site-list-minimum"><small>推送首选</small><strong>真主动推送</strong></span>
+            <span class="site-list-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+          </button>
+          <div class="site-list-collapsible" id="offers-route-b">
+            <div class="site-list-inner">
+              <div class="site-list-offers">
+                <div class="facts-grid">
+                  <div class="fact-box"><b>注册门槛</b>帮助中心有「个人组建团队」入口，一个微信号可建 5 个企业；企业验证费 300 元起，不验证也能建自建应用</div>
+                  <div class="fact-box"><b>未认证限制</b>通讯录成员上限 100、通讯录上限 1000、内部群上限 500、外部联系人全企业共享 100——1 人自用基本无感</div>
+                  <div class="fact-box"><b>收消息</b>回调验证须 1 秒内返回明文 echostr；消息以加密 XML 推送，5 秒不响应重试 3 次，可先回空串再异步补发</div>
+                  <div class="fact-box"><b>发消息</b><code>message/send</code> 支持文本/图片/文件/markdown/模板卡片等，无 48 小时窗口；频控同应用同成员 30 次/分、1000 次/时</div>
+                </div>
+                <ul class="detail-bullets">
+                  <li><strong>在个人微信里用：</strong>管理后台「我的企业 → 微信插件」生成邀请二维码（有效期 7 天），个人微信扫码关注后，在微信「通讯录 → 我的企业」里就能收应用消息并回复；2025–2026 该功能仍然存在，企微开发者中心 FAQ 至今在维护其排障条目</li>
+                  <li><strong>配置避坑：</strong>不要勾「仅在企业微信中接收消息」；不要给应用设「在微工作台中始终进入主页」，否则微信端只能收到文本且截断为 20 字节，其余类型变成「去企业微信查看」提示</li>
+                  <li><strong>硬性前提：</strong>新自建应用必须把调用方 IP 配进「企业可信 IP」，否则报 60020；未认证企业可用 <code>http://公网IP:端口</code> 做回调，认证企业则要求与主体一致的备案域名</li>
+                  <li><strong>别填虚假企业资料</strong>注册未认证企业，多方实测消息接口无需认证即可使用，以管理后台当日显示为准</li>
+                </ul>
+                <p class="card-src-bar">
+                  来源：<a href="https://open.work.weixin.qq.com/help2/pc/15422" target="_blank" rel="noopener">企微注册帮助（个人组建团队）</a> ·
+                  <a href="https://developer.work.weixin.qq.com/document/path/90238" target="_blank" rel="noopener">自建应用接收消息</a> ·
+                  <a href="https://developer.work.weixin.qq.com/document/path/96458" target="_blank" rel="noopener">发送应用消息</a> ·
+                  <a href="https://developer.work.weixin.qq.com/document/path/90315" target="_blank" rel="noopener">微信插件 FAQ</a> ·
+                  <a href="https://work.weixin.qq.com/nl/act/p/32d807ad4c554975" target="_blank" rel="noopener">企业可信 IP 安全升级公告</a> ·
+                  <a href="https://docs.cowagent.ai/zh/channels/wecom" target="_blank" rel="noopener">CowAgent 企微文档</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ================= 03 能用但不推荐当主力的三条 ================= -->
+    <section class="site-list-section" id="sec-03" aria-labelledby="t3">
+      <div class="site-list-topline">
+        <span class="sec-no-pill">03</span>
+        <h2 class="site-list-title" id="t3">能用但不推荐当主力的三条</h2>
+        <span class="site-list-count">3 类备选与退场</span>
+      </div>
+
+      <div class="site-list-groups">
+        <!-- 微信客服 kf -->
+        <article class="site-list-group open" id="site-group-kf">
+          <button class="site-list-trigger" type="button" onclick="toggleSiteGroup('kf')" aria-expanded="true" aria-controls="offers-kf">
+            <span class="site-list-brand-icon" aria-hidden="true">kf</span>
+            <span class="site-list-main">
+              <span class="site-list-name" style="display:block">微信客服 kf</span>
+              <span class="site-list-detail" style="display:block">用户侧体验最像原生聊天的客服会话，不用加好友、不用关注公众号，扫码即进</span>
+            </span>
+            <span class="site-list-minimum"><small>48h / 5条</small><strong>冷启动不行</strong></span>
+            <span class="site-list-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+          </button>
+          <div class="site-list-collapsible" id="offers-kf">
+            <div class="site-list-inner">
+              <div class="site-list-offers">
+                <ul class="detail-bullets">
+                  <li><strong>门槛：</strong>必须先注册企业微信再开通微信客服；未完成企业验证且未绑定视频号时，可咨询的微信用户数量有上限（具体数字官方未公开，条款称以页面展示为准），验证并绑定视频号后不限量</li>
+                  <li><strong>收消息有个坑：</strong>回调只推 <code>kf_msg_or_event</code> 事件通知，消息正文不在回调里，必须再调 <code>sync_msg</code> 用游标增量拉取（仅近 3 天消息，游标要入库保存）</li>
+                  <li><strong>发消息被锁死：</strong>仅当客户处于「新接入待处理」或「由智能助手接待」状态可发；客户发消息后 48 小时内最多 5 条，条款 2.4 明说 48 小时后无法主动发送——定时提醒不成立</li>
+                  <li><strong>口径冲突，须实测：</strong>CowAgent 的微信客服通道把「已认证企业微信」列为前提，与条款「未验证可开通但限人数」不一致；只有自己一个人咨询的话限量版大概率够用，但能否以未认证主体开启 API 收发，建议注册后在后台当日实测</li>
+                </ul>
+                <p class="card-src-bar">
+                  来源：<a href="https://kf.weixin.qq.com/kf/eula" target="_blank" rel="noopener">微信客服功能服务条款</a> ·
+                  <a href="https://developer.work.weixin.qq.com/document/path/94670" target="_blank" rel="noopener">kf 接收消息</a> ·
+                  <a href="https://developer.work.weixin.qq.com/document/path/94677" target="_blank" rel="noopener">kf 发送消息</a> ·
+                  <a href="https://docs.cowagent.ai/zh/channels/wechat-kf" target="_blank" rel="noopener">CowAgent 微信客服通道</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- 公众号 -->
+        <article class="site-list-group open" id="site-group-mp">
+          <button class="site-list-trigger" type="button" onclick="toggleSiteGroup('mp')" aria-expanded="true" aria-controls="offers-mp">
+            <span class="site-list-brand-icon" aria-hidden="true">MP</span>
+            <span class="site-list-main">
+              <span class="site-list-name" style="display:block">公众号（个人订阅号 / 个人服务号）</span>
+              <span class="site-list-detail" style="display:block">个人未认证号用不了客服消息接口，AI 慢慢想出来的答案没有任何 API 能推给用户</span>
+            </span>
+            <span class="site-list-minimum"><small>被动5秒</small><strong>无异步下发</strong></span>
+            <span class="site-list-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+          </button>
+          <div class="site-list-collapsible" id="offers-mp">
+            <div class="site-list-inner">
+              <div class="site-list-offers">
+                <ul class="detail-bullets">
+                  <li><strong>被动回复 5 秒：</strong>微信服务器 5 秒内收不到响应就断开并重试，共 3 次；处理不完时官方要求直接回 <code>success</code> 或空串，后续靠客服消息异步回复——而这一步个人号做不到</li>
+                  <li><strong>客服消息的适用范围写死了：</strong>公众号、服务号均为「仅认证」，定义为「仅允许企业主体已认证账号调用」；个人主体无法完成企业主体认证，个人订阅号、个人服务号都拿不到</li>
+                  <li><strong>框架的实际玩法：</strong>CowAgent 等对个人订阅号采用「先回一句『正在思考中』，生成完攒着，等用户再发任意一条消息，再把答案作为被动回复带出」——慢回复不会自动到达，必须用户再戳一下，不满足「1 分钟内自动回复」</li>
+                  <li><strong>文档里的「15 秒」别信：</strong>那是把 3 次重试累计成的经验窗口，不是官方单次时限承诺，依赖它攒 AI 回复并不可靠</li>
+                  <li><strong>个人服务号（2024-10 开放）救不了：</strong>个人不能做微信认证，高级接口仍无权限，接口能力与个人订阅号基本相同</li>
+                </ul>
+                <p class="card-src-bar">
+                  来源：<a href="https://developers.weixin.qq.com/doc/subscription/guide/product/message/Passive_user_reply_message.html" target="_blank" rel="noopener">被动回复官方文档</a> ·
+                  <a href="https://developers.weixin.qq.com/doc/subscription/api/customer/message/api_sendcustommessage" target="_blank" rel="noopener">客服消息发送（仅企业认证）</a> ·
+                  <a href="https://developers.weixin.qq.com/doc/subscription/guide/dev/push/" target="_blank" rel="noopener">消息推送配置</a> ·
+                  <a href="https://docs.cowagent.ai/zh/channels/wechatmp" target="_blank" rel="noopener">CowAgent 公众号通道</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- 逆向个人号框架 -->
+        <article class="site-list-group open" id="site-group-reverse">
+          <button class="site-list-trigger" type="button" onclick="toggleSiteGroup('reverse')" aria-expanded="true" aria-controls="offers-reverse">
+            <span class="site-list-brand-icon" aria-hidden="true">✕</span>
+            <span class="site-list-main">
+              <span class="site-list-name" style="display:block">逆向个人号框架（6 大方案现状）</span>
+              <span class="site-list-detail" style="display:block">AstrBot 明确表态不再集成新个人号逆向方案，三家开源项目齐齐转向官方 ClawBot</span>
+            </span>
+            <span class="site-list-minimum"><small>风险极高</small><strong>集体退场</strong></span>
+            <span class="site-list-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+          </button>
+          <div class="site-list-collapsible" id="offers-reverse">
+            <div class="site-list-inner">
+              <div class="site-list-offers">
+                <div class="dead-grid">
+                  <div class="dead-card">
+                    <h4>WeChatFerry — 已退场</h4>
+                    <p>DLL 注入 Hook 旧版 PC 微信 3.9.12.x；仓库已归档只读，作者 2025-06 宣布停维，旧版客户端登录正被「版本过低」拦截；2025-04 社区集中反馈 1 天被警告、强制下线</p>
+                  </div>
+                  <div class="dead-card">
+                    <h4>Gewechat — 已停维</h4>
+                    <p>仓库自称「技术归档」、不含完整服务端实现，2025-05 起停止维护、无法登录；AstrBot 已改接 WeChatPadPro 替代</p>
+                  </div>
+                  <div class="dead-card">
+                    <h4>itchat / Web 协议 — 基本已死</h4>
+                    <p>多数账号登录直接报「暂不支持使用网页版微信」；社区反馈 Web 端登录会被认定为外挂，警告、限制甚至封号</p>
+                  </div>
+                  <div class="dead-card">
+                    <h4>wxauto — 原版停维</h4>
+                    <p>微信 4.0 起渲染架构从 Qt Widgets 迁到 Qt Quick，控件树变黑盒，原版 2025-10-28 停维；现行付费版 wxautox4 适配 4.1.x，要常驻 Windows 且窗口保持在桌面</p>
+                  </div>
+                  <div class="dead-card">
+                    <h4>PadLocal — 付费续命</h4>
+                    <p>iPad 协议 Token 制，7 天试用；价格社区口径冲突（约 200 元/月 vs 约 50 元/月），官网未公示，下单前以 pad-local.com 为准；协议被官方调整时只能等服务商修复</p>
+                  </div>
+                  <div class="dead-card">
+                    <h4>Gewe 付费版 — 闭源 SaaS</h4>
+                    <p>按节点/在线时长计费，官网未公示固定单价，社区 2025-01 称约 100 元/号/月；账号登录在第三方服务器上，隐私、停服、协议被修复三重风险都在，不建议托付主力号</p>
+                  </div>
+                </div>
+                <p class="card-src-bar">
+                  来源：<a href="https://github.com/lich0821/WeChatFerry" target="_blank" rel="noopener">WeChatFerry 仓库（已归档）</a> ·
+                  <a href="https://github.com/Devo919/Gewechat" target="_blank" rel="noopener">Gewechat 仓库（技术归档）</a> ·
+                  <a href="https://github.com/AstrBotDevs/AstrBot/issues/4234" target="_blank" rel="noopener">AstrBot 对个人号接入的表态</a> ·
+                  <a href="https://wechaty.js.org/docs/puppet-services/padlocal" target="_blank" rel="noopener">Wechaty PadLocal 说明</a> ·
+                  <a href="https://www.geweapi.com/pricing" target="_blank" rel="noopener">Gewe 定价页</a> ·
+                  <a href="https://docs.wxauto.org/" target="_blank" rel="noopener">wxauto 文档站</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ================= 04 中转层：Cloudflare 怎么摆 ================= -->
+    <section class="site-list-section" id="sec-04" aria-labelledby="t4">
+      <div class="site-list-topline">
+        <span class="sec-no-pill">04</span>
+        <h2 class="site-list-title" id="t4">中转层：Cloudflare 怎么摆</h2>
+        <span class="site-list-count">入站 Worker · 出站固定 IP</span>
+      </div>
+      <p class="site-list-subhead">结论：入站回调放 Worker 完全可行且有成熟做法；出站调微信 API 这一步不能放 Worker，必须落回固定 IP 的云服务器——这是整条链路最容易忽略的一坑</p>
+
+      <div class="arch-card">
+        <div class="arch-tabs" role="tablist" aria-label="链路视图">
+          <button type="button" role="tab" data-view="wecom" aria-selected="true" onclick="switchArchView('wecom', this)">企微异步链路（推荐架构）</button>
+          <button type="button" role="tab" data-view="claw" aria-selected="false" onclick="switchArchView('claw', this)">ClawBot 链路</button>
+          <button type="button" role="tab" data-view="mp" aria-selected="false" onclick="switchArchView('mp', this)">公众号链路（断在哪）</button>
+        </div>
+        <div id="archBody"></div>
+        <p class="arch-note" id="archNote"></p>
+      </div>
+
+      <div class="site-list-group open">
+        <div class="site-list-offers">
+          <ul class="detail-bullets">
+            <li><strong>域名坑：</strong>回调地址优先绑自己的域名到 Worker，不要用 <code>*.workers.dev</code>——Cloudflare 官方文档明说该域名强制 Browser Integrity Check 且无法关闭，部分客户端会在 Worker 运行前被 1010 拦截，且其在大陆的连通性历来不稳定，微信服务器能否稳定回调未获任何官方保证</li>
+            <li><strong>白名单坑：</strong>公众号只有白名单 IP 能调取 access_token（错误 61004/40164），企微只有「企业可信 IP」能调任何接口（60020）；而 Worker 出站 IP 不固定、会变化，所以取 token 和一切回推调用都由固定 IP 服务器执行，Worker 只做验签、解密、入队</li>
+            <li><strong>去重必做：</strong>微信 3 次重试会重复投递，入队前按 MsgId（事件用 FromUserName + CreateTime）排重，这是官方明确推荐的做法</li>
+            <li><strong>图片也要走服务器出站：</strong>公众号/企微/kf 回图片不是发图片 URL，要先调素材上传接口换 MediaId；ClawBot 则有自己的 CDN 上传接口，由网关完成</li>
+          </ul>
+          <p class="card-src-bar">
+            来源：<a href="https://developers.cloudflare.com/workers/configuration/routing/workers-dev/" target="_blank" rel="noopener">Cloudflare workers.dev 说明</a> ·
+            <a href="https://developers.weixin.qq.com/doc/subscription/guide/dev/api/" target="_blank" rel="noopener">公众号 API 与 IP 白名单</a> ·
+            <a href="https://www.xugj520.cn/en/archives/cloudflare-serverless-wechat-backend.html" target="_blank" rel="noopener">Cloudflare 构建公众号后端教程（2025，社区实现）</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 05 要少写胶水代码：现成开源项目 ================= -->
+    <section class="site-list-section" id="sec-05" aria-labelledby="t5">
+      <div class="site-list-topline">
+        <span class="sec-no-pill">05</span>
+        <h2 class="site-list-title" id="t5">要少写胶水代码：现成开源项目</h2>
+        <span class="site-list-count">3 家活跃框架</span>
+      </div>
+      <p class="site-list-subhead">三家都在活跃维护，且不约而同完成了同一次迁移：个人号通道从 Gewechat 切到官方 ClawBot</p>
+
+      <div class="site-list-group open" id="site-group-oss">
+        <div class="site-list-offers">
+          <div class="real-offer-row">
+            <div class="offer-head-bar">
+              <div class="offer-title-group">
+                <span class="offer-item-title">CowAgent（原 chatgpt-on-wechat）</span>
+                <span class="platform-source-badge">部署难度：最低</span>
+              </div>
+              <span class="offer-price-val">★★★ 单机自用首选</span>
+            </div>
+            <div class="offer-badges-line">
+              <span class="attr-pill-tag tag-green">官方扫码微信通道</span>
+              <span class="attr-pill-tag tag-blue">企微自建应用</span>
+              <span class="attr-pill-tag tag-teal">文档更新至 2026-10</span>
+            </div>
+            <div class="offer-item-sub">
+              <strong>支持通道：</strong>官方扫码微信通道、公众号（个人订阅号戳取 + 企业服务号推送）、企微自建应用、企微智能机器人、微信客服<br>
+              <strong>部署方式：</strong>Python / Docker + 配置文件或 Web 控制台点选，通道与本页路线一一对应
+            </div>
+            <div class="offer-footer-bar">
+              <span class="offer-sub-note">适合人群：单机自用首选</span>
+              <a class="site-offer-link" href="https://docs.cowagent.ai/zh/channels/index" target="_blank" rel="noopener">官方文档 ↗</a>
+            </div>
+          </div>
+
+          <div class="real-offer-row">
+            <div class="offer-head-bar">
+              <div class="offer-title-group">
+                <span class="offer-item-title">LangBot（工作流集成最全）</span>
+                <span class="platform-source-badge">部署难度：中等</span>
+              </div>
+              <span class="offer-price-val">★★★ 工作流首选</span>
+            </div>
+            <div class="offer-badges-line">
+              <span class="attr-pill-tag tag-green">OpenClaw 适配器</span>
+              <span class="attr-pill-tag tag-purple">Dify / Coze / n8n</span>
+            </div>
+            <div class="offer-item-sub">
+              <strong>支持通道：</strong>个人微信主推 OpenClaw 适配器扫码登录、公众号、企微内部应用、企微智能机器人（流式）、企微客服<br>
+              <strong>部署方式：</strong>Docker + WebUI 可视化配置
+            </div>
+            <div class="offer-footer-bar">
+              <span class="offer-sub-note">适合人群：想接 Dify / Coze / n8n 等工作流</span>
+              <a class="site-offer-link" href="https://docs.langbot.app/zh/insight/features" target="_blank" rel="noopener">官方文档 ↗</a>
+            </div>
+          </div>
+
+          <div class="real-offer-row">
+            <div class="offer-head-bar">
+              <div class="offer-title-group">
+                <span class="offer-item-title">AstrBot（1000+ 插件生态）</span>
+                <span class="platform-source-badge">部署难度：中等</span>
+              </div>
+              <span class="offer-price-val">★★ 插件生态党</span>
+            </div>
+            <div class="offer-badges-line">
+              <span class="attr-pill-tag tag-green">openclaw-weixin</span>
+              <span class="attr-pill-tag tag-amber">WeChatPadPro 双轨</span>
+            </div>
+            <div class="offer-item-sub">
+              <strong>支持通道：</strong>公众号、企微应用 + 微信客服、企微 AI 机器人、个人微信双轨（WeChatPadPro 协议方案 + 官方 openclaw-weixin）<br>
+              <strong>部署方式：</strong>Docker / WebUI 部署，平台与插件概念较丰富
+            </div>
+            <div class="offer-footer-bar">
+              <span class="offer-sub-note">适合人群：想要 1000+ 插件生态的用户</span>
+              <a class="site-offer-link" href="https://docs.astrbot.app/platform/wecom.html" target="_blank" rel="noopener">官方文档 ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="site-list-footer">
+        提醒：三家都是「自带 Agent 大脑」的全家桶，如果你只需要把现成的助手桥过去，可能比需求重——直接用 iLink 协议或企微 API 对接自己的 Webhook 反而更干净
+      </p>
+    </section>
+
+    <!-- ================= 06 落地顺序建议 ================= -->
+    <section class="site-list-section" id="sec-06" aria-labelledby="t6">
+      <div class="site-list-topline">
+        <span class="sec-no-pill">06</span>
+        <h2 class="site-list-title" id="t6">落地顺序建议</h2>
+        <span class="site-list-count">5 步推进</span>
+      </div>
+      <ol class="steps-list">
+        <li><b>先上 ClawBot 聊天（半天内可跑通）</b><span>用 CowAgent 的微信通道或直接照腾讯官方 iLink 协议对接，扫码即通，先把「在微信里聊天、发图、1 分钟内回复」这条主体验落地</span></li>
+        <li><b>再补企微提醒通道</b><span>注册未认证企业微信（个人组建团队）→ 建自建应用 → 配回调与企业可信 IP → 个人微信扫码关注微信插件；定时提醒、冷启动通知全走 <code>message/send</code></span></li>
+        <li><b>中转层按分工摆</b><span>回调入站可放 Cloudflare Worker（绑自有域名、验签入队、立即回 success），出站调用一律回固定 IP 服务器执行，不要把 access_token 和回推放在 Worker 上</span></li>
+        <li><b>正式投入前做一次端到端实测</b><span>本次为案头调研，未实测任何路线；企微未认证链路有多方社区教程背书，但微信后台策略调整频繁，建议按 CowAgent 企微文档实际跑一遍再定型</span></li>
+        <li><b>主力微信号不碰逆向框架</b><span>WeChatFerry、Gewechat、itchat 已退场，PadLocal / Gewe 付费版是花钱买封号与隐私风险，与上面两条官方通道没有可比性</span></li>
+      </ol>
+    </section>
+
+    <!-- ================= 07 还没查实 / 口径有出入的点 ================= -->
+    <section class="site-list-section" id="sec-07" aria-labelledby="t7">
+      <div class="site-list-topline">
+        <span class="sec-no-pill">07</span>
+        <h2 class="site-list-title" id="t7">还没查实 / 口径有出入的点</h2>
+        <span class="site-list-count">5 项待实测</span>
+      </div>
+      <div class="site-list-groups" id="doubtsAccordionList"></div>
+    </section>
+
+    <!-- ================= 08 主要来源 ================= -->
+    <section class="site-list-section" id="sec-08" aria-labelledby="t8">
+      <div class="site-list-topline">
+        <span class="sec-no-pill">08</span>
+        <h2 class="site-list-title" id="t8">主要来源</h2>
+        <span class="site-list-count">15 项原始信源</span>
+      </div>
+      <div class="sources-card">
+        <ul>
+          <li>公众号被动回复（5 秒/重试）：<a href="https://developers.weixin.qq.com/doc/subscription/guide/product/message/Passive_user_reply_message.html" target="_blank" rel="noopener">developers.weixin.qq.com</a></li>
+          <li>公众号客服消息（48h/5 条/仅企业认证）：<a href="https://developers.weixin.qq.com/doc/subscription/api/customer/message/api_sendcustommessage" target="_blank" rel="noopener">developers.weixin.qq.com</a></li>
+          <li>公众号消息推送配置（80/443、验签）：<a href="https://developers.weixin.qq.com/doc/subscription/guide/dev/push/" target="_blank" rel="noopener">developers.weixin.qq.com</a></li>
+          <li>企微自建应用接收消息：<a href="https://developer.work.weixin.qq.com/document/path/90238" target="_blank" rel="noopener">developer.work.weixin.qq.com</a></li>
+          <li>企微发送应用消息（无窗口/频控）：<a href="https://developer.work.weixin.qq.com/document/path/96458" target="_blank" rel="noopener">developer.work.weixin.qq.com</a></li>
+          <li>企微微信插件 FAQ：<a href="https://developer.work.weixin.qq.com/document/path/90315" target="_blank" rel="noopener">developer.work.weixin.qq.com</a></li>
+          <li>微信客服发送 / 接收消息：<a href="https://developer.work.weixin.qq.com/document/path/94677" target="_blank" rel="noopener">path/94677</a> · <a href="https://developer.work.weixin.qq.com/document/path/94670" target="_blank" rel="noopener">path/94670</a></li>
+          <li>微信客服服务条款：<a href="https://kf.weixin.qq.com/kf/eula" target="_blank" rel="noopener">kf.weixin.qq.com/kf/eula</a></li>
+          <li>企微注册帮助（个人组建团队）：<a href="https://open.work.weixin.qq.com/help2/pc/15422" target="_blank" rel="noopener">open.work.weixin.qq.com</a></li>
+          <li>企微未认证限制：<a href="https://open.work.weixin.qq.com/help2/pc/14936" target="_blank" rel="noopener">成员/通讯录上限</a> · <a href="https://open.work.weixin.qq.com/help2/pc/20172?person_id=0" target="_blank" rel="noopener">外部联系人 100</a></li>
+          <li>腾讯官方 openclaw-weixin：<a href="https://github.com/Tencent/openclaw-weixin" target="_blank" rel="noopener">github.com/Tencent/openclaw-weixin</a></li>
+          <li>CowAgent 通道文档：<a href="https://docs.cowagent.ai/zh/channels/index" target="_blank" rel="noopener">docs.cowagent.ai</a></li>
+          <li>AstrBot 个人微信（官方通道）：<a href="https://docs.astrbot.app/platform/weixin_oc.html" target="_blank" rel="noopener">docs.astrbot.app</a></li>
+          <li>LangBot 个人微信：<a href="https://docs.langbot.app/zh/usage/platforms/wechat/weixin" target="_blank" rel="noopener">docs.langbot.app</a></li>
+          <li>Cloudflare workers.dev 限制说明：<a href="https://developers.cloudflare.com/workers/configuration/routing/workers-dev/" target="_blank" rel="noopener">developers.cloudflare.com</a></li>
+        </ul>
+      </div>
+      <p class="site-list-footer">
+        本页为 2026-11-07 的案头调研快照，未实测任何路线；微信后台策略调整频繁，正式投入前请按文中链接回官方文档与后台当日页面复核。文中数值凡标注者为实测反馈口径，不构成官方承诺
+      </p>
+    </section>
+  </div>
+
+  <!-- ================= 详情 / 多方口径对比弹窗 Modal ================= -->
+  <div class="same-source-modal-backdrop" id="sameSourceModalBackdrop" onclick="closeSameSourceModal(event)">
+    <div class="same-source-modal" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <div class="modal-title" id="modalItemTitle">路线详情与多方口径对比</div>
+        <button class="modal-close-btn" type="button" onclick="closeSameSourceModal()">✕</button>
+      </div>
+      <div class="modal-sub" id="modalItemSub">按「个人门槛 / 主动推送 / 风险 / 维护成本」核对</div>
+      <div class="modal-seller-list" id="modalSellerList"></div>
+    </div>
+  </div>
+
+  <script>
+    // ================= 1. 12套弥散光晕渐变与全链路配色方案（100% 同步 Ai比价.html） =================
+    const themes = {
+      quote: [
+        {
+          name: "01 · 冰川晴空",
+          nameEn: "01 · Glacier Sky",
+          orb1: "#BCE0FD",
+          orb2: "#93C5FD",
+          refreshBg: "#60A5FA",
+          sendCircleBg: "#9CCAF9",
+          accent: "#2563EB",
+          tagBg: "#EBF5FF",
+          tagText: "#1D4ED8",
+          pageBg: "#F4F8FC",
+          glow: "rgba(147, 197, 253, 0.38)"
+        },
+        {
+          name: "02 · 薄荷微风",
+          nameEn: "02 · Mint Breeze",
+          orb1: "#A7F3D0",
+          orb2: "#6EE7B7",
+          refreshBg: "#34D399",
+          sendCircleBg: "#86EFAC",
+          accent: "#059669",
+          tagBg: "#ECFDF5",
+          tagText: "#047857",
+          pageBg: "#F2FBF7",
+          glow: "rgba(110, 231, 183, 0.36)"
+        },
+        {
+          name: "03 · 极光青蓝",
+          nameEn: "03 · Aurora Cyan",
+          orb1: "#A5F3FC",
+          orb2: "#818CF8",
+          refreshBg: "#6366F1",
+          sendCircleBg: "#A5B4FC",
+          accent: "#4F46E5",
+          tagBg: "#EEF2FF",
+          tagText: "#4338CA",
+          pageBg: "#F4F6FC",
+          glow: "rgba(129, 140, 248, 0.34)"
+        },
+        {
+          name: "04 · 抹茶森屿",
+          nameEn: "04 · Matcha Isle",
+          orb1: "#D9F99D",
+          orb2: "#86EFAC",
+          refreshBg: "#4ADE80",
+          sendCircleBg: "#BEF264",
+          accent: "#16A34A",
+          tagBg: "#F0FDF4",
+          tagText: "#15803D",
+          pageBg: "#F6FAF5",
+          glow: "rgba(134, 239, 172, 0.36)"
+        },
+        {
+          name: "05 · 碧海晴空",
+          nameEn: "05 · Azure Lagoon",
+          orb1: "#99F6E4",
+          orb2: "#7DD3FC",
+          refreshBg: "#2DD4BF",
+          sendCircleBg: "#67E8F9",
+          accent: "#0D9488",
+          tagBg: "#F0FDFA",
+          tagText: "#0F766E",
+          pageBg: "#F2F9FA",
+          glow: "rgba(125, 211, 252, 0.36)"
+        },
+        {
+          name: "06 · 深海星雾",
+          nameEn: "06 · Mist Slate",
+          orb1: "#CBD5E1",
+          orb2: "#93C5FD",
+          refreshBg: "#64748B",
+          sendCircleBg: "#CBD5E1",
+          accent: "#334155",
+          tagBg: "#F1F5F9",
+          tagText: "#1E293B",
+          pageBg: "#F5F7FA",
+          glow: "rgba(148, 163, 184, 0.32)"
+        }
+      ],
+      shop: [
+        {
+          name: "07 · 星云幻紫",
+          nameEn: "07 · Nebula Violet",
+          orb1: "#E9D5FF",
+          orb2: "#C4B5FD",
+          refreshBg: "#8B5CF6",
+          sendCircleBg: "#A396F8",
+          accent: "#6D28D9",
+          tagBg: "#F3E8FF",
+          tagText: "#6D28D9",
+          pageBg: "#F8F5FD",
+          glow: "rgba(167, 139, 250, 0.38)"
+        },
+        {
+          name: "08 · 蜜桃乌龙",
+          nameEn: "08 · Peach Oolong",
+          orb1: "#FBCFE8",
+          orb2: "#FDA4AF",
+          refreshBg: "#F472B6",
+          sendCircleBg: "#F9A8D4",
+          accent: "#DB2777",
+          tagBg: "#FDF2F8",
+          tagText: "#BE185D",
+          pageBg: "#FDF6F9",
+          glow: "rgba(244, 114, 182, 0.34)"
+        },
+        {
+          name: "09 · 晨曦微光",
+          nameEn: "09 · Dawn Amber",
+          orb1: "#FDE68A",
+          orb2: "#FDBA74",
+          refreshBg: "#FB923C",
+          sendCircleBg: "#FCD34D",
+          accent: "#EA580C",
+          tagBg: "#FFF7ED",
+          tagText: "#C2410C",
+          pageBg: "#FCF9F4",
+          glow: "rgba(251, 146, 60, 0.34)"
+        },
+        {
+          name: "10 · 落日粉紫",
+          nameEn: "10 · Sunset Glow",
+          orb1: "#F5D0FE",
+          orb2: "#FECDD3",
+          refreshBg: "#C084FC",
+          sendCircleBg: "#F0ABFC",
+          accent: "#9333EA",
+          tagBg: "#FAF5FF",
+          tagText: "#7E22CE",
+          pageBg: "#FAF6FC",
+          glow: "rgba(192, 132, 252, 0.35)"
+        },
+        {
+          name: "11 · 香槟流金",
+          nameEn: "11 · Champagne Gold",
+          orb1: "#FEF08A",
+          orb2: "#FDE047",
+          refreshBg: "#EAB308",
+          sendCircleBg: "#FDE047",
+          accent: "#CA8A04",
+          tagBg: "#FEFCE8",
+          tagText: "#A16207",
+          pageBg: "#FAF9F2",
+          glow: "rgba(234, 179, 8, 0.32)"
+        },
+        {
+          name: "12 · 幻彩全息",
+          nameEn: "12 · Gemini Holo",
+          isHolo: true,
+          orb1: "#8FDBB8",
+          orb2: "#9CC8F7",
+          refreshBg: "#4FA8F6",
+          sendCircleBg: "#9EE0C5",
+          accent: "#1A73E8",
+          tagBg: "#E6F4EA",
+          tagText: "#137333",
+          pageBg: "#F3F8FA",
+          glow: "rgba(143, 219, 184, 0.44)"
+        }
+      ]
+    };
+
+    const allThemes = [...themes.quote, ...themes.shop];
+
+    // ================= 2. 完整保留《微信接入可行方案》全部业务数据 =================
+    // 顶部速览卡片：Tab 1（路线对比模式）
+    const summaryRouteCards = [
       {
-        name: "01 · 冰川晴空",
-        nameEn: "01 · Glacier Sky",
-        orb1: "#BCE0FD",
-        orb2: "#93C5FD",
-        refreshBg: "#60A5FA",
-        sendCircleBg: "#9CCAF9",
-        accent: "#2563EB",
-        tagBg: "#EBF5FF",
-        tagText: "#1D4ED8",
-        pageBg: "#F4F8FC",
-        glow: "rgba(147, 197, 253, 0.38)"
+        targetId: "sec-02",
+        groupId: "route-a",
+        name: "官方 ClawBot（iLink 协议）",
+        nameEn: "Official ClawBot (iLink)",
+        tag: "零封号 · 聊天首选",
+        tagEn: "Zero Ban · Chat Pick",
+        stars: "★★★ 聊天首选",
+        sub: "腾讯官方 · 2026-03",
+        cat: "preferred"
       },
       {
-        name: "02 · 薄荷微风",
-        nameEn: "02 · Mint Breeze",
-        orb1: "#A7F3D0",
-        orb2: "#6EE7B7",
-        refreshBg: "#34D399",
-        sendCircleBg: "#86EFAC",
-        accent: "#059669",
-        tagBg: "#ECFDF5",
-        tagText: "#047857",
-        pageBg: "#F2FBF7",
-        glow: "rgba(110, 231, 183, 0.36)"
+        targetId: "sec-02",
+        groupId: "route-b",
+        name: "企业微信自建应用 + 微信插件",
+        nameEn: "WeCom Self-Built App + Plugin",
+        tag: "无窗口 · 真主动推送",
+        tagEn: "No Window · True Push",
+        stars: "★★★ 推送首选",
+        sub: "官方 API · 个人可建",
+        cat: "preferred"
       },
       {
-        name: "03 · 极光青蓝",
-        nameEn: "03 · Aurora Cyan",
-        orb1: "#A5F3FC",
-        orb2: "#818CF8",
-        refreshBg: "#6366F1",
-        sendCircleBg: "#A5B4FC",
-        accent: "#4F46E5",
-        tagBg: "#EEF2FF",
-        tagText: "#4338CA",
-        pageBg: "#F4F6FC",
-        glow: "rgba(129, 140, 248, 0.34)"
+        targetId: "sec-03",
+        groupId: "kf",
+        name: "微信客服 kf",
+        nameEn: "WeChat Customer Service kf",
+        tag: "48h 最多 5 条",
+        tagEn: "48h / 5 Msgs Limit",
+        stars: "★★ 客服问答",
+        sub: "依托企业微信",
+        cat: "official"
       },
       {
-        name: "04 · 抹茶森屿",
-        nameEn: "04 · Matcha Isle",
-        orb1: "#D9F99D",
-        orb2: "#86EFAC",
-        refreshBg: "#4ADE80",
-        sendCircleBg: "#BEF264",
-        accent: "#16A34A",
-        tagBg: "#F0FDF4",
-        tagText: "#15803D",
-        pageBg: "#F6FAF5",
-        glow: "rgba(134, 239, 172, 0.36)"
+        targetId: "sec-03",
+        groupId: "mp",
+        name: "个人订阅号 / 个人服务号",
+        nameEn: "Personal MP / Service Account",
+        tag: "无客服消息异步下发",
+        tagEn: "No Async Custom Msg",
+        stars: "★ 仅秒回问答",
+        sub: "5秒被动回复限制",
+        cat: "official"
       },
       {
-        name: "05 · 碧海晴空",
-        nameEn: "05 · Azure Lagoon",
-        orb1: "#99F6E4",
-        orb2: "#7DD3FC",
-        refreshBg: "#2DD4BF",
-        sendCircleBg: "#67E8F9",
-        accent: "#0D9488",
-        tagBg: "#F0FDFA",
-        tagText: "#0F766E",
-        pageBg: "#F2F9FA",
-        glow: "rgba(125, 211, 252, 0.36)"
+        targetId: "sec-01",
+        groupId: "all-routes",
+        name: "公众号测试号",
+        nameEn: "WeChat MP Sandbox Account",
+        tag: "48h 窗口 · 5万次/日",
+        tagEn: "48h Window · Dev Only",
+        stars: "★ 链路验证",
+        sub: "开发测试定位",
+        cat: "official"
       },
       {
-        name: "06 · 深海星雾",
-        nameEn: "06 · Mist Slate",
-        orb1: "#CBD5E1",
-        orb2: "#93C5FD",
-        refreshBg: "#64748B",
-        sendCircleBg: "#CBD5E1",
-        accent: "#334155",
-        tagBg: "#F1F5F9",
-        tagText: "#1E293B",
-        pageBg: "#F5F7FA",
-        glow: "rgba(148, 163, 184, 0.32)"
-      },
-      {
-        name: "07 · 星云幻紫",
-        nameEn: "07 · Nebula Violet",
-        orb1: "#E9D5FF",
-        orb2: "#C4B5FD",
-        refreshBg: "#8B5CF6",
-        sendCircleBg: "#A396F8",
-        accent: "#6D28D9",
-        tagBg: "#F3E8FF",
-        tagText: "#6D28D9",
-        pageBg: "#F8F5FD",
-        glow: "rgba(167, 139, 250, 0.38)"
-      },
-      {
-        name: "08 · 蜜桃乌龙",
-        nameEn: "08 · Peach Oolong",
-        orb1: "#FBCFE8",
-        orb2: "#FDA4AF",
-        refreshBg: "#F472B6",
-        sendCircleBg: "#F9A8D4",
-        accent: "#DB2777",
-        tagBg: "#FDF2F8",
-        tagText: "#BE185D",
-        pageBg: "#FDF6F9",
-        glow: "rgba(244, 114, 182, 0.34)"
-      },
-      {
-        name: "09 · 晨曦微光",
-        nameEn: "09 · Dawn Amber",
-        orb1: "#FDE68A",
-        orb2: "#FDBA74",
-        refreshBg: "#FB923C",
-        sendCircleBg: "#FCD34D",
-        accent: "#EA580C",
-        tagBg: "#FFF7ED",
-        tagText: "#C2410C",
-        pageBg: "#FCF9F4",
-        glow: "rgba(251, 146, 60, 0.34)"
-      },
-      {
-        name: "10 · 落日粉紫",
-        nameEn: "10 · Sunset Glow",
-        orb1: "#F5D0FE",
-        orb2: "#FECDD3",
-        refreshBg: "#C084FC",
-        sendCircleBg: "#F0ABFC",
-        accent: "#9333EA",
-        tagBg: "#FAF5FF",
-        tagText: "#7E22CE",
-        pageBg: "#FAF6FC",
-        glow: "rgba(192, 132, 252, 0.35)"
-      },
-      {
-        name: "11 · 香槟流金",
-        nameEn: "11 · Champagne Gold",
-        orb1: "#FEF08A",
-        orb2: "#FDE047",
-        refreshBg: "#EAB308",
-        sendCircleBg: "#FDE047",
-        accent: "#CA8A04",
-        tagBg: "#FEFCE8",
-        tagText: "#A16207",
-        pageBg: "#FAF9F2",
-        glow: "rgba(234, 179, 8, 0.32)"
-      },
-      {
-        name: "12 · 幻彩全息",
-        nameEn: "12 · Gemini Holo",
-        isHolo: true,
-        orb1: "#8FDBB8",
-        orb2: "#9CC8F7",
-        refreshBg: "#4FA8F6",
-        sendCircleBg: "#9EE0C5",
-        accent: "#1A73E8",
-        tagBg: "#E6F4EA",
-        tagText: "#137333",
-        pageBg: "#F3F8FA",
-        glow: "rgba(143, 219, 184, 0.44)"
+        targetId: "sec-03",
+        groupId: "reverse",
+        name: "逆向个人号框架（wcferry / Gewe 等）",
+        nameEn: "Reverse-Engineered Frameworks",
+        tag: "高风险 · 集体退场",
+        tagEn: "High Risk · Archived",
+        stars: "✕ 主力号勿碰",
+        sub: "警告 / 强制下线",
+        cat: "reverse"
       }
     ];
-let currentThemeIdx = 11;
-(function(){ var ti = document.documentElement.getAttribute('data-theme-idx'); if (ti !== null){ var n = parseInt(ti, 10); if (n >= 0 && n <= 11) currentThemeIdx = n; } })();
-let isDarkMode = document.documentElement.getAttribute('data-dark') === 'true';
 
-function applyTheme(idx){
-  currentThemeIdx = idx;
-  const th = allThemes[idx]; if (!th) return;
-  const root = document.documentElement;
-  root.style.setProperty('--orb-color-1', th.orb1);
-  root.style.setProperty('--orb-color-2', th.orb2);
-  root.style.setProperty('--refresh-btn-bg', th.refreshBg);
-  root.style.setProperty('--send-circle-bg', th.sendCircleBg);
-  root.style.setProperty('--theme-accent', th.accent);
-  root.style.setProperty('--theme-tag-bg', th.tagBg);
-  root.style.setProperty('--theme-tag-text', th.tagText);
-  root.style.setProperty('--search-glow', th.glow);
-  if (th.isHolo) root.setAttribute('data-holo', 'true'); else root.removeAttribute('data-holo');
-  if (!isDarkMode){
-    root.style.setProperty('--page-bg', th.pageBg);
-    const mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute('content', th.pageBg);
-  }
-  const ol = document.getElementById('orbLeft'), or2 = document.getElementById('orbRight');
-  if (ol && or2){
-    if (!th.isHolo){ const sh = idx % 2 === 0 ? 1 : -1;
-      ol.style.transform = 'translate(' + (sh*14) + 'px,' + (-sh*8) + 'px) scale(' + (1+sh*0.05) + ')';
-      or2.style.transform = 'translate(' + (-sh*14) + 'px,' + (sh*8) + 'px) scale(' + (1-sh*0.05) + ')';
-    } else { ol.style.transform = ''; or2.style.transform = ''; }
-  }
-  updateSwatchActiveState();
-}
-function renderThemeSwatches(){
-  const zh = currentLang === 'zh';
-  document.getElementById('themeSwatchGrid').innerHTML = allThemes.map((t, idx) =>
-    '<div class="theme-swatch-item' + (idx === currentThemeIdx ? ' active' : '') + '" data-theme-idx="' + idx + '">' +
-      '<span class="swatch-orb-preview' + (t.isHolo ? ' holo-animated' : '') + '" style="background:linear-gradient(135deg,' + t.orb1 + ' 0%,' + t.orb2 + ' 65%,' + t.refreshBg + ' 100%)"></span>' +
-      '<span class="swatch-label">' + (zh ? t.name : t.nameEn) + '</span>' +
-    '</div>').join('');
-}
-function updateSwatchActiveState(){
-  document.querySelectorAll('.theme-swatch-item').forEach(el => {
-    el.classList.toggle('active', Number(el.getAttribute('data-theme-idx')) === currentThemeIdx);
-  });
-}
-function openThemePanel(){
-  document.getElementById('themePopover').classList.add('open');
-  document.getElementById('themeBackdrop').classList.add('open');
-  if (navigator.vibrate) navigator.vibrate(18);
-}
-function closeThemePanel(){
-  document.getElementById('themePopover').classList.remove('open');
-  document.getElementById('themeBackdrop').classList.remove('open');
-  document.querySelectorAll('.theme-swatch-item').forEach(el => el.classList.remove('sliding-hover'));
-}
-document.getElementById('themeBackdrop').addEventListener('click', closeThemePanel);
-document.getElementById('themeSwatchGrid').addEventListener('click', e => {
-  const item = e.target.closest('.theme-swatch-item'); if (!item) return;
-  applyTheme(Number(item.getAttribute('data-theme-idx'))); persistTheme(); closeThemePanel();
-});
+    // 顶部速览卡片：Tab 2（架构与开源模式）
+    const summaryArchCards = [
+      {
+        targetId: "sec-04",
+        archView: "wecom",
+        name: "企微异步链路（推荐架构）",
+        nameEn: "WeCom Async Pipeline",
+        tag: "Worker 入站 + 固定IP出站",
+        tagEn: "Worker In + Static IP Out",
+        stars: "★★★ 推荐架构",
+        sub: "解耦 5 秒限制",
+        cat: "arch"
+      },
+      {
+        targetId: "sec-04",
+        archView: "claw",
+        name: "ClawBot iLink 长轮询链路",
+        nameEn: "ClawBot Long-Polling Pipeline",
+        tag: "getupdates hold 35s",
+        tagEn: "getupdates hold 35s",
+        stars: "★★★ 无需回调",
+        sub: "天然异步生成",
+        cat: "arch"
+      },
+      {
+        targetId: "sec-04",
+        archView: "mp",
+        name: "公众号被动回复断点剖析",
+        nameEn: "Personal MP Bottleneck",
+        tag: "卡在客服接口权限",
+        tagEn: "Blocked by Custom API",
+        stars: "✕ 慢回复断链",
+        sub: "需用户再发消息带出",
+        cat: "arch"
+      },
+      {
+        targetId: "sec-05",
+        name: "CowAgent（原 chatgpt-on-wechat）",
+        nameEn: "CowAgent Framework",
+        tag: "全通道对齐 · 难度最低",
+        tagEn: "All Channels · Easiest",
+        stars: "★★★ 单机首选",
+        sub: "更新至 2026-10",
+        cat: "oss"
+      },
+      {
+        targetId: "sec-05",
+        name: "LangBot（Dify / Coze / n8n 集成）",
+        nameEn: "LangBot Workflow Hub",
+        tag: "OpenClaw + 流式企微",
+        tagEn: "OpenClaw + Streaming",
+        stars: "★★★ 工作流首选",
+        sub: "Docker + WebUI",
+        cat: "oss"
+      },
+      {
+        targetId: "sec-05",
+        name: "AstrBot（1000+ 插件生态）",
+        nameEn: "AstrBot Plugin Ecosystem",
+        tag: "openclaw + PadPro 双轨",
+        tagEn: "Dual Personal WeChat",
+        stars: "★★ 插件生态",
+        sub: "Docker + WebUI",
+        cat: "oss"
+      }
+    ];
 
-/* theme button: tap = day/night, long-press = open panel + slide to pick */
-const themeBtn = document.getElementById('themeModeBtn');
-function renderThemeBtnIcon(){
-  themeBtn.innerHTML =
-    '<svg class="sun-moon-svg icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4.5"></line><line x1="12" y1="19.5" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line><line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="4.5" y2="12"></line><line x1="19.5" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line><line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line></svg>' +
-    '<svg class="sun-moon-svg icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
-}
-function toggleDarkMode(){
-  isDarkMode = !isDarkMode;
-  const root = document.documentElement;
-  themeBtn.classList.add('rotating'); setTimeout(() => themeBtn.classList.remove('rotating'), 450);
-  const mt = document.querySelector('meta[name="theme-color"]');
-  if (isDarkMode){ root.setAttribute('data-dark', 'true'); root.style.setProperty('--page-bg', '#090D16'); if (mt) mt.setAttribute('content', '#0B1120'); }
-  else { root.removeAttribute('data-dark'); const th = allThemes[currentThemeIdx]; root.style.setProperty('--page-bg', th.pageBg); if (mt) mt.setAttribute('content', th.pageBg); }
-  writeSharedA();
-}
-(function initThemeButtonGestures(){
-  let pressTimer = null, isLong = false, isDown = false, lastHover = null;
-  themeBtn.addEventListener('pointerdown', e => {
-    if (e.button && e.button !== 0) return;
-    isDown = true; isLong = false; lastHover = null;
-    themeBtn.classList.add('pressing');
-    try { themeBtn.setPointerCapture(e.pointerId); } catch(_){}
-    pressTimer = setTimeout(() => { if (!isDown) return; isLong = true; openThemePanel(); }, 340);
-  });
-  themeBtn.addEventListener('pointermove', e => {
-    if (!isDown || !isLong) return;
-    const target = document.elementFromPoint(e.clientX, e.clientY);
-    const item = target ? target.closest('.theme-swatch-item') : null;
-    document.querySelectorAll('.theme-swatch-item').forEach(el => el.classList.toggle('sliding-hover', el === item));
-    if (item){ const idx = Number(item.getAttribute('data-theme-idx'));
-      if (idx !== lastHover){ lastHover = idx; applyTheme(idx); if (navigator.vibrate) navigator.vibrate(8); } }
-  });
-  const finish = () => {
-    if (!isDown) return;
-    isDown = false; clearTimeout(pressTimer); themeBtn.classList.remove('pressing');
-    if (!isLong){
-      if (document.getElementById('themePopover').classList.contains('open')) closeThemePanel();
-      else toggleDarkMode();
-    } else if (lastHover !== null){ persistTheme(); closeThemePanel(); }
-  };
-  themeBtn.addEventListener('pointerup', finish);
-  themeBtn.addEventListener('pointercancel', finish);
-  themeBtn.addEventListener('contextmenu', e => e.preventDefault());
-})();
+    // 01 全路线对比 11 条完整数据
+    const allRoutesData = [
+      {
+        kind: "official",
+        cat: "preferred",
+        name: "官方 ClawBot（iLink）",
+        sub: "腾讯官方 · 2026-03 上线",
+        threshold: "无，扫码即可；手机微信 iOS ≥ 8.0.70 / Android ≥ 8.0.69 且含 ClawBot 插件",
+        pushLabel: "受限",
+        pushColor: "tag-amber",
+        pushDetail: "需 context_token，社区称约 24h / 10 条窗口",
+        riskLabel: "风险：无（官方通道）",
+        riskColor: "tag-green",
+        maint: "低，网关常驻即可；会话过期需重新扫码",
+        stars: "★★★",
+        verdict: "聊天首选",
+        url: "https://github.com/Tencent/openclaw-weixin"
+      },
+      {
+        kind: "official",
+        cat: "preferred",
+        name: "企业微信自建应用 + 微信插件",
+        sub: "官方 API",
+        threshold: "可，个人可注册未认证企业并建自建应用；认证才需执照 + 300 元",
+        pushLabel: "真主动",
+        pushColor: "tag-green",
+        pushDetail: "无窗口，仅频控 30 次/分、1000 次/时",
+        riskLabel: "风险：无（官方 API）",
+        riskColor: "tag-green",
+        maint: "中，需固定公网 IP + 企业可信 IP 配置（勿填虚假企业资料）",
+        stars: "★★★",
+        verdict: "推送首选",
+        url: "https://developer.work.weixin.qq.com/document/path/96458"
+      },
+      {
+        kind: "official",
+        cat: "official",
+        name: "微信客服 kf",
+        sub: "官方 · 依托企业微信",
+        threshold: "须先有企业微信；未验证可开通但咨询用户数受限",
+        pushLabel: "不行",
+        pushColor: "tag-red",
+        pushDetail: "用户发消息后 48 小时内最多 5 条",
+        riskLabel: "风险：无（官方通道）",
+        riskColor: "tag-green",
+        maint: "中，回调通知 + 游标拉取 + 会话状态机",
+        stars: "★★",
+        verdict: "只适合客服式问答",
+        url: "https://developer.work.weixin.qq.com/document/path/94677"
+      },
+      {
+        kind: "official",
+        cat: "official",
+        name: "公众号 · 个人订阅号",
+        sub: "官方",
+        threshold: "可，身份证即可，1 个身份证 1 个号",
+        pushLabel: "不行",
+        pushColor: "tag-red",
+        pushDetail: "个人未认证用不了客服消息接口",
+        riskLabel: "风险：无（官方通道）",
+        riskColor: "tag-green",
+        maint: "低，但能力天花板低，消息还折叠在订阅号文件夹",
+        stars: "★",
+        verdict: "只适合秒回问答",
+        url: "https://developers.weixin.qq.com/doc/subscription/guide/product/message/Passive_user_reply_message.html"
+      },
+      {
+        kind: "official",
+        cat: "official",
+        name: "公众号 · 个人服务号",
+        sub: "2024-10 开放个人注册",
+        threshold: "可，经「服务号助手」小程序以个人注册",
+        pushLabel: "不行",
+        pushColor: "tag-red",
+        pushDetail: "个人不能微信认证，仍无客服消息",
+        riskLabel: "风险：无",
+        riskColor: "tag-green",
+        maint: "低",
+        stars: "★",
+        verdict: "名字是服务号，权限不是",
+        url: "https://developers.weixin.qq.com/doc/subscription/api/customer/message/api_sendcustommessage"
+      },
+      {
+        kind: "official",
+        cat: "official",
+        name: "公众号测试号",
+        sub: "官方 · 开发测试定位",
+        threshold: "可，扫码即得，带客服接口额度 5 万次/日",
+        pushLabel: "窗口内",
+        pushColor: "tag-amber",
+        pushDetail: "同样受 48 小时窗口约束",
+        riskLabel: "风险：灰色（超定位使用）",
+        riskColor: "tag-amber",
+        maint: "低",
+        stars: "★",
+        verdict: "适合先跑通链路验证",
+        url: "https://developers.weixin.qq.com/doc/subscription/guide/dev/push/"
+      },
+      {
+        kind: "reverse",
+        cat: "reverse",
+        name: "WeChatFerry（wcferry）",
+        sub: "Hook PC 微信",
+        threshold: "需常驻 Windows + 旧版 PC 微信 3.9.12.x",
+        pushLabel: "可以",
+        pushColor: "tag-blue",
+        pushDetail: "以本人号身份任意发",
+        riskLabel: "风险：高（警告/强制下线）",
+        riskColor: "tag-red",
+        maint: "极高，仓库已归档停维，旧版微信被强制升级挡住",
+        stars: "✕",
+        verdict: "已退场",
+        url: "https://github.com/lich0821/WeChatFerry"
+      },
+      {
+        kind: "reverse",
+        cat: "reverse",
+        name: "wxauto / wxautox4",
+        sub: "Windows UI 自动化",
+        threshold: "需常驻 Windows，微信窗口保持在桌面",
+        pushLabel: "可以",
+        pushColor: "tag-blue",
+        pushDetail: "低频可用",
+        riskLabel: "风险：中（非官方认可）",
+        riskColor: "tag-amber",
+        maint: "高，原版已停维，付费版跟着微信版本追",
+        stars: "△",
+        verdict: "特定场景可用，别作主力桥",
+        url: "https://docs.wxauto.org/"
+      },
+      {
+        kind: "reverse",
+        cat: "reverse",
+        name: "Wechaty + PadLocal",
+        sub: "iPad 协议 · 付费",
+        threshold: "付费 Token，7 天试用，长期价格社区口径不一（约 200 元/月，另有约 50 元/月说法）",
+        pushLabel: "可以",
+        pushColor: "tag-blue",
+        pushDetail: "协议级任意发送",
+        riskLabel: "风险：高（有被踢下线案例）",
+        riskColor: "tag-red",
+        maint: "中，可跑云端，需一台手机保持该号在线",
+        stars: "△",
+        verdict: "花钱买风险",
+        url: "https://wechaty.js.org/docs/puppet-services/padlocal"
+      },
+      {
+        kind: "reverse",
+        cat: "reverse",
+        name: "Gewechat / Gewe 付费版",
+        sub: "iPad 协议",
+        threshold: "免费版已停维；付费版按节点/在线时长计费，官网未公示固定单价",
+        pushLabel: "可以",
+        pushColor: "tag-blue",
+        pushDetail: "协议级发送",
+        riskLabel: "风险：高（第三方闭源托管）",
+        riskColor: "tag-red",
+        maint: "低（托管）但不可控",
+        stars: "△ / ✕",
+        verdict: "免费版已死，付费版不建议托付主力号",
+        url: "https://github.com/Devo919/Gewechat"
+      },
+      {
+        kind: "reverse",
+        cat: "reverse",
+        name: "itchat / Web 协议",
+        sub: "网页版微信协议",
+        threshold: "—",
+        pushLabel: "—",
+        pushColor: "tag-gray",
+        pushDetail: "多数账号直接无法登录",
+        riskLabel: "风险：高（扫码即警告/封1天）",
+        riskColor: "tag-red",
+        maint: "基本已死，多数账号登录直接报「暂不支持使用网页版微信」",
+        stars: "✕",
+        verdict: "不要再列入方案",
+        url: "https://github.com/AstrBotDevs/AstrBot/issues/4234"
+      }
+    ];
 
+    // 04 中转层 3 套架构视图数据
+    const archViewsData = {
+      wecom: {
+        flow: [
+          ['微信（插件入口）', '用户在微信里发消息', 0],
+          ['企业微信回调', '加密 XML 推送', 0],
+          ['Cloudflare Worker', '验签/解密 → 入队 → 立即回空串', 1],
+          ['Queue / D1', '按 MsgId 去重后落库', 0],
+          ['你的服务器', '固定 IP · 轮询取消息', 1],
+          ['AI 助手', '生成回复', 0],
+          ['message/send', '服务器以白名单 IP 直调，无窗口推送', 1]
+        ],
+        note: '成立条件：接收与生成解耦，5 秒内只做入队；回推走 message/send 所以没有 48 小时窗口。Worker 只碰入站，出站 token 与发送全部在固定 IP 服务器上'
+      },
+      claw: {
+        flow: [
+          ['微信 ClawBot 会话', '用户先发一条消息', 0],
+          ['iLink 长轮询', 'getupdates · hold 约 35 秒', 1],
+          ['你的网关', '直接收到消息，无需公网回调', 1],
+          ['AI 助手', '生成多久都行', 0],
+          ['sendmessage', '回带 context_token 发送', 1]
+        ],
+        note: '这条路线根本不需要 Worker 和队列——出站长轮询天然异步。短板只在主动推送：没有新的入站 context_token 时，冷启动下发不可靠，所以提醒另走企微'
+      },
+      mp: {
+        flow: [
+          ['微信用户', '在订阅号里发消息', 0],
+          ['公众号回调', 'POST 到服务器配置 URL', 0],
+          ['5 秒被动回复', '超时重试 3 次', 1],
+          ['AI 生成（超过 5 秒）', '答案攒在队列里', 0],
+          ['客服消息接口', '个人未认证号无权限', 1],
+          ['用户再发一条', '答案才能被动带出', 0]
+        ],
+        note: '链路断点不在队列、不在 Worker，在权限：个人号没有客服消息接口，攒好的答案没有任何 API 能推出去。这就是公众号路线对慢回复不合格的根本原因'
+      }
+    };
 
-renderThemeBtnIcon();
-renderThemeSwatches();
-applyTheme(currentThemeIdx);
+    // 07 还没查实 / 口径有出入的 5 个问题
+    const doubtsData = [
+      {
+        id: "doubt-1",
+        q: "ClawBot 主动推送的精确规则到底是多少",
+        tag: "社区口径不一",
+        a: "官方协议文档只规定发送需带 context_token；「约 24 小时」「约 10 条」「文本能否空 token 冷发」均为社区拆解且互相有出入，无法证实为官方规则。规划上按不可靠处理，重要提醒配企微兜底"
+      },
+      {
+        id: "doubt-2",
+        q: "未认证企业微信能不能开微信客服 API 接管",
+        tag: "需后台实测",
+        a: "kf 官方条款说未验证可开通（限咨询人数，具体数字未公开）；CowAgent 文档要求已认证企业微信。两者不一致，只能注册后在后台当日实测，不要预设"
+      },
+      {
+        id: "doubt-3",
+        q: "个人服务号的接口权限有没有官方说法",
+        tag: "无客服消息",
+        a: "「2024-10 开放个人注册、权限等同个人订阅号」来自壹伴等二手来源与博客，未找到官方文档单列；结论与「客服消息仅企业认证」的官方规则自洽、可信度高，但建议在公众平台后台「接口权限」页实测确认"
+      },
+      {
+        id: "doubt-4",
+        q: "PadLocal 和 Gewe 付费版现在到底多少钱",
+        tag: "官网未公示单价",
+        a: "PadLocal 社区口径 200 元/月与约 50 元/月冲突、官网未公示；Gewe 定价页只有计费模式没有单价。下单前以各自控制台实时价格为准"
+      },
+      {
+        id: "doubt-5",
+        q: "WeChatFerry 归档的准确时间点",
+        tag: "2025停维 · 2026归档",
+        a: "仓库现状为已归档只读（2026-11-07 打开确认），搜索索引显示归档于 2026-07-10；作者宣布停维的最早公开信号是 2025-06 的 V2EX 帖。两个时间点含义不同，本页分别表述"
+      }
+    ];
 
-</script>
+    // ================= 3. 状态管理与 localStorage 安全持久化 =================
+    const STORAGE_KEYS = {
+      themeIdx: 'useful_budget_wechat_theme_idx',
+      darkMode: 'useful_budget_wechat_dark_mode',
+      lang: 'useful_budget_wechat_lang',
+    };
+
+    function safeGetStorage(key, fallback) {
+      try {
+        const val = localStorage.getItem(key);
+        return val !== null ? val : fallback;
+      } catch (_) {
+        return fallback;
+      }
+    }
+
+    function safeSetStorage(key, val) {
+      try {
+        localStorage.setItem(key, String(val));
+      } catch (_) {}
+    }
+
+    // 跨子域名共享偏好 Cookie A（全站规范）：第1位语言 0中文/1英文，第2位日夜 0黑色/1浅色，其余主题号 1-12
+    function readCookieA() {
+      try {
+        const m = document.cookie.match(/(?:^|;\s*)A=(\d{3,})(?:;|$)/);
+        if (!m) return null;
+        const v = m[1];
+        const theme = parseInt(v.slice(2), 10);
+        if ((v.charAt(0) !== '0' && v.charAt(0) !== '1') || (v.charAt(1) !== '0' && v.charAt(1) !== '1') || !(theme >= 1 && theme <= 12)) return null;
+        return { lang: v.charAt(0), mode: v.charAt(1), theme: theme };
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function writeCookieA() {
+      try {
+        const v = (currentLang === 'en' ? '1' : '0') + (isDarkMode ? '0' : '1') + String(currentGlobalThemeIndex + 1);
+        const secure = location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = 'A=' + v + '; Domain=jpedu.asia; Path=/; Max-Age=31536000; SameSite=Lax' + secure;
+      } catch (_) {}
+    }
+    const cookieA = readCookieA();
+
+    let currentTab = 'quote'; // 'quote' | 'shop'
+    let currentGlobalThemeIndex = cookieA ? cookieA.theme - 1 : Number(safeGetStorage(STORAGE_KEYS.themeIdx, 11));
+    if (isNaN(currentGlobalThemeIndex) || currentGlobalThemeIndex < 0 || currentGlobalThemeIndex >= allThemes.length) {
+      currentGlobalThemeIndex = 11;
+    }
+    let currentLang = cookieA ? (cookieA.lang === '1' ? 'en' : 'zh') : (safeGetStorage(STORAGE_KEYS.lang, 'zh') === 'en' ? 'en' : 'zh');
+    let isDarkMode = cookieA ? cookieA.mode === '0' : safeGetStorage(STORAGE_KEYS.darkMode, 'false') === 'true';
+    let currentCategory = 'all';
+    let currentRouteFilter = 'all'; // 'all' | 'official' | 'reverse'
+    let currentArchKey = 'wecom';
+
+    const openSiteGroups = new Set([
+      'route-a',
+      'route-b',
+      'kf',
+      'mp',
+      'reverse',
+      'doubt-1',
+      'doubt-2'
+    ]);
+
+    function siteEscape(text) {
+      return String(text).replace(/[&<>"']/g, ch => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[ch]));
+    }
+
+    // ================= 4. 核心主题渲染函数（含第12号视频同款流光幻彩） =================
+    function applyThemeByGlobalIndex(index) {
+      currentGlobalThemeIndex = index;
+      const themeObj = allThemes[index];
+      if (!themeObj) return;
+
+      safeSetStorage(STORAGE_KEYS.themeIdx, index);
+      writeCookieA();
+
+      const root = document.documentElement;
+      root.style.setProperty('--orb-color-1', themeObj.orb1);
+      root.style.setProperty('--orb-color-2', themeObj.orb2);
+      root.style.setProperty('--refresh-btn-bg', themeObj.refreshBg);
+      root.style.setProperty('--send-circle-bg', themeObj.sendCircleBg);
+      root.style.setProperty('--theme-accent', themeObj.accent);
+      root.style.setProperty('--theme-tag-bg', themeObj.tagBg);
+      root.style.setProperty('--theme-tag-text', themeObj.tagText);
+      root.style.setProperty('--search-glow', themeObj.glow);
+
+      if (themeObj.isHolo) {
+        root.setAttribute('data-holo', 'true');
+      } else {
+        root.removeAttribute('data-holo');
+      }
+
+      if (!isDarkMode) {
+        root.style.setProperty('--page-bg', themeObj.pageBg);
+      }
+
+      const orbLeft = document.getElementById('orbLeft');
+      const orbRight = document.getElementById('orbRight');
+      if (!themeObj.isHolo) {
+        const shift = index % 2 === 0 ? 1 : -1;
+        orbLeft.style.transform = `translate(${shift * 14}px, ${-shift * 8}px) scale(${1 + shift * 0.05})`;
+        orbRight.style.transform = `translate(${-shift * 14}px, ${shift * 8}px) scale(${1 - shift * 0.05})`;
+      } else {
+        orbLeft.style.transform = '';
+        orbRight.style.transform = '';
+      }
+
+      updateSwatchActiveState();
+    }
+
+    // ================= 5. 渲染 12 色主题面板 & 绑定单击/长按滑动手势 =================
+    function renderThemeSwatches() {
+      const grid = document.getElementById('themeSwatchGrid');
+      grid.innerHTML = allThemes.map((t, idx) => {
+        const label = currentLang === 'zh' ? t.name : t.nameEn;
+        const isActive = idx === currentGlobalThemeIndex ? 'active' : '';
+        const holoClass = t.isHolo ? 'holo-animated' : '';
+        return `
+          <div class="theme-swatch-item ${isActive}" data-theme-idx="${idx}" onclick="selectThemeFromPanel(${idx})">
+            <span class="swatch-orb-preview ${holoClass}" style="background: linear-gradient(135deg, ${t.orb1} 0%, ${t.orb2} 65%, ${t.refreshBg} 100%);"></span>
+            <span class="swatch-label">${label}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateSwatchActiveState() {
+      document.querySelectorAll('.theme-swatch-item').forEach(el => {
+        const idx = Number(el.getAttribute('data-theme-idx'));
+        el.classList.toggle('active', idx === currentGlobalThemeIndex);
+      });
+    }
+
+    function openThemePanel() {
+      document.getElementById('themePopover').classList.add('open');
+      document.getElementById('themeBackdrop').classList.add('open');
+      if (navigator.vibrate) navigator.vibrate(18);
+    }
+
+    function closeThemePanel() {
+      document.getElementById('themePopover').classList.remove('open');
+      document.getElementById('themeBackdrop').classList.remove('open');
+      document.querySelectorAll('.theme-swatch-item').forEach(el => el.classList.remove('sliding-hover'));
+    }
+
+    function selectThemeFromPanel(idx) {
+      applyThemeByGlobalIndex(idx);
+      closeThemePanel();
+    }
+
+    (function initThemeButtonGestures() {
+      const btn = document.getElementById('darkModeBtn');
+      let pressTimer = null;
+      let isLongPressTriggered = false;
+      let isPointerDown = false;
+      let lastHoveredIdx = null;
+
+      btn.addEventListener('pointerdown', (e) => {
+        if (e.button && e.button !== 0) return;
+        isPointerDown = true;
+        isLongPressTriggered = false;
+        lastHoveredIdx = null;
+        btn.classList.add('pressing');
+
+        try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+
+        pressTimer = setTimeout(() => {
+          if (!isPointerDown) return;
+          isLongPressTriggered = true;
+          openThemePanel();
+        }, 340);
+      });
+
+      btn.addEventListener('pointermove', (e) => {
+        if (!isPointerDown || !isLongPressTriggered) return;
+
+        const targetEl = document.elementFromPoint(e.clientX, e.clientY);
+        const swatchItem = targetEl ? targetEl.closest('.theme-swatch-item') : null;
+
+        document.querySelectorAll('.theme-swatch-item').forEach(el => {
+          el.classList.toggle('sliding-hover', el === swatchItem);
+        });
+
+        if (swatchItem) {
+          const idx = Number(swatchItem.getAttribute('data-theme-idx'));
+          if (idx !== lastHoveredIdx) {
+            lastHoveredIdx = idx;
+            applyThemeByGlobalIndex(idx);
+            if (navigator.vibrate) navigator.vibrate(8);
+          }
+        }
+      });
+
+      const finishGesture = () => {
+        if (!isPointerDown) return;
+        isPointerDown = false;
+        clearTimeout(pressTimer);
+        btn.classList.remove('pressing');
+
+        if (!isLongPressTriggered) {
+          const popover = document.getElementById('themePopover');
+          if (popover.classList.contains('open')) {
+            closeThemePanel();
+          } else {
+            toggleDarkMode();
+          }
+        } else if (lastHoveredIdx !== null) {
+          closeThemePanel();
+        }
+      };
+
+      btn.addEventListener('pointerup', finishGesture);
+      btn.addEventListener('pointercancel', finishGesture);
+      btn.addEventListener('contextmenu', e => e.preventDefault());
+    })();
+
+    // ================= 6. Tab 切换（路线对比 ⇄ 架构与开源） =================
+    function switchTab(tabName) {
+      if (currentTab === tabName) return;
+      currentTab = tabName;
+
+      const tabsContainer = document.getElementById('geminiTabs');
+      tabsContainer.setAttribute('data-active', tabName);
+      document.getElementById('tabQuote').classList.toggle('active', tabName === 'quote');
+      document.getElementById('tabShop').classList.toggle('active', tabName === 'shop');
+
+      const searchInput = document.getElementById('searchInput');
+      if (currentLang === 'zh') {
+        searchInput.placeholder = tabName === 'quote'
+          ? '搜路线、框架或关键词，如 ClawBot、企微、Worker'
+          : '搜架构节点或开源框架，如 CowAgent、LangBot、AstrBot';
+      } else {
+        searchInput.placeholder = tabName === 'quote'
+          ? 'Search routes or keywords, e.g. ClawBot, WeCom'
+          : 'Search architectures or OSS projects, e.g. CowAgent';
+      }
+
+      const grid = document.getElementById('contentGrid');
+      grid.classList.add('switching');
+      setTimeout(() => {
+        renderSummaryCards();
+        grid.classList.remove('switching');
+      }, 180);
+    }
+
+    // ================= 8. 右上角组件交互：中英切换 & 日夜模式切换 =================
+    function syncLanguageUI() {
+      const zh = currentLang === 'zh';
+      document.getElementById('langText').textContent = zh ? '中文' : 'EN';
+      document.getElementById('mainTitle').textContent = zh ? '微信接入可行方案' : 'WeChat Bot Integration';
+      document.getElementById('tabQuote').textContent = zh ? '路线对比 (11)' : 'Routes (11)';
+      document.getElementById('tabShop').textContent = zh ? '架构与开源 (6)' : 'Arch & OSS (6)';
+      document.getElementById('panelTitle').textContent = zh ? '12色弥散主题' : '12 Aura Themes';
+      document.getElementById('panelHint').textContent = zh ? '滑动或点击选择' : 'Slide or tap';
+      document.getElementById('verdictTitle').textContent = zh ? '推荐组合（结论先行）' : 'Recommended Combo (TL;DR)';
+      document.getElementById('verdictBadge').textContent = zh ? '零封号 · 双通道互补' : 'Zero Ban · Dual Channel';
+      document.getElementById('t1').textContent = zh ? '全路线对比' : 'All Routes Comparison';
+      document.getElementById('t2').textContent = zh ? '两条首选路线，说细一点' : 'Deep Dive: Top 2 Official Routes';
+      document.getElementById('t3').textContent = zh ? '能用但不推荐当主力的三条' : '3 Secondary / Legacy Options';
+      document.getElementById('t4').textContent = zh ? '中转层：Cloudflare 怎么摆' : 'Relay Layer: Cloudflare Setup';
+      document.getElementById('t5').textContent = zh ? '要少写胶水代码：现成开源项目' : 'Turnkey Open-Source Frameworks';
+      document.getElementById('t6').textContent = zh ? '落地顺序建议' : 'Recommended Rollout Steps';
+      document.getElementById('t7').textContent = zh ? '还没查实 / 口径有出入的点' : 'Unverified / Conflicting Points';
+      document.getElementById('t8').textContent = zh ? '主要来源' : 'Primary References';
+
+      document.getElementById('searchInput').placeholder = zh
+        ? (currentTab === 'quote' ? '搜路线、框架或关键词，如 ClawBot、企微、Worker' : '搜架构节点或开源框架，如 CowAgent、LangBot、AstrBot')
+        : (currentTab === 'quote' ? 'Search routes or keywords, e.g. ClawBot, WeCom' : 'Search architectures or OSS projects, e.g. CowAgent');
+
+      renderThemeSwatches();
+      renderSummaryCards();
+      renderRouteComparisonRows();
+      renderDoubtsAccordion();
+    }
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      safeSetStorage(STORAGE_KEYS.lang, currentLang);
+      writeCookieA();
+      syncLanguageUI();
+    }
+
+    function applyDarkModeState() {
+      const root = document.documentElement;
+      const icon = document.getElementById('sunMoonIcon');
+      if (isDarkMode) {
+        root.setAttribute('data-dark', 'true');
+        root.style.setProperty('--page-bg', '#090D16');
+        icon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+      } else {
+        root.removeAttribute('data-dark');
+        const activeTheme = allThemes[currentGlobalThemeIndex];
+        root.style.setProperty('--page-bg', activeTheme.pageBg);
+        icon.innerHTML = `
+          <circle cx="12" cy="12" r="4"></circle>
+          <line x1="12" y1="2" x2="12" y2="4.5"></line>
+          <line x1="12" y1="19.5" x2="12" y2="22"></line>
+          <line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line>
+          <line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line>
+          <line x1="2" y1="12" x2="4.5" y2="12"></line>
+          <line x1="19.5" y1="12" x2="22" y2="12"></line>
+          <line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line>
+          <line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line>
+        `;
+      }
+    }
+
+    function toggleDarkMode() {
+      isDarkMode = !isDarkMode;
+      safeSetStorage(STORAGE_KEYS.darkMode, isDarkMode);
+      writeCookieA();
+      const btn = document.getElementById('darkModeBtn');
+      btn.classList.add('rotating');
+      setTimeout(() => btn.classList.remove('rotating'), 450);
+      applyDarkModeState();
+    }
+
+    // ================= 9. 搜索、分类胶囊与 01 路线表格过滤 =================
+    function selectCategory(cat, btnEl) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-chip').forEach(el => el.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+
+      // 联动 01 路线对比过滤与章节滚动定位
+      if (cat === 'official' || cat === 'preferred') {
+        setRouteFilterState('official');
+      } else if (cat === 'reverse') {
+        setRouteFilterState('reverse');
+      } else {
+        setRouteFilterState('all');
+      }
+
+      renderSummaryCards();
+      renderRouteComparisonRows();
+
+      const sectionMap = {
+        preferred: 'sec-02',
+        official: 'sec-03',
+        reverse: 'sec-03',
+        arch: 'sec-04',
+        oss: 'sec-05'
+      };
+      if (sectionMap[cat]) {
+        const target = document.getElementById(sectionMap[cat]);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function setRouteFilterState(filterVal) {
+      currentRouteFilter = filterVal;
+      document.querySelectorAll('.platform-filter-chip').forEach(btn => {
+        const match = btn.getAttribute('data-f') === filterVal;
+        btn.classList.toggle('active', match);
+        btn.setAttribute('aria-pressed', match ? 'true' : 'false');
+      });
+    }
+
+    function filterRouteTable(filterVal, btnEl) {
+      setRouteFilterState(filterVal);
+      renderRouteComparisonRows();
+    }
+
+    function resetCategoryFilter() {
+      const firstChip = document.querySelector('.cat-chip[data-cat="all"]');
+      selectCategory('all', firstChip);
+      clearSearch();
+    }
+
+    function handleSearchInput() {
+      const val = document.getElementById('searchInput').value.trim();
+      document.getElementById('clearBtn').classList.toggle('visible', val.length > 0);
+      renderSummaryCards();
+      renderRouteComparisonRows();
+      renderDoubtsAccordion();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('searchInput');
+      input.value = '';
+      document.getElementById('clearBtn').classList.remove('visible');
+      renderSummaryCards();
+      renderRouteComparisonRows();
+      renderDoubtsAccordion();
+    }
+
+    function triggerSearchFocus() {
+      const input = document.getElementById('searchInput');
+      if (!input.value.trim()) {
+        input.focus();
+      } else {
+        renderSummaryCards();
+        renderRouteComparisonRows();
+      }
+    }
+
+    function jumpToSummaryTarget(targetId, groupId, archView) {
+      if (groupId) {
+        openSiteGroups.add(groupId);
+        const grp = document.getElementById('site-group-' + groupId);
+        if (grp) {
+          grp.classList.add('open');
+          const trig = grp.querySelector('.site-list-trigger');
+          if (trig) trig.setAttribute('aria-expanded', 'true');
+        }
+      }
+      if (archView) {
+        const tabBtn = document.querySelector(`.arch-tabs button[data-view="${archView}"]`);
+        switchArchView(archView, tabBtn);
+      }
+      const el = document.getElementById(targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // ================= 10. 渲染顶部双列速览卡片 =================
+    function renderSummaryCards() {
+      const grid = document.getElementById('contentGrid');
+      const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+      const zh = currentLang === 'zh';
+
+      const sourceCards = currentTab === 'quote' ? summaryRouteCards : summaryArchCards;
+      const filtered = sourceCards.filter(item => {
+        const matchCat = currentCategory === 'all' || item.cat === currentCategory;
+        const text = [item.name, item.nameEn, item.tag, item.tagEn, item.stars, item.sub].join(' ').toLowerCase();
+        return matchCat && (!keyword || text.includes(keyword));
+      });
+
+      const hintLabel = document.getElementById('featuredCountLabel');
+      const jumpLabel = document.getElementById('featuredJumpLink');
+      if (hintLabel) {
+        hintLabel.textContent = zh
+          ? (currentTab === 'quote'
+              ? '6 大核心路线速览 · 点击任意卡片直达下方详细拆解'
+              : 'Cloudflare 链路与 3 大开源框架速览 · 点击直达对应章节')
+          : (currentTab === 'quote'
+              ? '6 Core Route Snapshots · Tap a card to jump to details'
+              : 'Cloudflare Pipelines & 3 OSS Projects · Tap to jump');
+      }
+      if (jumpLabel) {
+        jumpLabel.textContent = zh ? '查看全路线明细 ↓' : 'View full breakdown ↓';
+        jumpLabel.setAttribute('href', currentTab === 'quote' ? '#sec-01' : '#sec-04');
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state">${zh ? '未找到匹配的方案卡片，点击搜索框左侧 + 号重置筛选' : 'No matching cards found. Tap + to reset filters.'}</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        const title = zh ? item.name : item.nameEn;
+        const tag = zh ? item.tag : item.tagEn;
+        return `
+          <div class="product-card" onclick="jumpToSummaryTarget('${item.targetId}', '${item.groupId || ''}', '${item.archView || ''}')">
+            <div class="card-top">
+              <div class="product-name">${siteEscape(title)}</div>
+              <span class="product-tag">${siteEscape(tag)}</span>
+            </div>
+            <div class="card-bottom">
+              <span class="product-price">${siteEscape(item.stars)}</span>
+              <span class="shop-name">${siteEscape(item.sub)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ================= 11. 渲染 01 全路线对比（三栏列表 + 口径弹窗） =================
+    function renderRouteComparisonRows() {
+      const container = document.getElementById('routeComparisonRows');
+      const countBadge = document.getElementById('routeCountBadge');
+      const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+      const zh = currentLang === 'zh';
+
+      const visibleRoutes = allRoutesData.filter(r => {
+        const matchKind = currentRouteFilter === 'all' || r.kind === currentRouteFilter;
+        const text = [r.name, r.sub, r.threshold, r.pushLabel, r.pushDetail, r.riskLabel, r.maint, r.verdict].join(' ').toLowerCase();
+        return matchKind && (!keyword || text.includes(keyword));
+      });
+
+      if (countBadge) {
+        countBadge.textContent = zh ? `当前展示 ${visibleRoutes.length} / 11 条` : `${visibleRoutes.length} / 11 routes`;
+      }
+
+      if (visibleRoutes.length === 0) {
+        container.innerHTML = `<div class="empty-state">${zh ? '没有匹配的接入路线，请点击 + 号重置' : 'No matching routes found.'}</div>`;
+        return;
+      }
+
+      container.innerHTML = visibleRoutes.map((r, idx) => {
+        const kindBadge = r.kind === 'official' ? '官方通道' : '逆向框架';
+        const isHighRisk = r.riskColor === 'tag-red';
+        return `
+          <div class="real-offer-row" data-kind="${r.kind}">
+            <div class="offer-head-bar">
+              <div class="offer-title-group">
+                <span class="offer-item-title">
+                  <a href="${siteEscape(r.url)}" target="_blank" rel="noopener noreferrer">${siteEscape(r.name)}</a>
+                </span>
+                <span class="offer-sub-note">${siteEscape(r.sub)}</span>
+              </div>
+              <span class="offer-price-val ${isHighRisk ? 'low-stock' : ''}">${siteEscape(r.stars)} ${siteEscape(r.verdict)}</span>
+            </div>
+            <div class="offer-badges-line">
+              <span class="platform-source-badge">${kindBadge}</span>
+              <span class="attr-pill-tag ${r.pushColor}">主动推送：${siteEscape(r.pushLabel)}（${siteEscape(r.pushDetail)}）</span>
+              <span class="attr-pill-tag ${r.riskColor}">${siteEscape(r.riskLabel)}</span>
+            </div>
+            <div class="offer-item-sub">
+              <strong>个人门槛：</strong>${siteEscape(r.threshold)}<br>
+              <strong>日常维护：</strong>${siteEscape(r.maint)}
+            </div>
+            <div class="offer-footer-bar">
+              <button type="button" class="same-source-btn" onclick="openRouteDetailModal(${idx})">查看五维核验卡片 &gt;</button>
+              <a class="site-offer-link" href="${siteEscape(r.url)}" target="_blank" rel="noopener noreferrer">${zh ? '官方/参考信源 ↗' : 'Reference Doc ↗'}</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ================= 12. 04 架构流切换 & 07 疑点手风琴 & 弹窗 =================
+    function switchArchView(key, btnEl) {
+      currentArchKey = key;
+      document.querySelectorAll('.arch-tabs button').forEach(b => {
+        b.setAttribute('aria-selected', b === btnEl ? 'true' : 'false');
+      });
+      const v = archViewsData[key];
+      if (!v) return;
+      const body = document.getElementById('archBody');
+      const note = document.getElementById('archNote');
+      body.innerHTML = '';
+      const flow = document.createElement('div');
+      flow.className = 'flow-wrap';
+      v.flow.forEach((n, i) => {
+        if (i > 0) {
+          const a = document.createElement('span');
+          a.className = 'flow-arrow';
+          a.textContent = '→';
+          flow.appendChild(a);
+        }
+        const d = document.createElement('div');
+        d.className = 'flow-node' + (n[2] ? ' hot' : '');
+        d.appendChild(document.createTextNode(n[0]));
+        const s = document.createElement('small');
+        s.textContent = n[1];
+        d.appendChild(s);
+        flow.appendChild(d);
+      });
+      body.appendChild(flow);
+      note.textContent = v.note;
+    }
+
+    function renderDoubtsAccordion() {
+      const wrap = document.getElementById('doubtsAccordionList');
+      if (!wrap) return;
+      const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+      const filtered = doubtsData.filter(d => !keyword || (d.q + ' ' + d.a).toLowerCase().includes(keyword));
+
+      if (filtered.length === 0) {
+        wrap.innerHTML = `<div class="empty-state">没有匹配的待查实条目</div>`;
+        return;
+      }
+
+      wrap.innerHTML = filtered.map((d, i) => {
+        const opened = openSiteGroups.has(d.id);
+        return `
+          <article class="site-list-group ${opened ? 'open' : ''}" id="site-group-${d.id}">
+            <button class="site-list-trigger" type="button" onclick="toggleSiteGroup('${d.id}')" aria-expanded="${opened}" aria-controls="offers-${d.id}">
+              <span class="site-list-brand-icon" aria-hidden="true">?</span>
+              <span class="site-list-main">
+                <span class="site-list-name" style="display:block">${siteEscape(d.q)}</span>
+              </span>
+              <span class="site-list-minimum"><small>待核实</small><strong>${siteEscape(d.tag)}</strong></span>
+              <span class="site-list-arrow" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+              </span>
+            </button>
+            <div class="site-list-collapsible" id="offers-${d.id}">
+              <div class="site-list-inner">
+                <div class="site-list-offers">
+                  <p style="font-size:12.8px;color:var(--text-secondary);line-height:1.65;padding:4px 0;">${siteEscape(d.a)}</p>
+                </div>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function toggleSiteGroup(groupId) {
+      if (openSiteGroups.has(groupId)) openSiteGroups.delete(groupId);
+      else openSiteGroups.add(groupId);
+      const group = document.getElementById('site-group-' + groupId);
+      if (group) {
+        const opened = openSiteGroups.has(groupId);
+        group.classList.toggle('open', opened);
+        const trig = group.querySelector('.site-list-trigger');
+        if (trig) trig.setAttribute('aria-expanded', String(opened));
+      }
+    }
+
+    function openRouteDetailModal(routeIdx) {
+      const r = allRoutesData[routeIdx];
+      if (!r) return;
+      const backdrop = document.getElementById('sameSourceModalBackdrop');
+      const titleEl = document.getElementById('modalItemTitle');
+      const subEl = document.getElementById('modalItemSub');
+      const listEl = document.getElementById('modalSellerList');
+
+      titleEl.textContent = `${r.name}（${r.sub}）`;
+      subEl.textContent = `推荐度：${r.stars} ${r.verdict} · 通道属性：${r.kind === 'official' ? '官方通道' : '逆向框架'}`;
+
+      const dimensions = [
+        { dim: "个人门槛", val: r.threshold, badge: "准入条件" },
+        { dim: "主动推送", val: `${r.pushLabel} — ${r.pushDetail}`, badge: "触达能力" },
+        { dim: "账号风险", val: r.riskLabel, badge: "安全评估" },
+        { dim: "运维成本", val: r.maint, badge: "日常维护" }
+      ];
+
+      listEl.innerHTML = dimensions.map(item => `
+        <a class="modal-seller-item" href="${siteEscape(r.url)}" target="_blank" rel="noopener noreferrer">
+          <span class="modal-seller-price">${siteEscape(item.dim)}</span>
+          <div class="modal-seller-info">
+            <div class="modal-seller-shop">${siteEscape(item.badge)}</div>
+            <div class="modal-seller-meta">${siteEscape(item.val)}</div>
+          </div>
+          <span class="site-offer-link">文档 ↗</span>
+        </a>
+      `).join('');
+
+      backdrop.classList.add('open');
+    }
+
+    function closeSameSourceModal(e) {
+      if (e && e.target && e.target.id !== 'sameSourceModalBackdrop') return;
+      document.getElementById('sameSourceModalBackdrop').classList.remove('open');
+    }
+
+    // ================= 13. 初始化启动 =================
+    renderThemeSwatches();
+    applyThemeByGlobalIndex(currentGlobalThemeIndex);
+    applyDarkModeState();
+    switchArchView('wecom', document.querySelector('.arch-tabs button[data-view="wecom"]'));
+    syncLanguageUI();
+  </script>
 </body>
 </html>
