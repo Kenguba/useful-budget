@@ -1357,28 +1357,36 @@
     fns.forEach(function (f) { try { f(); } catch (e) {} });
   }
   var dataCache = {};
+  var pendingCache = {}; /* 在途请求缓存：冷启动预取与正式渲染共用同一次请求，不重复拉 */
   function getHot() {
     if (dataCache.hot) { state.hot = dataCache.hot; return Promise.resolve(); }
-    return liveOr("/hot-searches?limit=50", "hot").then(function (h) { dataCache.hot = h || []; state.hot = dataCache.hot; });
+    if (!pendingCache.hot) pendingCache.hot = liveOr("/hot-searches?limit=50", "hot").then(function (h) { dataCache.hot = h || []; state.hot = dataCache.hot; });
+    return pendingCache.hot;
   }
   function getUpdates() {
     if (dataCache.updates) { fillUpdates(dataCache.updates); return Promise.resolve(); }
-    return liveOr("/updates?page=1&page_size=24", "updates").then(function (u) { dataCache.updates = u; fillUpdates(u); });
+    if (!pendingCache.updates) pendingCache.updates = liveOr("/updates?page=1&page_size=24", "updates").then(function (u) { dataCache.updates = u; fillUpdates(u); });
+    return pendingCache.updates;
   }
   function getDiscovery() {
     if (dataCache.discovery) { state.discovery = dataCache.discovery; return Promise.resolve(); }
-    return liveOr("/discovery?limit=40&source=tmdb", "discovery").then(function (d) { dataCache.discovery = absDiscovery(d); state.discovery = dataCache.discovery; });
+    if (!pendingCache.discovery) pendingCache.discovery = liveOr("/discovery?limit=40&source=tmdb", "discovery").then(function (d) { dataCache.discovery = absDiscovery(d); state.discovery = dataCache.discovery; });
+    return pendingCache.discovery;
   }
   function getFriend() {
     if (dataCache.friend) { state.friend = dataCache.friend; return Promise.resolve(); }
-    return liveOr("/friend-link-settings", "friend").then(function (f) { dataCache.friend = f || {}; state.friend = dataCache.friend; });
+    if (!pendingCache.friend) pendingCache.friend = liveOr("/friend-link-settings", "friend").then(function (f) { dataCache.friend = f || {}; state.friend = dataCache.friend; });
+    return pendingCache.friend;
   }
   function getApp() {
     if (dataCache.app) { state.appInfo = dataCache.app; return Promise.resolve(); }
-    var appLive = relayReady()
-      ? fetch(RELAY + "/app/android/latest.json").then(function (r) { return r.json(); }).catch(function () { return load("app"); })
-      : load("app").catch(function () { return {}; });
-    return appLive.then(function (a) { dataCache.app = a || {}; state.appInfo = dataCache.app; });
+    if (!pendingCache.app) {
+      var appLive = relayReady()
+        ? fetch(RELAY + "/app/android/latest.json").then(function (r) { return r.json(); }).catch(function () { return load("app"); })
+        : load("app").catch(function () { return {}; });
+      pendingCache.app = appLive.then(function (a) { dataCache.app = a || {}; state.appInfo = dataCache.app; });
+    }
+    return pendingCache.app;
   }
   /* 搜索页先行帧：搜索框是静态的、不等数据——先画 hero+搜索框与结果骨架；
      真 renderSearch 在数据到齐后整体接管（它自带流式搜索、不可重入，故不预跑它本身） */
@@ -1512,6 +1520,15 @@
     var appBtn = document.getElementById("btnAppNav");
     if (appBtn) appBtn.addEventListener("click", function () { navigate(BASE + "app/"); });
   }
+
+  /* 冷启动预取：本页要用的数据在脚本就绪时立刻开拉，与站点配置 /site 并行，
+     不再排队等 /site 回来才开始——冷启动省下约一个接口往返（实测 /site 常需 2 秒上下） */
+  if (page === "home" || page === "search") { getHot(); getUpdates(); getDiscovery(); }
+  else if (page === "today") getUpdates();
+  else if (page === "hot") getHot();
+  else if (page === "discover") getDiscovery();
+  else if (page === "app") getApp();
+  else if (page === "apply") getFriend();
 
   liveOr("/site", "site", function () { state.live = true; }).then(function (siteRes) {
     state.site = siteRes || {};
