@@ -54,6 +54,12 @@
       --theme-tab-text: #F8FAFC;
     }
 
+    [data-dark="true"] body {
+      background-image:
+        radial-gradient(90% 880px at 8% 0%, color-mix(in srgb, var(--orb-color-1) 9%, transparent) 0%, transparent 70%),
+        radial-gradient(90% 880px at 92% 0%, color-mix(in srgb, var(--orb-color-2) 9%, transparent) 0%, transparent 70%);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -65,6 +71,10 @@
     body {
       font-variant-numeric: tabular-nums;
       background-color: var(--page-bg);
+      background-image:
+        radial-gradient(90% 880px at 8% 0%, color-mix(in srgb, var(--orb-color-1) 16%, transparent) 0%, transparent 70%),
+        radial-gradient(90% 880px at 92% 0%, color-mix(in srgb, var(--orb-color-2) 16%, transparent) 0%, transparent 70%);
+      background-repeat: no-repeat;
       color: var(--text-primary);
       min-height: 100vh;
       overflow-x: hidden;
@@ -84,117 +94,30 @@
     .hero-header {
       position: relative;
       background-color: var(--hero-bg-base);
+      background-image:
+        radial-gradient(130% 105% at 10% 112%, color-mix(in srgb, var(--orb-color-1) 52%, transparent) 0%, transparent 62%),
+        radial-gradient(130% 105% at 90% 112%, color-mix(in srgb, var(--orb-color-2) 52%, transparent) 0%, transparent 62%);
       padding: 16px 18px 26px;
       border-bottom-left-radius: 32px;
       border-bottom-right-radius: 32px;
-      box-shadow: 0 14px 34px -12px var(--search-glow);
+      box-shadow: 0 10px 24px -12px rgba(15, 23, 42, 0.12);
       transition: background-color 0.55s ease, box-shadow 0.6s ease;
       z-index: 10;
     }
 
-    /* 动态弥散光斑层（独立裁切圆角，避免遮挡下拉主题面板） */
-    .aura-backdrop {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: -1;
-      overflow: hidden;
-      border-bottom-left-radius: 32px;
-      border-bottom-right-radius: 32px;
+    [data-dark="true"] .hero-header {
+      background-image:
+        radial-gradient(130% 105% at 10% 112%, color-mix(in srgb, var(--orb-color-1) 30%, transparent) 0%, transparent 62%),
+        radial-gradient(130% 105% at 90% 112%, color-mix(in srgb, var(--orb-color-2) 30%, transparent) 0%, transparent 62%);
     }
 
-    .aura-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(48px);
-      opacity: 0.82;
-      transition: background-color 0.75s cubic-bezier(0.22, 1, 0.36, 1),
-                  transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
 
-    [data-dark="true"] .aura-orb {
-      opacity: 0.28;
-      filter: blur(56px);
-    }
 
-    .aura-orb.orb-left {
-      width: 280px;
-      height: 220px;
-      bottom: -60px;
-      left: -40px;
-      background-color: var(--orb-color-1);
-    }
-
-    .aura-orb.orb-right {
-      width: 300px;
-      height: 240px;
-      bottom: -75px;
-      right: -45px;
-      background-color: var(--orb-color-2);
-    }
-
-    .aura-orb.orb-center {
-      width: 260px;
-      height: 190px;
-      bottom: -55px;
-      left: 24%;
-      background-color: #9EE0C5;
-      opacity: 0;
-      transition: opacity 0.6s ease, background-color 0.75s ease;
-    }
-
-    /* ================= 2.5 第12号主题「视频同款·流光幻彩」专属动态呼吸呼吸极光 ================= */
-    @keyframes videoHoloLeft {
-      0%   { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
-      25%  { background-color: #8FDBB8; transform: translate(16px, -12px) scale(1.1); }
-      50%  { background-color: #92C6F2; transform: translate(8px, 6px) scale(1.06); }
-      75%  { background-color: #B9CFF8; transform: translate(-12px, -6px) scale(1.02); }
-      100% { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
-    }
-
-    @keyframes videoHoloRight {
-      0%   { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
-      25%  { background-color: #9CC8F7; transform: translate(-16px, -8px) scale(1.1); }
-      50%  { background-color: #A7D0F7; transform: translate(-8px, 8px) scale(1.04); }
-      75%  { background-color: #BDE7D5; transform: translate(14px, -6px) scale(1.08); }
-      100% { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
-    }
-
-    @keyframes videoHoloCenter {
-      0%   { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
-      33%  { background-color: #9FCAF5; transform: translateY(-14px) scale(1.12); }
-      66%  { background-color: #CFE7FB; transform: translateY(6px) scale(0.98); }
-      100% { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
-    }
-
+    /* 第12号全息主题：按钮流光渐变（保留静态渐变与流光，去光斑后仍为该主题签名） */
     @keyframes videoHoloBtn {
       0%   { background-position: 0% 50%; }
       50%  { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
-    }
-
-    [data-holo="true"] .aura-orb.orb-left {
-      animation: videoHoloLeft 4.8s ease-in-out infinite;
-      filter: blur(42px);
-      opacity: 0.9;
-    }
-
-    [data-holo="true"] .aura-orb.orb-right {
-      animation: videoHoloRight 4.8s ease-in-out infinite;
-      filter: blur(42px);
-      opacity: 0.9;
-    }
-
-    [data-holo="true"] .aura-orb.orb-center {
-      opacity: 0.78;
-      animation: videoHoloCenter 4.8s ease-in-out infinite;
-      filter: blur(44px);
-    }
-
-    [data-dark="true"][data-holo="true"] .aura-orb.orb-left,
-    [data-dark="true"][data-holo="true"] .aura-orb.orb-right,
-    [data-dark="true"][data-holo="true"] .aura-orb.orb-center {
-      opacity: 0.34;
     }
 
     [data-holo="true"] .refresh-btn {
@@ -529,7 +452,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      box-shadow: 0 5px 15px var(--search-glow);
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
       transition: background-color 0.45s ease,
                   transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
                   box-shadow 0.45s ease;
@@ -630,7 +553,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      box-shadow: 0 10px 28px -6px var(--search-glow),
+      box-shadow: 0 10px 28px -10px rgba(15, 23, 42, 0.10),
                   0 2px 6px rgba(15, 23, 42, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.92);
       transition: box-shadow 0.45s ease,
@@ -788,7 +711,7 @@
       background-color: var(--theme-accent);
       color: #FFFFFF;
       border-color: var(--theme-accent);
-      box-shadow: 0 4px 12px var(--search-glow);
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.15);
     }
 
     /* ================= 8. 顶部分组摘要 8 宫格卡片（还原官网 8 个分组最低价卡片） ================= */
@@ -1059,7 +982,7 @@
 
     @media (hover:hover) and (pointer:fine){
 .site-list-group:hover {
-      box-shadow: 0 8px 22px -10px var(--search-glow), 0 4px 14px rgba(15, 23, 42, 0.04);
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
       border-color: var(--orb-color-2);
     }
 }
@@ -1470,7 +1393,7 @@
     .site-list-shop:hover {
       transform: translateY(-2px);
       border-color: var(--orb-color-2);
-      box-shadow: 0 10px 22px -10px var(--search-glow);
+      box-shadow: 0 10px 22px -10px rgba(15, 23, 42, 0.12);
     }
 
     .shop-dir-name {
@@ -1785,11 +1708,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC"
 <body>
 <div class="app-container">
   <header class="hero-header">
-    <div class="aura-backdrop">
-      <div class="aura-orb orb-left" id="orbLeft"></div>
-      <div class="aura-orb orb-center" id="orbCenter"></div>
-      <div class="aura-orb orb-right" id="orbRight"></div>
-    </div>
     <div class="top-nav-bar">
       <div class="brand-tag">
         <span class="brand-bar"></span>
@@ -2648,11 +2566,6 @@ function applyTheme(idx){
   if(t.isHolo)root.setAttribute('data-holo','true'); else root.removeAttribute('data-holo');
   if(themeState.d)root.style.removeProperty('--page-bg'); else root.style.setProperty('--page-bg',t.pageBg);
   const mtc=document.querySelector('meta[name="theme-color"]');if(mtc)mtc.setAttribute('content',themeState.d?'#090D16':t.pageBg);
-  const ol=document.getElementById('orbLeft'),or=document.getElementById('orbRight');
-  if(ol&&or){
-    if(!t.isHolo){const shift=idx%2===0?1:-1;ol.style.transform='translate('+(shift*14)+'px,'+(-shift*8)+'px) scale('+(1+shift*0.05)+')';or.style.transform='translate('+(-shift*14)+'px,'+(shift*8)+'px) scale('+(1-shift*0.05)+')';}
-    else{ol.style.transform='';or.style.transform='';}
-  }
   document.querySelectorAll('.theme-swatch-item').forEach(el=>{el.classList.toggle('active',Number(el.getAttribute('data-theme-idx'))===idx);});
   saveThemeState();
 }
