@@ -522,3 +522,9 @@ details.about summary{cursor:pointer;color:var(--text-secondary);font-weight:600
 .acc-tip{font-size:13px;color:#b45309;margin:4px 0 8px}
 .acc-fail{color:#b91c1c;font-size:14px}
 .acc-loading{color:var(--text-secondary);font-size:14px}
+
+/* 加载骨架（ken 规范：按真实版式、灰块加流光；数据到后原地替换，不用与内容无关的通用骨架） */
+.skl{display:block;position:relative;overflow:hidden;background:var(--sub-surface);border-radius:8px}
+.skl::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 32%,rgba(255,255,255,.6) 50%,transparent 68%);transform:translateX(-100%);animation:sklFlow 1.35s ease-in-out infinite}
+[data-dark="true"] .skl::after{background:linear-gradient(100deg,transparent 32%,rgba(255,255,255,.09) 50%,transparent 68%)}
+@keyframes sklFlow{to{transform:translateX(100%)}}

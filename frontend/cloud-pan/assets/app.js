@@ -623,6 +623,32 @@
       '<span class="' + rankCls + '">' + item.rank + "</span></div>" +
       '<div class="meta"><div class="t">' + esc(item.name) + '</div><div class="s">' + sHtml + "</div></div></a>";
   }
+  /* 加载骨架（ken 规范：按真实版式占位、数据到后原地替换；静态区不等数据，见 loadAndRender 先行渲染） */
+  function sklUpdRows(n) {
+    var s = "";
+    for (var i = 0; i < n; i++) s += '<div class="upd-row" aria-hidden="true"><span class="skl" style="width:24px;height:18px"></span><div style="flex:1;min-width:0"><div class="skl" style="height:15px;width:58%"></div><div class="skl" style="height:11px;width:32%;margin-top:7px"></div></div><span class="skl" style="width:46px;height:46px;border-radius:14px"></span></div>';
+    return s;
+  }
+  function sklHotRows(n) {
+    var s = "";
+    for (var i = 0; i < n; i++) s += '<div class="hot-row" aria-hidden="true"><span class="skl" style="width:20px;height:20px;border-radius:6px"></span><span class="skl" style="height:14px;width:52%"></span></div>';
+    return s;
+  }
+  function sklHotCells(n) {
+    var s = "";
+    for (var i = 0; i < n; i++) s += '<div class="hot-cell" aria-hidden="true"><span class="skl" style="width:20px;height:20px;border-radius:6px"></span><div class="hc-main"><div class="skl" style="height:15px;width:58%"></div><div class="skl" style="height:11px;width:38%;margin-top:5px"></div></div></div>';
+    return s;
+  }
+  function sklPosters(n) {
+    var s = "";
+    for (var i = 0; i < n; i++) s += '<div class="poster" aria-hidden="true"><div class="ph skl"></div><div class="meta"><div class="skl" style="height:13px;width:74%"></div><div class="skl" style="height:11px;width:46%;margin-top:6px"></div></div></div>';
+    return s;
+  }
+  function sklChips(n) {
+    var s = "";
+    for (var i = 0; i < n; i++) s += '<span class="skl" style="display:inline-block;height:25px;width:' + (64 + (i % 4) * 14) + 'px;border-radius:999px;margin:2px 3px;vertical-align:middle"></span>';
+    return s;
+  }
   function discItems() { return (state.discovery && state.discovery.items) || []; }
   function typeOf(item) {
     var parts = (item.metadata || "").split("·");
@@ -703,6 +729,10 @@
   /* ---------------- 首页 ---------------- */
   function renderHome() {
     var main = document.getElementById("main");
+    /* 数据分批到达会重画整页：先存下搜索框里已敲的字和焦点，画完恢复，不能把用户输入冲掉 */
+    var prevIn = document.getElementById("searchInput");
+    var prevQ = prevIn ? prevIn.value : "";
+    var prevFocus = !!(prevIn && document.activeElement === prevIn);
     var pres = state.site.presentation || {};
     var content = state.site.content || {};
     var hotItems = state.hot.slice(0, 10).map(function (h, i) {
@@ -711,8 +741,8 @@
     window.__panHotItems = hotItems;
     var hotBar =
       '<div class="hot-keywords-bar" id="hotKeywordsBar">' +
-      '<div class="hot-kw-pc"><span class="lbl">大家都在搜</span><div class="hot-kw-pc-wrap" id="hotKwPcWrap"></div></div>' +
-      '<div class="hot-kw-mobile-wrap" id="hotKwMobileWrap"><div class="hot-kw-mobile-row" id="hotKwRow1"></div><div class="hot-kw-mobile-row" id="hotKwRow2"></div></div>' +
+      '<div class="hot-kw-pc"><span class="lbl">大家都在搜</span><div class="hot-kw-pc-wrap" id="hotKwPcWrap">' + (dataCache.hot ? "" : sklChips(6)) + '</div></div>' +
+      '<div class="hot-kw-mobile-wrap" id="hotKwMobileWrap"><div class="hot-kw-mobile-row" id="hotKwRow1">' + (dataCache.hot ? "" : sklChips(3)) + '</div><div class="hot-kw-mobile-row" id="hotKwRow2">' + (dataCache.hot ? "" : sklChips(3)) + '</div></div>' +
       '<div class="kw-measure-sandbox" id="kwMeasureSandbox" aria-hidden="true"></div></div>';
     var html =
       '<section class="hero"><div class="aura-backdrop" aria-hidden="true"><div class="aura-orb orb-left"></div><div class="aura-orb orb-center"></div><div class="aura-orb orb-right"></div></div>' +
@@ -725,12 +755,12 @@
         esc(content.announcement) + "</span></div></div>";
     }
     // 两栏：每日更新 + 热门搜索
-    var upd8 = state.updates.slice(0, 8).map(function (it, i) { return updRow(it, i); }).join("");
-    var hot9 = state.hot.slice(0, 9).map(function (h, i) {
+    var upd8 = dataCache.updates ? state.updates.slice(0, 8).map(function (it, i) { return updRow(it, i); }).join("") : sklUpdRows(8);
+    var hot9 = dataCache.hot ? state.hot.slice(0, 9).map(function (h, i) {
       return '<div class="hot-row"><span class="hot-rank">' + (i + 1) + '</span>' +
         '<span class="hot-name"><a href="' + BASE + "search/?q=" + encodeURIComponent(h.query) + '">' + esc(h.query) + "</a></span>" +
         (i < 3 ? '<span class="tag-hot">热</span>' : "") + "</div>";
-    }).join("");
+    }).join("") : sklHotRows(9);
     html += '<div class="section"><div class="cols">' +
       '<div class="card"><div class="card-head"><span class="ic ic-green">🕐</span><div><h2>每日更新</h2>' +
       '<div class="desc">新发布与追更内容，随时发现更新</div></div>' +
@@ -753,12 +783,15 @@
       "</div></div>";
     main.innerHTML = html;
     bindSearchbar();
+    if (prevQ) { var ni = document.getElementById("searchInput"); if (ni) ni.value = prevQ; }
+    if (prevFocus) { var nf = document.getElementById("searchInput"); if (nf) { nf.focus(); try { nf.setSelectionRange(nf.value.length, nf.value.length); } catch (e) {} } }
     layoutHotKeywords();
     // 导航签按 ken 2026-11-07 指示放回顶栏原位：首页不再移签，顶栏导航与子页面同款分段控件
     var curCat = "rec", curKind = "all";
     function drawBoard() {
       var items = boardFilter(curCat, curKind);
       document.getElementById("boardGrid").innerHTML =
+        !dataCache.discovery ? sklPosters(16) :
         (items.slice(0, 16).map(function (it) { return posterCard(it); }).join("") ||
          '<div style="color:var(--faint);font-size:14px;padding:12px 0">该分类暂无快照数据</div>');
       boardPills(document.getElementById("fCat"), BOARD_CATS, curCat, function (id) { curCat = id; drawBoard(); });
@@ -795,6 +828,7 @@
     function draw() {
       var items = boardFilter(curCat, curKind);
       document.getElementById("dGrid").innerHTML =
+        !dataCache.discovery ? sklPosters(12) :
         (items.map(function (it) { return posterCard(it); }).join("") ||
          '<div style="color:var(--faint);font-size:14px;padding:12px 0">该分类暂无快照数据</div>');
       boardPills(document.getElementById("dCat"), BOARD_CATS, curCat, function (id) { curCat = id; draw(); });
@@ -823,6 +857,15 @@
       '<button class="btn-small blue" id="tSearchBtn">搜索</button><button class="btn-small view-toggle-btn" id="tViewBtn" type="button" aria-label="切换视图" title="切换视图"></button></div></div>' +
       '<div class="frow" style="margin:4px 0 14px"><span id="tPan"></span></div>' +
       '<div id="tBody"></div><div class="more-row" id="tMore"></div>';
+    /* 先行渲染：更新数据未到时页头与工具行先出，列表区骨架占位，数据到后整页重渲染补齐 */
+    if (!dataCache.updates) {
+      var tt = document.getElementById("tTotal");
+      if (tt) tt.innerHTML = '<span class="skl" style="display:inline-block;width:34px;height:13px;vertical-align:-2px"></span>';
+      var tb = document.getElementById("tBody");
+      tb.className = "card";
+      tb.innerHTML = sklUpdRows(8);
+      return;
+    }
     function localFilter(list) {
       return list.filter(function (it) {
         if (kw && (it.note || "").indexOf(kw) < 0 && (it.title || "").indexOf(kw) < 0) return false;
@@ -931,13 +974,13 @@
   /* ---------------- 热搜榜页 ---------------- */
   function renderHot() {
     var main = document.querySelector("#main .wrap") || document.getElementById("main");
-    var cells = state.hot.map(function (h, i) {
+    var cells = dataCache.hot ? state.hot.map(function (h, i) {
       var cnt = h.search_count != null ? Number(h.search_count).toLocaleString("en-US") + " 次搜索" : "";
       return '<div class="hot-cell"><span class="hot-rank">' + (i + 1) + '</span>' +
         '<div class="hc-main"><div class="hc-name"><a href="' + BASE + "search/?q=" + encodeURIComponent(h.query) + '">' + esc(h.query) + "</a></div>" +
         '<div class="hc-sub">查看相关资源</div></div>' +
         '<span class="hot-count">' + cnt + "</span></div>";
-    }).join("");
+    }).join("") : sklHotCells(10);
     main.innerHTML =
       '<div class="page-head"><h1>热搜榜</h1><div class="desc">查看站内用户最近搜索最多的内容</div></div>' + staleNote("hot") +
       '<div class="card" style="margin-top:14px"><div class="hot-grid">' + cells + "</div></div>";
@@ -1172,7 +1215,9 @@
     if (app.versionName) params.push("v" + app.versionName);
     if (app.sizeBytes) params.push((app.sizeBytes / 1024).toFixed(0) + " KB");
     if (app.minSdk) params.push("Android " + (sdkMap[app.minSdk] || app.minSdk) + " 及以上");
-    var dlBtn = app.apkUrl
+    var dlBtn = !dataCache.app
+      ? '<span class="skl" style="display:inline-block;width:132px;height:40px;border-radius:999px;vertical-align:middle"></span>'
+      : app.apkUrl
       ? '<a class="btn-outline" href="' + esc(app.apkUrl) + '">下载安卓版 ↓</a>'
       : '<button class="btn-outline" disabled style="opacity:.5">安装包暂不可用</button>';
     main.innerHTML =
@@ -1180,7 +1225,7 @@
       '<div class="cols cols-app" style="margin-top:18px">' +
       '<div class="card"><h2 style="font-size:19px;margin:0 0 4px">安卓客户端</h2>' +
       '<div style="color:var(--mut);font-size:13.5px">网盘直达 · 本地历史</div>' +
-      '<div style="color:var(--faint);font-size:13px;margin:12px 0 18px">' + esc(params.join(" · ")) + "</div>" +
+      '<div style="color:var(--faint);font-size:13px;margin:12px 0 18px">' + (dataCache.app ? esc(params.join(" · ")) : '<span class="skl" style="display:inline-block;width:180px;height:13px;vertical-align:-2px"></span>') + "</div>" +
       '<div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn-primary" style="display:inline-block" href="' + ORIGIN + '/app" target="_blank" rel="noopener">打开 APP · 连接本站 →</a>' + dlBtn + "</div>" +
       '<p style="color:var(--mut);font-size:13.5px;line-height:1.8;margin:16px 0 0">首次安装后，回到这里点「打开 APP」，确认连接本站</p>' +
       '<details class="about"><summary>打开或安装遇到问题？</summary><p>安装时按系统提示允许当前浏览器安装应用<br>已安装但打不开，可「换一种方式打开」<br>后续在 APP「设置 → 检查更新」升级，安装时需系统确认</p></details></div>' +
@@ -1335,17 +1380,35 @@
       : load("app").catch(function () { return {}; });
     return appLive.then(function (a) { dataCache.app = a || {}; state.appInfo = dataCache.app; });
   }
+  /* 搜索页先行帧：搜索框是静态的、不等数据——先画 hero+搜索框与结果骨架；
+     真 renderSearch 在数据到齐后整体接管（它自带流式搜索、不可重入，故不预跑它本身） */
+  function paintSearchPreload(seq) {
+    if (seq !== renderSeq) return;
+    var main = document.querySelector("#main .wrap") || document.getElementById("main");
+    var q = new URLSearchParams(location.search).get("q") || "";
+    var rows = "";
+    for (var i = 0; i < 5; i++) rows += '<div class="res-row" aria-hidden="true"><div class="res-main"><div class="skl" style="height:16px;width:52%"></div><div class="skl" style="height:12px;width:82%;margin-top:8px"></div><div class="skl" style="height:11px;width:30%;margin-top:8px"></div></div></div>';
+    main.innerHTML = '<section class="hero" style="padding-top:36px"><div class="aura-backdrop" aria-hidden="true"><div class="aura-orb orb-left"></div><div class="aura-orb orb-center"></div><div class="aura-orb orb-right"></div></div>' + searchbarHtml(q) + "</section>" +
+      '<div class="section">' + rows + "</div>";
+    bindSearchbar();
+  }
   function loadAndRender(key, seq) {
     /* 渲染前必须确认这次导航仍是最新一次：数据谁先回不一定，旧视图的数据迟到时
        不许再往 #main 里写，否则会出现标签高亮与正文对不上的错位（2026-11-09 实测定位） */
     function live(fn) { return function () { if (seq === renderSeq) fn(); }; }
-    if (key === "home") return Promise.all([getHot(), getUpdates(), getDiscovery()]).then(live(renderHome));
-    if (key === "search") return Promise.all([getHot(), getUpdates(), getDiscovery()]).then(live(renderSearch));
-    if (key === "discover") return getDiscovery().then(live(renderDiscover));
-    if (key === "today") return getUpdates().then(live(renderToday));
-    if (key === "hot") return getHot().then(live(renderHot));
+    /* 先行渲染（ken 规范）：静态区不等数据先画，数据区由渲染器按 dataCache 出骨架，哪份先到就重渲染补哪份 */
+    if (key === "home") {
+      var rh = live(renderHome); rh();
+      var ph = getHot(), pu = getUpdates(), pd = getDiscovery();
+      ph.then(rh); pu.then(rh); pd.then(rh);
+      return Promise.all([ph, pu, pd]);
+    }
+    if (key === "search") { paintSearchPreload(seq); return Promise.all([getHot(), getUpdates(), getDiscovery()]).then(live(renderSearch)); }
+    if (key === "discover") { var rd = live(renderDiscover); rd(); return getDiscovery().then(rd); }
+    if (key === "today") { var rt = live(renderToday); rt(); return getUpdates().then(rt); }
+    if (key === "hot") { var rk = live(renderHot); rk(); return getHot().then(rk); }
     if (key === "resource") return load("updates").then(function (u) { fillUpdates(u); if (seq === renderSeq) renderResource(); }).catch(function () { if (seq === renderSeq) renderResource(); });
-    if (key === "app") return getApp().then(live(renderApp));
+    if (key === "app") { var ra = live(renderApp); ra(); return getApp().then(ra); }
     if (key === "apply") return getFriend().then(live(renderApply));
     renderHome();
     return Promise.resolve();
