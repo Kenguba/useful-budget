@@ -11,7 +11,7 @@
   var BASE = '/hub/modules/';
   /* 资源版本戳：改任何 hub/模块文件，必须同步 bump 这里的 MV 与根 index.html 里 hub.js/hub.css 的 ?v=，
      否则 CDN 对 .js 有 4 小时缓存，会出现新 ui.html 配旧 module.js 的混搭（2026-11-09 实测 ip 模块中招） */
-  var MV = '20261109a';
+  var MV = '20261109b';
   var MODULES = {
     phone: { proj: 'cloud-phone', dir: '/frontend/cloud-phone/', tier: 'light' },
     '2fa': { proj: '2fa-auth',    dir: '/frontend/2fa-auth/',    tier: 'light' },
@@ -356,12 +356,13 @@
   function trackPull(doc, scrollTopsOf, activeWhen, skipStart) {
     var startY = null, startX = 0, engX = 0, engaged = false, lastDy = 0, target = null;
     doc.addEventListener('touchstart', function (ev) {
-      if (!activeWhen() || ev.touches.length !== 1) { engaged = false; startY = null; return; }
+      if (!activeWhen() || ev.touches.length !== 1) { if (engaged || startY !== null) ptrHide(); engaged = false; startY = null; return; }
       if (skipStart && skipStart(ev.target)) { engaged = false; startY = null; return; }
       target = ev.target; startY = ev.touches[0].clientY; startX = ev.touches[0].clientX; engaged = false; lastDy = 0;
     }, { passive: true });
     doc.addEventListener('touchmove', function (ev) {
-      if (startY === null || !activeWhen() || ev.touches.length !== 1) return;
+      if (ev.touches.length !== 1) { if (engaged || startY !== null) { ptrHide(); engaged = false; startY = null; lastDy = 0; } return; }
+      if (startY === null || !activeWhen()) return;
       var y = ev.touches[0].clientY, x = ev.touches[0].clientX;
       if (!engaged) {
         var dx = x - startX, dy = y - startY;
@@ -386,7 +387,7 @@
     }, { passive: true });
     function end() {
       if (engaged && lastDy >= PTR_THRESHOLD) refreshCurrent();
-      else if (engaged) ptrHide();
+      else if (engaged || startY !== null) ptrHide();
       engaged = false; startY = null; lastDy = 0;
     }
     doc.addEventListener('touchend', end);
@@ -456,6 +457,7 @@
     try {
       var doc = frame.contentDocument;
       if (!doc || doc.__hubPtrTracked) return;
+      ptrHide();
       doc.__hubPtrTracked = 1;
       trackPull(doc, function () {
         var w = frame.contentWindow; if (!w) return null;
