@@ -9,6 +9,9 @@
 (function () {
   'use strict';
   var BASE = '/hub/modules/';
+  /* 资源版本戳：改任何 hub/模块文件，必须同步 bump 这里的 MV 与根 index.html 里 hub.js/hub.css 的 ?v=，
+     否则 CDN 对 .js 有 4 小时缓存，会出现新 ui.html 配旧 module.js 的混搭（2026-11-09 实测 ip 模块中招） */
+  var MV = '20261109a';
   var MODULES = {
     phone: { proj: 'cloud-phone', dir: '/frontend/cloud-phone/', tier: 'light' },
     '2fa': { proj: '2fa-auth',    dir: '/frontend/2fa-auth/',    tier: 'light' },
@@ -87,7 +90,7 @@
     var id = 'hub-css-' + name;
     if (document.getElementById(id)) return;
     var l = document.createElement('link');
-    l.id = id; l.rel = 'stylesheet'; l.href = BASE + name + '/module.css';
+    l.id = id; l.rel = 'stylesheet'; l.href = BASE + name + '/module.css?v=' + MV;
     document.head.appendChild(l);
   }
   function showRoot(name) {
@@ -120,9 +123,9 @@
      * moment it lands and the module's data fills in behind the
      * skeletons that page itself defines. A generic invented
      * skeleton here matched nothing and hid the header. */
-    st.promise = fetchText(BASE + name + '/ui.html').then(function (html) {
+    st.promise = fetchText(BASE + name + '/ui.html?v=' + MV).then(function (html) {
       root.innerHTML = html;                       /* UI first: real frame up */
-      return import(BASE + name + '/module.js');  /* then the module's own code */
+      return import(BASE + name + '/module.js?v=' + MV);  /* then the module's own code */
     }).then(function (mod) {
       st.mod = mod;
       if (mod.mount) return mod.mount(root, { standalone: false, api: api });
