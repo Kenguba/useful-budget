@@ -2150,19 +2150,20 @@ window.addEventListener('popstate',()=>{ if(srcIsOpen){ srcHist=false; closeSrc(
 /* 变价历史弹窗：数据来自 data/board-prices.json（只含看板条目的变价记录小表，时间戳错位增量编码，页面端解码还原；全量 price-log.json 只做后台维护，前端不拉） */
 let pcLogCache=null, pcIsOpen=false, pcHist=false, pcOpener=null, pcCloseTimer=null, pcLockedFlag=false;
 const pcOverlay=$('#pcOverlay'), pcSheet=$('#pcSheet');
-function pcKeyOf(it){ return String(it.url||'').split('?')[0]; }
+let pcPfx=null; /* 短码->链接前缀（board-prices.json 顶层 pfx；键=「短码:商品ID」，主机 www 归一） */
+function pcKeyOf(it){ const u=String(it.url||'').split('?')[0].replace(/^(https?:\/\/)www\./,'$1'); if(!pcPfx) return u; const i=u.lastIndexOf('/'); if(i<0) return u; const pfx=u.slice(0,i+1); for(const c in pcPfx){ if(pcPfx[c]===pfx) return c+':'+u.slice(i+1); } return u; }
 function decodePc(rec){ const pts=[]; let ts=rec[0]; pts.push({ts:ts,price:rec[1]}); for(let i=2;i+1<rec.length;i+=2){ ts+=rec[i]; pts.push({ts:ts,price:rec[i+1]}); } return pts; }
 function fmtPcT(ts,wy){ const d=new Date(ts*60000); const p=n=>String(n).padStart(2,'0'); return (wy?d.getFullYear()+'-':'')+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
 /* 小表按看板版本在设备本地存一份：同一版看板再打开直接用存货、不再重复请求；
    看板每小时更新，版本号（board.updated_at）变了才重新拉 */
-const PC_LS_KEY='aishop.board-prices.v2';
-function pcStored(any){ try{ const s=JSON.parse(localStorage.getItem(PC_LS_KEY)||'null'); if(s&&s.items&&(any||(board&&s.u===board.updated_at))) return s.items; }catch(e){} return null; }
+const PC_LS_KEY='aishop.board-prices.v3';
+function pcStored(any){ try{ const s=JSON.parse(localStorage.getItem(PC_LS_KEY)||'null'); if(s&&s.items&&(any||(board&&s.u===board.updated_at))){ if(s.pfx) pcPfx=s.pfx; return s.items; } }catch(e){} return null; }
 function loadPcLog(){
   if(pcLogCache) return Promise.resolve(pcLogCache);
   const hit=pcStored(false); if(hit){ pcLogCache=hit; return Promise.resolve(pcLogCache); }
   return fetch('data/board-prices.json?t='+Date.now()).then(r=>r.json()).then(j=>{
-    pcLogCache=(j&&j.items)||{};
-    try{ localStorage.setItem(PC_LS_KEY, JSON.stringify({u:board?board.updated_at:'', items:pcLogCache})); }catch(e){}
+    pcLogCache=(j&&j.items)||{}; if(j&&j.pfx) pcPfx=j.pfx;
+    try{ localStorage.setItem(PC_LS_KEY, JSON.stringify({u:board?board.updated_at:'', pfx:pcPfx, items:pcLogCache})); }catch(e){}
     return pcLogCache;
   }).catch(()=>{ pcLogCache=pcStored(true)||{}; return pcLogCache; });
 }
