@@ -12,7 +12,7 @@
 // 使いどころ: 画面のどこを見てもよい場面、奥行きの中で複数の出来事を同時に見せるとき。
 // タグ: deep focus, depth of field, everything sharp, f/16, small aperture, pan focus, focus
 // サイズ: 539x208 px · 1周: 9.4 s
-// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Needs: kit camera2 -> https://motion.jpedu.asia/api/v1/kit/camera2.js
 // 動く見本: https://motion.jpedu.asia/#182
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。

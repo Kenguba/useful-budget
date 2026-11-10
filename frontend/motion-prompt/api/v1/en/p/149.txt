@@ -10,6 +10,6 @@ Spec:
 - While scrolled, a 12 px shadow sits under the header (opacity 0→0.14 over the first 30 px of scroll). The scrollbar thumb follows the scroll.
 When to use it: Use it when screen space is tight, as on phones, to give the content more room while keeping the menu one small scroll away.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/149.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/149.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/lp2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

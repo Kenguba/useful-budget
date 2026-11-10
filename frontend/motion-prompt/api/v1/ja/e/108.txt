@@ -13,7 +13,7 @@
 // 使いどころ: 車・自転車・ランナーなどのスピード感を、1枚の写真で見せたいとき。
 // タグ: panning, panning shot, motion blur, speed, sports photography, slow shutter
 // サイズ: 539x208 px · 1周: 5 s
-// Needs: kit photo -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/photo.js
+// Needs: kit photo -> https://motion.jpedu.asia/api/v1/kit/photo.js
 // 動く見本: https://motion.jpedu.asia/#108
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。

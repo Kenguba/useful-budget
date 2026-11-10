@@ -10,6 +10,6 @@ Spec:
 - After the click the scroll goes 300→0 over 2.66–3.26 s (0.6 s, cubic ease-in-out); below 80 px the button fades out by the same formula.
 When to use it: Use it on long pages such as blog posts, long landing pages or product lists, so readers can get back to the menu at the top.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/151.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/151.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/lp2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

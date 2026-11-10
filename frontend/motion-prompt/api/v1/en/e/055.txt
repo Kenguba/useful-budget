@@ -12,7 +12,7 @@
 // When to use it: Use it for a short setting or confirmation that belongs right next to the button that opened it.
 // Tags: popover, popup, callout, bubble, flyout, overlay
 // Size: 542x191 px · Cycle: 4.5 s
-// Needs: kit ui -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/ui.js
+// Needs: kit ui -> https://motion.jpedu.asia/api/v1/kit/ui.js
 // Live demo: https://motion.jpedu.asia/#055
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.

@@ -12,7 +12,7 @@
 // When to use it: To show who is facing whom in a conversation and to focus on the other person's expression.
 // Tags: over-the-shoulder, ots, dialogue, conversation, shoulder, two shot, angle
 // Size: 539x208 px · Cycle: 9.4 s
-// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Needs: kit camera2 -> https://motion.jpedu.asia/api/v1/kit/camera2.js
 // Live demo: https://motion.jpedu.asia/#180
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.

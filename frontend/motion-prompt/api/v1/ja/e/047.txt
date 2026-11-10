@@ -13,7 +13,7 @@
 // 使いどころ: 次の場面への期待を先に作りたいとき、会話や場面転換を自然につなぐとき。
 // タグ: j-cut, j cut, split edit, audio lead, sound first, audio transition, edit
 // サイズ: 539x208 px · 1周: 9.4 s
-// Needs: kit camera -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera.js
+// Needs: kit camera -> https://motion.jpedu.asia/api/v1/kit/camera.js
 // 動く見本: https://motion.jpedu.asia/#047
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。

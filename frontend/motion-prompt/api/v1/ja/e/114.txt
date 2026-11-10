@@ -12,7 +12,7 @@
 // 使いどころ: 高級感・緊張感・ミステリアスな雰囲気を出したいとき。
 // タグ: low-key, low key, dark, black background, moody, dramatic, chiaroscuro
 // サイズ: 539x208 px · 1周: 5 s
-// Needs: kit photo -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/photo.js
+// Needs: kit photo -> https://motion.jpedu.asia/api/v1/kit/photo.js
 // 動く見本: https://motion.jpedu.asia/#114
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。

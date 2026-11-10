@@ -10,6 +10,6 @@ Spec:
 - While focused, the border turns from gray to navy and 1.5 → 2.2 px wide over 0.15 s. Once deletion starts, the messages go away.
 When to use it: Use it on sign-up or contact forms so people notice mistakes before they submit.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/159.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/159.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/lp2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

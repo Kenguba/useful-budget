@@ -11,6 +11,6 @@ Spec:
 - It fades out over 3.9–4.1 s and the original "送信する" button comes back, rising 6 px, over 4.1–4.4 s (cubic ease-out).
 When to use it: Use it on buttons that make people wait a moment for a result, such as submit, purchase or save.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/160.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/160.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/lp2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

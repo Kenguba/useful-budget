@@ -1,7 +1,7 @@
 // Motion Prompt #169-192 · MIT License (c) 2026 Shohei Ohtaki · https://motion.jpedu.asia/#169
 //
 // Kit for pack "camera2" (Camera moves & transitions, part 2 / カメラワークと切り替え 第2弾): the constants and helpers its elements share.
-// Elements #169-192 · 539x208 px · cycle 9.4 s. Element code: https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/<id>.txt (or /ja/).
+// Elements #169-192 · 539x208 px · cycle 9.4 s. Element code: https://motion.jpedu.asia/api/v1/en/e/<id>.txt (or /ja/).
 //
 // Run one element standalone in a browser:
 //   1. paste this file into a <script>,

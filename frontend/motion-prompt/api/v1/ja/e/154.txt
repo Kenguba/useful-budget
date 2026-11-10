@@ -12,7 +12,7 @@
 // 使いどころ: 暗い配色のサイトで特長や料金のカードを並べるとき、触っている場所を目立たせたいとき。
 // タグ: spotlight, hover, glow, cursor, radial-gradient, dark-mode, card
 // サイズ: 539x208 px · 1周: 9.4 s
-// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Needs: kit lp2 -> https://motion.jpedu.asia/api/v1/kit/lp2.js
 // 動く見本: https://motion.jpedu.asia/#154
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。

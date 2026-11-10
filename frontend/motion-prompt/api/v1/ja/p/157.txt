@@ -10,6 +10,6 @@ Motion Prompt #157
 - 写真は同じ0.25秒で不透明度0→1、大きさ0.85→1倍。カーソルに遅れずについて動き、次の行に移ると前の写真が消えながら次の写真が出る
 使いどころ: 実績・作品・物件の一覧を文字だけで軽く見せつつ、気になった行だけ写真で確かめさせたいとき。
 
-参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://showheyohtaki.github.io/motion-prompt/api/v1/ja/e/157.txt
-共通の補助コード: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://motion.jpedu.asia/api/v1/ja/e/157.txt
+共通の補助コード: https://motion.jpedu.asia/api/v1/kit/lp2.js
 参考実装の形・タイミング・イージングの数値はそのまま使い、中の文字・色・素材だけ、いま作っている物に合わせてください。

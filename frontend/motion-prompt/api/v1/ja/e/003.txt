@@ -13,7 +13,7 @@
 // 使いどころ: いいね・達成・正解など、押した瞬間や決まった瞬間を強調したいとき。
 // タグ: burst, explosion, radial, like, heart, celebrate, accent, sparkle
 // サイズ: 539x208 px · 1周: 4.7 s
-// Needs: kit motion -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/motion.js
+// Needs: kit motion -> https://motion.jpedu.asia/api/v1/kit/motion.js
 // 動く見本: https://motion.jpedu.asia/#003
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。

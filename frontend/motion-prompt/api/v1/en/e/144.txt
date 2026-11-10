@@ -10,7 +10,7 @@
 // When to use it: Use it to compare, to show things happening at once, or to line up several people or places, such as before and after or a set of options.
 // Tags: split-screen, multi-screen, panels, side-by-side, comparison, layout
 // Size: 539x208 px · Cycle: 4.7 s
-// Needs: kit motion2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/motion2.js
+// Needs: kit motion2 -> https://motion.jpedu.asia/api/v1/kit/motion2.js
 // Live demo: https://motion.jpedu.asia/#144
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.

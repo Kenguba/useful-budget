@@ -11,6 +11,6 @@ Spec:
 - 8 m is a multiple of the grid (2 m) and tree (8 m) spacing, so it loops seamlessly every 4.7 s; top-right readout shows "STEADICAM"
 When to use it: To make a walking move look smooth and cinematic.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/173.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/173.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/camera2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

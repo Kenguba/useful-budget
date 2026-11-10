@@ -11,6 +11,6 @@ Spec:
 - Top-right readout shows "SHOT A" → "CUTAWAY" → "SHOT A"; at 4.7 s it cuts straight back to the start
 When to use it: To show a reaction, or to hide a time skip or a removed slip.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/189.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/189.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/camera2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

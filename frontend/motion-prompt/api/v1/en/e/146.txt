@@ -11,7 +11,7 @@
 // When to use it: Use it on a short statement, such as a concept or a message from the founder, that should be read slowly.
 // Tags: scroll, text-reveal, scroll-driven, typography, opacity, storytelling
 // Size: 539x208 px · Cycle: 9.4 s
-// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Needs: kit lp2 -> https://motion.jpedu.asia/api/v1/kit/lp2.js
 // Live demo: https://motion.jpedu.asia/#146
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.

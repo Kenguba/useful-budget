@@ -11,6 +11,6 @@ Spec:
 - A playing badge (pause, muted) sits at the bottom right. On a real site the video uses autoplay, muted, loop and playsinline.
 When to use it: Use it on hero sections for travel, hotels, restaurants or recruiting, where atmosphere and motion say more than one photo.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/168.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/168.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/lp2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

@@ -11,6 +11,6 @@ Motion Prompt #182
 - 戻り: 3.4〜4.2秒は止め、最後の0.5秒で開始状態へクロスフェード。右上に絞り値（f/1.8 → f/16）
 使いどころ: 画面のどこを見てもよい場面、奥行きの中で複数の出来事を同時に見せるとき。
 
-参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://showheyohtaki.github.io/motion-prompt/api/v1/ja/e/182.txt
-共通の補助コード: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://motion.jpedu.asia/api/v1/ja/e/182.txt
+共通の補助コード: https://motion.jpedu.asia/api/v1/kit/camera2.js
 参考実装の形・タイミング・イージングの数値はそのまま使い、中の文字・色・素材だけ、いま作っている物に合わせてください。

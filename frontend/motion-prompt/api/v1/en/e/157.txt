@@ -11,7 +11,7 @@
 // When to use it: Use it on lists of work, projects or properties that stay text-only and light, while letting people check a photo for the rows they care about.
 // Tags: hover, image-reveal, list, cursor-follow, preview, portfolio
 // Size: 539x208 px · Cycle: 9.4 s
-// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Needs: kit lp2 -> https://motion.jpedu.asia/api/v1/kit/lp2.js
 // Live demo: https://motion.jpedu.asia/#157
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.

@@ -10,6 +10,6 @@ Motion Prompt #163
 - 2.4秒に下の点をクリックすると、上の吹き出しが同じ0.25秒で消え、下の点の右に次の吹き出しが出る。3.8秒にもう一度押すと閉じる
 使いどころ: 製品・間取り・地図など、1枚の絵の中で場所ごとに説明したいとき。
 
-参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://showheyohtaki.github.io/motion-prompt/api/v1/ja/e/163.txt
-共通の補助コード: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://motion.jpedu.asia/api/v1/ja/e/163.txt
+共通の補助コード: https://motion.jpedu.asia/api/v1/kit/lp2.js
 参考実装の形・タイミング・イージングの数値はそのまま使い、中の文字・色・素材だけ、いま作っている物に合わせてください。

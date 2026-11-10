@@ -11,6 +11,6 @@ Motion Prompt #187
 - 4.7秒ごとに A→B、B→A を交互に行う（往復で9.4秒）。右上に「FADE OUT」「FADE IN」。ファインダーの枠は黒の上にも残す
 使いどころ: 章の区切り、時間の大きな経過、物語の終わり。
 
-参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://showheyohtaki.github.io/motion-prompt/api/v1/ja/e/187.txt
-共通の補助コード: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://motion.jpedu.asia/api/v1/ja/e/187.txt
+共通の補助コード: https://motion.jpedu.asia/api/v1/kit/camera2.js
 参考実装の形・タイミング・イージングの数値はそのまま使い、中の文字・色・素材だけ、いま作っている物に合わせてください。

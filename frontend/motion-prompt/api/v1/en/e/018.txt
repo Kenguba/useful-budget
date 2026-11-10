@@ -12,7 +12,7 @@
 // When to use it: Use it to change scenes with shapes in brand colours: chapter breaks, topic changes.
 // Tags: shape-transition, transition, wipe, bands, stripes, cover, scene-change
 // Size: 539x208 px · Cycle: 4.7 s
-// Needs: kit motion -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/motion.js
+// Needs: kit motion -> https://motion.jpedu.asia/api/v1/kit/motion.js
 // Live demo: https://motion.jpedu.asia/#018
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.

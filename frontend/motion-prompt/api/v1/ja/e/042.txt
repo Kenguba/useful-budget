@@ -13,7 +13,7 @@
 // 使いどころ: 時間や場所が大きく離れた2つの場面を、形や動きの共通点で意味を持たせてつなぐとき。
 // タグ: match cut, graphic match, shape match, cut, transition, edit
 // サイズ: 539x208 px · 1周: 9.4 s
-// Needs: kit camera -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera.js
+// Needs: kit camera -> https://motion.jpedu.asia/api/v1/kit/camera.js
 // 動く見本: https://motion.jpedu.asia/#042
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。

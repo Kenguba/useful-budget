@@ -10,6 +10,6 @@ Motion Prompt #151
 - クリックの後 2.66〜3.26秒（0.6秒）でスクロール量 300→0（easeInOut 3乗）。80pxを切るとボタンは同じ式で消える
 使いどころ: ブログ・長いLP・商品一覧など、縦に長いページで先頭のメニューへすぐ戻れるようにしたいとき。
 
-参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://showheyohtaki.github.io/motion-prompt/api/v1/ja/e/151.txt
-共通の補助コード: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://motion.jpedu.asia/api/v1/ja/e/151.txt
+共通の補助コード: https://motion.jpedu.asia/api/v1/kit/lp2.js
 参考実装の形・タイミング・イージングの数値はそのまま使い、中の文字・色・素材だけ、いま作っている物に合わせてください。

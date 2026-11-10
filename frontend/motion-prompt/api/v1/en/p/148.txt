@@ -11,6 +11,6 @@ Spec:
 - Each section's picture (sun, moon and stars, mountain photo) moves with the page. The scrollbar thumb follows the scroll.
 When to use it: Use it on story-style pages where each chapter has its own mood, or to contrast scenes such as day and night or the seasons.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/148.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/148.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/lp2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

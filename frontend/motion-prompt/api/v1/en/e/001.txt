@@ -13,7 +13,7 @@
 // When to use it: Use it to bring in a small element such as an icon, button or badge with a light accent.
 // Tags: pop, pop-in, spring, bounce, scale, icon, badge, entrance
 // Size: 539x208 px · Cycle: 4.7 s
-// Needs: kit motion -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/motion.js
+// Needs: kit motion -> https://motion.jpedu.asia/api/v1/kit/motion.js
 // Live demo: https://motion.jpedu.asia/#001
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.

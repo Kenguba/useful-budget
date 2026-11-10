@@ -10,6 +10,6 @@ Spec:
 - Over the same 0.25 s the photo goes from opacity 0 to 1 and from 0.85× to 1×. It follows the cursor without lag; moving to the next row fades the old photo out as the new one comes in.
 When to use it: Use it on lists of work, projects or properties that stay text-only and light, while letting people check a photo for the rows they care about.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/157.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/157.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/lp2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

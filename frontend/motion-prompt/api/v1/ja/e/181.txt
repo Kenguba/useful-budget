@@ -13,7 +13,7 @@
 // 使いどころ: 配置や動線を図のように見せたいとき、神の視点で俯瞰するとき。
 // タグ: bird's-eye, birds eye, top-down, overhead, straight down, aerial, angle
 // サイズ: 539x208 px · 1周: 9.4 s
-// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Needs: kit camera2 -> https://motion.jpedu.asia/api/v1/kit/camera2.js
 // 動く見本: https://motion.jpedu.asia/#181
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。

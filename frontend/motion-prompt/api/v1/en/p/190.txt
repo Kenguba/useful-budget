@@ -12,6 +12,6 @@ Spec:
 - Top-right readout shows "SCENE A" / "SCENE B"
 When to use it: To build tension between things happening at once, such as a chase or a rescue.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/190.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/190.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/camera2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

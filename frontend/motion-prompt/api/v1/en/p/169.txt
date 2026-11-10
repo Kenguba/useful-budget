@@ -12,6 +12,6 @@ Spec:
 - Top-right readout shows the height (↕ 1.0m → ↕ 3.2m)
 When to use it: To show a shelf or a building from bottom to top smoothly, or to change the eye level without tilting.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/169.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/169.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/camera2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

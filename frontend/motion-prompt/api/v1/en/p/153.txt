@@ -11,6 +11,6 @@ Spec:
 - Glare: a white radial light of radius 130 px at the cursor (opacity 0.42 at the center). The floor shadow shifts up to 10 px against the tilt.
 When to use it: Use it on member cards, product packaging or pricing cards to make them feel like objects you can pick up.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/153.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/153.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/lp2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

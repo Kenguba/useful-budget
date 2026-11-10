@@ -12,7 +12,7 @@
 // 使いどころ: 決めの瞬間を立体的に見せるとき、アクションの見せ場。
 // タグ: bullet time, time slice, frozen moment, orbit, slow motion, matrix, effect
 // サイズ: 539x208 px · 1周: 9.4 s
-// Needs: kit camera2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+// Needs: kit camera2 -> https://motion.jpedu.asia/api/v1/kit/camera2.js
 // 動く見本: https://motion.jpedu.asia/#191
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。

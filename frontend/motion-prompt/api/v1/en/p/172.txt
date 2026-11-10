@@ -12,6 +12,6 @@ Spec:
 - Top-right readout shows the elapsed time (NO CUT 0.0s → 4.2s)
 When to use it: To keep tension and presence unbroken, or to show a sequence of movement as one flow.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/172.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/172.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/camera2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

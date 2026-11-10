@@ -11,7 +11,7 @@
 // 使いどころ: タイトル・ブランド名の中に写真や映像を見せたいとき。言葉とイメージを1つにまとめたいとき。
 // タグ: text-mask, mask, clipping-mask, knockout, text, typography, title
 // サイズ: 539x208 px · 1周: 4.7 s
-// Needs: kit motion2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/motion2.js
+// Needs: kit motion2 -> https://motion.jpedu.asia/api/v1/kit/motion2.js
 // 動く見本: https://motion.jpedu.asia/#133
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。

@@ -9,6 +9,6 @@ Spec:
 - 40 px to each side, two down-chevrons (line width 2.5) per side, half a beat apart, drift 24 px downward; their opacity follows a sine, 0 → 0.8 → 0.
 When to use it: Use it when the hero fills the screen and people need a hint that the page goes on below.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/167.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/167.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/lp2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

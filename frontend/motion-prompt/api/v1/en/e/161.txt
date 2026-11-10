@@ -12,7 +12,7 @@
 // When to use it: Use it on galleries or product pages that go back and forth between a list and a detail view, so people never lose track of what they opened.
 // Tags: view-transition, shared-element, page-transition, morph, gallery, navigation
 // Size: 539x208 px · Cycle: 9.4 s
-// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Needs: kit lp2 -> https://motion.jpedu.asia/api/v1/kit/lp2.js
 // Live demo: https://motion.jpedu.asia/#161
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.

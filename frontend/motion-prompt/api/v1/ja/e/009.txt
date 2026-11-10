@@ -13,7 +13,7 @@
 // 使いどころ: 移動・拡大・回転など、あらゆる動きに緩急を付けて機械的に見えないようにしたいとき。
 // タグ: easing, ease-in-out, cubic-bezier, linear, timing, curve, acceleration
 // サイズ: 539x208 px · 1周: 4.7 s
-// Needs: kit motion -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/motion.js
+// Needs: kit motion -> https://motion.jpedu.asia/api/v1/kit/motion.js
 // 動く見本: https://motion.jpedu.asia/#009
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。

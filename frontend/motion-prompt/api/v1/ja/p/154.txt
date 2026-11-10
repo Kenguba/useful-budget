@@ -11,6 +11,6 @@ Motion Prompt #154
 - 遅れはない。光はカーソルの位置にそのまま付いてくる（座標を CSS 変数に入れて radial-gradient の中心にする作り方と同じ）
 使いどころ: 暗い配色のサイトで特長や料金のカードを並べるとき、触っている場所を目立たせたいとき。
 
-参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://showheyohtaki.github.io/motion-prompt/api/v1/ja/e/154.txt
-共通の補助コード: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://motion.jpedu.asia/api/v1/ja/e/154.txt
+共通の補助コード: https://motion.jpedu.asia/api/v1/kit/lp2.js
 参考実装の形・タイミング・イージングの数値はそのまま使い、中の文字・色・素材だけ、いま作っている物に合わせてください。

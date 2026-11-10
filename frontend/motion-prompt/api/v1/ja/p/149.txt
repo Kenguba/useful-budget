@@ -10,6 +10,6 @@ Motion Prompt #149
 - スクロールしている間はヘッダーの下に12pxの影（濃さはスクロール量30pxまでで0→0.14）。右端のスクロールバーも連動
 使いどころ: スマホなど画面が狭いときに読む場所を広く取りつつ、メニューにすぐ戻れるようにしたいとき。
 
-参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://showheyohtaki.github.io/motion-prompt/api/v1/ja/e/149.txt
-共通の補助コード: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://motion.jpedu.asia/api/v1/ja/e/149.txt
+共通の補助コード: https://motion.jpedu.asia/api/v1/kit/lp2.js
 参考実装の形・タイミング・イージングの数値はそのまま使い、中の文字・色・素材だけ、いま作っている物に合わせてください。

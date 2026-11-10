@@ -10,7 +10,7 @@
 // When to use it: Use it when the hero fills the screen and people need a hint that the page goes on below.
 // Tags: scroll-cue, scroll-indicator, scroll-down, hero, arrow, loop
 // Size: 539x208 px · Cycle: 9.4 s
-// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Needs: kit lp2 -> https://motion.jpedu.asia/api/v1/kit/lp2.js
 // Live demo: https://motion.jpedu.asia/#167
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.

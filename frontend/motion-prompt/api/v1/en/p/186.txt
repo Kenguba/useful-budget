@@ -11,6 +11,6 @@ Spec:
 - Return: cross-fade back to the start of take 1 over the last 0.5 s; top-right readout shows "TAKE 1" → "MORPH" → "TAKE 2"
 When to use it: To tighten an interview or narration, or to remove a slip without drawing attention.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/186.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/186.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/camera2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

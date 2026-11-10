@@ -11,7 +11,7 @@
 // 使いどころ: 「いいね」・録音中・ライブ配信中・押してほしいボタンなど、生きている感じや注目を出したいとき。
 // タグ: pulse, heartbeat, throb, scale, loop, like, attention
 // サイズ: 539x208 px · 1周: 4.7 s
-// Needs: kit motion2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/motion2.js
+// Needs: kit motion2 -> https://motion.jpedu.asia/api/v1/kit/motion2.js
 // 動く見本: https://motion.jpedu.asia/#125
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。

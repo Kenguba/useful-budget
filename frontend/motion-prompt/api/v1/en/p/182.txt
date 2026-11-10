@@ -11,6 +11,6 @@ Spec:
 - Return: hold 3.4–4.2 s, then cross-fade back to the start over the last 0.5 s; top-right readout shows the aperture (f/1.8 → f/16)
 When to use it: When the viewer may look anywhere in the frame, or to show several things happening at different depths at once.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/182.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/182.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/camera2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

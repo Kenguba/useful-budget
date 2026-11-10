@@ -11,6 +11,6 @@ Motion Prompt #160
 - 3.9〜4.1秒で消え、4.1〜4.4秒で元の「送信する」が6px下から戻る（easeOut 3乗）
 使いどころ: フォームの送信・購入・保存など、押してから結果が出るまで少し待たせるボタンに。
 
-参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://showheyohtaki.github.io/motion-prompt/api/v1/ja/e/160.txt
-共通の補助コード: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+参考実装（Canvas 2D・時刻だけで絵が決まる関数）: https://motion.jpedu.asia/api/v1/ja/e/160.txt
+共通の補助コード: https://motion.jpedu.asia/api/v1/kit/lp2.js
 参考実装の形・タイミング・イージングの数値はそのまま使い、中の文字・色・素材だけ、いま作っている物に合わせてください。

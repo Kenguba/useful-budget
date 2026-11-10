@@ -11,6 +11,6 @@ Spec:
 - A grey tripod mark at bottom left; top-right readout shows "LOCKED" (#040 Freeze frame stops the footage time; here time runs and only the camera is still)
 When to use it: To make the subject stand out by contrast, for fixed-point observation, or as a base for time-lapse and compositing.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/175.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/camera2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/175.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/camera2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

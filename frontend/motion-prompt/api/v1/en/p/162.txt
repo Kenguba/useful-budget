@@ -10,6 +10,6 @@ Spec:
 - Close: over 3.05–3.4 s (0.35 s, cubic ease-in-out) the same move runs in reverse and the photo returns to its thumbnail.
 When to use it: Use it for case studies, portfolios or product photos that should be seen large without leaving the page.
 
-Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://showheyohtaki.github.io/motion-prompt/api/v1/en/e/162.txt
-Shared helper code: https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+Reference implementation (Canvas 2D, a function whose picture depends only on the time): https://motion.jpedu.asia/api/v1/en/e/162.txt
+Shared helper code: https://motion.jpedu.asia/api/v1/kit/lp2.js
 Keep the shapes, timing and easing values of the reference implementation as they are, and change only the text, colours and assets to fit what I am making.

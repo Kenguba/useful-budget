@@ -12,7 +12,7 @@
 // When to use it: Use it for a soft, organic scene change, for example in food, beauty or creative videos.
 // Tags: liquid, transition, drip, paint, goo, fluid, wipe, scene-change
 // Size: 539x208 px · Cycle: 4.7 s
-// Needs: kit motion -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/motion.js
+// Needs: kit motion -> https://motion.jpedu.asia/api/v1/kit/motion.js
 // Live demo: https://motion.jpedu.asia/#019
 //
 // cells[i](k, w, h, u): k = CanvasRenderingContext2D (already cleared and wrapped in save/restore by the caller), w,h = size, u = seconds in [0, cycle). The picture depends only on u.

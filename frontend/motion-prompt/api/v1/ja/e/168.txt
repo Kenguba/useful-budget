@@ -12,7 +12,7 @@
 // 使いどころ: 旅・ホテル・飲食・採用など、写真1枚より空気感や動きで印象を伝えたいファーストビューに。
 // タグ: background-video, hero, video, autoplay, loop, first-view
 // サイズ: 539x208 px · 1周: 9.4 s
-// Needs: kit lp2 -> https://showheyohtaki.github.io/motion-prompt/api/v1/kit/lp2.js
+// Needs: kit lp2 -> https://motion.jpedu.asia/api/v1/kit/lp2.js
 // 動く見本: https://motion.jpedu.asia/#168
 //
 // cells[i](k, w, h, u) … k = CanvasRenderingContext2D（呼ぶ側でクリアと save/restore 済み）、w・h = サイズ、u = 秒（0 以上 1周 未満）。u だけで絵が決まる。
