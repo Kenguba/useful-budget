@@ -1173,17 +1173,24 @@ def main():
     csv_path = os.path.join(DATA, 'shops.csv')
     if os.path.exists(csv_path):
         srows = list(csv.DictReader(io.open(csv_path, encoding='utf-8')))
-        best = {}
+        best, dead = {}, {}
         for r in srows:
-            if '失效' in (r.get('note') or ''):
-                continue
+            # 失效店不删除（ken 规矩）：csv note 含「失效（日期）」的是已核实关店，分开收集，
+            # 生成时 name 带上标记、排到目录末尾；直拉名单仍按 note 失效排除（见 fetch_16688_direct）
+            is_dead = '失效' in (r.get('note') or '')
             key = (r['platform'], r['shop_code']) if r['shop_code'] else (r['platform'], 'name:' + r['shop_name'])
-            cur = best.get(key)
+            cur_map = dead if is_dead else best
+            cur = cur_map.get(key)
             score = (2 if r['shop_url'] else 0) + (0 if '店名未记录' in r['shop_name'] else 1)
             if cur is None or score > cur[0]:
-                best[key] = (score, dict(platform=r['platform'], name=r['shop_name'],
-                                         url=r['shop_url'], code=r['shop_code']))
-        shops = sorted((v[1] for v in best.values()), key=lambda x: (x['platform'], x['name']))
+                name = r['shop_name']
+                if is_dead:
+                    m = re.search(r'失效（[^）]*）', r.get('note') or '')
+                    name += m.group(0) if m else '失效'
+                cur_map[key] = (score, dict(platform=r['platform'], name=name,
+                                            url=r['shop_url'], code=r['shop_code']))
+        shops = (sorted((v[1] for v in best.values()), key=lambda x: (x['platform'], x['name']))
+                 + sorted((v[1] for v in dead.values()), key=lambda x: (x['platform'], x['name'])))
         with open(os.path.join(DATA, 'shops.json'), 'w', encoding='utf-8') as f:
             json.dump(dict(updated_at=board['updated_at'], total=len(shops), shops=shops),
                       f, ensure_ascii=False, indent=1)
