@@ -76,6 +76,39 @@
       removeP1: 'To ask for a removal or a correction, use the ', removeLink: 'issue form on GitHub', removeP2: '. We act on it once the request is confirmed.',
       thanks1: 'The format — moving samples with a prompt you can copy — was inspired by', thanks2: '. Thank you.',
     },
+    zh: {
+      title: '找到的案例｜Motion Prompt',
+      skip: '跳到案例列表', navLabel: '站内导航', navGallery: '示例', navFound: '案例', langLabel: '语言',
+      themeToDark: '切换到深色模式', themeToLight: '切换到浅色模式',
+      eyebrow: '找到的案例',
+      h1: '用名字和示例建立共同语言的人们',
+      lead: '这里收集的是把给 AI 下指令用的名字、连同动态示例或速查表一起公开的帖子。领域、语言和样式各不相同。我们选取的都是作者自己做了示例的帖子，每篇帖子及其权利都属于原作者。',
+      leadNote: '被收录在这里并不代表作者支持本站。介绍文字由本站撰写。',
+      noteH: '关于嵌入',
+      noteP: '本页以 X（原 Twitter）嵌入的形式展示每篇帖子。打开时内容从 X 的服务器加载，并会使用 X 的 Cookie。X 可能记录这次浏览并用于广告。加载时我们带上了不希望被用于个性化的设置（dnt）。',
+      notePrivacy: 'X 隐私政策', noteCookies: 'X 如何使用 Cookie',
+      listH: '案例列表', loadListFailed: '列表加载失败。',
+      count: '{n} 篇',
+      postLang: { ja: '日语', en: '英语' },
+      postLangLabel: '帖子语言：{l}',
+      viewOnX: '在 X 上查看',
+      viewOnXLabel: '在 X 上查看 {a} 的帖子',
+      loading: '正在加载…',
+      gone: '这篇帖子无法显示，可能已被删除。',
+      failed: '从 X 加载失败，可能是内容拦截工具挡住了。可以点「在 X 上查看」打开。',
+      shown: '已显示 {a} 的帖子',
+      moreH: '你有好案例吗',
+      recH: '推荐帖子（也欢迎自荐）',
+      recP: '如果你发现把名字和示例一起公开的帖子，请在 GitHub Issue 里告诉我们，自己的帖子也可以。我们只做嵌入和链接，不会把图片或视频复制到本站。',
+      recLink: '推荐案例（GitHub Issue）',
+      rmH: '想撤下自己的帖子时',
+      rmP: '如果你想撤下自己的帖子，或者介绍文字有误，请用 Issue 表单联系我们。确认后会尽快处理。',
+      rmLink: '申请删除或更正（GitHub Issue）',
+      author: '作者', authorName: 'Shohei Ohtaki',
+      whyLink: '为什么做这个', makeLink: '为你的领域和语言做一个', addLink: '加上你所在领域的名字', listLink: '名字列表（GitHub）',
+      removeP1: '删除或更正的申请请通过', removeLink: 'GitHub 的 Issue 表单', removeP2: '提交。确认后我们会尽快处理。',
+      thanks1: '「并排展示动态示例、复制提示词即可用」这种形式，灵感来自', thanks2: '。谢谢。',
+    },
   };
 
   var store = {
@@ -84,12 +117,12 @@
     del: function (k) { try { localStorage.removeItem(k); } catch (e) { /* ignore */ } },
   };
   var darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : { matches: false };
-  var state = { lang: root.lang === 'en' ? 'en' : 'ja', data: null };
+  var state = { lang: root.lang === 'en' ? 'en' : 'zh', data: null };
   var cards = [];   // { item, el, box, status, shown, token }
 
   function t(key, vars) {
     var s = I18N[state.lang][key];
-    if (s == null) s = I18N.ja[key];
+    if (s == null) s = I18N.en[key];
     if (s == null) s = key;
     if (vars && typeof s === 'string') Object.keys(vars).forEach(function (k) { s = s.split('{' + k + '}').join(vars[k]); });
     return s;
@@ -187,7 +220,7 @@
             h('a', { class: 'ex-author', href: 'https://x.com/' + encodeURIComponent(handle), rel: 'noopener', text: it.author }),
             h('span', { class: 'ex-lang', title: t('postLangLabel', { l: langName }), 'aria-label': t('postLangLabel', { l: langName }), text: String(it.lang).toUpperCase() }),
           ]),
-          h('p', { class: 'ex-intro', text: (it.intro && (it.intro[state.lang] || it.intro.en || it.intro.ja)) || '' }),
+          h('p', { class: 'ex-intro', text: (it.intro && (it.intro[state.lang] || it.intro.en)) || '' }),
           h('div', { class: 'ex-act' }, [link]),
           status,
           box,
@@ -262,6 +295,7 @@
   });
 
   // ------------------------------------------------------------------ start
+  if (store.get('mp-lang') === 'ja') store.set('mp-lang', state.lang); // migrate a saved ja preference to the resolved zh/en
   applyText();
   fetch('examples/found.json', { cache: 'no-cache' })
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })

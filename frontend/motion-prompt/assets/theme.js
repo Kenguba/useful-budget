@@ -3,9 +3,14 @@
    site.js / found.js. This file adds the shared theme table (same values as
    ai-shop / ui-design), the header theme picker, and Cookie A read/write so a
    theme chosen on any jpedu.asia site applies here too.
-   Cookie A format: digit 1 = language (owned by the other sites — always kept
-   verbatim, never derived from this site's JA/EN/ZH UI language; new cookies
-   start at 0), digit 2 = day/night (0 dark, 1 light), rest = theme 1-12. */
+   Cookie A format: digit 1 = language, digit 2 = day/night (0 dark, 1 light),
+   rest = theme 1-12. Since the site ships Chinese and English only, the
+   language digit is now in two-way sync with the UI language like on the
+   other sites: entering with A digit 0/1 selects Chinese/English (handled by
+   each page's first-paint script), and switching the UI language here writes
+   the digit back (Chinese = 0, English = 1). This replaces the earlier
+   keep-the-digit-verbatim rule, which existed only because the old third
+   language (Japanese) had no digit to map to. */
 (function () {
   'use strict';
   var root = document.documentElement;
@@ -46,8 +51,7 @@
   }
   function writeA() {
     try {
-      var a = readA();
-      var l = a ? a.l : '0';
+      var l = root.lang === 'en' ? '1' : '0';
       var s = 'A=' + l + (state.dark ? '0' : '1') + String(state.idx + 1) +
         '; Path=/; Max-Age=31536000; SameSite=Lax';
       var h = location.hostname;
@@ -80,6 +84,13 @@
     state.dark = root.getAttribute('data-theme') === 'dark';
     applyVisual(state.idx);
     writeA();
+  });
+
+  /* Language: site.js / found.js own the language buttons and update
+     root.lang first (their listeners were registered earlier); mirror the
+     new language into Cookie A's language digit, keeping day/night + theme. */
+  document.querySelectorAll('[data-lang]').forEach(function (b) {
+    b.addEventListener('click', function () { writeA(); });
   });
 
   /* ---------- theme picker ---------- */

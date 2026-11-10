@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="ja">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>見つけた事例｜Motion Prompt</title>
-<meta name="description" content="AIに頼むための名前を、見本と一緒にまとめて公開している人たちのポストです。Xの埋め込みとリンクで紹介しています。">
+<title>找到的案例｜Motion Prompt</title>
+<meta name="description" content="把给 AI 下指令用的名字连同示例一起公开的人们的帖子合集，用 X 嵌入和链接介绍。">
 <link rel="canonical" href="https://motion.jpedu.asia/found.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Motion Prompt">
@@ -19,15 +19,17 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <script>
 /* Apply the saved theme and language before first paint (same keys as index.html).
-   Cookie A (shared across jpedu.asia) wins over this site's localStorage;
-   its language digit is never touched here. */
+   Cookie A (shared across jpedu.asia) wins over this site's localStorage,
+   language digit included: 0 = Chinese, 1 = English. This site ships Chinese
+   and English only; a saved 'ja' preference resolves to Chinese. */
 (function () {
   var d = document.documentElement, t = null, l = null, ti = null, a = null;
   try {
     var cm = document.cookie.match(/(?:^|;\s*)A=(\d{3,4})(?:;|$)/);
-    if (cm) { var cv = cm[1], ct = parseInt(cv.slice(2), 10); if ((cv.charAt(1) === '0' || cv.charAt(1) === '1') && ct >= 1 && ct <= 12) a = { dark: cv.charAt(1) === '0', idx: ct - 1 }; }
+    if (cm) { var cv = cm[1], ct = parseInt(cv.slice(2), 10); if ((cv.charAt(1) === '0' || cv.charAt(1) === '1') && ct >= 1 && ct <= 12) a = { dark: cv.charAt(1) === '0', idx: ct - 1, lang: cv.charAt(0) === '1' ? 'en' : (cv.charAt(0) === '0' ? 'zh' : null) }; }
     t = localStorage.getItem('mp-theme'); l = localStorage.getItem('mp-lang'); ti = localStorage.getItem('mp-theme-idx');
   } catch (e) {}
+  if (a && a.lang) l = a.lang;
   var dark, idx = 11;
   if (a) { dark = a.dark; idx = a.idx; }
   else {
@@ -37,7 +39,7 @@
   d.setAttribute('data-theme', dark ? 'dark' : 'light');
   d.setAttribute('data-tidx', String(idx));
   if (idx === 11) d.setAttribute('data-holo', 'true');
-  if (l !== 'ja' && l !== 'en') l = /^ja\b/i.test(navigator.language || 'ja') ? 'ja' : 'en';
+  if (l !== 'en' && l !== 'zh') l = 'zh';
   d.lang = l;
 })();
 </script>
@@ -56,7 +58,7 @@
       <a class="top-link" href="found.html" aria-current="page" data-t="navFound">事例</a>
       <a class="top-link top-gh" href="https://github.com/showheyohtaki/motion-prompt" rel="noopener">GitHub</a>
       <div class="seg" role="group" aria-label="言語" data-t-attr="aria-label:langLabel">
-        <button type="button" class="seg-b" data-lang="ja" aria-pressed="true" aria-label="日本語">JA</button>
+        <button type="button" class="seg-b" data-lang="zh" aria-pressed="true" aria-label="简体中文">中文</button>
         <button type="button" class="seg-b" data-lang="en" aria-pressed="false" aria-label="English">EN</button>
       </div>
       <button type="button" class="icon-b" id="themePick" aria-label="选择主题" aria-haspopup="true" aria-expanded="false">
@@ -120,10 +122,10 @@
   <div class="wrap foot-in">
     <p><strong>Motion Prompt</strong> · MIT License · <span data-t="author">作者</span> <span data-t="authorName">大滝昇平</span>（<a href="https://x.com/showheyohtaki" rel="noopener">@showheyohtaki</a>）</p>
     <p class="foot-links">
-      <a href="https://github.com/showheyohtaki/motion-prompt/blob/main/README.ja.md#なぜ作ったか" data-href-ja="https://github.com/showheyohtaki/motion-prompt/blob/main/README.ja.md#なぜ作ったか" data-href-en="https://github.com/showheyohtaki/motion-prompt#why-i-made-this" rel="noopener" data-t="whyLink">なぜ作ったか</a>
+      <a href="https://github.com/showheyohtaki/motion-prompt#why-i-made-this" data-href-ja="https://github.com/showheyohtaki/motion-prompt/blob/main/README.ja.md#なぜ作ったか" data-href-en="https://github.com/showheyohtaki/motion-prompt#why-i-made-this" data-href-zh="https://github.com/showheyohtaki/motion-prompt#why-i-made-this" rel="noopener" data-t="whyLink">なぜ作ったか</a>
       <a href="https://github.com/showheyohtaki/motion-prompt/tree/main/packs" rel="noopener" data-t="listLink">名前の一覧（GitHub）</a>
-      <a href="https://github.com/showheyohtaki/motion-prompt/blob/main/make-your-own/README.ja.md" data-href-ja="https://github.com/showheyohtaki/motion-prompt/blob/main/make-your-own/README.ja.md" data-href-en="https://github.com/showheyohtaki/motion-prompt/tree/main/make-your-own" rel="noopener" data-t="makeLink">自分の分野・自分の言語で作る</a>
-      <a href="https://github.com/showheyohtaki/motion-prompt/blob/main/CONTRIBUTING.ja.md" data-href-ja="https://github.com/showheyohtaki/motion-prompt/blob/main/CONTRIBUTING.ja.md" data-href-en="https://github.com/showheyohtaki/motion-prompt/blob/main/CONTRIBUTING.md" rel="noopener" data-t="addLink">あなたの分野の名前を足す</a>
+      <a href="https://github.com/showheyohtaki/motion-prompt/tree/main/make-your-own" data-href-ja="https://github.com/showheyohtaki/motion-prompt/blob/main/make-your-own/README.ja.md" data-href-en="https://github.com/showheyohtaki/motion-prompt/tree/main/make-your-own" data-href-zh="https://github.com/showheyohtaki/motion-prompt/tree/main/make-your-own" rel="noopener" data-t="makeLink">自分の分野・自分の言語で作る</a>
+      <a href="https://github.com/showheyohtaki/motion-prompt/blob/main/CONTRIBUTING.md" data-href-ja="https://github.com/showheyohtaki/motion-prompt/blob/main/CONTRIBUTING.ja.md" data-href-en="https://github.com/showheyohtaki/motion-prompt/blob/main/CONTRIBUTING.md" data-href-zh="https://github.com/showheyohtaki/motion-prompt/blob/main/CONTRIBUTING.md" rel="noopener" data-t="addLink">あなたの分野の名前を足す</a>
     </p>
     <p class="foot-remove"><span data-t="removeP1">掲載の削除・訂正は</span><a href="https://github.com/showheyohtaki/motion-prompt/issues/new?template=3-removal.yml" rel="noopener" data-t="removeLink">GitHub の Issue のフォーム</a><span data-t="removeP2">から依頼できます。確認後、すみやかに対応します。</span></p>
     <p class="foot-thanks"><span data-t="thanks1">動く見本を並べて、プロンプトをコピーして使う形は</span> <a href="https://lucianlabs.dev/uxui-prompt/" rel="noopener">Lucian UX/UI Prompt</a> <span data-t="thanks2">から着想を得ました。ありがとうございます。</span></p>

@@ -200,7 +200,7 @@
   var reduceMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
   var darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : { matches: false };
   var state = {
-    lang: root.lang === 'en' ? 'en' : root.lang === 'zh' ? 'zh' : 'ja',
+    lang: root.lang === 'en' ? 'en' : 'zh',
     pack: 'all', cat: 'all', q: '',
     playing: !reduceMotion.matches,
     open: null,           // id shown in the detail view
@@ -215,16 +215,26 @@
 
   function t(key, vars) {
     var s = I18N[state.lang][key];
-    if (s == null) s = (I18N.en[key] != null ? I18N.en[key] : I18N.ja[key]) || key;
+    if (s == null) s = I18N.en[key] != null ? I18N.en[key] : key;
     if (vars) Object.keys(vars).forEach(function (k) { s = s.split('{' + k + '}').join(vars[k]); });
     return s;
   }
   function clang() { return state.lang === 'zh' ? 'zh-Hans' : state.lang; }
   function alang() { return state.lang === 'zh' ? 'en' : state.lang; }
+  /* The prompt text handed to an AI follows the UI language. The catalog's
+     builder only has ja/en templates and its en template names the element by
+     its ja name in parentheses; this site ships zh/en only, so the element is
+     passed with the zh-Hans name in that slot and Japanese never reaches the
+     copied text. Sections without a Chinese version (summary/spec/use) stay
+     English, via alang(). */
+  function promptText(el, packTitle) {
+    var lang = alang(), c = Object.assign({}, el, { name: Object.assign({}, el.name) });
+    if (c.name['zh-Hans']) c.name.ja = c.name['zh-Hans'];
+    return PROMPT(c, packTitle, lang);
+  }
   function names(el) {
     if (state.lang === 'zh') return { main: el.name['zh-Hans'] || el.name.en, sub: el.name.en };
-    var ja = state.lang === 'ja';
-    return { main: ja ? el.name.ja : el.name.en, sub: ja ? el.name.en : el.name.ja };
+    return { main: el.name.en, sub: el.name['zh-Hans'] || el.name.en };
   }
   function h(tag, attrs, kids) {
     var n = document.createElement(tag);
@@ -519,7 +529,7 @@
     $('#d-use').textContent = el.use[lang];
     var tags = $('#d-tags'); tags.textContent = '';
     el.tags.forEach(function (s) { tags.appendChild(h('li', { text: s })); });
-    $('#d-prompt').textContent = PROMPT(el, p.title[clang()], lang);
+    $('#d-prompt').textContent = promptText(el, p.title[clang()]);
     var kit = $('#d-kit'), txt = $('#d-txt');
     kit.href = 'api/v1/kit/' + el.pack + '.js'; kit.textContent = t('kitLink', { pack: el.pack });
     txt.href = 'api/v1/' + lang + '/e/' + el.id + '.txt'; txt.textContent = t('txtLink', { id: el.id });
@@ -732,7 +742,7 @@
     var lang = state.lang, lines = [t('outIntro', { n: state.picks.length }), ''];
     state.picks.forEach(function (id, i) {
       var nm = names(elBy[id]);
-      var sub = nm.sub && nm.sub !== nm.main ? (lang === 'ja' ? '（' + nm.sub + '）' : ' (' + nm.sub + ')') : '';
+      var sub = nm.sub && nm.sub !== nm.main ? ' (' + nm.sub + ')' : '';
       lines.push((i + 1) + '. #' + id + ' ' + nm.main + sub);
       lines.push('   ' + t('outDemo') + ': ' + SITE + '#' + id);
       lines.push('   ' + t('outSpec') + ': ' + SITE + 'api/v1/' + (lang === 'zh' ? 'en' : lang) + '/e/' + id + '.txt');
@@ -847,6 +857,7 @@
   });
 
   // ------------------------------------------------------------------ start
+  if (store.get('mp-lang') === 'ja') store.set('mp-lang', state.lang); // migrate a saved ja preference to the resolved zh/en
   readParams();
   applyText();
   buildChips();
