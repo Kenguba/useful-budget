@@ -198,13 +198,14 @@
  "timers_note": "setInterval/setTimeout are NOT suspended on unmount (modules are never unloaded; intervals keep running against hidden DOM — see audit.md)",
  "fetch_points": {
   "literal_urls": [
-   "data/board-prices.json?t=",
    "data/board.json",
    "data/board.json?t=",
+   "data/maps.json",
+   "data/maps.json?t=",
    "data/shops.json",
    "data/shops.json?t="
   ],
-  "dynamic_fetch_calls": 8,
+  "dynamic_fetch_calls": 10,
   "xhr": 0,
   "rule": "all fetch() calls in module scope pass the generated __fetch shadow: relative URLs resolve against /frontend/ai-shop/"
  },

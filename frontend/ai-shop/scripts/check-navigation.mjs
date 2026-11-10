@@ -60,7 +60,7 @@ assert.ok(!/border-color\s+0\.35s\s+ease|box-shadow\s+0\.3s\s+ease|transition:\s
   'Selection border/shadow/top line must paint immediately');
 
 // Guard the unrelated price-history cache from being lost in a page rewrite.
-assert.ok(has("const PC_LS_KEY='aishop.board-prices.v1'"), 'Price-history cache key disappeared');
-assert.ok(has('function pcStored(any)'), 'Price-history cache reader disappeared');
+assert.ok(has("const MAPS_LS_KEY='aishop.maps.v4'"), 'Platform-maps cache key disappeared');
+assert.ok(has('function pcStored()'), 'Platform-maps cache reader disappeared');
 
 console.log('AI shop navigation invariant OK (' + inlineScripts.length + ' inline scripts checked)');

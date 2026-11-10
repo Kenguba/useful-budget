@@ -46,7 +46,7 @@
 - setInterval（unmount 不停，残留运行）：无
 
 ## 相对路径基准修正点
-- fetch 调用 8 处（字面相对地址：['data/board-prices.json?t=', 'data/board.json', 'data/board.json?t=', 'data/shops.json', 'data/shops.json?t=']）— all fetch() calls in module scope pass the generated __fetch shadow: relative URLs resolve against /frontend/ai-shop/
+- fetch 调用 10 处（字面相对地址：['data/board.json', 'data/board.json?t=', 'data/maps.json', 'data/maps.json?t=', 'data/shops.json', 'data/shops.json?t=']）— all fetch() calls in module scope pass the generated __fetch shadow: relative URLs resolve against /frontend/ai-shop/
 - XHR：0 处
 - ui.html 内无相对资源引用
 

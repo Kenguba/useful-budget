@@ -148,11 +148,18 @@ function fuzzy(q){
   if(hay.includes(nq)) return true;
   return q.toLowerCase().split(/\s+/).filter(Boolean).every(tok=>{const nt=norm(tok); return !nt||hay.includes(nt)||(nt.length>=3&&subseq(nt,hay));});
 }
-/* 链接粗匹配（ken 2026-11-05）：搜索框直接粘贴店铺/商品链接时，从链接里提代码
-   （/shop/店铺码、/item/商品码、/goods/G号、/product/数字），目录按店铺代码对、
-   看板按商品链接对（含同源来源里的链接），不用把链接拆开手打 */
+/* 链接粗匹配（ken 2026-11-05，2026-11-10 改走平台映射反向索引）：搜索框直接粘贴店铺/商品链接时，
+   先按 maps 的 goods/shop 前缀反向匹配（revLookup，与变价弹窗 pcKeyOf 共用同一套，不许两套）提代码：
+   店铺链接→店铺码、商品链接→商品 ID（多 goods 前缀平台取剩余段尾节），目录按店铺代码对、
+   看板按商品链接对（含同源来源里的链接）；映射未加载或非平台链接时退回原有尾段提取 */
 function linkCodeOf(q){
   q=String(q||'');
+  const r=revLookup(q);
+  if(r&&r.rest){
+    let seg=r.rest;
+    if(r.kind==='goods'&&pcPlat&&pcPlat[r.code]&&(pcPlat[r.code].goods||[]).length>1) seg=seg.split('/').pop();
+    if(seg) return String(seg).toLowerCase();
+  }
   const m=q.match(/shop\/([A-Za-z0-9_-]{3,})/i)||q.match(/goods\/(G\d+)/i)||q.match(/item\/([A-Za-z0-9_-]+)/i)||q.match(/product\/(\d+)/i);
   if(m) return m[1].toLowerCase();
   if(/:\/\//.test(q)||/\.(cn|com|xyz|top|shop|net)\//.test(q)){
@@ -188,7 +195,7 @@ let hiddenSet=new Set(loadJSON(HKEY,[])); if(!hiddenSet||typeof hiddenSet.has!==
 function saveFavs(){ try{ localStorage.setItem(FKEY,JSON.stringify(favs)); }catch(e){} }
 function saveHidden(){ try{ localStorage.setItem(HKEY,JSON.stringify([...hiddenSet])); }catch(e){} }
 const allSel=()=>!selFav&&selCats.size===0;
-function itemShown(g,it){ if(hiddenSet.has(it.url)) return false; if(allSel()) return true; if(selCats.has(GCAT(g.id))) return true; if(selFav&&favSet.has(it.url)) return true; return false; }
+function itemShown(g,it){ if(hiddenSet.has(it.url)) return false; if(it.stock===-1) return false; if(allSel()) return true; if(selCats.has(GCAT(g.id))) return true; if(selFav&&favSet.has(it.url)) return true; return false; }
 function paintChips(){ document.querySelectorAll('#categoryBar .cat-chip').forEach(x=>{ const c=x.dataset.cat; x.classList.toggle('active', c==='all'?allSel():c==='__fav'?selFav:selCats.has(c)); if(c==='__fav') x.textContent='收藏'+(favs.length?' ('+favs.length+')':''); }); }
 function findItem(url){ if(typeof board==='undefined'||!board||!board.groups) return null; for(const g of board.groups){ const it=g.items.find(x=>x.url===url); if(it) return {g,it}; } return null; }
 function toggleFav(url,wrap){
@@ -440,25 +447,64 @@ window.addEventListener('popstate',e=>{
   if(!srcIsOpen&&!pcIsOpen)window.scrollTo({top:st.y||0,behavior:'instant'});
 });
 window.addEventListener('popstate',()=>{ if(srcIsOpen){ srcHist=false; closeSrc(true); } });
-/* 变价历史弹窗：数据来自 data/board-prices.json（只含看板条目的变价记录小表，时间戳错位增量编码，页面端解码还原；全量 price-log.json 只做后台维护，前端不拉） */
-let pcLogCache=null, pcIsOpen=false, pcHist=false, pcOpener=null, pcCloseTimer=null, pcLockedFlag=false;
+/* 变价历史弹窗：数据来自 board.json 的 prices 段（看板条目的变价记录，三元交错差分编码：时刻/间隔、价、来源码，页面端解码还原；全量 price-log.json 只做后台维护，前端不拉） */
+let pcLogCache=null, pcLogVer='', pcIsOpen=false, pcHist=false, pcOpener=null, pcCloseTimer=null, pcLockedFlag=false;
 const pcOverlay=$('#pcOverlay'), pcSheet=$('#pcSheet');
-function normTitle(t){ const ta=document.createElement('textarea'); ta.innerHTML=String(t==null?'':t); return ta.value.toLowerCase().replace(/[\s【】\[\]（）()·|｜\/\\,，。、:：;；!！?？\-—_~`'"“”‘’*#@]+/g,''); }
-function pcKeyOf(it){ return String(it.url||'').split('?')[0]+'|'+normTitle(it.title); }
-function decodePc(rec){ const pts=[]; let ts=rec[0]; pts.push({ts:ts,price:rec[1]}); for(let i=2;i+1<rec.length;i+=2){ ts+=rec[i]; pts.push({ts:ts,price:rec[i+1]}); } return pts; }
+let pcPlat=null; /* 平台映射：短码->{name,goods[],shop}（data/maps.json 的 platforms，只含 4 家聚合平台） */
+let mapsData=null, mapsPromise=null;
+/* 平台映射反向索引（与 refresh.py PlatformMap 同语义）：任给整链接（商品/店铺入口都算），
+   按 goods/shop 前缀最长匹配得 {code, kind, rest}；pcKeyOf 与粘贴链接搜索 linkCodeOf 共用这一套，不许两套 */
+function revLookup(raw){
+  const u=String(raw||'').split('?')[0].replace(/^(https?:\/\/)www\./,'$1');
+  if(!pcPlat||!u) return null;
+  let best=null;
+  for(const code in pcPlat){ const ent=pcPlat[code]; if(!ent) continue;
+    const gs=ent.goods||[];
+    for(let i=0;i<gs.length;i++){ const p=gs[i]; if(p&&u.indexOf(p)===0&&(!best||p.length>best.len)){
+      let rest;
+      if(gs.length>1){ const m=u.match(/^https?:\/\/[^/]+\/(.*)$/); rest=m?m[1]:u.slice(p.length); }
+      else rest=u.slice(p.length);
+      best={code:code,kind:'goods',len:p.length,rest:rest};
+    } }
+    const sp=ent.shop;
+    if(sp&&u.indexOf(sp)===0&&(!best||sp.length>best.len)) best={code:code,kind:'shop',len:sp.length,rest:u.slice(sp.length)};
+  }
+  return best;
+}
+function pcKeyOf(it){
+  const r=revLookup(it&&it.url);
+  if(r&&r.kind==='goods') return r.code+':'+r.rest;
+  /* 非平台（个人店铺/自建站）不做键变换：归一后的整链接本身即键 */
+  return String(it&&it.url||'').split('?')[0].replace(/^(https?:\/\/)www\./,'$1');
+}
+function decodePc(rec){ const pts=[]; let ts=rec[0]; pts.push({ts:ts,price:rec[1],src:rec[2]}); for(let i=3;i+2<rec.length;i+=3){ ts+=rec[i]; pts.push({ts:ts,price:rec[i+1],src:rec[i+2]}); } return pts; }
 function fmtPcT(ts,wy){ const d=new Date(ts*60000); const p=n=>String(n).padStart(2,'0'); return (wy?d.getFullYear()+'-':'')+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
-/* 小表按看板版本在设备本地存一份：同一版看板再打开直接用存货、不再重复请求；
-   看板每小时更新，版本号（board.updated_at）变了才重新拉 */
-const PC_LS_KEY='aishop.board-prices.v1';
-function pcStored(any){ try{ const s=JSON.parse(localStorage.getItem(PC_LS_KEY)||'null'); if(s&&s.items&&(any||(board&&s.u===board.updated_at))) return s.items; }catch(e){} return null; }
+/* maps.json 全页只拉一次；platforms 在设备本地存一份：弹窗与粘贴链接搜索先秒用存货，后台校准完成再替换 */
+const MAPS_LS_KEY='aishop.maps.v4';
+function pcStored(){ try{ const s=JSON.parse(localStorage.getItem(MAPS_LS_KEY)||'null'); if(s&&s.platforms){ pcPlat=s.platforms; return s.platforms; } }catch(e){} return null; }
+function loadMaps(){
+  if(mapsData) return Promise.resolve(mapsData);
+  if(!pcPlat) pcStored();
+  if(!mapsPromise){
+    mapsPromise=fetch('data/maps.json').then(r=>r.json()).then(j=>{
+      mapsData=j||{};
+      if(mapsData.platforms){ pcPlat=mapsData.platforms; try{ localStorage.setItem(MAPS_LS_KEY, JSON.stringify({platforms:pcPlat})); }catch(e){} }
+      return mapsData;
+    }).catch(()=>{ mapsData={platforms:pcPlat||{}}; return mapsData; });
+  }
+  return mapsPromise;
+}
+/* 变价记录随看板走：board 全局已加载就直接读它的 prices 段（不再 fetch 独立小表），
+   按看板版本缓存；board 全局不在时退回拉 board.json */
 function loadPcLog(){
-  if(pcLogCache) return Promise.resolve(pcLogCache);
-  const hit=pcStored(false); if(hit){ pcLogCache=hit; return Promise.resolve(pcLogCache); }
-  return fetch('data/board-prices.json?t='+Date.now()).then(r=>r.json()).then(j=>{
-    pcLogCache=(j&&j.items)||{};
-    try{ localStorage.setItem(PC_LS_KEY, JSON.stringify({u:board?board.updated_at:'', items:pcLogCache})); }catch(e){}
-    return pcLogCache;
-  }).catch(()=>{ pcLogCache=pcStored(true)||{}; return pcLogCache; });
+  const ver=board?board.updated_at:'';
+  if(pcLogCache&&pcLogVer===ver) return Promise.resolve(pcLogCache);
+  return loadMaps().then(()=>{
+    if(board&&board.prices){ pcLogCache=board.prices; pcLogVer=ver; return pcLogCache; }
+    return fetch('data/board.json?t='+Date.now()).then(r=>r.json()).then(b=>{
+      pcLogCache=(b&&b.prices)||{}; pcLogVer=ver; return pcLogCache;
+    }).catch(()=>{ pcLogCache={}; pcLogVer=ver; return pcLogCache; });
+  });
 }
 function renderPcChart(pts){
   if(pts.length<2) return '';
@@ -476,6 +522,7 @@ function renderPcChart(pts){
     +'<text x="'+(W-PR)+'" y="'+(H-3)+'" font-size="9" fill="var(--text-muted)" text-anchor="end">'+fmtPcT(t1)+'</text>'
     +'<polyline points="'+line+'" fill="none" stroke="var(--theme-accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+dots+'</svg>';
 }
+const PC_SRC_LBL={'1':'脚本','2':'浏览器','3':'人工'}; /* 价格点来源：1=脚本抓 2=浏览器抓（现核）3=人工补充 */
 function renderPcBody(it,pts){
   const ch=$('#pcChart');
   ch.innerHTML=renderPcChart(pts);
@@ -486,7 +533,8 @@ function renderPcBody(it,pts){
     let right;
     if(i===0) right='<span class="pc-first">首次记录</span>';
     else { const d=p.price-pts[i-1].price; right='<span class="pc-delta '+(d>0?'up':'dn')+'">'+(d>0?'↑':'↓')+' ¥'+fmtN(Math.abs(d))+'</span>'; }
-    rows.push('<div class="pc-row"><span class="pc-when">'+fmtPcT(p.ts,true)+'</span><span class="pc-price">¥'+fmtN(p.price)+'</span>'+right+'</div>');
+    const sl=PC_SRC_LBL[String(p.src)];
+    rows.push('<div class="pc-row"><span class="pc-when">'+fmtPcT(p.ts,true)+'</span><span class="pc-price">¥'+fmtN(p.price)+'</span>'+(sl?'<span class="pc-src">'+sl+'</span>':'')+right+'</div>');
   }
   $('#pcList').innerHTML=rows.join('');
 }
@@ -507,7 +555,8 @@ function openPc(gi,ii,btn){
   requestAnimationFrame(()=>{ if(pcOverlay.hidden) return; pcOverlay.classList.add('open'); const c=pcSheet.querySelector('.btn-close'); if(c) c.focus({preventScroll:true}); });
   loadPcLog().then(items=>{
     if(!pcIsOpen) return;
-    const rec=items[pcKeyOf(it)];
+    const key=pcKeyOf(it);
+    const rec=items[key];
     if(!rec||rec.length<2){ $('#pcList').innerHTML='<p class="pc-empty">这条还没有变价记录</p>'; return; }
     renderPcBody(it, decodePc(rec));
   });
@@ -767,7 +816,7 @@ async function verifyStocks(){
   }catch(e){}
 }
 function showToast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),1800)}
-async function reloadData(){const [b,s]=await Promise.all([fetch('data/board.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json()),fetch('data/shops.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json())]);board=b;shops=s;fillMeta(b);renderBoard();renderShops();verifyStocks();}
+async function reloadData(){const [b,s,mp]=await Promise.all([fetch('data/board.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json()),fetch('data/shops.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json()),fetch('data/maps.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json()).catch(()=>null)]);board=b;shops=s;if(mp&&mp.platforms){mapsData=mp;pcPlat=mp.platforms;try{localStorage.setItem(MAPS_LS_KEY,JSON.stringify({platforms:pcPlat}));}catch(e){}}fillMeta(b);renderBoard();renderShops();verifyStocks();}
 $('#refreshBtn').onclick=async()=>{const btn=$('#refreshBtn');const oldMeta=board?board.updated_at:null;btn.disabled=true;btn.classList.add('loading');try{const r=await fetch(REFRESH_API,{method:'POST'});const j=await r.json().catch(()=>({}));if(j&&j.mode==='cooldown'){await reloadData();showToast(j.source==='auto'?'系统刚自动刷新过，数据更新中':'5 分钟内已刷新过，已加载最新快照');}else if(j&&j.ok){showToast('正在刷新，稍等片刻');let done=false;for(let i=0;i<20;i++){await new Promise(res=>setTimeout(res,8000));try{const nb=await fetch('data/board.json?t='+Date.now(),{cache:'no-store'}).then(x=>x.json());if(nb.updated_at&&nb.updated_at!==oldMeta){await reloadData();showToast('已刷新到最新数据');done=true;break;}}catch(e){}}if(!done)showToast('刷新超时，请稍后再点一次');}else{showToast('刷新服务暂不可用');}}catch(e){showToast('刷新服务暂不可用');}btn.disabled=false;btn.classList.remove('loading');};
 function fitStatusRow(){
   const row=document.querySelector('.status-row'),btn=$('#refreshBtn');
@@ -802,7 +851,7 @@ function loadShops(){ fetch('data/shops.json').then(r=>r.json()).then(s=>{
   document.querySelectorAll('#chips button').forEach(btn=>btn.onclick=()=>{shopFilter=btn.dataset.p;shopShown=300;document.querySelectorAll('#chips button').forEach(x=>x.classList.toggle('active',x===btn));renderShops();});
   renderShops();
   if(board)renderBoard();
-}).catch(e=>{ if(shopsRetry<2){ shopsRetry++; setTimeout(loadShops,1500); } else { shopsFailed=true; if($('#q').value.trim()) renderBoard(); } }); } loadShops();
+}).catch(e=>{ if(shopsRetry<2){ shopsRetry++; setTimeout(loadShops,1500); } else { shopsFailed=true; if($('#q').value.trim()) renderBoard(); } }); } loadShops(); loadMaps();
 
 /* ---- original script block #3 (source line 2608) ---- */
 

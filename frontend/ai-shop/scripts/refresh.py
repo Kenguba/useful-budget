@@ -7,10 +7,10 @@
 两库按商品链接去重合并；再用 PriceAI 商品页（按价升序前 12 条）补最低价段。
 随后按固定 7 分组（ken 2026-10-31 拍板）用标题规则分类，取有货最低 30 条，
 同标题铺货合并只取最低。链接均为商品详情页。
-店铺目录由 data/shops.csv 转 data/shops.json。
+店铺目录由 data/shops.csv 转 data/shops.json（独立文件，不进映射表）。
 
 用法：python3 scripts/refresh.py
-产出：data/board.json、data/shops.json
+产出：data/board.json（含 prices 价格史段）、data/shops.json、data/maps.json（仅平台映射）、data/price-log.json
 """
 import csv, html, io, json, os, re, sys, time, urllib.parse, urllib.request
 
@@ -566,17 +566,18 @@ def fetch_16688_direct(deadline):
     ex.shutdown(wait=False, cancel_futures=True)
     return out, ok
 
-# ---------------- 历史表短键：平台前缀映射（ken 2026-11-10 口径） ----------------
-# 记录本身不新增字段（platform 本来就有）；维护点只在这里：平台 -> 对应链接入口
-# （商品前缀，店铺入口前缀一并记）。price-log / board-prices 文件顶层存一份由本表
-# 派生的 pfx 短码表（前缀 -> 短码），文件里的键只存「短码:商品ID」，前缀只存一份。
-# 主机名归一：www. 与无 www 视为同一前缀。新前缀顺延下一个空号，旧号永不改、永不复用；
-# 存量编号由迁移按前缀条数降序定版（见 pfx 表），本表只负责登记已知平台入口与运行期派生。
+# ---------------- 平台映射：短码 <-> 链接前缀（ken 2026-11-10 定版，双向一等） ----------------
+# 映射本体只存一份：data/maps.json 的 platforms{短码: {name, goods[], shop}}，本表只是种子，
+# 运行期以 maps 为准。表里只收多卖家聚合平台（现 4 家：wzyp=链动小铺、16688、catfk=云猫寄售、
+# aicdks），以后真出现新的多卖家平台才人工加；个人店铺/自建站一律不进表——它们的记录键
+# 不做变换、保持整链接本身（仅 www 归一）。平台记录键 =「短码:商品ID」，靠 goods 前缀拼回
+# 整链接；反向：任给平台整链接（商品/店铺入口都算）按 goods/shop 前缀最长匹配回短码。
+# 主机名归一：www. 与无 www 视为同一前缀。
 PLATFORM_PREFIXES = {
-    '16688': ('https://www.16688.com.cn/goods/', 'https://www.16688.com.cn/shop/'),
-    '链动小铺': ('https://wzyp.cn/item/', 'https://wzyp.cn/shop/'),
-    '云猫寄售': ('https://catfk.com/item/', ''),
-    # 其余平台/自建站的商品前缀不逐个登记：运行期按链接自动分配短码，规则同上
+    '16688': dict(name='16688', goods=['https://16688.com.cn/goods/'], shop='https://16688.com.cn/shop/'),
+    'wzyp': dict(name='链动小铺', goods=['https://wzyp.cn/item/'], shop='https://wzyp.cn/shop/'),
+    'catfk': dict(name='云猫寄售', goods=['https://catfk.com/item/'], shop=None),
+    'aicdks': dict(name='aicdks', goods=['https://aicdks.com/product/'], shop=None),
 }
 
 def _norm_url(u):
@@ -587,9 +588,16 @@ def _split_prefix(u):
     i = u.rfind('/')
     return (u[:i + 1], u[i + 1:]) if i >= 0 else (u, '')
 
+def _points(rec):
+    return (len(rec) + 2) // 3
+
+def _src_prio(c):
+    return '123'.find(c)
+
 def _merge_records(recs):
-    """同链接多条旧记录合并为一条：价格点解码成绝对时间、排序、同刻取最后一个价、
-    折叠相邻同价点，再按差分格式重编码（与上一轮 www 合并同法则）。"""
+    """同链接多条旧记录（v1/v2 差分对格式）合并为一条三元记录：价格点解码成绝对时间、
+    排序、同刻取最后一个价、折叠相邻同价点，再按三元差分格式重编码（每点带来源码，
+    旧记录无法回溯来源、一律回填 1；与上一轮 www 合并同法则）。"""
     pts = []
     for rec in recs:
         ts = rec[0]
@@ -606,43 +614,138 @@ def _merge_records(recs):
             continue
         else:
             out.append((ts, p))
-    rec = [out[0][0], out[0][1]]
+    rec = [out[0][0], out[0][1], 1]
     for i in range(1, len(out)):
-        rec += [out[i][0] - out[i - 1][0], out[i][1]]
+        rec += [out[i][0] - out[i - 1][0], out[i][1], 1]
     return rec
 
-class PfxTable:
-    """链接前缀 <-> 短码。文件里的 pfx 为权威（存量编号已定版）；空表时先按
-    PLATFORM_PREFIXES 登记已知平台的商品前缀，再顺延分配。"""
-    def __init__(self, pfx=None):
-        self.pfx = dict(pfx or {})
-        self.rev = {p: c for c, p in self.pfx.items()}
-        self.nxt = max([int(c) for c in self.pfx] or [0]) + 1
-        if not self.pfx:
-            for _goods, _shop in PLATFORM_PREFIXES.values():
-                if _goods:
-                    self._code_for(_split_prefix(_goods + 'x')[0])
-    def _code_for(self, prefix):
-        c = self.rev.get(prefix)
-        if c is None:
-            c = str(self.nxt)
-            self.nxt += 1
-            self.pfx[c] = prefix
-            self.rev[prefix] = c
-        return c
+def _merge_src_v3(items, src):
+    """过渡形态兜底：v3 平行 src 字典（items 差分对 + src 串）在内存里并入三元数组，
+    与正式三元格式逐点等价；落盘只写三元，不再写 src 字典。"""
+    out = {}
+    for k, rec in items.items():
+        s = src.get(k) or ''
+        n = (len(rec) + 1) // 2
+        if len(s) != n:
+            s = '1' * n
+        tri = [rec[0], rec[1], int(s[0])]
+        ts = rec[0]
+        for i in range(2, len(rec), 2):
+            ts += rec[i]
+            tri += [rec[i], rec[i + 1], int(s[i // 2])]
+        out[k] = tri
+    return out
+
+def _norm_map(url):
+    """平台映射专用归一（与参考实现 mapping-fn 一致）：去参数；主机去掉开头 www.。"""
+    u = urllib.parse.urlsplit(str(url).split('?')[0])
+    net = u.netloc[4:] if u.netloc.startswith('www.') else u.netloc
+    return urllib.parse.urlunsplit((u.scheme, net, u.path, '', ''))
+
+class PlatformMap:
+    """平台映射双向表（语义与 mapping-fn/映射函数.py 参考实现一致，ken 2026-11-10 收紧）：
+    platforms{短码: {name, goods[], shop}} 为权威数据（存 maps.json），只含多卖家聚合平台。
+    encode(整链接)：命中平台 goods 前缀（最长匹配）->「短码:剩余段」；未命中（个人店铺/
+    自建站）-> 归一后的整链接本身即键，不查表、不变换。decode(键)：键头是平台短码 ->
+    查表拼回整链接；否则键本身就是整链接、原样返回。platform_of(店铺链接) -> (短码, 店铺码)，
+    平台商品链接 -> (短码, None)，非平台链接 -> (None, None)；shop_url(短码, 店铺码) ->
+    店铺入口链接。多 goods 前缀的平台剩余段保留完整路径段。"""
+    def __init__(self, platforms=None):
+        if platforms:
+            self.platforms = {str(c): dict(name=(e or {}).get('name', str(c)),
+                                            goods=list((e or {}).get('goods') or []),
+                                            shop=(e or {}).get('shop'))
+                               for c, e in platforms.items()}
+        else:
+            self.platforms = {c: dict(name=e['name'], goods=list(e['goods']), shop=e['shop'])
+                              for c, e in PLATFORM_PREFIXES.items()}
+        self._goods_idx = []
+        self._shop_idx = []
+        for code, ent in self.platforms.items():
+            for g in ent.get('goods') or []:
+                self._goods_idx.append((_norm_map(g), code))
+            if ent.get('shop'):
+                self._shop_idx.append((_norm_map(ent['shop']), code))
+        self._goods_idx.sort(key=lambda x: -len(x[0]))
+        self._shop_idx.sort(key=lambda x: -len(x[0]))
     def encode(self, url):
-        p, rest = _split_prefix(url)
-        return f'{self._code_for(p)}:{rest}'
+        u = _norm_map(url)
+        for pre, code in self._goods_idx:
+            if u.startswith(pre):
+                ent = self.platforms[code]
+                if len(ent.get('goods') or []) > 1:
+                    p = urllib.parse.urlsplit(u)
+                    return f"{code}:{p.path.lstrip('/')}"
+                return f"{code}:{u[len(pre):]}"
+        return u
+    def platform_of(self, url):
+        u = _norm_map(url)
+        for pre, code in self._shop_idx:
+            if u.startswith(pre):
+                return code, u[len(pre):].strip('/')
+        for pre, code in self._goods_idx:
+            if u.startswith(pre):
+                return code, None
+        return None, None
     def decode(self, key):
-        c, _, rest = str(key).partition(':')
-        return self.pfx[c] + rest if c in self.pfx else key
-    def subset(self, keys):
-        out = {}
-        for k in keys:
-            c = str(k).split(':', 1)[0]
-            if c in self.pfx:
-                out[c] = self.pfx[c]
-        return out
+        code, sep, rest = str(key).partition(':')
+        ent = self.platforms.get(code) if sep else None
+        if ent is None:
+            return key
+        goods = ent.get('goods') or []
+        if len(goods) > 1:
+            p = urllib.parse.urlsplit(_norm_map(goods[0]))
+            return f"{p.scheme}://{p.netloc}/{rest}"
+        return _norm_map(goods[0]) + rest
+    def shop_url(self, code, shop_code):
+        return _norm_map(self.platforms[code]['shop']) + shop_code
+
+def platforms_from_prefixes(pfx_map):
+    """旧 v2 文件内嵌的数字 pfx 表 -> 平台映射（兜底迁移用）：只取种子 4 家平台的
+    goods 前缀建表，其余前缀的记录在重编码时自然落回整链接键。"""
+    platforms = {c: dict(name=e['name'], goods=[], shop=e['shop'])
+                 for c, e in PLATFORM_PREFIXES.items()}
+    seed_goods = {g: c for c, e in PLATFORM_PREFIXES.items() for g in e['goods']}
+    for p in pfx_map.values():
+        c = seed_goods.get(p)
+        if c and p not in platforms[c]['goods']:
+            platforms[c]['goods'].append(p)
+    for c, ent in platforms.items():
+        if not ent['goods']:
+            ent['goods'] = list(PLATFORM_PREFIXES[c]['goods'])
+    return PlatformMap(platforms)
+
+def apply_pool_round(log, pool, pool_src, ovr_pool, now_min):
+    """把本轮全量池价并入历史表（原地更新 log），返回 (new, changed, overridden)。
+    记录为三元交错差分数组 [首时刻, 首价, 首来源, 间隔, 新价, 新来源, …]，每个价格点
+    带来源码：1=脚本抓（聚合/PriceAI/接口）、2=浏览器抓（browser-pool 植入）、3=人工
+    补充（overrides 植入）。变价追加一点（三元一组）；植入价就地覆盖脚本最后一点时
+    改写价格与来源码、不新增点（不产生假涨跌）；同价时一手价更新鲜且优先级更高才
+    就地升级最后一点来源码（不加点）；价格不变不追加。ovr_pool: {键: (价, 植入时刻
+    分钟, 来源码)}；pool_src: {键: 本轮池价来源码}，缺省 '1'；同轮多来源命中以写入
+    顺序 3>2>1 为准。"""
+    n_new = n_chg = n_ovr = 0
+    for key, price in pool.items():
+        sc = int(pool_src.get(key, '1'))
+        rec = log.get(key)
+        if rec is None:
+            log[key] = [now_min, price, sc]
+            n_new += 1
+            continue
+        last_ts = rec[0] + sum(rec[3::3])
+        ov = ovr_pool.get(key)
+        if price != rec[-2]:
+            if ov and last_ts <= ov[1]:
+                rec[-2] = price
+                rec[-1] = int(ov[2])
+                n_ovr += 1
+            else:
+                delta = now_min - last_ts
+                rec += [delta if delta > 0 else 0, price, sc]
+                n_chg += 1
+        elif ov and last_ts <= ov[1] and _src_prio(ov[2]) > _src_prio(str(rec[-1])):
+            rec[-1] = int(ov[2])
+    return n_new, n_chg, n_ovr
 
 def main():
     # 16688 直拉放后台线程，与聚合抓取并行，合并时再收结果（预算见 DIRECT_16688_BUDGET）
@@ -763,6 +866,13 @@ def main():
         rows = _rows2
         print(f'overrides: {len(_overrides)} fresh, price-applied {_ov_p}, soldout-dropped {_ov_s}', file=sys.stderr)
 
+    # 死链剔除（ken 2026-11-10）：stock=-1 = 链接不可以用，进看板候选前先滤掉（sources 随之不收）；
+    # 全量池 _pool_rows 不受影响、死链商品继续跟踪价格
+    _dead_n = sum(1 for o in rows if o.get('stock') == -1)
+    if _dead_n:
+        rows = [o for o in rows if o.get('stock') != -1]
+        print(f'dead-drop: {_dead_n} offers (stock=-1)', file=sys.stderr)
+
     pai = []
     for slug in ('chatgpt-plus', 'gemini-pro-year', 'gemini-ultra',
                  'openai-phone-verification', 'super-grok-heavy'):
@@ -801,7 +911,8 @@ def main():
     # 详情页库存为 0 / 已售罄的剔除，读到的实时库存同时回填展示；
     # 读不到的平台（wzyp 被阿里云验证挡、catfk 连不上、/products/ 系 JS 空壳）不在此列，只能靠聚合库库存。
     def detail_stock(it):
-        """返回 (库存, 起购量)：库存 None=读不到保留、0=售罄/下架剔除；起购量 >1 才有值。"""
+        """返回 (库存, 起购量)：库存 None=读不到保留、0=售罄剔除、-1=链接不可以用
+        （商品不存在/详情打不开，ken 2026-11-10 库存语义）；起购量 >1 才有值。"""
         url = it['url']
         try:
             if '16688.com.cn' in url:
@@ -815,8 +926,8 @@ def main():
                 with urllib.request.urlopen(req, timeout=20) as r:
                     d = json.loads(r.read().decode('utf-8', 'ignore'))
                 if not d.get('data'):
-                    # 接口明确回「商品不存在」= 已下架，按售罄剔除；其他空响应仍按读不到保留
-                    return (0, None) if '不存在' in str(d.get('msg') or '') else (None, None)
+                    # 接口明确回「商品不存在」= 死链，记 -1 剔除并回写 direct 状态；其他空响应仍按读不到保留
+                    return (-1, None) if '不存在' in str(d.get('msg') or '') else (None, None)
                 data = d.get('data') or {}
                 q = data.get('stock_available_quantity')
                 lq = data.get('limit_quantity')
@@ -828,10 +939,14 @@ def main():
                     return 0, None
                 km = re.search(r'库存\s*[:：]?\s*(\d+)', txt)
                 return (int(km.group(1)) if km else None), None
-        except Exception:
+        except Exception as e:
+            # 详情页明确 404 = 链接失效，记 -1；其余读不到（网络/风控）仍按未知保留
+            if 'HTTP Error 404' in str(e):
+                return -1, None
             return None, None
         return None, None
 
+    _dead_marks = []  # 本轮现核确认的死链：组装后回写 direct 当前状态 stock=-1
     def verify_detail_stock(items):
         # 候选池为每组前 45 条：并发核验（单条慢不阻塞整体），剔除售罄后回填截断到 30 条
         from concurrent.futures import ThreadPoolExecutor
@@ -839,6 +954,10 @@ def main():
             stocks = list(ex.map(detail_stock, items))
         kept = []
         for it, (st, mq) in zip(items, stocks):
+            if st == -1:
+                print(f'dead-drop: {it["url"]}', file=sys.stderr)
+                _dead_marks.append(it['url'])
+                continue
             if st == 0:
                 print(f'soldout-drop: {it["url"]}', file=sys.stderr)
                 continue
@@ -850,6 +969,23 @@ def main():
         return kept[:30]
     for g in groups:
         g['items'] = verify_detail_stock(g['items'])
+
+    # 死链回写（ken 2026-11-10）：本轮现核确认不存在/打不开的商品，把 direct 当前状态的
+    # stock 写成 -1（标题/价格保留最后已知值、记录不删）；之后直拉缓存覆盖聚合时带 -1 进组装层剔除
+    if _dead_marks:
+        try:
+            _dc = load_direct_cache()
+            _marked = 0
+            for _u in _dead_marks:
+                if _u in _dc and _dc[_u].get('stock') != -1:
+                    _dc[_u]['stock'] = -1
+                    _marked += 1
+            if _marked:
+                with open(os.path.join(DATA, 'direct16688.json'), 'w', encoding='utf-8') as f:
+                    json.dump(dict(items=_dc), f, ensure_ascii=False)
+            print(f'dead-mark: {_marked}/{len(_dead_marks)} direct records set stock=-1', file=sys.stderr)
+        except Exception as e:
+            print(f'dead-mark failed: {e}', file=sys.stderr)
 
     # 防覆盖保险（ken 2026-11-02）：新数据总条数不足上一版一半时，判定上游大面积失败，
     # 直接报错退出、不覆盖旧 board.json，网站保持上一版好数据。
@@ -876,8 +1012,13 @@ def main():
     # （去参数）唯一（ken 2026-11-10 点选 1a，取代 2026-11-04 的链接+归一标题键）：
     # 标题只是普通字段，卖家改标题不影响认领，同一链接天然续记、不断历史；
     # 同链接多规格也并成一条（以本轮合并后的行价为准），不再按规格拆账。
-    # 文件落盘键再经前缀短码压缩（ken 2026-11-10）：_pfx 把链接前缀编号化，
-    # 键 =「短码:商品ID」，pfx 表随文件顶层一起存，前缀只存一份（见 PfxTable）。
+    # 文件落盘键经平台映射压缩（ken 2026-11-10 定版）：键 =「平台短码:商品ID」
+    # （见 PlatformMap），映射本体在 data/maps.json、文件里不内嵌任何映射。
+    # 每个价格点带来源码：差分数组每点三元（时刻或间隔、价、来源码），1=脚本抓、
+    # 2=浏览器抓、3=人工补充，同轮覆盖优先级 3>2>1；存量点无法回溯区分、一律记 1，
+    # 上线后逐点精确（见 apply_pool_round）。
+    _maps_path = os.path.join(DATA, 'maps.json')
+    _maps = {}
     try:
         import time as _time
         from datetime import datetime as _dt, timezone as _tz, timedelta as _td
@@ -886,28 +1027,52 @@ def main():
         _now = _dt.now(_bj)
         _now_min = int(_now.timestamp() // 60)
         _log_path = os.path.join(DATA, 'price-log.json')
-        _pfx = PfxTable()
+        try:
+            with open(_maps_path, encoding='utf-8') as f:
+                _maps = json.load(f)
+        except Exception:
+            _maps = {}
+        _plat = PlatformMap(_maps.get('platforms')) if _maps.get('platforms') else None
         _log = {}
         try:
             with open(_log_path, encoding='utf-8') as f:
                 _raw = json.load(f)
-            if _raw.get('v', 1) >= 2 and _raw.get('pfx'):
-                _pfx = PfxTable(_raw['pfx'])
+            if _plat is None and _raw.get('v') == 2 and _raw.get('pfx'):
+                _plat = platforms_from_prefixes(_raw['pfx'])
+            if _plat is None:
+                _plat = PlatformMap()
+            if _raw.get('v', 1) >= 3:
                 _log = _raw.get('items', {})
+                if _raw.get('src'):
+                    # 过渡形态（v3 平行 src 字典）兜底：读入时并入三元，落盘只写三元
+                    _log = _merge_src_v3(_log, _raw['src'])
+            elif _raw.get('v') == 2 and _raw.get('pfx'):
+                # v2 数字短码键兜底：先按内嵌 pfx 解回整链接，再按平台映射重编码；
+                # 同键多条先收集齐再一次合并（_merge_records 输出三元）
+                _pfx_old = _raw['pfx']
+                _pend = {}
+                for _k, _rec in _raw.get('items', {}).items():
+                    _c, _, _rest = _k.partition(':')
+                    _u = _pfx_old[_c] + _rest if _c in _pfx_old else _k
+                    _pend.setdefault(_plat.encode(_u), []).append(_rec)
+                for _nk, _recs in _pend.items():
+                    _log[_nk] = _merge_records(_recs)
             else:
-                # 旧版整链接键兜底：载入时就地转短键，www 归一后同链接多条按 _merge_records 合并
+                # v1 整链接键兜底：www 归一后同链接多条按 _merge_records 合并再转平台键
                 _legacy = {}
                 for _k, _rec in _raw.get('items', {}).items():
                     _legacy.setdefault(_norm_url(_k), []).append(_rec)
                 for _u, _recs in _legacy.items():
-                    _log[_pfx.encode(_u)] = _recs[0] if len(_recs) == 1 else _merge_records(_recs)
+                    _log[_plat.encode(_u)] = _merge_records(_recs)
         except Exception:
             _log = {}
+        if _plat is None:
+            _plat = PlatformMap()
         _pool = {}
         for _o in _full_rows + _full_pai:
             if _o['price'] is None or _o['price'] <= 0:
                 continue
-            _pool[_pfx.encode(_o['url'])] = _o['price']
+            _pool[_plat.encode(_o['url'])] = _o['price']
         # 价格日志同样以脚本二为准：被覆盖的链接（全池每链接只有一条记录），本轮池价换成一手价，
         # 并在下面比对时把脚本一记错的最后一点直接改掉（_ovr_pool 标记）
         # 浏览器按店轮换采集（脚本二的全量池通道）：data/browser-pool.json {url:{price,t}}，
@@ -922,60 +1087,47 @@ def main():
                     _bpool[_u.split('?')[0]] = _v
         except Exception:
             _bpool = {}
+        # 植入价并入池价并记来源：browser-pool='2'（浏览器抓）、overrides='3'（人工补充），
+        # 按顺序写入，同键以人工为准（优先级 3>2>1）；apply_pool_round 据此记每个点的来源码
         _ovr_pool = {}
+        _pool_src = {}
         try:
-            _merged_ovr = dict(_bpool)
-            _merged_ovr.update(_overrides or {})
-            for _u, _v in _merged_ovr.items():
-                if _v.get('price'):
-                    _k = _pfx.encode(_u)  # 输入文件是整链接键，转短键再匹配（未见前缀现场分配）
-                    if _k in _pool:
-                        _pool[_k] = _v['price']
-                        _ovr_pool[_k] = (_v['price'], int(_v['t'] // 60000))
+            for _sc, _smap in (('2', _bpool), ('3', _overrides or {})):
+                for _u, _v in _smap.items():
+                    if _v.get('price'):
+                        _k = _plat.encode(_u)  # 输入文件是整链接键，转平台键再匹配
+                        if _k in _pool:
+                            _pool[_k] = _v['price']
+                            _pool_src[_k] = _sc
+                            _ovr_pool[_k] = (_v['price'], int(_v['t'] // 60000), _sc)
         except Exception:
             _ovr_pool = {}
-        _n_new = _n_chg = _n_ren = _n_ovr = 0
-        for _key, _price in _pool.items():
-            _rec = _log.get(_key)
-            if _rec is None:
-                # 首次出现只建账，不算变价（ken 2026-11-04：真的变了才显示变价）
-                _log[_key] = [_now_min, _price]
-                _n_new += 1
-                continue
-            if _price != _rec[-1]:
-                _last_ts = _rec[0] + sum(_rec[2::2])
-                _ov = _ovr_pool.get(_key)
-                if _ov and _last_ts <= _ov[1]:
-                    # 脚本二覆盖（ken 2026-11-06 定版）：脚本一记下的这个定价点是错的，
-                    # 一手价直接把最后一点的价格改掉，不追加新点、不产生假涨跌
-                    _rec[-1] = _price
-                    _n_ovr += 1
-                else:
-                    _delta = _now_min - _last_ts
-                    _rec += [_delta if _delta > 0 else 0, _price]
-                    _n_chg += 1
+        _n_ren = 0
+        _n_new, _n_chg, _n_ovr = apply_pool_round(_log, _pool, _pool_src, _ovr_pool, _now_min)
         for g in groups:
             for it in g['items']:
-                _rec = _log.get(_pfx.encode(it['url']))
-                if _rec and len(_rec) > 2:
-                    _last_ts = _rec[0] + sum(_rec[2::2])
+                _rec = _log.get(_plat.encode(it['url']))
+                if _rec and len(_rec) > 3:
+                    _last_ts = _rec[0] + sum(_rec[3::3])
                     it['pc'] = _dt.fromtimestamp(_last_ts * 60, _bj).strftime('%Y-%m-%d')
         with open(_log_path, 'w', encoding='utf-8') as f:
-            json.dump(dict(v=2, pfx=_pfx.pfx, items=_log), f, ensure_ascii=False, separators=(',', ':'))
+            json.dump(dict(v=3, items=_log), f, ensure_ascii=False, separators=(',', ':'))
         print(f'price-log: {len(_log)} keys (pool {len(_pool)}, new {_n_new}, renamed {_n_ren}, changed {_n_chg}, overridden {_n_ovr}, {int((_time.time() - _t0) * 1000)}ms)', file=sys.stderr)
-        # 前端弹窗专用小表（ken 2026-11-05）：只含当前 board 条目的价格记录，
-        # 页面点「价格变动」只拉这份（约 230 条、几十 KB），不拉全量 price-log
-        # （8 万多条、约 10MB，手机上打开弹窗要等很久）。全量表只做后台维护。
-        _sub = {}
+        # 看板价格史段（ken 2026-11-10 三件套收拢）：原 board-prices 小表退役，当前 board
+        # 条目的价格记录直接并入 board.json 顶层 prices 段（三元差分数组，来源码在点内），
+        # 页面弹窗从已加载的 board 里读，不再单独拉一份；全量 price-log 只做后台维护。
+        _prices = {}
         for g in groups:
             for it in g['items']:
-                _k = _pfx.encode(it['url'])
+                _k = _plat.encode(it['url'])
                 _rec = _log.get(_k)
                 if _rec:
-                    _sub[_k] = _rec
-        with open(os.path.join(DATA, 'board-prices.json'), 'w', encoding='utf-8') as f:
-            json.dump(dict(v=2, pfx=_pfx.subset(_sub), items=_sub), f, ensure_ascii=False, separators=(',', ':'))
-        print(f'board-prices: {len(_sub)} keys', file=sys.stderr)
+                    _prices[_k] = _rec
+        board['prices'] = _prices
+        print(f'board prices segment: {len(_prices)} keys', file=sys.stderr)
+        # 映射本体落盘：maps.json 只装平台映射这一件事（店铺目录在 shops.json、照旧独立）
+        with open(_maps_path, 'w', encoding='utf-8') as f:
+            json.dump(dict(v=1, platforms=_plat.platforms), f, ensure_ascii=False, indent=1)
     except Exception as e:
         print(f'price-log skipped: {e}', file=sys.stderr)
     os.makedirs(DATA, exist_ok=True)
@@ -988,7 +1140,9 @@ def main():
         index_path = os.path.join(BASE, 'index.html')
         with open(index_path, encoding='utf-8') as f:
             page = f.read()
-        inline_json = json.dumps(board, ensure_ascii=False, separators=(',', ':')).replace('<', '\\u003c').replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
+        # 内嵌段只含 groups 等展示结构：prices 价格史段不进 HTML（页面从 board.json 取）
+        inline_board = {k: v for k, v in board.items() if k != 'prices'}
+        inline_json = json.dumps(inline_board, ensure_ascii=False, separators=(',', ':')).replace('<', '\\u003c').replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
         block = '<!--INLINE-BOARD-START--><script>window.INLINE_BOARD=' + inline_json + ';</script><!--INLINE-BOARD-END-->'
         new_page, n = re.subn(r'<!--INLINE-BOARD-START-->.*?<!--INLINE-BOARD-END-->', lambda m: block, page, flags=re.S)
         if n == 0:

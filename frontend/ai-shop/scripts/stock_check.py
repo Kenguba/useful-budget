@@ -268,7 +268,9 @@ def main():
     page_path = os.path.join(BASE, 'index.html')
     with open(page_path, encoding='utf-8') as f:
         page = f.read()
-    inline_json = json.dumps(base, ensure_ascii=False, separators=(',', ':')) \
+    # 内嵌段只放 groups 等展示结构：prices 段（变价记录）不进 HTML，页面运行时从 board.json 读
+    inline_base = {k: v for k, v in base.items() if k != 'prices'}
+    inline_json = json.dumps(inline_base, ensure_ascii=False, separators=(',', ':')) \
         .replace('<', '\\u003c').replace(' ', '\\u2028').replace(' ', '\\u2029')
     block = '<!--INLINE-BOARD-START--><script>window.INLINE_BOARD=' + inline_json \
         + ';</script><!--INLINE-BOARD-END-->'
