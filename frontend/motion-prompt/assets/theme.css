@@ -1,0 +1,156 @@
+/* Motion Prompt — 12-colour theme layer, shared with the other jpedu.asia sites.
+   Loaded after site.css (and found.css). The theme table below is the shared
+   THEMES12 table used by ai-shop / ui-design: the same index is the same colour
+   on every site, and Cookie A carries the choice between sites.
+   Only the page chrome is themed. The demo canvases keep the palette of their
+   own pack kit — that palette is the content, not the skin. */
+
+* { -webkit-tap-highlight-color: transparent; }
+
+/* ---------- shared theme table (raw values, mode independent) ---------- */
+:root[data-tidx="0"]  { --orb-color-1:#BCE0FD; --orb-color-2:#93C5FD; --th-refresh:#60A5FA; --th-accent:#2563EB; --th-tag-bg:#EBF5FF; --th-tag-text:#1D4ED8; --th-page-bg:#F4F8FC; --th-glow:rgba(147,197,253,.38); --accent-ink:#FFFFFF; }
+:root[data-tidx="1"]  { --orb-color-1:#A7F3D0; --orb-color-2:#6EE7B7; --th-refresh:#34D399; --th-accent:#059669; --th-tag-bg:#ECFDF5; --th-tag-text:#047857; --th-page-bg:#F2FBF7; --th-glow:rgba(110,231,183,.36); --accent-ink:#17171A; }
+:root[data-tidx="2"]  { --orb-color-1:#A5F3FC; --orb-color-2:#818CF8; --th-refresh:#6366F1; --th-accent:#4F46E5; --th-tag-bg:#EEF2FF; --th-tag-text:#4338CA; --th-page-bg:#F4F6FC; --th-glow:rgba(129,140,248,.34); --accent-ink:#FFFFFF; }
+:root[data-tidx="3"]  { --orb-color-1:#D9F99D; --orb-color-2:#86EFAC; --th-refresh:#4ADE80; --th-accent:#16A34A; --th-tag-bg:#F0FDF4; --th-tag-text:#15803D; --th-page-bg:#F6FAF5; --th-glow:rgba(134,239,172,.36); --accent-ink:#17171A; }
+:root[data-tidx="4"]  { --orb-color-1:#99F6E4; --orb-color-2:#7DD3FC; --th-refresh:#2DD4BF; --th-accent:#0D9488; --th-tag-bg:#F0FDFA; --th-tag-text:#0F766E; --th-page-bg:#F2F9FA; --th-glow:rgba(125,211,252,.36); --accent-ink:#17171A; }
+:root[data-tidx="5"]  { --orb-color-1:#CBD5E1; --orb-color-2:#93C5FD; --th-refresh:#64748B; --th-accent:#334155; --th-tag-bg:#F1F5F9; --th-tag-text:#1E293B; --th-page-bg:#F5F7FA; --th-glow:rgba(148,163,184,.32); --accent-ink:#FFFFFF; }
+:root[data-tidx="6"]  { --orb-color-1:#E9D5FF; --orb-color-2:#C4B5FD; --th-refresh:#8B5CF6; --th-accent:#6D28D9; --th-tag-bg:#F3E8FF; --th-tag-text:#6D28D9; --th-page-bg:#F8F5FD; --th-glow:rgba(167,139,250,.38); --accent-ink:#FFFFFF; }
+:root[data-tidx="7"]  { --orb-color-1:#FBCFE8; --orb-color-2:#FDA4AF; --th-refresh:#F472B6; --th-accent:#DB2777; --th-tag-bg:#FDF2F8; --th-tag-text:#BE185D; --th-page-bg:#FDF6F9; --th-glow:rgba(244,114,182,.34); --accent-ink:#FFFFFF; }
+:root[data-tidx="8"]  { --orb-color-1:#FDE68A; --orb-color-2:#FDBA74; --th-refresh:#FB923C; --th-accent:#EA580C; --th-tag-bg:#FFF7ED; --th-tag-text:#C2410C; --th-page-bg:#FCF9F4; --th-glow:rgba(251,146,60,.34); --accent-ink:#17171A; }
+:root[data-tidx="9"]  { --orb-color-1:#F5D0FE; --orb-color-2:#FECDD3; --th-refresh:#C084FC; --th-accent:#9333EA; --th-tag-bg:#FAF5FF; --th-tag-text:#7E22CE; --th-page-bg:#FAF6FC; --th-glow:rgba(192,132,252,.35); --accent-ink:#FFFFFF; }
+:root[data-tidx="10"] { --orb-color-1:#FEF08A; --orb-color-2:#FDE047; --th-refresh:#EAB308; --th-accent:#CA8A04; --th-tag-bg:#FEFCE8; --th-tag-text:#A16207; --th-page-bg:#FAF9F2; --th-glow:rgba(234,179,8,.32); --accent-ink:#17171A; }
+:root[data-tidx="11"] { --orb-color-1:#8FDBB8; --orb-color-2:#9CC8F7; --th-refresh:#4FA8F6; --th-accent:#1A73E8; --th-tag-bg:#E6F4EA; --th-tag-text:#137333; --th-page-bg:#F3F8FA; --th-glow:rgba(143,219,184,.44); --accent-ink:#FFFFFF; }
+
+/* ---------- light mapping ---------- */
+:root[data-tidx]:not([data-theme="dark"]) {
+  --bg: var(--th-page-bg);
+  --surface: #FFFFFF;
+  --muted: #64748B;
+  --line: rgba(15, 23, 42, .08);
+  --line-strong: rgba(15, 23, 42, .18);
+  --accent: var(--th-accent);
+  --accent-text: var(--th-tag-text);
+}
+
+/* ---------- dark mapping: accent lightened toward white for contrast ---------- */
+:root[data-theme="dark"][data-tidx] {
+  --accent: color-mix(in srgb, var(--th-accent) 45%, #FFFFFF);
+  --accent-text: color-mix(in srgb, var(--th-accent) 45%, #FFFFFF);
+  --accent-ink: #17171A;
+}
+
+/* ---------- page wash and hero gradient (light only; dark stays solid) ---------- */
+:root[data-tidx]:not([data-theme="dark"]) body {
+  background-image:
+    radial-gradient(120% 700px at 26% 0%, color-mix(in srgb, var(--orb-color-1) 8%, transparent) 0%, transparent 100%),
+    radial-gradient(120% 700px at 74% 0%, color-mix(in srgb, var(--orb-color-2) 8%, transparent) 0%, transparent 100%);
+  background-repeat: no-repeat;
+}
+:root[data-theme="dark"] body { background-image: none; }
+:root[data-tidx]:not([data-theme="dark"]) .hero,
+:root[data-tidx]:not([data-theme="dark"]) .f-hero {
+  background-image:
+    radial-gradient(115% 200px at 26% calc(100% - 4px), color-mix(in srgb, var(--orb-color-1) 42%, transparent) 0%, transparent 88%),
+    radial-gradient(115% 200px at 74% calc(100% - 4px), color-mix(in srgb, var(--orb-color-2) 42%, transparent) 0%, transparent 88%);
+  background-repeat: no-repeat;
+}
+
+/* ---------- recoloured chrome (skin only) ---------- */
+:root[data-tidx] a:hover,
+:root[data-tidx] .linkish:hover,
+:root[data-tidx] .tray-name:hover { color: var(--accent-text); }
+:root[data-tidx] .step-n { color: var(--accent-text); }
+:root[data-tidx] .chip[aria-pressed="true"] { background: var(--th-tag-bg); border-color: var(--accent); color: var(--th-tag-text); }
+:root[data-tidx] .chips-sub .chip[aria-pressed="true"] { background: var(--th-tag-bg); color: var(--th-tag-text); border-color: var(--accent); box-shadow: none; }
+:root[data-tidx] .btn-main { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+:root[data-tidx] .btn-main:hover { border-color: var(--accent); }
+:root[data-holo="true"] .btn-main {
+  background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%);
+  background-size: 220% 220%;
+  border-color: transparent;
+  color: #0F172A;
+  animation: mp-holo 3.2s ease infinite;
+}
+@keyframes mp-holo { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+/* ---------- type: headings 500, tabular numbers ---------- */
+h1, h2, h3, .sec-h, .f-h1, .pack-h h3, .d-head h2 { font-weight: 500; }
+.logo { font-weight: 600; }
+.install-h { font-weight: 600; }
+.tray-toggle { font-weight: 600; }
+.facts dd, .count, .tile-id, .d-id, .chip small, .tray-n { font-variant-numeric: tabular-nums; }
+
+/* ---------- theme picker (panel style follows the other sites) ---------- */
+.top-nav { position: relative; }
+.theme-panel-backdrop {
+  position: fixed; inset: 0; z-index: 55;
+  background: rgba(15, 23, 42, .06);
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s ease;
+}
+.theme-panel-backdrop.open { opacity: 1; pointer-events: auto; }
+.theme-popover-panel {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 60;
+  width: 292px; max-width: calc(100vw - 32px);
+  background: rgba(255, 255, 255, .94);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, .9);
+  border-radius: 24px; padding: 14px;
+  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, .18), 0 4px 16px rgba(15, 23, 42, .06);
+  opacity: 0; transform: translateY(-10px) scale(.92); transform-origin: top right;
+  pointer-events: none; user-select: none; -webkit-user-select: none;
+  transition: opacity .26s cubic-bezier(.22, 1, .36, 1), transform .3s cubic-bezier(.34, 1.56, .64, 1);
+}
+:root[data-theme="dark"] .theme-popover-panel {
+  background: rgba(21, 31, 50, .94);
+  border-color: rgba(255, 255, 255, .12);
+  box-shadow: 0 22px 44px -8px rgba(0, 0, 0, .55);
+}
+.theme-popover-panel.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+.panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 4px; }
+.panel-title { font-size: 12px; font-weight: 600; color: var(--ink); }
+.panel-hint { font-size: 11px; color: var(--muted); }
+.theme-swatch-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.theme-swatch-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 14px;
+  background: rgba(248, 250, 252, .75);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: transform .18s ease, background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+:root[data-theme="dark"] .theme-swatch-item { background: rgba(30, 41, 59, .75); }
+.theme-swatch-item.active, .theme-swatch-item.sliding-hover {
+  background: var(--th-tag-bg);
+  border-color: var(--accent);
+  transform: scale(1.04);
+  box-shadow: 0 6px 16px -4px var(--th-glow);
+}
+:root[data-theme="dark"] .theme-swatch-item.active,
+:root[data-theme="dark"] .theme-swatch-item.sliding-hover { background: var(--th-tag-bg); }
+.swatch-orb-preview {
+  width: 22px; height: 22px; border-radius: 50%; flex: none;
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, .6), 0 2px 5px rgba(15, 23, 42, .1);
+}
+.swatch-orb-preview.holo-animated {
+  background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%) !important;
+  background-size: 220% 220% !important;
+  animation: mp-holo 3.2s ease infinite;
+}
+.swatch-label { font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+:root[data-theme="dark"] .swatch-label { color: #F8FAFC; }
+:root[data-theme="dark"] .theme-swatch-item.active .swatch-label,
+:root[data-theme="dark"] .theme-swatch-item.sliding-hover .swatch-label { color: #17171A; }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-popover-panel { transition: none; }
+  :root[data-holo="true"] .btn-main, .swatch-orb-preview.holo-animated { animation: none; }
+}
+
+@media (max-width: 720px) {
+  .theme-popover-panel { position: fixed; top: calc(var(--top-h) + 8px); right: 12px; left: 12px; width: auto; }
+  /* the extra picker button crowds the bar: keep every item on one line */
+  .logo, .top-link, .seg { flex: none; }
+  .seg-b { flex: none; white-space: nowrap; padding: 5px 6px; }
+  #themePick, #theme { flex: none; }
+}
