@@ -195,7 +195,7 @@ let hiddenSet=new Set(loadJSON(HKEY,[])); if(!hiddenSet||typeof hiddenSet.has!==
 function saveFavs(){ try{ localStorage.setItem(FKEY,JSON.stringify(favs)); }catch(e){} }
 function saveHidden(){ try{ localStorage.setItem(HKEY,JSON.stringify([...hiddenSet])); }catch(e){} }
 const allSel=()=>!selFav&&selCats.size===0;
-function itemShown(g,it){ if(hiddenSet.has(it.url)) return false; if(it.stock===-1) return false; if(allSel()) return true; if(selCats.has(GCAT(g.id))) return true; if(selFav&&favSet.has(it.url)) return true; return false; }
+function itemShown(g,it){ if(hiddenSet.has(it.url)) return false; if(it.stock===null) return false; if(allSel()) return true; if(selCats.has(GCAT(g.id))) return true; if(selFav&&favSet.has(it.url)) return true; return false; }
 function paintChips(){ document.querySelectorAll('#categoryBar .cat-chip').forEach(x=>{ const c=x.dataset.cat; x.classList.toggle('active', c==='all'?allSel():c==='__fav'?selFav:selCats.has(c)); if(c==='__fav') x.textContent='收藏'+(favs.length?' ('+favs.length+')':''); }); }
 function findItem(url){ if(typeof board==='undefined'||!board||!board.groups) return null; for(const g of board.groups){ const it=g.items.find(x=>x.url===url); if(it) return {g,it}; } return null; }
 function toggleFav(url,wrap){

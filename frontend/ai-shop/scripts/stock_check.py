@@ -103,12 +103,12 @@ def own_last_run():
     return 0
 
 
-NOT_FOUND = -1  # 明确「找不到」（商品不存在 / 详情页 404）：与读不到（None）区分
+NOT_FOUND = 'NF'  # 内部哨兵（绝不落盘）：明确「找不到」（商品不存在 / 详情页 404），与读不到（None）区分；落盘口径——看板直接去除该条目，direct 侧失效标记 stock=null 由 refresh.py 回写（ken 2026-11-10 改版，-1 不再使用）
 
 
 def detail_stock(it):
     """与 refresh.py 同口径：能读的详情页逐条核。
-    返回：库存数（0=售罄）；NOT_FOUND=明确找不到；None=暂时读不到（保留原值）。"""
+    返回：库存数（0=售罄）；NOT_FOUND=明确找不到（内部哨兵）；None=暂时读不到（保留原值）。"""
     url = it['url']
     try:
         if 'wzyp.cn' in url:
@@ -247,8 +247,9 @@ def main():
         kept = []
         for it in g.get('items', []):
             v = verified.get(it.get('url'))
-            if v is not None and v <= 0:
-                # 找不到（-1）或没库存（0）：直接去除（ken 2026-11-02 定）
+            if v is not None and (v is NOT_FOUND
+                                   or (isinstance(v, (int, float)) and v <= 0)):
+                # 找不到（核实失效）或没库存（0）：直接去除（ken 2026-11-02 定）
                 changed[0] += 1
                 removed += 1
                 continue

@@ -476,6 +476,7 @@ def slim(rows):
 # 接口慢（实测约 20 秒/店），单轮拉不完 543 家：结果存 data/direct16688.json 缓存，
 # 每轮从最旧的店开始滚动更新，缓存 5 小时内有效、且不比聚合快照旧太多才覆盖，
 # 接口整体故障时缓存自然过期失效、回退纯聚合，不让单点故障拖垮刷新。
+DEAD_STOCK = 'NF'  # 内部哨兵：现核确认链接失效（商品不存在/详情打不开）；只在内存流转、绝不落盘——落盘口径为 direct 的 stock=null（ken 2026-11-10 改版，-1 不再使用）
 DIRECT_16688_BUDGET = 420            # 单轮直拉总预算（秒，与聚合抓取并行）
 DIRECT_16688_MAX_AGE = 5 * 3600      # 缓存可用年龄上限（秒）
 DIRECT_16688_PRUNE_AGE = 24 * 3600   # 缓存文件保留上限（秒）
@@ -775,6 +776,7 @@ def main():
             print(f'{name} failed: {e}', file=sys.stderr)
     # 16688 直拉覆盖（ken 2026-11-05）：本轮新拉先并入缓存，再用可用缓存覆盖聚合——
     # 同链接以一手价为准（但缓存比聚合快照旧 30 分钟以上的不覆盖），库存直拉无效时保留聚合值
+    _dead_urls = set()  # 已核实失效链接（direct stock=null 标记，下方合并段计算）
     try:
         _crawl_thread.join(timeout=max(1, _t0 + DIRECT_16688_BUDGET - time.time()))
         if 'e' in _direct_box:
@@ -790,6 +792,15 @@ def main():
             json.dump(dict(items=cache), f, ensure_ascii=False)
         usable = {u: o for u, o in cache.items()
                   if now_ms - (o.get('ts') or 0) <= DIRECT_16688_MAX_AGE * 1000}
+        # 已核实失效（ken 2026-11-10 改版）：direct 里 stock=null 且本轮直拉没有刷新到
+        # 的记录 = 死链标记。直拉每轮近全量覆盖目录店铺：在售商品必被本轮刷新（列表
+        # 接口库存无效的也以 stock=None 重新落盘、ts 为本轮时刻），没被刷新到的 null
+        # 记录只可能是已下架商品的标记（现核回写/人工核实），不会误伤在售商品；
+        # 本轮直拉覆盖异常（店铺数过少）时不启用，免得坏网络误杀
+        _dead_urls = ({u for u, o in cache.items()
+                       if 'stock' in o and o['stock'] is None
+                       and (o.get('ts') or 0) < _t0 * 1000}
+                      if ok_shops >= 300 else set())
         applied = 0
         for url, drow0 in usable.items():
             keys = [url] if url in all_offers else []
@@ -802,8 +813,8 @@ def main():
                     old_stock = all_offers[k]['stock']
                 del all_offers[k]
             drow = dict(drow0)
-            if drow.get('stock') is None:
-                drow['stock'] = old_stock
+            if drow.get('stock') is None and url not in _dead_urls:
+                drow['stock'] = old_stock  # 已核实失效（stock=null 标记）不拿聚合库存复活
             all_offers[url] = drow
             applied += 1
         print(f'16688 direct: {len(fresh)} fresh from {ok_shops} shops, {applied} applied from cache', file=sys.stderr)
@@ -866,12 +877,13 @@ def main():
         rows = _rows2
         print(f'overrides: {len(_overrides)} fresh, price-applied {_ov_p}, soldout-dropped {_ov_s}', file=sys.stderr)
 
-    # 死链剔除（ken 2026-11-10）：stock=-1 = 链接不可以用，进看板候选前先滤掉（sources 随之不收）；
+    # 死链剔除（ken 2026-11-10 改版）：已核实失效的链接（direct 标记 stock=null，
+    # 见合并段 _dead_urls）进看板候选前先滤掉（sources 随之不收）；
     # 全量池 _pool_rows 不受影响、死链商品继续跟踪价格
-    _dead_n = sum(1 for o in rows if o.get('stock') == -1)
+    _dead_n = sum(1 for o in rows if o['url'].split('?')[0] in _dead_urls)
     if _dead_n:
-        rows = [o for o in rows if o.get('stock') != -1]
-        print(f'dead-drop: {_dead_n} offers (stock=-1)', file=sys.stderr)
+        rows = [o for o in rows if o['url'].split('?')[0] not in _dead_urls]
+        print(f'dead-drop: {_dead_n} offers (verified dead, stock=null)', file=sys.stderr)
 
     pai = []
     for slug in ('chatgpt-plus', 'gemini-pro-year', 'gemini-ultra',
@@ -911,8 +923,9 @@ def main():
     # 详情页库存为 0 / 已售罄的剔除，读到的实时库存同时回填展示；
     # 读不到的平台（wzyp 被阿里云验证挡、catfk 连不上、/products/ 系 JS 空壳）不在此列，只能靠聚合库库存。
     def detail_stock(it):
-        """返回 (库存, 起购量)：库存 None=读不到保留、0=售罄剔除、-1=链接不可以用
-        （商品不存在/详情打不开，ken 2026-11-10 库存语义）；起购量 >1 才有值。"""
+        """返回 (库存, 起购量)：库存 None=读不到保留、0=售罄剔除、DEAD_STOCK=链接不可以用
+        （商品不存在/详情打不开，ken 2026-11-10 改版：内部哨兵，落盘标记为 stock=null）；
+        起购量 >1 才有值。"""
         url = it['url']
         try:
             if '16688.com.cn' in url:
@@ -926,8 +939,8 @@ def main():
                 with urllib.request.urlopen(req, timeout=20) as r:
                     d = json.loads(r.read().decode('utf-8', 'ignore'))
                 if not d.get('data'):
-                    # 接口明确回「商品不存在」= 死链，记 -1 剔除并回写 direct 状态；其他空响应仍按读不到保留
-                    return (-1, None) if '不存在' in str(d.get('msg') or '') else (None, None)
+                    # 接口明确回「商品不存在」= 死链，记失效剔除并回写 direct 状态；其他空响应仍按读不到保留
+                    return (DEAD_STOCK, None) if '不存在' in str(d.get('msg') or '') else (None, None)
                 data = d.get('data') or {}
                 q = data.get('stock_available_quantity')
                 lq = data.get('limit_quantity')
@@ -940,13 +953,13 @@ def main():
                 km = re.search(r'库存\s*[:：]?\s*(\d+)', txt)
                 return (int(km.group(1)) if km else None), None
         except Exception as e:
-            # 详情页明确 404 = 链接失效，记 -1；其余读不到（网络/风控）仍按未知保留
+            # 详情页明确 404 = 链接失效，记失效；其余读不到（网络/风控）仍按未知保留
             if 'HTTP Error 404' in str(e):
-                return -1, None
+                return DEAD_STOCK, None
             return None, None
         return None, None
 
-    _dead_marks = []  # 本轮现核确认的死链：组装后回写 direct 当前状态 stock=-1
+    _dead_marks = []  # 本轮现核确认的死链：组装后回写 direct 当前状态 stock=null
     def verify_detail_stock(items):
         # 候选池为每组前 45 条：并发核验（单条慢不阻塞整体），剔除售罄后回填截断到 30 条
         from concurrent.futures import ThreadPoolExecutor
@@ -954,7 +967,7 @@ def main():
             stocks = list(ex.map(detail_stock, items))
         kept = []
         for it, (st, mq) in zip(items, stocks):
-            if st == -1:
+            if st == DEAD_STOCK:
                 print(f'dead-drop: {it["url"]}', file=sys.stderr)
                 _dead_marks.append(it['url'])
                 continue
@@ -970,20 +983,21 @@ def main():
     for g in groups:
         g['items'] = verify_detail_stock(g['items'])
 
-    # 死链回写（ken 2026-11-10）：本轮现核确认不存在/打不开的商品，把 direct 当前状态的
-    # stock 写成 -1（标题/价格保留最后已知值、记录不删）；之后直拉缓存覆盖聚合时带 -1 进组装层剔除
+    # 死链回写（ken 2026-11-10 改版）：本轮现核确认不存在/打不开的商品，把 direct 当前状态的
+    # stock 写成 null（失效标记；标题/价格保留最后已知值、记录不删）；之后直拉缓存覆盖聚合时
+    # 由合并段的失效识别（stock=null 且 ts 落后于同店最新抓取）在组装层剔除
     if _dead_marks:
         try:
             _dc = load_direct_cache()
             _marked = 0
             for _u in _dead_marks:
-                if _u in _dc and _dc[_u].get('stock') != -1:
-                    _dc[_u]['stock'] = -1
+                if _u in _dc and _dc[_u].get('stock', 'NA') is not None:
+                    _dc[_u]['stock'] = None
                     _marked += 1
             if _marked:
                 with open(os.path.join(DATA, 'direct16688.json'), 'w', encoding='utf-8') as f:
                     json.dump(dict(items=_dc), f, ensure_ascii=False)
-            print(f'dead-mark: {_marked}/{len(_dead_marks)} direct records set stock=-1', file=sys.stderr)
+            print(f'dead-mark: {_marked}/{len(_dead_marks)} direct records set stock=null', file=sys.stderr)
         except Exception as e:
             print(f'dead-mark failed: {e}', file=sys.stderr)
 

@@ -19,7 +19,7 @@
   var BASE = '/hub/modules/';
   /* 资源版本戳：改任何 hub/模块文件，必须同步 bump 这里的 MV 与根 index.html 里 hub.js/hub.css 的 ?v=，
      否则 CDN 对 .js 有 4 小时缓存，会出现新 ui.html 配旧 module.js 的混搭（2026-11-09 实测 ip 模块中招） */
-  var MV = '20261110b';
+  var MV = '20261110c';
   var MODULES = {
     phone: { proj: 'cloud-phone', dir: '/frontend/cloud-phone/', tier: 'light' },
     '2fa': { proj: '2fa-auth',    dir: '/frontend/2fa-auth/',    tier: 'light' },
