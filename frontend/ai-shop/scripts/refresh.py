@@ -585,8 +585,7 @@ def main():
             rows = load_shop_products(url)
             print(f'{name}: {len(rows)} products', file=sys.stderr)
             for o in rows:
-                _b, _s = split_spec(o['title'])
-                key = (urllib.parse.unquote(o['url'].split('?')[0]), norm_title(_s))
+                key = urllib.parse.unquote(o['url'].split('?')[0])
                 cur = all_offers.get(key)
                 if cur is None or (o['ts'] or 0) > (cur['ts'] or 0):
                     o['url'] = o['url'].split('?')[0]
@@ -610,12 +609,9 @@ def main():
             json.dump(dict(items=cache), f, ensure_ascii=False)
         usable = {u: o for u, o in cache.items()
                   if now_ms - (o.get('ts') or 0) <= DIRECT_16688_MAX_AGE * 1000}
-        by_url = {}
-        for k in list(all_offers):
-            by_url.setdefault(k[0], []).append(k)
         applied = 0
         for url, drow0 in usable.items():
-            keys = by_url.get(url, [])
+            keys = [url] if url in all_offers else []
             agg_ts = max([(all_offers[k].get('ts') or 0) for k in keys], default=0)
             if keys and (drow0.get('ts') or 0) < agg_ts - 1800_000:
                 continue  # 缓存明显比聚合快照旧，不拿旧一手价压新快照
@@ -627,8 +623,7 @@ def main():
             drow = dict(drow0)
             if drow.get('stock') is None:
                 drow['stock'] = old_stock
-            _b, _s = split_spec(drow['title'])
-            all_offers[(url, norm_title(_s))] = drow
+            all_offers[url] = drow
             applied += 1
         print(f'16688 direct: {len(fresh)} fresh from {ok_shops} shops, {applied} applied from cache', file=sys.stderr)
     except Exception as e:
@@ -799,10 +794,10 @@ def main():
     # 接着记。board 的 pc 只做派生：记录出现第 2 个价位点（真变价）才标，pc 为
     # 最近一次变价日期（北京时间）。
     # 比对算法（单遍哈希直查，全程线性）：本轮全量先一次性建成 key->价 的 dict，
-    # 旧表本身也是 dict，每件商品一次 O(1) 查表比对，没有两两比对。精确键 =
-    # 链接（去参数）+ 归一标题；精确未命中时走同链接兜底：同链接只有一条旧记录、
-    # 或多规格里规格后缀能唯一对上时，认定同一商品（卖家改了标题），把旧记录改名
-    # 到新键续记（改名不断历史），对不上才新建账；被认领的旧键本轮不再二次认领。
+    # 旧表本身也是 dict，每件商品一次 O(1) 查表比对，没有两两比对。键 = 链接
+    # （去参数）唯一（ken 2026-11-10 点选 1a，取代 2026-11-04 的链接+归一标题键）：
+    # 标题只是普通字段，卖家改标题不影响认领，同一链接天然续记、不断历史；
+    # 同链接多规格也并成一条（以本轮合并后的行价为准），不再按规格拆账。
     try:
         import time as _time
         from datetime import datetime as _dt, timezone as _tz, timedelta as _td
@@ -817,14 +812,11 @@ def main():
         except Exception:
             _log = {}
         _pool = {}
-        _spec_of = {}
         for _o in _full_rows + _full_pai:
             if _o['price'] is None or _o['price'] <= 0:
                 continue
-            _k = _o['url'].split('?')[0] + '|' + norm_title(_o['title'])
-            _pool[_k] = _o['price']
-            _spec_of[_k] = norm_title(split_spec(_o['title'])[1])
-        # 价格日志同样以脚本二为准：被覆盖且全池只有一条记录的链接，本轮池价换成一手价，
+            _pool[_o['url'].split('?')[0]] = _o['price']
+        # 价格日志同样以脚本二为准：被覆盖的链接（全池每链接只有一条记录），本轮池价换成一手价，
         # 并在下面比对时把脚本一记错的最后一点直接改掉（_ovr_pool 标记）
         # 浏览器按店轮换采集（脚本二的全量池通道）：data/browser-pool.json {url:{price,t}}，
         # 8 天内有效；优先级低于看板现核 overrides（条目级现核更准），高于聚合快照
@@ -840,51 +832,22 @@ def main():
             _bpool = {}
         _ovr_pool = {}
         try:
-            _url_keys = {}
-            for _k in _pool:
-                _url_keys.setdefault(_k.split('|', 1)[0], []).append(_k)
             _merged_ovr = dict(_bpool)
             _merged_ovr.update(_overrides or {})
             for _u, _v in _merged_ovr.items():
-                if _v.get('price') and len(_url_keys.get(_u, [])) == 1:
-                    _k = _url_keys[_u][0]
-                    _pool[_k] = _v['price']
-                    _ovr_pool[_k] = (_v['price'], int(_v['t'] // 60000))
+                if _v.get('price') and _u in _pool:
+                    _pool[_u] = _v['price']
+                    _ovr_pool[_u] = (_v['price'], int(_v['t'] // 60000))
         except Exception:
             _ovr_pool = {}
-        _by_url = {}
-        for _k in _log:
-            _by_url.setdefault(_k.split('|', 1)[0], []).append(_k)
-        _claimed = set()
         _n_new = _n_chg = _n_ren = _n_ovr = 0
-        _default_spec = norm_title('默认规格')
         for _key, _price in _pool.items():
             _rec = _log.get(_key)
-            if _rec is not None:
-                _claimed.add(_key)
-            else:
-                _url, _ntitle = _key.split('|', 1)
-                _cands = [c for c in _by_url.get(_url, []) if c not in _claimed]
-                _hit = None
-                if len(_cands) == 1:
-                    _hit = _cands[0]
-                elif len(_cands) > 1:
-                    _spec = _spec_of.get(_key) or ''
-                    if _spec and _spec != _default_spec and len(_spec) >= 2:
-                        _m = [c for c in _cands if c.split('|', 1)[1].endswith(_spec)]
-                        if len(_m) == 1:
-                            _hit = _m[0]
-                if _hit is not None:
-                    _log[_key] = _log.pop(_hit)
-                    _claimed.add(_hit)
-                    _claimed.add(_key)
-                    _rec = _log[_key]
-                    _n_ren += 1
-                else:
-                    # 首次出现只建账，不算变价（ken 2026-11-04：真的变了才显示变价）
-                    _log[_key] = [_now_min, _price]
-                    _n_new += 1
-                    continue
+            if _rec is None:
+                # 首次出现只建账，不算变价（ken 2026-11-04：真的变了才显示变价）
+                _log[_key] = [_now_min, _price]
+                _n_new += 1
+                continue
             if _price != _rec[-1]:
                 _last_ts = _rec[0] + sum(_rec[2::2])
                 _ov = _ovr_pool.get(_key)
@@ -899,7 +862,7 @@ def main():
                     _n_chg += 1
         for g in groups:
             for it in g['items']:
-                _rec = _log.get(it['url'].split('?')[0] + '|' + norm_title(it['title']))
+                _rec = _log.get(it['url'].split('?')[0])
                 if _rec and len(_rec) > 2:
                     _last_ts = _rec[0] + sum(_rec[2::2])
                     it['pc'] = _dt.fromtimestamp(_last_ts * 60, _bj).strftime('%Y-%m-%d')
@@ -912,7 +875,7 @@ def main():
         _sub = {}
         for g in groups:
             for it in g['items']:
-                _k = it['url'].split('?')[0] + '|' + norm_title(it['title'])
+                _k = it['url'].split('?')[0]
                 _rec = _log.get(_k)
                 if _rec:
                     _sub[_k] = _rec

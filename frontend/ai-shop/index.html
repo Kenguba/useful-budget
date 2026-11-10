@@ -2150,13 +2150,12 @@ window.addEventListener('popstate',()=>{ if(srcIsOpen){ srcHist=false; closeSrc(
 /* 变价历史弹窗：数据来自 data/board-prices.json（只含看板条目的变价记录小表，时间戳错位增量编码，页面端解码还原；全量 price-log.json 只做后台维护，前端不拉） */
 let pcLogCache=null, pcIsOpen=false, pcHist=false, pcOpener=null, pcCloseTimer=null, pcLockedFlag=false;
 const pcOverlay=$('#pcOverlay'), pcSheet=$('#pcSheet');
-function normTitle(t){ const ta=document.createElement('textarea'); ta.innerHTML=String(t==null?'':t); return ta.value.toLowerCase().replace(/[\s【】\[\]（）()·|｜\/\\,，。、:：;；!！?？\-—_~`'"“”‘’*#@]+/g,''); }
-function pcKeyOf(it){ return String(it.url||'').split('?')[0]+'|'+normTitle(it.title); }
+function pcKeyOf(it){ return String(it.url||'').split('?')[0]; }
 function decodePc(rec){ const pts=[]; let ts=rec[0]; pts.push({ts:ts,price:rec[1]}); for(let i=2;i+1<rec.length;i+=2){ ts+=rec[i]; pts.push({ts:ts,price:rec[i+1]}); } return pts; }
 function fmtPcT(ts,wy){ const d=new Date(ts*60000); const p=n=>String(n).padStart(2,'0'); return (wy?d.getFullYear()+'-':'')+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
 /* 小表按看板版本在设备本地存一份：同一版看板再打开直接用存货、不再重复请求；
    看板每小时更新，版本号（board.updated_at）变了才重新拉 */
-const PC_LS_KEY='aishop.board-prices.v1';
+const PC_LS_KEY='aishop.board-prices.v2';
 function pcStored(any){ try{ const s=JSON.parse(localStorage.getItem(PC_LS_KEY)||'null'); if(s&&s.items&&(any||(board&&s.u===board.updated_at))) return s.items; }catch(e){} return null; }
 function loadPcLog(){
   if(pcLogCache) return Promise.resolve(pcLogCache);
