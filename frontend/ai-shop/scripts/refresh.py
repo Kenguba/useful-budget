@@ -4,7 +4,8 @@
 方法（按商家遍历，不再只看聚合分类榜单页）：
 - AI价网全量商家商品库 aiprice.club/api/shop-products.json（2052 家店、每店全部分类与全部商品）
 - cardnav 同格式全量库 cardnav.xyz/api/shop-products.json（966 家店）
-两库按商品链接去重合并；再用 PriceAI 全站商品页（sitemap 全量，按价升序前 12 条）
+两库按商品链接去重合并；16688 / aicdks / catfk 三平台再走数据层直拉、一手价覆盖
+聚合（缓存滚动更新，口径见各直拉段注释）；再用 PriceAI 全站商品页（sitemap 全量，按价升序前 12 条）
 与 aibijia 首页报价补最低价段（2026-11-10 加深：PriceAI 旧版只抓 5 页）。
 随后按固定 7 分组（ken 2026-10-31 拍板）用标题规则分类，取有货最低 30 条，
 同标题铺货合并只取最低。链接均为商品详情页。
@@ -638,6 +639,184 @@ def fetch_16688_direct(deadline):
     ex.shutdown(wait=False, cancel_futures=True)
     return out, ok
 
+# ---------------- aicdks / catfk 直拉（ken 2026-11-10 批准并入，与 16688 同级） ----------------
+# aicdks 无店铺体系、单一市集：GET /api/products 分页全量（约 16 页），每轮整表拉；
+# stock=null 是接口未给库存（未知），不是失效，照收、库存回退聚合值。
+# catfk 与 16688 同模型（店铺 1 对多）：按目录逐家调 goodsList 拉全目录；
+# 坑（本地实测）：goodsList 必须省略 category_id（传 -1 返回空）、要带 Referer/Origin、
+# UA 用普通值（Chrome UA 会被 WAF 断连）；命中频繁/验证码类响应整腿停手、靠缓存兜底。
+# 两腿结果各存一份缓存（directaicdks.json / directcatfk.json），覆盖聚合走与 16688
+# 相同的口径（见 apply_direct_rows）；分类类目是看板分组的分类轴、仍以聚合分类为准。
+DIRECT_EXTRA_BUDGET = 420            # 两腿合计单轮预算（秒，与聚合抓取并行）
+
+def _load_direct_file(name):
+    try:
+        with open(os.path.join(DATA, name), encoding='utf-8') as f:
+            return json.load(f).get('items') or {}
+    except Exception:
+        return {}
+
+def _merge_direct_cache(name, fresh, now_ms):
+    """新拉结果并入缓存、剪掉超保留期的旧行、落盘，返回合并后的缓存。"""
+    cache = _load_direct_file(name)
+    for url, o in fresh.items():
+        cache[url] = o
+    cache = {u: o for u, o in cache.items()
+             if now_ms - (o.get('ts') or 0) <= DIRECT_16688_PRUNE_AGE * 1000}
+    with open(os.path.join(DATA, name), 'w', encoding='utf-8') as f:
+        json.dump(dict(items=cache), f, ensure_ascii=False)
+    return cache
+
+def apply_direct_rows(all_offers, cache, now_ms):
+    """直拉缓存覆盖聚合（与 16688 同口径）：缓存超 5 小时不用；缓存比聚合快照旧
+    30 分钟以上不覆盖；直拉库存无效（None）时保留聚合库存；类目保留聚合分类
+    （分组分类轴），直拉只定价/标题/库存/起购。返回覆盖条数。"""
+    applied = 0
+    for url, drow0 in cache.items():
+        if now_ms - (drow0.get('ts') or 0) > DIRECT_16688_MAX_AGE * 1000:
+            continue
+        keys = [url] if url in all_offers else []
+        agg_ts = max([(all_offers[k].get('ts') or 0) for k in keys], default=0)
+        if keys and (drow0.get('ts') or 0) < agg_ts - 1800_000:
+            continue
+        old_stock = None
+        old_cat = None
+        for k in keys:
+            if all_offers[k].get('stock') is not None:
+                old_stock = all_offers[k]['stock']
+            old_cat = all_offers[k].get('category')
+            del all_offers[k]
+        drow = dict(drow0)
+        if drow.get('stock') is None:
+            drow['stock'] = old_stock
+        if old_cat:
+            drow['category'] = old_cat
+        all_offers[url] = drow
+        applied += 1
+    return applied
+
+def fetch_aicdks_direct():
+    """aicdks 单一市集全量：按接口 total 分页拉完，返回 {url: row}。"""
+    items = {}
+    page, pages = 1, None
+    while page <= 100:
+        req = urllib.request.Request(
+            f'https://aicdks.com/api/products?page={page}&pageSize=200', headers=HEADERS)
+        with urllib.request.urlopen(req, timeout=30) as r:
+            d = json.loads(r.read().decode('utf-8'))
+        if pages is None:
+            total = d.get('total') or 0
+            pages = (total + 199) // 200 or 1
+        lst = d.get('items') or []
+        if not lst:
+            break
+        for it in lst:
+            code = str(it.get('code') or '')
+            price = it.get('displayPrice')
+            if not code or price is None or float(price) <= 0 or not it.get('title'):
+                continue
+            stock = it.get('stock')
+            url = f'https://aicdks.com/product/{code}'
+            items[url] = dict(title=it['title'].strip(), price=float(price),
+                              stock=int(stock) if isinstance(stock, (int, float)) and stock >= 0 else None,
+                              shop='aicdks', platform='aicdks', url=url,
+                              category=it.get('categorySlug') or '',
+                              ts=int(time.time() * 1000), minq=None)
+        if page >= pages:
+            break
+        page += 1
+    return items
+
+def _catfk_post(path, payload, token):
+    req = urllib.request.Request(
+        'https://catfk.com' + path,
+        data=json.dumps(payload).encode('utf-8'),
+        headers={'Content-Type': 'application/json',
+                 'Referer': f'https://catfk.com/shop/{token}',
+                 'Origin': 'https://catfk.com',
+                 'User-Agent': 'curl/8.5.0',
+                 'Accept': 'application/json'},
+        method='POST')
+    with urllib.request.urlopen(req, timeout=30) as r:
+        d = json.loads(r.read().decode('utf-8', 'replace'))
+    msg = str(d.get('msg') or '')
+    if d.get('code') != 1 and any(k in msg for k in ('频繁', '限制', '验证码', '稍后')):
+        raise RuntimeError('RISK:' + msg[:80])
+    return d
+
+def fetch_catfk_shop(code, name):
+    info = _catfk_post('/shopApi/Shop/info', {'token': code}, code)
+    if info.get('code') != 1:
+        return []  # 关店/不存在：本轮无货，缓存旧行靠年龄淘汰、不硬标失效
+    items, seen = [], set()
+    for gt in ('card', 'article', 'resource'):
+        cur = 1
+        while cur <= 60:
+            r = _catfk_post('/shopApi/Shop/goodsList',
+                            {'token': code, 'keywords': '', 'goods_type': gt,
+                             'current': cur, 'pageSize': 200}, code)
+            if r.get('code') != 1:
+                break
+            lst = ((r.get('data') or {}).get('list')) or []
+            for it in lst:
+                gk = it.get('goods_key')
+                price = it.get('price')
+                if not gk or gk in seen or price is None or float(price) <= 0 or not it.get('name'):
+                    continue
+                seen.add(gk)
+                ext = it.get('extend') or {}
+                stock = ext.get('stock_count')
+                lq = ext.get('limit_count')
+                items.append(dict(title=it['name'].strip(), price=float(price),
+                                  stock=int(stock) if isinstance(stock, (int, float)) and stock >= 0 else None,
+                                  shop=name, platform='catfk',
+                                  url=f'https://catfk.com/item/{gk}',
+                                  category=(it.get('category') or {}).get('name') or '',
+                                  ts=int(time.time() * 1000),
+                                  minq=lq if isinstance(lq, int) and lq > 1 else None))
+            if not lst or len(lst) < 200:
+                break
+            cur += 1
+    return items
+
+def fetch_catfk_direct(deadline):
+    """从缓存最旧（或从未拉过）的店开始拉，deadline 到点即停；命中风控整腿停手。
+    返回 (本轮新拉 {url: row}, 完成店数)。"""
+    csv_path = os.path.join(DATA, 'shops.csv')
+    shops = []
+    if os.path.exists(csv_path):
+        for r in csv.DictReader(io.open(csv_path, encoding='utf-8')):
+            if r.get('platform') == '云猫寄售' and r.get('shop_code') and '失效' not in (r.get('note') or ''):
+                shops.append((r['shop_code'], r['shop_name']))
+    if not shops:
+        return {}, 0
+    cache = _load_direct_file('directcatfk.json')
+    shop_age = {}
+    for o in cache.values():
+        if o.get('shop'):
+            shop_age[o['shop']] = max(shop_age.get(o['shop'], 0), o.get('ts') or 0)
+    shops.sort(key=lambda sn: shop_age.get(sn[1], 0))
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    out, ok = {}, 0
+    ex = ThreadPoolExecutor(max_workers=10)
+    futs = [ex.submit(fetch_catfk_shop, code, name) for code, name in shops]
+    try:
+        for fut in as_completed(futs, timeout=max(1, deadline - time.time())):
+            try:
+                items = fut.result()
+            except Exception as e:
+                if str(e).startswith('RISK:'):
+                    print(f'catfk direct stopped: {e}', file=sys.stderr)
+                    break
+                continue
+            ok += 1
+            for o in items:
+                out[o['url']] = o
+    except Exception:
+        pass
+    ex.shutdown(wait=False, cancel_futures=True)
+    return out, ok
+
 # ---------------- 平台映射：短码 <-> 链接前缀（ken 2026-11-10 定版，双向一等） ----------------
 # 映射本体只存一份：data/maps.json 的 platforms{短码: {name, goods[], shop}}，本表只是种子，
 # 运行期以 maps 为准。表里只收多卖家聚合平台（现 4 家：wzyp=链动小铺、16688、catfk=云猫寄售、
@@ -831,6 +1010,23 @@ def main():
             _direct_box['e'] = e
     _crawl_thread = threading.Thread(target=_crawl, daemon=True)
     _crawl_thread.start()
+    # aicdks / catfk 直拉同样放后台线程并行（预算见 DIRECT_EXTRA_BUDGET）
+    _extra_box = {}
+    def _crawl_extra():
+        r = {}
+        try:
+            r['aicdks'] = (fetch_aicdks_direct(), 1)
+        except Exception as e:
+            print(f'aicdks crawl error: {e}', file=sys.stderr)
+            r['aicdks'] = ({}, 0)
+        try:
+            r['catfk'] = fetch_catfk_direct(_t0 + DIRECT_EXTRA_BUDGET)
+        except Exception as e:
+            print(f'catfk crawl error: {e}', file=sys.stderr)
+            r['catfk'] = ({}, 0)
+        _extra_box['r'] = r
+    _extra_thread = threading.Thread(target=_crawl_extra, daemon=True)
+    _extra_thread.start()
     all_offers = {}
     for name, url in (('aiprice', 'https://aiprice.club/api/shop-products.json'),
                       ('cardnav', 'https://cardnav.xyz/api/shop-products.json')):
@@ -891,6 +1087,18 @@ def main():
         print(f'16688 direct: {len(fresh)} fresh from {ok_shops} shops, {applied} applied from cache', file=sys.stderr)
     except Exception as e:
         print(f'16688 direct failed: {e}', file=sys.stderr)
+    # aicdks / catfk 直拉覆盖（ken 2026-11-10 批准）：与 16688 相同的缓存+覆盖口径
+    try:
+        _extra_thread.join(timeout=max(1, _t0 + DIRECT_EXTRA_BUDGET - time.time()))
+        _extra = _extra_box.get('r', {})
+        _now_ms2 = int(time.time() * 1000)
+        for _plat_name, _fname in (('aicdks', 'directaicdks.json'), ('catfk', 'directcatfk.json')):
+            _fresh, _ok = _extra.get(_plat_name, ({}, 0))
+            _cache2 = _merge_direct_cache(_fname, _fresh, _now_ms2)
+            _applied2 = apply_direct_rows(all_offers, _cache2, _now_ms2)
+            print(f'{_plat_name} direct: {len(_fresh)} fresh ({_ok} shops), {_applied2} applied from cache', file=sys.stderr)
+    except Exception as e:
+        print(f'aicdks/catfk direct failed: {e}', file=sys.stderr)
     # 定点剔除（ken 2026-11-02 裁定）：异次元店铺 ¥1.85 为引流价（单源、库存未显示），从看板剔除
     # G47831683（ken 2026-11-05 裁定）：¥0.02 只卖渠道介绍、真卡人工发货 12–35 元，同为引流品剔除
     BLOCKED_URLS = {'https://fk.rupap.cn/item/10',
@@ -993,7 +1201,7 @@ def main():
     from datetime import datetime, timezone, timedelta
     bj_now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M')
     board = dict(updated_at=bj_now,
-                 source='AI价网 + cardnav + PriceAI + aibijia + 16688 直拉 按商家遍历合并',
+                 source='AI价网 + cardnav + PriceAI + aibijia + 16688/aicdks/catfk 直拉 按商家遍历合并',
                  groups=groups)
     # 详情页库存核验（ken 2026-11-02）：能读到详情页实时库存的平台逐条核验，
     # 详情页库存为 0 / 已售罄的剔除，读到的实时库存同时回填展示；
