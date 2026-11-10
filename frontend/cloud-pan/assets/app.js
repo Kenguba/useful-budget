@@ -349,7 +349,7 @@
       : "";
     var sunPaths = '<circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4.5"></line><line x1="12" y1="19.5" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line><line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="4.5" y2="12"></line><line x1="19.5" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line><line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line>';
     var globeSvg = '<svg class="globe-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>';
-    var auraHtml = '<div class="aura-backdrop" aria-hidden="true"><div class="aura-orb orb-left"></div><div class="aura-orb orb-center"></div><div class="aura-orb orb-right"></div></div>';
+    var auraHtml = '';
     var header =
       '<header class="topbar">' + auraHtml + '<div class="topbar-in">' +
       '<div class="top-row">' +
@@ -745,7 +745,7 @@
       '<div class="hot-kw-mobile-wrap" id="hotKwMobileWrap"><div class="hot-kw-mobile-row" id="hotKwRow1">' + (dataCache.hot ? "" : sklChips(3)) + '</div><div class="hot-kw-mobile-row" id="hotKwRow2">' + (dataCache.hot ? "" : sklChips(3)) + '</div></div>' +
       '<div class="kw-measure-sandbox" id="kwMeasureSandbox" aria-hidden="true"></div></div>';
     var html =
-      '<section class="hero"><div class="aura-backdrop" aria-hidden="true"><div class="aura-orb orb-left"></div><div class="aura-orb orb-center"></div><div class="aura-orb orb-right"></div></div>' +
+      '<section class="hero">' +
       '<div class="hero-badge">⚡ 夸克网盘搜索 · 迅雷会员特权直达 · 磁力聚合</div>' +
       '<h1>好内容，<span class="b">一搜就有</span></h1>' +
       searchbarHtml("") +
@@ -991,7 +991,7 @@
     var main = document.querySelector("#main .wrap") || document.getElementById("main");
     var q = new URLSearchParams(location.search).get("q") || "";
     var prov0 = new URLSearchParams(location.search).get("provider") || "";
-    var html = '<section class="hero" style="padding-top:36px"><div class="aura-backdrop" aria-hidden="true"><div class="aura-orb orb-left"></div><div class="aura-orb orb-center"></div><div class="aura-orb orb-right"></div></div>' + searchbarHtml(q) + "</section>";
+    var html = '<section class="hero" style="padding-top:36px">' + searchbarHtml(q) + "</section>";
     if (!q) {
       html += '<div class="section"><div class="card"><div class="card-head"><span class="ic ic-orange">🔥</span>' +
         "<div><h2>热门搜索</h2></div></div>" +
@@ -1396,7 +1396,7 @@
     var q = new URLSearchParams(location.search).get("q") || "";
     var rows = "";
     for (var i = 0; i < 5; i++) rows += '<div class="res-row" aria-hidden="true"><div class="res-main"><div class="skl" style="height:16px;width:52%"></div><div class="skl" style="height:12px;width:82%;margin-top:8px"></div><div class="skl" style="height:11px;width:30%;margin-top:8px"></div></div></div>';
-    main.innerHTML = '<section class="hero" style="padding-top:36px"><div class="aura-backdrop" aria-hidden="true"><div class="aura-orb orb-left"></div><div class="aura-orb orb-center"></div><div class="aura-orb orb-right"></div></div>' + searchbarHtml(q) + "</section>" +
+    main.innerHTML = '<section class="hero" style="padding-top:36px">' + searchbarHtml(q) + "</section>" +
       '<div class="section">' + rows + "</div>";
     bindSearchbar();
   }
