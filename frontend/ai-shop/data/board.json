@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-11 04:38",
+ "updated_at": "2026-11-11 04:50",
  "source": "AI价网 + cardnav + PriceAI + aibijia + 16688/aicdks/catfk 直拉 按商家遍历合并",
  "groups": [
   {
@@ -988,6 +988,13 @@
       },
       {
        "price": 15.4,
+       "shop": "小头",
+       "platform": "链动小铺",
+       "stock": 172,
+       "url": "https://wzyp.cn/item/9vrqo8"
+      },
+      {
+       "price": 15.4,
        "shop": "chiyu",
        "platform": "链动小铺",
        "stock": 65,
@@ -1120,6 +1127,13 @@
        "url": "https://wzyp.cn/item/mw9n1k"
       },
       {
+       "price": 16.38,
+       "shop": "自行车 Ai 店铺",
+       "platform": "链动小铺",
+       "stock": 172,
+       "url": "https://wzyp.cn/item/9rczvi"
+      },
+      {
        "price": 16.5,
        "shop": "蛙的小店",
        "platform": "链动小铺",
@@ -1176,13 +1190,6 @@
        "url": "https://wzyp.cn/item/6qmzgy"
       },
       {
-       "price": 17.55,
-       "shop": "自行车 Ai 店铺",
-       "platform": "链动小铺",
-       "stock": 3,
-       "url": "https://wzyp.cn/item/9rczvi"
-      },
-      {
        "price": 18.0,
        "shop": "ikun",
        "platform": "链动小铺",
@@ -1209,6 +1216,13 @@
        "platform": "链动小铺",
        "stock": 65,
        "url": "https://wzyp.cn/item/hobzig"
+      },
+      {
+       "price": 18.0,
+       "shop": "AI批发的杂货店",
+       "platform": "链动小铺",
+       "stock": 172,
+       "url": "https://wzyp.cn/item/jpw2qr"
       },
       {
        "price": 18.0,
@@ -1260,25 +1274,11 @@
        "url": "https://wzyp.cn/item/1t1xvv"
       },
       {
-       "price": 19.0,
-       "shop": "AI批发的杂货店",
-       "platform": "链动小铺",
-       "stock": 36,
-       "url": "https://wzyp.cn/item/jpw2qr"
-      },
-      {
        "price": 19.5,
        "shop": "极速Ai",
        "platform": "链动小铺",
        "stock": 2,
        "url": "https://wzyp.cn/item/n86isg"
-      },
-      {
-       "price": 19.8,
-       "shop": "小头",
-       "platform": "链动小铺",
-       "stock": 75,
-       "url": "https://wzyp.cn/item/9vrqo8"
       },
       {
        "price": 20.0,
@@ -1331,6 +1331,13 @@
       },
       {
        "price": 20.12,
+       "shop": "YUJI",
+       "platform": "链动小铺",
+       "stock": 172,
+       "url": "https://wzyp.cn/item/hh5fsk"
+      },
+      {
+       "price": 20.12,
        "shop": "黏人ai小狗",
        "platform": "链动小铺",
        "stock": 172,
@@ -1342,13 +1349,6 @@
        "platform": "链动小铺",
        "stock": 65,
        "url": "https://wzyp.cn/item/mlugfr"
-      },
-      {
-       "price": 21.55,
-       "shop": "YUJI",
-       "platform": "链动小铺",
-       "stock": 36,
-       "url": "https://wzyp.cn/item/hh5fsk"
       },
       {
        "price": 22.0,
@@ -1447,6 +1447,13 @@
        "url": "https://wzyp.cn/item/bcwmz2"
       },
       {
+       "price": 15.51,
+       "shop": "小头",
+       "platform": "链动小铺",
+       "stock": 28,
+       "url": "https://wzyp.cn/item/6mn50l"
+      },
+      {
        "price": 15.62,
        "shop": "大头1号【源头货源】",
        "platform": "链动小铺",
@@ -1461,6 +1468,13 @@
        "url": "https://wzyp.cn/item/wghvuk"
       },
       {
+       "price": 16.5,
+       "shop": "自行车 Ai 店铺",
+       "platform": "链动小铺",
+       "stock": 28,
+       "url": "https://wzyp.cn/item/x7onex"
+      },
+      {
        "price": 16.92,
        "shop": "AI账号乐园",
        "platform": "链动小铺",
@@ -1473,13 +1487,6 @@
        "platform": "链动小铺",
        "stock": 28,
        "url": "https://wzyp.cn/item/wggvnl"
-      },
-      {
-       "price": 17.55,
-       "shop": "自行车 Ai 店铺",
-       "platform": "链动小铺",
-       "stock": 2,
-       "url": "https://wzyp.cn/item/x7onex"
       },
       {
        "price": 17.7,
@@ -1522,13 +1529,6 @@
        "platform": "链动小铺",
        "stock": 28,
        "url": "https://wzyp.cn/item/l3hks4"
-      },
-      {
-       "price": 21.45,
-       "shop": "小头",
-       "platform": "链动小铺",
-       "stock": 18,
-       "url": "https://wzyp.cn/item/6mn50l"
       },
       {
        "price": 24.0,
@@ -1832,116 +1832,21 @@
     },
     {
      "price": 15.0,
-     "shop": "AI猪的店铺",
-     "platform": "",
-     "stock": null,
-     "title": "Microsoft Office 365 plus 成品账号-12 个月",
-     "url": "https://aizzx.me/item/489",
-     "kind": "",
-     "same_source": 2,
-     "sources": [
-      {
-       "price": 15.0,
-       "shop": "AI猪的店铺",
-       "platform": "",
-       "stock": null,
-       "url": "https://aizzx.me/item/489"
-      },
-      {
-       "price": 76.0,
-       "shop": "AI 年糕猫",
-       "platform": "",
-       "stock": null,
-       "url": "https://niangaomao.vip/item/489"
-      }
-     ]
-    },
-    {
-     "price": 15.0,
-     "shop": "圆梦AI",
-     "platform": "16688",
-     "stock": 4,
-     "title": "Plus | 成品号  iCloud||一号一住宅IP| UPI | 未绑定手机 | 邮箱+G密码+2FA | 质保首登",
-     "url": "https://www.16688.com.cn/goods/G96934996",
-     "kind": "",
-     "same_source": 9,
-     "sources": [
-      {
-       "price": 15.0,
-       "shop": "圆梦AI",
-       "platform": "16688",
-       "stock": 4,
-       "url": "https://www.16688.com.cn/goods/G96934996"
-      },
-      {
-       "price": 27.0,
-       "shop": "open-store",
-       "platform": "16688",
-       "stock": 4,
-       "url": "https://www.16688.com.cn/goods/G99545992"
-      },
-      {
-       "price": 27.1,
-       "shop": "凌小创ai",
-       "platform": "16688",
-       "stock": 4,
-       "url": "https://www.16688.com.cn/goods/G46680355"
-      },
-      {
-       "price": 27.5,
-       "shop": "北橘号铺-对接:DC260818VOY2Y7AD",
-       "platform": "16688",
-       "stock": 4,
-       "url": "https://www.16688.com.cn/goods/G95699575"
-      },
-      {
-       "price": 27.5,
-       "shop": "珠世AI",
-       "platform": "16688",
-       "stock": 4,
-       "url": "https://www.16688.com.cn/goods/G40868068"
-      },
-      {
-       "price": 27.5,
-       "shop": "一梦AI货源 招代理 对接马yimeng",
-       "platform": "16688",
-       "stock": 4,
-       "url": "https://www.16688.com.cn/goods/G63833842"
-      },
-      {
-       "price": 28.9,
-       "shop": "AI批量部",
-       "platform": "16688",
-       "stock": 4,
-       "url": "https://www.16688.com.cn/goods/G97564590"
-      },
-      {
-       "price": 31.25,
-       "shop": "YUJI",
-       "platform": "16688",
-       "stock": 4,
-       "url": "https://www.16688.com.cn/goods/G13827198"
-      },
-      {
-       "price": 31.9,
-       "shop": "源头ai",
-       "platform": "16688",
-       "stock": 4,
-       "url": "https://www.16688.com.cn/goods/G17064740"
-      }
-     ],
-     "pc": "2026-11-11"
-    },
-    {
-     "price": 15.45,
-     "shop": "爪爪AI专卖(对接实力号商)",
+     "shop": "蚂蚁AI",
      "platform": "链动小铺",
      "stock": 91,
      "title": "【源头产出】Plus独享成品账号纯手工|质保首登|未接马|账密+2fa 招代理",
-     "url": "https://wzyp.cn/item/c0r3to",
+     "url": "https://wzyp.cn/item/xfywt0",
      "kind": "",
      "same_source": 40,
      "sources": [
+      {
+       "price": 15.0,
+       "shop": "蚂蚁AI",
+       "platform": "链动小铺",
+       "stock": 91,
+       "url": "https://wzyp.cn/item/xfywt0"
+      },
       {
        "price": 15.45,
        "shop": "爪爪AI专卖(对接实力号商)",
@@ -1958,7 +1863,7 @@
       },
       {
        "price": 15.75,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 152,
        "url": "https://wzyp.cn/item/ptx4mx"
@@ -2053,6 +1958,13 @@
        "platform": "链动小铺",
        "stock": 91,
        "url": "https://wzyp.cn/item/tztyqg"
+      },
+      {
+       "price": 17.03,
+       "shop": "优质AI科技",
+       "platform": "链动小铺",
+       "stock": 91,
+       "url": "https://wzyp.cn/item/68dkw1"
       },
       {
        "price": 17.03,
@@ -2163,7 +2075,7 @@
        "price": 20.0,
        "shop": "智铺 AI",
        "platform": "链动小铺",
-       "stock": 112,
+       "stock": 91,
        "url": "https://wzyp.cn/item/hgy0hb"
       },
       {
@@ -2202,39 +2114,145 @@
        "url": "https://wzyp.cn/item/8sb4qa"
       },
       {
-       "price": 25.0,
-       "shop": "蚂蚁AI",
-       "platform": "链动小铺",
-       "stock": 32,
-       "url": "https://wzyp.cn/item/xfywt0"
-      },
-      {
        "price": 28.0,
        "shop": "怪兽源头小铺【对接:guai】",
        "platform": "链动小铺",
        "stock": 93,
        "url": "https://wzyp.cn/item/fsm7q7"
-      },
-      {
-       "price": 28.38,
-       "shop": "优质AI科技",
-       "platform": "链动小铺",
-       "stock": 29,
-       "url": "https://wzyp.cn/item/68dkw1"
       }
      ],
-     "pc": "2026-11-10"
+     "pc": "2026-11-11"
+    },
+    {
+     "price": 15.0,
+     "shop": "AI猪的店铺",
+     "platform": "",
+     "stock": null,
+     "title": "Microsoft Office 365 plus 成品账号-12 个月",
+     "url": "https://aizzx.me/item/489",
+     "kind": "",
+     "same_source": 2,
+     "sources": [
+      {
+       "price": 15.0,
+       "shop": "AI猪的店铺",
+       "platform": "",
+       "stock": null,
+       "url": "https://aizzx.me/item/489"
+      },
+      {
+       "price": 76.0,
+       "shop": "AI 年糕猫",
+       "platform": "",
+       "stock": null,
+       "url": "https://niangaomao.vip/item/489"
+      }
+     ]
+    },
+    {
+     "price": 15.0,
+     "shop": "圆梦AI",
+     "platform": "16688",
+     "stock": 4,
+     "title": "Plus | 成品号  iCloud||一号一住宅IP| UPI | 未绑定手机 | 邮箱+G密码+2FA | 质保首登",
+     "url": "https://www.16688.com.cn/goods/G96934996",
+     "kind": "",
+     "same_source": 9,
+     "sources": [
+      {
+       "price": 15.0,
+       "shop": "圆梦AI",
+       "platform": "16688",
+       "stock": 4,
+       "url": "https://www.16688.com.cn/goods/G96934996"
+      },
+      {
+       "price": 27.0,
+       "shop": "open-store",
+       "platform": "16688",
+       "stock": 4,
+       "url": "https://www.16688.com.cn/goods/G99545992"
+      },
+      {
+       "price": 27.1,
+       "shop": "凌小创ai",
+       "platform": "16688",
+       "stock": 4,
+       "url": "https://www.16688.com.cn/goods/G46680355"
+      },
+      {
+       "price": 27.5,
+       "shop": "北橘号铺-对接:DC260818VOY2Y7AD",
+       "platform": "16688",
+       "stock": 4,
+       "url": "https://www.16688.com.cn/goods/G95699575"
+      },
+      {
+       "price": 27.5,
+       "shop": "珠世AI",
+       "platform": "16688",
+       "stock": 4,
+       "url": "https://www.16688.com.cn/goods/G40868068"
+      },
+      {
+       "price": 27.5,
+       "shop": "一梦AI货源 招代理 对接马yimeng",
+       "platform": "16688",
+       "stock": 4,
+       "url": "https://www.16688.com.cn/goods/G63833842"
+      },
+      {
+       "price": 28.9,
+       "shop": "AI批量部",
+       "platform": "16688",
+       "stock": 4,
+       "url": "https://www.16688.com.cn/goods/G97564590"
+      },
+      {
+       "price": 31.25,
+       "shop": "YUJI",
+       "platform": "16688",
+       "stock": 4,
+       "url": "https://www.16688.com.cn/goods/G13827198"
+      },
+      {
+       "price": 31.9,
+       "shop": "源头ai",
+       "platform": "16688",
+       "stock": 4,
+       "url": "https://www.16688.com.cn/goods/G17064740"
+      }
+     ],
+     "pc": "2026-11-11"
+    },
+    {
+     "price": 15.4,
+     "shop": "优质AI科技",
+     "platform": "链动小铺",
+     "stock": 172,
+     "title": "plus成品号，未接码（质保购物半小时内首登）",
+     "url": "https://wzyp.cn/item/jyz0qm",
+     "kind": "",
+     "same_source": 1,
+     "pc": "2026-11-11"
     },
     {
      "price": 15.5,
-     "shop": "怪兽源头小铺【对接:guai】",
+     "shop": "蚂蚁AI",
      "platform": "链动小铺",
-     "stock": 43,
+     "stock": 39,
      "title": "Plus独享账号|iCloud邮箱|未接马|质保首登|账密+2fa 招代理",
-     "url": "https://wzyp.cn/item/an7gtq",
+     "url": "https://wzyp.cn/item/tvr3dg",
      "kind": "",
      "same_source": 18,
      "sources": [
+      {
+       "price": 15.5,
+       "shop": "蚂蚁AI",
+       "platform": "链动小铺",
+       "stock": 39,
+       "url": "https://wzyp.cn/item/tvr3dg"
+      },
       {
        "price": 15.5,
        "shop": "怪兽源头小铺【对接:guai】",
@@ -2258,7 +2276,7 @@
       },
       {
        "price": 16.28,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 30,
        "url": "https://wzyp.cn/item/uywqdq"
@@ -2316,7 +2334,7 @@
        "price": 17.05,
        "shop": "爱搜 AISO",
        "platform": "链动小铺",
-       "stock": 30,
+       "stock": 39,
        "url": "https://wzyp.cn/item/t3zoog"
       },
       {
@@ -2346,13 +2364,6 @@
        "platform": "链动小铺",
        "stock": 43,
        "url": "https://wzyp.cn/item/s1u2t6"
-      },
-      {
-       "price": 26.0,
-       "shop": "蚂蚁AI",
-       "platform": "链动小铺",
-       "stock": 26,
-       "url": "https://wzyp.cn/item/tvr3dg"
       },
       {
        "price": 34.9,
@@ -2476,6 +2487,54 @@
      "pc": "2026-11-10"
     },
     {
+     "price": 15.62,
+     "shop": "秋小鱼AI虚拟产品",
+     "platform": "链动小铺",
+     "stock": 10,
+     "title": "拉闸了快抢【源头产出】Plus独享成品账号纯手工 有可能抽到重置卡！今日准备1000个成品号 |质保首登|未接马 |",
+     "url": "https://wzyp.cn/item/h11o1f",
+     "kind": "",
+     "same_source": 5,
+     "sources": [
+      {
+       "price": 15.62,
+       "shop": "秋小鱼AI虚拟产品",
+       "platform": "链动小铺",
+       "stock": 10,
+       "url": "https://wzyp.cn/item/h11o1f"
+      },
+      {
+       "price": 16.37,
+       "shop": "梦泽AI",
+       "platform": "链动小铺",
+       "stock": 10,
+       "url": "https://wzyp.cn/item/gdpoaw"
+      },
+      {
+       "price": 17.86,
+       "shop": "自行车 Ai 店铺",
+       "platform": "链动小铺",
+       "stock": 10,
+       "url": "https://wzyp.cn/item/7rouw1"
+      },
+      {
+       "price": 17.86,
+       "shop": "007的小铺",
+       "platform": "链动小铺",
+       "stock": 10,
+       "url": "https://wzyp.cn/item/rhn57v"
+      },
+      {
+       "price": 17.88,
+       "shop": "码愿AI",
+       "platform": "链动小铺",
+       "stock": 10,
+       "url": "https://wzyp.cn/item/f8ic3z"
+      }
+     ],
+     "pc": "2026-11-11"
+    },
+    {
      "price": 16.0,
      "shop": "还没想好",
      "platform": "链动小铺",
@@ -2594,51 +2653,6 @@
       }
      ],
      "pc": "2026-11-10"
-    },
-    {
-     "price": 16.37,
-     "shop": "梦泽AI",
-     "platform": "链动小铺",
-     "stock": 10,
-     "title": "拉闸了快抢【源头产出】Plus独享成品账号纯手工 有可能抽到重置卡！今日准备1000个成品号 |质保首登|未接马 |",
-     "url": "https://wzyp.cn/item/gdpoaw",
-     "kind": "",
-     "same_source": 3,
-     "sources": [
-      {
-       "price": 16.37,
-       "shop": "梦泽AI",
-       "platform": "链动小铺",
-       "stock": 10,
-       "url": "https://wzyp.cn/item/gdpoaw"
-      },
-      {
-       "price": 17.86,
-       "shop": "007的小铺",
-       "platform": "链动小铺",
-       "stock": 10,
-       "url": "https://wzyp.cn/item/rhn57v"
-      },
-      {
-       "price": 17.88,
-       "shop": "码愿AI",
-       "platform": "链动小铺",
-       "stock": 10,
-       "url": "https://wzyp.cn/item/f8ic3z"
-      }
-     ],
-     "pc": "2026-11-10"
-    },
-    {
-     "price": 16.5,
-     "shop": "优质AI科技",
-     "platform": "链动小铺",
-     "stock": 8,
-     "title": "plus成品号，未接码（质保购物半小时内首登）",
-     "url": "https://wzyp.cn/item/jyz0qm",
-     "kind": "",
-     "same_source": 1,
-     "pc": "2026-11-10"
     }
    ]
   },
@@ -2709,6 +2723,13 @@
        "url": "https://wzyp.cn/item/t0qlmm"
       },
       {
+       "price": 13.68,
+       "shop": "秋小鱼AI虚拟产品",
+       "platform": "链动小铺",
+       "stock": 566,
+       "url": "https://wzyp.cn/item/dg1hh1"
+      },
+      {
        "price": 13.87,
        "shop": "FranklyBuilds的AI小店",
        "platform": "链动小铺",
@@ -2759,6 +2780,13 @@
       },
       {
        "price": 14.3,
+       "shop": "优质AI科技",
+       "platform": "链动小铺",
+       "stock": 566,
+       "url": "https://wzyp.cn/item/17iek1"
+      },
+      {
+       "price": 14.3,
        "shop": "chiyu",
        "platform": "链动小铺",
        "stock": 570,
@@ -2780,17 +2808,17 @@
       },
       {
        "price": 14.3,
+       "shop": "爱搜 AISO",
+       "platform": "链动小铺",
+       "stock": 566,
+       "url": "https://wzyp.cn/item/wmzbht"
+      },
+      {
+       "price": 14.3,
        "shop": "乔治的小铺",
        "platform": "链动小铺",
        "stock": 568,
        "url": "https://wzyp.cn/item/ll3dk8"
-      },
-      {
-       "price": 14.3,
-       "shop": "爱搜 AISO",
-       "platform": "链动小铺",
-       "stock": 202,
-       "url": "https://wzyp.cn/item/wmzbht"
       },
       {
        "price": 14.3,
@@ -2824,7 +2852,7 @@
        "price": 14.56,
        "shop": "自行车 Ai 店铺",
        "platform": "链动小铺",
-       "stock": 236,
+       "stock": 566,
        "url": "https://wzyp.cn/item/tkp306"
       },
       {
@@ -2857,6 +2885,13 @@
       },
       {
        "price": 14.86,
+       "shop": "AI批发的杂货店",
+       "platform": "链动小铺",
+       "stock": 567,
+       "url": "https://wzyp.cn/item/sr0q2c"
+      },
+      {
+       "price": 14.86,
        "shop": "大猪蹄子",
        "platform": "链动小铺",
        "stock": 569,
@@ -2868,13 +2903,6 @@
        "platform": "链动小铺",
        "stock": 568,
        "url": "https://wzyp.cn/item/pzusna"
-      },
-      {
-       "price": 14.86,
-       "shop": "AI批发的杂货店",
-       "platform": "链动小铺",
-       "stock": 202,
-       "url": "https://wzyp.cn/item/sr0q2c"
       },
       {
        "price": 14.86,
@@ -2912,6 +2940,13 @@
        "url": "https://wzyp.cn/item/v4o4e5"
       },
       {
+       "price": 14.95,
+       "shop": "AI小店",
+       "platform": "链动小铺",
+       "stock": 566,
+       "url": "https://wzyp.cn/item/84qh0k"
+      },
+      {
        "price": 15.0,
        "shop": "海海星星AI",
        "platform": "链动小铺",
@@ -2924,6 +2959,13 @@
        "platform": "链动小铺",
        "stock": 568,
        "url": "https://wzyp.cn/item/hwgiqv"
+      },
+      {
+       "price": 15.0,
+       "shop": "各种ai，会员，账号",
+       "platform": "链动小铺",
+       "stock": 566,
+       "url": "https://wzyp.cn/item/dp93rn"
       },
       {
        "price": 15.0,
@@ -2950,7 +2992,7 @@
        "price": 15.47,
        "shop": "小🐏阳AI精选店",
        "platform": "链动小铺",
-       "stock": 567,
+       "stock": 566,
        "url": "https://wzyp.cn/item/yz5zox"
       },
       {
@@ -3094,13 +3136,6 @@
        "url": "https://wzyp.cn/item/weoxy8"
       },
       {
-       "price": 16.84,
-       "shop": "秋小鱼AI虚拟产品",
-       "platform": "链动小铺",
-       "stock": 4,
-       "url": "https://wzyp.cn/item/dg1hh1"
-      },
-      {
        "price": 16.9,
        "shop": "codexai.club",
        "platform": "链动小铺",
@@ -3157,18 +3192,18 @@
        "url": "https://wzyp.cn/item/4wzvrp"
       },
       {
+       "price": 17.34,
+       "shop": "AI万能工具箱",
+       "platform": "链动小铺",
+       "stock": 566,
+       "url": "https://wzyp.cn/item/139zfb"
+      },
+      {
        "price": 17.5,
        "shop": "AI源头",
        "platform": "链动小铺",
        "stock": 4,
        "url": "https://wzyp.cn/item/ug1ct8"
-      },
-      {
-       "price": 17.6,
-       "shop": "优质AI科技",
-       "platform": "链动小铺",
-       "stock": 4,
-       "url": "https://wzyp.cn/item/17iek1"
       },
       {
        "price": 17.6,
@@ -3195,7 +3230,7 @@
        "price": 17.88,
        "shop": "YUJI",
        "platform": "链动小铺",
-       "stock": 203,
+       "stock": 566,
        "url": "https://wzyp.cn/item/zgd81a"
       },
       {
@@ -3204,27 +3239,6 @@
        "platform": "链动小铺",
        "stock": 567,
        "url": "https://wzyp.cn/item/ot8t0e"
-      },
-      {
-       "price": 17.9,
-       "shop": "YisamaAPI",
-       "platform": "链动小铺",
-       "stock": 239,
-       "url": "https://wzyp.cn/item/rw4yn3"
-      },
-      {
-       "price": 18.0,
-       "shop": "san qian",
-       "platform": "链动小铺",
-       "stock": 567,
-       "url": "https://wzyp.cn/item/zcj9s3"
-      },
-      {
-       "price": 18.0,
-       "shop": "比特拈花",
-       "platform": "链动小铺",
-       "stock": 567,
-       "url": "https://wzyp.cn/item/x29uof"
       }
      ],
      "pc": "2026-11-06"
@@ -3352,11 +3366,25 @@
        "url": "https://wzyp.cn/item/2dghix"
       },
       {
+       "price": 14.98,
+       "shop": "优质AI科技",
+       "platform": "链动小铺",
+       "stock": 100,
+       "url": "https://wzyp.cn/item/80fesr"
+      },
+      {
        "price": 15.17,
        "shop": "aicdks",
        "platform": "aicdks",
        "stock": 100,
        "url": "https://aicdks.com/product/104923"
+      },
+      {
+       "price": 15.4,
+       "shop": "小头",
+       "platform": "链动小铺",
+       "stock": 100,
+       "url": "https://wzyp.cn/item/vpgifp"
       },
       {
        "price": 15.4,
@@ -3406,6 +3434,13 @@
        "platform": "链动小铺",
        "stock": 100,
        "url": "https://wzyp.cn/item/oj7odv"
+      },
+      {
+       "price": 15.68,
+       "shop": "自行车 Ai 店铺",
+       "platform": "链动小铺",
+       "stock": 100,
+       "url": "https://wzyp.cn/item/m0nv4h"
       },
       {
        "price": 16.0,
@@ -3520,13 +3555,6 @@
        "url": "https://wzyp.cn/item/ul1uax"
       },
       {
-       "price": 17.12,
-       "shop": "优质AI科技",
-       "platform": "链动小铺",
-       "stock": 64,
-       "url": "https://wzyp.cn/item/80fesr"
-      },
-      {
        "price": 17.5,
        "shop": "真的不赚钱，就为了交个朋友",
        "platform": "链动小铺",
@@ -3535,24 +3563,10 @@
       },
       {
        "price": 17.6,
-       "shop": "小头",
-       "platform": "链动小铺",
-       "stock": 34,
-       "url": "https://wzyp.cn/item/vpgifp"
-      },
-      {
-       "price": 17.6,
        "shop": "蛙的小店",
        "platform": "链动小铺",
        "stock": 82,
        "url": "https://wzyp.cn/item/mennfn"
-      },
-      {
-       "price": 17.92,
-       "shop": "自行车 Ai 店铺",
-       "platform": "链动小铺",
-       "stock": 89,
-       "url": "https://wzyp.cn/item/m0nv4h"
       },
       {
        "price": 18.0,
@@ -3623,6 +3637,13 @@
        "platform": "链动小铺",
        "stock": 72,
        "url": "https://wzyp.cn/item/p38rzj"
+      },
+      {
+       "price": 19.6,
+       "shop": "YUJI",
+       "platform": "链动小铺",
+       "stock": 100,
+       "url": "https://wzyp.cn/item/z0e6jo"
       },
       {
        "price": 19.99,
@@ -3702,13 +3723,6 @@
        "url": "https://wzyp.cn/item/k7fdcp"
       },
       {
-       "price": 22.4,
-       "shop": "YUJI",
-       "platform": "链动小铺",
-       "stock": 100,
-       "url": "https://wzyp.cn/item/z0e6jo"
-      },
-      {
        "price": 22.68,
        "shop": "GGBoy",
        "platform": "链动小铺",
@@ -3730,10 +3744,10 @@
        "url": "https://wzyp.cn/item/nn3frh"
       },
       {
-       "price": 28.8,
+       "price": 25.2,
        "shop": "【AI源头直供】AICA",
        "platform": "链动小铺",
-       "stock": 89,
+       "stock": 100,
        "url": "https://wzyp.cn/item/umjvkv"
       },
       {
@@ -4345,7 +4359,7 @@
       },
       {
        "price": 15.75,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 83,
        "url": "https://wzyp.cn/item/p8kvas"
@@ -4386,6 +4400,13 @@
        "url": "https://wzyp.cn/item/rmxke4"
       },
       {
+       "price": 18.75,
+       "shop": "AI OPC",
+       "platform": "链动小铺",
+       "stock": 82,
+       "url": "https://wzyp.cn/item/1k5vhj"
+      },
+      {
        "price": 20.0,
        "shop": "托金AI工具小铺",
        "platform": "链动小铺",
@@ -4405,13 +4426,6 @@
        "platform": "链动小铺",
        "stock": 43,
        "url": "https://wzyp.cn/item/gt3ft9"
-      },
-      {
-       "price": 25.0,
-       "shop": "AI OPC",
-       "platform": "链动小铺",
-       "stock": 25,
-       "url": "https://wzyp.cn/item/1k5vhj"
       }
      ],
      "pc": "2026-11-11"
@@ -4472,8 +4486,15 @@
        "price": 16.05,
        "shop": "优质AI科技",
        "platform": "链动小铺",
-       "stock": 43,
+       "stock": 27,
        "url": "https://wzyp.cn/item/v97w96"
+      },
+      {
+       "price": 16.5,
+       "shop": "小头",
+       "platform": "链动小铺",
+       "stock": 27,
+       "url": "https://wzyp.cn/item/bimufi"
       },
       {
        "price": 16.5,
@@ -4514,7 +4535,7 @@
        "price": 16.5,
        "shop": "爱搜 AISO",
        "platform": "链动小铺",
-       "stock": 33,
+       "stock": 27,
        "url": "https://wzyp.cn/item/nhrlv7"
       },
       {
@@ -4542,7 +4563,7 @@
        "price": 16.8,
        "shop": "自行车 Ai 店铺",
        "platform": "链动小铺",
-       "stock": 35,
+       "stock": 27,
        "url": "https://wzyp.cn/item/au0dds"
       },
       {
@@ -4558,13 +4579,6 @@
        "platform": "链动小铺",
        "stock": 32,
        "url": "https://wzyp.cn/item/o3cy49"
-      },
-      {
-       "price": 17.05,
-       "shop": "小头",
-       "platform": "链动小铺",
-       "stock": 42,
-       "url": "https://wzyp.cn/item/bimufi"
       },
       {
        "price": 17.4,
@@ -4633,7 +4647,7 @@
        "price": 20.0,
        "shop": "GanAI小铺",
        "platform": "链动小铺",
-       "stock": 33,
+       "stock": 27,
        "url": "https://wzyp.cn/item/8uiuqb"
       },
       {
@@ -4874,11 +4888,25 @@
        "url": "https://wzyp.cn/item/jgsyql"
       },
       {
+       "price": 16.05,
+       "shop": "秋小鱼AI虚拟产品",
+       "platform": "链动小铺",
+       "stock": 38,
+       "url": "https://wzyp.cn/item/ximehk"
+      },
+      {
        "price": 16.29,
        "shop": "花生商店",
        "platform": "链动小铺",
        "stock": 38,
        "url": "https://wzyp.cn/item/jkp2ry"
+      },
+      {
+       "price": 16.82,
+       "shop": "优质AI科技",
+       "platform": "链动小铺",
+       "stock": 38,
+       "url": "https://wzyp.cn/item/nozdii"
       },
       {
        "price": 16.82,
@@ -4907,6 +4935,13 @@
        "platform": "链动小铺",
        "stock": 38,
        "url": "https://wzyp.cn/item/f7sxc5"
+      },
+      {
+       "price": 16.82,
+       "shop": "爱搜 AISO",
+       "platform": "链动小铺",
+       "stock": 38,
+       "url": "https://wzyp.cn/item/kvhs6c"
       },
       {
        "price": 16.82,
@@ -4958,25 +4993,11 @@
        "url": "https://wzyp.cn/item/eu2avs"
       },
       {
-       "price": 17.63,
-       "shop": "秋小鱼AI虚拟产品",
-       "platform": "链动小铺",
-       "stock": 38,
-       "url": "https://wzyp.cn/item/ximehk"
-      },
-      {
        "price": 17.79,
        "shop": "Super AI 苏帕AI的小铺 全网底价 对接码：yahello",
        "platform": "链动小铺",
        "stock": 38,
        "url": "https://wzyp.cn/item/oxxdcy"
-      },
-      {
-       "price": 17.92,
-       "shop": "爱搜 AISO",
-       "platform": "链动小铺",
-       "stock": 38,
-       "url": "https://wzyp.cn/item/kvhs6c"
       },
       {
        "price": 18.29,
@@ -4998,6 +5019,13 @@
        "platform": "链动小铺",
        "stock": 37,
        "url": "https://wzyp.cn/item/gn78zr"
+      },
+      {
+       "price": 18.35,
+       "shop": "自行车 Ai 店铺",
+       "platform": "链动小铺",
+       "stock": 38,
+       "url": "https://wzyp.cn/item/tljuua"
       },
       {
        "price": 18.35,
@@ -5033,13 +5061,6 @@
        "platform": "链动小铺",
        "stock": 38,
        "url": "https://wzyp.cn/item/t0405d"
-      },
-      {
-       "price": 18.47,
-       "shop": "优质AI科技",
-       "platform": "链动小铺",
-       "stock": 38,
-       "url": "https://wzyp.cn/item/nozdii"
       },
       {
        "price": 18.47,
@@ -5091,18 +5112,18 @@
        "url": "https://wzyp.cn/item/aajxyh"
       },
       {
+       "price": 19.88,
+       "shop": "琪琪科技",
+       "platform": "链动小铺",
+       "stock": 38,
+       "url": "https://wzyp.cn/item/ukap8h"
+      },
+      {
        "price": 19.99,
        "shop": "lulu-Ai",
        "platform": "链动小铺",
        "stock": 38,
        "url": "https://wzyp.cn/item/zlbqqc"
-      },
-      {
-       "price": 20.15,
-       "shop": "自行车 Ai 店铺",
-       "platform": "链动小铺",
-       "stock": 38,
-       "url": "https://wzyp.cn/item/tljuua"
       },
       {
        "price": 20.29,
@@ -5159,13 +5180,6 @@
        "platform": "链动小铺",
        "stock": 38,
        "url": "https://wzyp.cn/item/dol19d"
-      },
-      {
-       "price": 21.83,
-       "shop": "琪琪科技",
-       "platform": "链动小铺",
-       "stock": 38,
-       "url": "https://wzyp.cn/item/ukap8h"
       },
       {
        "price": 22.79,
@@ -5260,7 +5274,7 @@
       },
       {
        "price": 17.64,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 70,
        "url": "https://wzyp.cn/item/jdi6bx"
@@ -5403,7 +5417,7 @@
       },
       {
        "price": 20.58,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 20,
        "url": "https://wzyp.cn/item/fas6k6"
@@ -5536,14 +5550,21 @@
     },
     {
      "price": 16.5,
-     "shop": "怪兽源头小铺【对接:guai】",
+     "shop": "蚂蚁AI",
      "platform": "链动小铺",
-     "stock": 85,
+     "stock": 84,
      "title": "【源头供货】Plus独享成品账号纯手工|质保首登|已接马· 美国实马|账密+2fa 招代理",
-     "url": "https://wzyp.cn/item/bziwsf",
+     "url": "https://wzyp.cn/item/aijb4h",
      "kind": "",
      "same_source": 38,
      "sources": [
+      {
+       "price": 16.5,
+       "shop": "蚂蚁AI",
+       "platform": "链动小铺",
+       "stock": 84,
+       "url": "https://wzyp.cn/item/aijb4h"
+      },
       {
        "price": 16.5,
        "shop": "怪兽源头小铺【对接:guai】",
@@ -5567,7 +5588,7 @@
       },
       {
        "price": 17.33,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 79,
        "url": "https://wzyp.cn/item/rwx37e"
@@ -5630,6 +5651,13 @@
       },
       {
        "price": 18.15,
+       "shop": "优质AI科技",
+       "platform": "链动小铺",
+       "stock": 84,
+       "url": "https://wzyp.cn/item/okz6l0"
+      },
+      {
+       "price": 18.15,
        "shop": "码农",
        "platform": "链动小铺",
        "stock": 85,
@@ -5646,7 +5674,7 @@
        "price": 18.15,
        "shop": "爱搜 AISO",
        "platform": "链动小铺",
-       "stock": 79,
+       "stock": 84,
        "url": "https://wzyp.cn/item/1puce2"
       },
       {
@@ -5685,6 +5713,13 @@
        "url": "https://wzyp.cn/item/jd9n4d"
       },
       {
+       "price": 18.98,
+       "shop": "AI小店",
+       "platform": "链动小铺",
+       "stock": 84,
+       "url": "https://wzyp.cn/item/9wd85p"
+      },
+      {
        "price": 19.5,
        "shop": "老冯Ai小店",
        "platform": "链动小铺",
@@ -5697,13 +5732,6 @@
        "platform": "链动小铺",
        "stock": 84,
        "url": "https://wzyp.cn/item/qs29ho"
-      },
-      {
-       "price": 19.55,
-       "shop": "AI小店",
-       "platform": "链动小铺",
-       "stock": 33,
-       "url": "https://wzyp.cn/item/9wd85p"
       },
       {
        "price": 19.64,
@@ -5734,6 +5762,13 @@
        "url": "https://wzyp.cn/item/oqmq0m"
       },
       {
+       "price": 20.5,
+       "shop": "EsfineAi店",
+       "platform": "链动小铺",
+       "stock": 84,
+       "url": "https://wzyp.cn/item/kv05b7"
+      },
+      {
        "price": 21.5,
        "shop": "若鸿AI专卖店",
        "platform": "链动小铺",
@@ -5746,6 +5781,13 @@
        "platform": "链动小铺",
        "stock": 85,
        "url": "https://wzyp.cn/item/6te9id"
+      },
+      {
+       "price": 21.5,
+       "shop": "智铺 AI",
+       "platform": "链动小铺",
+       "stock": 84,
+       "url": "https://wzyp.cn/item/p8x17c"
       },
       {
        "price": 21.5,
@@ -5762,13 +5804,6 @@
        "url": "https://wzyp.cn/item/qloihp"
       },
       {
-       "price": 22.0,
-       "shop": "智铺 AI",
-       "platform": "链动小铺",
-       "stock": 23,
-       "url": "https://wzyp.cn/item/p8x17c"
-      },
-      {
        "price": 23.1,
        "shop": "G_plus_批发",
        "platform": "链动小铺",
@@ -5776,32 +5811,11 @@
        "url": "https://wzyp.cn/item/c9j5p7"
       },
       {
-       "price": 27.0,
-       "shop": "蚂蚁AI",
-       "platform": "链动小铺",
-       "stock": 37,
-       "url": "https://wzyp.cn/item/aijb4h"
-      },
-      {
        "price": 28.05,
        "shop": "小柴AI",
        "platform": "链动小铺",
        "stock": 84,
        "url": "https://wzyp.cn/item/t041wi"
-      },
-      {
-       "price": 29.7,
-       "shop": "优质AI科技",
-       "platform": "链动小铺",
-       "stock": 35,
-       "url": "https://wzyp.cn/item/okz6l0"
-      },
-      {
-       "price": 31.0,
-       "shop": "EsfineAi店",
-       "platform": "链动小铺",
-       "stock": 37,
-       "url": "https://wzyp.cn/item/kv05b7"
       },
       {
        "price": 33.59,
@@ -5887,6 +5901,13 @@
        "url": "https://wzyp.cn/item/gfi1nz"
       },
       {
+       "price": 31.25,
+       "shop": "AI OPC",
+       "platform": "链动小铺",
+       "stock": 5,
+       "url": "https://wzyp.cn/item/akutfj"
+      },
+      {
        "price": 32.5,
        "shop": "爪爪AI专卖(对接实力号商)",
        "platform": "链动小铺",
@@ -5899,13 +5920,6 @@
        "platform": "链动小铺",
        "stock": 7,
        "url": "https://wzyp.cn/item/ce6iwd"
-      },
-      {
-       "price": 37.5,
-       "shop": "AI OPC",
-       "platform": "链动小铺",
-       "stock": 3,
-       "url": "https://wzyp.cn/item/akutfj"
       }
      ],
      "pc": "2026-11-11"
@@ -6059,7 +6073,7 @@
        "price": 36.08,
        "shop": "小头",
        "platform": "链动小铺",
-       "stock": 3,
+       "stock": 4,
        "url": "https://wzyp.cn/item/y3mex5"
       },
       {
@@ -6164,7 +6178,7 @@
      "title": "周限额精品plus-未接🐎-账密2FA-质保30分钟首登",
      "url": "https://wzyp.cn/item/xjmmn2",
      "kind": "未注明",
-     "same_source": 35,
+     "same_source": 36,
      "sources": [
       {
        "price": 35.0,
@@ -6266,6 +6280,13 @@
       },
       {
        "price": 44.55,
+       "shop": "自行车 Ai 店铺",
+       "platform": "链动小铺",
+       "stock": 1,
+       "url": "https://wzyp.cn/item/jwhcw6"
+      },
+      {
+       "price": 44.55,
        "shop": "移步新卡网8.7折：https://wzyp.cn/shop/AI1xiaomao",
        "platform": "链动小铺",
        "stock": 1,
@@ -6343,10 +6364,10 @@
       },
       {
        "price": 44.55,
-       "shop": "自行车 Ai 店铺",
+       "shop": "秋小鱼AI虚拟产品",
        "platform": "链动小铺",
        "stock": 1,
-       "url": "https://wzyp.cn/item/jwhcw6"
+       "url": "https://wzyp.cn/item/6d5hlu"
       },
       {
        "price": 44.55,
@@ -6470,7 +6491,7 @@
      "title": "【1110新开-周限-长效邮箱】【Plus-已接马-IC邮箱】精品--可网页可codex--家宽注册",
      "url": "https://aicdks.com/product/112105",
      "kind": "已接马",
-     "same_source": 7,
+     "same_source": 8,
      "sources": [
       {
        "price": 35.8,
@@ -6492,6 +6513,13 @@
        "platform": "链动小铺",
        "stock": 6,
        "url": "https://wzyp.cn/item/guu6ji"
+      },
+      {
+       "price": 39.38,
+       "shop": "小头",
+       "platform": "链动小铺",
+       "stock": 6,
+       "url": "https://wzyp.cn/item/vhkcfw"
       },
       {
        "price": 39.38,
@@ -6882,7 +6910,7 @@
      "title": "无5H限制是周限制额度|iCloud邮箱|PLUS成品号已接|11.10新开",
      "url": "https://wzyp.cn/item/icno6g",
      "kind": "未注明",
-     "same_source": 25,
+     "same_source": 24,
      "sources": [
       {
        "price": 73.0,
@@ -7023,13 +7051,6 @@
        "platform": "链动小铺",
        "stock": 2,
        "url": "https://wzyp.cn/item/xmchn6"
-      },
-      {
-       "price": 82.5,
-       "shop": "小头",
-       "platform": "链动小铺",
-       "stock": 2,
-       "url": "https://wzyp.cn/item/xjw1r6"
       },
       {
        "price": 84.96,
@@ -7333,10 +7354,10 @@
       },
       {
        "price": 5.04,
-       "shop": "ai小铺",
+       "shop": "小北AI",
        "platform": "16688",
        "stock": 38,
-       "url": "https://16688.com.cn/goods/G65537277"
+       "url": "https://16688.com.cn/goods/G87047899"
       },
       {
        "price": 5.2,
@@ -7394,7 +7415,7 @@
      "price": 4.99,
      "shop": "琪琪科技",
      "platform": "链动小铺",
-     "stock": 9,
+     "stock": 36,
      "title": "【送油管会员】Gemini pro 会员代充6个月 都支持gemini4 opus5.5-CDK自助可囤货",
      "url": "https://wzyp.cn/item/w054l1",
      "kind": "代充",
@@ -7467,7 +7488,7 @@
        "price": 5.5,
        "shop": "琪琪科技",
        "platform": "链动小铺",
-       "stock": 607,
+       "stock": 601,
        "url": "https://wzyp.cn/item/hz35qb"
       },
       {
@@ -7551,7 +7572,7 @@
        "price": 6.0,
        "shop": "各种ai，会员，账号",
        "platform": "链动小铺",
-       "stock": 603,
+       "stock": 601,
        "url": "https://wzyp.cn/item/344omh"
       },
       {
@@ -7824,7 +7845,7 @@
        "price": 11.0,
        "shop": "动次打次",
        "platform": "链动小铺",
-       "stock": 603,
+       "stock": 601,
        "url": "https://wzyp.cn/item/23iita"
       },
       {
@@ -7873,7 +7894,7 @@
        "price": 15.0,
        "shop": "伊莉雅·曜辰",
        "platform": "链动小铺",
-       "stock": 603,
+       "stock": 601,
        "url": "https://wzyp.cn/item/9dwxir"
       },
       {
@@ -7901,7 +7922,7 @@
        "price": 35.0,
        "shop": "稳问AI  --AI 大玩家（AI真源头，招代理）",
        "platform": "链动小铺",
-       "stock": 603,
+       "stock": 601,
        "url": "https://wzyp.cn/item/fvkgje"
       },
       {
@@ -8122,7 +8143,7 @@
        "price": 8.8,
        "shop": "小头",
        "platform": "链动小铺",
-       "stock": 33,
+       "stock": 27,
        "url": "https://wzyp.cn/item/izzvve"
       },
       {
@@ -8276,7 +8297,7 @@
        "price": 11.0,
        "shop": "自行车 Ai 店铺",
        "platform": "链动小铺",
-       "stock": 29,
+       "stock": 27,
        "url": "https://wzyp.cn/item/x16gw7"
       },
       {
@@ -8416,7 +8437,7 @@
        "price": 14.7,
        "shop": "YUJI",
        "platform": "链动小铺",
-       "stock": 28,
+       "stock": 27,
        "url": "https://wzyp.cn/item/jwziqo"
       },
       {
@@ -8772,14 +8793,21 @@
     },
     {
      "price": 9.9,
-     "shop": "源AI小店",
+     "shop": "爱搜 AISO",
      "platform": "链动小铺",
-     "stock": 113,
+     "stock": 53,
      "title": "容易人机优质gmail｜随机 gemini pro｜可以4 和opus5.5包反重力质保1小时首登 带RT 账密直登",
-     "url": "https://wzyp.cn/item/rna3wx",
+     "url": "https://wzyp.cn/item/jqbz0t",
      "kind": "人机号",
-     "same_source": 13,
+     "same_source": 15,
      "sources": [
+      {
+       "price": 9.9,
+       "shop": "爱搜 AISO",
+       "platform": "链动小铺",
+       "stock": 53,
+       "url": "https://wzyp.cn/item/jqbz0t"
+      },
       {
        "price": 9.9,
        "shop": "源AI小店",
@@ -8863,6 +8891,13 @@
        "platform": "链动小铺",
        "stock": 113,
        "url": "https://wzyp.cn/item/mfvnfi"
+      },
+      {
+       "price": 39.0,
+       "shop": "稳问AI  --AI 大玩家（AI真源头，招代理）",
+       "platform": "链动小铺",
+       "stock": 53,
+       "url": "https://wzyp.cn/item/im4p9z"
       },
       {
        "price": 144.0,
@@ -9046,7 +9081,7 @@
        "price": 13.2,
        "shop": "小头",
        "platform": "链动小铺",
-       "stock": 10,
+       "stock": 43,
        "url": "https://wzyp.cn/item/per3xa"
       },
       {
@@ -9156,17 +9191,17 @@
       },
       {
        "price": 15.0,
+       "shop": "自行车 Ai 店铺",
+       "platform": "链动小铺",
+       "stock": 43,
+       "url": "https://wzyp.cn/item/m3135r"
+      },
+      {
+       "price": 15.0,
        "shop": "牛牛ai专卖店",
        "platform": "链动小铺",
        "stock": 43,
        "url": "https://wzyp.cn/item/xvmrd3"
-      },
-      {
-       "price": 15.0,
-       "shop": "自行车 Ai 店铺",
-       "platform": "链动小铺",
-       "stock": 6,
-       "url": "https://wzyp.cn/item/m3135r"
       },
       {
        "price": 15.0,
@@ -9305,7 +9340,7 @@
        "price": 18.9,
        "shop": "YUJI",
        "platform": "链动小铺",
-       "stock": 4,
+       "stock": 43,
        "url": "https://wzyp.cn/item/8ie7vq"
       },
       {
@@ -9475,7 +9510,7 @@
      "price": 12.0,
      "shop": "琪琪科技",
      "platform": "链动小铺",
-     "stock": 627,
+     "stock": 624,
      "title": "反重力一年【gemini pro人机验证号】 登陆被封号申诉无售后  事多的 不要拍 【懂货的下单】",
      "url": "https://wzyp.cn/item/l3mmv7",
      "kind": "人机号",
@@ -9554,30 +9589,14 @@
      "pc": "2026-11-10"
     },
     {
-     "price": 14.3,
-     "shop": "小头",
-     "platform": "链动小铺",
-     "stock": 1,
-     "title": "Gemini Pro 反重力人机成品号需绑定手机使用（带凭证不会使用RT勿拍）",
-     "url": "https://wzyp.cn/item/ugjhd0",
-     "kind": "人机号",
-     "same_source": 2,
-     "sources": [
-      {
-       "price": 14.3,
-       "shop": "小头",
-       "platform": "链动小铺",
-       "stock": 1,
-       "url": "https://wzyp.cn/item/ugjhd0"
-      },
-      {
-       "price": 21.0,
-       "shop": "小新ai",
-       "platform": "链动小铺",
-       "stock": 1,
-       "url": "https://wzyp.cn/item/v9xt55"
-      }
-     ]
+     "price": 14.9,
+     "shop": "蓝胖转售 AI 资产自营专区",
+     "platform": "",
+     "stock": null,
+     "title": "【Gemini Pro半年卡包绑卡】反重力Antigravity专用 无需外卡一键自动签约 (14.9元)",
+     "url": "https://chengjingshop.top/product/selection-help",
+     "kind": "成品号",
+     "same_source": 1
     }
    ]
   },
@@ -9585,32 +9604,6 @@
    "id": "ag-verified",
    "name": "Antigravity 反重力 — 已过验证成品号",
    "items": [
-    {
-     "price": 14.3,
-     "shop": "小头",
-     "platform": "链动小铺",
-     "stock": 1,
-     "title": "Gemini Pro 反重力人机成品号需绑定手机使用（带凭证不会使用RT勿拍）",
-     "url": "https://wzyp.cn/item/ugjhd0",
-     "kind": "人机号",
-     "same_source": 2,
-     "sources": [
-      {
-       "price": 14.3,
-       "shop": "小头",
-       "platform": "链动小铺",
-       "stock": 1,
-       "url": "https://wzyp.cn/item/ugjhd0"
-      },
-      {
-       "price": 21.0,
-       "shop": "小新ai",
-       "platform": "链动小铺",
-       "stock": 1,
-       "url": "https://wzyp.cn/item/v9xt55"
-      }
-     ]
-    },
     {
      "price": 16.0,
      "shop": "gemini成品批发",
@@ -9688,7 +9681,7 @@
        "price": 20.0,
        "shop": "AI批发的杂货店",
        "platform": "链动小铺",
-       "stock": 20,
+       "stock": 8,
        "url": "https://wzyp.cn/item/rry1jz"
       },
       {
@@ -9716,7 +9709,7 @@
        "price": 21.84,
        "shop": "YUJI",
        "platform": "链动小铺",
-       "stock": 20,
+       "stock": 8,
        "url": "https://wzyp.cn/item/ejm30u"
       },
       {
@@ -9751,7 +9744,7 @@
        "price": 23.0,
        "shop": "小头",
        "platform": "链动小铺",
-       "stock": 24,
+       "stock": 8,
        "url": "https://wzyp.cn/item/nu7hjb"
       },
       {
@@ -9768,60 +9761,19 @@
      "price": 17.85,
      "shop": "秋小鱼AI虚拟产品",
      "platform": "链动小铺",
-     "stock": 76,
-     "title": "Antigravity反重力12个月成品号pro（带rt-可以用4argon和opus5.5）",
+     "stock": 50,
+     "title": "Antigravity反重力12个月成品号pro（带rt-可以用gemini4和opus5.5）",
      "url": "https://wzyp.cn/item/yc32ly",
      "kind": "成品号",
-     "same_source": 5,
+     "same_source": 13,
      "sources": [
       {
        "price": 17.85,
        "shop": "秋小鱼AI虚拟产品",
        "platform": "链动小铺",
-       "stock": 76,
+       "stock": 50,
        "url": "https://wzyp.cn/item/yc32ly"
       },
-      {
-       "price": 23.8,
-       "shop": "ai不源头（看公告）",
-       "platform": "链动小铺",
-       "stock": 39,
-       "url": "https://wzyp.cn/item/7fl2ma"
-      },
-      {
-       "price": 24.1,
-       "shop": "YUJI",
-       "platform": "链动小铺",
-       "stock": 50,
-       "url": "https://wzyp.cn/item/2g846g"
-      },
-      {
-       "price": 34.0,
-       "shop": "元Ai",
-       "platform": "链动小铺",
-       "stock": 61,
-       "url": "https://wzyp.cn/item/7l3wpq"
-      },
-      {
-       "price": 167.0,
-       "shop": "即刻智联AI-对接马∶ok1",
-       "platform": "链动小铺",
-       "stock": 51,
-       "url": "https://wzyp.cn/item/588qso"
-      }
-     ],
-     "pc": "2026-11-10"
-    },
-    {
-     "price": 18.7,
-     "shop": "小鱼儿AI杂货铺",
-     "platform": "链动小铺",
-     "stock": 51,
-     "title": "Antigravity反重力12个月成品号pro（带rt-可以用gemini4和opus5.5）",
-     "url": "https://wzyp.cn/item/7alocc",
-     "kind": "成品号",
-     "same_source": 10,
-     "sources": [
       {
        "price": 18.7,
        "shop": "小鱼儿AI杂货铺",
@@ -9880,6 +9832,13 @@
       },
       {
        "price": 24.1,
+       "shop": "YUJI",
+       "platform": "链动小铺",
+       "stock": 51,
+       "url": "https://wzyp.cn/item/2g846g"
+      },
+      {
+       "price": 24.1,
        "shop": "黏人ai小狗",
        "platform": "链动小铺",
        "stock": 51,
@@ -9891,6 +9850,13 @@
        "platform": "链动小铺",
        "stock": 39,
        "url": "https://wzyp.cn/item/vjff4e"
+      },
+      {
+       "price": 34.0,
+       "shop": "元Ai",
+       "platform": "链动小铺",
+       "stock": 50,
+       "url": "https://wzyp.cn/item/7l3wpq"
       }
      ],
      "pc": "2026-11-10"
@@ -9952,6 +9918,16 @@
      "pc": "2026-11-10"
     },
     {
+     "price": 21.0,
+     "shop": "小新ai",
+     "platform": "链动小铺",
+     "stock": 1,
+     "title": "Gemini Pro 反重力人机成品号需绑定手机使用（带凭证不会使用RT勿拍）",
+     "url": "https://wzyp.cn/item/v9xt55",
+     "kind": "人机号",
+     "same_source": 1
+    },
+    {
      "price": 22.0,
      "shop": "怪兽源头小铺【对接:guai】",
      "platform": "链动小铺",
@@ -9959,7 +9935,7 @@
      "title": "Gemini Pro 反重力Antigravity成品号Pixel开通6月会员（已过验证带凭证，可直接登录使用）",
      "url": "https://wzyp.cn/item/w65jzv",
      "kind": "成品号",
-     "same_source": 77,
+     "same_source": 81,
      "sources": [
       {
        "price": 22.0,
@@ -10033,6 +10009,13 @@
       },
       {
        "price": 24.2,
+       "shop": "优质AI科技",
+       "platform": "链动小铺",
+       "stock": 12,
+       "url": "https://wzyp.cn/item/pd5i7r"
+      },
+      {
+       "price": 24.2,
        "shop": "毛毛AI货源",
        "platform": "链动小铺",
        "stock": 12,
@@ -10044,6 +10027,13 @@
        "platform": "链动小铺",
        "stock": 12,
        "url": "https://wzyp.cn/item/xxofve"
+      },
+      {
+       "price": 24.2,
+       "shop": "各种ai，会员，账号",
+       "platform": "链动小铺",
+       "stock": 12,
+       "url": "https://wzyp.cn/item/ylo7q6"
       },
       {
        "price": 24.2,
@@ -10140,7 +10130,7 @@
        "price": 26.4,
        "shop": "小头",
        "platform": "链动小铺",
-       "stock": 19,
+       "stock": 12,
        "url": "https://wzyp.cn/item/ehgcol"
       },
       {
@@ -10280,7 +10270,7 @@
        "price": 29.1,
        "shop": "YUJI",
        "platform": "链动小铺",
-       "stock": 14,
+       "stock": 12,
        "url": "https://wzyp.cn/item/8hud4i"
       },
       {
@@ -10445,6 +10435,13 @@
        "url": "https://wzyp.cn/item/1rlzi9"
       },
       {
+       "price": 39.6,
+       "shop": "元Ai",
+       "platform": "链动小铺",
+       "stock": 12,
+       "url": "https://wzyp.cn/item/idysnw"
+      },
+      {
        "price": 40.88,
        "shop": "老大AI源头供应商",
        "platform": "链动小铺",
@@ -10480,6 +10477,13 @@
        "url": "https://wzyp.cn/item/vejxa7"
       },
       {
+       "price": 47.0,
+       "shop": "源头AI充值【旗舰服务】",
+       "platform": "链动小铺",
+       "stock": 12,
+       "url": "https://wzyp.cn/item/gt9h87"
+      },
+      {
        "price": 50.0,
        "shop": "AI小小铺",
        "platform": "链动小铺",
@@ -10492,13 +10496,6 @@
        "platform": "链动小铺",
        "stock": 12,
        "url": "https://wzyp.cn/item/262rjp"
-      },
-      {
-       "price": 110.0,
-       "shop": "Jan的AI小铺",
-       "platform": "链动小铺",
-       "stock": 12,
-       "url": "https://wzyp.cn/item/spmoif"
       }
      ],
      "pc": "2026-11-10"
@@ -10669,6 +10666,33 @@
      "pc": "2026-11-10"
     },
     {
+     "price": 23.8,
+     "shop": "ai不源头（看公告）",
+     "platform": "链动小铺",
+     "stock": 39,
+     "title": "Antigravity反重力12个月成品号pro（带rt-可以用4argon和opus5.5）",
+     "url": "https://wzyp.cn/item/7fl2ma",
+     "kind": "成品号",
+     "same_source": 2,
+     "sources": [
+      {
+       "price": 23.8,
+       "shop": "ai不源头（看公告）",
+       "platform": "链动小铺",
+       "stock": 39,
+       "url": "https://wzyp.cn/item/7fl2ma"
+      },
+      {
+       "price": 167.0,
+       "shop": "即刻智联AI-对接马∶ok1",
+       "platform": "链动小铺",
+       "stock": 51,
+       "url": "https://wzyp.cn/item/588qso"
+      }
+     ],
+     "pc": "2026-11-10"
+    },
+    {
      "price": 24.0,
      "shop": "纸卷AI",
      "platform": "链动小铺",
@@ -10766,7 +10790,7 @@
      "price": 24.5,
      "shop": "琪琪科技",
      "platform": "链动小铺",
-     "stock": 13,
+     "stock": 12,
      "title": "【少量福利】Gemini Pro 反重力Antigravity成品号（已过验证带凭证，可直接登录使用）",
      "url": "https://wzyp.cn/item/7meuoh",
      "kind": "成品号",
@@ -10805,7 +10829,7 @@
        "price": 26.4,
        "shop": "爱搜 AISO",
        "platform": "链动小铺",
-       "stock": 14,
+       "stock": 12,
        "url": "https://wzyp.cn/item/1yr247"
       }
      ],
@@ -10927,7 +10951,7 @@
       },
       {
        "price": 27.29,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 1,
        "url": "https://wzyp.cn/item/ahzukm"
@@ -11108,6 +11132,74 @@
      "pc": "2026-11-10"
     },
     {
+     "price": 26.4,
+     "shop": "小头",
+     "platform": "链动小铺",
+     "stock": 3,
+     "title": "gemini pro Antigravity 成品号（已过验证，可直接登录使用）",
+     "url": "https://wzyp.cn/item/fks0yf",
+     "kind": "成品号",
+     "same_source": 9,
+     "sources": [
+      {
+       "price": 26.4,
+       "shop": "小头",
+       "platform": "链动小铺",
+       "stock": 3,
+       "url": "https://wzyp.cn/item/fks0yf"
+      },
+      {
+       "price": 28.0,
+       "shop": "码愿AI",
+       "platform": "链动小铺",
+       "stock": 3,
+       "url": "https://wzyp.cn/item/y0df75"
+      },
+      {
+       "price": 29.9,
+       "shop": "条条AI (对接码TTAI727)招代理",
+       "platform": "链动小铺",
+       "stock": 2,
+       "url": "https://wzyp.cn/item/ztbb6q"
+      },
+      {
+       "price": 29.9,
+       "shop": "Cursor 专卖",
+       "platform": "链动小铺",
+       "stock": 2,
+       "url": "https://wzyp.cn/item/63c1kj"
+      },
+      {
+       "price": 31.2,
+       "shop": "鹰鹰小铺",
+       "platform": "链动小铺",
+       "stock": 2,
+       "url": "https://wzyp.cn/item/eafrok"
+      },
+      {
+       "price": 36.0,
+       "shop": "爪爪AI专卖(对接实力号商)",
+       "platform": "链动小铺",
+       "stock": 3,
+       "url": "https://wzyp.cn/item/w606yi"
+      },
+      {
+       "price": 36.0,
+       "shop": "托金AI工具小铺",
+       "platform": "链动小铺",
+       "stock": 3,
+       "url": "https://wzyp.cn/item/b15kx8"
+      },
+      {
+       "price": 48.0,
+       "shop": "AI小店",
+       "platform": "链动小铺",
+       "stock": 3,
+       "url": "https://wzyp.cn/item/ohx8k4"
+      }
+     ]
+    },
+    {
      "price": 28.0,
      "shop": "AI大白杂货铺",
      "platform": "链动小铺",
@@ -11142,7 +11234,7 @@
        "price": 33.0,
        "shop": "小头",
        "platform": "链动小铺",
-       "stock": 7,
+       "stock": 6,
        "url": "https://wzyp.cn/item/7z66qr"
       },
       {
@@ -11191,7 +11283,7 @@
        "price": 42.0,
        "shop": "YUJI",
        "platform": "链动小铺",
-       "stock": 7,
+       "stock": 6,
        "url": "https://wzyp.cn/item/ah5yjx"
       },
       {
@@ -11207,67 +11299,6 @@
        "platform": "链动小铺",
        "stock": 6,
        "url": "https://wzyp.cn/item/m4njf9"
-      }
-     ]
-    },
-    {
-     "price": 28.0,
-     "shop": "码愿AI",
-     "platform": "链动小铺",
-     "stock": 3,
-     "title": "gemini pro Antigravity 成品号（已过验证，可直接登录使用）",
-     "url": "https://wzyp.cn/item/y0df75",
-     "kind": "成品号",
-     "same_source": 8,
-     "sources": [
-      {
-       "price": 28.0,
-       "shop": "码愿AI",
-       "platform": "链动小铺",
-       "stock": 3,
-       "url": "https://wzyp.cn/item/y0df75"
-      },
-      {
-       "price": 29.9,
-       "shop": "条条AI (对接码TTAI727)招代理",
-       "platform": "链动小铺",
-       "stock": 2,
-       "url": "https://wzyp.cn/item/ztbb6q"
-      },
-      {
-       "price": 29.9,
-       "shop": "Cursor 专卖",
-       "platform": "链动小铺",
-       "stock": 2,
-       "url": "https://wzyp.cn/item/63c1kj"
-      },
-      {
-       "price": 31.2,
-       "shop": "鹰鹰小铺",
-       "platform": "链动小铺",
-       "stock": 2,
-       "url": "https://wzyp.cn/item/eafrok"
-      },
-      {
-       "price": 36.0,
-       "shop": "爪爪AI专卖(对接实力号商)",
-       "platform": "链动小铺",
-       "stock": 3,
-       "url": "https://wzyp.cn/item/w606yi"
-      },
-      {
-       "price": 36.0,
-       "shop": "托金AI工具小铺",
-       "platform": "链动小铺",
-       "stock": 3,
-       "url": "https://wzyp.cn/item/b15kx8"
-      },
-      {
-       "price": 48.0,
-       "shop": "AI小店",
-       "platform": "链动小铺",
-       "stock": 4,
-       "url": "https://wzyp.cn/item/ohx8k4"
       }
      ]
     },
@@ -11339,7 +11370,7 @@
        "price": 29.4,
        "shop": "秋小鱼AI虚拟产品",
        "platform": "链动小铺",
-       "stock": 30,
+       "stock": 9,
        "url": "https://wzyp.cn/item/sn0nnp"
       },
       {
@@ -11360,7 +11391,7 @@
        "price": 30.8,
        "shop": "小头",
        "platform": "链动小铺",
-       "stock": 38,
+       "stock": 9,
        "url": "https://wzyp.cn/item/27mml1"
       },
       {
@@ -11486,7 +11517,7 @@
        "price": 35.7,
        "shop": "YUJI",
        "platform": "链动小铺",
-       "stock": 8,
+       "stock": 9,
        "url": "https://wzyp.cn/item/x9shkp"
       },
       {
@@ -11535,7 +11566,7 @@
        "price": 56.0,
        "shop": "元Ai",
        "platform": "链动小铺",
-       "stock": 11,
+       "stock": 9,
        "url": "https://wzyp.cn/item/u4hzqx"
       },
       {
@@ -12175,7 +12206,7 @@
     },
     {
      "price": 103.95,
-     "shop": "云脉AI",
+     "shop": "啥子AI? 锤子AI",
      "platform": "链动小铺",
      "stock": 46,
      "title": "正价claude pro 卡冲 实充 成品号 日抛 1个（人工交付）",
@@ -12185,7 +12216,7 @@
      "sources": [
       {
        "price": 103.95,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 46,
        "url": "https://wzyp.cn/item/bbdft5"
@@ -12794,7 +12825,7 @@
        "price": 0.36,
        "shop": "AI批发的杂货店",
        "platform": "链动小铺",
-       "stock": 499,
+       "stock": 500,
        "url": "https://wzyp.cn/item/pbkrqa"
       },
       {
@@ -12806,17 +12837,17 @@
       },
       {
        "price": 0.36,
+       "shop": "啥子AI? 锤子AI",
+       "platform": "链动小铺",
+       "stock": 499,
+       "url": "https://wzyp.cn/item/75rwt0"
+      },
+      {
+       "price": 0.36,
        "shop": "👑NEON AI｜霓虹玩家AI👑(专注精品✨)🔥",
        "platform": "链动小铺",
        "stock": 500,
        "url": "https://wzyp.cn/item/zfffwl"
-      },
-      {
-       "price": 0.36,
-       "shop": "云脉AI",
-       "platform": "链动小铺",
-       "stock": 499,
-       "url": "https://wzyp.cn/item/75rwt0"
       },
       {
        "price": 0.7,
@@ -12864,7 +12895,7 @@
        "price": 0.79,
        "shop": "爱搜 AISO",
        "platform": "链动小铺",
-       "stock": 499,
+       "stock": 500,
        "url": "https://wzyp.cn/item/j4z1o2"
       },
       {
@@ -12952,7 +12983,7 @@
       },
       {
        "price": 0.36,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 500,
        "url": "https://wzyp.cn/item/o8vrhc"
@@ -13131,7 +13162,7 @@
       },
       {
        "price": 0.63,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 104,
        "url": "https://wzyp.cn/item/a8uss0"
@@ -13539,23 +13570,7 @@
      "title": "【 codex自助接马 】一次性兑换码 100%包成功接马",
      "url": "https://wzyp.cn/item/4b4kgi",
      "kind": "",
-     "same_source": 2,
-     "sources": [
-      {
-       "price": 0.4,
-       "shop": "狗儿",
-       "platform": "链动小铺",
-       "stock": 117,
-       "url": "https://wzyp.cn/item/4b4kgi"
-      },
-      {
-       "price": 1.25,
-       "shop": "小🐏阳AI精选店",
-       "platform": "链动小铺",
-       "stock": 117,
-       "url": "https://wzyp.cn/item/rvsn35"
-      }
-     ],
+     "same_source": 1,
      "pc": "2026-11-10"
     },
     {
@@ -13895,23 +13910,7 @@
      "title": "【 codex自助接马 】一次性兑换码 专业codex接马 100%包成功",
      "url": "https://wzyp.cn/item/9bq7cq",
      "kind": "",
-     "same_source": 2,
-     "sources": [
-      {
-       "price": 0.49,
-       "shop": "狗儿",
-       "platform": "链动小铺",
-       "stock": 319,
-       "url": "https://wzyp.cn/item/9bq7cq"
-      },
-      {
-       "price": 1.02,
-       "shop": "小🐏阳AI精选店",
-       "platform": "链动小铺",
-       "stock": 319,
-       "url": "https://wzyp.cn/item/ak5jtb"
-      }
-     ],
+     "same_source": 1,
      "pc": "2026-11-04"
     },
     {
@@ -13989,7 +13988,7 @@
       },
       {
        "price": 0.53,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 1998,
        "url": "https://wzyp.cn/item/efyzi3"
@@ -14005,7 +14004,7 @@
        "price": 0.55,
        "shop": "AI批发的杂货店",
        "platform": "链动小铺",
-       "stock": 1980,
+       "stock": 1978,
        "url": "https://wzyp.cn/item/dj3gvr"
       },
       {
@@ -14031,7 +14030,7 @@
       },
       {
        "price": 0.55,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 1980,
        "url": "https://wzyp.cn/item/gm2w16"
@@ -14054,7 +14053,7 @@
        "price": 0.57,
        "shop": "小头",
        "platform": "链动小铺",
-       "stock": 1997,
+       "stock": 1978,
        "url": "https://wzyp.cn/item/qrts20"
       },
       {
@@ -14101,13 +14100,6 @@
       },
       {
        "price": 0.57,
-       "shop": "蛙的小店",
-       "platform": "链动小铺",
-       "stock": 1982,
-       "url": "https://wzyp.cn/item/4cnhw5"
-      },
-      {
-       "price": 0.57,
        "shop": "AI源头",
        "platform": "链动小铺",
        "stock": 1982,
@@ -14119,6 +14111,13 @@
        "platform": "链动小铺",
        "stock": 1982,
        "url": "https://wzyp.cn/item/1goj7s"
+      },
+      {
+       "price": 0.57,
+       "shop": "蛙的小店",
+       "platform": "链动小铺",
+       "stock": 1982,
+       "url": "https://wzyp.cn/item/4cnhw5"
       },
       {
        "price": 0.58,
@@ -14145,15 +14144,15 @@
        "price": 0.59,
        "shop": "GGbond ai",
        "platform": "链动小铺",
-       "stock": 2000,
-       "url": "https://wzyp.cn/item/i1rlqc"
+       "stock": 1982,
+       "url": "https://wzyp.cn/item/gnvlay"
       },
       {
        "price": 0.59,
        "shop": "GGbond ai",
        "platform": "链动小铺",
-       "stock": 1982,
-       "url": "https://wzyp.cn/item/gnvlay"
+       "stock": 2000,
+       "url": "https://wzyp.cn/item/i1rlqc"
       },
       {
        "price": 0.6,
@@ -14222,15 +14221,15 @@
        "price": 0.65,
        "shop": "雪米AI",
        "platform": "链动小铺",
-       "stock": 2000,
-       "url": "https://wzyp.cn/item/v2nml9"
+       "stock": 1982,
+       "url": "https://wzyp.cn/item/mgifv8"
       },
       {
        "price": 0.65,
        "shop": "雪米AI",
        "platform": "链动小铺",
-       "stock": 1982,
-       "url": "https://wzyp.cn/item/mgifv8"
+       "stock": 2000,
+       "url": "https://wzyp.cn/item/v2nml9"
       },
       {
        "price": 0.7,
@@ -14257,7 +14256,7 @@
        "price": 0.7,
        "shop": "AI批发的杂货店",
        "platform": "链动小铺",
-       "stock": 1998,
+       "stock": 2000,
        "url": "https://wzyp.cn/item/68qbxt"
       },
       {
@@ -14446,14 +14445,14 @@
        "price": 1.0,
        "shop": "元Ai",
        "platform": "链动小铺",
-       "stock": 1982,
+       "stock": 1978,
        "url": "https://wzyp.cn/item/h7v5jy"
       },
       {
        "price": 1.0,
        "shop": "爱搜 AISO",
        "platform": "链动小铺",
-       "stock": 1980,
+       "stock": 1978,
        "url": "https://wzyp.cn/item/gujrj4"
       },
       {
@@ -14958,7 +14957,7 @@
      "price": 0.72,
      "shop": "FranklyBuilds的AI小店",
      "platform": "16688",
-     "stock": 482,
+     "stock": 477,
      "title": "Muse成品号10亿token 新批次 传奇耐活王",
      "url": "https://16688.com.cn/goods/G68251624",
      "kind": "10亿·成品号",
@@ -14975,21 +14974,21 @@
        "price": 0.77,
        "shop": "MAXAI666",
        "platform": "16688",
-       "stock": 482,
+       "stock": 477,
        "url": "https://www.16688.com.cn/goods/G52472485"
       },
       {
        "price": 0.85,
        "shop": "梦泽Ai",
        "platform": "16688",
-       "stock": 482,
+       "stock": 477,
        "url": "https://www.16688.com.cn/goods/G29735704"
       },
       {
        "price": 2.9,
        "shop": "YUJI",
        "platform": "16688",
-       "stock": 482,
+       "stock": 477,
        "url": "https://www.16688.com.cn/goods/G96034725"
       }
      ],
@@ -14999,7 +14998,7 @@
      "price": 0.85,
      "shop": "MAXAI666",
      "platform": "16688",
-     "stock": 62,
+     "stock": 61,
      "title": "Muse AI 10亿 成品号 批发  11.11最新",
      "url": "https://www.16688.com.cn/goods/G42153481",
      "kind": "10亿·成品号",
@@ -15009,14 +15008,14 @@
        "price": 0.85,
        "shop": "MAXAI666",
        "platform": "16688",
-       "stock": 62,
+       "stock": 61,
        "url": "https://www.16688.com.cn/goods/G42153481"
       },
       {
        "price": 0.88,
        "shop": "ai小铺",
        "platform": "16688",
-       "stock": 62,
+       "stock": 61,
        "url": "https://www.16688.com.cn/goods/G38793197"
       }
      ]
@@ -15032,26 +15031,33 @@
      "same_source": 1
     },
     {
-     "price": 1.23,
-     "shop": "MAXAI666",
-     "platform": "16688",
-     "stock": 111,
-     "title": "【今日最新成品账号】Muse10亿成品账号【质保30分钟首登】需要换绑邮箱 下单前必看详情",
-     "url": "https://www.16688.com.cn/goods/G44184328",
+     "price": 1.0,
+     "shop": "Monster AI",
+     "platform": "",
+     "stock": 355,
+     "title": "Muse · 账号 10亿 Token",
+     "url": "https://monstergoai.store/products/muse",
      "kind": "10亿·成品号",
      "same_source": 1,
      "pc": "2026-11-11"
     },
     {
-     "price": 1.5,
-     "shop": "stayAI",
+     "price": 1.1,
+     "shop": "小头",
      "platform": "链动小铺",
      "stock": 6,
      "title": "MUSE 10亿Muse成品号",
-     "url": "https://wzyp.cn/item/welduk",
+     "url": "https://wzyp.cn/item/9rc68n",
      "kind": "10亿·成品号",
-     "same_source": 9,
+     "same_source": 10,
      "sources": [
+      {
+       "price": 1.1,
+       "shop": "小头",
+       "platform": "链动小铺",
+       "stock": 6,
+       "url": "https://wzyp.cn/item/9rc68n"
+      },
       {
        "price": 1.5,
        "shop": "stayAI",
@@ -15116,6 +15122,17 @@
        "url": "https://wzyp.cn/item/dzzkmm"
       }
      ]
+    },
+    {
+     "price": 1.23,
+     "shop": "MAXAI666",
+     "platform": "16688",
+     "stock": 111,
+     "title": "【今日最新成品账号】Muse10亿成品账号【质保30分钟首登】需要换绑邮箱 下单前必看详情",
+     "url": "https://www.16688.com.cn/goods/G44184328",
+     "kind": "10亿·成品号",
+     "same_source": 1,
+     "pc": "2026-11-11"
     },
     {
      "price": 1.65,
@@ -15201,7 +15218,7 @@
      "title": "Muse AI 成品号 | 带10亿token",
      "url": "https://9.plus/item/b6h762",
      "kind": "10亿·成品号",
-     "same_source": 3,
+     "same_source": 2,
      "sources": [
       {
        "price": 1.66,
@@ -15216,13 +15233,6 @@
        "platform": "链动小铺",
        "stock": 1,
        "url": "https://wzyp.cn/item/b5qno4"
-      },
-      {
-       "price": 13.75,
-       "shop": "AI OPC",
-       "platform": "链动小铺",
-       "stock": 1,
-       "url": "https://wzyp.cn/item/bqagka"
       }
      ],
      "pc": "2026-11-06"
@@ -15239,30 +15249,13 @@
     },
     {
      "price": 1.8,
-     "shop": "AI贝贝【分销码：aibeibei】",
+     "shop": "真的不赚钱，就为了交个朋友",
      "platform": "链动小铺",
      "stock": 4,
      "title": "Muse 成品号 额度10亿token",
-     "url": "https://wzyp.cn/item/q508ju",
+     "url": "https://wzyp.cn/item/qxrwsv",
      "kind": "10亿·成品号",
-     "same_source": 2,
-     "sources": [
-      {
-       "price": 1.8,
-       "shop": "AI贝贝【分销码：aibeibei】",
-       "platform": "链动小铺",
-       "stock": 4,
-       "url": "https://wzyp.cn/item/q508ju"
-      },
-      {
-       "price": 1.8,
-       "shop": "真的不赚钱，就为了交个朋友",
-       "platform": "链动小铺",
-       "stock": 4,
-       "url": "https://wzyp.cn/item/qxrwsv"
-      }
-     ],
-     "pc": "2026-11-09"
+     "same_source": 1
     },
     {
      "price": 1.8,
@@ -15485,7 +15478,7 @@
      "title": "Muse AI 10亿token成品号",
      "url": "https://wzyp.cn/item/15oqky",
      "kind": "10亿·成品号",
-     "same_source": 13,
+     "same_source": 9,
      "sources": [
       {
        "price": 2.3,
@@ -15530,27 +15523,6 @@
        "url": "https://wzyp.cn/item/caksyb"
       },
       {
-       "price": 3.5,
-       "shop": "智铺 AI",
-       "platform": "链动小铺",
-       "stock": 1,
-       "url": "https://wzyp.cn/item/8l9f1k"
-      },
-      {
-       "price": 3.7,
-       "shop": "自行车 Ai 店铺",
-       "platform": "链动小铺",
-       "stock": 1129,
-       "url": "https://wzyp.cn/item/wfmk12"
-      },
-      {
-       "price": 4.5,
-       "shop": "自行车 Ai 店铺",
-       "platform": "链动小铺",
-       "stock": 1,
-       "url": "https://wzyp.cn/item/322uq9"
-      },
-      {
        "price": 4.5,
        "shop": "AAA批发商",
        "platform": "链动小铺",
@@ -15563,13 +15535,6 @@
        "platform": "链动小铺",
        "stock": 8,
        "url": "https://wzyp.cn/item/vaeaey"
-      },
-      {
-       "price": 5.2,
-       "shop": "YUJI",
-       "platform": "链动小铺",
-       "stock": 4,
-       "url": "https://wzyp.cn/item/4up762"
       },
       {
        "price": 5.6,
@@ -15626,7 +15591,7 @@
      "title": "【11.10新批次】Muse AI 10亿token成品号",
      "url": "https://wzyp.cn/item/wdbqme",
      "kind": "10亿·成品号",
-     "same_source": 27,
+     "same_source": 20,
      "sources": [
       {
        "price": 3.19,
@@ -15650,13 +15615,6 @@
        "url": "https://wzyp.cn/item/5qntah"
       },
       {
-       "price": 3.65,
-       "shop": "小🐏阳AI精选店",
-       "platform": "链动小铺",
-       "stock": 168,
-       "url": "https://wzyp.cn/item/zlb8ph"
-      },
-      {
        "price": 3.9,
        "shop": "RenWin AI资源低价频道",
        "platform": "链动小铺",
@@ -15676,13 +15634,6 @@
        "platform": "链动小铺",
        "stock": 181,
        "url": "https://wzyp.cn/item/6t0a4p"
-      },
-      {
-       "price": 4.9,
-       "shop": "超级码少",
-       "platform": "链动小铺",
-       "stock": 168,
-       "url": "https://wzyp.cn/item/b07sa3"
       },
       {
        "price": 4.9,
@@ -15711,41 +15662,6 @@
        "platform": "链动小铺",
        "stock": 181,
        "url": "https://wzyp.cn/item/7kpg85"
-      },
-      {
-       "price": 5.8,
-       "shop": "AI小店",
-       "platform": "链动小铺",
-       "stock": 181,
-       "url": "https://wzyp.cn/item/kyvmwf"
-      },
-      {
-       "price": 5.8,
-       "shop": "YUJI",
-       "platform": "链动小铺",
-       "stock": 176,
-       "url": "https://wzyp.cn/item/xx3w77"
-      },
-      {
-       "price": 5.8,
-       "shop": "自行车 Ai 店铺",
-       "platform": "链动小铺",
-       "stock": 180,
-       "url": "https://wzyp.cn/item/gqcgky"
-      },
-      {
-       "price": 5.9,
-       "shop": "AI批发的杂货店",
-       "platform": "链动小铺",
-       "stock": 176,
-       "url": "https://wzyp.cn/item/hcz3p9"
-      },
-      {
-       "price": 6.9,
-       "shop": "123",
-       "platform": "链动小铺",
-       "stock": 181,
-       "url": "https://wzyp.cn/item/pm38ok"
       },
       {
        "price": 8.0,
@@ -15805,17 +15721,17 @@
       },
       {
        "price": 78.3,
-       "shop": "ysy科技",
-       "platform": "链动小铺",
-       "stock": 181,
-       "url": "https://wzyp.cn/item/qpfmuy"
-      },
-      {
-       "price": 78.3,
        "shop": "皮卡丘的Ai店铺",
        "platform": "链动小铺",
        "stock": 170,
        "url": "https://wzyp.cn/item/m0745u"
+      },
+      {
+       "price": 78.3,
+       "shop": "ysy科技",
+       "platform": "链动小铺",
+       "stock": 181,
+       "url": "https://wzyp.cn/item/qpfmuy"
       }
      ],
      "pc": "2026-11-06"
@@ -15870,34 +15786,7 @@
      "title": "Muse AI 成品号 10亿token",
      "url": "https://wzyp.cn/item/qox5xz",
      "kind": "10亿·成品号",
-     "same_source": 2,
-     "sources": [
-      {
-       "price": 4.0,
-       "shop": "stayAI",
-       "platform": "链动小铺",
-       "stock": 1,
-       "url": "https://wzyp.cn/item/qox5xz"
-      },
-      {
-       "price": 5.0,
-       "shop": "爱搜 AISO",
-       "platform": "链动小铺",
-       "stock": 1,
-       "url": "https://wzyp.cn/item/mwhewa"
-      }
-     ]
-    },
-    {
-     "price": 4.0,
-     "shop": "Monster AI",
-     "platform": "",
-     "stock": 255,
-     "title": "Muse · 账号 310亿 Token",
-     "url": "https://monstergoai.store/products/muse",
-     "kind": "310亿·成品号",
-     "same_source": 1,
-     "pc": "2026-11-10"
+     "same_source": 1
     },
     {
      "price": 4.0,
@@ -16107,7 +15996,7 @@
      "price": 1.5,
      "shop": "小头",
      "platform": "链动小铺",
-     "stock": 391,
+     "stock": 388,
      "title": "VISA 0 刀虚拟卡 485954(G 需要手法)kiro不行无3ds介意别拍只包卡号正确不包能过验证",
      "url": "https://wzyp.cn/item/bjhblt",
      "kind": "Visa",
@@ -16117,7 +16006,7 @@
        "price": 1.5,
        "shop": "小头",
        "platform": "链动小铺",
-       "stock": 391,
+       "stock": 388,
        "url": "https://wzyp.cn/item/bjhblt"
       },
       {
@@ -16171,7 +16060,7 @@
        "price": 1.5,
        "shop": "自行车 Ai 店铺",
        "platform": "链动小铺",
-       "stock": 390,
+       "stock": 388,
        "url": "https://wzyp.cn/item/zypq7c"
       },
       {
@@ -16232,7 +16121,7 @@
       },
       {
        "price": 1.5,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 388,
        "url": "https://wzyp.cn/item/c17cdg"
@@ -16374,7 +16263,7 @@
        "price": 2.1,
        "shop": "各种ai，会员，账号",
        "platform": "链动小铺",
-       "stock": 390,
+       "stock": 388,
        "url": "https://wzyp.cn/item/veqexd"
       },
       {
@@ -16395,7 +16284,7 @@
        "price": 2.2,
        "shop": "【AI源头直供】AICA",
        "platform": "链动小铺",
-       "stock": 389,
+       "stock": 388,
        "url": "https://wzyp.cn/item/wyplgb"
       },
       {
@@ -16409,7 +16298,7 @@
        "price": 2.3,
        "shop": "动次打次",
        "platform": "链动小铺",
-       "stock": 390,
+       "stock": 388,
        "url": "https://wzyp.cn/item/znrwo2"
       },
       {
@@ -16465,7 +16354,7 @@
        "price": 2.75,
        "shop": "小晨",
        "platform": "链动小铺",
-       "stock": 391,
+       "stock": 388,
        "url": "https://wzyp.cn/item/esxd9a"
       },
       {
@@ -16679,7 +16568,7 @@
     },
     {
      "price": 2.63,
-     "shop": "云脉AI",
+     "shop": "啥子AI? 锤子AI",
      "platform": "链动小铺",
      "stock": 456,
      "title": "451311（验证试用0刀卡）不限制任何项目，项目自测，兑换后无售后（系统繁忙是在补货）",
@@ -16689,7 +16578,7 @@
      "sources": [
       {
        "price": 2.63,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 456,
        "url": "https://wzyp.cn/item/huandb"
@@ -16761,7 +16650,7 @@
     },
     {
      "price": 2.63,
-     "shop": "云脉AI",
+     "shop": "啥子AI? 锤子AI",
      "platform": "链动小铺",
      "stock": 225,
      "title": "531790（验证试用0刀卡）不限制任何项目，项目自测，兑换后无售后（系统繁忙是在补货）",
@@ -16771,17 +16660,10 @@
      "sources": [
       {
        "price": 2.63,
-       "shop": "云脉AI",
+       "shop": "啥子AI? 锤子AI",
        "platform": "链动小铺",
        "stock": 225,
        "url": "https://wzyp.cn/item/r5sioq"
-      },
-      {
-       "price": 2.75,
-       "shop": "纵享丝滑",
-       "platform": "链动小铺",
-       "stock": 225,
-       "url": "https://wzyp.cn/item/9qii9o"
       },
       {
        "price": 2.75,
@@ -16789,6 +16671,13 @@
        "platform": "链动小铺",
        "stock": 225,
        "url": "https://wzyp.cn/item/kgdcph"
+      },
+      {
+       "price": 2.75,
+       "shop": "纵享丝滑",
+       "platform": "链动小铺",
+       "stock": 225,
+       "url": "https://wzyp.cn/item/9qii9o"
       },
       {
        "price": 2.8,
@@ -17823,6 +17712,29 @@
    14.73,
    1
   ],
+  "wzyp:xfywt0": [
+   29896150,
+   11.0,
+   1,
+   2778,
+   25.0,
+   1,
+   5984,
+   28.0,
+   1,
+   246,
+   25.0,
+   1,
+   227,
+   15.45,
+   1,
+   39,
+   25.0,
+   1,
+   306,
+   15.0,
+   1
+  ],
   "https://aizzx.me/item/489": [
    29896150,
    15.0,
@@ -17890,43 +17802,55 @@
    15.0,
    1
   ],
-  "wzyp:c0r3to": [
+  "wzyp:jyz0qm": [
    29896773,
-   18.03,
+   12.1,
    1,
-   1120,
-   25.75,
+   2155,
+   20.9,
    1,
-   9,
-   18.03,
+   1897,
+   27.5,
+   1,
+   4245,
+   19.8,
    1,
    11,
-   25.75,
+   27.5,
    1,
-   6111,
-   28.84,
+   12,
+   19.8,
    1,
-   1122,
-   25.75,
+   9,
+   27.5,
    1,
-   285,
-   15.45,
-   2,
+   71,
+   16.5,
+   1,
+   41,
+   27.5,
+   1,
    7,
-   15.45,
-   2
+   16.5,
+   1,
+   509,
+   15.4,
+   1
   ],
-  "wzyp:an7gtq": [
-   29898988,
+  "wzyp:tvr3dg": [
+   29896150,
+   11.5,
+   1,
+   2778,
    25.5,
    1,
-   5788,
+   6016,
    28.0,
    1,
-   345,
+   214,
    26.0,
    1,
-   501,
+   572,
    15.5,
    1
   ],
@@ -17942,6 +17866,20 @@
    1,
    163,
    15.5,
+   1
+  ],
+  "wzyp:h11o1f": [
+   29896773,
+   20.98,
+   1,
+   2155,
+   10.48,
+   1,
+   5970,
+   57.62,
+   1,
+   832,
+   15.62,
    1
   ],
   "wzyp:sg02e9": [
@@ -18016,49 +17954,6 @@
    1,
    54,
    16.28,
-   1
-  ],
-  "wzyp:gdpoaw": [
-   29896773,
-   21.98,
-   1,
-   7135,
-   73.57,
-   1,
-   898,
-   60.37,
-   2
-  ],
-  "wzyp:jyz0qm": [
-   29896773,
-   12.1,
-   1,
-   2155,
-   20.9,
-   1,
-   1897,
-   27.5,
-   1,
-   4245,
-   19.8,
-   1,
-   11,
-   27.5,
-   1,
-   12,
-   19.8,
-   1,
-   9,
-   27.5,
-   1,
-   71,
-   16.5,
-   1,
-   41,
-   27.5,
-   1,
-   7,
-   16.5,
    1
   ],
   "aicdks:101063": [
@@ -19315,17 +19210,20 @@
    16.37,
    1
   ],
-  "wzyp:bziwsf": [
-   29898988,
+  "wzyp:aijb4h": [
+   29896150,
+   12.0,
+   1,
+   2778,
    26.5,
    1,
-   5788,
+   4441,
    29.0,
    1,
-   345,
+   1789,
    27.0,
    1,
-   501,
+   572,
    16.5,
    1
   ],
@@ -19840,11 +19738,11 @@
    9.45,
    3
   ],
-  "wzyp:rna3wx": [
-   29898964,
+  "wzyp:jqbz0t": [
+   29896773,
    11.0,
    1,
-   6005,
+   8125,
    9.9,
    1
   ],
@@ -19936,9 +19834,9 @@
    13.5,
    1
   ],
-  "wzyp:ugjhd0": [
-   29905158,
-   14.3,
+  "https://chengjingshop.top/product/selection-help": [
+   29900849,
+   14.9,
    1
   ],
   "wzyp:lenr8s": [
@@ -19967,17 +19865,6 @@
    1,
    3267,
    17.85,
-   1
-  ],
-  "wzyp:7alocc": [
-   29903369,
-   22.0,
-   1,
-   1461,
-   20.9,
-   1,
-   152,
-   18.7,
    1
   ],
   "aicdks:104714": [
@@ -20011,6 +19898,11 @@
    1,
    1458,
    20.91,
+   1
+  ],
+  "wzyp:v9xt55": [
+   29905229,
+   21.0,
    1
   ],
   "wzyp:w65jzv": [
@@ -20050,6 +19942,23 @@
    1,
    5831,
    23.67,
+   1
+  ],
+  "wzyp:7fl2ma": [
+   29896773,
+   35.0,
+   1,
+   2966,
+   30.8,
+   1,
+   1909,
+   28.0,
+   1,
+   3049,
+   26.6,
+   1,
+   201,
+   23.8,
    1
   ],
   "wzyp:i9vhwq": [
@@ -20166,15 +20075,15 @@
    26.4,
    3
   ],
+  "wzyp:fks0yf": [
+   29901903,
+   26.4,
+   3
+  ],
   "wzyp:ntvzle": [
    29903174,
    28.0,
    3
-  ],
-  "wzyp:y0df75": [
-   29903908,
-   28.0,
-   1
   ],
   "wzyp:kx1uqj": [
    29896773,
@@ -20874,17 +20783,28 @@
    1.0,
    3
   ],
+  "https://monstergoai.store/products/muse": [
+   29904624,
+   8.0,
+   1,
+   320,
+   4.0,
+   1,
+   786,
+   1.0,
+   1
+  ],
+  "wzyp:9rc68n": [
+   29905730,
+   1.1,
+   1
+  ],
   "16688:G44184328": [
    29904642,
    1.56,
    1,
    817,
    1.23,
-   1
-  ],
-  "wzyp:welduk": [
-   29905214,
-   1.5,
    1
   ],
   "16688:G20609355": [
@@ -20939,20 +20859,8 @@
    1.78,
    1
   ],
-  "wzyp:q508ju": [
-   29896832,
-   2.8,
-   1,
-   346,
-   2.5,
-   1,
-   2233,
-   1.98,
-   1,
-   1945,
-   1.5,
-   1,
-   2552,
+  "wzyp:qxrwsv": [
+   29902454,
    1.8,
    3
   ],
@@ -21076,14 +20984,6 @@
    29904263,
    4.0,
    3
-  ],
-  "https://monstergoai.store/products/muse": [
-   29904624,
-   8.0,
-   1,
-   320,
-   4.0,
-   1
   ],
   "16688:G25301985": [
    29905266,
