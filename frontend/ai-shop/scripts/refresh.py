@@ -4,7 +4,8 @@
 方法（按商家遍历，不再只看聚合分类榜单页）：
 - AI价网全量商家商品库 aiprice.club/api/shop-products.json（2052 家店、每店全部分类与全部商品）
 - cardnav 同格式全量库 cardnav.xyz/api/shop-products.json（966 家店）
-两库按商品链接去重合并；再用 PriceAI 商品页（按价升序前 12 条）补最低价段。
+两库按商品链接去重合并；再用 PriceAI 全站商品页（sitemap 全量，按价升序前 12 条）
+与 aibijia 首页报价补最低价段（2026-11-10 加深：PriceAI 旧版只抓 5 页）。
 随后按固定 7 分组（ken 2026-10-31 拍板）用标题规则分类，取有货最低 30 条，
 同标题铺货合并只取最低。链接均为商品详情页。
 店铺目录由 data/shops.csv 转 data/shops.json（独立文件，不进映射表）。
@@ -104,6 +105,76 @@ def fetch_priceai(slug):
         return parse_priceai(fetch(f'https://priceai.cc/products/{slug}').decode('utf-8', 'ignore'))
     except Exception as e:
         print(f'priceai {slug} failed: {e}', file=sys.stderr)
+        return []
+
+# PriceAI 全站商品页（2026-11-10 加深聚合线）：sitemap 列全部商品页（约 60 个），
+# 旧版只抓 5 个。每页前 12 条按价升序，是最低价段的现价补充，行无时间戳、
+# 不受 48h 新鲜度门限制。telegram 两页不收（ken 规则：Telegram 账号不进商铺）。
+# sitemap 读不到时回退内置全量名单（2026-11-10 实测快照）。
+PRICEAI_EXCLUDE = {'telegram-account', 'telegram-premium'}
+PRICEAI_FALLBACK_SLUGS = (
+    'apple-id-account', 'chatgpt-codex-credits', 'chatgpt-codex-service',
+    'chatgpt-free-account', 'chatgpt-go', 'chatgpt-plus', 'chatgpt-plus-recharge',
+    'chatgpt-pro-20x', 'chatgpt-pro-20x-account', 'chatgpt-pro-500',
+    'chatgpt-pro-500-account', 'chatgpt-pro-5x', 'chatgpt-pro-5x-account',
+    'chatgpt-team-business', 'claude-account', 'claude-kyc-verification',
+    'claude-max-20x', 'claude-max-20x-account', 'claude-max-5x',
+    'claude-max-5x-account', 'claude-pro-month', 'claude-pro-month-account',
+    'claude-team-premium', 'claude-team-standard', 'cursor-account',
+    'dreamina-account', 'duolingo-super', 'education-email', 'email-account',
+    'gemini-pro-recharge', 'gemini-pro-year', 'gemini-ultra', 'gemini-ultra-5x',
+    'gift-card', 'gmail-account', 'google-phone-verification', 'grok-account',
+    'grok-super', 'icloud-email', 'identity-verification', 'kiro-account',
+    'kiro-pro-account', 'muse-ai-account', 'notion-business',
+    'openai-phone-verification', 'outlook-account', 'paypal-phone-verification',
+    'perplexity-account', 'phone-verification', 'social-media-account',
+    'suno-account', 'super-grok', 'super-grok-heavy', 'super-grok-lite',
+    'virtual-card', 'windsurf-account', 'x-twitter-account', 'x-twitter-premium')
+
+def priceai_slugs():
+    try:
+        text = fetch('https://priceai.cc/sitemap.xml').decode('utf-8', 'ignore')
+        slugs = sorted(set(re.findall(r'/products/([a-z0-9\-]+)', text)))
+        slugs = [s for s in slugs if s not in PRICEAI_EXCLUDE]
+        if len(slugs) >= 20:
+            return slugs
+    except Exception as e:
+        print(f'priceai sitemap failed: {e}', file=sys.stderr)
+    return [s for s in PRICEAI_FALLBACK_SLUGS if s not in PRICEAI_EXCLUDE]
+
+# ---------------- aibijia 首页报价（单页服务端渲染，锚点带标题与现价） ----------------
+def parse_aibijia(text):
+    offers = []
+    for block in re.findall(r'<a class="offer"[^>]*>.*?</a>', text, re.S):
+        hm = re.search(r'href="([^"]+)"', block)
+        lm = re.search(r'data-outbound-link-label="([^"]*)"', block)
+        if not hm or not lm:
+            continue
+        url = html.unescape(hm.group(1)).split('?')[0]
+        title = html.unescape(lm.group(1)).strip()
+        body = strip_tags(block)
+        pm = re.findall(r'¥\s*([\d,]+\.?\d*)', body)
+        if not pm or not title or not url.startswith('http'):
+            continue
+        rest = body[len(title):].strip() if body.startswith(title) else ''
+        rest = re.sub(r'¥\s*[\d,]+\.?\d*\s*$', '', rest).strip()
+        shop = re.sub(r'\s*(LDXP|16688|云猫寄售|自建站)\s*$', '', rest).strip()
+        if len(shop) > 30:
+            shop = ''
+        host = re.sub(r'^https?://(www\.)?', '', url).split('/')[0]
+        platform = ('16688' if '16688.com.cn' in host else
+                    '链动小铺' if ('wzyp.cn' in host or 'ldxp.cn' in host) else
+                    '云猫寄售' if 'catfk.com' in host else '自建站')
+        offers.append(dict(title=title, price=float(pm[-1].replace(',', '')),
+                           stock=None, shop=shop, platform=platform, url=url,
+                           category='', ts=0, same_source=1))
+    return offers
+
+def fetch_aibijia():
+    try:
+        return parse_aibijia(fetch('https://aibijia.org').decode('utf-8', 'ignore'))
+    except Exception as e:
+        print(f'aibijia failed: {e}', file=sys.stderr)
         return []
 
 # ---------------- 分组口径（ken 2026-10-31 拍板 7 组；2026-11-02 增 Claude 组，共 8 组） ----------------
@@ -886,11 +957,16 @@ def main():
         print(f'dead-drop: {_dead_n} offers (verified dead, stock=null)', file=sys.stderr)
 
     pai = []
-    for slug in ('chatgpt-plus', 'gemini-pro-year', 'gemini-ultra',
-                 'openai-phone-verification', 'super-grok-heavy'):
-        r = fetch_priceai(slug)
+    _slugs = priceai_slugs()
+    from concurrent.futures import ThreadPoolExecutor as _TPE2
+    with _TPE2(max_workers=6) as _ex2:
+        _pai_rows = list(_ex2.map(fetch_priceai, _slugs))
+    for slug, r in zip(_slugs, _pai_rows):
         print(f'priceai {slug}: {len(r)} rows', file=sys.stderr)
         pai += [o for o in r if o['url'] not in BLOCKED_URLS]
+    _abj = fetch_aibijia()
+    print(f'aibijia: {len(_abj)} rows', file=sys.stderr)
+    pai += [o for o in _abj if o['url'] not in BLOCKED_URLS]
 
     _full_rows = list(_pool_rows)  # prepare 前的全量原始行（价格日志全量维护用，含被新鲜度门拦下的）
     _full_pai = list(pai)
@@ -917,7 +993,7 @@ def main():
     from datetime import datetime, timezone, timedelta
     bj_now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M')
     board = dict(updated_at=bj_now,
-                 source='AI价网 + cardnav + PriceAI + 16688 直拉 按商家遍历合并',
+                 source='AI价网 + cardnav + PriceAI + aibijia + 16688 直拉 按商家遍历合并',
                  groups=groups)
     # 详情页库存核验（ken 2026-11-02）：能读到详情页实时库存的平台逐条核验，
     # 详情页库存为 0 / 已售罄的剔除，读到的实时库存同时回填展示；
