@@ -1,6 +1,6 @@
 # ip-check — IP 纯净度检测（IPPure 风格复刻）
 
-单文件静态页 `index.html`，零依赖、无后端。
+单文件静态页 `index.html`；除 DNS 泄露检测的权威服务外无后端。
 
 - **首屏排版 1:1 复刻 IPPure**：搜索圆角条 + My IP 行 + 白色大卡片（IP / ASN 折叠块 / 多源位置 / IP来源 / IP属性 / IPPure系数彩虹刻度）。
 - **展开区融合 ping0 字段**（保持 IPPure 卡片排版，不用 ping0 的表格）：主机名（反查 PTR）、探测时间、置信度、经度 / 纬度、ASN 所有者、企业、IP类型、风控值（胶囊 + 五色圆点）、原生 IP、大模型检测（点击检测 ChatGPT / Claude / Gemini / Grok 可用性）、IP 地址（数字，眼睛切换明文）、共享人数、适用场景（TikTok / 跨境电商 / 社媒运营 / AI 应用星级）。
@@ -15,3 +15,10 @@
 ## Cookie A 实现细则
 
 ip-check 是单槽：主题只有一个槽，读 `A` 后主题号 1–12 直接作为本站主题，语言、日夜也全部跟 `A` 走；ip-check 的 localStorage 键为 `ip-theme-idx` / `ip-dark` / `ip-lang`，与 `A` 双写
+
+## DNS 泄露检测服务（dnsleak）
+
+- 主检测（权威日志法）：页面生成随机令牌，触发浏览器解析 t<令牌>-<序号>.leak.jpedu.asia 共 6 个子域名；leak 子域名经 Cloudflare NS 委派到新加坡机的权威服务，服务记录来查询的解析器出口 IP 与 EDNS 子网；页面经 https://word.jpedu.asia/dnsleak/result?token= 取回结果（cloudflared 隧道按 /dnsleak/* 路径转发到本机 8053 端口）
+- 判定：任一解析器带 EDNS 子网 → 「EDNS 子网已暴露」；解析器归属国家与出口 IP 国家不一致 → 「检测到泄露」；其余 → 「未检测到泄露」
+- 兜底：6.5 秒内无权威记录（委派未生效、服务不可用等）自动回退原 DoH 法（dns.google 查 o-o.myaddr.l.google.com），字段与口径不变
+- 部署：源码 scripts/dnsleak_server.py、单元 scripts/dnsleak.service（仓库版 IP 只写前两段，完整值只在服务器单元里）；服务器 /home/deploy/dnsleak（deploy 用户），systemd 服务 dnsleak，绑 eth0 内网地址 53 端口（公网经优刻得 NAT 映射），应答 A 记录为服务器公网 IP；只应答本 zone、其余 REFUSED

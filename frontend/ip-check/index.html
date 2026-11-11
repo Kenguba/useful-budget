@@ -2755,6 +2755,9 @@ const DYN={
   rptDnsEdns:{zh:"EDNS 客户端子网",en:"EDNS Client Subnet"},
   rptDnsSafe:{zh:"未暴露真实 IP",en:"Real IP not exposed"},
   rptDnsExposed:{zh:"EDNS 子网已暴露",en:"EDNS subnet exposed"},
+  rptDnsNoLeak:{zh:"未检测到泄露",en:"No leak detected"},
+  rptDnsLeak:{zh:"检测到泄露",en:"Leak detected"},
+  rptDnsAuthProto:{zh:"权威 DNS 实测",en:"Authoritative DNS"},
   rptEdnsNone:{zh:"未暴露",en:"Not exposed"},
   rptUnknown:{zh:"未检出",en:"Not found"},
   rptRtcT:{zh:"WebRTC UDP 泄露检测",en:"WebRTC UDP Leak Test"},
@@ -3405,8 +3408,70 @@ function probeVendors(){
       });
   });
 }
+/* DNS 泄露主检测（权威日志法）：页面生成随机令牌，触发浏览器解析 leak 子域名，
+   新加坡机上的权威服务记录来查询的解析器出口 IP 与 EDNS 子网；无记录时回退 DoH 法 */
+const DNSLEAK_API="https://word.jpedu.asia/dnsleak/result?token=";
+const DNSLEAK_ZONE="leak.jpedu.asia";
+function dnsleakToken(){
+  const a=new Uint8Array(12);crypto.getRandomValues(a);
+  return Array.from(a,b=>b.toString(16).padStart(2,"0")).join("");
+}
+function dnsleakTrigger(token){
+  for(let i=0;i<6;i++){
+    const h="t"+token+"-"+i+"."+DNSLEAK_ZONE;
+    try{const l=document.createElement("link");l.rel="dns-prefetch";l.href="//"+h;document.head.appendChild(l);setTimeout(()=>{try{l.remove()}catch(e){}},20000);}catch(e){}
+    fetch("https://"+h+"/ping",{mode:"no-cors",cache:"no-store"}).catch(()=>{});
+  }
+}
+async function probeDnsAuth(ms){
+  const token=dnsleakToken();
+  dnsleakTrigger(token);
+  const t0=performance.now();let found=null;
+  while(performance.now()-t0<ms){
+    await new Promise(r=>setTimeout(r,800));
+    try{
+      const j=await fetchJSON(DNSLEAK_API+encodeURIComponent(token),2500);
+      if(j&&j.count>0){found=j;if(performance.now()-t0>2800)break}
+    }catch(e){}
+  }
+  return found;
+}
 async function probeDns(){
   const seq=++rptRun.dns;
+  let auth=null;
+  try{auth=await probeDnsAuth(6500)}catch(e){}
+  if(seq!==rptRun.dns)return;
+  if(auth&&auth.queries&&auth.queries.length){
+    const ips=[];let ecs="";
+    auth.queries.forEach(q=>{if(!ips.includes(q.ip))ips.push(q.ip);if(!ecs&&q.ecs)ecs=q.ecs});
+    const ups=[];
+    for(const ip of ips.slice(0,3)){
+      let place="";
+      try{const g=await srcIpWho(ip).catch(()=>null);if(g)place=" · "+[g.country,g.city].filter(Boolean).join(" ")}catch(e){}
+      ups.push(escapeHtml(ip+place));
+    }
+    if(seq!==rptRun.dns)return;
+    let leak=false;
+    try{
+      const exitIp=state.ip;
+      if(exitIp&&!ips.includes(exitIp)){
+        const eg=await srcIpWho(exitIp).catch(()=>null);
+        if(eg&&eg.cc){
+          for(const ip of ips){
+            const g=await srcIpWho(ip).catch(()=>null);
+            if(g&&g.cc&&g.cc!==eg.cc){leak=true;break}
+          }
+        }
+      }
+    }catch(e){}
+    if(seq!==rptRun.dns)return;
+    const status=ecs?rptBdg(TD("rptDnsExposed"),"warn"):(leak?rptBdg(TD("rptDnsLeak"),"warn"):rptBdg(TD("rptDnsNoLeak"),"ok"));
+    rptData.dns={status:status,proto:TD("rptDnsAuthProto"),up:ups.join("、"),edns:ecs?escapeHtml(ecs):TD("rptEdnsNone")};
+    paintRptDns();rptRefit();return;
+  }
+  probeDnsLegacy(seq);
+}
+async function probeDnsLegacy(seq){
   try{
     const j=await fetchJSON("https://dns.google/resolve?name=o-o.myaddr.l.google.com&type=TXT",6000);
     const txt=((j&&j.Answer)||[]).filter(a=>a.type===16).map(a=>String(a.data).replace(/"/g,"")).join(" ");
