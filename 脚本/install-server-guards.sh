@@ -18,20 +18,83 @@
 #   GUARD_T1_GB=780         一级阈值（停 VPN）
 #   GUARD_T2_GB=790         二级阈值（封对外）
 #   GUARD_OWN_IP=服务器公网IP  fail2ban 白名单（不给则自动探测，探测不到只留本机）
+#   GUARD_CHECK_DOMAINS="a.example.com b.example.com"  部署前要检测云状态的域名（空格分隔）
+#
+# 部署前逐项检测：脚本动手前先跑一遍 preflight，逐项报「已有 / 缺失」——
+# 流量守卫的程序、服务、定时器、状态文件，fail2ban 的程序、配置、运行状态；
+# 给了 GUARD_CHECK_DOMAINS 时，再逐个域名查公共解析并推断 Cloudflare 状态：
+# 解析直达本机公网 IP = 灰云（仅解析），解析到 Cloudflare 或隧道 = 橙云（代理开）。
+# 推断只作旁证，最终以 Cloudflare 后台该记录的 proxied 开关为准；对不上先核后台再部署。
+# 只检测不安装：bash install-server-guards.sh --preflight
 #
 # 用法：sudo bash install-server-guards.sh
 # 幂等：可重复运行，配置会被同内容覆盖；注意重跑会重启 fail2ban、清空当前封禁名单。
 set -euo pipefail
+
+GUARD_IFACE="${GUARD_IFACE:-eth0}"
+GUARD_ANCHOR_DAY="${GUARD_ANCHOR_DAY:-8}"
+GUARD_T1_GB="${GUARD_T1_GB:-780}"
+GUARD_T2_GB="${GUARD_T2_GB:-790}"
+GUARD_CHECK_DOMAINS="${GUARD_CHECK_DOMAINS:-}"
+
+OWN_IP="${GUARD_OWN_IP:-}"
+if [ -z "$OWN_IP" ]; then
+  OWN_IP="$(curl -s --max-time 8 https://api.ipify.org || true)"
+fi
+
+preflight() {
+  echo "== 部署前逐项检测（只查不装） =="
+  local f
+  for f in /usr/local/sbin/traffic-guard.py /etc/systemd/system/traffic-guard.service /etc/systemd/system/traffic-guard.timer /var/lib/traffic-guard/state.json; do
+    if [ -e "$f" ]; then echo "已有  $f"; else echo "缺失  $f"; fi
+  done
+  if systemctl is-enabled traffic-guard.timer >/dev/null 2>&1; then echo "已有  traffic-guard.timer 已启用"; else echo "缺失  traffic-guard.timer 未启用"; fi
+  if systemctl is-active traffic-guard.timer >/dev/null 2>&1; then echo "已有  traffic-guard.timer 运行中"; else echo "缺失  traffic-guard.timer 未运行"; fi
+  if command -v fail2ban-client >/dev/null 2>&1; then echo "已有  fail2ban 已安装"; else echo "缺失  fail2ban 未安装"; fi
+  if [ -e /etc/fail2ban/jail.d/sshd-ken.conf ]; then echo "已有  /etc/fail2ban/jail.d/sshd-ken.conf"; else echo "缺失  /etc/fail2ban/jail.d/sshd-ken.conf"; fi
+  if systemctl is-active fail2ban >/dev/null 2>&1; then echo "已有  fail2ban 运行中"; else echo "缺失  fail2ban 未运行"; fi
+  if [ -n "$GUARD_CHECK_DOMAINS" ]; then
+    python3 - "$OWN_IP" $GUARD_CHECK_DOMAINS <<'DNS_PY_END'
+import json, sys, urllib.parse, urllib.request
+own = sys.argv[1]
+for host in sys.argv[2:]:
+    ips, cname = [], ""
+    for t in ("A", "CNAME"):
+        url = "https://cloudflare-dns.com/dns-query?" + urllib.parse.urlencode({"name": host, "type": t})
+        req = urllib.request.Request(url, headers={"accept": "application/dns-json"})
+        try:
+            data = json.load(urllib.request.urlopen(req, timeout=10))
+        except Exception:
+            data = {}
+        for a in data.get("Answer", []):
+            if t == "A":
+                ips.append(a["data"])
+            else:
+                cname = a["data"]
+    if not ips and not cname:
+        print(f"缺失  {host}：无公共解析记录")
+    elif own and own in ips:
+        print(f"灰云  {host}：解析直达本机 {own}（仅解析、未走代理）")
+    elif "cfargotunnel.com" in cname:
+        print(f"橙云  {host}：隧道记录 {cname}（代理开）")
+    else:
+        print(f"橙云  {host}：解析到 {', '.join(ips) or cname}（经 Cloudflare 代理）")
+DNS_PY_END
+  fi
+  echo "== 检测完 =="
+}
+
+if [ "${1:-}" = "--preflight" ]; then
+  preflight
+  exit 0
+fi
 
 if [ "$(id -u)" -ne 0 ]; then
   echo "请用 root 运行：sudo bash install-server-guards.sh" >&2
   exit 1
 fi
 
-GUARD_IFACE="${GUARD_IFACE:-eth0}"
-GUARD_ANCHOR_DAY="${GUARD_ANCHOR_DAY:-8}"
-GUARD_T1_GB="${GUARD_T1_GB:-780}"
-GUARD_T2_GB="${GUARD_T2_GB:-790}"
+preflight
 
 echo "== [1/2] 流量守卫 traffic-guard =="
 install -d /var/lib/traffic-guard
@@ -218,10 +281,6 @@ if ! command -v fail2ban-client >/dev/null 2>&1; then
   DEBIAN_FRONTEND=noninteractive apt-get install -y fail2ban
 fi
 
-OWN_IP="${GUARD_OWN_IP:-}"
-if [ -z "$OWN_IP" ]; then
-  OWN_IP="$(curl -s --max-time 8 https://api.ipify.org || true)"
-fi
 IGNOREIP="127.0.0.1/8 ::1"
 if [ -n "$OWN_IP" ]; then
   IGNOREIP="${IGNOREIP} ${OWN_IP}"
