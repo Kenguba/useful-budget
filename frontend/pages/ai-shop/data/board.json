@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-13 05:57",
+ "updated_at": "2026-11-13 06:09",
  "source": "AI价网 + cardnav + PriceAI + aibijia + 16688/aicdks/catfk 直拉 按商家遍历合并",
  "groups": [
   {
@@ -10027,7 +10027,7 @@
       {
        "price": 400.0,
        "shop": "个性个性AI源头批发",
-       "platform": "catfk",
+       "platform": "云猫寄售",
        "stock": 24,
        "url": "https://catfk.com/item/auypbd"
       }
@@ -14080,17 +14080,6 @@
      "same_source": 1
     },
     {
-     "price": 5.5,
-     "shop": "快到碗里来",
-     "platform": "catfk",
-     "stock": 5,
-     "title": "【自营主推】Muse10亿token成品号",
-     "url": "https://catfk.com/item/5hg3f6",
-     "kind": "10亿·成品号",
-     "same_source": 1,
-     "pc": "2026-11-12"
-    },
-    {
      "price": 7.0,
      "shop": "路西法小铺",
      "platform": "",
@@ -14366,6 +14355,16 @@
      "title": "muse成品号质保7天",
      "url": "https://wzyp.cn/item/8f02g6",
      "kind": "成品号",
+     "same_source": 1
+    },
+    {
+     "price": 10.0,
+     "shop": "尼克的AI工具箱（代理码：NIKEAI）",
+     "platform": "16688",
+     "stock": null,
+     "title": "Muse AI成品号 带10亿token（对标SuperGro-K bot）",
+     "url": "https://www.16688.com.cn/goods/G56691827",
+     "kind": "10亿·成品号",
      "same_source": 1
     }
    ]
@@ -20158,17 +20157,6 @@
    5.5,
    1
   ],
-  "catfk:5hg3f6": [
-   29900178,
-   11.0,
-   1,
-   5168,
-   8.0,
-   1,
-   2632,
-   5.5,
-   1
-  ],
   "https://luxifa.cc/item/120": [
    29904024,
    7.0,
@@ -20265,6 +20253,11 @@
   ],
   "wzyp:8f02g6": [
    29908224,
+   10.0,
+   1
+  ],
+  "16688:G56691827": [
+   29896832,
    10.0,
    1
   ],
