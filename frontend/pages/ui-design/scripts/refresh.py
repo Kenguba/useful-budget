@@ -7,7 +7,7 @@ ui-design 数据刷新脚本
 - 正式目录 670 条：GET https://designeer.xyz/api/catalog?collection=<inspiration|resources|tools|portfolios>
   接口按 nextCursor 分页，每页约 24 条，循环拉到 nextCursor 为 null
 - Finds 157 条：https://designeer.xyz/index.md 按 Next page 链接分页解析
-产物：frontend/ui-design/data/data.json（结构与线上一致，失败时不覆盖旧文件）
+产物：frontend/pages/ui-design/data/data.json（结构与线上一致，失败时不覆盖旧文件）
 署名要求（站方 ai.txt）：须署名 Designeer 并链回原页，简介为原文引用，权利归原作者
 """
 import json

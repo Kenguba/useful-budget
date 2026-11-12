@@ -8,9 +8,9 @@ import { Script } from 'node:vm';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const read = path => readFileSync(resolve(root, path), 'utf8');
-const ai = read('frontend/ai-shop/index.html');
-const skill = read('frontend/skill-board/index.html');
-const ip = read('frontend/ip-check/index.html');
+const ai = read('frontend/pages/ai-shop/index.html');
+const skill = read('frontend/pages/skill-board/index.html');
+const ip = read('frontend/pages/ip-check/index.html');
 const between = (text, start, end) => {
   const i = text.indexOf(start);
   const j = text.indexOf(end, i + start.length);

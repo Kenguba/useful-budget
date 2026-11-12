@@ -1,6 +1,6 @@
 # AI账号商铺（ai-shop）
 
-AI 账号比价与店铺目录页：https://kenguba.github.io/useful-budget/frontend/ai-shop/
+AI 账号比价与店铺目录页：https://kenguba.github.io/useful-budget/frontend/pages/ai-shop/
 
 - `index.html` — 页面（报价单 + 店铺目录，店名可点击进店铺主页）
 - `scripts/refresh.py` — 纯代码刷新脚本（零依赖）：抓 AI价网公开分类「全部渠道」页，按固定 7 分组（GPT 日抛未接马/已接马、GPT 周限、反重力最便宜/已过验证、Codex 接码单次、Grok Heavy）取有货最低 10 条，同标题铺货合并；并把 `data/shops.csv` 转成 `data/shops.json`

@@ -1,6 +1,6 @@
 # ui-design · UI 设计资源目录
 
-线上：https://ui.jpedu.asia （Pages 版：https://kenguba.github.io/useful-budget/frontend/ui-design/）
+线上：https://ui.jpedu.asia （Pages 版：https://kenguba.github.io/useful-budget/frontend/pages/ui-design/）
 
 ## 内容
 - 数据来自 Designeer（https://designeer.xyz），由其官方开放接口 /api/catalog 拉取，站方 ai.txt 明确允许该接口

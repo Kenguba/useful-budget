@@ -3,16 +3,16 @@ name: Anchor navigation regression
 on:
   push:
     paths:
-      - 'frontend/ai-shop/index.html'
-      - 'frontend/skill-board/index.html'
-      - 'frontend/ip-check/index.html'
+      - 'frontend/pages/ai-shop/index.html'
+      - 'frontend/pages/skill-board/index.html'
+      - 'frontend/pages/ip-check/index.html'
       - '.github/scripts/check-anchor-navigation.mjs'
       - '.github/workflows/check-anchor-navigation.yml'
   pull_request:
     paths:
-      - 'frontend/ai-shop/index.html'
-      - 'frontend/skill-board/index.html'
-      - 'frontend/ip-check/index.html'
+      - 'frontend/pages/ai-shop/index.html'
+      - 'frontend/pages/skill-board/index.html'
+      - 'frontend/pages/ip-check/index.html'
       - '.github/scripts/check-anchor-navigation.mjs'
       - '.github/workflows/check-anchor-navigation.yml'
   workflow_dispatch:

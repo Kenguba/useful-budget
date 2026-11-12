@@ -19,11 +19,11 @@
   var BASE = '/hub/modules/';
   /* 资源版本戳：改任何 hub/模块文件，必须同步 bump 这里的 MV 与根 index.html 里 hub.js/hub.css 的 ?v=，
      否则 CDN 对 .js 有 4 小时缓存，会出现新 ui.html 配旧 module.js 的混搭（2026-11-09 实测 ip 模块中招） */
-  var MV = '20261110c';
+  var MV = '20261113a';
   var MODULES = {
-    phone: { proj: 'cloud-phone', dir: '/frontend/cloud-phone/', tier: 'light' },
-    '2fa': { proj: '2fa-auth',    dir: '/frontend/2fa-auth/',    tier: 'light' },
-    skill: { proj: 'skill-board', dir: '/frontend/skill-board/', tier: 'light' },
+    phone: { proj: 'cloud-phone', dir: '/frontend/pages/cloud-phone/', tier: 'light' },
+    '2fa': { proj: '2fa-auth',    dir: '/frontend/pages/2fa-auth/',    tier: 'light' },
+    skill: { proj: 'skill-board', dir: '/frontend/pages/skill-board/', tier: 'light' },
     /* ai is on-demand (heaviest: code 320KB + board ~424KB): never in the
      * idle preload order; the focus-card warm path downloads ui/css/js only.
      * lazyShops is a SWITCH POSITION ONLY (phase 3, not implemented):
@@ -31,12 +31,12 @@
      * (its own 2026-11-06 anti-fake-zero search behaviour). Flipping it to
      * true would defer shops.json to first directory/search use inside the
      * hub; do not flip until ken decides. */
-    ai:    { proj: 'ai-shop',     dir: '/frontend/ai-shop/',     tier: 'ondemand', lazyShops: false },
+    ai:    { proj: 'ai-shop',     dir: '/frontend/pages/ai-shop/',     tier: 'ondemand', lazyShops: false },
     /* ip (phase 4): pipeline module like the others, but its code alone is
      * ~187KB and it probes realtime APIs the moment it boots — ondemand
      * tier, NOT in PRELOAD_ORDER; focus warm downloads ui/css/js only
      * (modulepreload never evaluates, so warming cannot start a probe). */
-    ip:    { proj: 'ip-check',    dir: '/frontend/ip-check/',    tier: 'ondemand' },
+    ip:    { proj: 'ip-check',    dir: '/frontend/pages/ip-check/',    tier: 'ondemand' },
     /* pan (phase 4): the only multi-file self-SPA. NOT extracted — mounted
      * as a sub-application: an iframe in the module root loads its own
      * index from its real directory and bootstraps in its own document
@@ -44,7 +44,7 @@
      * document-global; same-document mounting would fight the shell).
      * Its internal history entries are unstamped -> the A1 contract treats
      * them as module-internal, exactly like ai/skill state entries. */
-    pan:   { proj: 'cloud-pan',   dir: '/frontend/cloud-pan/',   tier: 'subapp', subapp: true },
+    pan:   { proj: 'cloud-pan',   dir: '/frontend/pages/cloud-pan/',   tier: 'subapp', subapp: true },
     /* ui (phase 5, after ken picked slimming plan A): the standalone was
      * split first (data per collection in data/*.json, 27 posters as
      * files), so the pipeline module is ui 19K + css 51K + js 41K ~112K.
@@ -55,7 +55,7 @@
      * the strong intent signal here, exactly like ai/ip. Its runtime
      * poster paths ("assets/posters/..." inside finds.json) are rebased
      * by the pipeline's per-mount relative-URL watcher. */
-    ui:    { proj: 'ui-design',   dir: '/frontend/ui-design/',   tier: 'ondemand' }
+    ui:    { proj: 'ui-design',   dir: '/frontend/pages/ui-design/',   tier: 'ondemand' }
   };
   var PRELOAD_ORDER = ['phone', '2fa', 'skill']; /* sequential, lightest first; code+ui only, never data */
   var byProj = {};
@@ -228,7 +228,7 @@
 
   /* ---------- entry interception: home fly-out + card primary anchors ---- */
   function projFromHref(href) {
-    var m = /frontend\/([\w-]+)\//.exec(href || '');
+    var m = /frontend\/(?:pages\/)?([\w-]+)\//.exec(href || '');
     return m ? byProj[m[1]] : null;
   }
   document.addEventListener('click', function (ev) {

@@ -1,5 +1,5 @@
 // Regression contract: clicking a group owns the selected mark; browser history owns scroll only.
-// Run: node frontend/ai-shop/scripts/check-navigation.mjs
+// Run: node frontend/pages/ai-shop/scripts/check-navigation.mjs
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';

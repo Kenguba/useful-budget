@@ -15,7 +15,7 @@ ken 的微信与 Muse（逗包）之间的双向通道，2026-11-07 接通。
 - wechat-gateway-guard.sh — 守护 hook 脚本留档（30 秒轮询，重装丢失的服务单元、拉起停掉的网关、报告登录过期）
 - [ARCHITECTURE.md](ARCHITECTURE.md) — 整体搭建说明（组件、脚本读写、故障自愈、边界、迁移重建步骤）
 - [可行方案.md](%E5%8F%AF%E8%A1%8C%E6%96%B9%E6%A1%88.md) — 接入前的选型调研报告（14 条路线对比）
-- 可行方案的网页版在仓库 [frontend/wechat-bridge/](../../frontend/wechat-bridge/)（GitHub Pages 可直接打开，本目录只留文字版）
+- 可行方案的网页版在仓库 [frontend/pages/wechat-bridge/](../../frontend/pages/wechat-bridge/)（GitHub Pages 可直接打开，本目录只留文字版）
 
 ## 值班处理流程（agent 被唤醒时照此执行）
 

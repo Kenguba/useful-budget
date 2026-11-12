@@ -3,13 +3,13 @@ name: AI shop navigation regression
 on:
   push:
     paths:
-      - 'frontend/ai-shop/index.html'
-      - 'frontend/ai-shop/scripts/check-navigation.mjs'
+      - 'frontend/pages/ai-shop/index.html'
+      - 'frontend/pages/ai-shop/scripts/check-navigation.mjs'
       - '.github/workflows/check-ai-shop-navigation.yml'
   pull_request:
     paths:
-      - 'frontend/ai-shop/index.html'
-      - 'frontend/ai-shop/scripts/check-navigation.mjs'
+      - 'frontend/pages/ai-shop/index.html'
+      - 'frontend/pages/ai-shop/scripts/check-navigation.mjs'
       - '.github/workflows/check-ai-shop-navigation.yml'
   workflow_dispatch:
 
@@ -22,4 +22,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Verify selected card stays last clicked
-        run: node frontend/ai-shop/scripts/check-navigation.mjs
+        run: node frontend/pages/ai-shop/scripts/check-navigation.mjs

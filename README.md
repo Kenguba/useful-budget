@@ -22,8 +22,8 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 每个项目 = 一级目录一个，自带全套文件（页面、数据、脚本、图标等），互不引用、互不依赖：
 
 ```
-frontend/<project>/           # 例：frontend/skill-board/
-  index.html         # 项目页面（通过 /useful-budget/frontend/<project>/ 访问）
+frontend/pages/<project>/     # 例：frontend/pages/skill-board/
+  index.html         # 项目页面（通过 /useful-budget/frontend/pages/<project>/ 访问）
   data/              # 项目数据（如有）
   scripts/           # 项目脚本（如有）
   icons/             # 项目图标 / PWA 资源（如有）
@@ -32,8 +32,8 @@ frontend/<project>/           # 例：frontend/skill-board/
 ## 新增项目规范
 
 1. 目录名：全小写英文 + 连字符（如 `ai-links`），不使用中文、空格、下划线。
-2. 在根 `index.html` 导航页加一张卡片：项目名、一句话说明、状态标签，链接指向 `frontend/<project>/`（相对路径）。
-3. 项目需要定时更新的，在 `.github/workflows/` 里处理：脚本路径写全（含项目目录前缀，如 `frontend/skill-board/scripts/refresh.py`），数据提交范围写明项目目录（如 `git add frontend/skill-board/data/`）。
+2. 在根 `index.html` 导航页加一张卡片：项目名、一句话说明、状态标签，链接指向 `frontend/pages/<project>/`（相对路径）。
+3. 项目需要定时更新的，在 `.github/workflows/` 里处理：脚本路径写全（含项目目录前缀，如 `frontend/pages/skill-board/scripts/refresh.py`），数据提交范围写明项目目录（如 `git add frontend/pages/skill-board/data/`）。
 4. 发布方式全局统一：workflow 用 `actions/upload-pages-artifact` 上传仓库根目录（`path: .`），根导航与所有项目一次发布，不给单个项目单独建发布流程。
 5. 项目下线：删其目录 + 删导航页对应卡片，两处缺一不可。
 
@@ -41,15 +41,15 @@ frontend/<project>/           # 例：frontend/skill-board/
 
 | 目录 | 内容 | 更新方式 |
 | --- | --- | --- |
-| `frontend/skill-board/` | 全球 Skills 使用量排行榜（安装量双榜 + GitHub 星标榜） | workflow 每 12 小时跑 `scripts/refresh.py` 自动刷新数据并发布；自带 PWA，可添加到手机主屏幕 |
-| `frontend/ai-shop/` | AI账号商铺（AI 账号比价 7 分组 + 店铺目录） | workflow 每 12 小时跑 `scripts/refresh.py` 自动刷新数据并发布 |
-| `frontend/cloud-phone/` | 云手机横向对比（30 家资费/改机/底层真机核查） | 脚本每周两次（周一/周四）刷甘甘官网价（`scripts/refresh.py`）+ 每周一 agent 全量复核 30 家更新正文 |
-| `frontend/cloud-pan/` | 基德盘搜（pan）1:1 复刻：搜索首页 / 热播榜 / 每日更新 / 热搜榜 / APP / 申请友链 / 资源详情 | 手动跑 `scripts/refresh.py` 拉原站公开接口快照（`data/`），页面纯静态渲染 |
-| `frontend/ip-check/` | IP 纯净度检测（IPPure 风格 1:1 复刻，融合 ping0 字段）：ASN / 多源位置 / 人机流量比 / 来源 / 属性 / 纯净度系数 + 风控值 / 原生 IP / 大模型检测 / 共享人数 / 适用场景 | 纯静态单文件，浏览器端直查公开 IP 情报接口，无后端、无定时刷新 |
-| `frontend/2fa-auth/` | 2FA 验证码工具（2fa.fun 1:1 复刻）：谷歌验证器网页版，批量粘贴 2FA 密钥生成 6 位 TOTP 动态验证码，30 秒自动刷新、一键复制，毛玻璃侧边栏 + 深浅主题 + 中英切换 | 纯静态单文件，浏览器端本地计算（Web Crypto HMAC-SHA1），密钥不上传，无后端、无定时刷新 |
-| `frontend/ui-design/` | Designeer 设计目录复刻站（设计资源目录 + Finds 海报，署名 Designeer 并链回原页） | 手动跑 `scripts/refresh.py` 重拉官方目录数据，页面纯静态渲染 |
-| `frontend/wechat-bridge/` | 微信接入可行方案（调研报告页） | 静态页，手动维护 |
-| `frontend/motion-prompt/` | Motion Prompt 动效画廊（192 条命名动效/运镜/UI/网页特效，原画廊原样复刻，署名原作者 Shohei Ohtaki，MIT） | 纯静态站，手动维护（数据随上游原仓同步） |
+| `frontend/pages/skill-board/` | 全球 Skills 使用量排行榜（安装量双榜 + GitHub 星标榜） | workflow 每 12 小时跑 `scripts/refresh.py` 自动刷新数据并发布；自带 PWA，可添加到手机主屏幕 |
+| `frontend/pages/ai-shop/` | AI账号商铺（AI 账号比价 7 分组 + 店铺目录） | workflow 每 12 小时跑 `scripts/refresh.py` 自动刷新数据并发布 |
+| `frontend/pages/cloud-phone/` | 云手机横向对比（30 家资费/改机/底层真机核查） | 脚本每周两次（周一/周四）刷甘甘官网价（`scripts/refresh.py`）+ 每周一 agent 全量复核 30 家更新正文 |
+| `frontend/pages/cloud-pan/` | 基德盘搜（pan）1:1 复刻：搜索首页 / 热播榜 / 每日更新 / 热搜榜 / APP / 申请友链 / 资源详情 | 手动跑 `scripts/refresh.py` 拉原站公开接口快照（`data/`），页面纯静态渲染 |
+| `frontend/pages/ip-check/` | IP 纯净度检测（IPPure 风格 1:1 复刻，融合 ping0 字段）：ASN / 多源位置 / 人机流量比 / 来源 / 属性 / 纯净度系数 + 风控值 / 原生 IP / 大模型检测 / 共享人数 / 适用场景 | 纯静态单文件，浏览器端直查公开 IP 情报接口，无后端、无定时刷新 |
+| `frontend/pages/2fa-auth/` | 2FA 验证码工具（2fa.fun 1:1 复刻）：谷歌验证器网页版，批量粘贴 2FA 密钥生成 6 位 TOTP 动态验证码，30 秒自动刷新、一键复制，毛玻璃侧边栏 + 深浅主题 + 中英切换 | 纯静态单文件，浏览器端本地计算（Web Crypto HMAC-SHA1），密钥不上传，无后端、无定时刷新 |
+| `frontend/pages/ui-design/` | Designeer 设计目录复刻站（设计资源目录 + Finds 海报，署名 Designeer 并链回原页） | 手动跑 `scripts/refresh.py` 重拉官方目录数据，页面纯静态渲染 |
+| `frontend/pages/wechat-bridge/` | 微信接入可行方案（调研报告页） | 静态页，手动维护 |
+| `frontend/pages/motion-prompt/` | Motion Prompt 动效画廊（192 条命名动效/运镜/UI/网页特效，原画廊原样复刻，署名原作者 Shohei Ohtaki，MIT） | 纯静态站，手动维护（数据随上游原仓同步） |
 
 ## 子域名（Cloudflare 转发）
 
@@ -60,15 +60,15 @@ frontend/<project>/           # 例：frontend/skill-board/
 | 项目 | 子域名 |
 | --- | --- |
 | （全站入口）`index.html` | `xxxxx.asia`（主域名） |
-| `frontend/skill-board/` | `skill.xxxxx.asia` |
-| `frontend/ai-shop/` | `ai.xxxxx.asia` |
-| `frontend/cloud-phone/` | `phone.xxxxx.asia` |
-| `frontend/cloud-pan/` | `pan.xxxxx.asia` |
-| `frontend/ip-check/` | `ip.xxxxx.asia` |
-| `frontend/2fa-auth/` | `2fa.xxxxx.asia` |
-| `frontend/ui-design/` | `ui.xxxxx.asia` |
-| `frontend/wechat-bridge/` | `wechat.xxxxx.asia`（仅子域名，不进总汇） |
-| `frontend/motion-prompt/` | `motion.xxxxx.asia`（仅子域名，不进总汇） |
+| `frontend/pages/skill-board/` | `skill.xxxxx.asia` |
+| `frontend/pages/ai-shop/` | `ai.xxxxx.asia` |
+| `frontend/pages/cloud-phone/` | `phone.xxxxx.asia` |
+| `frontend/pages/cloud-pan/` | `pan.xxxxx.asia` |
+| `frontend/pages/ip-check/` | `ip.xxxxx.asia` |
+| `frontend/pages/2fa-auth/` | `2fa.xxxxx.asia` |
+| `frontend/pages/ui-design/` | `ui.xxxxx.asia` |
+| `frontend/pages/wechat-bridge/` | `wechat.xxxxx.asia`（仅子域名，不进总汇） |
+| `frontend/pages/motion-prompt/` | `motion.xxxxx.asia`（仅子域名，不进总汇） |
 
 **首页（总汇）收录规则（2026-11-07 ken 定）**：进总汇首页的只有 7 个——ai、skill、phone、pan、ip、2fa、ui。wechat 只开子域名 `wechat.xxxxx.asia`，不进总汇：不加短路径、不上首页卡片。以后新增项目先定类别：进首页的，子域名、总汇短路径、首页卡片三样一起加；不进首页的，只加子域名，并在子域名清单里登记注明，免得误加。
 

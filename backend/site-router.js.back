@@ -19,15 +19,15 @@
 // ============================================================
 // 通用解析：不数第几段，从右砍掉主域名（最后两段），左边剩下的整串就是前缀键。
 const ROUTES = {
-skill: "frontend/skill-board",
-ai: "frontend/ai-shop",
-phone: "frontend/cloud-phone",
-pan: "frontend/cloud-pan",
-ip: "frontend/ip-check",
-"2fa": "frontend/2fa-auth",
-ui: "frontend/ui-design",
-wechat: "frontend/wechat-bridge",
-motion: "frontend/motion-prompt",
+skill: "frontend/pages/skill-board",
+ai: "frontend/pages/ai-shop",
+phone: "frontend/pages/cloud-phone",
+pan: "frontend/pages/cloud-pan",
+ip: "frontend/pages/ip-check",
+"2fa": "frontend/pages/2fa-auth",
+ui: "frontend/pages/ui-design",
+wechat: "frontend/pages/wechat-bridge",
+motion: "frontend/pages/motion-prompt",
 };
 
 const HUB_SHORT = { ai: 1, phone: 1, skill: 1, ip: 1, pan: 1, '2fa': 1, ui: 1 };
