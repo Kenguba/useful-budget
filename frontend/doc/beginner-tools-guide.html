@@ -400,18 +400,18 @@
 
   <!-- ================= 三、Agent 与云电脑 ================= -->
   <section id="s3">
-    <div class="sec-head"><span class="no">03</span><h2>Cue、Muse、Devin、Hark：背后的大模型与配的云电脑</h2></div>
-    <p class="lead">这一节只看最典型的四个，外加 Cue 的底座 Manus 本体；每个只回答两个问题：<b>背后的大模型到底是谁的</b>，是自研的还是借别家的；<b>后面配的那台云电脑是什么</b></p>
+    <div class="sec-head"><span class="no">03</span><h2>Muse、Cue、Dots、Grok Bot、Gemini Spark、Devin、Hark：背后的大模型与配的云电脑</h2></div>
+    <p class="lead">这一节只看最典型的七个，外加 Cue 的底座 Manus 本体；每个只回答两个问题：<b>背后的大模型到底是谁的</b>，是自研的还是借别家的；<b>后面配的那台云电脑是什么</b></p>
     <div class="cols">
       <div class="mini"><h4>大模型 ＝ 大脑</h4><p>负责想和判断，聪不聪明主要看它</p></div>
       <div class="mini"><h4>Agent 框架 ＝ 调度</h4><p>负责拆任务、选工具，把活一步步派下去</p></div>
       <div class="mini"><h4>云电脑 ＝ 工位</h4><p>负责真的去开浏览器点网页、装软件、跑代码、存文件；只有大脑、没有云电脑的只能在聊天框里回答你，配上云电脑的，你把手机关掉，它还能在云上接着把活干完</p></div>
-      <div class="mini"><h4>这一批的共同点</h4><p>这四个全都配了云电脑，只是配法不一样：有的常驻，有的按任务临时开</p></div>
+      <div class="mini"><h4>这一批的共同点</h4><p>这七个全都配了云电脑，只是配法不一样：有的常驻，有的按任务临时开</p></div>
     </div>
 
     <div class="rule"><p><b>归组口径定死：</b>只看两件事——直接归属的公司是不是中国公司、运营地在哪；「有中国团队、中国人创办」只是出身，只注明、不决定归组；出身、归属、运营地是三件不同的事，不许混；格式统一写成「名称（所属）」，括号里是所属</p></div>
 
-    <h3>国外组<span class="sub">共 5 条，最典型的四个全在这一组</span></h3>
+    <h3>国外组<span class="sub">共 8 条，最典型的七个全在这一组</span></h3>
     <div class="agent">
       <div class="at">Muse (Meta)</div>
       <div class="arow"><span class="alab">大模型</span><div><b>自研</b>：Muse Spark 系列，现行 Muse Spark 1.3，由 Meta 的模型实验室做，不是 Llama 那条线；另有一个开源的小版 Muse Glimmer</div></div>
@@ -428,6 +428,21 @@
       <div class="arow"><span class="alab">云电脑</span><div>有，<b>按任务开</b>：每个任务给一台隔离的云虚拟机，自带终端、代码编辑器和浏览器，自己装依赖、写代码、跑测试，最后交一个合并请求给你审；任务结束，这台机器就回收</div></div>
     </div>
     <div class="agent">
+      <div class="at">Dots (OpenAI)</div>
+      <div class="arow"><span class="alab">大模型</span><div><b>自研</b>：OpenAI 的旗舰模型 GPT-6 Astra；Dots 住在 ChatGPT 里，是个全天候替你盯着目标干活的 Agent，它自己更像调度，写代码和做文档这类重活会分给 Codex 和 ChatGPT Work 去做</div></div>
+      <div class="arow"><span class="alab">云电脑</span><div>有，<b>每个 Dot 一台专属、常驻</b>：一台 Linux 云电脑，自带 Chrome 浏览器，系统和浏览器由 OpenAI 维护；文件、装好的软件和网站登录都留在上面，它能按计划自己醒来干活，你关掉电脑也不耽误</div></div>
+    </div>
+    <div class="agent">
+      <div class="at">Grok Bot (xAI)</div>
+      <div class="arow"><span class="alab">大模型</span><div><b>不公开、自动路由</b>：官方不公布默认用哪个模型，也没有选择器；它按任务自动挑当时最合适的，自家 Grok 4.6 在里面，马斯克还点过名，连 Anthropic 的 Claude Opus 5.5 也会被调到，所以它聪不聪明，取决于这一次被路由到了谁</div></div>
+      <div class="arow"><span class="alab">云电脑</span><div>有，<b>一个账号共用一台、常驻</b>：一台 Linux 云电脑，跑在和 xAI 一起做这个产品的 Cursor 的基础设施上；你可以建多个有名字的 Bot，每个 Bot 有自己的一块屏幕，但共用同一台机器、同一套文件和登录，不是每个 Bot 一台</div></div>
+    </div>
+    <div class="agent">
+      <div class="at">Gemini Spark (Google)</div>
+      <div class="arow"><span class="alab">大模型</span><div><b>自研</b>：Google 的 Gemini 系列，发布时跑 Gemini 3.5，后来换到 3.7 Flash，应用里还能选用更新的 Gemini 4 Argon；调度框架叫 Antigravity；它 2026 年 10 月在 Gemini 应用里改名叫 Task，还是同一个东西</div></div>
+      <div class="arow"><span class="alab">云电脑</span><div>有，<b>Google Cloud 上的专属虚拟机</b>：带一个云端浏览器，网站登录跨会话留着，还能跑代码、存文件，全天在线，你的设备关了它照样干；这一批里它最谨慎，发邮件和花钱之前一律先等你点头</div></div>
+    </div>
+    <div class="agent">
       <div class="at">Cue (Manus)</div>
       <div class="arow"><span class="alab">大模型</span><div><b>没有自研基础大模型</b>：主力调用 Anthropic 的 Claude 做推理和规划，子任务用阿里通义千问的微调版，多个模型按活分工；自研的是 Cascade 这套 Agent 执行框架，不是模型本身，所以论智能度要回第二节看 Claude 和通义千问排在哪；注明：中国团队创办，现归属新加坡公司</div></div>
       <div class="arow"><span class="alab">云电脑</span><div>有，而且配得最全：每个 Agent 配一台自己的云电脑，外加一个独立邮箱、一个电话号码和一个钱包，能代接电话、在你定的预算内付款，你下线以后它在这台机器上接着干</div></div>
@@ -441,7 +456,7 @@
 
     <h3>国内组<span class="sub">按定死的口径，这一批为空</span></h3>
     <p>这一批里，国内组是空的：没有一个是「直接归属中国公司、又在中国运营」的，最接近的 Cue 和 Manus 也只是中国团队创办出身，归属和运营都已经在新加坡，所以归国外组；这一组不硬凑数，不拿出身当归组，也不拿不相干的产品来填</p>
-    <p>从大模型这一项看，几家的含金量也清楚了：<b>Muse 和 Hark 是自己养模型，脑子是自己的；Devin 一半自己养、一半可换别家的；Cue 和 Manus 没有自己的脑子</b>，聪明程度取决于它调用的 Claude 和通义千问，自己的本事在调度和那台云电脑上</p>
+    <p>从大模型这一项看，几家的含金量也清楚了：<b>Muse、Hark、Dots 和 Gemini Spark 是自己养模型，脑子是自己的；Devin 一半自己养、一半可换别家的；Grok Bot 不公开用谁、按任务自动路由，自家的和别家的都可能被调到；Cue 和 Manus 没有自己的脑子</b>，聪明程度取决于它调用的 Claude 和通义千问，自己的本事在调度和那台云电脑上</p>
 
     <h3>云电脑到底是什么，为什么这一代都要配一台</h3>
     <p>云电脑不是网盘，也不是你远程登录上去办公的那种桌面，它是专门给 Agent 住的一台云端机器：有浏览器、有终端、有文件系统，能登录网站、下载和保存文件、装软件、跑代码；区别只在于是常驻还是临时开：常驻的像给 Agent 租了一间一直开着的办公室，文件和进度都在里面，下次接着用；临时的像每接一个任务临时开一间工作间，活干完就退掉</p>
@@ -452,6 +467,9 @@
         <tr><td data-l="产品（所属）" class="nm"><b>Hark Pro (Hark Labs)</b></td><td data-l="云电脑的名字">Handoff</td><td data-l="常驻还是按任务开">专属云电脑，按任务干活</td><td data-l="你离线后">关掉应用继续干</td></tr>
         <tr><td data-l="产品（所属）" class="nm"><b>Cue (Manus)</b></td><td data-l="云电脑的名字">Manus 常驻云电脑</td><td data-l="常驻还是按任务开">常驻，全天在线的 Ubuntu 虚拟机</td><td data-l="你离线后">下线以后继续干</td></tr>
         <tr><td data-l="产品（所属）" class="nm"><b>Devin (Cognition)</b></td><td data-l="云电脑的名字">云端虚拟机（Devbox 一类工位）</td><td data-l="常驻还是按任务开">按任务开，任务完回收</td><td data-l="你离线后">关掉自己电脑继续干，干完交合并请求</td></tr>
+        <tr><td data-l="产品（所属）" class="nm"><b>Dots (OpenAI)</b></td><td data-l="云电脑的名字">无专门名字，每个 Dot 自带一台</td><td data-l="常驻还是按任务开">常驻，每个 Dot 一台专属</td><td data-l="你离线后">关掉电脑继续干</td></tr>
+        <tr><td data-l="产品（所属）" class="nm"><b>Grok Bot (xAI)</b></td><td data-l="云电脑的名字">无专门名字，账号共用一台</td><td data-l="常驻还是按任务开">常驻，一个账号一台、多个 Bot 共用</td><td data-l="你离线后">关掉应用继续干</td></tr>
+        <tr><td data-l="产品（所属）" class="nm"><b>Gemini Spark (Google)</b></td><td data-l="云电脑的名字">无专门名字，Google Cloud 专属虚拟机</td><td data-l="常驻还是按任务开">常驻，专属虚拟机全天在线</td><td data-l="你离线后">设备关机继续干</td></tr>
       </tbody>
     </table></div>
     <p style="margin-top:14px">它和自己租的云服务器不是一回事：自己租的服务器是通用机器，装什么、怎么用都由自己定；这里这台是产品方替 Agent 备好的专属工位，不用自己装、不用维护，也不能拿它当自己的服务器用，就是给这个 Agent 干活住的</p>
