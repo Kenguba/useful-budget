@@ -1,0 +1,946 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>AI 云电脑</title>
+<script>
+  /* 首帧前先定主题，避免闪烁：有手动记录用记录，没有就跟随系统 */
+  (function(){
+    try{
+      var t = localStorage.getItem('ai-yun-theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      var a = localStorage.getItem('ai-yun-accent');
+      if (a !== null && a !== '') {
+        var n = parseInt(a, 10);
+        if (!isNaN(n) && n >= 0 && n <= 11) document.documentElement.setAttribute('data-accent', String(n));
+      }
+    }catch(e){}
+  })();
+</script>
+<style>
+  /* THEMES12 原值 — 与 ai-shop 同一套 */
+  :root[data-accent="0"]{--t-accent:#2563EB;--t-pagebg:#F4F8FC;--t-tagbg:#EBF5FF;--t-tagtext:#1D4ED8;--t-orb1:#BCE0FD;--t-orb2:#93C5FD;--t-glow:rgba(147,197,253,0.38)}
+  :root[data-accent="1"]{--t-accent:#059669;--t-pagebg:#F2FBF7;--t-tagbg:#ECFDF5;--t-tagtext:#047857;--t-orb1:#A7F3D0;--t-orb2:#6EE7B7;--t-glow:rgba(110,231,183,0.36)}
+  :root[data-accent="2"]{--t-accent:#4F46E5;--t-pagebg:#F4F6FC;--t-tagbg:#EEF2FF;--t-tagtext:#4338CA;--t-orb1:#A5F3FC;--t-orb2:#818CF8;--t-glow:rgba(129,140,248,0.34)}
+  :root[data-accent="3"]{--t-accent:#16A34A;--t-pagebg:#F6FAF5;--t-tagbg:#F0FDF4;--t-tagtext:#15803D;--t-orb1:#D9F99D;--t-orb2:#86EFAC;--t-glow:rgba(134,239,172,0.36)}
+  :root[data-accent="4"]{--t-accent:#0D9488;--t-pagebg:#F2F9FA;--t-tagbg:#F0FDFA;--t-tagtext:#0F766E;--t-orb1:#99F6E4;--t-orb2:#7DD3FC;--t-glow:rgba(125,211,252,0.36)}
+  :root[data-accent="5"]{--t-accent:#334155;--t-pagebg:#F5F7FA;--t-tagbg:#F1F5F9;--t-tagtext:#1E293B;--t-orb1:#CBD5E1;--t-orb2:#93C5FD;--t-glow:rgba(148,163,184,0.32)}
+  :root[data-accent="6"]{--t-accent:#6D28D9;--t-pagebg:#F8F5FD;--t-tagbg:#F3E8FF;--t-tagtext:#6D28D9;--t-orb1:#E9D5FF;--t-orb2:#C4B5FD;--t-glow:rgba(167,139,250,0.38)}
+  :root[data-accent="7"]{--t-accent:#DB2777;--t-pagebg:#FDF6F9;--t-tagbg:#FDF2F8;--t-tagtext:#BE185D;--t-orb1:#FBCFE8;--t-orb2:#FDA4AF;--t-glow:rgba(244,114,182,0.34)}
+  :root[data-accent="8"]{--t-accent:#EA580C;--t-pagebg:#FCF9F4;--t-tagbg:#FFF7ED;--t-tagtext:#C2410C;--t-orb1:#FDE68A;--t-orb2:#FDBA74;--t-glow:rgba(251,146,60,0.34)}
+  :root[data-accent="9"]{--t-accent:#9333EA;--t-pagebg:#FAF6FC;--t-tagbg:#FAF5FF;--t-tagtext:#7E22CE;--t-orb1:#F5D0FE;--t-orb2:#FECDD3;--t-glow:rgba(192,132,252,0.35)}
+  :root[data-accent="10"]{--t-accent:#CA8A04;--t-pagebg:#FAF9F2;--t-tagbg:#FEFCE8;--t-tagtext:#A16207;--t-orb1:#FEF08A;--t-orb2:#FDE047;--t-glow:rgba(234,179,8,0.32)}
+  :root[data-accent="11"]{--t-accent:#1A73E8;--t-pagebg:#F3F8FA;--t-tagbg:#E6F4EA;--t-tagtext:#137333;--t-orb1:#8FDBB8;--t-orb2:#9CC8F7;--t-glow:rgba(143,219,184,0.40)}
+
+  /* 浅色 — ai-shop 原值 */
+  :root{
+    color-scheme:light;
+    --page-bg:var(--t-pagebg,#F4F8FC);
+    --hero-bg:#FFFFFF;
+    --card-bg:#FFFFFF;
+    --card-border:rgba(226,232,240,0.75);
+    --text-primary:#0F172A;
+    --text-secondary:#64748B;
+    --text-muted:#94A3B8;
+    --pill-surface:#FFFFFF;
+    --pill-shadow:0 6px 20px rgba(15,23,42,0.06),0 2px 6px rgba(15,23,42,0.03);
+    --theme-accent:var(--t-accent,#2563EB);
+    --theme-tag-bg:var(--t-tagbg,#EBF5FF);
+    --theme-tag-text:var(--t-tagtext,#1D4ED8);
+    --search-glow:var(--t-glow,rgba(147,197,253,0.38));
+    --orb1:var(--t-orb1,#BCE0FD);
+    --orb2:var(--t-orb2,#93C5FD);
+    --green:#22C55E;
+    --specs-bg:#F8FAFC;
+    --radius:20px;
+    --ease:cubic-bezier(.16,1,.3,1);
+    /* aliases used below */
+    --line:var(--card-border);
+    --line-strong:rgba(148,163,184,.45);
+  }
+  /* 深色 — ai-shop 固定值，只 accent/tag/glow/orb 随套变 */
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --hero-bg-base:#0B1120;
+      --hero-bg:#0B1120;
+      --page-bg:#090D16;
+      --card-bg:#151F32;
+      --card-border:rgba(255,255,255,0.08);
+      --text-primary:#F8FAFC;
+      --text-secondary:#94A3B8;
+      --text-muted:#64748B;
+      --pill-surface:#1E293B;
+      --pill-shadow:0 8px 24px rgba(0,0,0,0.35);
+      --theme-tag-bg:color-mix(in srgb, var(--t-accent,#2563EB) 18%, #151F32);
+      --theme-tag-text:color-mix(in srgb, var(--t-accent,#2563EB) 45%, #F8FAFC);
+      --specs-bg:rgba(255,255,255,0.04);
+      --line:var(--card-border);
+      --line-strong:rgba(255,255,255,0.16);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --hero-bg-base:#0B1120;
+    --hero-bg:#0B1120;
+    --page-bg:#090D16;
+    --card-bg:#151F32;
+    --card-border:rgba(255,255,255,0.08);
+    --text-primary:#F8FAFC;
+    --text-secondary:#94A3B8;
+    --text-muted:#64748B;
+    --pill-surface:#1E293B;
+    --pill-shadow:0 8px 24px rgba(0,0,0,0.35);
+    --theme-tag-bg:color-mix(in srgb, var(--t-accent,#2563EB) 18%, #151F32);
+    --theme-tag-text:color-mix(in srgb, var(--t-accent,#2563EB) 45%, #F8FAFC);
+    --specs-bg:rgba(255,255,255,0.04);
+    --line:var(--card-border);
+    --line-strong:rgba(255,255,255,0.16);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .theme-item{--selbg:color-mix(in srgb, var(--d) 20%, transparent)}
+    :root:not([data-theme="light"]) .panel-backdrop{background:rgba(0,0,0,.4)}
+  }
+  :root[data-theme="dark"] .theme-item{--selbg:color-mix(in srgb, var(--d) 20%, transparent)}
+  :root[data-theme="dark"] .panel-backdrop{background:rgba(0,0,0,.4)}
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;color:var(--text-primary);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+    font-size:15px;line-height:1.55;
+    background:var(--page-bg);
+    background-color:var(--page-bg);
+    min-height:100vh;
+    transition:background-color .55s ease,color .5s ease;
+  }
+  .num{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+  a{color:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:16px 16px 44px}
+  .stat,.account,.card,.specs,.host-box,.sec-icon,.sec-count,.status,.icon,.avatar,footer,.theme-btn,.theme-panel{
+    transition:background-color .5s ease,border-color .5s ease,color .5s ease,box-shadow .5s ease;
+  }
+
+  /* 头部 — hero 底色 + 两团弥散光斑（orb1/orb2 随主题换） */
+  .top{
+    position:relative;overflow:hidden;isolation:isolate;
+    background:var(--hero-bg);
+    border:1px solid var(--card-border);
+    border-radius:22px;
+    padding:18px 18px 16px;
+    box-shadow:var(--pill-shadow);
+    transition:background-color .55s ease,border-color .5s ease;
+  }
+  .top::before,.top::after{content:"";position:absolute;border-radius:50%;filter:blur(52px);pointer-events:none;z-index:-1;transition:background-color .55s ease,opacity .55s ease}
+  .top::before{width:340px;height:340px;left:-90px;top:-150px;background:var(--orb1);opacity:.55}
+  .top::after{width:320px;height:320px;right:-70px;top:-130px;background:var(--orb2);opacity:.5}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .top::before{opacity:.28} :root:not([data-theme="light"]) .top::after{opacity:.24} }
+  :root[data-theme="dark"] .top::before{opacity:.28}
+  :root[data-theme="dark"] .top::after{opacity:.24}
+
+  .kicker{display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:11.5px;letter-spacing:.14em;padding-right:48px}
+  .kicker svg{width:16px;height:16px;flex:0 0 auto;color:var(--theme-accent);transition:color .5s ease}
+  .theme-anchor{position:absolute;top:14px;right:14px;z-index:50}
+  .theme-btn{
+    appearance:none;-webkit-appearance:none;padding:0;cursor:pointer;
+    width:38px;height:38px;border-radius:50%;
+    background:var(--pill-surface);border:1px solid var(--card-border);color:var(--text-secondary);
+    box-shadow:var(--pill-shadow);
+    display:flex;align-items:center;justify-content:center;
+    -webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:none;
+  }
+  .theme-btn:active{border-radius:50%}
+  @media(hover:hover){.theme-btn:hover{color:var(--text-primary)}}
+  .ic-wrap{display:flex;align-items:center;justify-content:center;transition:transform .55s var(--ease)}
+  .ic-wrap svg{width:19px;height:19px;display:block}
+  .theme-btn .ic-sun{display:none}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .ic-sun{display:block} :root:not([data-theme="light"]) .ic-moon{display:none} }
+  :root[data-theme="dark"] .ic-sun{display:block}
+  :root[data-theme="dark"] .ic-moon{display:none}
+
+  .panel-backdrop{position:fixed;inset:0;z-index:98;background:rgba(15,23,42,.16);opacity:0;pointer-events:none;transition:opacity .3s var(--ease)}
+  .panel-backdrop.open{opacity:1;pointer-events:auto}
+  .theme-panel{
+    position:fixed;z-index:101;
+    width:292px;max-width:calc(100vw - 28px);
+    max-height:calc(100dvh - 84px);overflow-y:auto;overscroll-behavior:contain;
+    background:var(--card-bg);border:1px solid var(--card-border);border-radius:18px;padding:14px;
+    box-shadow:var(--pill-shadow),0 24px 48px rgba(15,23,42,.14);
+    opacity:0;visibility:hidden;transform:translateY(-6px) scale(.97);transform-origin:top right;
+    transition:opacity .3s var(--ease),transform .3s var(--ease),visibility .3s,background-color .5s ease;
+  }
+  .theme-panel.open{opacity:1;visibility:visible;transform:none}
+  .panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .panel-title{font-size:13.5px;font-weight:700;color:var(--text-primary)}
+  .panel-hint{font-size:11px;color:var(--text-muted);white-space:nowrap}
+  .sys-row{
+    appearance:none;-webkit-appearance:none;width:100%;cursor:pointer;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:7px 10px;margin-bottom:8px;border-radius:10px;
+    background:transparent;border:1.5px solid var(--card-border);color:var(--text-secondary);
+    font:inherit;font-size:12.5px;text-align:left;
+    transition:background-color .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease);
+  }
+  .sys-row:active{border-radius:10px}
+  .sys-check{width:14px;height:14px;flex:0 0 auto;color:var(--theme-accent);opacity:0;transition:opacity .25s var(--ease)}
+  .sys-row[aria-pressed="true"]{color:var(--text-primary);border-color:var(--theme-accent);background:var(--theme-tag-bg)}
+  .sys-row[aria-pressed="true"] .sys-check{opacity:1}
+  .theme-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .theme-item{
+    --selbg:var(--dtag);
+    appearance:none;-webkit-appearance:none;cursor:pointer;
+    display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:12px;
+    background:transparent;border:1.5px solid transparent;color:var(--text-primary);
+    font:inherit;font-size:13px;text-align:left;
+    user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+    transition:transform .3s var(--ease),border-color .3s var(--ease),background-color .3s var(--ease),box-shadow .3s var(--ease);
+  }
+  .theme-item:active{border-radius:12px}
+  .theme-item .orb{width:22px;height:22px;border-radius:50%;flex:0 0 auto;background:linear-gradient(135deg,var(--orb1),var(--orb2));box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),0 2px 6px rgba(15,23,42,.12)}
+  .theme-item.on,.theme-item.hl{border-color:var(--d);background:var(--selbg);transform:scale(1.04);box-shadow:0 4px 16px var(--dglow)}
+  @media(prefers-reduced-motion:reduce){.ic-wrap,.theme-panel,.theme-item{transition:none}}
+
+  h1{font-size:27px;line-height:1.15;margin:7px 0 0;font-weight:800;letter-spacing:.01em;color:var(--text-primary)}
+  .top-sub{margin:7px 0 0;color:var(--text-secondary);font-size:13.5px;max-width:600px}
+  .stats{display:flex;gap:8px;flex-wrap:nowrap;margin-top:12px}
+  .stat{display:inline-flex;align-items:baseline;gap:6px;padding:5px 12px;border-radius:999px;background:var(--theme-tag-bg);border:1.5px solid transparent;font-size:12.5px;color:var(--text-secondary);flex:0 0 auto;white-space:nowrap}
+  .stat:active{border-radius:999px}
+  .stat b{font-size:14px;line-height:1.2;font-weight:700;color:var(--theme-tag-text)}
+  a.stat{text-decoration:none;cursor:pointer;transition:transform .3s var(--ease),background-color .5s ease,border-color .5s ease,color .5s ease,box-shadow .5s ease}
+  a.stat:active{transform:scale(.96)}
+  @media(hover:hover){a.stat:hover{box-shadow:0 4px 14px var(--search-glow)}}
+  h2[id]{scroll-margin-top:18px}
+
+  .account{margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;background:var(--pill-surface);border:1px solid var(--card-border);border-radius:14px;padding:9px 12px;box-shadow:var(--pill-shadow)}
+  .avatar{width:32px;height:32px;border-radius:50%;flex:0 0 auto;background:var(--theme-tag-bg);color:var(--theme-tag-text);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;border:1px solid var(--card-border)}
+  .avatar::before{content:"";width:3px;height:18px;border-radius:3px;background:var(--theme-accent);margin-right:6px;display:none}
+  .account-main{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+  .account-label{font-size:11.5px;color:var(--text-muted);white-space:nowrap}
+  .account-mail{font-size:14.5px;font-weight:600;color:var(--text-primary);word-break:break-all}
+  .account-note{font-size:12.5px;color:var(--text-secondary)}
+  .copy-btn{min-height:36px;padding:7px 14px;border-radius:999px;cursor:pointer;background:var(--theme-tag-bg);color:var(--theme-tag-text);border:1.5px solid transparent;font:inherit;font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;transition:background-color .35s var(--ease),border-color .35s var(--ease)}
+  .copy-btn:active{border-radius:999px;transform:scale(.98)}
+  .copy-btn svg{width:15px;height:15px;flex:0 0 auto}
+  @media(hover:hover){.copy-btn:hover{box-shadow:0 4px 14px var(--search-glow)}}
+
+  section{margin-top:30px}
+  .sec-head{display:flex;align-items:center;gap:10px;margin:0 2px 16px}
+  .sec-icon{width:30px;height:30px;border-radius:9px;flex:0 0 auto;background:var(--card-bg);border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center;color:var(--theme-accent);box-shadow:var(--pill-shadow)}
+  .sec-icon svg{width:16px;height:16px}
+  .sec-head h2{font-size:19px;margin:0;font-weight:700;color:var(--text-primary)}
+  .sec-count{font-size:12px;color:var(--theme-tag-text);background:var(--theme-tag-bg);border:1.5px solid transparent;border-radius:999px;padding:2px 10px;font-weight:600}
+  .sec-head .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line-strong),transparent)}
+
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+
+  .card{
+    --brand:#64748B;--brand-soft:rgba(100,116,139,.10);
+    position:relative;overflow:hidden;
+    background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);
+    padding:20px;display:flex;flex-direction:column;gap:14px;
+    box-shadow:var(--pill-shadow);
+    transition:transform .5s var(--ease),border-color .5s var(--ease),box-shadow .5s var(--ease),background-color .5s ease;
+  }
+  @media(hover:hover){.card:hover{transform:translateY(-3px);box-shadow:var(--pill-shadow),0 16px 32px rgba(15,23,42,.08)}}
+  .card-head{display:flex;align-items:flex-start;gap:12px;position:relative}
+  .icon{width:44px;height:44px;border-radius:12px;flex:0 0 auto;background:var(--theme-tag-bg);color:var(--theme-accent);border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center}
+  .icon svg{width:23px;height:23px}
+  .card-title{flex:1;min-width:0}
+  .card-title h3{margin:0;font-size:17px;line-height:1.3;font-weight:700;color:var(--text-primary)}
+  .card-title p{margin:3px 0 0;font-size:12.5px;color:var(--text-muted)}
+  .status{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--theme-tag-text);background:var(--theme-tag-bg);border:1.5px solid transparent;border-radius:999px;padding:5px 11px;white-space:nowrap}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex:0 0 auto;box-shadow:0 0 0 3px color-mix(in srgb, var(--green) 22%, transparent)}
+  .dot.gray{background:#94A3B8;box-shadow:none}
+  .desc{margin:0;font-size:13.5px;color:var(--text-secondary);position:relative}
+  .specs{display:grid;grid-template-columns:1fr 1fr;background:var(--specs-bg);border:1px solid var(--card-border);border-radius:14px;overflow:hidden}
+  .spec{padding:11px 13px;min-width:0}
+  .spec:nth-child(odd){border-right:1px solid var(--card-border)}
+  .spec:nth-child(-n+2){border-bottom:1px solid var(--card-border)}
+  .spec span{display:block;font-size:10.5px;color:var(--text-muted);letter-spacing:.12em;font-weight:600}
+  .spec b{display:block;margin-top:3px;font-size:14px;font-weight:700;line-height:1.4;color:var(--text-primary);overflow-wrap:anywhere}
+  .note{margin:0;font-size:13px;color:var(--text-secondary)}
+  .note b{color:var(--text-primary);font-weight:600}
+  .facts-table{width:100%;border-collapse:collapse;table-layout:fixed;background:var(--card-bg);border:1px solid var(--line-strong);border-radius:10px;overflow:hidden;font-size:13px;line-height:1.55}
+  .facts-table th,.facts-table td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--card-border)}
+  .facts-table tr:last-child th,.facts-table tr:last-child td{border-bottom:0}
+  .facts-table th{width:82px;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--theme-tag-text);background:var(--theme-tag-bg);white-space:nowrap;border-right:1px solid var(--card-border)}
+  .facts-table td{color:var(--text-secondary);overflow-wrap:anywhere}
+  .facts-table td b{color:var(--text-primary);font-weight:600}
+  @media(max-width:480px){.facts-table th{width:72px;padding:7px 8px}.facts-table td{padding:7px 8px}}
+  .host-box{background:var(--specs-bg);border:1px solid var(--card-border);border-radius:14px;padding:13px 14px;display:flex;flex-direction:column;gap:8px}
+  .host-title{font-size:13px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:7px}
+  .host-title::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green);flex:0 0 auto;box-shadow:0 0 0 3px color-mix(in srgb, var(--green) 18%, transparent)}
+  .host-box.no .host-title::before{background:#94A3B8;box-shadow:0 0 0 3px color-mix(in srgb, #94A3B8 18%, transparent)}
+  .host-box.pending .host-title::before{background:#F59E0B;box-shadow:0 0 0 3px color-mix(in srgb, #F59E0B 18%, transparent)}
+  .host-desc,.host-conclusion{margin:0;font-size:13px;color:var(--text-secondary);line-height:1.6}
+  .host-conclusion{color:var(--text-primary);font-weight:600}
+  .host-limit-title{font-size:11px;letter-spacing:.12em;font-weight:700;color:var(--text-muted)}
+  .host-limits{margin:0;padding-left:18px;font-size:13px;color:var(--text-secondary);line-height:1.6;display:flex;flex-direction:column;gap:4px}
+  .host-limits li::marker{color:var(--theme-accent)}
+  .host-toggle{appearance:none;-webkit-appearance:none;width:100%;cursor:pointer;background:transparent;border:0;padding:2px 0;margin:0;font:inherit;text-align:left;display:flex;align-items:center;gap:8px;color:inherit;border-radius:8px}
+  .host-toggle:active{border-radius:8px}
+  .host-toggle .host-title{flex:1;min-width:0}
+  .host-toggle-label{flex:0 0 auto;font-size:12px;font-weight:600;color:var(--theme-tag-text)}
+  .host-chevron{width:16px;height:16px;flex:0 0 auto;color:var(--text-secondary);transition:transform .35s var(--ease)}
+  .host-box.open .host-chevron{transform:rotate(180deg)}
+  .host-body{display:flex;flex-direction:column;gap:8px}
+  .host-body[hidden]{display:none}
+  .card-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:relative}
+  .updated{font-size:12px;color:var(--text-muted)}
+  .open-btn{min-height:42px;padding:10px 17px;border-radius:999px;text-decoration:none;background:var(--theme-tag-bg);border:1.5px solid color-mix(in srgb, var(--theme-accent) 28%, transparent);color:var(--theme-tag-text);font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px;box-shadow:0 6px 16px var(--search-glow);transition:transform .35s var(--ease),box-shadow .35s var(--ease),background-color .5s ease}
+  .open-btn:active{border-radius:999px;transform:scale(.98)}
+  .open-btn svg{width:15px;height:15px;transition:transform .35s var(--ease)}
+  @media(hover:hover){.open-btn:hover svg{transform:translateX(3px)}}
+  .card.dim{opacity:.82}
+  .card.dim .open-btn{background:var(--pill-surface);color:var(--text-secondary);border-color:var(--card-border);box-shadow:var(--pill-shadow)}
+  footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--card-border);color:var(--text-muted);font-size:12px;display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
+  @media(max-width:480px){
+    .wrap{padding:12px 12px 36px}
+    .top{padding:16px 14px 14px;border-radius:20px}
+    h1{font-size:25px}
+    .stats{gap:6px}
+    .stat{padding:4px 9px;gap:5px;font-size:12px}
+    .stat b{font-size:13px}
+    .account-note{display:none}
+    .card{padding:18px}
+    .open-btn{width:100%;justify-content:center}
+    .card-foot{flex-direction:column;align-items:stretch}
+    .updated{text-align:center}
+    .account{flex-wrap:nowrap;gap:8px;padding:8px 10px}
+    .avatar{width:28px;height:28px;font-size:12.5px}
+    .account-main{flex-direction:column;align-items:flex-start;gap:0;flex-wrap:nowrap}
+    .account-label{font-size:10.5px}
+    .account-mail{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;word-break:normal}
+    .copy-btn{flex:0 0 auto;min-height:32px;padding:6px 10px;font-size:12.5px;white-space:nowrap}
+    .copy-btn svg{width:13px;height:13px}
+  }
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto} *{transition-duration:.01ms !important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <!-- 顶部标题区 -->
+  <div class="top">
+    <div class="theme-anchor">
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="切换深浅，长按选择配色" aria-haspopup="true">
+        <span class="ic-wrap" id="themeIcon">
+          <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+          <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </span>
+      </button>
+      <div class="panel-backdrop" id="panelBackdrop"></div>
+      <div class="theme-panel" id="themePanel" role="dialog" aria-label="12色弥散主题">
+        <template id="themePanelTpl">
+        <div class="panel-head">
+          <span class="panel-title">12色弥散主题</span>
+          <span class="panel-hint">滑动或点按选择</span>
+        </div>
+        <button class="sys-row" id="sysRow" type="button" aria-pressed="true">
+          <span>跟随系统</span>
+          <svg class="sys-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>
+        </button>
+        <div class="theme-grid">
+          <button type="button" class="theme-item" data-accent="0" aria-pressed="true" style="--d:#2563EB;--dtag:#EBF5FF;--dglow:rgba(147,197,253,.38);--orb1:#BCE0FD;--orb2:#93C5FD"><span class="orb"></span>冰川晴空</button>
+          <button type="button" class="theme-item" data-accent="1" aria-pressed="false" style="--d:#059669;--dtag:#ECFDF5;--dglow:rgba(110,231,183,.36);--orb1:#A7F3D0;--orb2:#6EE7B7"><span class="orb"></span>薄荷微风</button>
+          <button type="button" class="theme-item" data-accent="2" aria-pressed="false" style="--d:#4F46E5;--dtag:#EEF2FF;--dglow:rgba(129,140,248,.34);--orb1:#A5F3FC;--orb2:#818CF8"><span class="orb"></span>极光青蓝</button>
+          <button type="button" class="theme-item" data-accent="3" aria-pressed="false" style="--d:#16A34A;--dtag:#F0FDF4;--dglow:rgba(134,239,172,.36);--orb1:#D9F99D;--orb2:#86EFAC"><span class="orb"></span>抹茶森屿</button>
+          <button type="button" class="theme-item" data-accent="4" aria-pressed="false" style="--d:#0D9488;--dtag:#F0FDFA;--dglow:rgba(125,211,252,.36);--orb1:#99F6E4;--orb2:#7DD3FC"><span class="orb"></span>碧海晴空</button>
+          <button type="button" class="theme-item" data-accent="5" aria-pressed="false" style="--d:#334155;--dtag:#F1F5F9;--dglow:rgba(148,163,184,.32);--orb1:#CBD5E1;--orb2:#93C5FD"><span class="orb"></span>深海星雾</button>
+          <button type="button" class="theme-item" data-accent="6" aria-pressed="false" style="--d:#6D28D9;--dtag:#F3E8FF;--dglow:rgba(167,139,250,.38);--orb1:#E9D5FF;--orb2:#C4B5FD"><span class="orb"></span>星云幻紫</button>
+          <button type="button" class="theme-item" data-accent="7" aria-pressed="false" style="--d:#DB2777;--dtag:#FDF2F8;--dglow:rgba(244,114,182,.34);--orb1:#FBCFE8;--orb2:#FDA4AF"><span class="orb"></span>蜜桃乌龙</button>
+          <button type="button" class="theme-item" data-accent="8" aria-pressed="false" style="--d:#EA580C;--dtag:#FFF7ED;--dglow:rgba(251,146,60,.34);--orb1:#FDE68A;--orb2:#FDBA74"><span class="orb"></span>晨曦微光</button>
+          <button type="button" class="theme-item" data-accent="9" aria-pressed="false" style="--d:#9333EA;--dtag:#FAF5FF;--dglow:rgba(192,132,252,.35);--orb1:#F5D0FE;--orb2:#FECDD3"><span class="orb"></span>落日粉紫</button>
+          <button type="button" class="theme-item" data-accent="10" aria-pressed="false" style="--d:#CA8A04;--dtag:#FEFCE8;--dglow:rgba(234,179,8,.32);--orb1:#FEF08A;--orb2:#FDE047"><span class="orb"></span>香槟流金</button>
+          <button type="button" class="theme-item" data-accent="11" aria-pressed="false" style="--d:#1A73E8;--dtag:#E6F4EA;--dglow:rgba(143,219,184,.40);--orb1:#8FDBB8;--orb2:#9CC8F7"><span class="orb"></span>幻彩全息</button>
+        </div>
+        </template>
+      </div>
+    </div>
+    <div class="kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 13.5a4 4 0 1 1 .8-7.9 5 5 0 0 1 9.6 1.2A3.25 3.25 0 0 1 16.5 13.5h-10z"/><rect x="5" y="16.5" width="14" height="4.5" rx="1.2"/><path d="M8.5 18.75h.01"/></svg>MY CLOUD WORKBENCH</div>
+    <h1>AI 云电脑</h1>
+    <p class="top-sub">今晚逐台领好并实测过的免费算力，都挂在同一个谷歌账号下，点卡片就能进各自的控制台</p>
+    <div class="stats" aria-label="汇总">
+      <a class="stat" href="#sec-ai"><b class="num">4 台</b><span>AI 云电脑</span></a>
+      <a class="stat" href="#sec-server"><b class="num">1 台</b><span>服务器</span></a>
+      <a class="stat pending" href="#sec-todo"><b class="num">1 项</b><span>待办理</span></a>
+    </div>
+
+    <div class="account">
+      <div class="avatar" aria-hidden="true">C</div>
+      <div class="account-main">
+        <div class="account-label">共用谷歌账号</div>
+        <div class="account-mail">cyberli***@gmail.com</div>
+      </div>
+      <div class="account-note">只显示谷歌账号，不显示密码、密钥等登录信息</div>
+      <button class="copy-btn" id="copyMail" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span id="copyLabel">复制账号</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 分区一：AI 云电脑 -->
+  <section aria-labelledby="sec-ai">
+    <div class="sec-head">
+      <span class="sec-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      </span>
+      <h2 id="sec-ai">AI 云电脑</h2>
+      <span class="sec-count">4 台</span>
+      <span class="rule" aria-hidden="true"></span>
+    </div>
+    <div class="grid">
+
+      <article class="card" style="--brand:#2f8fd6;--brand-soft:rgba(78,168,232,.13)">
+        <div class="card-head">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg>
+          </div>
+          <div class="card-title">
+            <h3>Kaggle GPU</h3>
+            <p>平台 Kaggle · Kaggle Notebook</p>
+          </div>
+          <span class="status"><span class="dot"></span>已领取</span>
+        </div>
+        <p class="desc">AI 推理与训练宿主，手机验证已过，T4 x2 已实测可选</p>
+        <div class="specs">
+          <div class="spec"><span>CPU</span><b class="num">4 核</b></div>
+          <div class="spec"><span>内存</span><b class="num">29 GB</b></div>
+          <div class="spec"><span>磁盘</span><b class="num">20 GB</b></div>
+          <div class="spec"><span>GPU</span><b class="num">2× Tesla T4 · 16 GB</b></div>
+        </div>
+        <p class="note">每周 <b class="num">30 小时</b>额度 · 按周重置</p>
+        <div class="host-box no">
+          <button class="host-toggle" type="button" aria-expanded="false" aria-controls="kaggleBody">
+            <span class="host-title">不能当服务器</span>
+            <span class="host-toggle-label">展开详情</span>
+            <svg class="host-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="host-body" id="kaggleBody" hidden>
+          <table class="facts-table">
+            <tbody>
+              <tr><th scope="row">归属</th><td>谷歌旗下平台，<b class="num">2017 年</b>被谷歌收购</td></tr>
+              <tr><th scope="row">打包实测</th><td>jpcard 生产包冷启动全程约 <b class="num">19 分钟</b>：环境 <b class="num">2 分 48 秒</b>、测试 <b class="num">6 分 14 秒</b>、构建 <b class="num">8 分 48 秒</b></td></tr>
+              <tr><th scope="row">暖打包</th><td>缓存齐时只要 <b class="num">3 分 52 秒</b>，已定为打包主力机</td></tr>
+              <tr><th scope="row">可用性</th><td>单次会话最长约 <b class="num">12 小时</b>，会话结束环境清空，要留的东西放私有数据集</td></tr>
+            </tbody>
+          </table>
+          <p class="host-desc">它是借 GPU 跑批的 Notebook 环境，没有对外开站的入口，会话一结束环境就不保留</p>
+          </div>
+        </div>
+        <div class="card-foot">
+          <span class="updated">更新时间 <span class="num">2026-11-12</span></span>
+          <a class="open-btn" href="https://www.kaggle.com/code/cyberli***/notebook7fe838f929/edit" target="_blank" rel="noopener noreferrer">打开 Notebook
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <article class="card" style="--brand:#dd8a06;--brand-soft:rgba(240,168,50,.13)">
+        <div class="card-head">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>
+          </div>
+          <div class="card-title">
+            <h3>Google Colab</h3>
+            <p>平台 Google</p>
+          </div>
+          <span class="status"><span class="dot"></span>已领取</span>
+        </div>
+        <p class="desc">AI 推理与训练宿主，T4 已实测跑通，笔记本存放在谷歌云端硬盘</p>
+        <div class="specs">
+          <div class="spec"><span>CPU</span><b class="num">—</b></div>
+          <div class="spec"><span>内存</span><b class="num">约 12.7 GB</b></div>
+          <div class="spec"><span>磁盘</span><b>会话临时空间</b></div>
+          <div class="spec"><span>GPU</span><b class="num">1× Tesla T4 · 15 GB</b></div>
+        </div>
+        <p class="note">单次会话最长 <b class="num">12 小时</b> · 结束清空</p>
+        <div class="host-box no">
+          <button class="host-toggle" type="button" aria-expanded="false" aria-controls="colabBody">
+            <span class="host-title">不能当服务器</span>
+            <span class="host-toggle-label">展开详情</span>
+            <svg class="host-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="host-body" id="colabBody" hidden>
+          <table class="facts-table">
+            <tbody>
+              <tr><th scope="row">归属</th><td>谷歌自家产品</td></tr>
+              <tr><th scope="row">打包实测</th><td>jpcard 生产包冷启动全程约 <b class="num">34 分钟</b>，冷构建 <b class="num">16 分钟</b>、是暖跑的 <b class="num">2 倍</b>多</td></tr>
+              <tr><th scope="row">暖打包</th><td>缓存齐时约 <b class="num">7 分 45 秒</b></td></tr>
+              <tr><th scope="row">可用性</th><td>运行时一次性的，断开删除就全清；闲置会断开，免费层会被动态限流</td></tr>
+            </tbody>
+          </table>
+          <p class="host-desc">它是随开随用的 Notebook 试验环境，关掉就不保留，也没有对外开站的入口</p>
+          </div>
+        </div>
+        <div class="card-foot">
+          <span class="updated">更新时间 <span class="num">2026-11-12</span></span>
+          <a class="open-btn" href="https://colab.research.google.com/drive/1F6bw3lXFUlk-RszOvWfboVY_wgBolkx1" target="_blank" rel="noopener noreferrer">打开控制台
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <article class="card" style="--brand:#8a6bf0;--brand-soft:rgba(167,139,250,.14)">
+        <div class="card-head">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          </div>
+          <div class="card-title">
+            <h3>InstaBox 云电脑</h3>
+            <p>平台 InstaBox · Debian 13 · 机器名 agent-browser-01</p>
+          </div>
+          <span class="status"><span class="dot"></span>运行中</span>
+        </div>
+        <p class="desc">AI 专属云电脑，免费档 1 台已建好并在运行，未绑卡、无邀请码</p>
+        <div class="specs">
+          <div class="spec"><span>CPU</span><b class="num">4 核</b></div>
+          <div class="spec"><span>内存</span><b class="num">8 GB</b></div>
+          <div class="spec"><span>磁盘</span><b class="num">20 GB + 16 GB 系统盘</b></div>
+          <div class="spec"><span>GPU</span><b>无独立 GPU</b></div>
+        </div>
+        <p class="note">空闲 <b class="num">30 分钟</b>自动暂停 · 单次最长运行 <b class="num">2 小时</b></p>
+        <div class="host-box" id="hostBox">
+          <button class="host-toggle" id="hostToggle" type="button" aria-expanded="false" aria-controls="hostBody">
+            <span class="host-title">可当云服务器 · 用来搭建网站</span>
+            <span class="host-toggle-label" id="hostToggleLabel">展开详情</span>
+            <svg class="host-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="host-body" id="hostBody" hidden>
+          <table class="facts-table">
+            <tbody>
+              <tr><th scope="row">归属</th><td>创业公司 <b>InsForge</b> 的产品，YC <b class="num">2026</b> 春季班，<b class="num">2026-10-14</b> 上线，测试期还没定价</td></tr>
+              <tr><th scope="row">打包实测</th><td>五台里最快，jpcard 生产包冷跑全程约 <b class="num">7 分钟</b></td></tr>
+              <tr><th scope="row">暖打包</th><td>缓存齐时只要约 <b class="num">2 分钟</b>，其中构建 <b class="num">1 分 49 秒</b></td></tr>
+              <tr><th scope="row">可用性</th><td>每账号可领 <b class="num">5 台</b>、目前领了 <b class="num">1 台</b>；机器固定不换、盘持久，暂停后唤醒只要几秒</td></tr>
+            </tbody>
+          </table>
+          <p class="host-desc">能在里面部署服务、搭建网站，再通过它自带的 Ports 功能发布出公网网址；外网的人直接点网址就能打开，不用登录它；今早已经实测通过，它上面正跑着一个测试页和一份例子站</p>
+          <div class="host-limit-title">使用限制</div>
+          <ul class="host-limits">
+            <li>空闲约 30 分钟就自动暂停，机器一睡网站就打不开了；外面的人没法把它叫醒，只能回控制台手动唤醒</li>
+            <li>免费档单次连续运行有时长上限，到点会停</li>
+            <li>它没有自己的公网 IP，发布出来的网址是平台给的随机子域名（instabox.tech 结尾的那串），绑不了自己的域名</li>
+            <li>免费档每月出站流量有上限，超了要等下个周期</li>
+          </ul>
+          <p class="host-conclusion">适合临时演示和试验用的网站；要 24 小时在线、挂自己域名的正式网站，还是放新加坡那台真服务器</p>
+          </div>
+        </div>
+        <div class="card-foot">
+          <span class="updated">更新时间 <span class="num">2026-11-12</span></span>
+          <a class="open-btn" href="https://dashboard.instabox.sh/dashboard/machines" target="_blank" rel="noopener noreferrer">打开控制台
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <article class="card" style="--brand:#0da08c;--brand-soft:rgba(20,184,166,.13)">
+        <div class="card-head">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/></svg>
+          </div>
+          <div class="card-title">
+            <h3>Simular Box 云电脑</h3>
+            <p>平台 Simular · Ubuntu 24.04.5 LTS · 机器名 main</p>
+          </div>
+          <span class="status"><span class="dot"></span>运行中</span>
+        </div>
+        <p class="desc">AI 专属云电脑，已从休眠唤醒在跑，带桌面、能接 MCP 让 AI 直接操作</p>
+        <div class="specs">
+          <div class="spec"><span>CPU</span><b class="num">2 核</b></div>
+          <div class="spec"><span>内存</span><b class="num">3.8 GB</b></div>
+          <div class="spec"><span>磁盘</span><b class="num">20 GB</b></div>
+          <div class="spec"><span>GPU</span><b>无独立 GPU</b></div>
+        </div>
+        <p class="note">免费档 · 每日 <b class="num">1000 credits</b> · 空闲自动休眠</p>
+        <div class="host-box no">
+          <button class="host-toggle" type="button" aria-expanded="false" aria-controls="simularBody">
+            <span class="host-title">不能当服务器</span>
+            <span class="host-toggle-label">展开详情</span>
+            <svg class="host-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="host-body" id="simularBody" hidden>
+          <table class="facts-table">
+            <tbody>
+              <tr><th scope="row">归属</th><td><b>Simular AI</b> 公司的产品</td></tr>
+              <tr><th scope="row">打包实测</th><td>环境和测试都过，<b class="num">497 个</b>测试全过、约 <b class="num">7 分钟</b>；但构建没跑完</td></tr>
+              <tr><th scope="row">实测结论</th><td>它没有直连出口、网络要走自带网关，盒子还会长时间失联，<b>不适合当打包机</b></td></tr>
+              <tr><th scope="row">可用性</th><td>免费版每天 <b class="num">1000 点</b>，开机每分钟扣 <b class="num">1 点</b></td></tr>
+            </tbody>
+          </table>
+          <p class="host-desc">它没有对外发布端口的功能，服务在里面跑起来外网也进不来；而且它会自己睡觉，连睡 14 天还会被删除</p>
+          </div>
+        </div>
+        <div class="card-foot">
+          <span class="updated">更新时间 <span class="num">2026-11-12</span></span>
+          <a class="open-btn" href="https://box.simular.ai/box/cb-09d0ac786de1" target="_blank" rel="noopener noreferrer">打开控制台
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- 分区二：服务器 -->
+  <section aria-labelledby="sec-server">
+    <div class="sec-head">
+      <span class="sec-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 6.5h.01M6 17.5h.01"/></svg>
+      </span>
+      <h2 id="sec-server">服务器</h2>
+      <span class="sec-count">1 台</span>
+      <span class="rule" aria-hidden="true"></span>
+    </div>
+    <div class="grid">
+      <article class="card" style="--brand:#23a3dd;--brand-soft:rgba(86,200,245,.13)">
+        <div class="card-head">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 6.5h.01M6 17.5h.01"/></svg>
+          </div>
+          <div class="card-title">
+            <h3>新加坡 VPS</h3>
+            <p>平台 优刻得 ULightHost · Ubuntu 24.04</p>
+          </div>
+          <span class="status"><span class="dot"></span>运行中</span>
+        </div>
+        <p class="desc">自购的海外服务器，部署网站与自建线路在用</p>
+        <div class="specs">
+          <div class="spec"><span>CPU</span><b class="num">2 核</b></div>
+          <div class="spec"><span>内存</span><b class="num">4 GB</b></div>
+          <div class="spec"><span>磁盘</span><b class="num">80 GB</b></div>
+          <div class="spec"><span>GPU</span><b>无</b></div>
+        </div>
+        <p class="note">年付 <b class="num">¥115.92</b> · <b class="num">2027-11-08</b> 到期 · 部署网站与自建线路在用</p>
+        <div class="host-box">
+          <button class="host-toggle" type="button" aria-expanded="false" aria-controls="sgBody">
+            <span class="host-title">能当服务器 · 正牌云服务器</span>
+            <span class="host-toggle-label">展开详情</span>
+            <svg class="host-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="host-body" id="sgBody" hidden>
+          <table class="facts-table">
+            <tbody>
+              <tr><th scope="row">归属</th><td>优刻得 <b>UCloud</b> 的云服务器</td></tr>
+              <tr><th scope="row">打包</th><td>已退役：<b class="num">2026-11-12</b> 起不在这台生产机打包，环境保留作后备</td></tr>
+              <tr><th scope="row">使用约定</th><td>生产环境借作他用，要先问负责人</td></tr>
+            </tbody>
+          </table>
+          <p class="host-desc">它有自己的公网 IP，能绑自己的域名，24 小时在线；现在 word 背词站和 eg 例子站就跑在它上面，是主力服务器</p>
+          </div>
+        </div>
+        <div class="card-foot">
+          <span class="updated">更新时间 <span class="num">2026-11-12</span></span>
+          <a class="open-btn" href="https://www.ucloud.cn" target="_blank" rel="noopener noreferrer">打开控制台
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 分区三：待办理 -->
+  <section aria-labelledby="sec-todo">
+    <div class="sec-head">
+      <span class="sec-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      </span>
+      <h2 id="sec-todo">待办理</h2>
+      <span class="sec-count">1 项</span>
+      <span class="rule" aria-hidden="true"></span>
+    </div>
+    <div class="grid">
+      <article class="card dim" style="--brand:#e05252;--brand-soft:rgba(224,82,82,.12)">
+        <div class="card-head">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 .42-8.98 6.5 6.5 0 0 0-12.6 1.6A4 4 0 0 0 6 19h11.5z"/></svg>
+          </div>
+          <div class="card-title">
+            <h3>甲骨文 Oracle Cloud</h3>
+            <p>平台 Oracle · Always Free 永久免费</p>
+          </div>
+          <span class="status"><span class="dot gray"></span>待办理</span>
+        </div>
+        <p class="desc">还没注册，等定下用哪张实体卡验证再开办</p>
+        <div class="specs">
+          <div class="spec"><span>ARM 机器</span><b class="num">2 台 · 2 核 12 GB</b></div>
+          <div class="spec"><span>AMD 机器</span><b>2 台微型机</b></div>
+          <div class="spec"><span>磁盘</span><b>以开通时为准</b></div>
+          <div class="spec"><span>GPU</span><b>无</b></div>
+        </div>
+        <p class="note">注册需本人<b>实体信用卡</b>验证 · 虚拟卡官方不接受</p>
+        <div class="host-box pending">
+          <button class="host-toggle" type="button" aria-expanded="false" aria-controls="oracleBody">
+            <span class="host-title">能当服务器 · 还没到手</span>
+            <span class="host-toggle-label">展开详情</span>
+            <svg class="host-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="host-body" id="oracleBody" hidden>
+          <table class="facts-table">
+            <tbody>
+              <tr><th scope="row">归属</th><td>甲骨文 <b>Oracle</b> 自家云服务</td></tr>
+            </tbody>
+          </table>
+          <p class="host-desc">还没到手；真办下来是正牌 VPS，能当服务器</p>
+          </div>
+        </div>
+        <div class="card-foot">
+          <span class="updated">更新时间 <span class="num">2026-11-12</span></span>
+          <a class="open-btn" href="https://www.oracle.com/cloud/free/" target="_blank" rel="noopener noreferrer">打开官网
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span>状态为 2026-11-12 确认快照，非实时监测</span>
+    <span>机器状态以点进各自控制台看到的为准</span>
+  </footer>
+
+</main>
+<script>
+  (function(){
+    /* ---------- 主题按钮：单击切深浅，长按弹 12 色面板滑动选 ---------- */
+    var KEY = 'ai-yun-theme';
+    var AKEY = 'ai-yun-accent';
+    var root = document.documentElement;
+    var btn = document.getElementById('themeBtn');
+    var iconWrap = document.getElementById('themeIcon');
+    var panel = document.getElementById('themePanel');
+    var backdrop = document.getElementById('panelBackdrop');
+    /* 面板与遮罩原本嵌在头部 .top 里，.top 的 isolation 层叠上下文把 z-index 锁死在头部内部，
+       下面的卡片按 DOM 顺序盖住面板下半截；移到 body 顶层后 z-index 98/101 才对全页生效 */
+    document.body.appendChild(backdrop);
+    document.body.appendChild(panel);
+    var sysRow = null;
+    var items = [];
+    var rot = 0;
+
+    function storedMode(){
+      var t = null;
+      try { t = localStorage.getItem(KEY); } catch(e) {}
+      return (t === 'light' || t === 'dark') ? t : 'system';
+    }
+    function effectiveDark(){
+      var t = root.getAttribute('data-theme');
+      if (t === 'dark') return true;
+      if (t === 'light') return false;
+      return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+    function paintSys(){
+      if (sysRow) sysRow.setAttribute('aria-pressed', storedMode() === 'system' ? 'true' : 'false');
+    }
+    function applyMode(mode){
+      if (mode === 'light' || mode === 'dark') {
+        root.setAttribute('data-theme', mode);
+        try { localStorage.setItem(KEY, mode); } catch(e) {}
+      } else {
+        root.removeAttribute('data-theme');
+        try { localStorage.removeItem(KEY); } catch(e) {}
+      }
+      paintSys();
+    }
+    function toggleTheme(){
+      applyMode(effectiveDark() ? 'light' : 'dark');
+      rot += 180;
+      if (iconWrap) iconWrap.style.transform = 'rotate(' + rot + 'deg)';
+    }
+
+    /* ---------- 12 套配色（与深浅独立，单独记住） ---------- */
+    function currentAccent(){
+      var v = null;
+      try { v = localStorage.getItem(AKEY); } catch(e) {}
+      var n = parseInt(v, 10);
+      return (isNaN(n) || n < 0 || n > 11) ? 0 : n;
+    }
+    function paintAccent(){
+      var idx = currentAccent();
+      for (var j = 0; j < items.length; j++) {
+        var on = parseInt(items[j].getAttribute('data-accent'), 10) === idx;
+        items[j].classList.toggle('on', on);
+        items[j].setAttribute('aria-pressed', on ? 'true' : 'false');
+      }
+    }
+    function applyAccent(idx){
+      root.setAttribute('data-accent', String(idx));
+      try { localStorage.setItem(AKEY, String(idx)); } catch(e) {}
+      paintAccent();
+    }
+
+    /* ---------- 面板开合（内容懒渲染：首次打开才把模板装进面板） ---------- */
+    var panelOpen = false;
+    var built = false;
+    function buildPanel(){
+      if (built) return;
+      built = true;
+      var tpl = document.getElementById('themePanelTpl');
+      panel.appendChild(tpl.content.cloneNode(true));
+      sysRow = panel.querySelector('.sys-row');
+      items = panel.querySelectorAll('.theme-item');
+      for (var k = 0; k < items.length; k++) {
+        items[k].addEventListener('click', function(){
+          applyAccent(parseInt(this.getAttribute('data-accent'), 10));
+          closePanel();
+        });
+      }
+      sysRow.addEventListener('click', function(){ applyMode('system'); });
+      paintAccent(); paintSys();
+    }
+    function placePanel(){
+      /* fixed 定位只认视口坐标：top 严格 = 按钮 rect.bottom + 8，不叠加 scrollY 或任何偏移 */
+      var r = btn.getBoundingClientRect();
+      var top = r.bottom + 8;
+      panel.style.top = top + 'px';
+      panel.style.right = Math.max(8, window.innerWidth - r.right) + 'px';
+      /* 高度上限 = 视口高 − top − 底部安全距，超出部分面板内部滚动，最后一行够得着 */
+      panel.style.maxHeight = Math.max(180, window.innerHeight - top - 14) + 'px';
+    }
+    function openPanel(){
+      buildPanel();
+      panelOpen = true;
+      paintAccent(); paintSys();
+      placePanel();
+      panel.classList.add('open');
+      backdrop.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+    window.addEventListener('resize', function(){ if (panelOpen) placePanel(); });
+    window.addEventListener('scroll', function(){ if (panelOpen) placePanel(); }, true);
+    function closePanel(){
+      panelOpen = false;
+      setHl(null);
+      panel.classList.remove('open');
+      backdrop.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+    backdrop.addEventListener('click', closePanel);
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && panelOpen) closePanel();
+    });
+
+    /* ---------- 长按与滑动选择 ---------- */
+    var pressTimer = null, sliding = false, suppressClick = false, hlItem = null;
+    function setHl(item){
+      if (hlItem === item) return;
+      if (hlItem) hlItem.classList.remove('hl');
+      hlItem = item;
+      if (hlItem) hlItem.classList.add('hl');
+    }
+    btn.addEventListener('pointerdown', function(){
+      sliding = false;
+      if (pressTimer) clearTimeout(pressTimer);
+      pressTimer = setTimeout(function(){
+        pressTimer = null;
+        sliding = true;
+        suppressClick = true;
+        openPanel();
+        if (navigator.vibrate) { try { navigator.vibrate(8); } catch(e) {} }
+      }, 340);
+    });
+    document.addEventListener('pointermove', function(e){
+      if (!sliding) return;
+      if (e.cancelable) e.preventDefault();
+      var el = document.elementFromPoint(e.clientX, e.clientY);
+      var item = (el && el.closest) ? el.closest('.theme-item') : null;
+      setHl(item);
+    }, { passive:false });
+    document.addEventListener('pointerup', function(){
+      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; return; }
+      if (sliding) {
+        sliding = false;
+        if (hlItem) {
+          applyAccent(parseInt(hlItem.getAttribute('data-accent'), 10));
+          closePanel();
+        }
+        setHl(null);
+        setTimeout(function(){ suppressClick = false; }, 80);
+      }
+    });
+    document.addEventListener('pointercancel', function(){
+      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+      sliding = false;
+      setHl(null);
+    });
+    btn.addEventListener('click', function(){
+      if (suppressClick) { suppressClick = false; return; }
+      toggleTheme();
+    });
+    btn.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+    btn.setAttribute('aria-expanded', 'false');
+
+    /* ---------- 复制账号 ---------- */
+    /* 注意：变量名不能再用 btn —— btn 已是主题按钮，placePanel 靠它定位；
+       此前这里把 btn 覆盖成复制按钮，导致面板锚到账号卡位置、偏离约 260px */
+    var copyBtn = document.getElementById('copyMail');
+    var label = document.getElementById('copyLabel');
+    var mail = 'cyberli***@gmail.com';
+    var timer = null;
+    copyBtn.addEventListener('click', function(){
+      function done(){
+        label.textContent = '已复制';
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(function(){ label.textContent = '复制账号'; }, 1800);
+      }
+      function fallback(){
+        var ta = document.createElement('textarea');
+        ta.value = mail;
+        ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch(e) {}
+        document.body.removeChild(ta); done();
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(mail).then(done, fallback);
+      } else { fallback(); }
+    });
+
+    /* ---------- 每张卡的服务器说明区块：默认折叠，点标题展开/收起 ---------- */
+    var hostToggles = document.querySelectorAll('.host-toggle');
+    for (var h = 0; h < hostToggles.length; h++) {
+      hostToggles[h].addEventListener('click', function(){
+        var box = this.closest('.host-box');
+        var body = box ? box.querySelector('.host-body') : null;
+        if (!box || !body) return;
+        var label = this.querySelector('.host-toggle-label');
+        var open = body.hidden;
+        body.hidden = !open;
+        box.classList.toggle('open', open);
+        this.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (label) label.textContent = open ? '收起' : '展开详情';
+      });
+    }
+
+    /* ---------- 汇总徽章跳转：压历史记录滚动到分区，返回时滚回原位 ---------- */
+    var statLinks = document.querySelectorAll('a.stat[href^="#"]');
+    var jumpBackY = null;
+    for (var s = 0; s < statLinks.length; s++) {
+      statLinks[s].addEventListener('click', function(e){
+        var target = document.getElementById(this.getAttribute('href').slice(1));
+        if (!target) return;
+        e.preventDefault();
+        var y = window.scrollY || window.pageYOffset || 0;
+        var pushed = false;
+        try { history.pushState({ aiYunJump: true }, ''); pushed = true; } catch(err) {}
+        if (pushed) jumpBackY = y;
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+    window.addEventListener('popstate', function(){
+      if (jumpBackY === null) return;
+      var y = jumpBackY;
+      jumpBackY = null;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    });
+  })();
+</script>
+</body>
+</html>
