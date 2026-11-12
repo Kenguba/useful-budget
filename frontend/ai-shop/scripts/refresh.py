@@ -12,7 +12,7 @@
 店铺目录由 data/shops.csv 转 data/shops.json（独立文件，不进映射表）。
 
 用法：python3 scripts/refresh.py
-产出：data/board.json（含 prices 价格史段）、data/shops.json、data/maps.json（仅平台映射）、data/price-log.json
+产出：data/board.json（含 prices 价格史段）、data/shops.json、data/maps.json（仅平台映射）、data/price-log/（按来源分片）
 """
 import csv, html, io, json, os, re, sys, time, urllib.parse, urllib.request
 
@@ -998,6 +998,64 @@ def apply_pool_round(log, pool, pool_src, ovr_pool, now_min):
             rec[-1] = int(ov[2])
     return n_new, n_chg, n_ovr
 
+def _shard_of(key):
+    """全量池分片归属（ken 2026-11-12 定：按来源分片存 data/price-log/）：平台短码键
+    按短码分片，整链接键（自建站）归 web 片，其余归 misc 片。"""
+    if key.startswith('http://') or key.startswith('https://'):
+        return 'web'
+    code, sep, _ = key.partition(':')
+    if sep and code and '/' not in code and ' ' not in code:
+        return code
+    return 'misc'
+
+
+def _load_price_log_shards(data_dir):
+    """读 data/price-log/ 分片并合并为一张表；无分片目录时返回 None（走旧单文件兜底）。"""
+    sdir = os.path.join(data_dir, 'price-log')
+    idx_path = os.path.join(sdir, 'index.json')
+    if not os.path.isfile(idx_path):
+        return None
+    with open(idx_path, encoding='utf-8') as f:
+        idx = json.load(f)
+    log = {}
+    for name in idx.get('shards', {}):
+        with open(os.path.join(sdir, name + '.json'), encoding='utf-8') as f:
+            log.update(json.load(f).get('items', {}))
+    return log
+
+
+def _save_price_log_shards(data_dir, log, now_bj):
+    """按来源把全量表写回分片：只重写内容变了的片，刷新 index.json 清单，旧单文件
+    price-log.json 在场时一并删除（迁移收尾）。表为空时不落盘，防止读失败误清池。"""
+    if not log:
+        return
+    sdir = os.path.join(data_dir, 'price-log')
+    os.makedirs(sdir, exist_ok=True)
+    groups = {}
+    for k, v in log.items():
+        groups.setdefault(_shard_of(k), {})[k] = v
+    shards = {}
+    for name, items in sorted(groups.items()):
+        payload = json.dumps(dict(v=3, items=items), ensure_ascii=False, separators=(',', ':'))
+        path = os.path.join(sdir, name + '.json')
+        old = None
+        try:
+            with open(path, encoding='utf-8') as f:
+                old = f.read()
+        except Exception:
+            old = None
+        if old != payload:
+            with open(path, 'w', encoding='utf-8') as f:
+                f.write(payload)
+        shards[name] = dict(keys=len(items), bytes=len(payload.encode('utf-8')))
+    idx = dict(v=1, updated_at=now_bj.strftime('%Y-%m-%d %H:%M'), total=len(log), shards=shards)
+    with open(os.path.join(sdir, 'index.json'), 'w', encoding='utf-8') as f:
+        json.dump(idx, f, ensure_ascii=False, indent=1)
+    legacy = os.path.join(data_dir, 'price-log.json')
+    if os.path.isfile(legacy):
+        os.remove(legacy)
+
+
 def main():
     # 16688 直拉放后台线程，与聚合抓取并行，合并时再收结果（预算见 DIRECT_16688_BUDGET）
     import threading
@@ -1333,8 +1391,12 @@ def main():
         _plat = PlatformMap(_maps.get('platforms')) if _maps.get('platforms') else None
         _log = {}
         try:
-            with open(_log_path, encoding='utf-8') as f:
-                _raw = json.load(f)
+            _sharded = _load_price_log_shards(DATA)
+            if _sharded is not None:
+                _raw = dict(v=3, items=_sharded)
+            else:
+                with open(_log_path, encoding='utf-8') as f:
+                    _raw = json.load(f)
             if _plat is None and _raw.get('v') == 2 and _raw.get('pfx'):
                 _plat = platforms_from_prefixes(_raw['pfx'])
             if _plat is None:
@@ -1408,8 +1470,7 @@ def main():
                 if _rec and len(_rec) > 3:
                     _last_ts = _rec[0] + sum(_rec[3::3])
                     it['pc'] = _dt.fromtimestamp(_last_ts * 60, _bj).strftime('%Y-%m-%d')
-        with open(_log_path, 'w', encoding='utf-8') as f:
-            json.dump(dict(v=3, items=_log), f, ensure_ascii=False, separators=(',', ':'))
+        _save_price_log_shards(DATA, _log, _now)
         print(f'price-log: {len(_log)} keys (pool {len(_pool)}, new {_n_new}, renamed {_n_ren}, changed {_n_chg}, overridden {_n_ovr}, {int((_time.time() - _t0) * 1000)}ms)', file=sys.stderr)
         # 看板价格史段（ken 2026-11-10 三件套收拢）：原 board-prices 小表退役，当前 board
         # 条目的价格记录直接并入 board.json 顶层 prices 段（三元差分数组，来源码在点内），
