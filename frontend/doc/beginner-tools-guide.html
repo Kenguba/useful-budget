@@ -23,7 +23,6 @@
 
     /* ================= 1. 核心动态 CSS 变量体系（同步 Ai比价.html 12色弥散主题） ================= */
     :root {
-      --hero-bg-base: #FFFFFF;
       --orb-color-1: #BCE0FD;
       --orb-color-2: #93C5FD;
       --refresh-btn-bg: #60A5FA;
@@ -44,7 +43,6 @@
     }
 
     [data-dark="true"] {
-      --hero-bg-base: #111827;
       --page-bg: #090D16;
       --card-bg: #111827;
       --card-border: rgba(255, 255, 255, 0.08);
@@ -138,115 +136,38 @@
       color: var(--orb-color-2);
     }
 
-    /* ================= 2. Hero 弥散光晕层 ================= */
+    /* ================= 2. Hero 顶部渐变（规范：整片平滑的表面渐变，颜色取当前主题那套） ================= */
     .hero-aura-card {
       position: relative;
-      background-color: var(--hero-bg-base);
-      transition: background-color 0.55s ease;
+      background: linear-gradient(180deg,
+        color-mix(in srgb, var(--orb-color-1) 72%, #FFFFFF) 0%,
+        color-mix(in srgb, var(--orb-color-2) 72%, #FFFFFF) 100%);
       overflow: hidden;
       z-index: 1;
     }
 
-    .aura-backdrop {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: -1;
-      overflow: hidden;
+    [data-dark="true"] .hero-aura-card {
+      background: linear-gradient(180deg,
+        color-mix(in srgb, var(--orb-color-1) 24%, #131C2E) 0%,
+        color-mix(in srgb, var(--orb-color-2) 14%, #0B1120) 100%);
     }
 
-    .aura-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(52px);
-      opacity: 0.72;
-      transition: background-color 0.75s cubic-bezier(0.22, 1, 0.36, 1),
-                  transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* 第12号主题「幻彩全息」：同一套幻彩色流动渐变 */
+    [data-holo="true"] .hero-aura-card {
+      background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%);
+      background-size: 220% 220%;
+      animation: videoHoloBtn 4.2s ease infinite;
     }
 
-    [data-dark="true"] .aura-orb {
-      opacity: 0.07;
-      filter: blur(76px);
-    }
-
-    .aura-orb.orb-left {
-      width: 340px;
-      height: 240px;
-      top: -60px;
-      left: -60px;
-      background-color: var(--orb-color-1);
-    }
-
-    .aura-orb.orb-right {
-      width: 360px;
-      height: 260px;
-      bottom: -80px;
-      right: -60px;
-      background-color: var(--orb-color-2);
-    }
-
-    .aura-orb.orb-center {
-      width: 300px;
-      height: 210px;
-      top: -40px;
-      left: 32%;
-      background-color: #9EE0C5;
-      opacity: 0;
-      transition: opacity 0.6s ease, background-color 0.75s ease;
-    }
-
-    /* 第12号主题「幻彩全息」动态呼吸极光 */
-    @keyframes videoHoloLeft {
-      0%   { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
-      25%  { background-color: #8FDBB8; transform: translate(16px, -12px) scale(1.1); }
-      50%  { background-color: #92C6F2; transform: translate(8px, 6px) scale(1.06); }
-      75%  { background-color: #B9CFF8; transform: translate(-12px, -6px) scale(1.02); }
-      100% { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
-    }
-
-    @keyframes videoHoloRight {
-      0%   { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
-      25%  { background-color: #9CC8F7; transform: translate(-16px, -8px) scale(1.1); }
-      50%  { background-color: #A7D0F7; transform: translate(-8px, 8px) scale(1.04); }
-      75%  { background-color: #BDE7D5; transform: translate(14px, -6px) scale(1.08); }
-      100% { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
-    }
-
-    @keyframes videoHoloCenter {
-      0%   { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
-      33%  { background-color: #9FCAF5; transform: translateY(-14px) scale(1.12); }
-      66%  { background-color: #CFE7FB; transform: translateY(6px) scale(0.98); }
-      100% { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
+    [data-dark="true"][data-holo="true"] .hero-aura-card {
+      background: linear-gradient(135deg, #22392A 0%, #1E3329 35%, #1D2F45 72%, #27354E 100%);
+      background-size: 220% 220%;
     }
 
     @keyframes videoHoloBtn {
       0%   { background-position: 0% 50%; }
       50%  { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
-    }
-
-    [data-holo="true"] .aura-orb.orb-left {
-      animation: videoHoloLeft 4.8s ease-in-out infinite;
-      filter: blur(44px);
-      opacity: 0.85;
-    }
-
-    [data-holo="true"] .aura-orb.orb-right {
-      animation: videoHoloRight 4.8s ease-in-out infinite;
-      filter: blur(44px);
-      opacity: 0.85;
-    }
-
-    [data-holo="true"] .aura-orb.orb-center {
-      opacity: 0.72;
-      animation: videoHoloCenter 4.8s ease-in-out infinite;
-      filter: blur(46px);
-    }
-
-    [data-dark="true"][data-holo="true"] .aura-orb.orb-left,
-    [data-dark="true"][data-holo="true"] .aura-orb.orb-right,
-    [data-dark="true"][data-holo="true"] .aura-orb.orb-center {
-      opacity: 0.09;
     }
 
     [data-holo="true"] #reading-progress,
@@ -538,11 +459,6 @@
 
   <!-- Hero：全宽横幅，不是卡片：左右贴边、顶部紧贴顶栏，无卡片外间距 -->
   <section id="top" class="hero-aura-card">
-    <div class="aura-backdrop">
-      <div class="aura-orb orb-left" id="orbLeft"></div>
-      <div class="aura-orb orb-center" id="orbCenter"></div>
-      <div class="aura-orb orb-right" id="orbRight"></div>
-    </div>
     <div class="max-w-5xl mx-auto px-4 pt-6 pb-8 sm:pt-10 sm:pb-10">
 
       <div class="flex flex-wrap items-center gap-2 mb-4">
@@ -1266,17 +1182,6 @@
 
         if (!isDarkMode) {
           root.style.setProperty('--page-bg', themeObj.pageBg);
-        }
-
-        const orbLeft = document.getElementById('orbLeft');
-        const orbRight = document.getElementById('orbRight');
-        if (!themeObj.isHolo) {
-          const shift = index % 2 === 0 ? 1 : -1;
-          orbLeft.style.transform = `translate(${shift * 14}px, ${-shift * 8}px) scale(${1 + shift * 0.05})`;
-          orbRight.style.transform = `translate(${-shift * 14}px, ${shift * 8}px) scale(${1 - shift * 0.05})`;
-        } else {
-          orbLeft.style.transform = '';
-          orbRight.style.transform = '';
         }
 
         const nameEl = document.getElementById('current-theme-name');
