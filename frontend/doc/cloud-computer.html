@@ -282,6 +282,16 @@
   .host-limit-title{font-size:11px;letter-spacing:.12em;font-weight:700;color:var(--text-muted)}
   .host-limits{margin:0;padding-left:18px;font-size:13px;color:var(--text-secondary);line-height:1.6;display:flex;flex-direction:column;gap:4px}
   .host-limits li::marker{color:var(--theme-accent)}
+  .deploy-list{display:flex;flex-direction:column;gap:6px}
+  .deploy-entry{background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:9px 10px;display:flex;flex-direction:column;gap:5px}
+  .deploy-link{text-decoration:none;display:flex;flex-direction:column;gap:3px;border-radius:8px}
+  .deploy-link:active{border-radius:8px}
+  .deploy-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .deploy-name{font-size:13px;font-weight:700;color:var(--text-primary);line-height:1.4}
+  .deploy-port{font-size:11px;font-weight:600;color:var(--theme-tag-text);background:var(--theme-tag-bg);border:1.5px solid transparent;border-radius:999px;padding:1px 8px;white-space:nowrap}
+  .deploy-url{font-size:12px;line-height:1.5;color:var(--theme-tag-text);overflow-wrap:anywhere;word-break:break-all}
+  .deploy-note{margin:0;font-size:12.5px;line-height:1.6;color:var(--text-secondary)}
+  @media(hover:hover){.deploy-link:hover .deploy-url{text-decoration:underline;text-underline-offset:2px}}
   .host-toggle{appearance:none;-webkit-appearance:none;width:100%;cursor:pointer;background:transparent;border:0;padding:2px 0;margin:0;font:inherit;text-align:left;display:flex;align-items:center;gap:8px;color:inherit;border-radius:8px}
   .host-toggle:active{border-radius:8px}
   .host-toggle .host-title{flex:1;min-width:0}
@@ -431,7 +441,29 @@
               <tr><th scope="row">可用性</th><td>每账号免费 <b class="num">1 台</b>，已领满；再加机器要升级付费套餐；机器固定不换、盘持久，暂停后唤醒只要几秒</td></tr>
             </tbody>
           </table>
-          <p class="host-desc">能在里面部署服务、搭建网站，再通过它自带的 Ports 功能发布出公网网址；外网的人直接点网址就能打开，不用登录它；今早已经实测通过，它上面正跑着一个测试页和一份例子站</p>
+          <p class="host-desc">能在里面部署服务、搭建网站，再通过它自带的 Ports 功能发布出公网网址；外网的人直接点网址就能打开，不用登录它；已经实测通过，它上面正跑着下面三个入口</p>
+          <div class="host-limit-title">部署入口 · Ports 公网网址</div>
+          <div class="deploy-list">
+            <div class="deploy-entry">
+              <a class="deploy-link" href="https://8082-***REMOVED***.instabox.tech" target="_blank" rel="noopener noreferrer">
+                <span class="deploy-head"><span class="deploy-name">useful-budget 静态镜像</span><span class="deploy-port num">8082</span></span>
+                <span class="deploy-url num">https://8082-***REMOVED***.instabox.tech</span>
+              </a>
+              <p class="deploy-note">这是静态镜像，不会自动跟仓库更新；这台机器睡着时这些链接打不开，要先唤醒机器</p>
+            </div>
+            <div class="deploy-entry">
+              <a class="deploy-link" href="https://8080-***REMOVED***.instabox.tech" target="_blank" rel="noopener noreferrer">
+                <span class="deploy-head"><span class="deploy-name">测试页</span><span class="deploy-port num">8080</span></span>
+                <span class="deploy-url num">https://8080-***REMOVED***.instabox.tech</span>
+              </a>
+            </div>
+            <div class="deploy-entry">
+              <a class="deploy-link" href="https://8081-***REMOVED***.instabox.tech" target="_blank" rel="noopener noreferrer">
+                <span class="deploy-head"><span class="deploy-name">例子站 eg</span><span class="deploy-port num">8081</span></span>
+                <span class="deploy-url num">https://8081-***REMOVED***.instabox.tech</span>
+              </a>
+            </div>
+          </div>
           <div class="host-limit-title">使用限制</div>
           <ul class="host-limits">
             <li>空闲约 30 分钟就自动暂停，机器一睡网站就打不开了；外面的人没法把它叫醒，只能回控制台手动唤醒</li>
