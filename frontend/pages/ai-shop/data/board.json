@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-14 05:54",
+ "updated_at": "2026-11-14 06:06",
  "source": "AI价网 + cardnav + PriceAI + aibijia + 16688/aicdks/catfk 直拉 按商家遍历合并",
  "groups": [
   {
@@ -6743,7 +6743,7 @@
      "price": 5.95,
      "shop": "GPT小店",
      "platform": "",
-     "stock": 857,
+     "stock": 856,
      "title": "反重力antigravity过验证  24小时自助代过  CDK激活 只能激活谷歌邮箱",
      "url": "https://shuka.cc/item/ydv2g3",
      "kind": "激活链接·免绑卡",
@@ -7843,7 +7843,7 @@
      "shop": "无界AI",
      "platform": "16688",
      "stock": null,
-     "title": "Gemini Pro 官网直充1个月会员成品号（反重力可用Gemini 4 - 质保24小时，之后10元换新）",
+     "title": "Gemini Pro 官网直充1个月会员成品号（反重力可用Gemini 4 - 质保24小时，之后1元换新）",
      "url": "https://www.16688.com.cn/goods/G40799620",
      "kind": "成品号",
      "same_source": 1,
@@ -13410,6 +13410,17 @@
      "same_source": 1
     },
     {
+     "price": 3.61,
+     "shop": "鹰鹰小铺",
+     "platform": "链动小铺",
+     "stock": 461,
+     "title": "4513（虚拟卡验证试用0刀卡）不限制任何项目，项目自测，激活后无售后（系统繁忙是在补货）",
+     "url": "https://wzyp.cn/item/9pm4ae",
+     "kind": "0刀",
+     "same_source": 1,
+     "pc": "2026-11-14"
+    },
+    {
      "price": 4.0,
      "shop": "金幺の小店",
      "platform": "链动小铺",
@@ -13624,32 +13635,6 @@
      "url": "https://wzyp.cn/item/yk9x9z",
      "kind": "Visa·0刀",
      "same_source": 1
-    },
-    {
-     "price": 7.47,
-     "shop": "爪爪AI专卖(对接实力号商)",
-     "platform": "链动小铺",
-     "stock": 59,
-     "title": "0刀卡（适用Gemini其他自测）",
-     "url": "https://wzyp.cn/item/c4dyx3",
-     "kind": "0刀",
-     "same_source": 2,
-     "sources": [
-      {
-       "price": 7.47,
-       "shop": "爪爪AI专卖(对接实力号商)",
-       "platform": "链动小铺",
-       "stock": 59,
-       "url": "https://wzyp.cn/item/c4dyx3"
-      },
-      {
-       "price": 9.98,
-       "shop": "牛店",
-       "platform": "链动小铺",
-       "stock": 59,
-       "url": "https://wzyp.cn/item/jpvveg"
-      }
-     ]
     }
    ]
   }
@@ -18445,6 +18430,20 @@
    3.2,
    3
   ],
+  "wzyp:9pm4ae": [
+   29896832,
+   3.5,
+   1,
+   8367,
+   3.61,
+   1,
+   3963,
+   3.5,
+   1,
+   965,
+   3.61,
+   1
+  ],
   "wzyp:8iqs1f": [
    29896832,
    4.0,
@@ -18477,11 +18476,6 @@
    29907744,
    6.6,
    1
-  ],
-  "wzyp:c4dyx3": [
-   29900535,
-   7.47,
-   2
   ]
  }
 }
