@@ -23,6 +23,7 @@
 
     /* ================= 1. 核心动态 CSS 变量体系（同步 Ai比价.html 12色弥散主题） ================= */
     :root {
+      --hero-bg-base: #FFFFFF;
       --orb-color-1: #BCE0FD;
       --orb-color-2: #93C5FD;
       --refresh-btn-bg: #60A5FA;
@@ -43,6 +44,7 @@
     }
 
     [data-dark="true"] {
+      --hero-bg-base: #0B1120;
       --page-bg: #090D16;
       --card-bg: #111827;
       --card-border: rgba(255, 255, 255, 0.08);
@@ -71,7 +73,6 @@
     .decision-btn:active,
     .tool-filter-btn:active,
     .region-btn:active,
-    .nav-pill:active,
     #theme-palette-trigger:active {
       box-shadow: 0 0 0 3px var(--search-glow);
     }
@@ -92,17 +93,8 @@
       border-color: rgba(255, 255, 255, 0.08);
     }
 
-    .ios-glass-nav {
-      background-color: rgba(255, 255, 255, 0.78);
-      backdrop-filter: saturate(180%) blur(20px);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
-    }
-    [data-dark="true"] .ios-glass-nav {
-      background-color: rgba(15, 23, 42, 0.78);
-    }
-
     section[id], div[id^="sec-"] {
-      scroll-margin-top: 88px;
+      scroll-margin-top: 20px;
     }
 
     /* 主题联动表面与强调色辅助类 */
@@ -136,31 +128,46 @@
       color: var(--orb-color-2);
     }
 
-    /* ================= 2. Hero 顶部渐变（规范：整片平滑的表面渐变，颜色取当前主题那套） ================= */
-    .hero-aura-card {
+    /* ================= 2. 头部 hero-header（ai-shop 同款：一整块、底部大圆角＋主题光晕影） ================= */
+    .hero-header {
       position: relative;
-      background: linear-gradient(180deg,
-        color-mix(in srgb, var(--orb-color-1) 72%, #FFFFFF) 0%,
-        color-mix(in srgb, var(--orb-color-2) 72%, #FFFFFF) 100%);
-      overflow: hidden;
-      z-index: 1;
+      border-bottom-left-radius: 32px;
+      border-bottom-right-radius: 32px;
+      box-shadow: 0 14px 34px -12px var(--search-glow);
+      z-index: 10;
     }
 
-    [data-dark="true"] .hero-aura-card {
-      background: linear-gradient(180deg,
-        color-mix(in srgb, var(--orb-color-1) 24%, #131C2E) 0%,
-        color-mix(in srgb, var(--orb-color-2) 14%, #0B1120) 100%);
+    /* 渐变层独立裁切圆角，不遮挡主题面板；规范：整片平滑的表面渐变，颜色取当前主题那套，双色自底部向上弥散 */
+    .hero-wash {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+      border-bottom-left-radius: 32px;
+      border-bottom-right-radius: 32px;
+      background-color: var(--hero-bg-base);
+      background-image:
+        radial-gradient(115% 125% at 10% 112%, color-mix(in srgb, var(--orb-color-1) 78%, #FFFFFF) 0%, transparent 62%),
+        radial-gradient(115% 125% at 90% 112%, color-mix(in srgb, var(--orb-color-2) 78%, #FFFFFF) 0%, transparent 62%);
+      transition: background-color 0.55s ease;
+    }
+
+    [data-dark="true"] .hero-wash {
+      background-image:
+        radial-gradient(115% 125% at 10% 112%, color-mix(in srgb, var(--orb-color-1) 26%, #0B1120) 0%, transparent 62%),
+        radial-gradient(115% 125% at 90% 112%, color-mix(in srgb, var(--orb-color-2) 26%, #0B1120) 0%, transparent 62%);
     }
 
     /* 第12号主题「幻彩全息」：同一套幻彩色流动渐变 */
-    [data-holo="true"] .hero-aura-card {
-      background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%);
+    [data-holo="true"] .hero-wash {
+      background-image: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%);
       background-size: 220% 220%;
       animation: videoHoloBtn 4.2s ease infinite;
     }
 
-    [data-dark="true"][data-holo="true"] .hero-aura-card {
-      background: linear-gradient(135deg, #22392A 0%, #1E3329 35%, #1D2F45 72%, #27354E 100%);
+    [data-dark="true"][data-holo="true"] .hero-wash {
+      background-image: linear-gradient(135deg, #22392A 0%, #1E3329 35%, #1D2F45 72%, #27354E 100%);
       background-size: 220% 220%;
     }
 
@@ -379,34 +386,15 @@
   </div>
 
   <!-- Sticky Top Navbar -->
-  <header class="sticky top-0 z-40 border-b ios-hairline ios-glass-nav">
-    <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
-      <a href="#top" class="flex items-center gap-2.5 min-w-0 group">
-        <span class="w-8 h-8 rounded-lg theme-accent-bg flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
-          指
-        </span>
-        <span class="font-semibold text-sm sm:text-base tracking-tight truncate text-slate-900 dark:text-white">
-          小白建站与 AI 工具选型指南
-        </span>
-      </a>
-
-      <!-- Desktop Nav Pills -->
-      <nav class="hidden md:flex items-center gap-1" aria-label="章节导航">
-        <a href="#sec-01" data-nav="sec-01" class="nav-pill px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap">
-          01 建站工具与搭配
-        </a>
-        <a href="#sec-02" data-nav="sec-02" class="nav-pill px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap">
-          02 Agent 与云电脑
-        </a>
-        <a href="#sec-03" data-nav="sec-03" class="nav-pill px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap">
-          03 自办虚拟卡
-        </a>
-        <a href="#sec-04" data-nav="sec-04" class="nav-pill px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap">
-          04 AI 大模型双榜
-        </a>
-      </nav>
-
-      <!-- Actions: Ai比价同款 日夜切换 + 长按12色主题选择 & 移动端菜单 -->
+  <!-- 头部：ai-shop 同款 hero-header，品牌行与标题内容同处一整块，底部大圆角＋主题光晕影，渐变为规范的整片平滑版 -->
+  <header id="top" class="hero-header">
+    <div class="hero-wash"></div>
+    <div class="max-w-5xl mx-auto px-4 pt-4 pb-8 sm:pb-10">
+      <div class="flex items-center justify-between gap-3 mb-5">
+        <div class="flex items-center min-w-0">
+          <span class="w-1 h-[15px] rounded-[3px] theme-accent-bg mr-2 shrink-0"></span>
+          <span class="text-xs font-extrabold tracking-[0.14em] text-slate-500 dark:text-slate-400">小白指南</span>
+        </div>
       <div class="flex items-center gap-2 shrink-0 relative">
         <button id="theme-palette-trigger" type="button"
           class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold theme-tag-pill border border-black/5 dark:border-white/10 hover:opacity-90 transition-opacity"
@@ -446,21 +434,7 @@
           </svg>
         </button>
       </div>
-    </div>
-
-    <!-- Mobile Nav Drawer -->
-    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 space-y-1">
-      <a href="#sec-01" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">01 建站工具与搭配</a>
-      <a href="#sec-02" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">02 Agent 与云电脑</a>
-      <a href="#sec-03" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">03 自办虚拟卡</a>
-      <a href="#sec-04" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">04 AI 大模型双榜</a>
-    </div>
-  </header>
-
-  <!-- Hero：全宽横幅，不是卡片：左右贴边、顶部紧贴顶栏，无卡片外间距 -->
-  <section id="top" class="hero-aura-card">
-    <div class="max-w-5xl mx-auto px-4 pt-6 pb-8 sm:pt-10 sm:pb-10">
-
+      </div>
       <div class="flex flex-wrap items-center gap-2 mb-4">
         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold theme-tag-pill">
           小白工具选型指南
@@ -524,8 +498,16 @@
           <div class="text-[11.5px] sm:text-xs text-slate-500 dark:text-slate-400 leading-snug">24 家厂商 · 热度榜 / 智能度榜</div>
         </a>
       </div>
-      </div>
-  </section>
+    </div>
+  </header>
+
+  <!-- Mobile Nav Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 space-y-1">
+      <a href="#sec-01" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">01 建站工具与搭配</a>
+      <a href="#sec-02" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">02 Agent 与云电脑</a>
+      <a href="#sec-03" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">03 自办虚拟卡</a>
+      <a href="#sec-04" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">04 AI 大模型双榜</a>
+    </div>
 
   <!-- Main Content -->
   <main class="max-w-5xl mx-auto px-4 py-8 sm:py-12 space-y-16">
@@ -1725,8 +1707,6 @@
 
       const progressBar = document.getElementById('reading-progress');
       const backToTopBtn = document.getElementById('back-to-top');
-      const navPills = document.querySelectorAll('.nav-pill');
-      const sections = ['sec-01', 'sec-02', 'sec-03', 'sec-04'].map(id => document.getElementById(id));
 
       window.addEventListener('scroll', () => {
         const scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -1740,17 +1720,6 @@
           backToTopBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
         }
 
-        let currentId = '';
-        sections.forEach(sec => {
-          if (sec && sec.getBoundingClientRect().top <= 140) currentId = sec.id;
-        });
-        navPills.forEach(pill => {
-          if (pill.dataset.nav === currentId) {
-            pill.classList.add('theme-tag-pill');
-          } else {
-            pill.classList.remove('theme-tag-pill');
-          }
-        });
       }, { passive: true });
 
       backToTopBtn.addEventListener('click', () => {
