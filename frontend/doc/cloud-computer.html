@@ -441,16 +441,16 @@
               <tr><th scope="row">可用性</th><td>每账号免费 <b class="num">1 台</b>，已领满；再加机器要升级付费套餐；机器固定不换、盘持久，暂停后唤醒只要几秒</td></tr>
             </tbody>
           </table>
-          <p class="host-desc">能在里面部署服务、搭建网站，再通过它自带的 Ports 功能发布出公网网址；外网的人直接点网址就能打开，不用登录它；已经实测通过，三个站已合并到这一个地址下、按路径区分</p>
+          <p class="host-desc">能在里面部署服务、搭建网站，通过自带的 Ports 功能发布出公网网址，外网的人点网址就能打开、不用登录；已实测，两个站合并在一个地址下、按路径区分</p>
           <div class="host-limit-title">部署入口 · Ports 公网网址</div>
-          <p class="deploy-note">原本想合并到 80 端口，但 Ports 只允许发布 1024–65535 的端口，80 发不出去，所以落在 8080；旧的 8081、8082 两个网址已停用</p>
+          <p class="deploy-note">想合并到 80，但 Ports 只许发布 1024–65535，80 发不出去才落在 8080；旧 8081、8082 已停用</p>
           <div class="deploy-list">
             <div class="deploy-entry">
               <a class="deploy-link" href="https://8080-***REMOVED***.instabox.tech" target="_blank" rel="noopener noreferrer">
                 <span class="deploy-head"><span class="deploy-name">useful-budget 静态镜像</span><span class="deploy-port num">/</span></span>
                 <span class="deploy-url num">https://8080-***REMOVED***.instabox.tech</span>
               </a>
-              <p class="deploy-note">这是静态镜像，不会自动跟仓库更新；这台机器睡着时这些链接打不开，要先唤醒机器</p>
+              <p class="deploy-note">静态镜像，不会自动跟仓库更新；机器睡着时链接打不开，要先唤醒</p>
             </div>
             <div class="deploy-entry">
               <a class="deploy-link" href="https://8080-***REMOVED***.instabox.tech/eg" target="_blank" rel="noopener noreferrer">
@@ -458,21 +458,12 @@
                 <span class="deploy-url num">https://8080-***REMOVED***.instabox.tech/eg</span>
               </a>
             </div>
-            <div class="deploy-entry">
-              <a class="deploy-link" href="https://8080-***REMOVED***.instabox.tech/test" target="_blank" rel="noopener noreferrer">
-                <span class="deploy-head"><span class="deploy-name">测试页</span><span class="deploy-port num">/test</span></span>
-                <span class="deploy-url num">https://8080-***REMOVED***.instabox.tech/test</span>
-              </a>
-            </div>
           </div>
           <div class="host-limit-title">使用限制</div>
           <ul class="host-limits">
-            <li>空闲 30 分钟就自动暂停，免费档这个时长固定、不可修改；机器一睡网站就打不开了，外面的人没法把它叫醒，只能回控制台手动唤醒</li>
-            <li>单次运行起步 120 分钟，持续使用会延长，单次最高 480 分钟（8 小时），到点暂停、唤醒接着跑</li>
-            <li>它没有自己的公网 IP，发布出来的网址是平台给的随机子域名（instabox.tech 结尾的那串），绑不了自己的域名</li>
-            <li>每月出站流量上限 100 GiB，超了要等下个周期，入站流量不计</li>
-            <li>快照最多 5 个</li>
-            <li>存储上限：账号总存储 200 GiB，这台机的持久盘 20 GiB</li>
+            <li>空闲 30 分钟自动暂停，免费档固定不可改；机器睡着网站就打不开，外面的人叫不醒，只能回控制台手动唤醒</li>
+            <li>单次运行起步 120 分钟、持续使用延长，最高 480 分钟（8 小时），到点暂停、唤醒接着跑；每月出站流量上限 100 GiB、入站不计，超了等下个周期</li>
+            <li>快照最多 5 个；存储账号总上限 200 GiB、这台机持久盘 20 GiB；没有自己的公网 IP，网址是平台给的随机子域名，绑不了自己的域名</li>
           </ul>
           <p class="host-conclusion">适合临时演示和试验用的网站；要 24 小时在线、挂自己域名的正式网站，还是放新加坡那台真服务器</p>
           </div>
