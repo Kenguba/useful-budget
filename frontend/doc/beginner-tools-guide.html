@@ -1,784 +1,1877 @@
-<!doctype html>
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="color-scheme" content="light dark" />
-<link rel="icon" href="data:," />
-<title>小白建站与 AI 工具选型指南</title>
-<style>
-  :root{
-    color-scheme: light;
-    --bg:#f8fafc; --card:#ffffff; --hover:#f1f5f9; --soft:#f1f5f9;
-    --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --line2:#cbd5e1;
-    --accent:#0ea5e9; --accent-soft:rgba(14,165,233,.12); --accent-ink:#0369a1;
-    --thead:#f1f5f9; --zebra:rgba(100,116,139,.05);
-    --badge-rest:#f1f5f9; --badge-rest-ink:#64748b;
-    --header-bg:rgba(248,250,252,.85);
-    --shadow:0 1px 3px rgba(15,23,42,.06);
-    --sans:-apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", sans-serif;
-    --ease:cubic-bezier(.16, 1, .3, 1);
-  }
-  @media (prefers-color-scheme: dark){
-    :root{
-      color-scheme: dark;
-      --bg:#0b0f19; --card:#1e293b; --hover:#334155; --soft:rgba(148,163,184,.10);
-      --ink:#f8fafc; --muted:#94a3b8; --line:#334155; --line2:#475569;
-      --accent:#38bdf8; --accent-soft:rgba(56,189,248,.16); --accent-ink:#7dd3fc;
-      --thead:#232e44; --zebra:rgba(148,163,184,.05);
-      --badge-rest:#334155; --badge-rest-ink:#94a3b8;
-      --header-bg:rgba(11,15,25,.85);
-      --shadow:0 1px 3px rgba(0,0,0,.4);
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小白建站与 AI 工具选型指南</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', '"PingFang SC"', '"Hiragino Sans GB"', '"Inter"', '"Microsoft YaHei"', 'sans-serif'],
+            mono: ['"SF Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    /* ================= 1. 核心动态 CSS 变量体系（同步 Ai比价.html 12色弥散主题） ================= */
+    :root {
+      --hero-bg-base: #FFFFFF;
+      --orb-color-1: #BCE0FD;
+      --orb-color-2: #93C5FD;
+      --refresh-btn-bg: #60A5FA;
+      --send-circle-bg: #9CCAF9;
+      --theme-accent: #2563EB;
+      --theme-tag-bg: #EBF5FF;
+      --theme-tag-text: #1D4ED8;
+      --search-glow: rgba(147, 197, 253, 0.38);
+
+      --page-bg: #F4F8FC;
+      --card-bg: #FFFFFF;
+      --card-border: rgba(226, 232, 240, 0.85);
+      --text-primary: #0F172A;
+      --text-secondary: #64748B;
+      --text-muted: #94A3B8;
+      --pill-surface: #FFFFFF;
+      --pill-shadow: 0 6px 20px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03);
     }
-  }
-  :root[data-theme="light"]{
-    color-scheme: light;
-    --bg:#f8fafc; --card:#ffffff; --hover:#f1f5f9; --soft:#f1f5f9;
-    --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --line2:#cbd5e1;
-    --accent:#0ea5e9; --accent-soft:rgba(14,165,233,.12); --accent-ink:#0369a1;
-    --thead:#f1f5f9; --zebra:rgba(100,116,139,.05);
-    --badge-rest:#f1f5f9; --badge-rest-ink:#64748b;
-    --header-bg:rgba(248,250,252,.85);
-    --shadow:0 1px 3px rgba(15,23,42,.06);
-  }
-  :root[data-theme="dark"]{
-    color-scheme: dark;
-    --bg:#0b0f19; --card:#1e293b; --hover:#334155; --soft:rgba(148,163,184,.10);
-    --ink:#f8fafc; --muted:#94a3b8; --line:#334155; --line2:#475569;
-    --accent:#38bdf8; --accent-soft:rgba(56,189,248,.16); --accent-ink:#7dd3fc;
-    --thead:#232e44; --zebra:rgba(148,163,184,.05);
-    --badge-rest:#334155; --badge-rest-ink:#94a3b8;
-    --header-bg:rgba(11,15,25,.85);
-    --shadow:0 1px 3px rgba(0,0,0,.4);
-  }
-  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html{ scroll-behavior:smooth; }
-  body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.7; font-variant-numeric:tabular-nums; }
-  b, strong{ font-weight:500; }
-  a{ color:var(--accent); text-decoration:none; }
-  a:hover{ text-decoration:underline; }
-  .wrap{ max-width:800px; margin:0 auto; padding:0 16px 72px; }
-  @media (min-width:720px){ .wrap{ padding:0 24px 80px; } }
 
-  /* ---------- header ---------- */
-  header.top{ margin:0 -16px; padding:8px 16px 8px; border-bottom:1px solid var(--line); }
-  @media (min-width:720px){ header.top{ margin:0 -24px; padding:12px 24px 8px; } }
-  .trow{ display:flex; align-items:flex-start; gap:12px; }
-  .tt{ flex:1; min-width:0; }
-  .tt h1{ font-size:20px; font-weight:500; line-height:1.3; margin:0; }
-  .tsub{ font-size:14px; color:var(--muted); margin:2px 0 0; }
-  .tbtn{ flex:0 0 auto; width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:var(--card); color:var(--ink); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0; transition:background .3s var(--ease); }
-  .tbtn:active{ background:var(--hover); border-radius:50%; }
-  .tbtn svg{ width:18px; height:18px; }
-  .tbtn .sun{ display:none; }
-  @media (prefers-color-scheme: dark){ .tbtn .sun{ display:block; } .tbtn .moon{ display:none; } }
-  :root[data-theme="dark"] .tbtn .sun{ display:block; }
-  :root[data-theme="dark"] .tbtn .moon{ display:none; }
-  :root[data-theme="light"] .tbtn .sun{ display:none; }
-  :root[data-theme="light"] .tbtn .moon{ display:block; }
-  nav.toc{ margin-top:8px; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding-bottom:2px; }
-  nav.toc::-webkit-scrollbar{ display:none; }
-  nav.toc a{ flex:0 0 auto; display:inline-flex; align-items:center; gap:8px; padding:4px 12px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--muted); font-size:14px; font-weight:500; transition:background .3s var(--ease), color .3s var(--ease), border-color .3s var(--ease); }
-  nav.toc a .n{ font-weight:500; }
-  nav.toc a.on{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent-ink); }
-  nav.toc a:active{ background:var(--hover); border-radius:10px; }
-  nav.toc a.on:active{ background:var(--accent-soft); }
+    [data-dark="true"] {
+      --hero-bg-base: #111827;
+      --page-bg: #090D16;
+      --card-bg: #111827;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --pill-surface: #1E293B;
+      --pill-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
 
-  /* ---------- intro ---------- */
-  .intro{ padding:16px 0 0; }
-  .intro p{ margin:0 0 12px; }
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
 
-  /* ---------- sections ---------- */
-  section{ margin-top:64px; padding-top:40px; border-top:1px solid var(--line); scroll-margin-top:24px; }
-  section#s1{ margin-top:28px; padding-top:0; border-top:0; }
-  .sec-head{ display:flex; align-items:center; gap:12px; margin-bottom:20px; }
-  .sec-head .no{ flex:0 0 auto; color:var(--muted); font-size:14px; font-weight:500; }
-  .sec-head h2{ font-size:20px; font-weight:500; margin:0; line-height:1.4; }
-  h3{ font-size:16px; font-weight:500; margin:36px 0 12px; }
-  h3 .sub{ font-size:14px; font-weight:400; color:var(--muted); margin-left:8px; }
-  p{ margin:0 0 12px; }
-  .note{ background:var(--soft); border-radius:12px; padding:16px 20px; margin:16px 0; }
-  .note p:last-child{ margin-bottom:0; }
-  .rule{ background:var(--soft); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
-  .rule p{ margin:0; }
+    *:focus,
+    *:focus-visible {
+      outline: none !important;
+    }
 
-  /* ---------- layer cards ---------- */
-  .layer{ background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); padding:20px; margin-bottom:12px; }
-  @media (min-width:720px){ .layer{ padding:24px; } }
-  .ltop{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-  .ltag{ background:var(--soft); color:var(--muted); font-size:14px; font-weight:500; padding:2px 12px; border-radius:999px; }
-  .lnum{ font-size:14px; font-weight:500; color:var(--muted); }
-  .layer h4{ font-size:16px; font-weight:500; margin:12px 0 4px; }
-  .layer p{ margin:0 0 12px; color:var(--muted); }
-  .llab{ display:block; font-size:14px; font-weight:500; color:var(--muted); margin-bottom:2px; }
-  .ltools{ font-size:16px; }
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible {
+      box-shadow: 0 0 0 3px var(--search-glow);
+    }
 
-  /* ---------- tables ---------- */
-  .tblwrap{ border:1px solid var(--line); border-radius:12px; overflow-x:auto; background:var(--card); box-shadow:var(--shadow); }
-  table.tbl{ width:100%; min-width:600px; border-collapse:collapse; font-size:14px; line-height:1.6; }
-  table.tbl th{ text-align:left; font-size:14px; font-weight:500; color:var(--muted); background:var(--thead); padding:12px 16px; border-bottom:1px solid var(--line); white-space:nowrap; }
-  table.tbl td{ padding:16px; border-bottom:1px solid var(--line); vertical-align:top; }
-  table.tbl tbody tr:nth-child(even) td{ background-color:var(--zebra); }
-  table.tbl tr:last-child td{ border-bottom:0; }
-  td.rk{ white-space:nowrap; }
-  td.nm{ white-space:nowrap; }
-  .badge{ font-size:14px; font-weight:500; color:var(--muted); }
-  .badge.n1{ color:var(--ink); }
-  .tag{ display:inline-block; font-size:14px; font-weight:500; line-height:1.5; padding:0 8px; border-radius:999px; margin-left:8px; vertical-align:1px; white-space:nowrap; background:var(--soft); color:var(--muted); border:1px solid var(--line); }
-  .tag.layer{ margin-left:0; }
-  table.stickytbl th:first-child, table.stickytbl td:first-child{ position:sticky; left:0; background:var(--card); }
-  table.stickytbl th:first-child{ background:var(--thead); }
-  @media (max-width:720px){
-    .tblwrap.rankwrap{ border:0; background:transparent; overflow:visible; box-shadow:none; }
-    table.ranktbl{ min-width:0; }
-    table.ranktbl, table.ranktbl tbody, table.ranktbl tr, table.ranktbl td{ display:block; width:100%; }
-    table.ranktbl thead{ display:none; }
-    table.ranktbl tr{ background:var(--soft); border:1px solid var(--line); border-radius:12px; margin-bottom:12px; padding:12px 16px; }
-    table.ranktbl td{ border-bottom:0; padding:4px 0; background-color:transparent; }
-    table.ranktbl td::before{ content:attr(data-label); display:block; font-size:14px; font-weight:500; color:var(--muted); margin-bottom:2px; }
-    table.ranktbl td.rk::before, table.ranktbl td.nm::before{ display:none; }
-    table.ranktbl td.nm{ white-space:normal; font-size:16px; font-weight:500; }
-  }
+    .decision-btn:active,
+    .tool-filter-btn:active,
+    .region-btn:active,
+    .nav-pill:active,
+    #theme-palette-trigger:active {
+      box-shadow: 0 0 0 3px var(--search-glow);
+    }
 
-  /* ---------- tools list ---------- */
-  .tool{ display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); margin-bottom:8px; }
-  .tico{ flex:0 0 auto; width:36px; height:36px; border-radius:9px; background:#ffffff; border:1px solid var(--line); display:inline-flex; align-items:center; justify-content:center; }
-  .tico svg{ width:20px; height:20px; display:block; }
-  .tico .mono{ font-size:16px; font-weight:500; color:#0f172a; }
-  .tool .tbody{ min-width:0; font-size:14px; line-height:1.6; }
-  .tool .tn{ font-weight:500; font-size:16px; }
+    body {
+      background-color: var(--page-bg);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-variant-numeric: tabular-nums;
+      transition: background-color 0.55s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s ease;
+    }
 
-  /* ---------- combos ---------- */
-  .combo{ background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); padding:20px; margin-bottom:16px; }
-  @media (min-width:720px){ .combo{ padding:24px; } }
-  .combo .ch{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:4px; }
-  .combo .ch .k{ flex:0 0 auto; width:28px; height:28px; border-radius:50%; background:var(--card); border:1px solid var(--line); color:var(--muted); font-size:14px; font-weight:500; display:inline-flex; align-items:center; justify-content:center; }
-  .combo .ch h3{ margin:0; font-size:16px; }
-  .combo .fit{ font-size:14px; font-weight:500; color:var(--muted); background:var(--soft); border:1px solid var(--line); padding:2px 12px; border-radius:999px; }
-  .combo .mix{ font-size:14px; background:var(--soft); border-radius:8px; padding:12px 16px; margin:12px 0 12px; word-break:break-word; }
-  .combo ol{ list-style:none; counter-reset:step; margin:12px 0 8px; padding:0; }
-  .combo ol li{ counter-increment:step; position:relative; padding-left:40px; margin-bottom:8px; }
-  .combo ol li::before{ content:counter(step); position:absolute; left:0; top:1px; width:26px; height:26px; border-radius:50%; border:1px solid var(--line); background:var(--card); font-size:14px; font-weight:500; display:flex; align-items:center; justify-content:center; line-height:1; }
-  .combo p:last-child{ margin-bottom:0; }
-  .combo .rule{ margin:16px 0 0; }
+    .ios-hairline {
+      border-color: rgba(15, 23, 42, 0.07);
+    }
+    [data-dark="true"] .ios-hairline {
+      border-color: rgba(255, 255, 255, 0.08);
+    }
 
-  /* ---------- rank tabs ---------- */
-  .segcard{ background:var(--card); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); padding:20px; }
-  @media (min-width:720px){ .segcard{ padding:24px; } }
-  .segcard .tblwrap{ box-shadow:none; }
-  .seg{ position:relative; display:inline-flex; background:var(--soft); border-radius:12px; padding:4px; gap:4px; margin-bottom:8px; max-width:100%; }
-  .seg-ind{ position:absolute; top:4px; bottom:4px; left:0; width:0; border:1.5px solid var(--accent); background:var(--accent-soft); border-radius:8px; transform-origin:left center; transition:transform .45s var(--ease); }
-  .seg button{ position:relative; z-index:1; font-family:var(--sans); font-size:16px; font-weight:500; border:0; background:transparent; color:var(--muted); border-radius:8px; padding:8px 20px; cursor:pointer; transition:color .3s var(--ease); }
-  .seg button.on{ color:var(--ink); font-weight:500; }
-  .seg button:active{ border-radius:8px; }
-  .panel{ display:none; transition:opacity .3s var(--ease), transform .3s var(--ease), filter .3s var(--ease); }
-  .panel.on{ display:block; }
-  .panel.anim-out{ opacity:0; transform:scale(.985); filter:blur(4px); }
-  .panel.anim-in{ opacity:0; transform:scale(.99); filter:blur(3px); }
-  .panel > p{ margin-top:12px; }
-  .gapline{ display:flex; align-items:center; gap:12px; color:var(--muted); font-size:14px; font-weight:500; margin:16px 0; }
-  .gapline::before, .gapline::after{ content:""; flex:1; border-top:1px solid var(--line); }
+    .ios-glass-nav {
+      background-color: rgba(255, 255, 255, 0.78);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+    }
+    [data-dark="true"] .ios-glass-nav {
+      background-color: rgba(15, 23, 42, 0.78);
+    }
 
-  /* ---------- link list ---------- */
-  ul.links{ list-style:none; margin:0; padding:0; }
-  ul.links li{ margin-bottom:12px; }
-  .linkcard{ display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); padding:16px 20px; color:var(--ink); transition:background .3s var(--ease); }
-  a.linkcard:hover{ background:var(--hover); text-decoration:none; }
-  a.linkcard:active{ background:var(--hover); border-radius:12px; }
-  .linkcard .ln{ font-weight:500; font-size:16px; white-space:nowrap; }
-  .linkcard .lu{ margin-left:auto; font-size:14px; color:var(--muted); word-break:break-all; text-align:right; }
-  .linkcard svg{ flex:0 0 auto; width:16px; height:16px; color:var(--muted); }
-  @media (max-width:640px){
-    .linkcard{ flex-wrap:wrap; }
-    .linkcard .ln{ order:1; }
-    .linkcard svg{ order:2; margin-left:auto; }
-    .linkcard .lu{ order:3; flex:1 1 100%; margin-left:0; text-align:left; }
-  }
+    section[id], div[id^="sec-"] {
+      scroll-margin-top: 88px;
+    }
 
-  /* ---------- section 3 ---------- */
-  .cols{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
-  @media (max-width:720px){ .cols{ grid-template-columns:1fr; } }
-  .mini{ background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); padding:16px 20px; }
-  .mini h4{ margin:0 0 4px; font-size:16px; font-weight:500; }
-  .mini p{ font-size:14px; margin:0; }
-  .agent{ background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); padding:20px; margin-bottom:12px; }
-  @media (min-width:720px){ .agent{ padding:24px; } }
-  .agent .at{ font-size:16px; font-weight:500; }
-  .arow{ display:grid; grid-template-columns:60px 1fr; gap:12px; margin-top:16px; padding-top:16px; border-top:1px solid var(--line); }
-  .alab{ align-self:start; background:var(--soft); color:var(--muted); font-size:14px; font-weight:500; text-align:center; padding:2px 0; border-radius:999px; }
-  .arow > div{ min-width:0; }
+    /* 主题联动表面与强调色辅助类 */
+    .theme-surface {
+      background-color: var(--card-bg);
+      border-color: var(--card-border);
+      transition: background-color 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease;
+    }
 
-  footer{ margin-top:64px; padding-top:16px; border-top:1px solid var(--line); font-size:14px; color:var(--muted); }
+    .theme-accent-text {
+      color: var(--theme-accent);
+      transition: color 0.4s ease;
+    }
+    [data-dark="true"] .theme-accent-text {
+      color: var(--orb-color-2);
+    }
 
-  @media (prefers-reduced-motion: reduce){
-    html{ scroll-behavior:auto; }
-    *, *::before, *::after{ transition:none !important; }
-  }
-</style>
+    .theme-accent-bg {
+      background-color: var(--theme-accent);
+      color: #FFFFFF;
+      transition: background-color 0.4s ease;
+    }
+
+    .theme-tag-pill {
+      background-color: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+    [data-dark="true"] .theme-tag-pill {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: var(--orb-color-2);
+    }
+
+    /* ================= 2. Hero 弥散光晕层 ================= */
+    .hero-aura-card {
+      position: relative;
+      background-color: var(--hero-bg-base);
+      transition: background-color 0.55s ease;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .aura-backdrop {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .aura-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(52px);
+      opacity: 0.72;
+      transition: background-color 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-dark="true"] .aura-orb {
+      opacity: 0.07;
+      filter: blur(76px);
+    }
+
+    .aura-orb.orb-left {
+      width: 340px;
+      height: 240px;
+      top: -60px;
+      left: -60px;
+      background-color: var(--orb-color-1);
+    }
+
+    .aura-orb.orb-right {
+      width: 360px;
+      height: 260px;
+      bottom: -80px;
+      right: -60px;
+      background-color: var(--orb-color-2);
+    }
+
+    .aura-orb.orb-center {
+      width: 300px;
+      height: 210px;
+      top: -40px;
+      left: 32%;
+      background-color: #9EE0C5;
+      opacity: 0;
+      transition: opacity 0.6s ease, background-color 0.75s ease;
+    }
+
+    /* 第12号主题「幻彩全息」动态呼吸极光 */
+    @keyframes videoHoloLeft {
+      0%   { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
+      25%  { background-color: #8FDBB8; transform: translate(16px, -12px) scale(1.1); }
+      50%  { background-color: #92C6F2; transform: translate(8px, 6px) scale(1.06); }
+      75%  { background-color: #B9CFF8; transform: translate(-12px, -6px) scale(1.02); }
+      100% { background-color: #B2E2B4; transform: translate(-8px, -4px) scale(1.04); }
+    }
+
+    @keyframes videoHoloRight {
+      0%   { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
+      25%  { background-color: #9CC8F7; transform: translate(-16px, -8px) scale(1.1); }
+      50%  { background-color: #A7D0F7; transform: translate(-8px, 8px) scale(1.04); }
+      75%  { background-color: #BDE7D5; transform: translate(14px, -6px) scale(1.08); }
+      100% { background-color: #98DBC5; transform: translate(10px, 6px) scale(1.05); }
+    }
+
+    @keyframes videoHoloCenter {
+      0%   { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
+      33%  { background-color: #9FCAF5; transform: translateY(-14px) scale(1.12); }
+      66%  { background-color: #CFE7FB; transform: translateY(6px) scale(0.98); }
+      100% { background-color: #9EDDC5; transform: translateY(0px) scale(1.02); }
+    }
+
+    @keyframes videoHoloBtn {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    [data-holo="true"] .aura-orb.orb-left {
+      animation: videoHoloLeft 4.8s ease-in-out infinite;
+      filter: blur(44px);
+      opacity: 0.85;
+    }
+
+    [data-holo="true"] .aura-orb.orb-right {
+      animation: videoHoloRight 4.8s ease-in-out infinite;
+      filter: blur(44px);
+      opacity: 0.85;
+    }
+
+    [data-holo="true"] .aura-orb.orb-center {
+      opacity: 0.72;
+      animation: videoHoloCenter 4.8s ease-in-out infinite;
+      filter: blur(46px);
+    }
+
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-left,
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-right,
+    [data-dark="true"][data-holo="true"] .aura-orb.orb-center {
+      opacity: 0.09;
+    }
+
+    [data-holo="true"] #reading-progress,
+    [data-holo="true"] #back-to-top {
+      background: linear-gradient(120deg, #56C596, #4FA8F6, #74B9FF, #68D391);
+      background-size: 240% 240%;
+      animation: videoHoloBtn 4.2s ease infinite;
+    }
+
+    /* ================= 3. 右上角日夜圆形按钮 & 长按12色主题悬浮面板 ================= */
+    .theme-mode-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background-color: var(--pill-surface);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: var(--pill-shadow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-primary);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      position: relative;
+      z-index: 102;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background-color 0.4s ease,
+                  color 0.3s ease,
+                  box-shadow 0.3s ease;
+    }
+
+    [data-dark="true"] .theme-mode-btn {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .theme-mode-btn.pressing {
+      transform: scale(0.9);
+      box-shadow: 0 0 0 3px var(--search-glow);
+    }
+
+    .sun-moon-svg {
+      width: 19px;
+      height: 19px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .theme-mode-btn.rotating .sun-moon-svg {
+      transform: rotate(180deg) scale(0.85);
+    }
+
+    .theme-panel-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 98;
+      background: rgba(15, 23, 42, 0.08);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .theme-panel-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .theme-popover-panel {
+      position: absolute;
+      top: 48px;
+      right: 0;
+      width: 296px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 24px;
+      padding: 14px;
+      box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.18),
+                  0 4px 16px rgba(15, 23, 42, 0.06);
+      z-index: 101;
+      opacity: 0;
+      transform: translateY(-10px) scale(0.92);
+      transform-origin: top right;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      transition: opacity 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-dark="true"] .theme-popover-panel {
+      background: rgba(21, 31, 50, 0.95);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 22px 44px -8px rgba(0, 0, 0, 0.55);
+    }
+
+    .theme-popover-panel.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 0 4px;
+    }
+
+    .panel-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: 0.3px;
+    }
+
+    .panel-hint {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .theme-swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
+    }
+
+    .theme-swatch-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      background: rgba(248, 250, 252, 0.8);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: transform 0.18s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    [data-dark="true"] .theme-swatch-item {
+      background: rgba(30, 41, 59, 0.78);
+    }
+
+    .theme-swatch-item.active,
+    .theme-swatch-item.sliding-hover {
+      background: var(--card-bg);
+      border-color: var(--theme-accent);
+      transform: scale(1.04);
+      box-shadow: 0 6px 16px -4px var(--search-glow);
+    }
+
+    .swatch-orb-preview {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6), 0 2px 5px rgba(15, 23, 42, 0.1);
+    }
+
+    .swatch-orb-preview.holo-animated {
+      background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%) !important;
+      background-size: 220% 220% !important;
+      animation: videoHoloBtn 3.2s ease infinite;
+    }
+
+    .swatch-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+
+    /* Custom subtle scrollbar for tables */
+    .table-scroll::-webkit-scrollbar { height: 6px; }
+    .table-scroll::-webkit-scrollbar-track { background: transparent; }
+    .table-scroll::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.35);
+      border-radius: 9999px;
+    }
+    [data-dark="true"] .table-scroll::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.5);
+    }
+
+    /* Checklist strikethrough transition */
+    .step-check:checked + span {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+  </style>
 </head>
-<body>
-<div class="wrap">
+<body class="font-sans antialiased selection:bg-blue-500/20">
 
-  <header class="top">
-    <div class="trow">
-      <div class="tt">
-        <h1>小白建站与 AI 工具选型指南</h1>
-        <p class="tsub">小白工具选型指南 · 建站工具 / Agent 与云电脑 / 虚拟卡 / AI 大模型</p>
-      </div>
-      <button class="tbtn" id="themeBtn" type="button" aria-label="切换深浅色">
-        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-      </button>
-    </div>
-    <nav class="toc" id="toc">
-      <a href="#s1" class="on"><span class="n">01</span>建站工具与搭配</a>
-      <a href="#s3"><span class="n">02</span>Agent 与云电脑</a>
-      <a href="#s4"><span class="n">03</span>自办虚拟卡</a>
-      <a href="#s2"><span class="n">04</span>AI 大模型双榜</a>
-    </nav>
-  </header>
-
-  <div class="intro">
-    <p>这份指南是给<b>刚入门、第一次搭网站和选 AI 工具的人</b>用的：不用先懂服务器，也不用会运维，照着搭配选一套就能开始动手</p>
-    <p>全文四节：<b>小白建站工具与搭配</b>、<b>带云电脑的 Agent 背后的大模型</b>、<b>自办虚拟卡选型</b>、<b>国内外 AI 大模型双榜</b>；先看第一节把网站搭起来，再按需要到后面几节挑 AI、办付款用的卡</p>
+  <!-- Reading Progress Bar -->
+  <div class="fixed top-0 left-0 right-0 z-50 h-0.5 bg-transparent pointer-events-none">
+    <div id="reading-progress" class="h-full w-0 transition-[width] duration-75" style="background-color: var(--theme-accent);"></div>
   </div>
 
-  <!-- ================= 一、建站工具 ================= -->
-  <section id="s1">
-    <div class="sec-head"><span class="no">01</span><h2>小白建站工具全图与三套搭配</h2></div>
-    <p class="lead">先把市面上最常见的建站工具一次看全：一类是 AI 应用里能连接的服务，一类是免费建站清单里的托管平台；两边有重复，合起来 <b>16 个工具</b>，它们不是互相替代的竞品，而是一个网站的不同零件</p>
-    <p>先记住一句话：<b>页面放哪、数据存哪、AI 用谁、重复劳动交给谁</b>，四个问题各选一个工具，就是一套完整搭配；只做展示页时只需要第一个，其余三层按需要再加，不要一上来全装上</p>
+  <!-- Sticky Top Navbar -->
+  <header class="sticky top-0 z-40 border-b ios-hairline ios-glass-nav">
+    <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+      <a href="#top" class="flex items-center gap-2.5 min-w-0 group">
+        <span class="w-8 h-8 rounded-lg theme-accent-bg flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
+          指
+        </span>
+        <span class="font-semibold text-sm sm:text-base tracking-tight truncate text-slate-900 dark:text-white">
+          小白建站与 AI 工具选型指南
+        </span>
+      </a>
 
-    <h3>先分清四层</h3>
-    <div class="layer">
-      <div class="ltop"><span class="ltag">第一层</span><span class="lnum">01</span></div>
-      <h4>页面托管</h4>
-      <p>把页面放到网上，给出能打开的网址</p>
-      <div class="ltools"><span class="llab">这一层的工具</span>GitHub Pages、Cloudflare Pages、Vercel、Netlify、Surge、PinMe、Zeabur、Railway、Render</div>
-    </div>
-    <div class="layer">
-      <div class="ltop"><span class="ltag">第二层</span><span class="lnum">02</span></div>
-      <h4>数据与后端</h4>
-      <p>存数据、做用户登录、跑常驻的服务器程序</p>
-      <div class="ltools"><span class="llab">这一层的工具</span>Supabase、Cloudflare（Workers 与 R2）；Zeabur、Railway、Render 也能兼这一层</div>
-    </div>
-    <div class="layer">
-      <div class="ltop"><span class="ltag">第三层</span><span class="lnum">03</span></div>
-      <h4>AI 大脑</h4>
-      <p>对话、写作、看图、写代码的能力，通过接口接进自己的网站</p>
-      <div class="ltools"><span class="llab">这一层的工具</span>Anthropic（Claude）、Google Gemini</div>
-    </div>
-    <div class="layer">
-      <div class="ltop"><span class="ltag">第四层</span><span class="lnum">04</span></div>
-      <h4>自动化与抓取</h4>
-      <p>把重复流程串起来自动跑，或把公开网页数据抓下来</p>
-      <div class="ltools"><span class="llab">这一层的工具</span>Make、n8n、Apify</div>
-    </div>
-    <div class="note"><p><b>Cloudflare 单独说一句：</b>它既是第一张图里的平台本体（管域名解析、加速和防护，还能跑 Workers 小程序、存文件），也是 Cloudflare Pages 的出品方；Pages 是它家的页面托管产品，两者是同一家公司的不同产品，不要当成两个重复选项</p></div>
+      <!-- Desktop Nav Pills -->
+      <nav class="hidden md:flex items-center gap-1" aria-label="章节导航">
+        <a href="#sec-01" data-nav="sec-01" class="nav-pill px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap">
+          01 建站工具与搭配
+        </a>
+        <a href="#sec-02" data-nav="sec-02" class="nav-pill px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap">
+          02 Agent 与云电脑
+        </a>
+        <a href="#sec-03" data-nav="sec-03" class="nav-pill px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap">
+          03 自办虚拟卡
+        </a>
+        <a href="#sec-04" data-nav="sec-04" class="nav-pill px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap">
+          04 AI 大模型双榜
+        </a>
+      </nav>
 
-    <h3>16 个工具一览<span class="sub">同一层里选一个就够，区别主要在顺手程度和免费额度的给法，具体额度以各官网为准</span></h3>
-    <div id="tools"></div>
-    <p>托管这一层看着有九个，其实只分三种：<b>纯静态</b>的（GitHub Pages、Surge、PinMe）只能放做好的页面；<b>前端加轻函数</b>的（Cloudflare Pages、Vercel、Netlify）还能顺手处理一点简单逻辑；<b>全栈</b>的（Zeabur、Railway、Render）前后端和数据库都能跑；网站越简单，越往前选</p>
-    <div class="note"><p><b>免费口径先纠两个标题党：</b>Railway 不是真免费，新号先给 30 天 5 美元试用，之后免费档每月只剩 1 美元额度，常驻服务基本要上 5 美元/月的 Hobby；Zeabur 免费档主要是让你管理 1 台自己的服务器，算力另外算钱；Vercel 免费档只许个人非商用；PinMe 把页面发到 IPFS 上，免费档整站 1GB，但绑自己的域名要付费档</p></div>
+      <!-- Actions: Ai比价同款 日夜切换 + 长按12色主题选择 & 移动端菜单 -->
+      <div class="flex items-center gap-2 shrink-0 relative">
+        <button id="theme-palette-trigger" type="button"
+          class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold theme-tag-pill border border-black/5 dark:border-white/10 hover:opacity-90 transition-opacity"
+          title="点击打开12色主题面板">
+          <span id="current-theme-dot" class="w-2.5 h-2.5 rounded-full" style="background: linear-gradient(135deg, var(--orb-color-1), var(--theme-accent));"></span>
+          <span id="current-theme-name">01 · 冰川晴空</span>
+        </button>
 
-    <h3>三套小白搭配<span class="sub">按需求从少到多排列，照着自己那一套做，不要跨套混搭</span></h3>
-    <div class="combo">
-      <div class="ch"><span class="k">A</span><h3 style="margin:0">个人主页、博客、文档站</h3><span class="fit">只展示内容</span></div>
-      <div class="mix">GitHub ＋ Cloudflare Pages ＋ Cloudflare（绑域名）</div>
-      <p>适合只有展示内容的网站：主页、博客、作品集、项目文档；不需要登录、不需要存数据，是最简单、最稳妥的一套入门搭配</p>
-      <ol>
-        <li>用同一个邮箱注册 GitHub 和 Cloudflare 两个账号</li>
-        <li>在 GitHub 建仓库，把页面文件放进去（不会写就让 AI 生成，或套一个现成模板）</li>
-        <li>在 Cloudflare Pages 里点「连 GitHub 仓库」选这个仓，它自动部署出一个 pages.dev 网址，网站当场就能打开</li>
-        <li>有自己的域名就绑上，DNS 也在 Cloudflare 里改，一处搞定</li>
-        <li>以后改站只管往仓库里更新，网站自动跟着更新，不用再手动传文件</li>
-      </ol>
-      <p>更省事的备选：只用 GitHub Pages 一家，仓库设置里打开 Pages 就有网址，适合先练手；这一套可以零元跑起来，需要花钱的只有域名本身</p>
-    </div>
-    <div class="combo">
-      <div class="ch"><span class="k">B</span><h3 style="margin:0">带登录和数据库的完整小网站</h3><span class="fit">要登录和存数据</span></div>
-      <div class="mix">Vercel ＋ Supabase ＋ Cloudflare（绑域名）</div>
-      <p>适合要用户注册登录、要存数据的网站：留言板、记账、收藏夹、小型管理工具；分工是 Vercel 放页面，Supabase 管登录和数据库，页面存取数据直接调用 Supabase，不用自己写后端、不用自己装数据库；诀窍是<b>能不用常驻后端就不用</b>，也就躲开了免费档休眠、试用过期的坑</p>
-      <ol>
-        <li>在 Supabase 建项目，先建好数据表并打开登录功能，拿到项目地址和访问密钥</li>
-        <li>页面代码放 GitHub，在 Vercel 连接仓库并填入 Supabase 的地址和密钥</li>
-        <li>上线后在 Cloudflare 绑自己的域名</li>
-        <li>先自己注册一个账号走通登录和存数据，再给别人用</li>
-      </ol>
-      <p>怕两家平台来回切换的，用全包备选：Zeabur 或 Railway 一家把前端、后端、数据库全放下，中文界面、上手最低优先选 Zeabur；代价是灵活性和可迁移性不如分开搭配，但对第一个全栈练手项目完全够用</p>
-    </div>
-    <div class="combo">
-      <div class="ch"><span class="k">C</span><h3 style="margin:0">AI 小工具与自动采集站</h3><span class="fit">要 AI 功能或自动抓数据</span></div>
-      <div class="mix">Vercel 或 Cloudflare Pages ＋ Anthropic 或 Gemini ＋ Apify ＋ Make 或 n8n ＋ Supabase</div>
-      <p>适合带 AI 功能或要自动抓数据的网站：AI 问答小工具、自动汇总资讯、定时抓价格再展示；页面平台负责展示，AI 负责理解和生成，Apify 负责抓公开数据，Make 或 n8n 负责定时把流程串起来跑，Supabase 负责把结果存下来给页面读</p>
-      <ol>
-        <li>先按搭配 B 把页面和 Supabase 搭好</li>
-        <li>去 Anthropic 或 Gemini 申请接口密钥，先在本地或平台的函数里调通一次问答</li>
-        <li>在 Apify 选一个现成抓取器跑通，确认能拿到想要的数据格式</li>
-        <li>在 Make 或 n8n 里把流程串起来：定时触发、调用 Apify 抓取、交给 AI 整理、写入 Supabase</li>
-        <li>页面只读 Supabase 里整理好的结果展示</li>
-      </ol>
-      <p>两个二选一：AI 大脑在 Claude 和 Gemini 之间选一个起步就够；自动化在 Make 和 n8n 之间，不想自己部署、想拖拽上手选 Make，想免费自部署、数据自己掌控选 n8n；进阶插件等站跑起来再加，不用一开始就配</p>
-      <div class="rule"><p><b>一条硬规矩：</b>AI 的接口密钥只能放在服务器一侧（平台的函数或环境变量里），绝不能写进网页前端，写进去等于公开送人</p></div>
+        <button class="theme-mode-btn" id="darkModeBtn" type="button" aria-label="单击切换日夜 / 长按滑动选12色主题" title="单击切换日夜 / 长按滑动选12色主题">
+          <svg class="sun-moon-svg" id="sunMoonIcon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"></circle>
+            <line x1="12" y1="2" x2="12" y2="4.5"></line>
+            <line x1="12" y1="19.5" x2="12" y2="22"></line>
+            <line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line>
+            <line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line>
+            <line x1="2" y1="12" x2="4.5" y2="12"></line>
+            <line x1="19.5" y1="12" x2="22" y2="12"></line>
+            <line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line>
+            <line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line>
+          </svg>
+        </button>
+
+        <!-- 遮罩与12色主题悬浮面板 -->
+        <div class="theme-panel-backdrop" id="themeBackdrop"></div>
+        <div class="theme-popover-panel" id="themePopover">
+          <div class="panel-header">
+            <span class="panel-title">12色弥散主题</span>
+            <span class="panel-hint">滑动或点击选择</span>
+          </div>
+          <div class="theme-swatch-grid" id="themeSwatchGrid"></div>
+        </div>
+
+        <button id="mobile-menu-btn" type="button" aria-label="展开导航菜单"
+          class="md:hidden w-9 h-9 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
     </div>
 
-    <h3>怎么选：三个问题定搭配</h3>
-    <div class="tblwrap">
-      <table class="tbl">
-        <thead><tr><th>你的情况</th><th>选哪套</th><th>说明</th></tr></thead>
-        <tbody>
-          <tr><td data-l="你的情况">只展示内容，不要登录</td><td data-l="选哪套"><b>搭配 A</b></td><td data-l="说明">纯静态最省心，先把网站上线再谈其他</td></tr>
-          <tr><td data-l="你的情况">要注册登录、要存数据</td><td data-l="选哪套"><b>搭配 B</b></td><td data-l="说明">加 Supabase 一层即可，不用自己搭后端</td></tr>
-          <tr><td data-l="你的情况">要 AI 功能或自动抓数据</td><td data-l="选哪套"><b>搭配 C</b></td><td data-l="说明">在 B 的基础上加 AI、Apify 和自动化</td></tr>
-          <tr><td data-l="你的情况">说不清，先练手</td><td data-l="选哪套"><b>搭配 A 起步</b></td><td data-l="说明">需求长出来再往 B、C 升，静态页面迁过去不费劲</td></tr>
-        </tbody>
-      </table>
+    <!-- Mobile Nav Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 space-y-1">
+      <a href="#sec-01" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">01 建站工具与搭配</a>
+      <a href="#sec-02" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">02 Agent 与云电脑</a>
+      <a href="#sec-03" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">03 自办虚拟卡</a>
+      <a href="#sec-04" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">04 AI 大模型双榜</a>
     </div>
-    <p style="margin-top:16px">费用口径统一说一次：三套搭配起步都可以零元，免费额度对学习和个人小流量通常够用；开始付费的触发点也很一致：流量或用量超出免费额度、要长期常驻不休眠的后端、AI 按调用量计费、抓取按运行量计费、以及自己买域名；各家具体价格和额度经常调整，本文不写死数字，动手前到官网定价页看一眼现行口径为准；抓数据时只抓公开内容，并遵守目标网站的规则和条款</p>
-    <p>回到最开始的问题：这些工具算小白友好，但不是小白专用；它们省掉的是买服务器、配环境和日常运维，专业团队也在大量使用；第一次搭站先用搭配 A 把网站跑起来，需求长出来再往 B、C 升，加 Supabase 的省事、Make 或 n8n 的自动化，以及 Apify 的现成抓取</p>
+  </header>
 
-    <h3>官网链接清单<span class="sub">个别工具给的是官网文档页或站内页，从该页即可回到官网首页</span></h3>
-    <ul class="links">
-      <li><a class="linkcard" href="https://pages.github.com/" target="_blank" rel="noopener"><span class="ln">GitHub Pages</span><span class="lu">pages.github.com</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><a class="linkcard" href="https://www.cloudflare.com/products/pages/?lang=en" target="_blank" rel="noopener"><span class="ln">Cloudflare Pages</span><span class="lu">cloudflare.com/products/pages</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><a class="linkcard" href="https://vercel.com/docs/deployments?query=deploy" target="_blank" rel="noopener"><span class="ln">Vercel</span><span class="lu">vercel.com/docs/deployments</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><a class="linkcard" href="https://www.netlify.com/blog/a-new-starting-point-for-the-web/" target="_blank" rel="noopener"><span class="ln">Netlify</span><span class="lu">netlify.com</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><a class="linkcard" href="https://surge.sh/docs/cli/" target="_blank" rel="noopener"><span class="ln">Surge</span><span class="lu">surge.sh/docs/cli</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><a class="linkcard" href="https://github.com/glitternetwork/pinme/tree/dfab3ae59b05fe0bb2aa429312d60e7f5ff45640" target="_blank" rel="noopener"><span class="ln">PinMe（官方仓库）</span><span class="lu">github.com/glitternetwork/pinme</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><a class="linkcard" href="https://zeabur.com/skills" target="_blank" rel="noopener"><span class="ln">Zeabur</span><span class="lu">zeabur.com/skills</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><a class="linkcard" href="https://railway.com/features" target="_blank" rel="noopener"><span class="ln">Railway</span><span class="lu">railway.com/features</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><a class="linkcard" href="https://render.com/docs/deploy-django" target="_blank" rel="noopener"><span class="ln">Render</span><span class="lu">render.com/docs</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><a class="linkcard" href="https://www.cloudflare.com/about/" target="_blank" rel="noopener"><span class="ln">Cloudflare</span><span class="lu">cloudflare.com/about</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><a class="linkcard" href="https://supabase.com/docs/guides/platform" target="_blank" rel="noopener"><span class="ln">Supabase</span><span class="lu">supabase.com/docs</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><a class="linkcard" href="https://www.anthropic.com/" target="_blank" rel="noopener"><span class="ln">Anthropic</span><span class="lu">anthropic.com</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><a class="linkcard" href="https://gemini.google/bf/about/?hl=en-GB" target="_blank" rel="noopener"><span class="ln">Google Gemini</span><span class="lu">gemini.google</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><a class="linkcard" href="https://www.make.com/integrations/geekflare" target="_blank" rel="noopener"><span class="ln">Make</span><span class="lu">make.com</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><a class="linkcard" href="https://n8n.io/" target="_blank" rel="noopener"><span class="ln">n8n</span><span class="lu">n8n.io</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg></a></li>
-      <li><div class="linkcard"><span class="ln">Apify</span><span class="lu">apify.com（官网域名）</span></div></li>
-    </ul>
+  <!-- Hero：全宽横幅，不是卡片：左右贴边、顶部紧贴顶栏，无卡片外间距 -->
+  <section id="top" class="hero-aura-card">
+    <div class="aura-backdrop">
+      <div class="aura-orb orb-left" id="orbLeft"></div>
+      <div class="aura-orb orb-center" id="orbCenter"></div>
+      <div class="aura-orb orb-right" id="orbRight"></div>
+    </div>
+    <div class="max-w-5xl mx-auto px-4 pt-6 pb-8 sm:pt-10 sm:pb-10">
+
+      <div class="flex flex-wrap items-center gap-2 mb-4">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold theme-tag-pill">
+          小白工具选型指南
+        </span>
+        <span class="text-xs text-slate-500 dark:text-slate-400">
+          建站工具 / Agent 与云电脑 / 虚拟卡 / AI 大模型
+        </span>
+        <span class="ml-auto text-xs font-mono text-slate-400 dark:text-slate-500">2026-11 版</span>
+      </div>
+
+      <h1 class="text-[24px] sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight mb-3.5">
+        小白建站与 AI 工具选型指南
+      </h1>
+      <p class="text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed max-w-3xl">
+        这份指南是给刚入门、第一次搭网站和选 AI 工具的人用的：不用先懂服务器，也不用会运维，照着搭配选一套就能开始动手；全文四节：小白建站工具与搭配、带云电脑的 Agent 背后的巨模型、自办虚拟卡选型、国内外 AI 大模型双榜；先看第一节把网站搭起来，再按需要到后面几节挑 AI、办付款用的卡
+      </p>
+
+      <!-- Quick Jump Cards (SVG图标 + 标题同行单行，描述完整显示不带省略号) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 mt-7">
+        <a href="#sec-01" class="group p-3 sm:p-3.5 rounded-2xl border ios-hairline bg-white/85 dark:bg-slate-800/65 hover:shadow-sm transition-[box-shadow] min-w-0">
+          <div class="flex items-center gap-1.5 mb-1.5 min-w-0">
+            <svg class="w-4 h-4 theme-accent-text shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 12 12 17 22 12"></polyline>
+              <polyline points="2 17 12 22 22 17"></polyline>
+            </svg>
+            <span class="text-[13px] sm:text-sm font-semibold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">建站工具与搭配</span>
+          </div>
+          <div class="text-[11.5px] sm:text-xs text-slate-500 dark:text-slate-400 leading-snug">4 层架构 · 16 个工具 · 3 套方案</div>
+        </a>
+        <a href="#sec-02" class="group p-3 sm:p-3.5 rounded-2xl border ios-hairline bg-white/85 dark:bg-slate-800/65 hover:shadow-sm transition-[box-shadow] min-w-0">
+          <div class="flex items-center gap-1.5 mb-1.5 min-w-0">
+            <svg class="w-4 h-4 theme-accent-text shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            <span class="text-[13px] sm:text-sm font-semibold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">Agent 与云电脑</span>
+          </div>
+          <div class="text-[11.5px] sm:text-xs text-slate-500 dark:text-slate-400 leading-snug">8 款代表产品 · 底层大模型解析</div>
+        </a>
+        <a href="#sec-03" class="group p-3 sm:p-3.5 rounded-2xl border ios-hairline bg-white/85 dark:bg-slate-800/65 hover:shadow-sm transition-[box-shadow] min-w-0">
+          <div class="flex items-center gap-1.5 mb-1.5 min-w-0">
+            <svg class="w-4 h-4 theme-accent-text shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+            <span class="text-[13px] sm:text-sm font-semibold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">自办虚拟卡选型</span>
+          </div>
+          <div class="text-[11.5px] sm:text-xs text-slate-500 dark:text-slate-400 leading-snug">5 家对比 · 避坑排序 · 办理流程</div>
+        </a>
+        <a href="#sec-04" class="group p-3 sm:p-3.5 rounded-2xl border ios-hairline bg-white/85 dark:bg-slate-800/65 hover:shadow-sm transition-[box-shadow] min-w-0">
+          <div class="flex items-center gap-1.5 mb-1.5 min-w-0">
+            <svg class="w-4 h-4 theme-accent-text shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span class="text-[13px] sm:text-sm font-semibold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">AI 大模型双榜</span>
+          </div>
+          <div class="text-[11.5px] sm:text-xs text-slate-500 dark:text-slate-400 leading-snug">24 家厂商 · 热度榜 / 智能度榜</div>
+        </a>
+      </div>
+      </div>
   </section>
 
-  <!-- ================= 二、Agent 与云电脑 ================= -->
-  <section id="s3">
-    <div class="sec-head"><span class="no">02</span><h2>Muse、Cue、Dots、Grok Bot、Gemini Spark、Devin、Hark、Cowork：背后的大模型与配的云电脑</h2></div>
-    <p class="lead">这一节只看最典型的八个，外加 Cue 的底座 Manus 本体；每个只回答两个问题：<b>背后的大模型到底是谁的</b>，是自研的还是借别家的；<b>后面配的那台云电脑是什么</b></p>
-    <div class="cols">
-      <div class="mini"><h4>大模型 ＝ 大脑</h4><p>负责想和判断，聪不聪明主要看它</p></div>
-      <div class="mini"><h4>Agent 框架 ＝ 调度</h4><p>负责拆任务、选工具，把活一步步派下去</p></div>
-      <div class="mini"><h4>云电脑 ＝ 工位</h4><p>负责真的去开浏览器点网页、装软件、跑代码、存文件；只有大脑、没有云电脑的只能在聊天框里回答你，配上云电脑的，你把手机关掉，它还能在云上接着把活干完</p></div>
-      <div class="mini"><h4>这一批的共同点</h4><p>这八个都配了云电脑，只是配法不一样：有的常驻，有的按任务临时开</p></div>
-    </div>
+  <!-- Main Content -->
+  <main class="max-w-5xl mx-auto px-4 py-8 sm:py-12 space-y-16">
 
-    <div class="rule"><p><b>归组口径定死：</b>只看两件事——直接归属的公司是不是中国公司、运营地在哪；「有中国团队、中国人创办」只是出身，只注明、不决定归组；出身、归属、运营地是三件不同的事，不许混；格式统一写成「名称（所属）」，括号里是所属</p></div>
+    <!-- ==================== SECTION 01 ==================== -->
+    <section id="sec-01" class="space-y-8">
+      <div class="flex items-baseline gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+        <span class="text-xl sm:text-3xl font-mono font-bold theme-accent-text shrink-0">01</span>
+        <h2 class="text-[18px] sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug">小白建站工具全图与三套搭配</h2>
+      </div>
 
-    <h3>国外组<span class="sub">共 9 条，最典型的八个全在这一组</span></h3>
-    <div class="agent">
-      <div class="at">Muse (Meta)</div>
-      <div class="arow"><span class="alab">大模型</span><div><b>自研</b>：Muse Spark 系列，现行 Muse Spark 1.3，由 Meta 的模型实验室做，不是 Llama 那条线；另有一个开源的小版 Muse Glimmer</div></div>
-      <div class="arow"><span class="alab">云电脑</span><div>有，叫 <b>Muse Secure VM</b>：每人一台专属云虚拟机，自带浏览器；你关掉应用它还在后台接着干，登录凭据不经过模型本身，敏感动作由独立的 Sentinel 把关</div></div>
-    </div>
-    <div class="agent">
-      <div class="at">Hark Pro (Hark Labs)</div>
-      <div class="arow"><span class="alab">大模型</span><div><b>自研</b>：Hark 自己的 computer-use 模型，驱动云电脑干活的那套就叫 Handoff；路线是先做后训练，再往中训练和自研预训练走，不是套别家的模型改个名</div></div>
-      <div class="arow"><span class="alab">云电脑</span><div>有，叫 <b>Handoff</b>：一台专属云电脑，自带浏览器、文件系统和终端，最多同时开 6 个浏览器，替你登录网站、填表、下单、订位和缴费，花钱和发消息前默认先问你</div></div>
-    </div>
-    <div class="agent">
-      <div class="at">Devin (Cognition)</div>
-      <div class="arow"><span class="alab">大模型</span><div><b>混合</b>：有自研的编程模型 SWE 系列，云端任务推荐用 SWE-2，它是由月之暗面的 Kimi K3 再做后训练来的；同时也能在选择器里换成 Claude、GPT、Gemini 等别家大模型</div></div>
-      <div class="arow"><span class="alab">云电脑</span><div>有，<b>按任务开</b>：每个任务给一台隔离的云虚拟机，自带终端、代码编辑器和浏览器，自己装依赖、写代码、跑测试，最后交一个合并请求给你审；任务结束，这台机器就回收</div></div>
-    </div>
-    <div class="agent">
-      <div class="at">Dots (OpenAI)</div>
-      <div class="arow"><span class="alab">大模型</span><div><b>自研</b>：OpenAI 的旗舰模型 GPT-6 Astra；Dots 住在 ChatGPT 里，是个全天候替你盯着目标干活的 Agent，它自己更像调度，写代码和做文档这类重活会分给 Codex 和 ChatGPT Work 去做</div></div>
-      <div class="arow"><span class="alab">云电脑</span><div>有，<b>每个 Dot 一台专属、常驻</b>：一台 Linux 云电脑，自带 Chrome 浏览器，系统和浏览器由 OpenAI 维护；文件、装好的软件和网站登录都留在上面，它能按计划自己醒来干活，你关掉电脑也不耽误</div></div>
-    </div>
-    <div class="agent">
-      <div class="at">Grok Bot (xAI)</div>
-      <div class="arow"><span class="alab">大模型</span><div><b>不公开、自动路由</b>：官方不公布默认用哪个模型，也没有选择器；它按任务自动挑当时最合适的，自家 Grok 4.6 在里面，马斯克还点过名，连 Anthropic 的 Claude Opus 5.5 也会被调到，所以它聪不聪明，取决于这一次被路由到了谁</div></div>
-      <div class="arow"><span class="alab">云电脑</span><div>有，<b>一个账号共用一台、常驻</b>：一台 Linux 云电脑，跑在和 xAI 一起做这个产品的 Cursor 的基础设施上；你可以建多个有名字的 Bot，每个 Bot 有自己的一块屏幕，但共用同一台机器、同一套文件和登录，不是每个 Bot 一台</div></div>
-    </div>
-    <div class="agent">
-      <div class="at">Gemini Spark (Google)</div>
-      <div class="arow"><span class="alab">大模型</span><div><b>自研</b>：Google 的 Gemini 系列，发布时跑 Gemini 3.5，后来换到 3.7 Flash，应用里还能选用更新的 Gemini 4 Argon；调度框架叫 Antigravity；它 2026 年 10 月在 Gemini 应用里改名叫 Task，还是同一个东西</div></div>
-      <div class="arow"><span class="alab">云电脑</span><div>有，<b>Google Cloud 上的专属虚拟机</b>：带一个云端浏览器，网站登录跨会话留着，还能跑代码、存文件，全天在线，你的设备关了它照样干；这一批里它最谨慎，发邮件和花钱之前一律先等你点头</div></div>
-    </div>
-    <div class="agent">
-      <div class="at">Cowork (Anthropic)</div>
-      <div class="arow"><span class="alab">大模型</span><div><b>自研</b>：Anthropic 的 Claude 系列，只用自家的；它和编程工具 Claude Code 是同一套 agent 骨架，Cowork 是换给不写代码的人用的那一面，2026 年 1 月以研究预览发布；2026 年 9 月起并回 Claude 本体，不再是单独一个模式，打开 Claude 它自己判断是聊天还是动手干活</div></div>
-      <div class="arow"><span class="alab">云电脑</span><div>这一批里它最不一样：<b>起初没有云电脑</b>，任务跑在你自己电脑的桌面应用里、关在一个沙盒虚拟机中，电脑关了就停；2026 年 10 月起改成新任务默认在 Anthropic 云端按任务跑，要碰你本地文件时才经桌面应用伸手回来</div></div>
-    </div>
-    <div class="agent">
-      <div class="at">Cue (Manus)</div>
-      <div class="arow"><span class="alab">大模型</span><div><b>没有自研基础大模型</b>：主力调用 Anthropic 的 Claude 做推理和规划，子任务用阿里通义千问的微调版，多个模型按活分工；自研的是 Cascade 这套 Agent 执行框架，不是模型本身，所以论智能度要回第四节看 Claude 和通义千问排在哪；注明：中国团队创办，现归属新加坡公司</div></div>
-      <div class="arow"><span class="alab">云电脑</span><div>有，而且配得最全：每个 Agent 配一台自己的云电脑，外加一个独立邮箱、一个电话号码和一个钱包，能代接电话、在你定的预算内付款，你下线以后它在这台机器上接着干</div></div>
-    </div>
-    <div class="agent">
-      <div class="at">Manus (Butterfly Effect Pte)</div>
-      <div class="arow"><span class="alab">大模型</span><div>和 Cue 同一个底座：<b>没有自研基础大模型</b>，同样是 Claude 加通义千问微调版在背后，自己的本事在 Cascade 调度框架；注明：中国团队创办，现归属新加坡公司，总部和运营在新加坡、只面向海外用户</div></div>
-      <div class="arow"><span class="alab">云电脑</span><div>有，叫<b>常驻云电脑</b>：一台全天在线的 Ubuntu 虚拟机，文件、装好的软件、正在跑的进程都留着，你的电脑关机断网，它照样接着干，Cue 的云电脑就建在这套底座上</div></div>
-    </div>
-    <div class="note"><p><b>Cue 和 Manus 为什么归国外组，一句话说清：</b>直接是中国公司就要受中国监管这一套，麻烦很多，Manus 当年把总部迁到新加坡、把运营主体换成新加坡的 Butterfly Effect Pte（开曼架构控股），正是为避开这个，所以按归属和运营地它算国外，出身是中国团队创办只在这里注明；后来腾讯牵头的中方资本回购后成了它最大单一股东，但那是少数股权、不控股，公司还是独立运营、总部仍在新加坡，所以归属不变</p></div>
+      <!-- 1.1 四层架构 -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-semibold text-slate-900 dark:text-white">建站四层架构</h3>
+        <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+          先把市场上最常见的建站工具一次看全：一类是 AI 应用里能连接的服务，一类是免费建站清单里的托管平台；两边有重复，合起来 16 个工具，它们不是互相替代的竞品，而是一个网站的不同零件；先记住一句话：<strong>页面放哪、数据存哪、AI 用谁、重复劳动交给谁</strong>，四个问题各选一个工具，就是一套完整搭配；只做展示页时只需要第一个，其余三层按需要再加，不要一上来全装上
+        </p>
 
-    <h3>国内组<span class="sub">按定死的口径，这一批为空</span></h3>
-    <p>这一批里，国内组是空的：没有一个是「直接归属中国公司、又在中国运营」的，最接近的 Cue 和 Manus 也只是中国团队创办出身，归属和运营都已经在新加坡，所以归国外组；这一组不硬凑数，不拿出身当归组，也不拿不相干的产品来填</p>
-    <p>从大模型这一项看，几家的含金量也清楚了：<b>Muse、Hark、Dots、Gemini Spark 和 Cowork 是自己养模型，脑子是自己的；Devin 一半自己养、一半可换别家的；Grok Bot 不公开用谁、按任务自动路由，自家的和别家的都可能被调到；Cue 和 Manus 没有自己的脑子</b>，聪明程度取决于它调用的 Claude 和通义千问，自己的本事在调度和那台云电脑上</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="theme-surface rounded-2xl border p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold uppercase tracking-wider theme-accent-text">第一层</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">必备起步</span>
+            </div>
+            <h4 class="font-semibold text-slate-900 dark:text-white mb-1">页面托管</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">把页面放到网上，给出能打开的网址</p>
+            <div class="flex flex-wrap gap-1.5 text-xs">
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">GitHub Pages</span>
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Cloudflare Pages</span>
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Vercel</span>
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Netlify</span>
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Surge</span>
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">PinMe</span>
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Zeabur</span>
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Railway</span>
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Render</span>
+            </div>
+          </div>
 
-    <h3>云电脑到底是什么，为什么这一代都要配一台</h3>
-    <p>云电脑不是网盘，也不是你远程登录上去办公的那种桌面，它是专门给 Agent 住的一台云端机器：有浏览器、有终端、有文件系统，能登录网站、下载和保存文件、装软件、跑代码；区别只在于是常驻还是临时开：常驻的像给 Agent 租了一间一直开着的办公室，文件和进度都在里面，下次接着用；临时的像每接一个任务临时开一间工作间，活干完就退掉</p>
-    <div class="tblwrap"><table class="tbl stickytbl">
-      <thead><tr><th>产品（所属）</th><th>云电脑的名字</th><th>常驻还是按任务开</th><th>你离线后</th></tr></thead>
-      <tbody>
-        <tr><td data-l="产品（所属）" class="nm"><b>Muse (Meta)</b></td><td data-l="云电脑的名字">Muse Secure VM</td><td data-l="常驻还是按任务开">常驻，每人一台专属</td><td data-l="你离线后">关掉应用继续干</td></tr>
-        <tr><td data-l="产品（所属）" class="nm"><b>Hark Pro (Hark Labs)</b></td><td data-l="云电脑的名字">Handoff</td><td data-l="常驻还是按任务开">专属云电脑，按任务干活</td><td data-l="你离线后">关掉应用继续干</td></tr>
-        <tr><td data-l="产品（所属）" class="nm"><b>Cue (Manus)</b></td><td data-l="云电脑的名字">Manus 常驻云电脑</td><td data-l="常驻还是按任务开">常驻，全天在线的 Ubuntu 虚拟机</td><td data-l="你离线后">下线以后继续干</td></tr>
-        <tr><td data-l="产品（所属）" class="nm"><b>Devin (Cognition)</b></td><td data-l="云电脑的名字">云端虚拟机（Devbox 一类工位）</td><td data-l="常驻还是按任务开">按任务开，任务完回收</td><td data-l="你离线后">关掉自己电脑继续干，干完交合并请求</td></tr>
-        <tr><td data-l="产品（所属）" class="nm"><b>Dots (OpenAI)</b></td><td data-l="云电脑的名字">无专门名字，每个 Dot 自带一台</td><td data-l="常驻还是按任务开">常驻，每个 Dot 一台专属</td><td data-l="你离线后">关掉电脑继续干</td></tr>
-        <tr><td data-l="产品（所属）" class="nm"><b>Grok Bot (xAI)</b></td><td data-l="云电脑的名字">无专门名字，账号共用一台</td><td data-l="常驻还是按任务开">常驻，一个账号一台、多个 Bot 共用</td><td data-l="你离线后">关掉应用继续干</td></tr>
-        <tr><td data-l="产品（所属）" class="nm"><b>Gemini Spark (Google)</b></td><td data-l="云电脑的名字">无专门名字，Google Cloud 专属虚拟机</td><td data-l="常驻还是按任务开">常驻，专属虚拟机全天在线</td><td data-l="你离线后">设备关机继续干</td></tr>
-        <tr><td data-l="产品（所属）" class="nm"><b>Cowork (Anthropic)</b></td><td data-l="云电脑的名字">无专门名字，起初是你电脑里的沙盒虚拟机，现为云端任务环境</td><td data-l="常驻还是按任务开">按任务开，2026 年 10 月起默认云端跑</td><td data-l="你离线后">云端任务继续干，碰本地文件要开着桌面应用</td></tr>
-      </tbody>
-    </table></div>
-    <p style="margin-top:16px">它和自己租的云服务器不是一回事：自己租的服务器是通用机器，装什么、怎么用都由自己定；这里这台是产品方替 Agent 备好的专属工位，不用自己装、不用维护，也不能拿它当自己的服务器用，就是给这个 Agent 干活住的</p>
-    <div class="note"><p><b>以后再看到一个新的 Agent 产品，就问三句，立刻能看懂它：</b>第一句，背后的大模型是谁的，自研还是借的；第二句，后面配没配云电脑，叫什么；第三句，那台云电脑是常驻的还是干完一个任务就没了的；第四节管第一句，这一节管后两句</p></div>
-  </section>
+          <div class="theme-surface rounded-2xl border p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">第二层</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">按需加装</span>
+            </div>
+            <h4 class="font-semibold text-slate-900 dark:text-white mb-1">数据与后端</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">存数据、做用户登录、跑常驻的服务器程序</p>
+            <div class="flex flex-wrap gap-1.5 text-xs">
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Supabase</span>
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Cloudflare (Workers 与 R2)</span>
+              <span class="px-2 py-1 rounded-md bg-slate-100/70 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400">Zeabur / Railway / Render 亦可兼任</span>
+            </div>
+          </div>
 
-  <!-- ================= 三、自办虚拟卡 ================= -->
-  <section id="s4">
-    <div class="sec-head"><span class="no">03</span><h2>自办虚拟卡选型</h2></div>
-    <p class="lead">前面几节选的 AI 订阅大多要绑一张能付美元的卡，这一节讲怎么<b>自己办一张自己名下的 Visa 虚拟卡</b>：自己在发卡平台注册、实名、充值，付正价订阅，不用小贩卖的成品卡、长租卡</p>
+          <div class="theme-surface rounded-2xl border p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold uppercase tracking-wider text-violet-600 dark:text-violet-400">第三层</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">按需加装</span>
+            </div>
+            <h4 class="font-semibold text-slate-900 dark:text-white mb-1">AI 大脑</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">对话、写作、看图、写代码的能力，通过接口接进自己的网站</p>
+            <div class="flex flex-wrap gap-1.5 text-xs">
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Anthropic（Claude）</span>
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Google Gemini</span>
+            </div>
+          </div>
 
-    <h3>定版与用途</h3>
-    <div class="cols">
-      <div class="mini"><h4>路线</h4><p>自己在发卡平台注册、实名、充值，开自己名下的 Visa 虚拟卡，付正价订阅；不用小贩成品卡、长租卡</p></div>
-      <div class="mini"><h4>充值</h4><p>用 USDT 充，按月充、按月花，不在卡里存大额</p></div>
-      <div class="mini"><h4>用途</h4><p>付 AI 订阅月费；过 Muse 年龄验证（卡预授权 1 美元，5–7 个工作日退）</p></div>
-      <div class="mini"><h4>先分清</h4><p>小贩卖的 0 刀耗材卡是另一回事，0 刀卡过不了 Muse 验证</p></div>
-    </div>
+          <div class="theme-surface rounded-2xl border p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">第四层</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">按需加装</span>
+            </div>
+            <h4 class="font-semibold text-slate-900 dark:text-white mb-1">自动化与抓取</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">把重复流程串起来自动跑，或把公开网页数据抓下来</p>
+            <div class="flex flex-wrap gap-1.5 text-xs">
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Make</span>
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">n8n</span>
+              <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Apify</span>
+            </div>
+          </div>
+        </div>
 
-    <h3>五家对比<span class="sub">只看这五家，结论和数字都已定版，动手前再到各家 App 或官网核一眼现行口径</span></h3>
-    <div class="agent">
-      <div class="at">Gate 卡<span class="tag">平台最稳</span></div>
-      <div class="arow"><span class="alab">定位</span><div>平台最稳：虚拟卡免费开，刷卡从账户现扣；多个教程证实能过 Muse 绑卡</div></div>
-      <div class="arow"><span class="alab">费用</span><div>兑换约 0.9%、非美元外汇约 1%（第三方口径，以 App 内为准）</div></div>
-      <div class="arow"><span class="alab">门槛</span><div>KYC 最严：2 级认证（证件+人脸），部分卡还要近 3 个月地址证明；官方受限地区含中国大陆，大陆居民新申资格被排除，已有账号且 App 内能申到的另说</div></div>
-      <div class="arow"><span class="alab">注意</span><div>坑在用法：拿假地址绕资格开卡会被冻号冻钱</div></div>
-    </div>
-    <div class="agent">
-      <div class="at">PokePay<span class="tag">首选</span></div>
-      <div class="arow"><span class="alab">定位</span><div>香港 Visa 虚拟卡，官网 <a href="https://pokepay.cc" target="_blank" rel="noopener">pokepay.cc</a></div></div>
-      <div class="arow"><span class="alab">门槛</span><div>KYC 一级（身份证/护照+人脸）</div></div>
-      <div class="arow"><span class="alab">费用</span><div>0 月费 0 年费；开卡费原价 20 美元、邀请券后约 5–7.2 美元；充值费 1%、消费 1%、非港币转换 1%；USDT（TRC20）充值；首充建议 45 USDT</div></div>
-      <div class="arow"><span class="alab">注意</span><div>2025 年下半年有过一波合规清理停用（官方承诺开卡费与余额全额退），教训是别长期停放余额；CVV 输错 3 次自动锁卡；Steam、暴雪、EA 明文禁用</div></div>
-    </div>
-    <div class="agent">
-      <div class="at">Roogoo（乐享卡）</div>
-      <div class="arow"><span class="alab">定位</span><div>美国 Visa，官方明列支持 AI 订阅；其香港卡种不支持 AI 订阅，须选乐享或尊享</div></div>
-      <div class="arow"><span class="alab">门槛</span><div>要 KYC（证件+人脸）</div></div>
-      <div class="arow"><span class="alab">费用</span><div>首卡 0 开卡费、首充 10 美元、充值 0%、交易费 1%</div></div>
-      <div class="arow"><span class="alab">注意</span><div>社区深挖后下调：退出难（小于 3 美元提不出、销卡收费层层卡）、余额低于 2 美元冻卡且冻着不能销卡、余额不足拒付罚金重（授权额 2%–5%＋0.5 美元、上限 30 美元）、付款失败仍扣费等，只适合小额快进快出</div></div>
-    </div>
-    <div class="agent">
-      <div class="at">SuPay（SupayCard）</div>
-      <div class="arow"><span class="alab">定位</span><div>社区有人实测过 Muse 验证</div></div>
-      <div class="arow"><span class="alab">门槛</span><div>免 KYC、邮箱注册</div></div>
-      <div class="arow"><span class="alab">费用</span><div>USDT 充值 2%；宣传开卡约 8 美元，实测真实最低成本 27 美元（开卡费 7＋首充 20）</div></div>
-      <div class="arow"><span class="alab">注意</span><div>平台 2025 年才立、有完整维权实录、原则上不支持退款、卡段后来禁用 Google 系列产品，只适合一次性小额试、不存大额</div></div>
-    </div>
-    <div class="agent">
-      <div class="at">ZovoCard<span class="tag">尚不可用</span></div>
-      <div class="arow"><span class="alab">门槛</span><div>免 KYC、邮箱注册；服务条款明文排除中国大陆居民</div></div>
-      <div class="arow"><span class="alab">费用</span><div>USDT 充值；无公开统一价目</div></div>
-      <div class="arow"><span class="alab">注意</span><div>注册实测被其站点的人机验证卡死，至今没看到卡目录与费率，尚不可用</div></div>
-    </div>
+        <div class="rounded-2xl border border-blue-200/80 dark:border-blue-900/60 theme-tag-pill p-4 text-sm leading-relaxed">
+          <span class="font-semibold">特别提示：</span>Cloudflare 单独说一句：它既是第一张图里的平台本体（管域名解析、加速和防护，还能跑 Workers 小程序、存文件），也是 Cloudflare Pages 的出品方；Pages 是它的页面托管产品，两者是同一家公司的不同产品，不要当成两个重复选项
+        </div>
+      </div>
 
-    <h3>排序<span class="sub">按长期扣款这个用途排</span></h3>
-    <div class="rule"><p><b>Gate（有资格时）&gt; PokePay &gt; SuPay（一次性用途）&gt; Roogoo（只快进快出）&gt; ZovoCard（尚不可用）</b></p></div>
-    <p>没有 Gate 资格的，直接从首选 PokePay 开始办；SuPay 只拿来一次性小额试，Roogoo 只快进快出，ZovoCard 先不用考虑</p>
+      <!-- 1.2 16 个工具一览（带交互筛选） -->
+      <div class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+          <div>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">16 个工具一览</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">同一层里选一个就够，区别主要在顺手程度和免费额度的给法，具体额度以各官网为准</p>
+          </div>
+          <!-- Filter Pills -->
+          <div id="tool-filters" class="flex flex-wrap gap-1.5" role="group" aria-label="工具分类筛选">
+            <button type="button" data-filter="all" class="tool-filter-btn px-2.5 py-1 rounded-full text-xs font-medium theme-accent-bg transition-colors">全部 (16)</button>
+            <button type="button" data-filter="托管" class="tool-filter-btn px-2.5 py-1 rounded-full text-xs font-medium theme-surface border text-slate-600 dark:text-slate-300 transition-colors">托管 (6)</button>
+            <button type="button" data-filter="全栈托管" class="tool-filter-btn px-2.5 py-1 rounded-full text-xs font-medium theme-surface border text-slate-600 dark:text-slate-300 transition-colors">全栈托管 (3)</button>
+            <button type="button" data-filter="基础与数据" class="tool-filter-btn px-2.5 py-1 rounded-full text-xs font-medium theme-surface border text-slate-600 dark:text-slate-300 transition-colors">基础与数据 (2)</button>
+            <button type="button" data-filter="AI 大脑" class="tool-filter-btn px-2.5 py-1 rounded-full text-xs font-medium theme-surface border text-slate-600 dark:text-slate-300 transition-colors">AI 大脑 (2)</button>
+            <button type="button" data-filter="自动化与抓取" class="tool-filter-btn px-2.5 py-1 rounded-full text-xs font-medium theme-surface border text-slate-600 dark:text-slate-300 transition-colors">自动化与抓取 (3)</button>
+          </div>
+        </div>
 
-    <h3>已排除<span class="sub">这三家不用再看</span></h3>
-    <div class="cols">
-      <div class="mini"><h4>WildCard 野卡</h4><p>2025-07-12 已停服</p></div>
-      <div class="mini"><h4>RedotPay</h4><p>官方限制地区含中国大陆</p></div>
-      <div class="mini"><h4>NobePay</h4><p>官网域名已无 DNS 解析</p></div>
-    </div>
+        <div id="tools-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5"></div>
 
-    <h3>PokePay 办理流程<span class="sub">照这个顺序走，第一次先小额试活</span></h3>
-    <div class="combo">
-      <ol>
-        <li>官网或 App 注册</li>
-        <li>KYC 一级（须本人刷脸）</li>
-        <li>USDT 汇入（选 TRC20，提币网络与充值页一致）</li>
-        <li>申请虚拟卡（付款前先确认有无开卡优惠券）</li>
-        <li>先小额试活再订订阅，账单地址照抄 App 所给</li>
-      </ol>
-    </div>
-  </section>
+        <p class="text-sm text-slate-600 dark:text-slate-300 theme-surface rounded-2xl border p-4 leading-relaxed">
+          <strong class="text-slate-900 dark:text-white">总结：</strong>托管这一层看着有九个，其实只分三种：纯静态的（GitHub Pages、Surge、PinMe）只能放做好的页面；前端加轻函数的（Cloudflare Pages、Vercel、Netlify）还能顺手处理一点简单逻辑；全栈的（Zeabur、Railway、Render）前后端和数据库都能跑；网站越简单，越往前选
+        </p>
 
-  <!-- ================= 四、AI 大模型双榜 ================= -->
-  <section id="s2">
-    <div class="sec-head"><span class="no">04</span><h2>国内外 AI 名单：热度榜与智能度榜</h2></div>
-    <p class="lead">国外和国内主要的 AI 全收进来：一共 <b>24 家，国外 10 家、国内 14 家</b>，口径是市面上主流、初学者最常接触到的大模型厂商，一个不落</p>
-    <p>这一节不混排，做成<b>两张榜</b>：热度决定生态与顺手程度，智能度决定上限，两件事差别很大（比如 Meta AI 热度靠前但智能不在第一梯队，Claude 正好反过来）；每家都带代表产品或模型、一句话特长与建站用途；第一节搭配里 AI 站在第三层「AI 大脑」的位置，选大脑时对照这两张榜挑</p>
+        <!-- 免费额度预警 -->
+        <div class="rounded-2xl border border-amber-300/80 dark:border-amber-800/70 bg-amber-50/80 dark:bg-amber-950/30 p-4 sm:p-5 text-sm text-amber-950 dark:text-amber-100 leading-relaxed">
+          <div class="font-semibold text-amber-900 dark:text-amber-300 mb-1 flex items-center gap-1.5">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            免费额度预警（先纠正几个标题党）
+          </div>
+          Railway 不是真免费，新号先给 30 天 5 美元试用，之后免费档每月只剩 1 美元额度，常驻服务基本要上 5 美元/月的 Hobby；Zeabur 免费档主要是让你管理 1 台自己的服务器，算力另外算钱；Vercel 免费档只许个人非商用；PinMe 把页面用到 IPFS 上，免费档整站 1GB，但绑自己的域名要付费档
+        </div>
+      </div>
 
-    <div class="segcard">
-    <div class="seg" role="tablist" aria-label="榜单切换">
-      <span class="seg-ind" aria-hidden="true"></span>
-      <button type="button" class="on" data-panel="hot" role="tab" aria-selected="true">热度榜</button>
-      <button type="button" data-panel="smart" role="tab" aria-selected="false">智能度榜</button>
-    </div>
+      <!-- 1.3 交互式“三问定搭配”决策器 + 三套搭配 -->
+      <div class="space-y-5">
+        <div class="theme-surface rounded-2xl border p-5 sm:p-6 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h3 class="text-lg font-semibold text-slate-900 dark:text-white">交互式搭配决策器（点击你的情况，自动高亮推荐方案）</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">三问定搭配，点击下方任意场景立即定位对应方案与操作步骤</p>
+            </div>
+            <button id="clear-combo-highlight" type="button" class="text-xs text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 underline self-start sm:self-auto">显示全部</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5" id="decision-buttons">
+            <button type="button" data-target-combo="A" class="decision-btn text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-[border-color]">
+              <div class="text-xs font-semibold theme-accent-text mb-1">→ 选搭配 A</div>
+              <div class="text-sm font-medium text-slate-900 dark:text-white">只展示内容，不要登录</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">纯静态最省心，先把网站上线再谈其他</div>
+            </button>
+            <button type="button" data-target-combo="B" class="decision-btn text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-[border-color]">
+              <div class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-1">→ 选搭配 B</div>
+              <div class="text-sm font-medium text-slate-900 dark:text-white">要注册登录、要存数据</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">加 Supabase 一层即可，不用自己搭后端</div>
+            </button>
+            <button type="button" data-target-combo="C" class="decision-btn text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-[border-color]">
+              <div class="text-xs font-semibold text-violet-600 dark:text-violet-400 mb-1">→ 选搭配 C</div>
+              <div class="text-sm font-medium text-slate-900 dark:text-white">要 AI 功能或自动抓数据</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">在 B 的基础上加 AI、Apify 和自动化</div>
+            </button>
+            <button type="button" data-target-combo="A" class="decision-btn text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-[border-color]">
+              <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">→ 选搭配 A 起步</div>
+              <div class="text-sm font-medium text-slate-900 dark:text-white">说不清，先练手</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">需求长出来再往 B、C 升，静态页面迁过去不费劲</div>
+            </button>
+          </div>
+        </div>
 
-    <div class="panel on" id="panel-hot">
-      <p>热度以用户量和访问份额为准；各家统计口径不同，月活、应用内嵌月活、全球聊天网页访问份额不能直接互换，所以这张榜是<b>量级排序</b>，不是精确换算；前十名有公开量级数，其后各家按大致量级靠后排</p>
-      <div class="tblwrap rankwrap"><table class="tbl ranktbl">
-        <thead><tr><th class="rk">名次</th><th>公司</th><th>代表产品 / 模型</th><th>热度依据</th><th>一句话特长与建站用途</th></tr></thead>
-        <tbody id="hotBody"></tbody>
-      </table></div>
-    </div>
+        <!-- 三套搭配卡片（带可勾选步骤） -->
+        <div class="grid grid-cols-1 gap-5" id="combo-cards">
+          <!-- 搭配 A -->
+          <article data-combo="A" class="combo-card theme-surface rounded-2xl border p-5 sm:p-6 shadow-sm transition-[border-color,background-color,box-shadow]">
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span class="px-2.5 py-0.5 rounded-md text-xs font-bold theme-accent-bg">搭配 A</span>
+              <h4 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">个人主页、博客、文档站（只展示内容）</h4>
+            </div>
+            <div class="inline-block max-w-full break-words font-mono text-xs sm:text-sm px-3 py-1.5 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 mb-3">
+              GitHub + Cloudflare Pages + Cloudflare（绑域名）
+            </div>
+            <p class="text-sm text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
+              适合只有展示内容的网站：主页、博客、作品集、项目文档；不需要登录、不需要存数据，是最简单、最稳妥的一套入门搭配
+            </p>
+            <div class="space-y-2 mb-4">
+              <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">动手步骤（可点击勾选记录进度）</div>
+              <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
+                <input type="checkbox" class="step-check mt-1 rounded border-slate-300 text-blue-600" data-step-id="A-1" />
+                <span>1. 用同一个邮箱注册 GitHub 和 Cloudflare 两个账号</span>
+              </label>
+              <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
+                <input type="checkbox" class="step-check mt-1 rounded border-slate-300 text-blue-600" data-step-id="A-2" />
+                <span>2. 在 GitHub 建仓库，把页面文件放进去（不会写就让 AI 生成，或套一个现成模板）</span>
+              </label>
+              <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
+                <input type="checkbox" class="step-check mt-1 rounded border-slate-300 text-blue-600" data-step-id="A-3" />
+                <span>3. 在 Cloudflare Pages 里点「连 GitHub 仓库」选这个仓，它自动部署出一个 pages.dev 网址，网站当场就能打开</span>
+              </label>
+              <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
+                <input type="checkbox" class="step-check mt-1 rounded border-slate-300 text-blue-600" data-step-id="A-4" />
+                <span>4. 有自己的域名就绑上，DNS 也在 Cloudflare 里改，一处搞定</span>
+              </label>
+              <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
+                <input type="checkbox" class="step-check mt-1 rounded border-slate-300 text-blue-600" data-step-id="A-5" />
+                <span>5. 以后改站只管往仓库里更新，网站自动跟着更新，不用再手动传文件</span>
+              </label>
+            </div>
+            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 rounded-lg p-3">
+              <strong>备选：</strong>更省事的备选：只用 GitHub Pages 一家，仓库设置里打开 Pages 就有网址，适合先练手；这一套可以零元跑起来，需要花钱的只有域名本身
+            </div>
+          </article>
 
-    <div class="panel" id="panel-smart">
-      <p>智能度以 <b>Artificial Analysis 智能指数（2026-11 版）</b>为准，按各家最强模型算；前三名与后面之间有一档肉眼可见的差距；没有公开前沿分数的公司按第三梯队列出，注明是按梯队排、不是精确分数，不编数字</p>
-      <div class="tblwrap rankwrap"><table class="tbl ranktbl">
-        <thead><tr><th class="rk">名次</th><th>公司</th><th>代表产品 / 模型</th><th>智能度依据</th><th>一句话特长与建站用途</th></tr></thead>
-        <tbody id="smartBody"></tbody>
-      </table></div>
-      <div class="gapline">第三梯队起无公开前沿分数，按行业地位列</div>
-      <div class="tblwrap rankwrap"><table class="tbl ranktbl">
-        <thead><tr><th class="rk">梯队</th><th>公司</th><th>代表产品 / 模型</th><th>一句话特长与建站用途</th></tr></thead>
-        <tbody id="tierBody"></tbody>
-      </table></div>
-    </div>
+          <!-- 搭配 B -->
+          <article data-combo="B" class="combo-card theme-surface rounded-2xl border p-5 sm:p-6 shadow-sm transition-[border-color,background-color,box-shadow]">
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-600 text-white">搭配 B</span>
+              <h4 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">带登录和数据库的完整小网站（要登录和存数据）</h4>
+            </div>
+            <div class="inline-block max-w-full break-words font-mono text-xs sm:text-sm px-3 py-1.5 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 mb-3">
+              Vercel + Supabase + Cloudflare（绑域名）
+            </div>
+            <p class="text-sm text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
+              适合要用户注册登录、要存数据的网站：留言板、记账、收藏夹、小型管理工具；分工是 Vercel 放页面，Supabase 管登录和数据库，页面存取数据直接调用 Supabase，不用自己写后端、不用自己装数据库；诀窍是能不用常驻后端就不用，也就躲开了免费档休眠、试用过期的坑
+            </p>
+            <div class="space-y-2 mb-4">
+              <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">动手步骤（可点击勾选记录进度）</div>
+              <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
+                <input type="checkbox" class="step-check mt-1 rounded border-slate-300 text-emerald-600" data-step-id="B-1" />
+                <span>1. 在 Supabase 建项目，先建好数据表并打开登录功能，拿到项目地址和访问密钥</span>
+              </label>
+              <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
+                <input type="checkbox" class="step-check mt-1 rounded border-slate-300 text-emerald-600" data-step-id="B-2" />
+                <span>2. 页面代码放 GitHub，在 Vercel 连接仓库并填入 Supabase 的地址和密钥</span>
+              </label>
+              <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
+                <input type="checkbox" class="step-check mt-1 rounded border-slate-300 text-emerald-600" data-step-id="B-3" />
+                <span>3. 上线后在 Cloudflare 绑自己的域名</span>
+              </label>
+              <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
+                <input type="checkbox" class="step-check mt-1 rounded border-slate-300 text-emerald-600" data-step-id="B-4" />
+                <span>4. 先自己注册一个账号走通登录和存数据，再给别人用</span>
+              </label>
+            </div>
+            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 rounded-lg p-3">
+              <strong>备选：</strong>怕两家平台来回切换的，用全包备选：Zeabur 或 Railway 一家把前端、后端、数据库全放下，中文界面、上手最低优先选 Zeabur；代价是灵活性和可迁移性不如分开搭配，但对第一个全栈练手项目完全够用
+            </div>
+          </article>
 
-    </div>
+          <!-- 搭配 C -->
+          <article data-combo="C" class="combo-card theme-surface rounded-2xl border p-5 sm:p-6 shadow-sm transition-[border-color,background-color,box-shadow]">
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-violet-600 text-white">搭配 C</span>
+              <h4 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">AI 小工具与自动采集站（要 AI 功能或自动抓数据）</h4>
+            </div>
+            <div class="inline-block max-w-full break-words font-mono text-xs sm:text-sm px-3 py-1.5 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 mb-3">
+              Vercel 或 Cloudflare Pages + Anthropic 或 Gemini + Apify + Make 或 n8n + Supabase
+            </div>
+            <p class="text-sm text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
+              适合带 AI 功能或要自动抓数据的网站：AI 问答小工具、自动汇总资讯、定时抓价格再展示；页面平台负责展示，AI 负责理解和生成，Apify 负责抓公开数据，Make 或 n8n 负责定时把流程串起来跑，Supabase 负责把结果存下来给页面读
+            </p>
+            <div class="space-y-2 mb-4">
+              <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">动手步骤（可点击勾选记录进度）</div>
+              <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
+                <input type="checkbox" class="step-check mt-1 rounded border-slate-300 text-violet-600" data-step-id="C-1" />
+                <span>1. 先按搭配 B 把页面和 Supabase 搭好</span>
+              </label>
+              <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
+                <input type="checkbox" class="step-check mt-1 rounded border-slate-300 text-violet-600" data-step-id="C-2" />
+                <span>2. 去 Anthropic 或 Gemini 申请接口密钥，先在本地或平台的函数里调通一次问答</span>
+              </label>
+              <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
+                <input type="checkbox" class="step-check mt-1 rounded border-slate-300 text-violet-600" data-step-id="C-3" />
+                <span>3. 在 Apify 选一个现成抓取器跑通，确认能拿到想要的数据格式</span>
+              </label>
+              <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
+                <input type="checkbox" class="step-check mt-1 rounded border-slate-300 text-violet-600" data-step-id="C-4" />
+                <span>4. 在 Make 或 n8n 里把流程串起来：定时触发、调用 Apify 抓取、交给 AI 整理、写入 Supabase</span>
+              </label>
+              <label class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
+                <input type="checkbox" class="step-check mt-1 rounded border-slate-300 text-violet-600" data-step-id="C-5" />
+                <span>5. 页面只读 Supabase 里整理好的结果展示</span>
+              </label>
+            </div>
+            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 rounded-lg p-3">
+              <strong>备选：</strong>两个二选一：AI 大脑在 Claude 和 Gemini 之间选一个起步就够；自动化在 Make 和 n8n 之间，不想自己部署、想拖拽上手选 Make，想免费自部署、数据自己掌控选 n8n；进阶插件等站跑起来再加，不用一开始就配
+            </div>
+          </article>
+        </div>
 
-    <h3>怎么用这两张榜</h3>
-    <p>一句话总结：<b>最聪明的是 Claude、Gemini、GPT 三家，最热的是 ChatGPT、Meta AI、Gemini、豆包</b>；国内智能看通义和 DeepSeek，热度看豆包、通义、DeepSeek</p>
-    <p>做纯展示站（搭配 A）用不上 AI；要登录与数据（搭配 B）一般也先不用；只有做 AI 小工具或自动采集站（搭配 C）时才选大脑：要上限看智能度榜前列，要省钱与中文顺手看 DeepSeek、通义千问、豆包、Kimi、GLM；写代码第一梯队是 Claude、GPT、Gemini、DeepSeek、通义千问，这 5 个轮着用基本够了；一个够用，互为备用再加第二个</p>
-    <p>国内这 14 家共同的好处是<b>不用绕海外网络、中文原生、API 便宜</b>，站要面向国内用户、调用量又大时优先用它们；能开源自部署的是 Llama、通义千问、DeepSeek、GLM、Mistral，能搬回自己的服务器上自己跑，其余都是只能调人家云上 API；接口密钥的规矩不变：只能放服务器一侧，绝不能写进网页前端</p>
-  </section>
+        <!-- 安全规矩 & 通用说明 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="rounded-2xl border border-rose-300/80 dark:border-rose-900/70 bg-rose-50/70 dark:bg-rose-950/30 p-4 text-sm text-rose-950 dark:text-rose-100 leading-relaxed">
+            <strong class="block text-rose-800 dark:text-rose-300 mb-1">安全硬规矩</strong>
+            AI 的接口密钥只能放在服务器一侧（平台的函数或环境变量里），绝不能写进网页前端，写进去等于公开送人
+          </div>
+          <div class="theme-surface rounded-2xl border p-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            <strong class="block text-slate-900 dark:text-white mb-1">费用与合规口径</strong>
+            三套搭配起步都可以零元，免费额度对学习和个人小流量通常够用；开始付费的触发点也很一致：流量或用量超出免费额度、要长期常驻不休眠的后端、AI 按调用量计费、抓取按运行量计费、以及自己买域名；各家具体价格和额度经常调整，本文不写死数字，动手前到官网定价页看一眼现行口径为准；抓数据时只抓公开内容，并遵守目标网站的规则和条款
+          </div>
+        </div>
+      </div>
 
-  <footer>小白建站与 AI 工具选型指南 · 榜单依据为 2026-11 版公开数据，各家口径不同、仅作量级参考；工具价格与免费额度以各官网现行说明为准</footer>
-</div>
+      <!-- 1.4 16 个工具官网链接清单 -->
+      <div class="space-y-3">
+        <h3 class="text-lg font-semibold text-slate-900 dark:text-white">16 个工具官网链接清单</h3>
+        <div id="official-links-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5"></div>
+      </div>
+    </section>
 
-<script>
-/* ---------- 第一节：16 个工具 ---------- */
-var TOOLS = [
-  ['GitHub Pages','托管','代码仓库直接变成网站，只放静态页面','最稳的免费静态托管；不能跑后端，适合个人主页和文档站'],
-  ['Cloudflare Pages','托管','静态页面加轻量函数，全球节点分发','免费额度大方、速度快；已有 Cloudflare 账号最顺手'],
-  ['Vercel','托管','前端页面加轻后端，改完自动上线并给预览网址','Next.js 官方出品；做现代前端和 AI 小站体验最好；免费档只许个人非商用'],
-  ['Netlify','托管','前端页面托管，自带表单收集','老牌好上手；页面要收表单时省事'],
-  ['Surge','托管','一行命令把一个文件夹发到网上','适合临时演示和练手；要会用一点命令行'],
-  ['PinMe','托管','上传文件夹或运行一条命令立即上线，免注册','出链接最快；生态较小，绑自己的域名要付费档，长期正式项目慎用'],
-  ['Zeabur','全栈托管','前端、后端、数据库在一个平台一键部署','中文界面友好；想一家全包的小白首选之一；免费档主要管自己的服务器'],
-  ['Railway','全栈托管','前端、后端、数据库画布式管理，连几下就跑起完整应用','全栈练手顺手；不是真免费，试用后约 5 美元/月起'],
-  ['Render','全栈托管','后端服务、定时任务、数据库','跑常驻后端和定时任务；免费档闲置可能休眠，唤醒偏慢'],
-  ['Cloudflare（平台）','入口与基础设施','管域名解析、加速、防护，可跑 Workers、存文件（R2）','几乎每套搭配都用它管域名入口；和 Pages 是同家不同产品'],
-  ['Supabase','数据与登录','现成的数据库、用户登录和文件存储，不用自己搭后端','网站要存数据、做登录时配它'],
-  ['Anthropic（Claude）','AI 大脑','对话、写作、代码能力，通过接口接进自己的产品','和 Gemini 二选一即可，也可互为备用'],
-  ['Google Gemini','AI 大脑','文字、图片、代码多模态处理，通过接口调用','和 Claude 二选一即可；有谷歌账号上手快'],
-  ['Make','自动化','可视化拖拽，把多个应用串成流程自动跑','不想写代码、不想自己部署时选它'],
-  ['n8n','自动化','和 Make 同类，开源，可以部署在自己的机器上','想省钱、数据想自己掌控时选它；云版也可直接用'],
-  ['Apify','抓取','现成抓取器商店，几千个抓取器直接运行出数据','抓公开数据不用自己写爬虫；按运行量计费']
-];
-var ICONS = {
-  'GitHub Pages': '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000000" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>',
-  'Cloudflare Pages': '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000000" d="M16.5088 16.8447c.1475-.5068.0908-.9707-.1553-1.3154-.2246-.3164-.6045-.499-1.0615-.5205l-8.6592-.1123a.1559.1559 0 0 1-.1333-.0713c-.0283-.042-.0351-.0986-.021-.1553.0278-.084.1123-.1484.2036-.1562l8.7359-.1123c1.0351-.0489 2.1601-.8868 2.5537-1.9136l.499-1.3013c.0215-.0561.0293-.1128.0147-.168-.5625-2.5463-2.835-4.4453-5.5499-4.4453-2.5039 0-4.6284 1.6177-5.3876 3.8614-.4927-.3658-1.1187-.5625-1.794-.499-1.2026.119-2.1665 1.083-2.2861 2.2856-.0283.31-.0069.6128.0635.894C1.5683 13.171 0 14.7754 0 16.752c0 .1748.0142.3515.0352.5273.0141.083.0844.1475.1689.1475h15.9814c.0909 0 .1758-.0645.2032-.1553l.12-.4268zm2.7568-5.5634c-.0771 0-.1611 0-.2383.0112-.0566 0-.1054.0415-.127.0976l-.3378 1.1744c-.1475.5068-.0918.9707.1543 1.3164.2256.3164.6055.498 1.0625.5195l1.8437.1133c.0557 0 .1055.0263.1329.0703.0283.043.0351.1074.0214.1562-.0283.084-.1132.1485-.204.1553l-1.921.1123c-1.041.0488-2.1582.8867-2.5527 1.914l-.1406.3585c-.0283.0713.0215.1416.0986.1416h6.5977c.0771 0 .1474-.0489.169-.126.1122-.4082.1757-.837.1757-1.2803 0-2.6025-2.125-4.727-4.7344-4.727"/></svg>',
-  'Vercel': '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000000" d="m12 1.608 12 20.784H0Z"/></svg>',
-  'Netlify': '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000000" d="M6.49 19.04h-.23L5.13 17.9v-.23l1.73-1.71h1.2l.15.15v1.2L6.5 19.04ZM5.13 6.31V6.1l1.13-1.13h.23L8.2 6.68v1.2l-.15.15h-1.2L5.13 6.31Zm9.96 9.09h-1.65l-.14-.13v-3.83c0-.68-.27-1.2-1.1-1.23-.42 0-.9 0-1.43.02l-.07.08v4.96l-.14.14H8.9l-.13-.14V8.73l.13-.14h3.7a2.6 2.6 0 0 1 2.61 2.6v4.08l-.13.14Zm-8.37-2.44H.14L0 12.82v-1.64l.14-.14h6.58l.14.14v1.64l-.14.14Zm17.14 0h-6.58l-.14-.14v-1.64l.14-.14h6.58l.14.14v1.64l-.14.14ZM11.05 6.55V1.64l.14-.14h1.65l.14.14v4.9l-.14.14h-1.65l-.14-.13Zm0 15.81v-4.9l.14-.14h1.65l.14.13v4.91l-.14.14h-1.65l-.14-.14Z"/></svg>',
-  'Surge': '<svg viewBox="0 0 350 350" aria-hidden="true"><path fill="#564740" d="M284 85.5c-2.4-2-5.1-4.4-12.5-6.3v-.1c10.6-27.2 3.3-38-6.9-46.5-7.4-6.2-20.3-7.4-30.4-5.1-10.9-20.2-35.7-27.3-59.2-27.5-23.5.2-48.3 7.3-59.3 27.4-10.1-2.3-23-1-30.4 5.1-10.2 8.5-17.5 19.3-6.9 46.5v.1c-7.4 1.9-10 4.4-12.4 6.4-5.3 4.1-9.8 10.5-9.8 20 .5 15.1 12.5 129.6 12.5 129.6 0 .3.3.6.6.6.2 0 .3-.1.4-.2l10.8-10.1v16.3c0 .4.3.6.6.6.1 0 .3 0 .4-.2l18.3-15.8v9.5c0 .4.3.6.6.6.2 0 .3-.1.4-.2l10.3-9.9 7.1-6.8c.4 36.5-1 80.9-7.3 122.2-1 6.7 2.7 8.3 6 8.3 1.8 0 3.4-.5 4.2-.9 10.1-5.3 18.5-26.4 24-49.9 4.6-19.5 9.7-44.9 14.5-75.8 2.2 1.1 8.7 3.1 15.2 3.1s12.9-2 15.2-3.1c4.7 30.8 9.9 56.2 14.5 75.8 5.5 23.5 13.9 44.6 24 49.9.8.4 2.5.9 4.2.9 3.3 0 7.1-1.6 6-8.3-6.3-41.2-7.7-85.6-7.3-122.2l7.1 6.8 10.3 9.9c.1.1.3.2.4.2.3 0 .6-.3.6-.6v-9.5l18.3 15.8c.1.1.3.2.4.2.3 0 .6-.3.6-.6v-16.3l10.8 10.1c.1.1.3.2.4.2.3 0 .6-.2.6-.6 0 0 12-114.4 12.5-129.6.4-9.5-4.1-15.9-9.4-20z"/><path fill="#483A34" d="M178.7 167.9l-3.7-3.5-3.7 3.5v.1l-4.3 4.3c2.5 2.6 5.2 4 8 4s5.5-1.4 8-4l-4.3-4.4z"/><path fill="#F6E3D6" d="M158.9 180.4s-3.1 22.7-4.2 30.6c-9 61.3-21.7 125.7-36.3 132-1.1.5-2.1-.5-2-1.6 1.8-9.7 5.9-35.3 7.2-58.2 1-17 1.4-47.8 1.5-79.6l8.8-8.4c.7-.7 1.8-.4 1.8.7v7.9l23.2-23.4z"/><path fill="#FAF1EA" d="M135.6 203.9v-7.9c0-1.1-1.1-1.4-1.8-.7l-5.5 5.2c-.1 2.7-1.3 51-1.3 61 0 27.8-7.2 71.4-6.5 71.4 6.3 0 15.1-94.5 18-132.1l-2.9 3.1z"/><path fill="#F6E3D6" d="M191.1 180.4s3.1 22.7 4.2 30.6c9 61.3 21.7 125.7 36.3 132 1.1.5 2.1-.5 2-1.6-1.8-9.7-5.9-35.3-7.2-58.2-1-17-1.4-47.8-1.5-79.6l-8.8-8.4c-.7-.7-1.8-.4-1.8.7v7.9l-23.2-23.4z"/><path fill="#63C199" d="M266.6 83.2c-5.1-.8-20.7-.6-20.9-.6l19.5-4.5c14.9-31.7-7.9-46.8-21.7-46.8-4.7 0-17 1.7-18.4 1.7 0 0 2.3-.3 2.9-.9 0-5.9-16.5-25.4-53-25.4-36.4 0-53 19.5-53 25.4.6.6 2.9.9 2.9.9-1.4 0-13.7-1.7-18.4-1.7-13.7 0-36.6 15-21.7 46.8l19.5 4.5c-.1 0-15.8-.1-20.9.6-7 1.1-20.7 8.6-20.7 21.9 0 6.2 2.6 24.5 2.6 24.5h219.3s2.6-18.3 2.6-24.5c.1-13.3-13.6-20.8-20.6-21.9z"/><path fill="#C5E4D0" d="M257.9 43.4c-3.3-2.4-7.7-3.4-13.6-3.4 0 0-2.6.1-4.1.3-14.1 1.8-19.1 9.4-32.7 9.4-6.9 0-3.2-16.4-3.2-16.4s17.4.4 17.4-.8c0-5.3-20.5-20.6-45.3-20.6h-3c-24.8 0-45.3 15.3-45.3 20.6 0 1.2 17.4.8 17.4.8s3.8 16.4-3.2 16.4c-13.6 0-18.6-7.6-32.7-9.4-1.5-.2-4.1-.3-4.1-.3-5.9 0-10.3 1-13.6 3.4-4.6 3.4-14 16.1 2.4 37l9.8 2.2h141.4l9.8-2.2c16.6-21 7.2-33.7 2.6-37z"/><path fill="#483A34" d="M107.6 53.6c-1 0-1.9.3-2.7.9.3.3.4.6.4 1 0 .8-.6 1.4-1.4 1.4-.3 0-.6-.1-.9-.3-.5.9-.7 2-.7 3.1 0 3.4 2.4 6.1 5.4 6.1 3 0 5.4-2.7 5.4-6.1-.1-3.4-2.5-6.1-5.5-6.1z"/><path fill="#FBF8F5" d="M106.5 55.5c0-.7-.3-1.4-.8-1.8-.5-.5-1.1-.8-1.8-.8-1.4 0-2.6 1.2-2.6 2.6 0 .8.4 1.6 1 2.1.4.3 1 .5 1.6.5 1.4 0 2.6-1.2 2.6-2.6z"/><path fill="#483A34" d="M244.3 53.6c-1 0-1.9.3-2.7.9.3.3.4.6.4 1 0 .8-.6 1.4-1.4 1.4-.3 0-.6-.1-.9-.3-.5.9-.7 2-.7 3.1 0 3.4 2.4 6.1 5.4 6.1 3 0 5.4-2.7 5.4-6.1-.1-3.4-2.5-6.1-5.5-6.1z"/><path fill="#FBF8F5" d="M243.2 55.5c0-.7-.3-1.4-.8-1.8-.5-.5-1.1-.8-1.8-.8-1.4 0-2.6 1.2-2.6 2.6 0 .8.4 1.6 1 2.1.4.3 1 .5 1.6.5 1.4 0 2.6-1.2 2.6-2.6z"/><path fill="#FAF1EA" d="M214.4 203.9v-7.9c0-1.1 1.1-1.4 1.8-.7l5.5 5.2c.1 2.7 1.3 51 1.3 61 0 27.8 7.2 71.4 6.5 71.4-6.3 0-15.1-94.5-18-132.1l2.9 3.1z"/><path fill="#AAD9BD" d="M248.9 101.7c-21.5-9.3-53.6-12.6-63.4-13.4l-6.3 5.9-.3.3-2.6 2.4c-.3.3-.8.5-1.3.5s-.9-.2-1.3-.5l-2.6-2.4-.3-.3-6.3-5.9c-9.8.8-41.9 4.1-63.4 13.4-23.1 10-35.8 28.7-35.8 27.9l1.1 11.9v-.1c34.7-39.7 104.8 26.4 104.8 26.4l3.7-3.5 3.7 3.5s70.1-66.1 104.8-26.4v.1l1.1-11.9c.2.8-12.5-17.9-35.6-27.9z"/><path fill="#C5E4D0" d="M171.3 167.9l-4.7-48.4c-5 6.5-14 12.3-28.8 12.3-23 0-36.6-30.1-71.3 9.6l7.1 77.1.5 3.7 9.8-10 1.2-67.3 1.5-1 .5 84.4 11.6-10 5.3-4.6c.4-19.7 1-53.6 1-53.6l1.6-1.1.3 62.2 9.5-9.1.6-.6 5.7-5.5c.3-16 .6-31.2.6-31.2l1.6-1.4.2 30.4 3.3-3.2 5.5-5.2c.3-.3.6-.4.9-.4.5 0 .9.4.9 1.1v7.9l35.6-36.1z"/><path fill="#564740" d="M201.7 76c-.3-.1-.6-.2-.9-.2h-51.6c-.3 0-.7.1-.9.2-.7.4-1.1 1.2-.7 1.9l.3.4 22.8 21.4.1.1 2.9 2.7c.3.3.8.5 1.3.5s.9-.2 1.3-.5l2.9-2.7.1-.1 22.8-21.4c.1-.1.2-.2.3-.4.4-.7.1-1.6-.7-1.9z"/><path fill="#C5E4D0" d="M178.7 167.9l4.7-48.4c5 6.5 14 12.3 28.8 12.3 23 0 36.6-30.1 71.3 9.6l-7.1 77.1-.5 3.7-9.8-10-1.2-67.3-1.5-1-.5 84.4-11.6-10-5.3-4.6c-.4-19.7-1-53.6-1-53.6l-1.6-1.1-.3 62.2-9.5-9.1-.6-.6-5.7-5.5c-.3-16-.6-31.2-.6-31.2l-1.6-1.4-.2 30.4-3.3-3.2-5.5-5.2c-.3-.3-.6-.4-.9-.4-.5 0-.9.4-.9 1.1v7.9l-35.6-36.1z"/><path fill="#564740" d="M271.5 63.2c0-2 0-3.9-.1-5.8v21.7c.1-16.3.1-15.5.1-15.9z"/><path fill="#AAD9BD" d="M141.8 55.9c11.4 0 4.6-18.7 4.6-18.7s.9 7.7-7.9 7.7c-17 0-17-5.9-30.6-5.9-11.2 0-14.8 3.6-14.8 3.6 25.8-6.2 32.2 13.3 48.7 13.3z"/><path fill="#F5E0D3" d="M191.1 180.4"/><path fill="#C5E4D0" d="M187.7 187l-6.2-6.2c-2.2.3-4.3.4-6.5.4s-4.4-.2-6.5-.4l-6.2 6.2-3.8 27.8c4.6 3.8 10.1 5.4 16.3 5.4h.4c6.3 0 11.7-1.6 16.3-5.4l-3.8-27.8z"/><path fill="#63C199" d="M186.1 175.4l-3.1-3.2c-2.5 2.6-5.2 4-8 4s-5.5-1.4-8-4l-3.1 3.2-.6 4.5c.7.2 1.3.3 2 .4 3.2.6 6.4.9 9.7.9 3.3 0 6.6-.3 9.7-.9.7-.1 1.4-.3 2-.4l-.6-4.5z"/><path fill="#AAD9BD" d="M208.2 55.9c-11.4 0-4.6-18.7-4.6-18.7s-.9 7.7 7.9 7.7c17 0 17-5.9 30.6-5.9 11.2 0 14.8 3.6 14.8 3.6-25.8-6.2-32.2 13.3-48.7 13.3z"/></svg>',
-  'Zeabur': '<svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#19181B" d="M13.324 18.9879H28V25.8747H4V18.9879H10.7465L20.0353 14.0118H4V7.125H28V14.0118L13.324 18.9879Z"/><path fill="#6300FF" d="M19.9554 7.125H4V14.0118H19.9554V7.125Z"/><path fill="#EE430E" d="M27.9982 18.9883H13.3984V25.8751H27.9982V18.9883Z"/></svg>',
-  'Railway': '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000000" d="M.113 10.27A13.026 13.026 0 000 11.48h18.23c-.064-.125-.15-.237-.235-.347-3.117-4.027-4.793-3.677-7.19-3.78-.8-.034-1.34-.048-4.524-.048-1.704 0-3.555.005-5.358.01-.234.63-.459 1.24-.567 1.737h9.342v1.216H.113v.002zm18.26 2.426H.009c.02.326.05.645.094.961h16.955c.754 0 1.179-.429 1.315-.96zm-17.318 4.28s2.81 6.902 10.93 7.024c4.855 0 9.027-2.883 10.92-7.024H1.056zM11.988 0C7.5 0 3.593 2.466 1.531 6.108l4.75-.005v-.002c3.71 0 3.849.016 4.573.047l.448.016c1.563.052 3.485.22 4.996 1.364.82.621 2.007 1.99 2.712 2.965.654.902.842 1.94.396 2.934-.408.914-1.289 1.458-2.353 1.458H.391s.099.42.249.886h22.748A12.026 12.026 0 0024 12.005C24 5.377 18.621 0 11.988 0z"/></svg>',
-  'Render': '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000000" d="M18.263.007c-3.121-.147-5.744 2.109-6.192 5.082-.018.138-.045.272-.067.405-.696 3.703-3.936 6.507-7.827 6.507-1.388 0-2.691-.356-3.825-.979a.2024.2024 0 0 0-.302.178V24H12v-8.999c0-1.656 1.338-3 2.987-3h2.988c3.382 0 6.103-2.817 5.97-6.244-.12-3.084-2.61-5.603-5.682-5.75"/></svg>',
-  'Cloudflare': '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000000" d="M16.5088 16.8447c.1475-.5068.0908-.9707-.1553-1.3154-.2246-.3164-.6045-.499-1.0615-.5205l-8.6592-.1123a.1559.1559 0 0 1-.1333-.0713c-.0283-.042-.0351-.0986-.021-.1553.0278-.084.1123-.1484.2036-.1562l8.7359-.1123c1.0351-.0489 2.1601-.8868 2.5537-1.9136l.499-1.3013c.0215-.0561.0293-.1128.0147-.168-.5625-2.5463-2.835-4.4453-5.5499-4.4453-2.5039 0-4.6284 1.6177-5.3876 3.8614-.4927-.3658-1.1187-.5625-1.794-.499-1.2026.119-2.1665 1.083-2.2861 2.2856-.0283.31-.0069.6128.0635.894C1.5683 13.171 0 14.7754 0 16.752c0 .1748.0142.3515.0352.5273.0141.083.0844.1475.1689.1475h15.9814c.0909 0 .1758-.0645.2032-.1553l.12-.4268zm2.7568-5.5634c-.0771 0-.1611 0-.2383.0112-.0566 0-.1054.0415-.127.0976l-.3378 1.1744c-.1475.5068-.0918.9707.1543 1.3164.2256.3164.6055.498 1.0625.5195l1.8437.1133c.0557 0 .1055.0263.1329.0703.0283.043.0351.1074.0214.1562-.0283.084-.1132.1485-.204.1553l-1.921.1123c-1.041.0488-2.1582.8867-2.5527 1.914l-.1406.3585c-.0283.0713.0215.1416.0986.1416h6.5977c.0771 0 .1474-.0489.169-.126.1122-.4082.1757-.837.1757-1.2803 0-2.6025-2.125-4.727-4.7344-4.727"/></svg>',
-  'Supabase': '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000000" d="M11.9 1.036c-.015-.986-1.26-1.41-1.874-.637L.764 12.05C-.33 13.427.65 15.455 2.409 15.455h9.579l.113 7.51c.014.985 1.259 1.408 1.873.636l9.262-11.653c1.093-1.375.113-3.403-1.645-3.403h-9.642z"/></svg>',
-  'Anthropic': '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000000" d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z"/></svg>',
-  'Google Gemini': '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000000" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>',
-  'Make': '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000000" d="M13.38 3.498c-.27 0-.511.19-.566.465L9.85 18.986a.578.578 0 0 0 .453.678l4.095.826a.58.58 0 0 0 .682-.455l2.963-15.021a.578.578 0 0 0-.453-.678l-4.096-.826a.589.589 0 0 0-.113-.012zm-5.876.098a.576.576 0 0 0-.516.318L.062 17.697a.575.575 0 0 0 .256.774l3.733 1.877a.578.578 0 0 0 .775-.258l6.926-13.781a.577.577 0 0 0-.256-.776L7.762 3.658a.571.571 0 0 0-.258-.062zm11.74.115a.576.576 0 0 0-.576.576v15.426c0 .318.258.578.576.578h4.178a.58.58 0 0 0 .578-.578V4.287a.578.578 0 0 0-.578-.576Z"/></svg>',
-  'n8n': '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000000" d="M21.4737 5.6842c-1.1772 0-2.1663.8051-2.4468 1.8947h-2.8955c-1.235 0-2.289.893-2.492 2.111l-.1038.623a1.263 1.263 0 0 1-1.246 1.0555H11.289c-.2805-1.0896-1.2696-1.8947-2.4468-1.8947s-2.1663.8051-2.4467 1.8947H4.973c-.2805-1.0896-1.2696-1.8947-2.4468-1.8947C1.1311 9.4737 0 10.6047 0 12s1.131 2.5263 2.5263 2.5263c1.1772 0 2.1663-.8051 2.4468-1.8947h1.4223c.2804 1.0896 1.2696 1.8947 2.4467 1.8947 1.1772 0 2.1663-.8051 2.4468-1.8947h1.0008a1.263 1.263 0 0 1 1.2459 1.0555l.1038.623c.203 1.218 1.257 2.111 2.492 2.111h.3692c.2804 1.0895 1.2696 1.8947 2.4468 1.8947 1.3952 0 2.5263-1.131 2.5263-2.5263s-1.131-2.5263-2.5263-2.5263c-1.1772 0-2.1664.805-2.4468 1.8947h-.3692a1.263 1.263 0 0 1-1.246-1.0555l-.1037-.623A2.52 2.52 0 0 0 13.9607 12a2.52 2.52 0 0 0 .821-1.4794l.1038-.623a1.263 1.263 0 0 1 1.2459-1.0555h2.8955c.2805 1.0896 1.2696 1.8947 2.4468 1.8947 1.3952 0 2.5263-1.131 2.5263-2.5263s-1.131-2.5263-2.5263-2.5263m0 1.2632a1.263 1.263 0 0 1 1.2631 1.2631 1.263 1.263 0 0 1-1.2631 1.2632 1.263 1.263 0 0 1-1.2632-1.2632 1.263 1.263 0 0 1 1.2632-1.2631M2.5263 10.7368A1.263 1.263 0 0 1 3.7895 12a1.263 1.263 0 0 1-1.2632 1.2632A1.263 1.263 0 0 1 1.2632 12a1.263 1.263 0 0 1 1.2631-1.2632m6.3158 0A1.263 1.263 0 0 1 10.1053 12a1.263 1.263 0 0 1-1.2632 1.2632A1.263 1.263 0 0 1 7.579 12a1.263 1.263 0 0 1 1.2632-1.2632m10.1053 3.7895a1.263 1.263 0 0 1 1.2631 1.2632 1.263 1.263 0 0 1-1.2631 1.2631 1.263 1.263 0 0 1-1.2632-1.2631 1.263 1.263 0 0 1 1.2632-1.2632"/></svg>',
-  'Apify': '<svg viewBox="0 0 1080 1080" aria-hidden="true"><path fill="#246DFF" d="M607.859 78.2218H987.785C995.513 78.2218 1001.78 84.4868 1001.78 92.2151V672.834C1001.78 686.742 983.69 692.134 976.075 680.496L596.15 99.877C590.06 90.5703 596.737 78.2218 607.859 78.2218Z"/><path fill="#20A34E" d="M472.141 78.2218H92.215C84.4867 78.2218 78.2217 84.4868 78.2217 92.2151V672.834C78.2217 686.742 96.3094 692.134 103.924 680.496L483.85 99.877C489.94 90.5703 483.263 78.2218 472.141 78.2218Z"/><path fill="#F86606" d="M533.491 543.086L101.895 977.927C93.1302 986.758 99.3849 1001.78 111.826 1001.78H968.529C980.919 1001.78 987.197 986.863 978.535 978.003L553.429 543.161C547.969 537.576 538.993 537.542 533.491 543.086Z"/></svg>'
-};
-function iconFor(name){
-  var s = ICONS[name];
-  if (s) return '<span class="tico">' + s + '</span>';
-  return '<span class="tico"><span class="mono">' + name.charAt(0) + '</span></span>';
-}
-var toolsEl = document.getElementById('tools');
-TOOLS.forEach(function(t){
-  var div = document.createElement('div');
-  div.className = 'tool';
-  var ic = document.createElement('span'); ic.className = 'tico';
-  if (ICONS[t[0]]) { ic.innerHTML = ICONS[t[0]]; }
-  else { var mono = document.createElement('span'); mono.className = 'mono'; mono.textContent = t[0].charAt(0); ic.appendChild(mono); }
-  var body = document.createElement('div'); body.className = 'tbody';
-  var nm = document.createElement('span'); nm.className = 'tn'; nm.textContent = t[0];
-  var tag = document.createElement('span'); tag.className = 'tag layer'; tag.textContent = t[1];
-  body.appendChild(nm); body.appendChild(tag);
-  body.appendChild(document.createTextNode(' ' + t[2] + '；' + t[3]));
-  div.appendChild(ic); div.appendChild(body);
-  toolsEl.appendChild(div);
-});
+    <!-- ==================== SECTION 02 ==================== -->
+    <section id="sec-02" class="space-y-8">
+      <div class="flex items-baseline gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+        <span class="text-xl sm:text-3xl font-mono font-bold theme-accent-text shrink-0">02</span>
+        <div>
+          <h2 class="text-[18px] sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug">Agent 与云电脑背后的巨模型</h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Muse、Cue、Dots、Grok Bot、Gemini Spark、Devin、Hark、Cowork：背后的大模型与配的云电脑</p>
+        </div>
+      </div>
 
-/* ---------- 第四节：双榜 ---------- */
-function tagFor(side){ return '<span class="tag ' + (side === '国外' ? 'out' : 'in') + '">' + side + '</span>'; }
-function rankRow(r){
-  return '<tr><td class="rk" data-label="名次"><span class="badge n' + r[0] + '">' + r[0] + '</span></td>' +
-    '<td class="nm" data-label="公司"><b>' + r[1] + '</b>' + tagFor(r[2]) + '</td>' +
-    '<td data-label="代表产品 / 模型">' + r[3] + '</td>' +
-    '<td data-label="依据">' + r[4] + '</td>' +
-    '<td data-label="特长与建站用途">' + r[5] + '</td></tr>';
-}
-var HOT = [
-  ['1','OpenAI','国外','ChatGPT、GPT 系列、Codex','全球聊天网页访问份额约 54%，周活约 10 亿，断层第一','综合能力与生态最全；建站主力大脑，问答、内容生成、Codex 写代码搭站'],
-  ['2','Meta','国外','Meta AI、Llama','靠 WhatsApp、Instagram 内嵌，月活约 12 亿（内嵌口径）','开源权重可自部署；想把模型放自己服务器时用'],
-  ['3','Google','国外','Gemini','月活约 9.5 亿，网页份额约 27.9%','多模态强；看图理解与图文生成，适合图文类小工具、日常问答和生图'],
-  ['4','字节跳动','国内','豆包','月活约 3.82 亿，国内第一','中文对话顺；中文客服问答、内容生成，接火山引擎部署'],
-  ['5','Microsoft','国外','Copilot','靠 Windows 和 Office 内嵌，用户过亿，网页份额约 1.3%','与 Office、Azure、GitHub 打通；办公自动化、Azure 部署时接入'],
-  ['6','Anthropic','国外','Claude','全球网页访问份额约 9.2%','长文本、写作与代码稳；个人用户不多但企业端很强，长文档整理、写文案、代码审查'],
-  ['7','阿里巴巴','国内','通义千问 Qwen','月活约 1.67 亿，国内第二','开源生态全；自部署或调阿里云接口，中文代码与文案都行'],
-  ['8','DeepSeek 深度求索','国内','DeepSeek 系列','月活约 1.3 亿，全球网页份额约 4.1%','推理与代码强、性价比高；低成本大脑首选'],
-  ['9','腾讯','国内','混元 / 元宝','国内第一梯队尾巴，靠微信往上冲','与微信、腾讯云生态打通；网站接微信生态时顺手用'],
-  ['10','xAI','国外','Grok','全球网页访问份额约 2.4%','实时信息与 X 生态；抓实时热点，做资讯汇总类内容'],
-  ['11','Perplexity','国外','Perplexity AI 搜索','全球网页访问份额约 1.3%','带出处引用的 AI 搜索；建站前查资料、带来源的检索问答'],
-  ['12','月之暗面','国内','Kimi','无统一公开量级数，按大致量级排','超长上下文；给文档站做长文问答、整份资料整理'],
-  ['13','百度','国内','文心（文心一言）','无统一公开量级数，按大致量级排','中文老牌；中文内容与搜索类功能，百度智能云部署搭配'],
-  ['14','智谱','国内','GLM / 清言','无统一公开量级数，按大致量级排','通用与代码模型齐、平台成熟；中文 AI 小工具的通用大脑'],
-  ['15','MiniMax','国内','MiniMax 系列（海螺）','无统一公开量级数，按大致量级排','语音、多模态与长文本见长；语音播报、音频内容功能'],
-  ['16','小米','国内','MiMo','无统一公开量级数，按大致量级排','新入局的开源推理模型；关注成本的推理类功能备选'],
-  ['17','Mistral AI','国外','Mistral 系列','无统一公开量级数，按大致量级排','轻量高效；成本敏感、要自部署或欧洲合规时的备选大脑'],
-  ['18','科大讯飞','国内','星火','无统一公开量级数，按大致量级排','语音技术根基深；语音输入、语音合成功能优先选它'],
-  ['19','阶跃星辰','国内','Step 系列','无统一公开量级数，按大致量级排','多模态与推理的新锐；图文多模态小工具的新选择'],
-  ['20','百川智能','国内','Baichuan 系列','无统一公开量级数，按大致量级排','中文能力扎实；中文内容站、垂直行业问答的备选'],
-  ['21','商汤','国内','日日新 SenseNova','无统一公开量级数，按大致量级排','多模态与视觉见长；看图、视觉类功能与内容处理搭配'],
-  ['22','Cohere','国外','Command 系列','无统一公开量级数，按大致量级排','企业级文本与检索增强见长；给文档站、知识库站做检索问答'],
-  ['23','Amazon','国外','Nova、Bedrock','无统一公开量级数，按大致量级排','AWS 上的托管多模型平台；已用 AWS 部署时统一调用各家模型'],
-  ['24','华为','国内','盘古','以行业客户为主，消费端量级最低','行业大模型与华为云、昇腾生态；政企行业站的配套大脑']
-];
-var SMART = [
-  ['1','Anthropic','国外','Claude Fable 5.2','智能指数约 65 分，全场第一','长文本、写作与代码稳；长文档整理、写文案、代码审查'],
-  ['2','Google','国外','Gemini 4','智能指数约 60 分，第二','多模态强；看图理解与图文生成'],
-  ['3','OpenAI','国外','GPT-6','智能指数约 57 分，第三','综合能力与生态最全；建站主力大脑，问答、内容、写代码'],
-  ['4','xAI','国外','Grok 4.7','智能指数约 35 分，与前三有一档差距','实时信息与 X 生态；抓热点做资讯汇总'],
-  ['5','阿里巴巴','国内','通义千问 Qwen','智能指数约 34 分，国内第一','开源生态全；自部署或阿里云接口，中文代码与文案'],
-  ['6','DeepSeek 深度求索','国内','DeepSeek V4.1','智能指数约 32 分','推理与代码强、性价比高；低成本大脑首选'],
-  ['7','月之暗面','国内','Kimi','紧随其后，本版未列精确分','开源模型里建站实测排得靠前；超长上下文，长文问答、整份资料整理'],
-  ['8','小米','国内','MiMo','紧随其后，本版未列精确分','真人盲评榜上开源模型第一名；关注成本的推理类功能备选'],
-  ['9','智谱','国内','GLM','紧随其后，本版未列精确分','代码类榜单的开源前排；中文 AI 小工具的通用大脑'],
-  ['10','MiniMax','国内','MiniMax 系列','紧随其后，本版未列精确分','代码类榜单的开源前排；语音与多模态见长，语音播报、音频内容功能']
-];
-var TIER = [
-  ['Meta','国外','Llama、Meta AI','开源权重可自部署；把模型放自己服务器时用'],
-  ['Mistral AI','国外','Mistral 系列','轻量高效；自部署或欧洲合规的备选'],
-  ['Cohere','国外','Command 系列','企业级检索增强；文档站、知识库站问答'],
-  ['Microsoft','国外','Copilot','强在产品整合；办公自动化、Azure 部署接入'],
-  ['Amazon','国外','Nova、Bedrock','AWS 托管多模型平台；统一调用各家模型'],
-  ['Perplexity','国外','Perplexity AI 搜索','强项是带引用的搜索；查资料与检索问答'],
-  ['腾讯','国内','混元','微信与腾讯云生态；接微信生态时用'],
-  ['字节跳动','国内','豆包','中文对话顺；中文客服问答、内容生成'],
-  ['百度','国内','文心（文心一言）','中文内容与搜索类功能'],
-  ['阶跃星辰','国内','Step 系列','多模态新锐；图文多模态小工具'],
-  ['百川智能','国内','Baichuan 系列','中文内容站、垂直行业问答备选'],
-  ['科大讯飞','国内','星火','语音根基深；语音输入与合成功能优先'],
-  ['商汤','国内','日日新 SenseNova','视觉见长；看图与视觉类功能'],
-  ['华为','国内','盘古','行业大模型；政企行业站与华为云配套']
-];
-document.getElementById('hotBody').innerHTML = HOT.map(rankRow).join('');
-document.getElementById('smartBody').innerHTML = SMART.map(rankRow).join('');
-document.getElementById('tierBody').innerHTML = TIER.map(function(r){
-  return '<tr><td class="rk" data-label="梯队">第三梯队</td>' +
-    '<td class="nm" data-label="公司"><b>' + r[0] + '</b>' + tagFor(r[1]) + '</td>' +
-    '<td data-label="代表产品 / 模型">' + r[2] + '</td>' +
-    '<td data-label="特长与建站用途">' + r[3] + '</td></tr>';
-}).join('');
+      <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+        这一节只看最典型的八个，外加 Cue 的底座 Manus 本体；每个只回答两个问题：背后的巨模型到底是谁的，是自研的还是借别家的；后面配的那台云电脑是什么
+      </p>
 
-/* 榜单切换：同组高亮滑动跟随，两榜交叉淡化切换 */
-var segBtns = document.querySelectorAll('.seg button');
-var segInd = document.querySelector('.seg-ind');
-var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-function moveSegInd(){
-  var on = document.querySelector('.seg button.on');
-  if (!on || !segInd) return;
-  var base = segBtns[0].offsetWidth;
-  if (!base) return;
-  segInd.style.width = base + 'px';
-  segInd.style.transform = 'translateX(' + on.offsetLeft + 'px) scaleX(' + (on.offsetWidth / base) + ')';
-}
-segBtns.forEach(function(btn){
-  btn.addEventListener('click', function(){
-    if (btn.classList.contains('on')) return;
-    segBtns.forEach(function(b){ b.classList.remove('on'); b.setAttribute('aria-selected','false'); });
-    btn.classList.add('on'); btn.setAttribute('aria-selected','true');
-    moveSegInd();
-    var cur = document.querySelector('.panel.on');
-    var nxt = document.getElementById('panel-' + btn.getAttribute('data-panel'));
-    if (!cur || cur === nxt) return;
-    if (reduceMotion){
-      cur.classList.remove('on'); nxt.classList.add('on'); return;
-    }
-    cur.classList.add('anim-out');
-    setTimeout(function(){
-      cur.classList.remove('on'); cur.classList.remove('anim-out');
-      nxt.classList.add('on'); nxt.classList.add('anim-in');
-      requestAnimationFrame(function(){
-        requestAnimationFrame(function(){ nxt.classList.remove('anim-in'); });
+      <!-- 核心概念厘清 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="theme-surface rounded-2xl border p-4 shadow-sm">
+          <div class="text-xs font-semibold theme-accent-text mb-1">01 · 大脑</div>
+          <h3 class="font-semibold text-slate-900 dark:text-white mb-1">大模型 = 大脑</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-300">负责想和判断，聪不聪明主要看它</p>
+        </div>
+        <div class="theme-surface rounded-2xl border p-4 shadow-sm">
+          <div class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-1">02 · 调度</div>
+          <h3 class="font-semibold text-slate-900 dark:text-white mb-1">Agent 框架 = 调度</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-300">负责拆任务、选工具，把活一步步派下去</p>
+        </div>
+        <div class="theme-surface rounded-2xl border p-4 shadow-sm">
+          <div class="text-xs font-semibold text-violet-600 dark:text-violet-400 mb-1">03 · 工位</div>
+          <h3 class="font-semibold text-slate-900 dark:text-white mb-1">云电脑 = 工位</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-300">负责真的去开浏览器点网页、装软件、跑代码、存文件；只有大脑、没有云电脑的只能在聊天框里回答你，配上云电脑的，你把手机关掉，它能在云上接着把活干完</p>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-900/70 p-4 text-sm text-slate-700 dark:text-slate-300 space-y-1.5 leading-relaxed">
+        <div><strong>这一批的共同点：</strong>这八个都配了云电脑，只是配法不一样：有的常驻，有的按任务临时开</div>
+        <div><strong>归组口径硬性规定：</strong>只看两件事——直接归属的公司是不是中国公司、运营地在哪；「有中国团队、中国人创办」只是出身，只注明、不决定归组；出身、归属、运营地是三件不同的事，不许混；格式统一写成「名称（所属）」，括号里是所属</div>
+      </div>
+
+      <!-- 国外组 9 条 -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">国外组（共 9 条）</h3>
+          <span class="text-xs px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">含 Manus 本体</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="agents-grid"></div>
+
+        <div class="theme-surface rounded-2xl border p-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          <strong class="text-slate-900 dark:text-white">归组特别说明：</strong>Cue 和 Manus 为什么归国外组，一句话说清：直接是中国公司就要受中国监管这一套，麻烦很多，Manus 当年把总部迁到新加坡、把运营主体换成新加坡的 Butterfly Effect Pte（开曼架构控股），正是为避开这个，所以按归属和运营地它算国外，出身是中国团队创办只在这里注明；后来腾讯牵头的中方资本回购后成了它最大单一股东，但那是少数股权、不控股，公司还是独立运营、总部仍在新加坡，所以归属不变
+        </div>
+      </div>
+
+      <!-- 国内组 -->
+      <div class="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-4 text-sm text-slate-600 dark:text-slate-400">
+        <strong class="text-slate-800 dark:text-slate-200">国内组：</strong>按定死的口径，这一批为空：没有一个是「直接归属中国公司、又在中国运营」的，最接近的 Cue 和 Manus 也只是中国团队创办出身，归属和运营都已经在新加坡，所以归国外组；这一组不硬凑数，不拿出身当归组，也不拿不相干的产品来填
+      </div>
+
+      <!-- 云电脑对比表 -->
+      <div class="space-y-3">
+        <h3 class="text-lg font-semibold text-slate-900 dark:text-white">云电脑对比与总结</h3>
+        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          从大模型这一项看，几家的含金量也清楚了：Muse、Hark、Dots、Gemini Spark 和 Cowork 是自己养模型，脑子是自己的；Devin 一半自己养、一半可换别家的；Grok Bot 不公开用谁、按任务自动路由，自家的和别家的都可能被调到；Cue 和 Manus 没有自己的脑子，聪明程度取决于它调用的 Claude 和通义千问，自己的本事在调度和那台云电脑上
+        </p>
+
+        <div class="theme-surface rounded-2xl border overflow-hidden shadow-sm">
+          <div class="overflow-x-auto table-scroll">
+            <table class="w-full text-left border-collapse text-sm min-w-[680px]">
+              <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60 text-xs uppercase text-slate-500 dark:text-slate-400">
+                  <th class="py-3 px-4 font-semibold">产品（所属）</th>
+                  <th class="py-3 px-4 font-semibold">云电脑的名字</th>
+                  <th class="py-3 px-4 font-semibold">常驻还是按任务开</th>
+                  <th class="py-3 px-4 font-semibold">你离线后</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40"><td class="py-3 px-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">Muse (Meta)</td><td class="py-3 px-4">Muse Secure VM</td><td class="py-3 px-4">常驻，每人一台专属</td><td class="py-3 px-4">关掉应用继续干</td></tr>
+                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40"><td class="py-3 px-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">Hark Pro (Hark Labs)</td><td class="py-3 px-4">Handoff</td><td class="py-3 px-4">专属云电脑，按任务干活</td><td class="py-3 px-4">关掉应用继续干</td></tr>
+                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40"><td class="py-3 px-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">Cue (Manus)</td><td class="py-3 px-4">Manus 常驻云电脑</td><td class="py-3 px-4">常驻，全天在线的 Ubuntu 虚拟机</td><td class="py-3 px-4">下线以后继续干</td></tr>
+                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40"><td class="py-3 px-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">Devin (Cognition)</td><td class="py-3 px-4">云端虚拟机（Devbox 一类工位）</td><td class="py-3 px-4">按任务开，任务完回收</td><td class="py-3 px-4">关掉自己电脑继续干，干完交合并请求</td></tr>
+                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40"><td class="py-3 px-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">Dots (OpenAI)</td><td class="py-3 px-4">无专门名字，每个 Dot 自带一台</td><td class="py-3 px-4">常驻，每个 Dot 一台专属</td><td class="py-3 px-4">关掉电脑继续干</td></tr>
+                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40"><td class="py-3 px-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">Grok Bot (xAI)</td><td class="py-3 px-4">无专门名字，账号共用一台</td><td class="py-3 px-4">常驻，一个账号一台、多个 Bot 共用</td><td class="py-3 px-4">关掉应用继续干</td></tr>
+                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40"><td class="py-3 px-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">Gemini Spark (Google)</td><td class="py-3 px-4">无专门名字，Google Cloud 专属虚拟机</td><td class="py-3 px-4">常驻，专属虚拟机全天在线</td><td class="py-3 px-4">设备关机继续干</td></tr>
+                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40"><td class="py-3 px-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">Cowork (Anthropic)</td><td class="py-3 px-4">无专门名字，起初是你电脑里的沙盒虚拟机，现为云端任务环境</td><td class="py-3 px-4">按任务开，2026 年 10 月起默认云端跑</td><td class="py-3 px-4">云端任务继续干，碰本地文件要开着桌面应用</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-blue-200/80 dark:border-blue-900/60 theme-tag-pill p-4 text-sm leading-relaxed">
+          <strong>评估新 Agent 的口诀：</strong>以后再看到一个新的 Agent 产品，就问三句，立刻能看懂它：第一句，背后的巨模型是谁的，自研还是借的；第二句，后面配没配云电脑，叫什么；第三句，那台云电脑是常驻的还是干完一个任务就没了的；第四节管第一句，这一节管后两句
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SECTION 03 ==================== -->
+    <section id="sec-03" class="space-y-8">
+      <div class="flex items-baseline gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+        <span class="text-xl sm:text-3xl font-mono font-bold theme-accent-text shrink-0">03</span>
+        <h2 class="text-[18px] sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug">自办虚拟卡选型</h2>
+      </div>
+
+      <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+        前面几节选的 AI 订阅大多要绑一张能付美元的卡，这一节讲怎么自己办一张自己名下的 Visa 虚拟卡：自己在发卡平台注册、实名、充值，付正价订阅，不用小贩卖的成品卡、长租卡
+      </p>
+
+      <!-- 定版与用途卡片 -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="theme-surface rounded-2xl border p-4">
+          <div class="text-xs font-semibold theme-accent-text mb-1">路线</div>
+          <p class="text-sm text-slate-700 dark:text-slate-200">自己在发卡平台注册、实名、充值，开自己名下的 Visa 虚拟卡，付正价订阅；不用小贩成品卡、长租卡</p>
+        </div>
+        <div class="theme-surface rounded-2xl border p-4">
+          <div class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-1">充值</div>
+          <p class="text-sm text-slate-700 dark:text-slate-200">用 USDT 充，按月充、按月花，不在卡里存大额</p>
+        </div>
+        <div class="theme-surface rounded-2xl border p-4">
+          <div class="text-xs font-semibold text-violet-600 dark:text-violet-400 mb-1">用途</div>
+          <p class="text-sm text-slate-700 dark:text-slate-200">付 AI 订阅月费；过 Muse 年龄验证（卡预授权 1 美元，5-7 个工作日退）</p>
+        </div>
+        <div class="bg-amber-50/70 dark:bg-amber-950/30 rounded-2xl border border-amber-200 dark:border-amber-800/60 p-4">
+          <div class="text-xs font-semibold text-amber-800 dark:text-amber-300 mb-1">先分清</div>
+          <p class="text-sm text-amber-950 dark:text-amber-100">小贩卖的 0 刀耗材卡是另一回事，0 刀卡过不了 Muse 验证</p>
+        </div>
+      </div>
+
+      <!-- 五家虚拟卡平台对比 -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-semibold text-slate-900 dark:text-white">五家虚拟卡平台对比</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="theme-surface rounded-2xl border p-5 shadow-sm">
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <h4 class="font-bold text-base text-slate-900 dark:text-white">Gate 卡</h4>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">平台最稳</span>
+            </div>
+            <dl class="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+              <div><dt class="inline font-semibold text-slate-800 dark:text-slate-200">定位：</dt><dd class="inline">虚拟卡免费开，刷卡从账户现扣；多个教程证实能过 Muse 绑卡</dd></div>
+              <div><dt class="inline font-semibold text-slate-800 dark:text-slate-200">费用：</dt><dd class="inline">兑换约 0.9%、非美元外汇约 1%（第三方口径，以 App 内为准）</dd></div>
+              <div><dt class="inline font-semibold text-slate-800 dark:text-slate-200">门槛：</dt><dd class="inline">KYC 最严：2 级认证（证件+人脸），部分卡还要近 3 个月地址证明；官方受限地区含中国大陆，大陆居民新申资格被排除，已有账号且 App 内能申到的另说</dd></div>
+              <div class="text-amber-800 dark:text-amber-300 bg-amber-50/70 dark:bg-amber-950/30 p-2.5 rounded-lg text-xs mt-2"><strong>注意：</strong>坑在用法：拿假地址绕资格开卡会被冻号冻钱</div>
+            </dl>
+          </div>
+
+          <div class="theme-surface rounded-2xl border-2 p-5 shadow-sm" style="border-color: var(--theme-accent);">
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <h4 class="font-bold text-base text-slate-900 dark:text-white">PokePay</h4>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-medium theme-accent-bg">首选</span>
+            </div>
+            <dl class="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+              <div><dt class="inline font-semibold text-slate-800 dark:text-slate-200">定位：</dt><dd class="inline">香港 Visa 虚拟卡，官网 <a href="https://pokepay.cc" target="_blank" rel="noopener noreferrer" class="theme-accent-text underline">pokepay.cc</a></dd></div>
+              <div><dt class="inline font-semibold text-slate-800 dark:text-slate-200">门槛：</dt><dd class="inline">KYC 一级（身份证/护照+人脸）</dd></div>
+              <div><dt class="inline font-semibold text-slate-800 dark:text-slate-200">费用：</dt><dd class="inline">0 月费 0 年费；开卡费原价 20 美元、邀请券后约 5–7.2 美元；充值费 1%、消费 1%、非港币转换 1%；USDT（TRC20）充值；首充建议 45 USDT</dd></div>
+              <div class="text-amber-800 dark:text-amber-300 bg-amber-50/70 dark:bg-amber-950/30 p-2.5 rounded-lg text-xs mt-2"><strong>注意：</strong>2025 年下半年有过一波合规清理停用（官方承诺开卡费与余额全额退），教训是别长期停放余额；CVV 输错 3 次自动锁卡；Steam、暴雪、EA 明文禁用</div>
+            </dl>
+          </div>
+
+          <div class="theme-surface rounded-2xl border p-5 shadow-sm">
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <h4 class="font-bold text-base text-slate-900 dark:text-white">Roogoo（乐享卡）</h4>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">仅快进快出</span>
+            </div>
+            <dl class="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+              <div><dt class="inline font-semibold text-slate-800 dark:text-slate-200">定位：</dt><dd class="inline">美国 Visa，官方明列支持 AI 订阅；其香港卡种不支持 AI 订阅，须选乐享或尊享</dd></div>
+              <div><dt class="inline font-semibold text-slate-800 dark:text-slate-200">门槛：</dt><dd class="inline">要 KYC（证件+人脸）</dd></div>
+              <div><dt class="inline font-semibold text-slate-800 dark:text-slate-200">费用：</dt><dd class="inline">首卡 0 开卡费、首充 10 美元、充值 0%、交易费 1%</dd></div>
+              <div class="text-amber-800 dark:text-amber-300 bg-amber-50/70 dark:bg-amber-950/30 p-2.5 rounded-lg text-xs mt-2"><strong>注意：</strong>社区深挖后下调：退出难（小于 3 美元提不出、销卡收费层层卡）、余额低于 2 美元冻卡且冻着不能销卡、余额不足拒付罚金重（授权额 2%-5%+0.5 美元、上限 30 美元）、付款失败仍扣费等，只适合小额快进快出</div>
+            </dl>
+          </div>
+
+          <div class="theme-surface rounded-2xl border p-5 shadow-sm">
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <h4 class="font-bold text-base text-slate-900 dark:text-white">SuPay (SupayCard)</h4>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">一次性用途</span>
+            </div>
+            <dl class="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+              <div><dt class="inline font-semibold text-slate-800 dark:text-slate-200">定位：</dt><dd class="inline">社区有人实测过 Muse 验证</dd></div>
+              <div><dt class="inline font-semibold text-slate-800 dark:text-slate-200">门槛：</dt><dd class="inline">免 KYC、邮箱注册</dd></div>
+              <div><dt class="inline font-semibold text-slate-800 dark:text-slate-200">费用：</dt><dd class="inline">USDT 充值 2%；宣传开卡约 8 美元，实测真实最低成本 27 美元（开卡费 7＋首充 20）</dd></div>
+              <div class="text-amber-800 dark:text-amber-300 bg-amber-50/70 dark:bg-amber-950/30 p-2.5 rounded-lg text-xs mt-2"><strong>注意：</strong>平台 2025 年才立、有完整维权实录、原则上不支持退款、卡段后来禁用 Google 系列产品，只适合一次性小额试、不存大额</div>
+            </dl>
+          </div>
+
+          <div class="md:col-span-2 theme-surface rounded-2xl border p-5 opacity-85">
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <h4 class="font-bold text-base text-slate-900 dark:text-white">ZovoCard</h4>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300">尚不可用</span>
+            </div>
+            <p class="text-sm text-slate-600 dark:text-slate-300">
+              <strong>门槛：</strong>免 KYC、邮箱注册；服务条款明文排除中国大陆居民｜
+              <strong>费用：</strong>USDT 充值；无公开统一价目｜
+              <strong>注意：</strong>注册实测被其站点的人机验证卡死，至今没看到卡目录与费率，尚不可用
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 排序与排除平台 + PokePay 办理流程 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div class="theme-surface rounded-2xl border p-5 space-y-4 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">长期扣款用途推荐排序与排除名单</h3>
+          <div class="p-3 rounded-lg theme-tag-pill text-xs sm:text-sm font-medium leading-relaxed">
+            Gate（有资格时） &gt; PokePay &gt; SuPay（一次性用途） &gt; Roogoo（只快进快出） &gt; ZovoCard（尚不可用）
+          </div>
+          <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            没有 Gate 资格的，直接从首选 PokePay 开始办；SuPay 只拿来一次性小额试，Roogoo 只快进快出，ZovoCard 先不用考虑
+          </p>
+          <div class="border-t border-slate-100 dark:border-slate-800 pt-3">
+            <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2">已排除（不用再看）</div>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
+              <li>1. <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-xs">WildCard 野卡</code>：2025-07-12 已停服</li>
+              <li>2. <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-xs">RedotPay</code>：官方限制地区含中国大陆</li>
+              <li>3. <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-xs">NobePay</code>：官网域名已无 DNS 解析</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="theme-surface rounded-2xl border p-5 space-y-4 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">PokePay 办理流程</h3>
+          <ol class="space-y-3 text-sm text-slate-700 dark:text-slate-200">
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full theme-tag-pill font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+              <span>官网或 App 注册</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full theme-tag-pill font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+              <span>KYC 一级（须本人刷脸）</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full theme-tag-pill font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+              <span>USDT 汇入（选 TRC20，提币网络与充值页一致）</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full theme-tag-pill font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
+              <span>申请虚拟卡（付款前先确认有无开卡优惠券）</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full theme-tag-pill font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">5</span>
+              <span>先小额试活再订订阅，账单地址照抄 App 所给</span>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SECTION 04 ==================== -->
+    <section id="sec-04" class="space-y-6">
+      <div class="flex items-baseline gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+        <span class="text-xl sm:text-3xl font-mono font-bold theme-accent-text shrink-0">04</span>
+        <h2 class="text-[18px] sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug">国内外 AI 名单：热度榜与智能度榜</h2>
+      </div>
+
+      <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+        国外和国内主要的 AI 全收进来：一共 24 家，国外 10 家、国内 14 家，口径是市面上主流、初学者最常接触到的巨模型厂商，一个不落；这一节不混排，做成两张榜：热度决定生态与顺手程度，智能度决定上限，两件事差别很大（比如 Meta AI 热度靠前但智能不在第一梯队，Claude 正好反过来）；每家都带代表产品或模型、一句话特长与建站用途；第一节搭配里 AI 站在第三层「AI 大脑」的位置，选大脑时对照这两张榜挑
+      </p>
+
+      <!-- Tab Switcher + Region Filter + Search -->
+      <div class="theme-surface rounded-2xl border p-4 sm:p-5 shadow-sm space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <!-- Tabs -->
+          <div class="inline-flex p-1 rounded-xl bg-slate-100 dark:bg-slate-800 self-start" role="tablist">
+            <button type="button" id="tab-heat" role="tab" aria-selected="true"
+              class="ai-tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-slate-900 theme-accent-text shadow-sm transition-[border-color,background-color,box-shadow]">
+              热度榜 (24家)
+            </button>
+            <button type="button" id="tab-iq" role="tab" aria-selected="false"
+              class="ai-tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-[background-color,color,box-shadow]">
+              智能度榜 (2026-11)
+            </button>
+          </div>
+
+          <!-- Region & Search -->
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden text-xs">
+              <button type="button" data-region="all" class="region-btn px-3 py-1.5 font-medium theme-accent-bg">全部</button>
+              <button type="button" data-region="国外" class="region-btn px-3 py-1.5 font-medium bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">国外 (10)</button>
+              <button type="button" data-region="国内" class="region-btn px-3 py-1.5 font-medium bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">国内 (14)</button>
+            </div>
+            <div class="relative flex-1 sm:flex-initial min-w-[180px]">
+              <input id="ai-search" type="search" placeholder="搜索厂商、模型或特长..."
+                class="w-full pl-8 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none" />
+              <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <p id="ai-tab-desc" class="text-xs text-slate-500 dark:text-slate-400">
+          热度以用户量和访问份额为准；前十名有公开量级数，其后各家按大致量级靠后排
+        </p>
+
+        <div class="overflow-x-auto table-scroll border border-slate-200 dark:border-slate-800 rounded-xl">
+          <div id="ai-table-container"></div>
+        </div>
+      </div>
+
+      <!-- 榜单使用指南与总结 -->
+      <div class="theme-surface rounded-2xl border p-5 sm:p-6 space-y-3 shadow-sm text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white">榜单使用指南与总结</h3>
+        <p><strong class="text-slate-900 dark:text-white">一句话总结：</strong>最聪明的是 Claude、Gemini、GPT 三家，最热的是 ChatGPT、Meta AI、Gemini、豆包；国内智能看通义和 DeepSeek，热度看豆包、通义、DeepSeek</p>
+        <p><strong class="text-slate-900 dark:text-white">选型策略：</strong>做纯展示站（搭配 A）用不上 AI；要登录与数据（搭配 B）一般也先不用；只有做 AI 小工具或自动采集站（搭配 C）时才选大脑：要上限看智能度榜前列，要省钱与中文顺手看 DeepSeek、通义千问、豆包、Kimi、GLM；写代码第一梯队是 Claude、GPT、Gemini、DeepSeek、通义千问，这 5 个轮着用基本够了；一个够用，互为备用再加第二个</p>
+        <p><strong class="text-slate-900 dark:text-white">国内厂商优势与开源：</strong>国内这 14 家共同的好处是不用绕海外网络、中文原生、API 便宜，站要面向国内用户、调用量又大时优先用它们；能开源自部署的是 Llama、通义千问、DeepSeek、GLM、Mistral，能搬回自己的服务器上自己跑，其余都是只能调用人家云上 API；接口密钥的规矩不变：只能放服务器一侧，绝不能写进网页前端</p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 dark:border-slate-800 pt-8 pb-6 text-center text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+      小白建站与 AI 工具选型指南 · 榜单依据为 2026-11 版公开数据，各家口径不同、仅作量级参考；工具价格与免费额度以官网现行说明为准
+    </footer>
+  </main>
+
+  <!-- Back to Top Button -->
+  <button id="back-to-top" type="button" aria-label="回到顶部"
+    class="fixed bottom-6 right-6 z-40 w-10 h-10 rounded-full theme-accent-bg shadow-lg flex items-center justify-center opacity-0 pointer-events-none translate-y-2 transition-[opacity,transform] duration-200">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+    </svg>
+  </button>
+
+  <script>
+    (function () {
+      // ==================== 12色弥散主题配置（同步 Ai比价.html） ====================
+      const allThemes = [
+        { name: "01 · 冰川晴空", orb1: "#BCE0FD", orb2: "#93C5FD", refreshBg: "#60A5FA", sendCircleBg: "#9CCAF9", accent: "#2563EB", tagBg: "#EBF5FF", tagText: "#1D4ED8", pageBg: "#F4F8FC", glow: "rgba(147, 197, 253, 0.38)" },
+        { name: "02 · 薄荷微风", orb1: "#A7F3D0", orb2: "#6EE7B7", refreshBg: "#34D399", sendCircleBg: "#86EFAC", accent: "#059669", tagBg: "#ECFDF5", tagText: "#047857", pageBg: "#F2FBF7", glow: "rgba(110, 231, 183, 0.36)" },
+        { name: "03 · 极光青蓝", orb1: "#A5F3FC", orb2: "#818CF8", refreshBg: "#6366F1", sendCircleBg: "#A5B4FC", accent: "#4F46E5", tagBg: "#EEF2FF", tagText: "#4338CA", pageBg: "#F4F6FC", glow: "rgba(129, 140, 248, 0.34)" },
+        { name: "04 · 抹茶森屿", orb1: "#D9F99D", orb2: "#86EFAC", refreshBg: "#4ADE80", sendCircleBg: "#BEF264", accent: "#16A34A", tagBg: "#F0FDF4", tagText: "#15803D", pageBg: "#F6FAF5", glow: "rgba(134, 239, 172, 0.36)" },
+        { name: "05 · 碧海晴空", orb1: "#99F6E4", orb2: "#7DD3FC", refreshBg: "#2DD4BF", sendCircleBg: "#67E8F9", accent: "#0D9488", tagBg: "#F0FDFA", tagText: "#0F766E", pageBg: "#F2F9FA", glow: "rgba(125, 211, 252, 0.36)" },
+        { name: "06 · 深海星雾", orb1: "#CBD5E1", orb2: "#93C5FD", refreshBg: "#64748B", sendCircleBg: "#CBD5E1", accent: "#334155", tagBg: "#F1F5F9", tagText: "#1E293B", pageBg: "#F5F7FA", glow: "rgba(148, 163, 184, 0.32)" },
+        { name: "07 · 星云幻紫", orb1: "#E9D5FF", orb2: "#C4B5FD", refreshBg: "#8B5CF6", sendCircleBg: "#A396F8", accent: "#6D28D9", tagBg: "#F3E8FF", tagText: "#6D28D9", pageBg: "#F8F5FD", glow: "rgba(167, 139, 250, 0.38)" },
+        { name: "08 · 蜜桃乌龙", orb1: "#FBCFE8", orb2: "#FDA4AF", refreshBg: "#F472B6", sendCircleBg: "#F9A8D4", accent: "#DB2777", tagBg: "#FDF2F8", tagText: "#BE185D", pageBg: "#FDF6F9", glow: "rgba(244, 114, 182, 0.34)" },
+        { name: "09 · 晨曦微光", orb1: "#FDE68A", orb2: "#FDBA74", refreshBg: "#FB923C", sendCircleBg: "#FCD34D", accent: "#EA580C", tagBg: "#FFF7ED", tagText: "#C2410C", pageBg: "#FCF9F4", glow: "rgba(251, 146, 60, 0.34)" },
+        { name: "10 · 落日粉紫", orb1: "#F5D0FE", orb2: "#FECDD3", refreshBg: "#C084FC", sendCircleBg: "#F0ABFC", accent: "#9333EA", tagBg: "#FAF5FF", tagText: "#7E22CE", pageBg: "#FAF6FC", glow: "rgba(192, 132, 252, 0.35)" },
+        { name: "11 · 香槟流金", orb1: "#FEF08A", orb2: "#FDE047", refreshBg: "#EAB308", sendCircleBg: "#FDE047", accent: "#CA8A04", tagBg: "#FEFCE8", tagText: "#A16207", pageBg: "#FAF9F2", glow: "rgba(234, 179, 8, 0.32)" },
+        { name: "12 · 幻彩全息", isHolo: true, orb1: "#8FDBB8", orb2: "#9CC8F7", refreshBg: "#4FA8F6", sendCircleBg: "#9EE0C5", accent: "#1A73E8", tagBg: "#E6F4EA", tagText: "#137333", pageBg: "#F3F8FA", glow: "rgba(143, 219, 184, 0.44)" }
+      ];
+
+      let currentThemeIdx = 0;
+      let isDarkMode = false;
+
+      function applyThemeByIndex(index) {
+        currentThemeIdx = index;
+        const themeObj = allThemes[index];
+        if (!themeObj) return;
+
+        const root = document.documentElement;
+        root.style.setProperty('--orb-color-1', themeObj.orb1);
+        root.style.setProperty('--orb-color-2', themeObj.orb2);
+        root.style.setProperty('--refresh-btn-bg', themeObj.refreshBg);
+        root.style.setProperty('--send-circle-bg', themeObj.sendCircleBg);
+        root.style.setProperty('--theme-accent', themeObj.accent);
+        root.style.setProperty('--theme-tag-bg', themeObj.tagBg);
+        root.style.setProperty('--theme-tag-text', themeObj.tagText);
+        root.style.setProperty('--search-glow', themeObj.glow);
+
+        if (themeObj.isHolo) {
+          root.setAttribute('data-holo', 'true');
+        } else {
+          root.removeAttribute('data-holo');
+        }
+
+        if (!isDarkMode) {
+          root.style.setProperty('--page-bg', themeObj.pageBg);
+        }
+
+        const orbLeft = document.getElementById('orbLeft');
+        const orbRight = document.getElementById('orbRight');
+        if (!themeObj.isHolo) {
+          const shift = index % 2 === 0 ? 1 : -1;
+          orbLeft.style.transform = `translate(${shift * 14}px, ${-shift * 8}px) scale(${1 + shift * 0.05})`;
+          orbRight.style.transform = `translate(${-shift * 14}px, ${shift * 8}px) scale(${1 - shift * 0.05})`;
+        } else {
+          orbLeft.style.transform = '';
+          orbRight.style.transform = '';
+        }
+
+        const nameEl = document.getElementById('current-theme-name');
+        if (nameEl) nameEl.textContent = themeObj.name;
+
+        document.querySelectorAll('.theme-swatch-item').forEach(el => {
+          el.classList.toggle('active', Number(el.dataset.themeIdx) === currentThemeIdx);
+        });
+
+        try { localStorage.setItem('guide_theme_idx', String(index)); } catch (e) {}
+      }
+
+      function applyDarkMode(dark, animate) {
+        isDarkMode = dark;
+        const root = document.documentElement;
+        const btn = document.getElementById('darkModeBtn');
+        const icon = document.getElementById('sunMoonIcon');
+
+        if (animate && btn) {
+          btn.classList.add('rotating');
+          setTimeout(() => btn.classList.remove('rotating'), 450);
+        }
+
+        if (isDarkMode) {
+          root.setAttribute('data-dark', 'true');
+          root.classList.add('dark');
+          root.style.setProperty('--page-bg', '#090D16');
+          icon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+        } else {
+          root.removeAttribute('data-dark');
+          root.classList.remove('dark');
+          root.style.setProperty('--page-bg', allThemes[currentThemeIdx].pageBg);
+          icon.innerHTML = `
+            <circle cx="12" cy="12" r="4"></circle>
+            <line x1="12" y1="2" x2="12" y2="4.5"></line>
+            <line x1="12" y1="19.5" x2="12" y2="22"></line>
+            <line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line>
+            <line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line>
+            <line x1="2" y1="12" x2="4.5" y2="12"></line>
+            <line x1="19.5" y1="12" x2="22" y2="12"></line>
+            <line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line>
+            <line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line>
+          `;
+        }
+
+        try { localStorage.setItem('guide_dark_mode', isDarkMode ? 'true' : 'false'); } catch (e) {}
+      }
+
+      function renderThemeSwatches() {
+        const grid = document.getElementById('themeSwatchGrid');
+        grid.innerHTML = allThemes.map((t, idx) => {
+          const isActive = idx === currentThemeIdx ? 'active' : '';
+          const holoClass = t.isHolo ? 'holo-animated' : '';
+          return `
+            <div class="theme-swatch-item ${isActive}" data-theme-idx="${idx}">
+              <span class="swatch-orb-preview ${holoClass}" style="background: linear-gradient(135deg, ${t.orb1} 0%, ${t.orb2} 65%, ${t.refreshBg} 100%);"></span>
+              <span class="swatch-label">${t.name}</span>
+            </div>
+          `;
+        }).join('');
+
+        grid.querySelectorAll('.theme-swatch-item').forEach(item => {
+          item.addEventListener('click', () => {
+            applyThemeByIndex(Number(item.dataset.themeIdx));
+            closeThemePanel();
+          });
+        });
+      }
+
+      function openThemePanel() {
+        document.getElementById('themePopover').classList.add('open');
+        document.getElementById('themeBackdrop').classList.add('open');
+        if (navigator.vibrate) navigator.vibrate(18);
+      }
+
+      function closeThemePanel() {
+        document.getElementById('themePopover').classList.remove('open');
+        document.getElementById('themeBackdrop').classList.remove('open');
+        document.querySelectorAll('.theme-swatch-item').forEach(el => el.classList.remove('sliding-hover'));
+      }
+
+      document.getElementById('themeBackdrop').addEventListener('click', closeThemePanel);
+      document.getElementById('theme-palette-trigger').addEventListener('click', () => {
+        const popover = document.getElementById('themePopover');
+        if (popover.classList.contains('open')) closeThemePanel();
+        else openThemePanel();
       });
-    }, 170);
-  });
-});
-moveSegInd();
-window.addEventListener('resize', moveSegInd);
 
-/* 深浅色手动切换：未手动切换时跟随系统 */
-document.getElementById('themeBtn').addEventListener('click', function(){
-  var cur = document.documentElement.getAttribute('data-theme');
-  var isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-});
+      // 单击切换日夜，长按340ms弹出并滑动选12色主题
+      (function initThemeButtonGestures() {
+        const btn = document.getElementById('darkModeBtn');
+        let pressTimer = null;
+        let isLongPressTriggered = false;
+        let isPointerDown = false;
+        let lastHoveredIdx = null;
 
-/* 目录导航高亮 */
-var tocLinks = document.querySelectorAll('#toc a');
-var secs = ['s1','s3','s4','s2'].map(function(id){ return document.getElementById(id); });
-function syncToc(){
-  var pos = window.scrollY + 40, cur = 0;
-  secs.forEach(function(s, i){ if (s && s.offsetTop <= pos) cur = i; });
-  tocLinks.forEach(function(a, i){ a.classList.toggle('on', i === cur); });
-}
-window.addEventListener('scroll', syncToc, { passive: true });
-syncToc();
+        btn.addEventListener('pointerdown', (e) => {
+          if (e.button && e.button !== 0) return;
+          isPointerDown = true;
+          isLongPressTriggered = false;
+          lastHoveredIdx = null;
+          btn.classList.add('pressing');
 
-/* 返回恢复（同 ai-shop 口径）：离开前把滚到的位置记进当前历史记录，返回/前进时精确回到那个位置，页面不重载 */
-if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-function stampPos(){
-  var st = (history.state && typeof history.state === 'object') ? history.state : {};
-  st.y = window.scrollY;
-  try { history.replaceState(st, '', location.href); } catch (e) {}
-}
-var stampTimer = null;
-window.addEventListener('scroll', function(){
-  if (stampTimer) return;
-  stampTimer = setTimeout(function(){ stampTimer = null; stampPos(); }, 160);
-}, { passive: true });
-function goSection(id, smooth){
-  var el = document.getElementById(id);
-  if (!el) return;
-  window.scrollTo({ top: Math.max(0, el.offsetTop - 24), behavior: smooth ? 'smooth' : 'instant' });
-}
-tocLinks.forEach(function(a){
-  a.addEventListener('click', function(ev){
-    var id = a.getAttribute('href').slice(1);
-    if (!document.getElementById(id)) return;
-    ev.preventDefault();
-    stampPos();
-    history.pushState({ sec: id }, '', '#' + id);
-    goSection(id, true);
-  });
-});
-window.addEventListener('popstate', function(){
-  var st = history.state;
-  if (st && typeof st.y === 'number') window.scrollTo({ top: st.y, behavior: 'instant' });
-  else if (location.hash) goSection(location.hash.slice(1), false);
-  else window.scrollTo({ top: 0, behavior: 'instant' });
-  syncToc();
-});
-stampPos();
-</script>
+          try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+
+          pressTimer = setTimeout(() => {
+            if (!isPointerDown) return;
+            isLongPressTriggered = true;
+            openThemePanel();
+          }, 340);
+        });
+
+        btn.addEventListener('pointermove', (e) => {
+          if (!isPointerDown || !isLongPressTriggered) return;
+
+          const targetEl = document.elementFromPoint(e.clientX, e.clientY);
+          const swatchItem = targetEl ? targetEl.closest('.theme-swatch-item') : null;
+
+          document.querySelectorAll('.theme-swatch-item').forEach(el => {
+            el.classList.toggle('sliding-hover', el === swatchItem);
+          });
+
+          if (swatchItem) {
+            const idx = Number(swatchItem.dataset.themeIdx);
+            if (idx !== lastHoveredIdx) {
+              lastHoveredIdx = idx;
+              applyThemeByIndex(idx);
+              if (navigator.vibrate) navigator.vibrate(8);
+            }
+          }
+        });
+
+        const finishGesture = () => {
+          if (!isPointerDown) return;
+          isPointerDown = false;
+          clearTimeout(pressTimer);
+          btn.classList.remove('pressing');
+
+          if (!isLongPressTriggered) {
+            const popover = document.getElementById('themePopover');
+            if (popover.classList.contains('open')) {
+              closeThemePanel();
+            } else {
+              applyDarkMode(!isDarkMode, true);
+            }
+          } else if (lastHoveredIdx !== null) {
+            closeThemePanel();
+          }
+        };
+
+        btn.addEventListener('pointerup', finishGesture);
+        btn.addEventListener('pointercancel', finishGesture);
+        btn.addEventListener('contextmenu', e => e.preventDefault());
+      })();
+
+      // ==================== 原有指南数据 ====================
+      const toolsData = [
+        { id: 1, name: 'GitHub Pages', tag: '托管', group: '托管', desc: '代码仓库直接变成网站，只放静态页面；最稳的免费静态托管；不能跑后端，适合个人主页和文档站', url: 'https://pages.github.com', label: 'pages.github.com' },
+        { id: 2, name: 'Cloudflare Pages', tag: '托管', group: '托管', desc: '静态页面加轻量函数，全球节点分发；免费额度大方、速度快；已有 Cloudflare 账号最顺手', url: 'https://www.cloudflare.com/products/pages', label: 'cloudflare.com/products/pages' },
+        { id: 3, name: 'Vercel', tag: '托管', group: '托管', desc: '前端页面加后端，改完自动上线并给预览网址；Next.js 官方出品；做现代前端和 AI 小站体验最好；免费档只许个人非商用', url: 'https://vercel.com/docs/deployments', label: 'vercel.com/docs/deployments' },
+        { id: 4, name: 'Netlify', tag: '托管', group: '托管', desc: '前端页面托管，自带表单收集；老牌好上手；页面要收表单时省事', url: 'https://www.netlify.com', label: 'netlify.com' },
+        { id: 5, name: 'Surge', tag: '托管', group: '托管', desc: '一行命令把一个文件夹发到网上；适合临时演示和练手；要会用一点命令行', url: 'https://surge.sh/docs/cli', label: 'surge.sh/docs/cli' },
+        { id: 6, name: 'PinMe', tag: '托管', group: '托管', desc: '上传文件夹或运行一条命令立即上线，免注册；出链接最快；生态较小，绑定自己的域名要付费档，长期正式项目慎用', url: 'https://github.com/glitternetwork/pinme', label: 'github.com/glitternetwork/pinme', sub: '官方仓库' },
+        { id: 7, name: 'Zeabur', tag: '全栈托管', group: '全栈托管', desc: '前端、后端、数据库在一个平台一键部署；中文界面友好；想一家全包的小白首选之一；免费档主要管自己的服务器', url: 'https://zeabur.com/skills', label: 'zeabur.com/skills' },
+        { id: 8, name: 'Railway', tag: '全栈托管', group: '全栈托管', desc: '前端、后端、数据库画布式管理，连几下就跑起完整应用；全栈练手顺手；不是真免费，试用后约 5 美元/月起', url: 'https://railway.com/features', label: 'railway.com/features' },
+        { id: 9, name: 'Render', tag: '全栈托管', group: '全栈托管', desc: '后端服务、定时任务、数据库；跑常驻后端和定时任务；免费档闲置可能休眠，唤醒偏慢', url: 'https://render.com/docs', label: 'render.com/docs' },
+        { id: 10, name: 'Cloudflare（平台）', tag: '入口与基础设施', group: '基础与数据', desc: '管域名解析、加速、防护，可跑 Workers、存文件（R2）；几乎每套搭配都用它管域名入口；和 Pages 是同家不同产品', url: 'https://www.cloudflare.com/about', label: 'cloudflare.com/about' },
+        { id: 11, name: 'Supabase', tag: '数据与登录', group: '基础与数据', desc: '现成的数据库、用户登录和文件存储，不用自己搭后端；网站要存数据、做登录时配它', url: 'https://supabase.com/docs', label: 'supabase.com/docs' },
+        { id: 12, name: 'Anthropic（Claude）', tag: 'AI 大脑', group: 'AI 大脑', desc: '对话、写作、代码能力，通过接口接入自己的产品；和 Gemini 二选一即可，也可互为备用', url: 'https://www.anthropic.com', label: 'anthropic.com' },
+        { id: 13, name: 'Google Gemini', tag: 'AI 大脑', group: 'AI 大脑', desc: '文字、图片、代码多模态处理，通过接口调用；和 Claude 二选一即可；有谷歌账号上手快', url: 'https://gemini.google.com', label: 'gemini.google' },
+        { id: 14, name: 'Make', tag: '自动化', group: '自动化与抓取', desc: '可视化拖拽，把多个应用串成流程自动跑；不想写代码、不想自己部署时选它', url: 'https://www.make.com', label: 'make.com' },
+        { id: 15, name: 'n8n', tag: '自动化', group: '自动化与抓取', desc: '和 Make 同类，开源，可以部署在自己的机器上；想省钱、数据想自己掌控时选它；云版也可直接用', url: 'https://n8n.io', label: 'n8n.io' },
+        { id: 16, name: 'Apify', tag: '抓取', group: '自动化与抓取', desc: '现成抓取器商店，几千个抓取器直接运行出数据；抓公开数据不用自己写爬虫；按运行量计费', url: 'https://apify.com', label: 'apify.com' }
+      ];
+
+      const agentsData = [
+        { name: 'Muse (Meta)', modelBadge: '自研模型', modelBadgeColor: 'blue', model: '自研：Muse Spark 系列，现行 Muse Spark 1.3，由 Meta 的模型实验室做，不是 Llama 那条线；另有一个开源的小版 Muse Glimmer', vm: '有，叫 Muse Secure VM：每人一台专属云虚拟机，自带浏览器；你关掉应用它还在后台接着干，登录凭据不经过模型本身，敏感动作由独立的 Sentinel 把关' },
+        { name: 'Hark Pro (Hark Labs)', modelBadge: '自研模型', modelBadgeColor: 'blue', model: '自研：Hark 自己的 computer-use 模型，驱动云电脑干活的那套就叫 Handoff；路线是先做后训练，再往中训练和自研预训练走，不是套别家的模型改个名', vm: '有，叫 Handoff：一台专属云电脑，自带浏览器、文件系统和终端，最多同时开 6 个浏览器，替你登录网站、填表、下单、订位和缴费，花钱和发消息前默认先问你' },
+        { name: 'Devin (Cognition)', modelBadge: '混合模型', modelBadgeColor: 'amber', model: '混合：有自研的编程模型 SWE 系列，云端任务推荐用 SWE-2，它是由月之暗面的 Kimi K3 再做后训练来的；同时也能在选择器里换成 Claude、GPT、Gemini 等别家大模型', vm: '有，按任务开：每个任务给一台隔离的云虚拟机，自带终端、代码编辑器和浏览器，自己装依赖、写代码、跑测试，最后做一个合并请求给你审；任务结束，这台机器就回收' },
+        { name: 'Dots (OpenAI)', modelBadge: '自研模型', modelBadgeColor: 'blue', model: '自研：OpenAI 的旗舰模型 GPT-6 Astra；Dots 住在 ChatGPT 里，是个全天候替你盯着目标干活的 Agent，它自己更像调度，写代码和做文档这类重活会分给 Codex 和 ChatGPT Work 去做', vm: '有，每个 Dot 一台专属、常驻：一台 Linux 云电脑，自带 Chrome 浏览器，系统和浏览器由 OpenAI 维护；文件、装好的软件和网站登录都留在上面，它能按计划自己醒来干活，你关掉电脑也不耽误' },
+        { name: 'Grok Bot (xAI)', modelBadge: '自动路由', modelBadgeColor: 'violet', model: '不公开、自动路由：官方不公布默认用哪个模型，也没有选择器；它按任务自动挑选当时最合适的，自家 Grok 4.6 在里面，马斯克还点过名，连 Anthropic 的 Claude Opus 5.5 也会被调到，所以它聪不聪明，取决于这一次被路由到了谁', vm: '有，一个账号共用一台、常驻：一台 Linux 云电脑，跑在和 xAI 一起做这个产品的 Cursor 的基础设施上；你可以建多个有名字的 Bot，每个 Bot 有自己的一块屏幕，但共用同一台机器、同一套文件和登录，不是每个 Bot 一台' },
+        { name: 'Gemini Spark (Google)', modelBadge: '自研模型', modelBadgeColor: 'blue', model: '自研：Google 的 Gemini 系列，发布时跑 Gemini 3.5，后来换到 3.7 Flash，应用里还能选用更新的 Gemini 4 Argon；调度框架叫 Antigravity；它 2026 年 10 月在 Gemini 应用里改名叫 Task，还是同一个东西', vm: '有，Google Cloud 上的专属虚拟机：带一个云端浏览器，网站登录跨会话留着，还能跑代码、存文件，全天在线，你的设备关了它照样干；这一批里它最谨慎，发邮件和花钱之前一律先等你点头' },
+        { name: 'Cowork (Anthropic)', modelBadge: '自研模型', modelBadgeColor: 'blue', model: '自研：Anthropic 的 Claude 系列，只用自家的；它和编程工具 Claude Code 是同一套 agent 骨架，Cowork 是换给不写代码的人用的那一面，2026 年 1 月以研究预览发布；2026 年 9 月起并回 Claude 本体，不再是单独一个模式，打开 Claude 它自己判断是聊天还是动手干活', vm: '这一批里它最不一样：起初没有云电脑，任务跑在你自己电脑的桌面应用里、关在一个沙盒虚拟机中，电脑关了就停；2026 年 10 月起改成新任务默认在 Anthropic 云端按任务跑，要碰你本地文件时才经桌面应用伸手回来' },
+        { name: 'Cue (Manus)', modelBadge: '无自研基座', modelBadgeColor: 'slate', model: '没有自研基础大模型：主力调用 Anthropic 的 Claude 做推理和规划，子任务用阿里通义千问的微调版，多个模型按活分工；自研的是 Cascade 这套 Agent 执行框架，不是模型本身，所以论智能程度要回第四节看 Claude 和通义千问排在哪；注明：中国团队创办，现归属新加坡公司', vm: '有，而且配得最全：每个 Agent 配一台自己的云电脑，外加一个独立邮箱、一个电话号码和一个钱包，能代接电话、在你的预算内付款，你下线以后它在这台机器上接着干' },
+        { name: 'Manus (Butterfly Effect Pte)', modelBadge: '无自研基座', modelBadgeColor: 'slate', model: '和 Cue 同一个底座：没有自研基础大模型，同样是 Claude 加通义千问微调版在背后，自己的本事在 Cascade 调度框架；注明：中国团队创办，现归属新加坡公司，总部和运营在新加坡、只面向海外用户', vm: '有，叫常驻云电脑：一台全天在线的 Ubuntu 虚拟机，文件、装好的软件、正在跑的进程都留着，你的电脑关机断网，它照样接着干，Cue 的云电脑就建在这套底座上' }
+      ];
+
+      const heatRankData = [
+        { rank: 1, company: 'OpenAI', region: '国外', product: 'ChatGPT、GPT 系列、Codex', basis: '全球聊天网页访问份额约 54%，周活约 10 亿，断层第一', usage: '综合能力与生态最全；建站主力大脑，问答、内容生成、Codex 写代码搭站' },
+        { rank: 2, company: 'Meta', region: '国外', product: 'Meta AI、Llama', basis: '靠 WhatsApp、Instagram 内嵌，月活约 12 亿（内嵌口径）', usage: '开源权重可自部署；想把模型放在自己服务器时用' },
+        { rank: 3, company: 'Google', region: '国外', product: 'Gemini', basis: '月活约 9.5 亿，网页份额约 27.9%', usage: '多模态强；看图理解与图文生成，适合图文类小工具、日常问答和生图' },
+        { rank: 4, company: '字节跳动', region: '国内', product: '豆包', basis: '月活约 3.82 亿，国内第一', usage: '中文对话顺；中文客服问答、内容生成，接火山引擎部署' },
+        { rank: 5, company: 'Microsoft', region: '国外', product: 'Copilot', basis: '靠 Windows 和 Office 内嵌，用户过亿，网页份额约 1.3%', usage: '与 Office、Azure、GitHub 打通；办公自动化、Azure 部署时接入' },
+        { rank: 6, company: 'Anthropic', region: '国外', product: 'Claude', basis: '全球网页访问份额约 9.2%', usage: '长文本、写作与代码稳；个人用户不多但企业端很强，长文档整理、写文案、代码审查' },
+        { rank: 7, company: '阿里巴巴', region: '国内', product: '通义千问 Qwen', basis: '月活约 1.67 亿，国内第二', usage: '开源生态全；自部署或调用阿里云接口，中文代码与文案都行' },
+        { rank: 8, company: 'DeepSeek 深度求索', region: '国内', product: 'DeepSeek 系列', basis: '月活约 1.3 亿，全球网页份额约 4.1%', usage: '推理与代码强、性价比高；低成本大脑首选' },
+        { rank: 9, company: '腾讯', region: '国内', product: '混元 / 元宝', basis: '国内第一梯队尾巴，靠微信往下冲', usage: '与微信、腾讯云生态打通；网站连接微信生态时顺手用' },
+        { rank: 10, company: 'xAI', region: '国外', product: 'Grok', basis: '全球网页访问份额约 2.4%', usage: '实时信息与 X 生态；抓实时热点，做资讯汇总类内容' },
+        { rank: 11, company: 'Perplexity', region: '国外', product: 'Perplexity AI 搜索', basis: '全球网页访问份额约 1.3%', usage: '带出处引用的 AI 搜索；建站前查资料、带来源的检索问答' },
+        { rank: 12, company: '月之暗面', region: '国内', product: 'Kimi', basis: '无统一公开量级数，按大致量级靠后排', usage: '超长上下文；给文档站做长文问答、整份资料整理' },
+        { rank: 13, company: '百度', region: '国内', product: '文心（文心一言）', basis: '无统一公开量级数，按大致量级靠后排', usage: '中文老牌；中文内容与搜索类功能，百度智能云部署搭配' },
+        { rank: 14, company: '智谱', region: '国内', product: 'GLM / 清言', basis: '无统一公开量级数，按大致量级靠后排', usage: '通用与代码模型齐、平台成熟；中文 AI 小工具的通用大脑' },
+        { rank: 15, company: 'MiniMax', region: '国内', product: 'MiniMax 系列（海螺）', basis: '无统一公开量级数，按大致量级靠后排', usage: '语音、多模态与长文本见长；语音播报、音频内容功能' },
+        { rank: 16, company: '小米', region: '国内', product: 'MiMo', basis: '无统一公开量级数，按大致量级靠后排', usage: '新入局的开源推理模型；关注成本的推理类功能备选' },
+        { rank: 17, company: 'Mistral AI', region: '国外', product: 'Mistral 系列', basis: '无统一公开量级数，按大致量级靠后排', usage: '轻量高效；成本敏感、要自部署或欧洲合规时的备选大脑' },
+        { rank: 18, company: '科大讯飞', region: '国内', product: '星火', basis: '无统一公开量级数，按大致量级靠后排', usage: '语音技术根基深；语音输入、语音合成功能优先选它' },
+        { rank: 19, company: '阶跃星辰', region: '国内', product: 'Step 系列', basis: '无统一公开量级数，按大致量级靠后排', usage: '多模态与推理的新锐；图文多模态小工具的新选择' },
+        { rank: 20, company: '百川智能', region: '国内', product: 'Baichuan 系列', basis: '无统一公开量级数，按大致量级靠后排', usage: '中文能力扎实；中文内容与一键生成功能备选' },
+        { rank: 21, company: '商汤', region: '国内', product: '日日新 SenseNova', basis: '无统一公开量级数，按大致量级靠后排', usage: '多模态与视觉见长；看图、视觉类功能与内容处理搭配' },
+        { rank: 22, company: 'Cohere', region: '国外', product: 'Command 系列', basis: '无统一公开量级数，按大致量级靠后排', usage: '企业级文本与检索增强见长；给文档站、知识库站做检索问答' },
+        { rank: 23, company: 'Amazon', region: '国外', product: 'Nova、Bedrock', basis: '无统一公开量级数，按大致量级靠后排', usage: 'AWS 上的托管多模型平台；已用 AWS 部署时统一调用各家模型' },
+        { rank: 24, company: '华为', region: '国内', product: '盘古', basis: '以行业客户为主，消费端量级最低', usage: '行业大模型与华为云、昇腾生态；政企行业站的配套大脑' }
+      ];
+
+      const iqRankTopData = [
+        { rank: 1, company: 'Anthropic', region: '国外', product: 'Claude Fable 5.2', score: 65, basis: '智能指数约 65 分，全场第一', usage: '长文本、写作与代码稳；长文档整理、写文案、代码审查' },
+        { rank: 2, company: 'Google', region: '国外', product: 'Gemini 4', score: 60, basis: '智能指数约 60 分，第二', usage: '多模态强；看图理解与图文生成' },
+        { rank: 3, company: 'OpenAI', region: '国外', product: 'GPT-6', score: 57, basis: '智能指数约 57 分，第三', usage: '综合能力与生态最全；建站主力大脑，问答、内容生成' },
+        { rank: 4, company: 'xAI', region: '国外', product: 'Grok 4.7', score: 35, basis: '智能指数约 35 分，与前三有一档差距', usage: '实时信息与 X 生态；抓热点做资讯汇总' },
+        { rank: 5, company: '阿里巴巴', region: '国内', product: '通义千问 Qwen', score: 34, basis: '智能指数约 34 分，国内第一', usage: '开源生态全；自部署或阿里云接口，中文代码与文案' },
+        { rank: 6, company: 'DeepSeek 深度求索', region: '国内', product: 'DeepSeek V4.1', score: 32, basis: '智能指数约 32 分', usage: '推理与代码强、性价比高；低成本大脑首选' },
+        { rank: 7, company: '月之暗面', region: '国内', product: 'Kimi', score: null, basis: '紧随其后，本版未列精确分（开源模型里建站实测排得靠前）', usage: '超长上下文，长文问答、整份资料整理' },
+        { rank: 8, company: '小米', region: '国内', product: 'MiMo', score: null, basis: '紧随其后，本版未列精确分（真人盲评榜上开源模型第一名）', usage: '关注成本的推理类功能备选' },
+        { rank: 9, company: '智谱', region: '国内', product: 'GLM', score: null, basis: '紧随其后，本版未列精确分（代码类榜单的开源前排）', usage: '中文 AI 小工具的通用大脑' },
+        { rank: 10, company: 'MiniMax', region: '国内', product: 'MiniMax 系列', score: null, basis: '紧随其后，本版未列精确分（代码类榜单的开源前排）', usage: '语音与多模态见长，语音播报、音频内容功能' }
+      ];
+
+      const iqRankTier3Data = [
+        { company: 'Meta', region: '国外', product: 'Llama、Meta AI', usage: '开源权重可自部署；把模型放在自己服务器时用' },
+        { company: 'Mistral AI', region: '国外', product: 'Mistral 系列', usage: '轻量高效；自部署或欧洲合规的备选' },
+        { company: 'Cohere', region: '国外', product: 'Command 系列', usage: '企业级检索增强；文档站、知识库站问答' },
+        { company: 'Microsoft', region: '国外', product: 'Copilot', usage: '强在产品整合；办公自动化、Azure 部署接入' },
+        { company: 'Amazon', region: '国外', product: 'Nova、Bedrock', usage: 'AWS 托管多模型平台；统一调用各家模型' },
+        { company: 'Perplexity', region: '国外', product: 'Perplexity AI 搜索', usage: '强项是带引用的搜索；查资料与检索问答' },
+        { company: '腾讯', region: '国内', product: '混元', usage: '微信与腾讯云生态；接微信生态时用' },
+        { company: '字节跳动', region: '国内', product: '豆包', usage: '中文对话顺；中文客服问答、内容生成' },
+        { company: '百度', region: '国内', product: '文心（文心一言）', usage: '中文内容与搜索类功能' },
+        { company: '阶跃星辰', region: '国内', product: 'Step 系列', usage: '多模态新锐；图文多模态小工具' },
+        { company: '百川智能', region: '国内', product: 'Baichuan 系列', usage: '中文内容站、垂直行业问答备选' },
+        { company: '科大讯飞', region: '国内', product: '星火', usage: '语音根基深；语音输入与合成功能优先' },
+        { company: '商汤', region: '国内', product: '日日新 SenseNova', usage: '视觉见长；看图与视觉类功能' },
+        { company: '华为', region: '国内', product: '盘古', usage: '行业大模型；政企行业站与华为云配套' }
+      ];
+
+      // ==================== RENDER HELPERS ====================
+      function renderTools(filterGroup) {
+        const grid = document.getElementById('tools-grid');
+        const list = filterGroup === 'all' ? toolsData : toolsData.filter(t => t.group === filterGroup);
+        grid.innerHTML = list.map(t => `
+          <div class="theme-surface rounded-2xl border p-4 shadow-sm flex flex-col justify-between gap-2.5 transition-colors">
+            <div>
+              <div class="flex items-start justify-between gap-2 mb-1.5">
+                <h4 class="font-semibold text-sm text-slate-900 dark:text-white leading-snug">
+                  <span class="font-mono text-xs text-slate-400 mr-1">${String(t.id).padStart(2, '0')}</span>${t.name}
+                </h4>
+                <span class="shrink-0 px-2 py-0.5 rounded text-[11px] font-medium theme-tag-pill">${t.tag}</span>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">${t.desc}</p>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function renderOfficialLinks() {
+        const grid = document.getElementById('official-links-grid');
+        grid.innerHTML = toolsData.map(t => `
+          <a href="${t.url}" target="_blank" rel="noopener noreferrer"
+            class="group theme-surface rounded-xl border p-3 hover:shadow-md transition-[box-shadow] flex items-start justify-between gap-2">
+            <div class="min-w-0 flex-1">
+              <div class="text-xs font-semibold text-slate-900 dark:text-white truncate">
+                ${t.id}. ${t.name}${t.sub ? '（' + t.sub + '）' : ''}
+              </div>
+              <div class="text-[11px] font-mono text-slate-500 dark:text-slate-400 break-all mt-0.5 leading-snug">
+                ${t.label}
+              </div>
+            </div>
+            <svg class="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+        `).join('');
+      }
+
+      function renderAgents() {
+        const grid = document.getElementById('agents-grid');
+        const badgeClasses = {
+          blue: 'bg-blue-50 text-blue-700 dark:bg-blue-950/70 dark:text-blue-300 border-blue-200/70 dark:border-blue-800/60',
+          amber: 'bg-amber-50 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/60',
+          violet: 'bg-violet-50 text-violet-700 dark:bg-violet-950/70 dark:text-violet-300 border-violet-200/70 dark:border-violet-800/60',
+          slate: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+        };
+        grid.innerHTML = agentsData.map((a, idx) => `
+          <article class="theme-surface rounded-2xl border p-5 shadow-sm space-y-2.5 ${idx === agentsData.length - 1 ? 'md:col-span-2' : ''}">
+            <div class="flex items-center justify-between gap-2">
+              <h4 class="font-bold text-base text-slate-900 dark:text-white">${idx + 1}. ${a.name}</h4>
+              <span class="shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium border ${badgeClasses[a.modelBadgeColor]}">${a.modelBadge}</span>
+            </div>
+            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed"><strong class="text-slate-800 dark:text-slate-100">大模型：</strong>${a.model}</p>
+            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed"><strong class="text-slate-800 dark:text-slate-100">云电脑：</strong>${a.vm}</p>
+          </article>
+        `).join('');
+      }
+
+      function companyCell(company, region) {
+        const cls = region === '国内'
+          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/60'
+          : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700';
+        return `<span class="inline-flex items-center gap-1.5 whitespace-nowrap font-medium text-slate-900 dark:text-white">${company}<span class="px-1.5 py-0.5 rounded text-[11px] font-normal border ${cls}">${region}</span></span>`;
+      }
+
+      // ==================== AI RANKING STATE ====================
+      let activeAiTab = 'heat';
+      let activeRegion = 'all';
+      let aiSearchQuery = '';
+
+      function matchesFilter(item) {
+        if (activeRegion !== 'all' && item.region !== activeRegion) return false;
+        if (aiSearchQuery) {
+          const q = aiSearchQuery.toLowerCase();
+          const text = `${item.company} ${item.product} ${item.basis || ''} ${item.usage}`.toLowerCase();
+          return text.includes(q);
+        }
+        return true;
+      }
+
+      function renderAiTable() {
+        const container = document.getElementById('ai-table-container');
+        const desc = document.getElementById('ai-tab-desc');
+
+        if (activeAiTab === 'heat') {
+          desc.textContent = '热度以用户量和访问份额为准；前十名有公开量级数，其后各家按大致量级靠后排';
+          const rows = heatRankData.filter(matchesFilter);
+          if (rows.length === 0) {
+            container.innerHTML = '<div class="p-8 text-center text-sm text-slate-500 dark:text-slate-400">没有找到匹配的厂商或模型，试试清空筛选条件</div>';
+            return;
+          }
+          container.innerHTML = `
+            <table class="w-full text-left border-collapse text-sm min-w-[760px]">
+              <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60 text-xs uppercase text-slate-500 dark:text-slate-400">
+                  <th class="py-3 px-4 font-semibold w-14">名次</th>
+                  <th class="py-3 px-4 font-semibold">公司</th>
+                  <th class="py-3 px-4 font-semibold">代表产品 / 模型</th>
+                  <th class="py-3 px-4 font-semibold">热度依据</th>
+                  <th class="py-3 px-4 font-semibold">一句话特长与建站用途</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                ${rows.map(r => `
+                  <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 align-top">
+                    <td class="py-3 px-4 font-mono text-xs font-semibold ${r.rank <= 3 ? 'theme-accent-text' : 'text-slate-500'}">${r.rank}</td>
+                    <td class="py-3 px-4">${companyCell(r.company, r.region)}</td>
+                    <td class="py-3 px-4 font-medium text-slate-800 dark:text-slate-200">${r.product}</td>
+                    <td class="py-3 px-4 text-xs sm:text-sm text-slate-600 dark:text-slate-300">${r.basis}</td>
+                    <td class="py-3 px-4 text-xs sm:text-sm">${r.usage}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `;
+        } else {
+          desc.textContent = '智能度以 Artificial Analysis 智能指数（2026-11 版）为准，按各家最强模型算；前三名与后面之间有一档肉眼可见的差距；没有公开前沿分数的公司按三梯队列出';
+          const topRows = iqRankTopData.filter(matchesFilter);
+          const tier3Rows = iqRankTier3Data.filter(matchesFilter);
+
+          if (topRows.length === 0 && tier3Rows.length === 0) {
+            container.innerHTML = '<div class="p-8 text-center text-sm text-slate-500 dark:text-slate-400">没有找到匹配的厂商或模型，试试清空筛选条件</div>';
+            return;
+          }
+
+          let html = '';
+          if (topRows.length > 0) {
+            html += `
+              <div class="px-4 py-2.5 theme-tag-pill border-b border-slate-200 dark:border-slate-800 text-xs font-semibold">
+                前沿量化第一 / 二梯队（第 1 - 10 名）
+              </div>
+              <table class="w-full text-left border-collapse text-sm min-w-[760px]">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60 text-xs uppercase text-slate-500 dark:text-slate-400">
+                    <th class="py-3 px-4 font-semibold w-14">名次</th>
+                    <th class="py-3 px-4 font-semibold">公司</th>
+                    <th class="py-3 px-4 font-semibold">代表产品 / 模型</th>
+                    <th class="py-3 px-4 font-semibold w-56">智能度依据</th>
+                    <th class="py-3 px-4 font-semibold">一句话特长与建站用途</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                  ${topRows.map(r => `
+                    <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 align-top">
+                      <td class="py-3 px-4 font-mono text-xs font-semibold ${r.rank <= 3 ? 'theme-accent-text' : 'text-slate-500'}">${r.rank}</td>
+                      <td class="py-3 px-4">${companyCell(r.company, r.region)}</td>
+                      <td class="py-3 px-4 font-medium text-slate-800 dark:text-slate-200">${r.product}</td>
+                      <td class="py-3 px-4 text-xs sm:text-sm">
+                        ${r.score ? `
+                          <div class="flex items-center gap-2 mb-1">
+                            <div class="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                              <div class="h-full rounded-full" style="width: ${Math.min(100, Math.round((r.score / 70) * 100))}%; background-color: ${r.rank <= 3 ? 'var(--theme-accent)' : '#64748B'};"></div>
+                            </div>
+                            <span class="font-mono text-xs font-semibold text-slate-700 dark:text-slate-200">${r.score}分</span>
+                          </div>
+                        ` : ''}
+                        <div class="text-xs text-slate-500 dark:text-slate-400">${r.basis}</div>
+                      </td>
+                      <td class="py-3 px-4 text-xs sm:text-sm">${r.usage}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `;
+          }
+
+          if (tier3Rows.length > 0) {
+            html += `
+              <div class="px-4 py-2.5 bg-slate-100/80 dark:bg-slate-800/80 border-y border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                第三梯队（无公开前沿分数，按行业地位列）
+              </div>
+              <table class="w-full text-left border-collapse text-sm min-w-[700px]">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60 text-xs uppercase text-slate-500 dark:text-slate-400">
+                    <th class="py-3 px-4 font-semibold w-28">梯队</th>
+                    <th class="py-3 px-4 font-semibold">公司</th>
+                    <th class="py-3 px-4 font-semibold">代表产品 / 模型</th>
+                    <th class="py-3 px-4 font-semibold">一句话特长与建站用途</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                  ${tier3Rows.map(r => `
+                    <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 align-top">
+                      <td class="py-3 px-4 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">第三梯队</td>
+                      <td class="py-3 px-4">${companyCell(r.company, r.region)}</td>
+                      <td class="py-3 px-4 font-medium text-slate-800 dark:text-slate-200">${r.product}</td>
+                      <td class="py-3 px-4 text-xs sm:text-sm">${r.usage}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `;
+          }
+
+          container.innerHTML = html;
+        }
+      }
+
+      // ==================== OTHER INTERACTIONS ====================
+      const mobileBtn = document.getElementById('mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      mobileBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+      document.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+      });
+
+      document.querySelectorAll('.tool-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tool-filter-btn').forEach(b => {
+            b.className = 'tool-filter-btn px-2.5 py-1 rounded-full text-xs font-medium theme-surface border text-slate-600 dark:text-slate-300 transition-colors';
+          });
+          btn.className = 'tool-filter-btn px-2.5 py-1 rounded-full text-xs font-medium theme-accent-bg transition-colors';
+          renderTools(btn.dataset.filter);
+        });
+      });
+
+      const comboCards = document.querySelectorAll('.combo-card');
+      const decisionBtns = document.querySelectorAll('.decision-btn');
+
+      function highlightCombo(target) {
+        comboCards.forEach(card => {
+          if (!target || card.dataset.combo === target) {
+            card.classList.remove('opacity-45', 'scale-[0.99]');
+            card.style.boxShadow = target ? '0 6px 18px -3px var(--search-glow)' : '';
+          } else {
+            card.classList.add('opacity-45', 'scale-[0.99]');
+            card.style.boxShadow = '';
+          }
+        });
+      }
+
+      decisionBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          decisionBtns.forEach(b => { b.style.boxShadow = ''; });
+          btn.style.boxShadow = '0 0 0 3px var(--search-glow)';
+          const target = btn.dataset.targetCombo;
+          highlightCombo(target);
+          const targetCard = document.querySelector(`.combo-card[data-combo="${target}"]`);
+          if (targetCard) targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+      });
+
+      document.getElementById('clear-combo-highlight').addEventListener('click', () => {
+        decisionBtns.forEach(b => { b.style.boxShadow = ''; });
+        highlightCombo(null);
+      });
+
+      const stepChecks = document.querySelectorAll('.step-check');
+      try {
+        const savedSteps = JSON.parse(localStorage.getItem('guide_steps') || '{}');
+        stepChecks.forEach(cb => {
+          if (savedSteps[cb.dataset.stepId]) cb.checked = true;
+        });
+      } catch (e) {}
+
+      stepChecks.forEach(cb => {
+        cb.addEventListener('change', () => {
+          try {
+            const savedSteps = JSON.parse(localStorage.getItem('guide_steps') || '{}');
+            savedSteps[cb.dataset.stepId] = cb.checked;
+            localStorage.setItem('guide_steps', JSON.stringify(savedSteps));
+          } catch (e) {}
+        });
+      });
+
+      const tabHeat = document.getElementById('tab-heat');
+      const tabIq = document.getElementById('tab-iq');
+      function updateTabStyles() {
+        const activeCls = 'ai-tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-slate-900 theme-accent-text shadow-sm transition-[border-color,background-color,box-shadow]';
+        const inactiveCls = 'ai-tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-[background-color,color,box-shadow]';
+        tabHeat.className = activeAiTab === 'heat' ? activeCls : inactiveCls;
+        tabIq.className = activeAiTab === 'iq' ? activeCls : inactiveCls;
+        tabHeat.setAttribute('aria-selected', String(activeAiTab === 'heat'));
+        tabIq.setAttribute('aria-selected', String(activeAiTab === 'iq'));
+      }
+
+      tabHeat.addEventListener('click', () => { activeAiTab = 'heat'; updateTabStyles(); renderAiTable(); });
+      tabIq.addEventListener('click', () => { activeAiTab = 'iq'; updateTabStyles(); renderAiTable(); });
+
+      document.querySelectorAll('.region-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeRegion = btn.dataset.region;
+          document.querySelectorAll('.region-btn').forEach(b => {
+            b.className = b.dataset.region === activeRegion
+              ? 'region-btn px-3 py-1.5 font-medium theme-accent-bg'
+              : 'region-btn px-3 py-1.5 font-medium bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800';
+          });
+          renderAiTable();
+        });
+      });
+
+      document.getElementById('ai-search').addEventListener('input', (e) => {
+        aiSearchQuery = e.target.value.trim();
+        renderAiTable();
+      });
+
+      const progressBar = document.getElementById('reading-progress');
+      const backToTopBtn = document.getElementById('back-to-top');
+      const navPills = document.querySelectorAll('.nav-pill');
+      const sections = ['sec-01', 'sec-02', 'sec-03', 'sec-04'].map(id => document.getElementById(id));
+
+      window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const pct = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
+        progressBar.style.width = pct + '%';
+
+        if (scrollTop > 400) {
+          backToTopBtn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+        } else {
+          backToTopBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+        }
+
+        let currentId = '';
+        sections.forEach(sec => {
+          if (sec && sec.getBoundingClientRect().top <= 140) currentId = sec.id;
+        });
+        navPills.forEach(pill => {
+          if (pill.dataset.nav === currentId) {
+            pill.classList.add('theme-tag-pill');
+          } else {
+            pill.classList.remove('theme-tag-pill');
+          }
+        });
+      }, { passive: true });
+
+      backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      // ==================== INIT ====================
+      try {
+        const savedThemeIdx = Number(localStorage.getItem('guide_theme_idx'));
+        if (!Number.isNaN(savedThemeIdx) && savedThemeIdx >= 0 && savedThemeIdx < allThemes.length) {
+          currentThemeIdx = savedThemeIdx;
+        }
+        const savedDark = localStorage.getItem('guide_dark_mode');
+        if (savedDark === 'true' || (savedDark === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          isDarkMode = true;
+        }
+      } catch (e) {}
+
+      renderThemeSwatches();
+      applyThemeByIndex(currentThemeIdx);
+      applyDarkMode(isDarkMode, false);
+      renderTools('all');
+      renderOfficialLinks();
+      renderAgents();
+      renderAiTable();
+    })();
+  </script>
 </body>
 </html>
