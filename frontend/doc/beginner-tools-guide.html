@@ -737,6 +737,42 @@ function syncToc(){
 }
 window.addEventListener('scroll', syncToc, { passive: true });
 syncToc();
+
+/* 返回恢复（同 ai-shop 口径）：离开前把滚到的位置记进当前历史记录，返回/前进时精确回到那个位置，页面不重载 */
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+function stampPos(){
+  var st = (history.state && typeof history.state === 'object') ? history.state : {};
+  st.y = window.scrollY;
+  try { history.replaceState(st, '', location.href); } catch (e) {}
+}
+var stampTimer = null;
+window.addEventListener('scroll', function(){
+  if (stampTimer) return;
+  stampTimer = setTimeout(function(){ stampTimer = null; stampPos(); }, 160);
+}, { passive: true });
+function goSection(id, smooth){
+  var el = document.getElementById(id);
+  if (!el) return;
+  window.scrollTo({ top: Math.max(0, el.offsetTop - 24), behavior: smooth ? 'smooth' : 'instant' });
+}
+tocLinks.forEach(function(a){
+  a.addEventListener('click', function(ev){
+    var id = a.getAttribute('href').slice(1);
+    if (!document.getElementById(id)) return;
+    ev.preventDefault();
+    stampPos();
+    history.pushState({ sec: id }, '', '#' + id);
+    goSection(id, true);
+  });
+});
+window.addEventListener('popstate', function(){
+  var st = history.state;
+  if (st && typeof st.y === 'number') window.scrollTo({ top: st.y, behavior: 'instant' });
+  else if (location.hash) goSection(location.hash.slice(1), false);
+  else window.scrollTo({ top: 0, behavior: 'instant' });
+  syncToc();
+});
+stampPos();
 </script>
 </body>
 </html>
