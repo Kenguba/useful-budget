@@ -624,14 +624,6 @@
           <strong class="text-slate-900 dark:text-white">总结：</strong>托管这一层看着有九个，其实只分三种：纯静态的（GitHub Pages、Surge、PinMe）只能放做好的页面；前端加轻函数的（Cloudflare Pages、Vercel、Netlify）还能顺手处理一点简单逻辑；全栈的（Zeabur、Railway、Render）前后端和数据库都能跑；网站越简单，越往前选
         </p>
 
-        <!-- 免费额度预警 -->
-        <div class="rounded-2xl border border-amber-300/80 dark:border-amber-800/70 bg-amber-50/80 dark:bg-amber-950/30 p-4 sm:p-5 text-sm text-amber-950 dark:text-amber-100 leading-relaxed">
-          <div class="font-semibold text-amber-900 dark:text-amber-300 mb-1 flex items-center gap-1.5">
-            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-            免费额度预警（先纠正几个标题党）
-          </div>
-          Railway 不是真免费，新号先给 30 天 5 美元试用，之后免费档每月只剩 1 美元额度，常驻服务基本要上 5 美元/月的 Hobby；Zeabur 免费档主要是让你管理 1 台自己的服务器，算力另外算钱；Vercel 免费档只许个人非商用；PinMe 把页面用到 IPFS 上，免费档整站 1GB，但绑自己的域名要付费档
-        </div>
       </div>
 
       <!-- 1.3 交互式“三问定搭配”决策器 + 三套搭配 -->
@@ -1352,9 +1344,9 @@
         { id: 3, name: 'Vercel', tag: '托管', group: '托管', desc: '前端页面加后端，改完自动上线并给预览网址；Next.js 官方出品；做现代前端和 AI 小站体验最好；免费档只许个人非商用', url: 'https://vercel.com/docs/deployments', label: 'vercel.com/docs/deployments' },
         { id: 4, name: 'Netlify', tag: '托管', group: '托管', desc: '前端页面托管，自带表单收集；老牌好上手；页面要收表单时省事', url: 'https://www.netlify.com', label: 'netlify.com' },
         { id: 5, name: 'Surge', tag: '托管', group: '托管', desc: '一行命令把一个文件夹发到网上；适合临时演示和练手；要会用一点命令行', url: 'https://surge.sh/docs/cli', label: 'surge.sh/docs/cli' },
-        { id: 6, name: 'PinMe', tag: '托管', group: '托管', desc: '上传文件夹或运行一条命令立即上线，免注册；出链接最快；生态较小，绑定自己的域名要付费档，长期正式项目慎用', url: 'https://github.com/glitternetwork/pinme', label: 'github.com/glitternetwork/pinme', sub: '官方仓库' },
-        { id: 7, name: 'Zeabur', tag: '全栈托管', group: '全栈托管', desc: '前端、后端、数据库在一个平台一键部署；中文界面友好；想一家全包的小白首选之一；免费档主要管自己的服务器', url: 'https://zeabur.com/skills', label: 'zeabur.com/skills' },
-        { id: 8, name: 'Railway', tag: '全栈托管', group: '全栈托管', desc: '前端、后端、数据库画布式管理，连几下就跑起完整应用；全栈练手顺手；不是真免费，试用后约 5 美元/月起', url: 'https://railway.com/features', label: 'railway.com/features' },
+        { id: 6, name: 'PinMe', tag: '托管', group: '托管', desc: '上传文件夹或运行一条命令立即上线，免注册；出链接最快；页面实际托管在 IPFS 上，免费档整站 1GB；生态较小，绑定自己的域名要付费档，长期正式项目慎用', url: 'https://github.com/glitternetwork/pinme', label: 'github.com/glitternetwork/pinme', sub: '官方仓库' },
+        { id: 7, name: 'Zeabur', tag: '全栈托管', group: '全栈托管', desc: '前端、后端、数据库在一个平台一键部署；中文界面友好；想一家全包的小白首选之一；免费档主要是让你管理 1 台自己的服务器，算力另外算钱', url: 'https://zeabur.com/skills', label: 'zeabur.com/skills' },
+        { id: 8, name: 'Railway', tag: '全栈托管', group: '全栈托管', desc: '前端、后端、数据库画布式管理，连几下就跑起完整应用；全栈练手顺手；不是真免费：新号先给 30 天 5 美元试用，之后免费档每月只剩 1 美元额度，常驻服务基本要上 5 美元/月的 Hobby', url: 'https://railway.com/features', label: 'railway.com/features' },
         { id: 9, name: 'Render', tag: '全栈托管', group: '全栈托管', desc: '后端服务、定时任务、数据库；跑常驻后端和定时任务；免费档闲置可能休眠，唤醒偏慢', url: 'https://render.com/docs', label: 'render.com/docs' },
         { id: 10, name: 'Cloudflare（平台）', tag: '入口与基础设施', group: '基础与数据', desc: '管域名解析、加速、防护，可跑 Workers、存文件（R2）；几乎每套搭配都用它管域名入口；和 Pages 是同家不同产品', url: 'https://www.cloudflare.com/about', label: 'cloudflare.com/about' },
         { id: 11, name: 'Supabase', tag: '数据与登录', group: '基础与数据', desc: '现成的数据库、用户登录和文件存储，不用自己搭后端；网站要存数据、做登录时配它', url: 'https://supabase.com/docs', label: 'supabase.com/docs' },
