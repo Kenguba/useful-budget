@@ -1765,6 +1765,7 @@
 
       // ==================== 工具详情弹窗 ====================
       const toolModal = document.getElementById('tool-modal');
+      let toolModalPushed = false;
       function openToolModal(id) {
         const t = toolsData.find(x => x.id === id);
         if (!t) return;
@@ -1785,12 +1786,17 @@
         }
         toolModal.classList.add('open');
         document.body.style.overflow = 'hidden';
+        if (!toolModalPushed) { history.pushState({ toolModal: true }, ''); toolModalPushed = true; }
       }
-      function closeToolModal() {
+      function closeToolModal(fromPop) {
         if (!toolModal.classList.contains('open')) return;
         toolModal.classList.remove('open');
         document.body.style.overflow = '';
+        if (toolModalPushed && !fromPop) { toolModalPushed = false; history.back(); }
       }
+      window.addEventListener('popstate', () => {
+        if (toolModal.classList.contains('open')) { toolModalPushed = false; closeToolModal(true); }
+      });
       const toolsGrid = document.getElementById('tools-grid');
       toolsGrid.addEventListener('click', (e) => {
         const card = e.target.closest('[data-tool-id]');
