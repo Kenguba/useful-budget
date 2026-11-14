@@ -486,7 +486,7 @@
         小白建站与 AI 工具选型指南
       </h1>
       <p class="text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed max-w-3xl">
-        这份指南是给刚入门、第一次搭网站和选 AI 工具的人用的：不用先懂服务器，也不用会运维，照着搭配选一套就能开始动手；全文四节：小白建站工具与搭配、带云电脑的 Agent 背后的巨模型、自办虚拟卡选型、国内外 AI 大模型双榜；先看第一节把网站搭起来，再按需要到后面几节挑 AI、办付款用的卡
+        给刚入门、第一次搭网站和选 AI 工具的人：不用先懂服务器，也不用会运维，照着搭配选一套就能动手；全文四节，先看第一节把网站搭起来，再按需要到后面挑 AI、办付款用的卡
       </p>
 
       <!-- Quick Jump Cards (SVG图标 + 标题同行单行，描述完整显示不带省略号) -->
@@ -552,7 +552,7 @@
       <div class="space-y-4">
         <h3 class="text-lg font-semibold text-slate-900 dark:text-white">建站四层架构</h3>
         <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-          先把市场上最常见的建站工具一次看全：一类是 AI 应用里能连接的服务，一类是免费建站清单里的托管平台；两边有重复，合起来 16 个工具，它们不是互相替代的竞品，而是一个网站的不同零件；先记住一句话：<strong>页面放哪、数据存哪、AI 用谁、重复劳动交给谁</strong>，四个问题各选一个工具，就是一套完整搭配；只做展示页时只需要第一个，其余三层按需要再加，不要一上来全装上
+          最常见的建站工具合起来 16 个，不是互相替代的竞品，而是一个网站的不同零件；记住一句话：<strong>页面放哪、数据存哪、AI 用谁、重复劳动交给谁</strong>，四个问题各选一个就是一套完整搭配，只做展示页时只需要第一个，其余三层按需再加
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -588,6 +588,7 @@
               <span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">Cloudflare (Workers 与 R2)</span>
               <span class="px-2 py-1 rounded-md bg-slate-100/70 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400">Zeabur / Railway / Render 亦可兼任</span>
             </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">这里的 Cloudflare 是平台本体：管域名解析、加速和防护，还能跑 Workers 小程序、存文件；第一层的 Cloudflare Pages 是它出的页面托管产品</p>
           </div>
 
           <div class="theme-surface rounded-2xl border p-5 shadow-sm">
@@ -618,9 +619,7 @@
           </div>
         </div>
 
-        <div class="rounded-2xl border border-blue-200/80 dark:border-blue-900/60 theme-tag-pill p-4 text-sm leading-relaxed">
-          <span class="font-semibold">特别提示：</span>Cloudflare 单独说一句：它既是第一张图里的平台本体（管域名解析、加速和防护，还能跑 Workers 小程序、存文件），也是 Cloudflare Pages 的出品方；Pages 是它的页面托管产品，两者是同一家公司的不同产品，不要当成两个重复选项
-        </div>
+        
       </div>
 
       <!-- 1.2 16 个工具一览（带交互筛选） -->
@@ -638,6 +637,26 @@
             <button type="button" data-filter="基础与数据" class="tool-filter-btn px-2.5 py-1 rounded-full text-xs font-medium theme-surface border text-slate-600 dark:text-slate-300 transition-colors">基础与数据 (2)</button>
             <button type="button" data-filter="AI 大脑" class="tool-filter-btn px-2.5 py-1 rounded-full text-xs font-medium theme-surface border text-slate-600 dark:text-slate-300 transition-colors">AI 大脑 (2)</button>
             <button type="button" data-filter="自动化与抓取" class="tool-filter-btn px-2.5 py-1 rounded-full text-xs font-medium theme-surface border text-slate-600 dark:text-slate-300 transition-colors">自动化与抓取 (3)</button>
+          </div>
+        </div>
+
+        <!-- 1.2 工具一览首位：Cloudflare 免费全家桶（默认收缩，随筛选显示：全部 / 托管时出现） -->
+        <div id="cf-free-block" class="theme-surface rounded-2xl border overflow-hidden">
+          <button id="cf-free-toggle" type="button" aria-expanded="false" class="w-full flex items-center justify-between gap-3 p-4 text-left">
+            <span class="min-w-0">
+              <span class="block text-lg font-semibold text-slate-900 dark:text-white">Cloudflare 免费全家桶</span>
+              <span class="block text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">建站要用的整套基建一家凑齐，全免费起步；点开看每一项的免费额度和官方直达链接</span>
+            </span>
+            <span class="flex items-center gap-2 shrink-0">
+              <span id="cf-free-count" class="text-xs font-medium text-slate-500 dark:text-slate-400"></span>
+              <svg id="cf-free-chevron" class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
+          </button>
+          <div id="cf-free-body" class="hidden border-t border-slate-200 dark:border-slate-700/60 p-3 sm:p-4">
+            <div id="cf-free-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-3">额度按 2026-11 的官方口径写，官方会不时调整，动手前点直达链接看一眼现行数字；唯一硬提醒：域名开了橙云代理后，国内访问会绕到海外节点，延迟比国内云高，图省钱就要接受这一点</p>
           </div>
         </div>
 
@@ -819,26 +838,6 @@
       <div class="space-y-3">
         <h3 class="text-lg font-semibold text-slate-900 dark:text-white">16 个工具官网链接清单</h3>
         <div id="official-links-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5"></div>
-      </div>
-
-      <!-- 1.5 Cloudflare 免费全家桶（默认收缩） -->
-      <div class="theme-surface rounded-2xl border overflow-hidden">
-        <button id="cf-free-toggle" type="button" aria-expanded="false" class="w-full flex items-center justify-between gap-3 p-4 text-left">
-          <span class="min-w-0">
-            <span class="block text-lg font-semibold text-slate-900 dark:text-white">Cloudflare 免费全家桶</span>
-            <span class="block text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">建站要用的整套基建一家凑齐，全免费起步；点开看每一项的免费额度和官方直达链接</span>
-          </span>
-          <span class="flex items-center gap-2 shrink-0">
-            <span id="cf-free-count" class="text-xs font-medium text-slate-500 dark:text-slate-400"></span>
-            <svg id="cf-free-chevron" class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-          </span>
-        </button>
-        <div id="cf-free-body" class="hidden border-t border-slate-200 dark:border-slate-700/60 p-3 sm:p-4">
-          <div id="cf-free-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
-          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-3">额度按 2026-11 的官方口径写，官方会不时调整，动手前点直达链接看一眼现行数字；唯一硬提醒：域名开了橙云代理后，国内访问会绕到海外节点，延迟比国内云高，图省钱就要接受这一点</p>
-        </div>
       </div>
     </section>
 
@@ -1094,7 +1093,7 @@
       </div>
 
       <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-        国外和国内主要的 AI 全收进来：一共 24 家，国外 10 家、国内 14 家，口径是市面上主流、初学者最常接触到的巨模型厂商，一个不落；这一节不混排，做成两张榜：热度决定生态与顺手程度，智能度决定上限，两件事差别很大（比如 Meta AI 热度靠前但智能不在第一梯队，Claude 正好反过来）；每家都带代表产品或模型、一句话特长与建站用途；第一节搭配里 AI 站在第三层「AI 大脑」的位置，选大脑时对照这两张榜挑
+        国外和国内主流的 AI 厂商全收进来：一共 24 家，国外 10 家、国内 14 家，做成热度和智能度两张榜——热度决定生态与顺手程度，智能度决定上限；每家带代表产品、一句话特长与建站用途，选「AI 大脑」时对照着挑
       </p>
 
       <!-- Tab Switcher + Region Filter + Search -->
@@ -1405,7 +1404,7 @@
       // ==================== 原有指南数据 ====================
       const toolsData = [
         { id: 1, name: 'GitHub Pages', tag: '托管', group: '托管', desc: '代码仓库直接变成网站，只放静态页面；最稳的免费静态托管；不能跑后端，适合个人主页和文档站', url: 'https://pages.github.com', label: 'pages.github.com' },
-        { id: 2, name: 'Cloudflare Pages', tag: '托管', group: '托管', desc: '静态页面加轻量函数，全球节点分发；免费额度大方、速度快；已有 Cloudflare 账号最顺手', url: 'https://www.cloudflare.com/products/pages', label: 'cloudflare.com/products/pages' },
+        { id: 2, name: 'Cloudflare Pages', tag: '托管', group: '托管', desc: '静态页面加轻量函数，全球节点分发；免费额度大方、速度快；已有 Cloudflare 账号最顺手；Cloudflare 本体管域名解析、加速和防护，Pages 是它出的页面托管产品，同公司不同产品，别当成重复选项', url: 'https://www.cloudflare.com/products/pages', label: 'cloudflare.com/products/pages' },
         { id: 3, name: 'Vercel', tag: '托管', group: '托管', desc: '前端页面加后端，改完自动上线并给预览网址；Next.js 官方出品；做现代前端和 AI 小站体验最好；免费档只许个人非商用', url: 'https://vercel.com/docs/deployments', label: 'vercel.com/docs/deployments' },
         { id: 4, name: 'Netlify', tag: '托管', group: '托管', desc: '前端页面托管，自带表单收集；老牌好上手；页面要收表单时省事', url: 'https://www.netlify.com', label: 'netlify.com' },
         { id: 5, name: 'Surge', tag: '托管', group: '托管', desc: '一行命令把一个文件夹发到网上；适合临时演示和练手；要会用一点命令行', url: 'https://surge.sh/docs/cli', label: 'surge.sh/docs/cli' },
@@ -1529,6 +1528,8 @@
             </div>
           </div>
         `).join('');
+        const cfBlock = document.getElementById('cf-free-block');
+        if (cfBlock) cfBlock.style.display = (filterGroup === 'all' || filterGroup === '托管') ? '' : 'none';
       }
 
       function renderOfficialLinks() {
