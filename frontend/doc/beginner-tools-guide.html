@@ -625,26 +625,6 @@
         </div>
       </div>
 
-      <!-- Cloudflare 免费全家桶（独立块，位于 16 个工具一览之前，默认收缩，随筛选显示：全部 / 托管时出现） -->
-      <div id="cf-free-block" class="theme-surface rounded-2xl border overflow-hidden">
-        <button id="cf-free-toggle" type="button" aria-expanded="false" class="w-full flex items-center justify-between gap-3 p-4 text-left">
-          <span class="min-w-0">
-            <span class="block text-lg font-semibold text-slate-900 dark:text-white">Cloudflare 免费全家桶</span>
-            <span class="block text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">建站要用的整套基建一家凑齐，全免费起步；点开看每一项的免费额度和官方直达链接</span>
-          </span>
-          <span class="flex items-center gap-2 shrink-0">
-            <span id="cf-free-count" class="text-xs font-medium text-slate-500 dark:text-slate-400"></span>
-            <svg id="cf-free-chevron" class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-          </span>
-        </button>
-        <div id="cf-free-body" class="hidden border-t border-slate-200 dark:border-slate-700/60 p-3 sm:p-4">
-          <div id="cf-free-grid" class="divide-y divide-slate-200 dark:divide-slate-700/60"></div>
-          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-3">额度按 2026-11 的官方口径写，官方会不时调整，动手前点直达链接看一眼现行数字；唯一硬提醒：域名开了橙云代理后，国内访问会绕到海外节点，延迟比国内云高，图省钱就要接受这一点</p>
-        </div>
-      </div>
-
       <!-- 1.2 16 个工具一览（带交互筛选） -->
       <div class="space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
@@ -663,7 +643,27 @@
           </div>
         </div>
 
-                <div id="tools-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5"></div>
+        <!-- Cloudflare 免费全家桶：16 个工具一览的第一位（默认收缩，随筛选显示：全部 / 托管时出现） -->
+        <div id="cf-free-block" class="theme-surface rounded-2xl border overflow-hidden">
+          <button id="cf-free-toggle" type="button" aria-expanded="false" class="w-full flex items-center justify-between gap-3 p-4 text-left">
+            <span class="min-w-0">
+              <span class="block text-lg font-semibold text-slate-900 dark:text-white">Cloudflare 免费全家桶</span>
+              <span class="block text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">建站要用的整套基建一家凑齐，全免费起步；点开看每一项的免费额度和官方直达链接</span>
+            </span>
+            <span class="flex items-center gap-2 shrink-0">
+              <span id="cf-free-count" class="text-xs font-medium text-slate-500 dark:text-slate-400"></span>
+              <svg id="cf-free-chevron" class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
+          </button>
+          <div id="cf-free-body" class="hidden border-t border-slate-200 dark:border-slate-700/60 p-3 sm:p-4">
+            <div id="cf-free-grid" class="divide-y divide-slate-200 dark:divide-slate-700/60"></div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-3">额度按 2026-11 的官方口径写，官方会不时调整，动手前点直达链接看一眼现行数字；唯一硬提醒：域名开了橙云代理后，国内访问会绕到海外节点，延迟比国内云高，图省钱就要接受这一点</p>
+          </div>
+        </div>
+
+        <div id="tools-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5"></div>
 
         <p class="text-sm text-slate-600 dark:text-slate-300 theme-surface rounded-2xl border p-4 leading-relaxed">
           <strong class="text-slate-900 dark:text-white">总结：</strong>托管这一层看着有九个，其实只分三种：纯静态的（GitHub Pages、Surge、PinMe）只能放做好的页面；前端加轻函数的（Cloudflare Pages、Vercel、Netlify）还能顺手处理一点简单逻辑；全栈的（Zeabur、Railway、Render）前后端和数据库都能跑；网站越简单，越往前选
