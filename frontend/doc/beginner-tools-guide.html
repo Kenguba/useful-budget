@@ -1554,8 +1554,8 @@
       const cfFreeData = [
         { name: 'DNS 解析与安全防护', desc: '域名解析托管到 Cloudflare，秒级生效；开启橙云代理后自带全球 CDN、DDoS 防护与免费 SSL，流量不计量收费', url: 'https://developers.cloudflare.com/dns/', label: 'developers.cloudflare.com/dns' },
         { name: 'Pages 前端托管', desc: '静态网站免费托管，站点数与流量不限；每月 500 次构建，单站最多 2 万个文件、单文件 25MB', url: 'https://developers.cloudflare.com/pages/', label: 'developers.cloudflare.com/pages' },
-        { name: 'Workers 后端计算', desc: '边缘函数跑接口和轻量后端，每天 10 万次请求免费，单次 10ms CPU；它托管的静态资源不占这个额度', url: 'https://developers.cloudflare.com/workers/', label: 'developers.cloudflare.com/workers' },
-        { name: 'R2 文件存储', desc: '对象存储 10GB 免费，出站流量不收费；每月 100 万次写入类、1000 万次读取类操作；开通前要先给账户绑一张支付方式，免费额度内不扣费', url: 'https://developers.cloudflare.com/r2/', label: 'developers.cloudflare.com/r2' },
+        { name: 'Workers 后端计算', desc: '边缘函数跑接口和轻量后端，每天 10 万次请求免费，单次 10ms CPU；它托管的静态资源不占这个额度；自带的 Workflows 能把长任务拆成多步跑，休眠时不耗算力，免费版也能用', url: 'https://developers.cloudflare.com/workers/', label: 'developers.cloudflare.com/workers' },
+        { name: 'R2 文件存储', desc: '对象存储 10GB 免费，出站流量不收费；每月 100 万次写入类、1000 万次读取类操作；开通前要先给账户绑一张支付方式，免费额度内不扣费；注意免费额度只适用于 Standard 存储', url: 'https://developers.cloudflare.com/r2/', label: 'developers.cloudflare.com/r2' },
         { name: 'D1 数据库', desc: 'SQLite 语法的边缘数据库，总存储 5GB；每天可读 500 万行、写 10 万行，不用自己运维', url: 'https://developers.cloudflare.com/d1/', label: 'developers.cloudflare.com/d1' },
         { name: 'Workers KV 键值存储', desc: '存配置、缓存和会话这类小数据；每天读 10 万次、写 1000 次，总量 1GB', url: 'https://developers.cloudflare.com/kv/', label: 'developers.cloudflare.com/kv' },
         { name: 'Tunnel 内网穿透', desc: '把家里或本地电脑上的服务安全地发布到公网，不用公网 IP、不用开路由器端口，免费', url: 'https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/', label: 'developers.cloudflare.com/cloudflare-one' },
@@ -1563,7 +1563,8 @@
         { name: '邮件路由', desc: '把域名邮箱收到的信免费转发到你的常用邮箱，拥有 me@你的域名 这种地址不用买企业邮箱', url: 'https://developers.cloudflare.com/email-routing/', label: 'developers.cloudflare.com/email-routing' },
         { name: 'Workers AI', desc: '在边缘直接调用开源大模型，每天送 1 万个神经元的免费额度，练手和小功能够用', url: 'https://developers.cloudflare.com/workers-ai/', label: 'developers.cloudflare.com/workers-ai' },
         { name: 'AI Gateway', desc: '给各家 AI 接口加一层免费网关：缓存、限流、重试和用量日志都有，能省调用费', url: 'https://developers.cloudflare.com/ai-gateway/', label: 'developers.cloudflare.com/ai-gateway' },
-        { name: 'Wrangler 命令行', desc: '官方命令行工具，部署 Workers 和 Pages、管理 D1、R2、KV 都靠它，一条命令上线', url: 'https://developers.cloudflare.com/workers/wrangler/', label: 'developers.cloudflare.com/workers/wrangler' }
+        { name: 'Wrangler 命令行', desc: '官方命令行工具，部署 Workers 和 Pages、管理 D1、R2、KV 都靠它，一条命令上线', url: 'https://developers.cloudflare.com/workers/wrangler/', label: 'developers.cloudflare.com/workers/wrangler' },
+        { name: 'Agent Skills 官方技能包', desc: 'Cloudflare 官方给 AI 编程助手出的开源技能仓库：把 Workers、Wrangler、D1、R2、Turnstile 等的规范写法打包好，装进你的 Agent 工具，它写出来的代码就不容易跑偏', url: 'https://github.com/cloudflare/skills', label: 'github.com/cloudflare/skills' }
       ];
 
       function renderCfFree() {
