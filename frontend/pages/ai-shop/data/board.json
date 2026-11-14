@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-15 05:06",
+ "updated_at": "2026-11-15 05:18",
  "source": "AI价网 + cardnav + PriceAI + aibijia + 16688/aicdks/catfk 直拉 按商家遍历合并",
  "groups": [
   {
@@ -2883,10 +2883,10 @@
       },
       {
        "price": 15.23,
-       "shop": "牟利ai",
+       "shop": "精选好货AI",
        "platform": "链动小铺",
        "stock": 38,
-       "url": "https://wzyp.cn/item/fbiga5"
+       "url": "https://wzyp.cn/item/25tihz"
       },
       {
        "price": 15.53,
@@ -3092,6 +3092,13 @@
        "url": "https://wzyp.cn/item/s9jy51"
       },
       {
+       "price": 18.59,
+       "shop": "牟利ai",
+       "platform": "链动小铺",
+       "stock": 38,
+       "url": "https://wzyp.cn/item/fbiga5"
+      },
+      {
        "price": 19.08,
        "shop": "🐓PT-Plus",
        "platform": "链动小铺",
@@ -3125,13 +3132,6 @@
        "platform": "链动小铺",
        "stock": 37,
        "url": "https://wzyp.cn/item/m7wzp1"
-      },
-      {
-       "price": 19.68,
-       "shop": "精选好货AI",
-       "platform": "链动小铺",
-       "stock": 38,
-       "url": "https://wzyp.cn/item/25tihz"
       },
       {
        "price": 19.79,
@@ -8712,32 +8712,6 @@
     },
     {
      "price": 150.0,
-     "shop": "香蕉",
-     "platform": "catfk",
-     "stock": 10,
-     "title": "Claude Pro IOS 渠道月卡",
-     "url": "https://catfk.com/item/njkfyu",
-     "kind": "Pro·成品号",
-     "same_source": 2,
-     "sources": [
-      {
-       "price": 150.0,
-       "shop": "香蕉",
-       "platform": "catfk",
-       "stock": 10,
-       "url": "https://catfk.com/item/njkfyu"
-      },
-      {
-       "price": 168.0,
-       "shop": "快到碗里来",
-       "platform": "云猫寄售",
-       "stock": 10,
-       "url": "https://catfk.com/item/5gs00k"
-      }
-     ]
-    },
-    {
-     "price": 150.0,
      "shop": "TxyxT小店",
      "platform": "",
      "stock": 7,
@@ -8776,6 +8750,32 @@
        "platform": "16688",
        "stock": null,
        "url": "https://16688.com.cn/goods/G61291628"
+      }
+     ]
+    },
+    {
+     "price": 150.0,
+     "shop": "香蕉",
+     "platform": "catfk",
+     "stock": 10,
+     "title": "Claude Pro IOS 渠道月卡",
+     "url": "https://catfk.com/item/njkfyu",
+     "kind": "Pro·成品号",
+     "same_source": 2,
+     "sources": [
+      {
+       "price": 150.0,
+       "shop": "香蕉",
+       "platform": "catfk",
+       "stock": 10,
+       "url": "https://catfk.com/item/njkfyu"
+      },
+      {
+       "price": 168.0,
+       "shop": "快到碗里来",
+       "platform": "catfk",
+       "stock": 10,
+       "url": "https://catfk.com/item/5gs00k"
       }
      ]
     },
@@ -11778,6 +11778,32 @@
      ]
     },
     {
+     "price": 5.0,
+     "shop": "我不是号神",
+     "platform": "链动小铺",
+     "stock": 8,
+     "title": "Muse AI 10亿token 成品号",
+     "url": "https://wzyp.cn/item/vaeaey",
+     "kind": "10亿·成品号",
+     "same_source": 2,
+     "sources": [
+      {
+       "price": 5.0,
+       "shop": "我不是号神",
+       "platform": "链动小铺",
+       "stock": 8,
+       "url": "https://wzyp.cn/item/vaeaey"
+      },
+      {
+       "price": 18.0,
+       "shop": "源头AI - Bot",
+       "platform": "链动小铺",
+       "stock": 2,
+       "url": "https://wzyp.cn/item/tuf4jm"
+      }
+     ]
+    },
+    {
      "price": 5.5,
      "shop": "G小铺",
      "platform": "链动小铺",
@@ -11848,17 +11874,6 @@
     },
     {
      "price": 5.5,
-     "shop": "快到碗里来",
-     "platform": "云猫寄售",
-     "stock": 12,
-     "title": "【自营主推】Muse10亿token成品号",
-     "url": "https://catfk.com/item/5hg3f6",
-     "kind": "10亿·成品号",
-     "same_source": 1,
-     "pc": "2026-11-12"
-    },
-    {
-     "price": 5.5,
      "shop": "哈哈哈的云小店",
      "platform": "云猫寄售",
      "stock": 65,
@@ -11876,6 +11891,17 @@
      "url": "https://www.16688.com.cn/goods/G94992864",
      "kind": "成品号",
      "same_source": 1
+    },
+    {
+     "price": 5.5,
+     "shop": "快到碗里来",
+     "platform": "catfk",
+     "stock": 12,
+     "title": "【自营主推】Muse10亿token成品号",
+     "url": "https://catfk.com/item/5hg3f6",
+     "kind": "10亿·成品号",
+     "same_source": 1,
+     "pc": "2026-11-12"
     },
     {
      "price": 6.0,
@@ -11992,17 +12018,6 @@
      "url": "https://www.16688.com.cn/goods/G29122242",
      "kind": "10亿·成品号",
      "same_source": 1
-    },
-    {
-     "price": 8.19,
-     "shop": "🏆51XUEAI.ORG",
-     "platform": "",
-     "stock": 1,
-     "title": "质保首登 Muse AI -31 Billion Tokens  ( 310亿TOKEN代币)（无质保）成品号 只包首登，秒封别找，是环境问题",
-     "url": "https://www.51xueai.org/products/Muse AI",
-     "kind": "310亿·成品号",
-     "same_source": 1,
-     "pc": "2026-11-14"
     }
    ]
   },
@@ -17554,11 +17569,6 @@
    150.0,
    1
   ],
-  "catfk:njkfyu": [
-   29896773,
-   150.0,
-   1
-  ],
   "https://shop.txyxt.dpdns.org/products/claude-pro-cz": [
    29896773,
    150.0,
@@ -17566,6 +17576,11 @@
   ],
   "16688:G59763962": [
    29903126,
+   150.0,
+   1
+  ],
+  "catfk:njkfyu": [
+   29896773,
    150.0,
    1
   ],
@@ -18185,6 +18200,11 @@
    4.4,
    1
   ],
+  "wzyp:vaeaey": [
+   29896832,
+   5.0,
+   3
+  ],
   "wzyp:k6mqvu": [
    29896832,
    10.0,
@@ -18202,6 +18222,16 @@
    5.5,
    3
   ],
+  "catfk:72unyn": [
+   29899944,
+   5.5,
+   1
+  ],
+  "16688:G94992864": [
+   29909136,
+   5.5,
+   1
+  ],
   "catfk:5hg3f6": [
    29900178,
    11.0,
@@ -18210,16 +18240,6 @@
    8.0,
    1,
    2632,
-   5.5,
-   1
-  ],
-  "catfk:72unyn": [
-   29899944,
-   5.5,
-   1
-  ],
-  "16688:G94992864": [
-   29909136,
    5.5,
    1
   ],
@@ -18265,59 +18285,6 @@
   "16688:G29122242": [
    29896832,
    8.0,
-   1
-  ],
-  "https://51xueai.org/products/Muse AI": [
-   29896832,
-   9.45,
-   1,
-   847,
-   9.87,
-   1,
-   499,
-   8.36,
-   1,
-   922,
-   9.87,
-   1,
-   241,
-   8.86,
-   1,
-   127,
-   8.28,
-   1,
-   1864,
-   8.11,
-   1,
-   1122,
-   8.28,
-   1,
-   478,
-   8.11,
-   1,
-   4856,
-   9.87,
-   1,
-   215,
-   8.95,
-   1,
-   352,
-   10.21,
-   1,
-   549,
-   8.95,
-   1,
-   60,
-   9.87,
-   1,
-   1487,
-   9.79,
-   1,
-   270,
-   9.45,
-   1,
-   419,
-   8.19,
    1
   ],
   "wzyp:m96hgl": [
