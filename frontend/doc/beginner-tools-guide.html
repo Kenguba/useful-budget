@@ -1725,6 +1725,11 @@
           backToTopBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
         }
 
+        // 滚到最顶且地址还带着章节锚点时，把锚点抹掉（同 ai-shop 口径）：地址变干净，之后按返回不会再被定位回那个锚点
+        if (scrollTop <= 0 && location.hash) {
+          try { history.replaceState(null, '', location.pathname + location.search); } catch (err) {}
+        }
+
       }, { passive: true });
 
       backToTopBtn.addEventListener('click', () => {
