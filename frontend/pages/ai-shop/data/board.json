@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-14 08:06",
+ "updated_at": "2026-11-14 08:18",
  "source": "AI价网 + cardnav + PriceAI + aibijia + 16688/aicdks/catfk 直拉 按商家遍历合并",
  "groups": [
   {
@@ -7932,17 +7932,17 @@
       },
       {
        "price": 132.0,
+       "shop": "AI小铺",
+       "platform": "云猫寄售",
+       "stock": 51,
+       "url": "https://catfk.com/item/e971xc"
+      },
+      {
+       "price": 132.0,
        "shop": "商家4361",
        "platform": "catfk",
        "stock": 51,
        "url": "https://catfk.com/item/tbbecm"
-      },
-      {
-       "price": 132.0,
-       "shop": "AI小铺",
-       "platform": "catfk",
-       "stock": 51,
-       "url": "https://catfk.com/item/e971xc"
       }
      ]
     },
@@ -11760,6 +11760,33 @@
      "same_source": 1
     },
     {
+     "price": 2.09,
+     "shop": "MAXAI666",
+     "platform": "16688",
+     "stock": 21,
+     "title": "Muse 10亿token成品号 美日新混区手搓注册  质保24小时",
+     "url": "https://www.16688.com.cn/goods/G57944183",
+     "kind": "10亿·成品号",
+     "same_source": 2,
+     "sources": [
+      {
+       "price": 2.09,
+       "shop": "MAXAI666",
+       "platform": "16688",
+       "stock": 21,
+       "url": "https://www.16688.com.cn/goods/G57944183"
+      },
+      {
+       "price": 2.4,
+       "shop": "爱搜 AISO",
+       "platform": "16688",
+       "stock": 21,
+       "url": "https://www.16688.com.cn/goods/G75885530"
+      }
+     ],
+     "pc": "2026-11-13"
+    },
+    {
      "price": 2.4,
      "shop": "爱搜 AISO",
      "platform": "16688",
@@ -12121,6 +12148,16 @@
      "pc": "2026-11-12"
     },
     {
+     "price": 5.9,
+     "shop": "【胖东来】阿度AI超市",
+     "platform": "16688",
+     "stock": 10,
+     "title": "【24小时质保】MUSE成品账号｜10亿Token｜平价入门款",
+     "url": "https://www.16688.com.cn/goods/G80817758",
+     "kind": "10亿·成品号",
+     "same_source": 1
+    },
+    {
      "price": 6.0,
      "shop": "AI代充源头（招代理）",
      "platform": "链动小铺",
@@ -12207,26 +12244,6 @@
      "title": "Muse 10亿词元【成品号】",
      "url": "https://yufenggpt.com/item/27",
      "kind": "10亿·成品号",
-     "same_source": 1
-    },
-    {
-     "price": 8.0,
-     "shop": "跳跳的AI店铺",
-     "platform": "16688",
-     "stock": 13,
-     "title": "Muse AI 10亿token成品号（类似于bot）",
-     "url": "https://www.16688.com.cn/goods/G29122242",
-     "kind": "10亿·成品号",
-     "same_source": 1
-    },
-    {
-     "price": 9.0,
-     "shop": "解郁杂货店",
-     "platform": "",
-     "stock": null,
-     "title": "Muse 300亿成品号 · 默认规格",
-     "url": "https://shop.xujunjiong.cc/products/muse_300",
-     "kind": "成品号",
      "same_source": 1
     }
    ]
@@ -18056,6 +18073,17 @@
    2.0,
    3
   ],
+  "16688:G57944183": [
+   29904642,
+   2.09,
+   1,
+   743,
+   1.65,
+   1,
+   3370,
+   2.09,
+   1
+  ],
   "16688:G53963436": [
    29909121,
    2.4,
@@ -18205,6 +18233,11 @@
    5.5,
    1
   ],
+  "16688:G80817758": [
+   29909725,
+   5.9,
+   1
+  ],
   "wzyp:znpluq": [
    29898964,
    6.0,
@@ -18247,16 +18280,6 @@
   "https://yufenggpt.com/item/27": [
    29896832,
    8.0,
-   1
-  ],
-  "16688:G29122242": [
-   29896832,
-   8.0,
-   1
-  ],
-  "https://shop.xujunjiong.cc/products/muse_300": [
-   29906901,
-   9.0,
    1
   ],
   "wzyp:m96hgl": [
