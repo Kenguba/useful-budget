@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-14 12:06",
+ "updated_at": "2026-11-14 12:10",
  "source": "AI价网 + cardnav + PriceAI + aibijia + 16688/aicdks/catfk 直拉 按商家遍历合并",
  "groups": [
   {
@@ -659,6 +659,47 @@
       }
      ],
      "pc": "2026-11-14"
+    },
+    {
+     "price": 19.0,
+     "shop": "LF-Plus小铺",
+     "platform": "16688",
+     "stock": 1,
+     "title": "🚀源头 PLUS成品账号-未接🐎 质保1h -账密2FA 指纹+家宽注册，诚招代理",
+     "url": "https://www.16688.com.cn/goods/G96943828",
+     "kind": "",
+     "same_source": 4,
+     "sources": [
+      {
+       "price": 19.0,
+       "shop": "LF-Plus小铺",
+       "platform": "16688",
+       "stock": 1,
+       "url": "https://www.16688.com.cn/goods/G96943828"
+      },
+      {
+       "price": 20.9,
+       "shop": "梦泽Ai",
+       "platform": "16688",
+       "stock": 1,
+       "url": "https://www.16688.com.cn/goods/G14312722"
+      },
+      {
+       "price": 20.9,
+       "shop": "爱搜 AISO",
+       "platform": "16688",
+       "stock": 1,
+       "url": "https://www.16688.com.cn/goods/G20080755"
+      },
+      {
+       "price": 21.0,
+       "shop": "凌小创ai",
+       "platform": "16688",
+       "stock": 1,
+       "url": "https://www.16688.com.cn/goods/G39731897"
+      }
+     ],
+     "pc": "2026-11-13"
     },
     {
      "price": 19.0,
@@ -1929,40 +1970,6 @@
      "kind": "",
      "same_source": 1,
      "pc": "2026-11-14"
-    },
-    {
-     "price": 20.9,
-     "shop": "梦泽Ai",
-     "platform": "16688",
-     "stock": 1,
-     "title": "🚀源头 PLUS成品账号-未接🐎 质保1h -账密2FA 指纹+家宽注册，诚招代理",
-     "url": "https://www.16688.com.cn/goods/G14312722",
-     "kind": "",
-     "same_source": 3,
-     "sources": [
-      {
-       "price": 20.9,
-       "shop": "梦泽Ai",
-       "platform": "16688",
-       "stock": 1,
-       "url": "https://www.16688.com.cn/goods/G14312722"
-      },
-      {
-       "price": 20.9,
-       "shop": "爱搜 AISO",
-       "platform": "16688",
-       "stock": 1,
-       "url": "https://www.16688.com.cn/goods/G20080755"
-      },
-      {
-       "price": 21.0,
-       "shop": "凌小创ai",
-       "platform": "16688",
-       "stock": 1,
-       "url": "https://www.16688.com.cn/goods/G39731897"
-      }
-     ],
-     "pc": "2026-11-13"
     }
    ]
   },
@@ -6101,7 +6108,7 @@
      "price": 13.88,
      "shop": "新教长",
      "platform": "16688",
-     "stock": 22,
+     "stock": 23,
      "title": "Gemini白号(不带Pro)｜Antigravity包反重力直登｜谷歌邮箱+2FA+RT自动发货 保首登",
      "url": "https://www.16688.com.cn/goods/G55013821",
      "kind": "成品号",
@@ -6111,7 +6118,7 @@
        "price": 13.88,
        "shop": "新教长",
        "platform": "16688",
-       "stock": 21,
+       "stock": 23,
        "url": "https://www.16688.com.cn/goods/G55013821"
       },
       {
@@ -7062,27 +7069,11 @@
      "price": 50.0,
      "shop": "byy",
      "platform": "catfk",
-     "stock": 1173,
-     "title": "Antigravity半年6个月成品号 包反重力Gemini Pro（已经过验证 带JS格式 带RT）【保一个月】",
+     "stock": 1172,
+     "title": "【保首登】Antigravity3/6个月成品号三或六个月 包反重力Gemini Pro（已经过验证 带RT）",
      "url": "https://catfk.com/item/3q0kyf",
      "kind": "成品号",
-     "same_source": 2,
-     "sources": [
-      {
-       "price": 50.0,
-       "shop": "byy",
-       "platform": "catfk",
-       "stock": 1173,
-       "url": "https://catfk.com/item/3q0kyf"
-      },
-      {
-       "price": 59.4,
-       "shop": "👑NEON AI｜霓虹玩家AI👑(专注精品✨)🔥",
-       "platform": "云猫寄售",
-       "stock": 1173,
-       "url": "https://catfk.com/item/u776m6"
-      }
-     ]
+     "same_source": 1
     },
     {
      "price": 55.0,
@@ -7103,6 +7094,17 @@
      "url": "https://catfk.com/item/symofd",
      "kind": "成品号",
      "same_source": 1
+    },
+    {
+     "price": 59.4,
+     "shop": "👑NEON AI｜霓虹玩家AI👑(专注精品✨)🔥",
+     "platform": "云猫寄售",
+     "stock": 1173,
+     "title": "Antigravity半年6个月成品号 包反重力Gemini Pro（已经过验证 带JS格式 带RT）【保一个月】",
+     "url": "https://catfk.com/item/u776m6",
+     "kind": "成品号",
+     "same_source": 1,
+     "pc": "2026-11-09"
     },
     {
      "price": 60.75,
@@ -7238,16 +7240,6 @@
      "stock": 23,
      "title": "Google AI Pro 一年成品号【十年老号 限时半价 质保一月 可用Antigravity】",
      "url": "https://of365.vip/product/18.html",
-     "kind": "成品号",
-     "same_source": 1
-    },
-    {
-     "price": 198.0,
-     "shop": "毛毛De地理空间",
-     "platform": "链动小铺",
-     "stock": 24,
-     "title": "Antigravity Pro 账号已过验证",
-     "url": "https://wzyp.cn/item/x5dao8",
      "kind": "成品号",
      "same_source": 1
     }
@@ -9346,7 +9338,7 @@
      "price": 0.45,
      "shop": "喵喵ai",
      "platform": "16688",
-     "stock": 462,
+     "stock": 461,
      "title": "Codex 自动接马服务｜卡密自助提交｜codex 接马 自动接🐎  自助接🐎",
      "url": "https://www.16688.com.cn/goods/G12469792",
      "kind": "",
@@ -9356,7 +9348,7 @@
        "price": 0.45,
        "shop": "喵喵ai",
        "platform": "16688",
-       "stock": 462,
+       "stock": 461,
        "url": "https://www.16688.com.cn/goods/G12469792"
       },
       {
@@ -9370,21 +9362,21 @@
        "price": 0.5,
        "shop": "梦泽Ai",
        "platform": "16688",
-       "stock": 462,
+       "stock": 461,
        "url": "https://www.16688.com.cn/goods/G34215937"
       },
       {
        "price": 0.5,
        "shop": "👑XAI店铺（全品类✨超市）🔥",
        "platform": "16688",
-       "stock": 462,
+       "stock": 461,
        "url": "https://www.16688.com.cn/goods/G14218682"
       },
       {
        "price": 0.56,
        "shop": "AI OPC",
        "platform": "16688",
-       "stock": 462,
+       "stock": 461,
        "url": "https://www.16688.com.cn/goods/G77033937"
       },
       {
@@ -9398,56 +9390,56 @@
        "price": 0.59,
        "shop": "xueluon",
        "platform": "16688",
-       "stock": 462,
+       "stock": 461,
        "url": "https://www.16688.com.cn/goods/G44146534"
       },
       {
        "price": 0.85,
        "shop": "珠世AI",
        "platform": "16688",
-       "stock": 462,
+       "stock": 461,
        "url": "https://www.16688.com.cn/goods/G48299883"
       },
       {
        "price": 0.9,
        "shop": "ai聚合--分销码 ADEFAI",
        "platform": "16688",
-       "stock": 462,
+       "stock": 461,
        "url": "https://www.16688.com.cn/goods/G74358182"
       },
       {
        "price": 0.95,
        "shop": "华润",
        "platform": "16688",
-       "stock": 462,
+       "stock": 461,
        "url": "https://www.16688.com.cn/goods/G33685746"
       },
       {
        "price": 0.95,
        "shop": "爱搜 AISO",
        "platform": "16688",
-       "stock": 462,
+       "stock": 461,
        "url": "https://www.16688.com.cn/goods/G53658383"
       },
       {
        "price": 1.0,
        "shop": "天才AI",
        "platform": "16688",
-       "stock": 462,
+       "stock": 461,
        "url": "https://www.16688.com.cn/goods/G11374294"
       },
       {
        "price": 1.45,
        "shop": "AI批量部",
        "platform": "16688",
-       "stock": 462,
+       "stock": 461,
        "url": "https://www.16688.com.cn/goods/G45649680"
       },
       {
        "price": 2.05,
        "shop": "x会员ai订阅（可用u）",
        "platform": "16688",
-       "stock": 462,
+       "stock": 461,
        "url": "https://www.16688.com.cn/goods/G89374803"
       }
      ],
@@ -12336,7 +12328,7 @@
        "price": 2.97,
        "shop": "moyanovo",
        "platform": "链动小铺",
-       "stock": 408,
+       "stock": 407,
        "url": "https://wzyp.cn/item/wlccqq"
       }
      ]
@@ -13230,6 +13222,71 @@
    19.0,
    1
   ],
+  "16688:G96943828": [
+   29896832,
+   8.0,
+   1,
+   2662,
+   20.0,
+   1,
+   5672,
+   17.0,
+   1,
+   24,
+   15.42,
+   1,
+   100,
+   14.91,
+   1,
+   21,
+   14.5,
+   1,
+   56,
+   14.91,
+   1,
+   18,
+   14.5,
+   1,
+   13,
+   15.42,
+   1,
+   26,
+   15.0,
+   1,
+   222,
+   14.39,
+   1,
+   319,
+   14.0,
+   1,
+   440,
+   16.0,
+   1,
+   2039,
+   18.0,
+   1,
+   18,
+   18.5,
+   1,
+   66,
+   18.0,
+   1,
+   112,
+   18.5,
+   1,
+   300,
+   18.0,
+   1,
+   293,
+   21.0,
+   1,
+   333,
+   19.9,
+   1,
+   79,
+   19.0,
+   1
+  ],
   "16688:G54264299": [
    29896773,
    30.0,
@@ -13842,35 +13899,6 @@
    19.8,
    1,
    1065,
-   20.9,
-   1
-  ],
-  "16688:G14312722": [
-   29899914,
-   22.0,
-   1,
-   5252,
-   18.7,
-   1,
-   24,
-   16.5,
-   1,
-   456,
-   15.4,
-   1,
-   759,
-   17.6,
-   1,
-   2039,
-   19.8,
-   1,
-   789,
-   23.1,
-   1,
-   333,
-   21.89,
-   1,
-   79,
    20.9,
    1
   ],
@@ -16731,6 +16759,14 @@
    56.0,
    1
   ],
+  "catfk:u776m6": [
+   29896815,
+   48.6,
+   1,
+   6613,
+   59.4,
+   1
+  ],
   "catfk:ki9q8l": [
    29896773,
    60.75,
@@ -16763,11 +16799,6 @@
    29896773,
    149.9,
    1
-  ],
-  "wzyp:x5dao8": [
-   29898952,
-   198.0,
-   3
   ],
   "wzyp:2jj9i4": [
    29896150,
