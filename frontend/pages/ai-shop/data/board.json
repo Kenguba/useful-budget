@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-14 08:18",
+ "updated_at": "2026-11-14 08:30",
  "source": "AI价网 + cardnav + PriceAI + aibijia + 16688/aicdks/catfk 直拉 按商家遍历合并",
  "groups": [
   {
@@ -11894,17 +11894,6 @@
      "pc": "2026-11-11"
     },
     {
-     "price": 3.3,
-     "shop": "MAXAI666",
-     "platform": "16688",
-     "stock": 1,
-     "title": "Muse成品号10亿token+可换邮箱",
-     "url": "https://www.16688.com.cn/goods/G27081752",
-     "kind": "10亿·成品号",
-     "same_source": 1,
-     "pc": "2026-11-13"
-    },
-    {
      "price": 3.5,
      "shop": "解郁杂货店",
      "platform": "",
@@ -12243,6 +12232,16 @@
      "stock": null,
      "title": "Muse 10亿词元【成品号】",
      "url": "https://yufenggpt.com/item/27",
+     "kind": "10亿·成品号",
+     "same_source": 1
+    },
+    {
+     "price": 8.0,
+     "shop": "跳跳的AI店铺",
+     "platform": "16688",
+     "stock": 13,
+     "title": "Muse AI 10亿token成品号（类似于bot）",
+     "url": "https://www.16688.com.cn/goods/G29122242",
      "kind": "10亿·成品号",
      "same_source": 1
     }
@@ -18121,14 +18120,6 @@
    3.3,
    1
   ],
-  "16688:G27081752": [
-   29907718,
-   1.1,
-   1,
-   1833,
-   3.3,
-   1
-  ],
   "https://shop.xujunjiong.cc/products/muse_10b": [
    29906901,
    3.5,
@@ -18278,6 +18269,11 @@
    1
   ],
   "https://yufenggpt.com/item/27": [
+   29896832,
+   8.0,
+   1
+  ],
+  "16688:G29122242": [
    29896832,
    8.0,
    1
