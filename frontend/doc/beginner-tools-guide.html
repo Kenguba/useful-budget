@@ -137,6 +137,11 @@
       z-index: 10;
     }
 
+    /* 黑色模式下头部底部不要光晕（ken 2026-11-15 定）：去掉主题色光晕影，只留平底 */
+    [data-dark="true"] .hero-header {
+      box-shadow: none;
+    }
+
     /* 渐变层独立裁切圆角，不遮挡主题面板；规范：整片平滑的表面渐变，颜色取当前主题那套，双色自底部向上弥散 */
     .hero-wash {
       position: absolute;
