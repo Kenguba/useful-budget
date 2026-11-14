@@ -805,6 +805,26 @@
         <h3 class="text-lg font-semibold text-slate-900 dark:text-white">16 个工具官网链接清单</h3>
         <div id="official-links-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5"></div>
       </div>
+
+      <!-- 1.5 Cloudflare 免费全家桶（默认收缩） -->
+      <div class="theme-surface rounded-2xl border overflow-hidden">
+        <button id="cf-free-toggle" type="button" aria-expanded="false" class="w-full flex items-center justify-between gap-3 p-4 text-left">
+          <span class="min-w-0">
+            <span class="block text-lg font-semibold text-slate-900 dark:text-white">Cloudflare 免费全家桶</span>
+            <span class="block text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">建站要用的整套基建一家凑齐，全免费起步；点开看每一项的免费额度和官方直达链接</span>
+          </span>
+          <span class="flex items-center gap-2 shrink-0">
+            <span id="cf-free-count" class="text-xs font-medium text-slate-500 dark:text-slate-400"></span>
+            <svg id="cf-free-chevron" class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </span>
+        </button>
+        <div id="cf-free-body" class="hidden border-t border-slate-200 dark:border-slate-700/60 p-3 sm:p-4">
+          <div id="cf-free-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-3">额度按 2026-11 的官方口径写，官方会不时调整，动手前点直达链接看一眼现行数字；唯一硬提醒：域名开了橙云代理后，国内访问会绕到海外节点，延迟比国内云高，图省钱就要接受这一点</p>
+        </div>
+      </div>
     </section>
 
     <!-- ==================== SECTION 02 ==================== -->
@@ -1453,6 +1473,39 @@
         `).join('');
       }
 
+      const cfFreeData = [
+        { name: 'DNS 解析与安全防护', desc: '域名解析托管到 Cloudflare，秒级生效；开启橙云代理后自带全球 CDN、DDoS 防护与免费 SSL，流量不计量收费', url: 'https://developers.cloudflare.com/dns/', label: 'developers.cloudflare.com/dns' },
+        { name: 'Pages 前端托管', desc: '静态网站免费托管，站点数与流量不限；每月 500 次构建，单站最多 2 万个文件、单文件 25MB', url: 'https://developers.cloudflare.com/pages/', label: 'developers.cloudflare.com/pages' },
+        { name: 'Workers 后端计算', desc: '边缘函数跑接口和轻量后端，每天 10 万次请求免费，单次 10ms CPU；它托管的静态资源不占这个额度', url: 'https://developers.cloudflare.com/workers/', label: 'developers.cloudflare.com/workers' },
+        { name: 'R2 文件存储', desc: '对象存储 10GB 免费，出站流量不收费；每月 100 万次写入类、1000 万次读取类操作；开通前要先给账户绑一张支付方式，免费额度内不扣费', url: 'https://developers.cloudflare.com/r2/', label: 'developers.cloudflare.com/r2' },
+        { name: 'D1 数据库', desc: 'SQLite 语法的边缘数据库，总存储 5GB；每天可读 500 万行、写 10 万行，不用自己运维', url: 'https://developers.cloudflare.com/d1/', label: 'developers.cloudflare.com/d1' },
+        { name: 'Workers KV 键值存储', desc: '存配置、缓存和会话这类小数据；每天读 10 万次、写 1000 次，总量 1GB', url: 'https://developers.cloudflare.com/kv/', label: 'developers.cloudflare.com/kv' },
+        { name: 'Tunnel 内网穿透', desc: '把家里或本地电脑上的服务安全地发布到公网，不用公网 IP、不用开路由器端口，免费', url: 'https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/', label: 'developers.cloudflare.com/cloudflare-one' },
+        { name: 'Turnstile 人机验证', desc: '无感验证码，替代传统图形验证码挡机器人，免费且不限调用次数', url: 'https://developers.cloudflare.com/turnstile/', label: 'developers.cloudflare.com/turnstile' },
+        { name: '邮件路由', desc: '把域名邮箱收到的信免费转发到你的常用邮箱，拥有 me@你的域名 这种地址不用买企业邮箱', url: 'https://developers.cloudflare.com/email-routing/', label: 'developers.cloudflare.com/email-routing' },
+        { name: 'Workers AI', desc: '在边缘直接调用开源大模型，每天送 1 万个神经元的免费额度，练手和小功能够用', url: 'https://developers.cloudflare.com/workers-ai/', label: 'developers.cloudflare.com/workers-ai' },
+        { name: 'AI Gateway', desc: '给各家 AI 接口加一层免费网关：缓存、限流、重试和用量日志都有，能省调用费', url: 'https://developers.cloudflare.com/ai-gateway/', label: 'developers.cloudflare.com/ai-gateway' },
+        { name: 'Wrangler 命令行', desc: '官方命令行工具，部署 Workers 和 Pages、管理 D1、R2、KV 都靠它，一条命令上线', url: 'https://developers.cloudflare.com/workers/wrangler/', label: 'developers.cloudflare.com/workers/wrangler' }
+      ];
+
+      function renderCfFree() {
+        const grid = document.getElementById('cf-free-grid');
+        document.getElementById('cf-free-count').textContent = cfFreeData.length + ' 项';
+        grid.innerHTML = cfFreeData.map(f => `
+          <a href="${f.url}" target="_blank" rel="noopener noreferrer"
+            class="group theme-surface rounded-xl border p-3 hover:shadow-md transition-[box-shadow] block">
+            <div class="flex items-start justify-between gap-2">
+              <div class="text-sm font-semibold text-slate-900 dark:text-white">${f.name}</div>
+              <svg class="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mt-1">${f.desc}</p>
+            <div class="text-[11px] font-mono text-slate-500 dark:text-slate-400 break-all mt-1.5 leading-snug">${f.label}</div>
+          </a>
+        `).join('');
+      }
+
       function renderAgents() {
         const grid = document.getElementById('agents-grid');
         const badgeClasses = {
@@ -1627,6 +1680,15 @@
         });
       });
 
+      const cfFreeToggle = document.getElementById('cf-free-toggle');
+      const cfFreeBody = document.getElementById('cf-free-body');
+      const cfFreeChevron = document.getElementById('cf-free-chevron');
+      cfFreeToggle.addEventListener('click', () => {
+        const opening = cfFreeBody.classList.toggle('hidden') === false;
+        cfFreeToggle.setAttribute('aria-expanded', String(opening));
+        cfFreeChevron.style.transform = opening ? 'rotate(180deg)' : '';
+      });
+
       document.querySelectorAll('.tool-filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.tool-filter-btn').forEach(b => {
@@ -1760,6 +1822,7 @@
       applyDarkMode(isDarkMode, false);
       renderTools('all');
       renderOfficialLinks();
+      renderCfFree();
       renderAgents();
       renderAiTable();
     })();
