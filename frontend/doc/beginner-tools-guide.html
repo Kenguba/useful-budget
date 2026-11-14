@@ -183,6 +183,29 @@
       animation: videoHoloBtn 4.2s ease infinite;
     }
 
+    /* ================= 工具详情弹窗 ================= */
+    #tool-modal {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+
+    #tool-modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #tool-modal .tool-modal-panel {
+      transform: translateY(14px) scale(0.97);
+      opacity: 0;
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease;
+    }
+
+    #tool-modal.open .tool-modal-panel {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
     /* ================= 3. 右上角日夜圆形按钮 & 长按12色主题悬浮面板 ================= */
     .theme-mode-btn {
       width: 38px;
@@ -1138,6 +1161,48 @@
     </svg>
   </button>
 
+  <!-- 工具详情弹窗 -->
+  <div id="tool-modal" class="fixed inset-0 z-[120] flex items-end sm:items-center justify-center sm:p-6" role="dialog" aria-modal="true">
+    <div id="tool-modal-backdrop" class="absolute inset-0 bg-slate-950/50 backdrop-blur-[2px]"></div>
+    <div class="tool-modal-panel theme-surface relative w-full max-w-lg max-h-[86vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl border shadow-2xl p-5 sm:p-6">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-center gap-2 min-w-0">
+          <h3 id="tool-modal-title" class="text-lg font-bold text-slate-900 dark:text-white leading-snug"></h3>
+          <span id="tool-modal-tag" class="shrink-0 px-2 py-0.5 rounded text-[11px] font-medium theme-tag-pill"></span>
+        </div>
+        <button id="tool-modal-close" type="button" aria-label="关闭详情"
+          class="shrink-0 w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <p id="tool-modal-desc" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mt-2"></p>
+      <div class="mt-4 space-y-3.5">
+        <div>
+          <div class="text-xs font-semibold theme-accent-text mb-1">免费口径</div>
+          <p id="tool-modal-free" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+        </div>
+        <div>
+          <div class="text-xs font-semibold theme-accent-text mb-1">适合</div>
+          <p id="tool-modal-fit" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+        </div>
+        <div>
+          <div class="text-xs font-semibold theme-accent-text mb-1">注意</div>
+          <p id="tool-modal-avoid" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+        </div>
+      </div>
+      <a id="tool-modal-link" href="#" target="_blank" rel="noopener noreferrer"
+        class="theme-accent-bg mt-5 flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-sm font-semibold text-white">
+        官网直达
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        </svg>
+      </a>
+      <div id="tool-modal-label" class="text-[11px] font-mono text-slate-500 dark:text-slate-400 text-center mt-1.5 break-all"></div>
+    </div>
+  </div>
+
   <script>
     (function () {
       // ==================== 12色弥散主题配置（同步 Ai比价.html） ====================
@@ -1357,6 +1422,26 @@
         { id: 16, name: 'Apify', tag: '抓取', group: '自动化与抓取', desc: '现成抓取器商店，几千个抓取器直接运行出数据；抓公开数据不用自己写爬虫；按运行量计费', url: 'https://apify.com', label: 'apify.com' }
       ];
 
+      // 工具详情（点击卡片弹窗展示）：免费口径 / 适合 / 注意
+      const toolDetails = {
+        1: { free: '免费，绑定自己的域名也免费', fit: '个人主页、博客、文档站、作品集这类纯展示站', avoid: '只能放静态页面，不能跑后端、不能存用户数据；每次改内容要走一次 Git 提交，不适合频繁手动改字' },
+        2: { free: '免费档：站点与流量不限，每月 500 次构建，单站最多 2 万个文件、单文件 25MB', fit: '静态站加一点轻函数逻辑，想让全球打开都快', avoid: '重后端逻辑要另配 Workers 或别家全栈平台；构建和部署走它自己的流水线，与 GitHub Pages 的方式不同' },
+        3: { free: '免费档（Hobby）功能对个人站和练手足够', fit: 'Next.js 项目、现代前端、AI 小站；改完自动生成预览网址，体验这一批里最好', avoid: '免费档只许个人非商用；商用或团队协作要上付费档' },
+        4: { free: '免费档有基础流量与构建额度，个人小站够用', fit: '静态站要收表单（留言、报名）时最省事，自带表单收集，不用另写后端', avoid: '函数与流量超出免费档要付费；国内访问速度一般' },
+        5: { free: '基础发布免费', fit: '临时演示、课堂练手、一次性活动页，出链接极快', avoid: '要会用一点命令行；功能最简，自定义域名等进阶项要付费档' },
+        6: { free: '免费档整站 1GB，页面实际托管在 IPFS 上', fit: '要出链接最快的场合：临时分享、快速验证一个想法', avoid: '绑自己的域名要付费档；生态较小，长期正式项目慎用' },
+        7: { free: '免费档主要是让你管理 1 台自己的服务器，算力另外算钱', fit: '前端、后端、数据库想一家全包，中文界面友好、上手快', avoid: '别把它当免费算力：跑在它家算力上要按量付费' },
+        8: { free: '不是真免费：新号先给 30 天 5 美元试用，之后免费档每月只剩 1 美元额度', fit: '全栈练手；画布式管理，前后端和数据库的关系看得清清楚楚', avoid: '常驻服务基本要上 5 美元/月的 Hobby，别拿免费档长期挂服务' },
+        9: { free: '有免费档，后端服务与静态站可免费用', fit: '跑常驻后端、定时任务，再配它自家数据库', avoid: '免费档闲置会休眠，下次唤醒偏慢；怕冷启动的接口别放免费档' },
+        10: { free: '免费计划含 DNS 解析、CDN 加速、DDoS 防护与免费 SSL；各子产品另有免费额度，细目见下方收纳块', fit: '几乎每套搭配的域名入口都归它管，再按需叠加 Workers、R2、D1', avoid: '开了橙云代理后，国内访问会绕海外节点，延迟变高；国内用户为主的站要实测速度再定' },
+        11: { free: '有免费档，数据库加登录加文件存储一套齐', fit: '网站要用户登录、要存数据，又不想自己从零搭后端', avoid: '免费档项目闲置一周可能被暂停，重要项目要留意；权限规则要花点时间学' },
+        12: { free: '接口按调用量计费，没有免费额度；网页版有免费层，可以先试效果再决定', fit: '对话、写作、代码类功能，回答质量优先时选它', avoid: '密钥只能放在服务器侧调用，绝不能写进前端页面；国内直连不通，要经能出海的服务器调用' },
+        13: { free: '接口有免费层：在 Google AI Studio 里领密钥就能用，有速率上限；超了再按量计费', fit: '文字、图片多模态都要碰的产品；有谷歌账号上手最快', avoid: '免费层的调用数据可能被用于改进产品，敏感数据别走免费层' },
+        14: { free: '有免费档，每月送少量操作数，练手够用', fit: '不想写代码：把表格、邮箱、AI 接口用拖拽串成自动流程', avoid: '流程跑得勤，操作数消耗快，要盯着额度；复杂逻辑会越搭越乱' },
+        15: { free: '软件本身开源免费，自部署只花自己机器的钱；官方云版有试用与付费档', fit: '想省钱、数据想自己掌控、流程要长期稳定跑', avoid: '自部署要自己维护机器与更新；上手比 Make 稍陡' },
+        16: { free: '有免费档，送一点平台额度；抓取器按运行量计费', fit: '抓公开数据又不想自己写爬虫：电商、地图、社媒都有现成抓取器可直接跑', avoid: '抓取器质量参差，先小量试跑、确认数据格式对了再批量；只抓公开数据，注意目标站条款' }
+      };
+
       const agentsData = [
         { name: 'Muse (Meta)', modelBadge: '自研模型', modelBadgeColor: 'blue', model: '自研：Muse Spark 系列，现行 Muse Spark 1.3，由 Meta 的模型实验室做，不是 Llama 那条线；另有一个开源的小版 Muse Glimmer', vm: '有，叫 Muse Secure VM：每人一台专属云虚拟机，自带浏览器；你关掉应用它还在后台接着干，登录凭据不经过模型本身，敏感动作由独立的 Sentinel 把关' },
         { name: 'Hark Pro (Hark Labs)', modelBadge: '自研模型', modelBadgeColor: 'blue', model: '自研：Hark 自己的 computer-use 模型，驱动云电脑干活的那套就叫 Handoff；路线是先做后训练，再往中训练和自研预训练走，不是套别家的模型改个名', vm: '有，叫 Handoff：一台专属云电脑，自带浏览器、文件系统和终端，最多同时开 6 个浏览器，替你登录网站、填表、下单、订位和缴费，花钱和发消息前默认先问你' },
@@ -1431,7 +1516,7 @@
         const grid = document.getElementById('tools-grid');
         const list = filterGroup === 'all' ? toolsData : toolsData.filter(t => t.group === filterGroup);
         grid.innerHTML = list.map(t => `
-          <div class="theme-surface rounded-2xl border p-4 shadow-sm flex flex-col justify-between gap-2.5 transition-colors">
+          <div data-tool-id="${t.id}" role="button" tabindex="0" class="theme-surface rounded-2xl border p-4 shadow-sm flex flex-col justify-between gap-2.5 transition-colors cursor-pointer hover:shadow-md">
             <div>
               <div class="flex items-start justify-between gap-2 mb-1.5">
                 <h4 class="font-semibold text-sm text-slate-900 dark:text-white leading-snug">
@@ -1440,6 +1525,7 @@
                 <span class="shrink-0 px-2 py-0.5 rounded text-[11px] font-medium theme-tag-pill">${t.tag}</span>
               </div>
               <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">${t.desc}</p>
+              <div class="text-[11px] font-medium theme-accent-text mt-2">查看详情 →</div>
             </div>
           </div>
         `).join('');
@@ -1671,6 +1757,42 @@
           requestAnimationFrame(() => requestAnimationFrame(() => { location.hash = hash; }));
         });
       });
+
+      // ==================== 工具详情弹窗 ====================
+      const toolModal = document.getElementById('tool-modal');
+      function openToolModal(id) {
+        const t = toolsData.find(x => x.id === id);
+        if (!t) return;
+        const d = toolDetails[id] || {};
+        document.getElementById('tool-modal-title').textContent = String(t.id).padStart(2, '0') + ' ' + t.name;
+        document.getElementById('tool-modal-tag').textContent = t.tag;
+        document.getElementById('tool-modal-desc').textContent = t.desc;
+        document.getElementById('tool-modal-free').textContent = d.free || '';
+        document.getElementById('tool-modal-fit').textContent = d.fit || '';
+        document.getElementById('tool-modal-avoid').textContent = d.avoid || '';
+        document.getElementById('tool-modal-link').href = t.url;
+        document.getElementById('tool-modal-label').textContent = (t.sub ? t.sub + ' · ' : '') + t.label;
+        toolModal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeToolModal() {
+        if (!toolModal.classList.contains('open')) return;
+        toolModal.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+      const toolsGrid = document.getElementById('tools-grid');
+      toolsGrid.addEventListener('click', (e) => {
+        const card = e.target.closest('[data-tool-id]');
+        if (card) openToolModal(Number(card.dataset.toolId));
+      });
+      toolsGrid.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter') return;
+        const card = e.target.closest('[data-tool-id]');
+        if (card) openToolModal(Number(card.dataset.toolId));
+      });
+      document.getElementById('tool-modal-close').addEventListener('click', closeToolModal);
+      document.getElementById('tool-modal-backdrop').addEventListener('click', closeToolModal);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeToolModal(); });
 
       const cfFreeToggle = document.getElementById('cf-free-toggle');
       const cfFreeBody = document.getElementById('cf-free-body');
