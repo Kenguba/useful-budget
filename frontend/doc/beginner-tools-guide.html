@@ -153,10 +153,9 @@
       transition: background-color 0.55s ease;
     }
 
+    /* 深色纯色（ai-shop 定版口径）：双色光池在深色下会成杂色斑块，故不做渐变 */
     [data-dark="true"] .hero-wash {
-      background-image:
-        radial-gradient(115% 125% at 10% 112%, color-mix(in srgb, var(--orb-color-1) 26%, #0B1120) 0%, transparent 62%),
-        radial-gradient(115% 125% at 90% 112%, color-mix(in srgb, var(--orb-color-2) 26%, #0B1120) 0%, transparent 62%);
+      background-image: none;
     }
 
     /* 第12号主题「幻彩全息」：同一套幻彩色流动渐变 */
@@ -435,6 +434,14 @@
         </button>
       </div>
       </div>
+        <!-- Mobile Nav Drawer：头部内下拉，点开就出现在按钮行正下方 -->
+        <div id="mobile-menu" class="hidden md:hidden absolute left-4 right-4 top-[68px] z-30 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg px-2 py-2 space-y-1">
+          <a href="#sec-01" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">01 建站工具与搭配</a>
+          <a href="#sec-02" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">02 Agent 与云电脑</a>
+          <a href="#sec-03" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">03 自办虚拟卡</a>
+          <a href="#sec-04" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">04 AI 大模型双榜</a>
+        </div>
+
       <div class="flex flex-wrap items-center gap-2 mb-4">
         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold theme-tag-pill">
           小白工具选型指南
@@ -500,14 +507,6 @@
       </div>
     </div>
   </header>
-
-  <!-- Mobile Nav Drawer -->
-    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 space-y-1">
-      <a href="#sec-01" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">01 建站工具与搭配</a>
-      <a href="#sec-02" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">02 Agent 与云电脑</a>
-      <a href="#sec-03" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">03 自办虚拟卡</a>
-      <a href="#sec-04" class="mobile-nav-link block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">04 AI 大模型双榜</a>
-    </div>
 
   <!-- Main Content -->
   <main class="max-w-5xl mx-auto px-4 py-8 sm:py-12 space-y-16">
