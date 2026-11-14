@@ -1611,7 +1611,13 @@
       const mobileMenu = document.getElementById('mobile-menu');
       mobileBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
       document.querySelectorAll('.mobile-nav-link').forEach(link => {
-        link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const hash = link.getAttribute('href');
+          mobileMenu.classList.add('hidden');
+          // 先让「菜单已关」这一帧画出来再跳转；否则浏览器给历史记录留的返回预览图还是菜单开着的那一帧
+          requestAnimationFrame(() => requestAnimationFrame(() => { location.hash = hash; }));
+        });
       });
 
       document.querySelectorAll('.tool-filter-btn').forEach(btn => {
