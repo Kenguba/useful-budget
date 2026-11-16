@@ -69,6 +69,11 @@
     --specs-bg:#F8FAFC;
     --radius:20px;
     --ease:cubic-bezier(.16,1,.3,1);
+    /* 展开动效变量 — 照参考文件原值：卡 383ms / 子卡 300ms / 错峰每步 25ms，同一条 quint 曲线 */
+    --ease-out-quint:cubic-bezier(0.22,1,0.36,1);
+    --dur-card:383ms;
+    --dur-subcard:300ms;
+    --stagger-step:25ms;
     /* aliases used below */
     --line:var(--card-border);
     --line-strong:rgba(148,163,184,.45);
@@ -461,7 +466,19 @@
   /* 展开态箭头钮与卡片边框同一套中性色，固定不随主题强调色变（ken 2026-11-17 点明颜色不要鲜艳） */
   .card.open .card-chevron{transform:rotate(90deg);width:34px;height:34px;padding:7px;background:var(--specs-bg);border-color:var(--card-border);color:var(--text-secondary)}
   .card-body{display:flex;flex-direction:column;gap:10px;padding:2px 16px 16px;border-top:1px solid var(--card-border)}
-  .card-body[hidden]{display:none}
+  /* 展开/收缩折叠层（照参考文件机制）：外层 grid 行高 0fr↔1fr 平滑过渡、内层溢出裁剪，卡身不再用 hidden 瞬时显隐 */
+  .card-collapse-wrapper{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--dur-card) var(--ease-out-quint)}
+  .card.open .card-collapse-wrapper{grid-template-rows:1fr}
+  .card-collapse-inner{overflow:hidden;min-height:0;visibility:hidden;transition:visibility 0s linear var(--dur-card)}
+  .card.open .card-collapse-inner{visibility:visible;transition-delay:0s}
+  /* 展开错峰入场（照参考文件 stagger-item）：收起无延迟淡出，展开逐个淡入＋上移 8px 回落、每步延迟 25ms */
+  .card .stagger-item{opacity:0;transform:translate3d(0,8px,0);transition:opacity 180ms var(--ease-out-quint),transform 240ms var(--ease-out-quint);transition-delay:0ms}
+  .card.open .stagger-item{opacity:1;transform:translate3d(0,0,0);transition:opacity 280ms var(--ease-out-quint),transform 340ms var(--ease-out-quint);transition-delay:calc(var(--stagger-idx,0)*var(--stagger-step))}
+  .pcd-scroll .stagger-item{opacity:1;transform:none;transition:none}
+  /* 进页恢复初始展开态时先关过渡，免得一打开页面就播一遍展开动画 */
+  .no-anim .card-collapse-wrapper,.no-anim .subcard-collapse,.no-anim .stagger-item,.no-anim .host-body{transition:none !important}
+  /* 折叠层收起动画走完后由 JS 给内层挂上：收起稳态真正不占盒、内部控件不呈现（与原先 hidden 时一致） */
+  .collapse-hidden{display:none !important}
   .icon{width:52px;height:52px;border-radius:14px;flex:0 0 auto;background:var(--brand-soft);color:var(--brand);display:flex;align-items:center;justify-content:center}
   /* 图标光学等大：六个官方 SVG 的 viewBox 留白与长宽比各不相同，图形占框比例从 74% 到 100% 不等，
      统一 30px 时实际图形大小差 36%；--isz 按各图形实测占比逐个校准，让六个图形主轴都落到 25–29px */
@@ -699,8 +716,14 @@
   .host-toggle-label{flex:0 0 auto;font-size:12px;font-weight:600;color:var(--theme-tag-text)}
   .host-chevron{width:16px;height:16px;flex:0 0 auto;color:var(--text-secondary);transition:transform .35s var(--ease)}
   .host-box.open .host-chevron{transform:rotate(180deg)}
-  .host-body{display:flex;flex-direction:column;gap:8px}
-  .host-body[hidden]{display:none}
+  .host-body{display:flex;flex-direction:column;gap:8px;opacity:0;transform:translateY(4px);transition:opacity 220ms var(--ease-out-quint),transform 240ms var(--ease-out-quint)}
+  .host-box.open .host-body{opacity:1;transform:translateY(0)}
+  /* 子卡折叠层：与机器卡同一 grid 机制，时长 300ms；负上边距抵掉 .host-box 的 8px 行距、内边距补回，收起不留空档、展开间距与原先一致 */
+  .subcard-collapse{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--dur-subcard) var(--ease-out-quint);margin-top:-8px}
+  .host-box.open .subcard-collapse{grid-template-rows:1fr}
+  .subcard-collapse-inner{overflow:hidden;min-height:0;visibility:hidden;transition:visibility 0s linear var(--dur-subcard)}
+  .host-box.open .subcard-collapse-inner{visibility:visible;transition-delay:0s}
+  .subcard-collapse .host-body{padding-top:8px}
   .card-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:relative}
   .updated{font-size:12px;color:var(--text-muted)}
   /* 「打开控制台」与卡片边框同一套中性色，固定不随主题强调色变（ken 2026-11-17 点明颜色不要鲜艳） */
@@ -2435,15 +2458,66 @@
       try { localStorage.setItem(key, JSON.stringify(m)); } catch(e) {}
     }
 
+    /* ---------- 展开/收缩动效（照参考文件机制移植）：进页先把每张卡的 .card-body 与每个子卡的 .host-body
+       包进 grid 0fr↔1fr 折叠层（.card-collapse-wrapper / .subcard-collapse），显隐改走 .open 类过渡、
+       不再用 hidden 瞬时跳变；卡身直接子块挂 stagger-item 并按序编号，展开时错峰入场、收起不做错峰。
+       包裹与随后的状态恢复都在同一段同步脚本里完成、且全程挂着 .no-anim 关过渡，
+       所以初始展开的卡直接停在 1fr、不播动画；两帧后摘掉 .no-anim，后续点按才走过渡 ---------- */
+    document.documentElement.classList.add('no-anim');
+    /* 折叠收尾：行高过渡结束且仍是收起态，才把内层置 display:none；打开时先摘掉并强制回流、再加 .open，
+       过渡从 0fr 起步；过渡事件没来时由 520ms 兜底检查补上（同样以届时状态为准，连点反向不会误藏） */
+    function bindCollapseHide(wrapper, inner, isOpen){
+      wrapper.addEventListener('transitionend', function(e){
+        if (e.propertyName !== 'grid-template-rows') return;
+        if (!isOpen()) inner.classList.add('collapse-hidden');
+      });
+    }
+    function openCollapse(wrapper, inner){
+      if (!inner || !inner.classList.contains('collapse-hidden')) return;
+      inner.classList.remove('collapse-hidden');
+      if (wrapper) void wrapper.offsetWidth;
+    }
+    function closeCollapseFallback(inner, isOpen){
+      if (!inner) return;
+      setTimeout(function(){ if (!isOpen()) inner.classList.add('collapse-hidden'); }, 520);
+    }
+    (function wrapCollapses(){
+      var bodies = document.querySelectorAll('.card-body');
+      for (var i = 0; i < bodies.length; i++) {
+        var b = bodies[i];
+        b.removeAttribute('hidden');
+        var w = document.createElement('div'); w.className = 'card-collapse-wrapper';
+        var inn = document.createElement('div'); inn.className = 'card-collapse-inner';
+        b.parentNode.insertBefore(w, b); w.appendChild(inn); inn.appendChild(b);
+        inn.classList.add('collapse-hidden');
+        (function(cardEl, wr, inr){ bindCollapseHide(wr, inr, function(){ return cardEl.classList.contains('open'); }); })(b.closest('.card'), w, inn);
+        var kids = b.children;
+        for (var k = 0; k < kids.length; k++) { kids[k].classList.add('stagger-item'); kids[k].style.setProperty('--stagger-idx', String(k + 1)); }
+      }
+      var hbs = document.querySelectorAll('.host-body');
+      for (var j = 0; j < hbs.length; j++) {
+        var hb = hbs[j];
+        hb.removeAttribute('hidden');
+        var sw = document.createElement('div'); sw.className = 'subcard-collapse';
+        var si = document.createElement('div'); si.className = 'subcard-collapse-inner';
+        hb.parentNode.insertBefore(sw, hb); sw.appendChild(si); si.appendChild(hb);
+        si.classList.add('collapse-hidden');
+        (function(boxEl, wr, inr){ bindCollapseHide(wr, inr, function(){ return boxEl.classList.contains('open'); }); })(hb.closest('.host-box'), sw, si);
+      }
+    })();
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ document.documentElement.classList.remove('no-anim'); }); });
+
     /* ---------- 机器行：默认收起，点头部展开/收起详情（同一时刻不强制关其他台） ---------- */
     var cardHeads = document.querySelectorAll('.card-head');
     function toggleCard(head){
       var card = head.closest('.card');
-      var body = card ? card.querySelector('.card-body') : null;
-      if (!card || !body) return;
-      var open = body.hidden;
-      body.hidden = !open;
+      if (!card || !card.querySelector('.card-body')) return;
+      var wrap = card.querySelector('.card-collapse-wrapper');
+      var inner = card.querySelector('.card-collapse-inner');
+      var open = !card.classList.contains('open');
+      if (open) openCollapse(wrap, inner);
       card.classList.toggle('open', open);
+      if (!open) closeCollapseFallback(inner, function(){ return card.classList.contains('open'); });
       head.setAttribute('aria-expanded', open ? 'true' : 'false');
       saveOpenState(CARD_OPEN_KEY, machineNameOf(card), open);
     }
@@ -2515,9 +2589,12 @@
         var body = box ? box.querySelector('.host-body') : null;
         if (!box || !body) return;
         var label = this.querySelector('.host-toggle-label');
-        var open = body.hidden;
-        body.hidden = !open;
+        var sw = box.querySelector('.subcard-collapse');
+        var si = box.querySelector('.subcard-collapse-inner');
+        var open = !box.classList.contains('open');
+        if (open) openCollapse(sw, si);
         box.classList.toggle('open', open);
+        if (!open) closeCollapseFallback(si, function(){ return box.classList.contains('open'); });
         this.setAttribute('aria-expanded', open ? 'true' : 'false');
         if (label) label.textContent = open ? '收起' : '展开详情';
         /* 小框展开状态按「机器名 | 小框内容区 id」存，两个 id 都取自机器自身、与卡片顺序无关 */
@@ -2537,8 +2614,9 @@
         var body = card.querySelector('.card-body');
         var head = card.querySelector('.card-head');
         if (!body || !head) continue;
-        body.hidden = false;
         card.classList.add('open');
+        var cin = card.querySelector('.card-collapse-inner');
+        if (cin) cin.classList.remove('collapse-hidden');
         head.setAttribute('aria-expanded', 'true');
       }
       var bm = loadOpenMap(BOX_OPEN_KEY);
@@ -2548,8 +2626,9 @@
         var hb = box ? box.querySelector('.host-body') : null;
         var cn = machineNameOf(tg.closest('.card'));
         if (!box || !hb || !cn || !hb.id || !bm[cn + '|' + hb.id]) continue;
-        hb.hidden = false;
         box.classList.add('open');
+        var sin = box.querySelector('.subcard-collapse-inner');
+        if (sin) sin.classList.remove('collapse-hidden');
         tg.setAttribute('aria-expanded', 'true');
         var lb = tg.querySelector('.host-toggle-label');
         if (lb) lb.textContent = '收起';
@@ -3162,12 +3241,24 @@
             var hb = box ? box.querySelector('.host-body') : null;
             if (!box || !hb) return;
             var label = this.querySelector('.host-toggle-label');
-            var open = hb.hidden;
-            hb.hidden = !open;
+            var sw = box.querySelector('.subcard-collapse');
+            var si = box.querySelector('.subcard-collapse-inner');
+            var open = !box.classList.contains('open');
+            if (open) openCollapse(sw, si);
             box.classList.toggle('open', open);
+            if (!open) closeCollapseFallback(si, function(){ return box.classList.contains('open'); });
             this.setAttribute('aria-expanded', open ? 'true' : 'false');
             if (label) label.textContent = open ? '收起' : '展开详情';
           });
+        }
+        /* 克隆体里的子卡折叠层同样要在收起动画走完后置 display:none（绑定随克隆新建，原卡上的绑定不跟过来） */
+        var cws = clone.querySelectorAll('.subcard-collapse');
+        for (var cw = 0; cw < cws.length; cw++) {
+          (function(wr){
+            var bx = wr.closest('.host-box');
+            var inr = wr.querySelector('.subcard-collapse-inner');
+            if (bx && inr) bindCollapseHide(wr, inr, function(){ return bx.classList.contains('open'); });
+          })(cws[cw]);
         }
         scroll.appendChild(clone);
       }
