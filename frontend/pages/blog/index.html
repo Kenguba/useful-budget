@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>实战笔记 · 博客</title>
+<meta name="description" content="把长期用 AI 做项目的经验写成能照着做的文章：原创系列与精选收录">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F4F8FC">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4z' fill='none' stroke='%2364748B' stroke-width='1.8'/%3E%3Cpath d='M9 9h6M9 13h6' stroke='%2364748B' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E">
+<script>
+/* 首屏前先定主题：Cookie A（跨子域名共享：语言 / 日夜 / 主题 1-12）优先，其次本站 localStorage，都没有时跟随系统深浅、主题第 12 套 */
+(function () {
+  var d = document.documentElement, a = null;
+  var ls = { idx: null, dark: null };
+  try {
+    var cm = document.cookie.match(/(?:^|;\s*)A=(\d{3,4})(?:;|$)/);
+    if (cm) { var cv = cm[1], ct = parseInt(cv.slice(2), 10); if ((cv.charAt(1) === '0' || cv.charAt(1) === '1') && ct >= 1 && ct <= 12) a = { dark: cv.charAt(1) === '0', idx: ct - 1, lang: cv.charAt(0) }; }
+    var ti = localStorage.getItem('blog-theme-idx'), td = localStorage.getItem('blog-dark');
+    if (ti !== null) { var n = parseInt(ti, 10); if (n >= 0 && n < 12) ls.idx = n; }
+    if (td !== null) ls.dark = td === '1';
+  } catch (e) {}
+  var dark, idx;
+  if (a) { dark = a.dark; idx = a.idx; }
+  else {
+    idx = ls.idx !== null ? ls.idx : 11;
+    dark = ls.dark !== null ? ls.dark : (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+  d.setAttribute('data-theme', dark ? 'dark' : 'light');
+  d.setAttribute('data-tidx', String(idx));
+  d._blogInit = { dark: dark, idx: idx, langDigit: a ? a.lang : '0', hasA: !!a, hasLs: ls.idx !== null || ls.dark !== null };
+})();
+</script>
+<style>
+:root{
+  --accent:#4FA8F6; --accent-soft:rgba(79,168,246,.12);
+  --ink:#1d2126; --sub:#4a5462; --weak:#68727f;
+  --bg:#f6f7f9; --surface:#ffffff; --surface2:#eef0f3;
+  --line:rgba(29,33,38,.08);
+  --wash1:#F4F8FC; --wash2:#E8F1FB;
+  --shadow:0 4px 16px rgba(29,33,38,.06);
+  --search-glow:rgba(79,168,246,.38);
+}
+html[data-theme="dark"]{
+  --ink:#eceef1; --sub:#a7b0bc; --weak:#8a94a1;
+  --bg:#101214; --surface:#1a1c1f; --surface2:#232529;
+  --line:rgba(236,238,241,.09);
+  --wash1:#14171b; --wash2:#101214;
+  --shadow:0 4px 16px rgba(0,0,0,.32);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0; background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-variant-numeric:tabular-nums; line-height:1.65}
+button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
+input{font:inherit; color:inherit}
+a{color:inherit; text-decoration:none}
+.wrap{max-width:1120px; margin:0 auto; padding:0 16px 24px}
+
+/* 顶栏：左标志与站名、中导航、右主题钮，进页立即可见 */
+header.top{margin:0 -16px; padding:8px 16px; background:var(--surface); border-bottom:1px solid var(--line)}
+.top-row{display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+.brand{display:flex; align-items:center; gap:8px; flex:none; min-width:0}
+.brand .logo{width:32px; height:32px; flex:none; border-radius:8px; background:var(--accent);
+  display:flex; align-items:center; justify-content:center}
+.brand .logo svg{width:18px; height:18px; stroke:#fff}
+.brand .b-name{font-size:17px; font-weight:500; white-space:nowrap}
+.brand .b-domain{padding:4px 8px; border-radius:999px; background:var(--accent-soft); color:var(--sub);
+  font-size:12px; white-space:nowrap}
+.top-nav{display:flex; gap:8px; margin:0 auto; overflow-x:auto; scrollbar-width:none}
+.top-nav::-webkit-scrollbar{display:none}
+.top-nav button{flex:none; padding:4px 16px; border-radius:999px; color:var(--sub); font-size:14px}
+.top-nav button:active{background:var(--accent-soft); color:var(--ink)}
+.site-sub{margin-top:16px; color:var(--sub); font-size:14px}
+.theme-btn{flex:none; width:40px; height:40px; border-radius:50%; border:1px solid var(--line);
+  background:var(--surface); display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow)}
+.theme-btn:active{transform:scale(.96)}
+.theme-btn svg{width:20px; height:20px; stroke:var(--sub)}
+.theme-btn .moon-i{display:none}
+html[data-theme="dark"] .theme-btn .sun-i{display:none}
+html[data-theme="dark"] .theme-btn .moon-i{display:block}
+
+/* 主题面板 */
+.pop-back{position:fixed; inset:0; background:rgba(16,18,20,.32); opacity:0; pointer-events:none; transition:opacity .18s ease-out}
+.pop-back.open{opacity:1; pointer-events:auto}
+.pop{position:fixed; left:50%; top:64px; transform:translate(-50%,-8px); width:min(400px,calc(100vw - 32px));
+  background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow);
+  padding:16px; opacity:0; pointer-events:none; transition:opacity .18s ease-out, transform .18s ease-out; z-index:30}
+.pop.open{opacity:1; pointer-events:auto; transform:translate(-50%,0)}
+.pop h2{margin:0; font-size:15px; font-weight:500}
+.pop .hint{margin-top:4px; color:var(--weak); font-size:12px}
+.swatch-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:16px}
+.swatch{display:flex; flex-direction:column; align-items:flex-start; gap:4px; padding:8px; border-radius:10px;
+  border:1.5px solid transparent; text-align:left; transition:border-color .15s ease-out, background-color .15s ease-out, transform .15s ease-out}
+.swatch .orb{width:24px; height:24px; border-radius:50%; flex:none}
+.swatch .nm{font-size:12px; color:var(--sub); line-height:1.4}
+.swatch.active{border-color:var(--accent); background:var(--accent-soft); transform:scale(1.04); box-shadow:0 4px 16px var(--accent-soft)}
+
+/* 工具区：筛选条在搜索框上方 */
+.tools{margin-top:24px}
+.chips{display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding-bottom:4px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none; padding:4px 16px; border-radius:999px; border:1px solid var(--line); background:var(--surface);
+  color:var(--sub); font-size:14px; transition:background-color .15s ease-out, color .15s ease-out, border-color .15s ease-out}
+.chip.active{background:var(--accent-soft); border-color:var(--accent); color:var(--ink)}
+.search-box{margin-top:8px; display:flex; align-items:center; gap:8px; background:var(--surface);
+  border:1px solid var(--line); border-radius:10px; padding:8px 16px; transition:box-shadow .18s ease-out}
+.search-box:focus-within{box-shadow:0 0 0 2px var(--search-glow)}
+.search-box svg{width:18px; height:18px; stroke:var(--weak); flex:none}
+.search-box input{flex:1; min-width:0; border:0; outline:0; background:none; font-size:15px}
+.search-box input::placeholder{color:var(--weak)}
+.clear-btn{flex:none; width:24px; height:24px; border-radius:50%; background:var(--surface2); color:var(--sub);
+  display:none; align-items:center; justify-content:center; font-size:14px; line-height:1}
+.clear-btn.show{display:flex}
+.hit-line{margin-top:8px; color:var(--weak); font-size:13px; min-height:20px}
+
+/* 区块 */
+section.block{margin-top:24px}
+.sec-head{display:flex; align-items:center; gap:16px}
+.sec-head .sec-left{display:flex; align-items:baseline; gap:8px; flex:1; min-width:0}
+.sec-head .no{color:var(--accent); font-size:13px; font-weight:500}
+.sec-head h2{margin:0; font-size:18px; font-weight:500}
+.sec-count{flex:none; padding:4px 8px; border-radius:999px; background:var(--accent-soft); color:var(--sub); font-size:12px}
+.sec-note{margin-top:4px; color:var(--weak); font-size:13px}
+
+/* 分工区：左右联动（照 Oil Book 的 model-dispatch 版式） */
+.dispatch{display:grid; grid-template-columns:minmax(0,53fr) minmax(0,47fr); gap:24px 20px; margin-top:16px; align-items:start}
+.d-steps{display:grid; gap:24px; align-content:start; min-width:0}
+.d-step-head{display:flex; align-items:baseline; gap:8px}
+.d-step-head .d-no{color:var(--accent); font-size:13px; font-weight:500; font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.d-step-head h3{margin:0; font-size:15px; font-weight:500}
+.d-marks{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px}
+.mark{display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:12px;
+  border:1.5px solid transparent; background:var(--surface); text-align:left;
+  transition:border-color .15s ease-out, background-color .15s ease-out, box-shadow .15s ease-out}
+.mark svg{width:18px; height:18px; stroke:var(--sub); flex:none}
+.mark .m-name{font-size:14px; font-weight:500}
+.mark .m-badge{font-size:12px; color:var(--weak)}
+.mark.active{border-color:var(--accent); background:var(--accent-soft); box-shadow:0 4px 16px var(--accent-soft)}
+.mark.active svg{stroke:var(--accent)}
+.dossier{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:16px; position:sticky; top:16px; min-width:0}
+.dossier .d-head{display:flex; align-items:center; gap:16px}
+.dossier .d-icon{width:40px; height:40px; flex:none; border-radius:10px; background:var(--surface2);
+  display:flex; align-items:center; justify-content:center}
+.dossier .d-icon svg{width:22px; height:22px; stroke:var(--accent)}
+.dossier .d-name{font-size:18px; font-weight:500; line-height:1.4}
+.dossier .d-badge{flex:none; margin-left:auto; padding:4px 8px; border-radius:999px; background:var(--accent-soft);
+  color:var(--ink); font-size:12px}
+.dossier .d-quote{margin-bottom:16px; color:var(--sub); font-size:14px}
+.dossier .d-row{margin-top:16px}
+.dossier .d-lab{color:var(--weak); font-size:12px}
+.dossier .d-txt{margin-top:4px; font-size:14px; color:var(--ink)}
+
+/* 文章区：多列网格（照 Oil Book 的 editorial-grid 版式） */
+.editorial-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:24px 40px; margin-top:16px}
+.a-card{display:flex; flex-direction:column; background:var(--surface); border:1px solid var(--line); border-radius:16px;
+  overflow:hidden; transition:border-color .15s ease-out, background-color .15s ease-out}
+.a-card:active{background:var(--surface2)}
+/* 书封式封面：竖版约 3:4，主题色底、左侧书脊、图案、章号与短题，卡片与阅读页共用 */
+.a-cover{position:relative; display:block; aspect-ratio:3/4; background:var(--accent-soft); color:var(--accent); overflow:hidden; flex:none}
+.a-cover::before{content:''; position:absolute; left:8px; top:0; bottom:0; width:2px; background:currentColor; opacity:.28; z-index:1}
+.a-cover svg{position:absolute; inset:0; width:100%; height:100%}
+.a-cover-no{position:absolute; left:16px; top:8px; font-size:32px; font-weight:500; line-height:1; color:var(--accent); z-index:1}
+.a-cover-title{position:absolute; left:16px; right:8px; bottom:8px; font-size:15px; font-weight:500; line-height:1.4; color:var(--accent); z-index:1}
+.a-card .a-body{display:flex; flex-direction:column; padding:16px; min-width:0}
+.a-card .a-top{display:flex; align-items:baseline; gap:8px}
+.a-card .a-chap{color:var(--accent); font-size:12px; font-weight:500; flex:none}
+.a-card .a-type{color:var(--weak); font-size:12px; margin-left:auto; flex:none}
+.a-card h3{margin:8px 0 0; font-size:16px; font-weight:500; line-height:1.5}
+.a-card .a-sum{margin-top:4px; color:var(--sub); font-size:13px; display:-webkit-box; -webkit-line-clamp:3;
+  -webkit-box-orient:vertical; overflow:hidden}
+.a-card .a-meta{margin-top:8px; color:var(--weak); font-size:12px; display:flex; gap:8px 16px; flex-wrap:wrap}
+.a-card.flash{background:var(--accent-soft)}
+
+/* 列表尾 */
+.list-end{margin-top:24px; text-align:center; color:var(--weak); font-size:13px; min-height:20px}
+.spinner{width:20px; height:20px; margin:0 auto; border-radius:50%; border:2px solid var(--line); border-top-color:var(--accent);
+  animation:spin .8s linear infinite; display:none}
+.spinner.show{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{margin-top:24px; text-align:center; color:var(--weak); font-size:14px; display:none}
+
+/* 阅读视图：宽屏左目录、右正文卡 */
+.read{margin-top:24px; display:grid; grid-template-columns:272px minmax(0,1fr); gap:24px; align-items:start}
+.toc{position:sticky; top:16px; min-width:0}
+.back-btn{display:inline-flex; align-items:center; gap:4px; padding:4px 16px 4px 8px; border-radius:999px;
+  border:1px solid var(--line); background:var(--surface); color:var(--sub); font-size:14px}
+.back-btn svg{width:16px; height:16px; stroke:var(--sub)}
+.back-btn:active{background:var(--surface2)}
+.toc-toggle{display:none; width:100%; align-items:center; gap:8px; margin-top:16px; padding:8px 16px; border-radius:10px;
+  border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:14px; text-align:left}
+.toc-toggle svg{width:16px; height:16px; stroke:var(--sub); margin-left:auto; flex:none; transition:transform .15s ease-out}
+.toc.open .toc-toggle svg{transform:rotate(180deg)}
+.toc-list{margin-top:16px; display:flex; flex-direction:column; gap:4px}
+.toc-item{display:flex; gap:8px; align-items:baseline; width:100%; padding:8px; border-radius:8px; text-align:left;
+  border-left:3px solid transparent; color:var(--sub); font-size:14px; line-height:1.5}
+.toc-item .t-no{color:var(--weak); font-size:12px; flex:none}
+.toc-item.active{border-left-color:var(--accent); color:var(--ink); font-weight:600; background:var(--accent-soft)}
+.toc-item.active .t-no{color:var(--accent)}
+.font-ctrl{margin-top:24px}
+.font-ctrl .f-lab{color:var(--weak); font-size:12px}
+.font-row{display:flex; gap:8px; margin-top:8px}
+.f-btn{flex:1; padding:4px 8px; border-radius:8px; border:1.5px solid transparent; background:var(--surface);
+  color:var(--sub); font-size:13px; transition:border-color .15s ease-out, background-color .15s ease-out}
+.f-btn.active{border-color:var(--accent); background:var(--accent-soft); color:var(--ink)}
+.r-card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:24px; min-width:0}
+.r-head{display:flex; gap:16px; align-items:flex-start}
+.r-head .r-coverbox{width:90px; flex:none}
+.r-head .r-coverbox .a-cover{border-radius:8px; width:100%}
+.r-head .r-coverbox .a-cover-no{font-size:20px; left:16px}
+.r-head .r-coverbox .a-cover-title{font-size:11px; left:16px}
+.r-head-info{flex:1; min-width:0}
+.read .r-chap{color:var(--accent); font-size:13px; font-weight:500}
+.read h2.r-title{margin:8px 0 0; font-size:24px; font-weight:500; line-height:1.45}
+.read .r-meta{margin-top:8px; color:var(--weak); font-size:13px; display:flex; gap:16px; flex-wrap:wrap}
+.read .r-body{margin-top:24px; font-size:16px}
+.read .r-body h3{margin:24px 0 0; font-size:1.06em; font-weight:500; scroll-margin-top:24px}
+.read .r-body h3 .sec-no{color:var(--accent); margin-right:8px}
+.read .r-body p{margin:8px 0 0; color:var(--ink)}
+.read .r-body ul{margin:8px 0 0; padding-left:24px}
+.read .r-body li{margin-top:4px}
+.src-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:24px}
+.src-btn{display:inline-flex; align-items:center; gap:4px; padding:8px 16px; border-radius:10px;
+  border:1px solid var(--line); background:var(--surface); font-size:14px; color:var(--ink)}
+.src-btn svg{width:16px; height:16px; stroke:var(--sub)}
+.src-btn:active{background:var(--surface2)}
+
+footer.site{margin-top:24px; padding-top:16px; border-top:1px solid var(--line); color:var(--weak); font-size:12px}
+[hidden]{display:none !important}
+@media (min-width:761px) and (max-width:1080px){
+  .dispatch{grid-template-columns:minmax(0,42fr) minmax(0,58fr); gap:24px 18px}
+}
+@media (max-width:960px){
+  .editorial-grid{grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px}
+}
+@media (max-width:860px){
+  .read{grid-template-columns:minmax(0,1fr)}
+  .toc{position:static}
+  .toc-toggle{display:flex}
+  .toc-list{display:none}
+  .toc.open .toc-list{display:flex}
+  .font-ctrl{display:none}
+  .r-card{padding:16px}
+  .read h2.r-title{font-size:21px}
+}
+@media (max-width:760px){
+  .dispatch{grid-template-columns:minmax(0,1fr)}
+  .dossier{position:static}
+  .editorial-grid{grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px 16px}
+}
+@media (max-width:420px){
+  .editorial-grid{grid-template-columns:minmax(0,1fr)}
+  .a-card{flex-direction:row}
+  .a-card .a-cover{width:96px; aspect-ratio:auto}
+  .a-card .a-cover-no{font-size:20px; left:16px}
+  .a-card .a-cover-title{font-size:11px}
+  .a-card .a-body{flex:1; padding:8px 16px}
+  .a-card .a-sum{-webkit-line-clamp:2}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="top-row">
+      <div class="brand">
+        <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4z"/><path d="M9 9h6M9 13h6"/></svg></span>
+        <span class="b-name">实战笔记</span>
+        <span class="b-domain">blog.jpedu.asia</span>
+      </div>
+      <nav class="top-nav" aria-label="分区导航">
+        <button type="button" data-nav="home">首页</button>
+        <button type="button" data-nav="orig">原创</button>
+        <button type="button" data-nav="cur">精选</button>
+      </nav>
+      <button type="button" class="theme-btn" id="themeBtn" aria-label="切换深浅，长按选主题色">
+        <svg class="sun-i" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="moon-i" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </header>
+  <div class="site-sub">把长期用 AI 做项目的经验，写成能照着做的文章</div>
+
+  <div class="pop-back" id="popBack"></div>
+  <div class="pop" id="themePop" role="dialog" aria-label="主题">
+    <h2>12 色主题</h2>
+    <div class="hint">点击选择，与其它子站共享</div>
+    <div class="swatch-grid" id="swatchGrid"></div>
+  </div>
+
+  <!-- 列表视图 -->
+  <main id="listView">
+    <div class="tools">
+      <div class="chips" id="chips" role="tablist" aria-label="筛选">
+        <button type="button" class="chip active" data-f="全部">全部</button>
+        <button type="button" class="chip" data-f="原创">原创</button>
+        <button type="button" class="chip" data-f="精选">精选</button>
+      </div>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg>
+        <input id="searchIn" type="search" placeholder="搜索文章" autocomplete="off">
+        <button type="button" class="clear-btn" id="clearBtn" aria-label="清除搜索">×</button>
+      </div>
+      <div class="hit-line" id="hitLine"></div>
+    </div>
+
+    <section class="block" id="rolesSec">
+      <div class="sec-head"><span class="sec-left"><span class="no">01</span><h2>我平时使用的模型与工具分工</h2></span><span class="sec-count" id="rolesCount"></span></div>
+      <div class="sec-note">先分工、再干活：左边选环节与模型，右边看这个模型的档案</div>
+      <div class="dispatch" id="dispatch">
+        <div class="d-steps" id="stepsBox"></div>
+        <div class="dossier" id="dossierBox" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="block" id="origSec">
+      <div class="sec-head"><span class="sec-left"><span class="no">02</span><h2>原创系列</h2></span><span class="sec-count" id="origCount"></span></div>
+      <div class="sec-note">自己的项目里踩出来、验过的办法，按章编号</div>
+      <div class="editorial-grid" id="origCards"></div>
+    </section>
+
+    <section class="block" id="curSec">
+      <div class="sec-head"><span class="sec-left"><span class="no">03</span><h2>精选收录</h2></span><span class="sec-count" id="curCount"></span></div>
+      <div class="sec-note">值得一读的外部文章，只写摘要并标原作者与原文链接</div>
+      <div class="editorial-grid" id="curCards"></div>
+    </section>
+
+    <div class="empty" id="emptyBox">没有命中的文章，换个关键词试试</div>
+    <div id="sentinel"></div>
+    <div class="spinner" id="spinner"></div>
+    <div class="list-end" id="listEnd"></div>
+  </main>
+
+  <!-- 阅读视图：宽屏左目录右正文，窄屏目录收成正文上方折叠条 -->
+  <main id="readView" hidden>
+    <div class="read">
+      <aside class="toc" id="tocBox">
+        <button type="button" class="back-btn" id="backBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+          返回列表
+        </button>
+        <button type="button" class="toc-toggle" id="tocToggle" aria-expanded="false">
+          目录
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <nav class="toc-list" id="tocList" aria-label="文章目录"></nav>
+        <div class="font-ctrl">
+          <div class="f-lab">正文字号</div>
+          <div class="font-row" id="fontRow">
+            <button type="button" class="f-btn" data-fl="0">A-</button>
+            <button type="button" class="f-btn active" data-fl="1">标准</button>
+            <button type="button" class="f-btn" data-fl="2">A+</button>
+          </div>
+        </div>
+      </aside>
+      <article class="r-card">
+        <div class="r-head">
+          <div class="r-coverbox" id="rCover"></div>
+          <div class="r-head-info">
+            <div class="r-chap" id="rChap"></div>
+            <h2 class="r-title" id="rTitle"></h2>
+            <div class="r-meta" id="rMeta"></div>
+          </div>
+        </div>
+        <div class="r-body" id="rBody"></div>
+        <div class="src-row" id="srcRow"></div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="site">本站为公开版：内容已经脱敏处理，不含账号、地址与内部细节</footer>
+</div>
+
+<script src="data/articles.js"></script>
+<script src="data/roles.js"></script>
+<script>
+(function () {
+  'use strict';
+  var root = document.documentElement;
+  var THEMES = [
+    { name: '01 · 冰川晴空', orb1: '#BCE0FD', orb2: '#93C5FD', accent: '#60A5FA', pageBg: '#F4F8FC' },
+    { name: '02 · 薄荷微风', orb1: '#A7F3D0', orb2: '#6EE7B7', accent: '#34D399', pageBg: '#F2FBF7' },
+    { name: '03 · 极光青蓝', orb1: '#A5F3FC', orb2: '#818CF8', accent: '#6366F1', pageBg: '#F4F6FC' },
+    { name: '04 · 抹茶森屿', orb1: '#D9F99D', orb2: '#86EFAC', accent: '#4ADE80', pageBg: '#F6FAF5' },
+    { name: '05 · 碧海晴空', orb1: '#99F6E4', orb2: '#7DD3FC', accent: '#2DD4BF', pageBg: '#F2F9FA' },
+    { name: '06 · 深海星雾', orb1: '#CBD5E1', orb2: '#93C5FD', accent: '#64748B', pageBg: '#F5F7FA' },
+    { name: '07 · 星云幻紫', orb1: '#E9D5FF', orb2: '#C4B5FD', accent: '#8B5CF6', pageBg: '#F8F5FD' },
+    { name: '08 · 蜜桃乌龙', orb1: '#FBCFE8', orb2: '#FDA4AF', accent: '#F472B6', pageBg: '#FDF6F9' },
+    { name: '09 · 晨曦微光', orb1: '#FDE68A', orb2: '#FDBA74', accent: '#FB923C', pageBg: '#FCF9F4' },
+    { name: '10 · 落日粉紫', orb1: '#F5D0FE', orb2: '#FECDD3', accent: '#C084FC', pageBg: '#FAF6FC' },
+    { name: '11 · 香槟流金', orb1: '#FEF08A', orb2: '#FDE047', accent: '#EAB308', pageBg: '#FAF9F2' },
+    { name: '12 · 幻彩全息', orb1: '#8FDBB8', orb2: '#9CC8F7', accent: '#4FA8F6', pageBg: '#F3F8FA' }
+  ];
+  var init = root._blogInit || { dark: false, idx: 11, langDigit: '0', hasA: false, hasLs: false };
+  var state = { dark: init.dark, idx: init.idx, filter: '全部', query: '', shown: 0, queue: [] };
+  var listScroll = 0;
+
+  function store(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function writeA() {
+    var s = 'A=' + init.langDigit + (state.dark ? '0' : '1') + String(state.idx + 1) + '; Path=/; Max-Age=31536000; SameSite=Lax';
+    var h = location.hostname;
+    if (h === 'jpedu.asia' || h.slice(-11) === '.jpedu.asia') s += '; Domain=jpedu.asia';
+    if (location.protocol === 'https:') s += '; Secure';
+    try { document.cookie = s; } catch (e) {}
+  }
+  function persist() { store('blog-theme-idx', String(state.idx)); store('blog-dark', state.dark ? '1' : '0'); writeA(); }
+  function applyTheme() {
+    root.setAttribute('data-theme', state.dark ? 'dark' : 'light');
+    root.setAttribute('data-tidx', String(state.idx));
+    var t = THEMES[state.idx], cs = root.style;
+    cs.setProperty('--accent', t.accent);
+    cs.setProperty('--accent-soft', t.accent + '1f');
+    cs.setProperty('--search-glow', t.accent + '61');
+    if (!state.dark) { cs.setProperty('--wash1', t.pageBg); cs.setProperty('--wash2', t.orb1 + '55'); }
+    else { cs.removeProperty('--wash1'); cs.removeProperty('--wash2'); }
+    var mt = document.querySelector('meta[name="theme-color"]');
+    if (mt) mt.setAttribute('content', state.dark ? '#101214' : t.pageBg);
+    document.querySelectorAll('.swatch').forEach(function (el) {
+      el.classList.toggle('active', Number(el.getAttribute('data-i')) === state.idx);
+    });
+  }
+  /* 种子：A 与本站记录都不存在时不写 A；只有本站有旧记录时才把现值写成 A */
+  if (!init.hasA && init.hasLs) writeA();
+
+  /* ---------- 主题钮：单击切深浅，长按约 0.34 秒开面板 ---------- */
+  var themeBtn = document.getElementById('themeBtn'), pop = document.getElementById('themePop'), popBack = document.getElementById('popBack');
+  var grid = document.getElementById('swatchGrid');
+  grid.innerHTML = THEMES.map(function (t, i) {
+    return '<button type="button" class="swatch" data-i="' + i + '"><span class="orb" style="background:linear-gradient(135deg,' + t.orb1 + ',' + t.orb2 + ' 65%,' + t.accent + ')"></span><span class="nm">' + t.name + '</span></button>';
+  }).join('');
+  grid.querySelectorAll('.swatch').forEach(function (el) {
+    el.addEventListener('click', function () { state.idx = Number(el.getAttribute('data-i')); applyTheme(); persist(); closePop(); });
+  });
+  function openPop() { pop.classList.add('open'); popBack.classList.add('open'); }
+  function closePop() { pop.classList.remove('open'); popBack.classList.remove('open'); }
+  popBack.addEventListener('click', closePop);
+  var pressTimer = null, longPressed = false;
+  themeBtn.addEventListener('pointerdown', function () {
+    longPressed = false;
+    pressTimer = setTimeout(function () { longPressed = true; openPop(); }, 340);
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) {
+    themeBtn.addEventListener(ev, function () { if (pressTimer) clearTimeout(pressTimer); });
+  });
+  themeBtn.addEventListener('click', function () {
+    if (longPressed) { longPressed = false; return; }
+    state.dark = !state.dark; applyTheme(); persist();
+  });
+
+  /* ---------- 数据渲染 ---------- */
+  var DATA = window.BLOG_DATA || { articles: [] };
+  var ICONS = {
+    chat: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.5 8.5 0 1 1 16.1-3.8z"/></svg>',
+    pen: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>',
+    code: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-5 6 5 6M16 6l5 6-5 6"/></svg>',
+    shield: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>',
+    image: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M3 16l5-4 4 3 3-2 6 5"/></svg>'
+  };
+  function icon(name) { return ICONS[name] || ICONS.chat; }
+  /* 书封：竖版画布 120x160，图案居中，章号与短题由 HTML 层叠加 */
+  function coverSvg(pat) {
+    var inner;
+    if (pat === 'steps') inner = '<path d="M24 138h18V114h18V90h18V66h18V42h12"/>';
+    else if (pat === 'rings') inner = '<circle cx="60" cy="76" r="12"/><circle cx="60" cy="76" r="25"/><circle cx="60" cy="76" r="38"/>';
+    else if (pat === 'shield') inner = '<path d="M60 36l27 10v21c0 21-12 33-27 41C45 100 33 88 33 67V46l27-10z"/><path d="M47 72l9 9 17-17"/>';
+    else if (pat === 'book') inner = '<path d="M38 30h30a9 9 0 0 1 9 9v88H47a9 9 0 0 1-9-9V30z"/><path d="M51 56h14M51 72h14"/>';
+    else inner = '<path d="M30 0v160M60 0v160M90 0v160M0 40h120M0 80h120M0 120h120"/>';
+    return '<svg viewBox="0 0 120 160" preserveAspectRatio="xMidYMid slice" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.45">' + inner + '</svg>';
+  }
+  function coverHtml(a) {
+    return '<span class="a-cover">' + coverSvg(a.coverPat) + '<span class="a-cover-no">' + esc(a.coverNo || '') + '</span>' +
+      '<span class="a-cover-title">' + esc(a.coverTitle || '') + '</span></span>';
+  }
+
+  /* ---------- 分工区：档案库 + 环节引用，左栏选模型，右栏看档案 ---------- */
+  var ROLES = window.BLOG_ROLES || { models: {}, steps: [] };
+  var MODELS = ROLES.models || {}, STEPS = ROLES.steps || [];
+  var stepsBox = document.getElementById('stepsBox'), dossierBox = document.getElementById('dossierBox');
+  var selMid = STEPS.length && STEPS[0].models.length ? STEPS[0].models[0] : '';
+  stepsBox.innerHTML = STEPS.map(function (s) {
+    return '<div class="d-step"><div class="d-step-head"><span class="d-no">' + esc(s.step) + '</span><h3>' + esc(s.name) + '</h3></div><div class="d-marks">' +
+      s.models.map(function (id) {
+        var m = MODELS[id]; if (!m) return '';
+        return '<button type="button" class="mark' + (id === selMid ? ' active' : '') + '" data-mid="' + id + '">' + icon(m.icon) + '<span class="m-name">' + esc(m.name) + '</span><span class="m-badge">' + esc(m.badge) + '</span></button>';
+      }).join('') + '</div></div>';
+  }).join('');
+  function renderDossier() {
+    var m = MODELS[selMid];
+    if (!m) { dossierBox.innerHTML = ''; return; }
+    dossierBox.innerHTML = '<div class="d-quote">' + esc(m.quote) + '</div>' +
+      '<div class="d-head"><span class="d-icon">' + icon(m.icon) + '</span><span class="d-name">' + esc(m.name) + '</span><span class="d-badge">' + esc(m.badge) + '</span></div>' +
+      '<div class="d-row"><div class="d-lab">核心长处</div><div class="d-txt">' + esc(m.strengths) + '</div></div>' +
+      '<div class="d-row"><div class="d-lab">短板与门槛</div><div class="d-txt">' + esc(m.limits) + '</div></div>' +
+      '<div class="d-row"><div class="d-lab">典型场景</div><div class="d-txt">' + esc(m.scenes) + '</div></div>';
+  }
+  stepsBox.addEventListener('click', function (e) {
+    var b = e.target.closest('.mark'); if (!b) return;
+    selMid = b.getAttribute('data-mid');
+    stepsBox.querySelectorAll('.mark').forEach(function (el) { el.classList.toggle('active', el.getAttribute('data-mid') === selMid); });
+    renderDossier();
+  });
+  renderDossier();
+
+  /* ---------- 分区计数（按数据实数） ---------- */
+  document.getElementById('rolesCount').textContent = STEPS.length + ' 个环节';
+  document.getElementById('origCount').textContent = '共 ' + DATA.articles.filter(function (a) { return a.type === '原创'; }).length + ' 篇';
+  document.getElementById('curCount').textContent = '共 ' + DATA.articles.filter(function (a) { return a.type === '精选'; }).length + ' 篇';
+
+  var origBox = document.getElementById('origCards'), curBox = document.getElementById('curCards');
+  var origSec = document.getElementById('origSec'), curSec = document.getElementById('curSec'), rolesSec = document.getElementById('rolesSec');
+  var hitLine = document.getElementById('hitLine'), listEnd = document.getElementById('listEnd'), emptyBox = document.getElementById('emptyBox');
+  var spinner = document.getElementById('spinner');
+  var BATCH = 4, loading = false;
+
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function matches(a) {
+    if (state.filter !== '全部' && a.type !== state.filter) return false;
+    if (!state.query) return true;
+    var hay = (a.title + ' ' + a.summary + ' ' + (a.author || '') + ' ' + a.chapter).toLowerCase();
+    return hay.indexOf(state.query.toLowerCase()) !== -1;
+  }
+  function cardHtml(a) {
+    return '<a class="a-card" href="#/article/' + a.slug + '" data-slug="' + a.slug + '">' +
+      coverHtml(a) +
+      '<span class="a-body"><span class="a-top"><span class="a-chap">' + esc(a.chapter) + '</span><span class="a-type">' + esc(a.type) + '</span></span>' +
+      '<h3>' + esc(a.title) + '</h3><span class="a-sum">' + esc(a.summary) + '</span>' +
+      '<span class="a-meta"><span>' + esc(a.date) + '</span><span>阅读约 ' + a.minutes + ' 分钟</span>' +
+      (a.author ? '<span>作者 ' + esc(a.author) + '</span>' : '') + '</span></span></a>';
+  }
+  function rebuild() {
+    origBox.innerHTML = ''; curBox.innerHTML = '';
+    var list = DATA.articles.filter(matches);
+    state.queue = list.slice(); state.shown = 0;
+    origSec.hidden = !list.some(function (a) { return a.type === '原创'; });
+    curSec.hidden = !list.some(function (a) { return a.type === '精选'; });
+    rolesSec.hidden = state.filter === '精选' || !!state.query;
+    emptyBox.style.display = list.length ? 'none' : 'block';
+    hitLine.textContent = state.query ? '命中 ' + list.length + ' 篇' : '';
+    listEnd.textContent = '';
+    loadMore();
+    if (state.query && list.length) {
+      var first = document.querySelector('.a-card');
+      if (first) { first.scrollIntoView({ block: 'center' }); first.classList.add('flash'); setTimeout(function () { first.classList.remove('flash'); }, 2600); }
+    }
+  }
+  function loadMore() {
+    if (loading || !state.queue.length) { finishCheck(); return; }
+    loading = true; spinner.classList.add('show');
+    setTimeout(function () {
+      var batch = state.queue.splice(0, BATCH);
+      batch.forEach(function (a) { (a.type === '原创' ? origBox : curBox).insertAdjacentHTML('beforeend', cardHtml(a)); state.shown++; });
+      loading = false; spinner.classList.remove('show');
+      finishCheck();
+      /* 哨兵仍在视口内时接着加载下一批，避免只触发一次就停 */
+      var r = document.getElementById('sentinel').getBoundingClientRect();
+      if (state.queue.length && r.top < window.innerHeight + 300) loadMore();
+    }, 120);
+  }
+  function finishCheck() {
+    if (!state.queue.length && state.shown) listEnd.textContent = '已展示全部 ' + state.shown + ' 篇';
+  }
+  var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) loadMore(); }, { rootMargin: '300px' });
+  io.observe(document.getElementById('sentinel'));
+
+  /* ---------- 筛选与搜索：只就地更新 ---------- */
+  document.getElementById('chips').addEventListener('click', function (e) {
+    var b = e.target.closest('.chip'); if (!b) return;
+    document.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('active', c === b); });
+    state.filter = b.getAttribute('data-f'); rebuild();
+  });
+  var searchIn = document.getElementById('searchIn'), clearBtn = document.getElementById('clearBtn');
+  searchIn.addEventListener('input', function () {
+    state.query = searchIn.value.trim();
+    clearBtn.classList.toggle('show', !!state.query);
+    rebuild();
+  });
+  clearBtn.addEventListener('click', function () { searchIn.value = ''; state.query = ''; clearBtn.classList.remove('show'); rebuild(); searchIn.focus(); });
+
+  /* ---------- 阅读视图与 hash 路由 ---------- */
+  var listView = document.getElementById('listView'), readView = document.getElementById('readView');
+  var tocBox = document.getElementById('tocBox'), tocList = document.getElementById('tocList'), tocToggle = document.getElementById('tocToggle');
+  var rBody = document.getElementById('rBody');
+  var FONT_LEVELS = [15, 16, 18], fontLvl = 1, spy = null;
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function setActiveToc(id) {
+    tocList.querySelectorAll('.toc-item').forEach(function (el) { el.classList.toggle('active', el.getAttribute('data-target') === id); });
+  }
+  function openArticle(slug) {
+    var a = null;
+    DATA.articles.forEach(function (x) { if (x.slug === slug) a = x; });
+    if (!a) { location.hash = ''; return; }
+    listScroll = window.scrollY;
+    document.getElementById('rChap').textContent = a.chapter + ' · ' + a.type;
+    document.getElementById('rTitle').textContent = a.title;
+    document.getElementById('rMeta').innerHTML = '<span>' + esc(a.date) + '</span><span>阅读约 ' + a.minutes + ' 分钟</span>' + (a.author ? '<span>作者 ' + esc(a.author) + '</span>' : '');
+    document.getElementById('rCover').innerHTML = coverHtml(a);
+    /* 正文与目录同源生成：小标题即目录项，节号 §NN 两处一致 */
+    var secs = [];
+    rBody.innerHTML = a.body.map(function (b) {
+      if (b.h) { var k = secs.length; secs.push(b.h); return '<h3 id="sec-' + k + '"><span class="sec-no">§' + pad2(k + 1) + '</span>' + esc(b.h) + '</h3>'; }
+      if (b.list) return '<ul>' + b.list.map(function (li) { return '<li>' + esc(li) + '</li>'; }).join('') + '</ul>';
+      return '<p>' + esc(b.p) + '</p>';
+    }).join('');
+    rBody.style.fontSize = FONT_LEVELS[fontLvl] + 'px';
+    tocBox.classList.remove('open'); tocToggle.setAttribute('aria-expanded', 'false');
+    tocList.innerHTML = secs.map(function (h, k) {
+      return '<button type="button" class="toc-item' + (k === 0 ? ' active' : '') + '" data-target="sec-' + k + '"><span class="t-no">§' + pad2(k + 1) + '</span><span>' + esc(h) + '</span></button>';
+    }).join('');
+    /* 滚动跟随：维护当前带内的可见小节集合，高亮取其中最靠前的一节，只切类、不重绘 */
+    if (spy) spy.disconnect();
+    var spyVisible = {};
+    spy = new IntersectionObserver(function (es) {
+      es.forEach(function (en) { if (en.isIntersecting) spyVisible[en.target.id] = 1; else delete spyVisible[en.target.id]; });
+      var ids = Object.keys(spyVisible).sort();
+      if (ids.length) setActiveToc(ids[0]);
+    }, { rootMargin: '-72px 0px -65% 0px' });
+    rBody.querySelectorAll('h3[id]').forEach(function (el) { spy.observe(el); });
+    var src = '';
+    if (a.source) src += '<a class="src-btn" href="' + a.source + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>原文链接</a>';
+    if (a.video) src += '<a class="src-btn" href="' + a.video + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>视频讲解</a>';
+    document.getElementById('srcRow').innerHTML = src;
+    listView.hidden = true; readView.hidden = false;
+    window.scrollTo(0, 0);
+  }
+  /* 目录点按：平滑滚到小节，不动 location.hash；窄屏点完收起折叠 */
+  tocList.addEventListener('click', function (e) {
+    var b = e.target.closest('.toc-item'); if (!b) return;
+    var t = document.getElementById(b.getAttribute('data-target'));
+    if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); setActiveToc(t.id); }
+    tocBox.classList.remove('open'); tocToggle.setAttribute('aria-expanded', 'false');
+  });
+  tocToggle.addEventListener('click', function () {
+    var open = tocBox.classList.toggle('open');
+    tocToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  /* 字号三档：只调正文字号，就地生效 */
+  document.getElementById('fontRow').addEventListener('click', function (e) {
+    var b = e.target.closest('.f-btn'); if (!b) return;
+    fontLvl = Number(b.getAttribute('data-fl'));
+    this.querySelectorAll('.f-btn').forEach(function (el) { el.classList.toggle('active', el === b); });
+    rBody.style.fontSize = FONT_LEVELS[fontLvl] + 'px';
+  });
+  function showList() {
+    readView.hidden = true; listView.hidden = false;
+    window.scrollTo(0, listScroll || 0);
+  }
+  function route() {
+    var m = /^#\/article\/(.+)$/.exec(location.hash);
+    if (m) openArticle(decodeURIComponent(m[1])); else showList();
+  }
+  window.addEventListener('hashchange', route);
+  document.getElementById('backBtn').addEventListener('click', function () {
+    if (history.length > 1) history.back(); else location.hash = '';
+  });
+
+  /* ---------- 顶栏导航：锚点滚到对应分区（在阅读视图时先回列表） ---------- */
+  document.querySelector('.top-nav').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-nav]'); if (!b) return;
+    var kind = b.getAttribute('data-nav');
+    function go() {
+      if (kind === 'home') window.scrollTo({ top: 0, behavior: 'smooth' });
+      else { var sec = document.getElementById(kind === 'orig' ? 'origSec' : 'curSec'); if (sec && !sec.hidden) sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }
+    if (!readView.hidden) { location.hash = ''; setTimeout(go, 80); } else go();
+  });
+
+  applyTheme();
+  rebuild();
+  route();
+})();
+</script>
+</body>
+</html>

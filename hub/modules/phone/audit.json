@@ -1,0 +1,107 @@
+{
+ "site": "phone",
+ "dir": "cloud-phone",
+ "source_bytes": 120687,
+ "script_blocks": [
+  {
+   "idx": 0,
+   "offset": 299,
+   "line": 8,
+   "region": "head",
+   "bytes": 2460,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  },
+  {
+   "idx": 1,
+   "offset": 54811,
+   "line": 1908,
+   "region": "body",
+   "bytes": 63473,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  }
+ ],
+ "bootstrap_hazards": [],
+ "head_scripts": [
+  {
+   "idx": 0,
+   "offset": 299,
+   "line": 8,
+   "region": "head",
+   "bytes": 2460,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  }
+ ],
+ "global_listeners": [],
+ "element_listeners_count": 5,
+ "dangers": {
+  "document_write": [],
+  "eval": [],
+  "new_function": [],
+  "location_nav": [],
+  "history_writes": [],
+  "window_assignments": [],
+  "service_worker": [],
+  "set_interval": []
+ },
+ "timers_note": "setInterval/setTimeout are NOT suspended on unmount (modules are never unloaded; intervals keep running against hidden DOM — see audit.md)",
+ "fetch_points": {
+  "literal_urls": [],
+  "dynamic_fetch_calls": 0,
+  "xhr": 0,
+  "rule": "all fetch() calls in module scope pass the generated __fetch shadow: relative URLs resolve against /frontend/cloud-phone/"
+ },
+ "shadow_name_declarations": [],
+ "inline_handler_bridge": {
+  "names": [
+   "clearSearch",
+   "closeBrandModal",
+   "closeThemePanel",
+   "handleRefresh",
+   "handleScenarioCardClick",
+   "handleSearchInput",
+   "openBrandModal",
+   "resetCategoryFilter",
+   "selectCategory",
+   "selectThemeFromPanel",
+   "switchTab",
+   "toggleCheckStep",
+   "toggleLanguage",
+   "toggleModFilter",
+   "toggleOfficialFilter",
+   "toggleSiteGroup",
+   "triggerSearchFocus"
+  ],
+  "declared_in_source": [
+   "clearSearch",
+   "closeBrandModal",
+   "closeThemePanel",
+   "handleRefresh",
+   "handleScenarioCardClick",
+   "handleSearchInput",
+   "openBrandModal",
+   "resetCategoryFilter",
+   "selectCategory",
+   "selectThemeFromPanel",
+   "switchTab",
+   "toggleCheckStep",
+   "toggleLanguage",
+   "toggleModFilter",
+   "toggleOfficialFilter",
+   "toggleSiteGroup",
+   "triggerSearchFocus"
+  ],
+  "not_found_as_declaration": []
+ },
+ "localstorage_keys": [
+  "phone-dark",
+  "phone-lang",
+  "phone-theme-idx"
+ ],
+ "ui_relative_assets_rebased": []
+}

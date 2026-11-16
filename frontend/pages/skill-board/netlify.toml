@@ -1,0 +1,4 @@
+# Netlify / Cloudflare Pages 等纯静态托管：直接把仓库根目录设为发布目录即可
+# 这类托管本身不跑定时任务，刷新走仓库里的 GitHub Actions（见 README 方案 C）
+[build]
+  publish = "."

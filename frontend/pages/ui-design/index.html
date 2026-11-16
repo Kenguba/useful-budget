@@ -1,0 +1,2681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:,">
+  <title>Designeer · Curated Catalogue for Designers &amp; Developers (ui.jpedu.asia)</title>
+  <style>
+    /* ================= 1. 核心动态 CSS 变量体系（12 色弥散光晕全链路统一配色） ================= */
+    :root {
+      /* 顶部与侧栏共享弥散渐变色值（默认 12 号：幻彩全息 Gemini Holo） */
+      --hero-bg-base: #FFFFFF;
+      --orb-color-1: #8FDBB8;
+      --orb-color-2: #9CC8F7;
+      --orb-color-3: #9EDDC5;
+
+      /* 按钮与组件专属联动色 */
+      --refresh-btn-bg: #4FA8F6;
+      --refresh-btn-text: #FFFFFF;
+      --send-circle-bg: #9EE0C5;
+      --send-circle-icon: #0F172A;
+
+      /* 主题强调色与标签配比（全站统一） */
+      --theme-accent: #1A73E8;
+      --theme-tab-text: #0F172A;
+      --theme-tag-bg: #E6F4EA;
+      --theme-tag-text: #137333;
+      --search-glow: rgba(143, 219, 184, 0.42);
+
+      /* 页面与卡片表面色（随主题微染，消除左右割裂感） */
+      --page-bg: #F3F8FA;
+      --card-bg: #FFFFFF;
+      --card-border: rgba(226, 232, 240, 0.85);
+      --card-hover-border: #93C5FD;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #64748B;
+      --badge-bg: #F1F5F9;
+      --badge-text: #334155;
+      --pill-surface: #FFFFFF;
+      --pill-shadow: 0 6px 20px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* 深色模式覆盖变量（单击右上角太阳按钮切换） */
+    [data-dark="true"] {
+      --hero-bg-base: #0F172A;
+      --page-bg: #090D16;
+      --card-bg: #151F32;
+      --card-border: rgba(255, 255, 255, 0.09);
+      --card-hover-border: rgba(147, 197, 253, 0.35);
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --badge-bg: rgba(255, 255, 255, 0.08);
+      --badge-text: #CBD5E1;
+      --pill-surface: #1E293B;
+      --pill-shadow: 0 8px 24px rgba(0, 0, 0, 0.38);
+      --theme-tab-text: #F8FAFC;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--page-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color 0.5s var(--ease-smooth), color 0.35s ease;
+      background-image: radial-gradient(120% 700px at 26% 0%, color-mix(in srgb, var(--orb-color-1) 8%, transparent) 0%, transparent 100%), radial-gradient(120% 700px at 74% 0%, color-mix(in srgb, var(--orb-color-2) 8%, transparent) 0%, transparent 100%);
+      background-repeat: no-repeat;
+    }
+
+    [data-dark="true"] body {
+      background-image: none;
+    }
+
+    /* ================= 2. 顶部与侧边栏同源 12 色弥散光晕呼吸动画 ================= */
+
+
+
+    @keyframes videoHoloBtn {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    [data-holo="true"] .refresh-btn,
+    [data-holo="true"] .submit-cta-btn {
+      background: linear-gradient(120deg, #56C596, #4FA8F6, #74B9FF, #68D391);
+      background-size: 240% 240%;
+      animation: videoHoloBtn 4.2s ease infinite;
+    }
+
+    [data-holo="true"] .action-circle-btn {
+      background: linear-gradient(135deg, #B2E2B4 0%, #98DBC5 45%, #9CC8F7 100%);
+      background-size: 200% 200%;
+      animation: videoHoloBtn 4.2s ease infinite;
+    }
+
+    /* ================= 3. 电脑端双栏（左导航+右内容） vs 手机端全宽（无侧栏挤压） ================= */
+    .workspace-shell {
+      max-width: 1280px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 248px minmax(0, 1fr);
+      gap: 24px;
+      padding: 22px 24px 64px;
+      align-items: start;
+    }
+
+    /* ================= 4. 电脑端左侧栏：与右侧同源的弥散光晕毛玻璃卡片（彻底消除割裂感） ================= */
+    .designeer-sidebar {
+      position: sticky;
+      top: 22px;
+      background-color: var(--hero-bg-base);
+      background-image: radial-gradient(130% 300px at 50% 0%, color-mix(in srgb, var(--orb-color-1) 36%, transparent) 0%, transparent 72%), radial-gradient(130% 300px at 50% 100%, color-mix(in srgb, var(--orb-color-2) 32%, transparent) 0%, transparent 72%);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 28px;
+      padding: 22px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: calc(100vh - 44px);
+      box-shadow: 0 14px 34px -12px rgba(15, 23, 42, 0.14), 0 4px 14px rgba(15, 23, 42, 0.03);
+      overflow: hidden;
+      z-index: 15;
+      transition: background-color 0.5s ease, box-shadow 0.5s ease, border-color 0.4s ease;
+    }
+
+    [data-dark="true"] .designeer-sidebar {
+      background-image: none;
+      border-color: rgba(255, 255, 255, 0.09);
+    }
+
+    /* 左侧栏内部同源弥散光斑背景，使左右两栏视觉融为一体 */
+
+
+
+    .sidebar-top-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .sidebar-brand-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sidebar-brand-bar {
+      width: 4px;
+      height: 16px;
+      border-radius: 3px;
+      background-color: var(--theme-accent);
+      transition: background-color 0.45s ease;
+    }
+
+    .sidebar-brand-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--theme-accent);
+      box-shadow: 0 0 10px var(--theme-accent);
+    }
+
+    .sidebar-brand-desc {
+      margin-top: 8px;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+
+    .sidebar-section-label {
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 0 10px;
+      margin-bottom: -8px;
+    }
+
+    .sidebar-nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .sidebar-nav-btn {
+      width: 100%;
+      border: 1px solid transparent;
+      background: transparent;
+      padding: 9px 12px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.22s ease;
+      text-align: left;
+    }
+
+    .sidebar-nav-btn:hover {
+      background-color: rgba(255, 255, 255, 0.65);
+      color: var(--text-primary);
+    }
+
+    [data-dark="true"] .sidebar-nav-btn:hover {
+      background-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .sidebar-nav-btn.active {
+      background-color: var(--pill-surface);
+      border-color: rgba(255, 255, 255, 0.9);
+      color: var(--theme-accent);
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
+
+    [data-dark="true"] .sidebar-nav-btn.active {
+      border-color: rgba(255, 255, 255, 0.12);
+      color: var(--orb-color-2);
+    }
+
+    .sidebar-nav-count {
+      font-size: 11.5px;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+      font-weight: 600;
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      padding: 1.5px 7px;
+      border-radius: 999px;
+      transition: all 0.3s ease;
+    }
+
+    [data-dark="true"] .sidebar-nav-count {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--orb-color-2);
+    }
+
+    .sidebar-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      padding-top: 8px;
+    }
+
+    /* 侧栏按钮与右侧刷新按钮采用同色系流光渐变，浑然一体 */
+    .submit-cta-btn {
+      width: 100%;
+      border: none;
+      background-color: var(--refresh-btn-bg);
+      color: #FFFFFF;
+      padding: 10px 16px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+      transition: transform 0.22s var(--ease-spring), filter 0.2s ease;
+    }
+
+    .submit-cta-btn:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    .submit-cta-btn:active {
+      transform: scale(0.96);
+    }
+
+    .login-trigger-btn {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      background-color: var(--pill-surface);
+      color: var(--text-primary);
+      padding: 8.5px 14px;
+      border-radius: 9999px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: var(--pill-shadow);
+      transition: all 0.22s ease;
+    }
+
+    [data-dark="true"] .login-trigger-btn {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .login-trigger-btn:hover {
+      color: var(--theme-accent);
+      transform: translateY(-1px);
+    }
+
+    .sidebar-footer-note {
+      margin-top: 20px;
+      font-size: 11px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      opacity: 0.85;
+    }
+
+    /* ================= 5. 右侧主内容列 ================= */
+    .main-column {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 顶部 12 色弥散光晕 Hero Header（1:1 复刻 Ai比价.html 视觉质感） */
+    .hero-header {
+      position: relative;
+      background-color: var(--hero-bg-base);
+      background-image: radial-gradient(115% 180px at 26% calc(100% - 108px), color-mix(in srgb, var(--orb-color-1) 42%, transparent) 0%, transparent 88%), radial-gradient(115% 180px at 74% calc(100% - 108px), color-mix(in srgb, var(--orb-color-2) 42%, transparent) 0%, transparent 88%);
+      padding: 16px 20px 24px;
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 14px 34px -12px rgba(15, 23, 42, 0.14);
+      transition: background-color 0.55s ease, box-shadow 0.6s ease;
+      z-index: 20;
+    }
+
+    [data-dark="true"] .hero-header {
+      background-image: none;
+      border-color: rgba(255, 255, 255, 0.09);
+    }
+
+
+
+
+
+
+
+    /* ================= 6. 顶部第一行：左侧品牌标识 + 最右边固定「语言 + 主题」（同行绝不截断） ================= */
+    .top-nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: nowrap;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .brand-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .brand-bar {
+      width: 4px;
+      height: 15px;
+      background-color: var(--theme-accent);
+      border-radius: 3px;
+      margin-right: 8px;
+      flex-shrink: 0;
+      transition: background-color 0.45s ease;
+    }
+
+    /* 最右边固定在一行的「🌐 语言」+「☀️ 主题」 */
+    .top-right-widgets {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+      margin-left: auto;
+      gap: 10px;
+      position: relative;
+    }
+
+    .lang-pill-btn {
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background-color: var(--pill-surface);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: var(--pill-shadow);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: transform 0.25s var(--ease-spring),
+                  box-shadow 0.3s ease,
+                  background-color 0.4s ease;
+    }
+
+    [data-dark="true"] .lang-pill-btn,
+    [data-dark="true"] .theme-mode-btn {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .lang-pill-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .lang-pill-btn:active {
+      transform: scale(0.93);
+    }
+
+    .globe-svg {
+      width: 17px;
+      height: 17px;
+      stroke: var(--theme-accent);
+      fill: none;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+      transition: stroke 0.45s ease, transform 0.4s ease;
+    }
+
+    .lang-pill-btn:hover .globe-svg {
+      transform: rotate(15deg);
+    }
+
+    .lang-text {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.3px;
+    }
+
+    .theme-mode-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--pill-surface);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: var(--pill-shadow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-primary);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 102;
+      transition: transform 0.25s var(--ease-spring),
+                  background-color 0.4s ease,
+                  color 0.3s ease,
+                  box-shadow 0.3s ease;
+    }
+
+    .theme-mode-btn.pressing {
+      transform: scale(0.9);
+      box-shadow: 0 0 0 4px var(--search-glow);
+    }
+
+    .sun-moon-svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+      transition: transform 0.5s var(--ease-spring);
+    }
+
+    .theme-mode-btn.rotating .sun-moon-svg {
+      transform: rotate(180deg) scale(0.85);
+    }
+
+    /* 长按弹出的 12 色主题悬浮面板 */
+    .theme-panel-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 98;
+      background: rgba(15, 23, 42, 0.06);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .theme-panel-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .theme-popover-panel {
+      position: absolute;
+      top: 44px;
+      right: 0;
+      width: 288px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 22px;
+      padding: 13px;
+      box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.18),
+                  0 4px 16px rgba(15, 23, 42, 0.06);
+      z-index: 101;
+      opacity: 0;
+      transform: translateY(-10px) scale(0.92);
+      transform-origin: top right;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      transition: opacity 0.26s var(--ease-smooth),
+                  transform 0.3s var(--ease-spring);
+    }
+
+    [data-dark="true"] .theme-popover-panel {
+      background: rgba(21, 31, 50, 0.95);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 22px 44px -8px rgba(0, 0, 0, 0.55);
+    }
+
+    .theme-popover-panel.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 9px;
+      padding: 0 4px;
+    }
+
+    .panel-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .panel-hint {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .theme-swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
+    }
+
+    .theme-swatch-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 9px;
+      border-radius: 13px;
+      background: rgba(248, 250, 252, 0.78);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: transform 0.18s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    [data-dark="true"] .theme-swatch-item {
+      background: rgba(30, 41, 59, 0.78);
+    }
+
+    .theme-swatch-item.active,
+    .theme-swatch-item.sliding-hover {
+      background: var(--theme-tag-bg);
+      border-color: var(--theme-accent);
+      transform: scale(1.04);
+      box-shadow: 0 8px 20px -4px var(--search-glow);
+    }
+
+    .swatch-orb-preview {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6), 0 2px 5px rgba(15, 23, 42, 0.1);
+    }
+
+    .swatch-orb-preview.holo-animated {
+      background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%) !important;
+      background-size: 220% 220% !important;
+      animation: videoHoloBtn 3.2s ease infinite;
+    }
+
+    .swatch-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* ================= 7. 完整无截断的标题、副标题、统计胶囊与状态刷新行 ================= */
+    .eyebrow-subtitle {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.9px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .hero-main-heading {
+      font-size: clamp(20px, 2.5vw, 27px);
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.4px;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .hero-lead-paragraph {
+      font-size: 13.5px;
+      line-height: 1.58;
+      color: var(--text-secondary);
+      max-width: 720px;
+      margin-bottom: 14px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .update-time {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .refresh-btn {
+      background-color: var(--refresh-btn-bg);
+      color: var(--refresh-btn-text);
+      border: none;
+      padding: 7.5px 15px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      box-shadow: 0 5px 15px rgba(15, 23, 42, 0.12);
+      transition: background-color 0.45s ease,
+                  transform 0.25s var(--ease-spring),
+                  box-shadow 0.45s ease;
+    }
+
+    .refresh-btn:hover {
+      filter: brightness(1.04);
+      transform: translateY(-1px);
+    }
+
+    .refresh-btn:active {
+      transform: scale(0.94);
+    }
+
+    .refresh-svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2.3;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+      transition: transform 0.55s var(--ease-spring);
+    }
+
+    .refresh-btn.spinning .refresh-svg {
+      transform: rotate(360deg);
+    }
+
+    /* ================= 8. 悬浮滑动胶囊 Tab（1:1 复刻 Ai比价.html 双项胶囊） ================= */
+    .gemini-tab-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .gemini-tabs {
+      position: relative;
+      display: inline-grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.48);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.68);
+    }
+
+    [data-dark="true"] .gemini-tabs {
+      background: rgba(15, 23, 42, 0.48);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .tab-glider {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: calc(50% - 4px);
+      height: calc(100% - 8px);
+      background-color: var(--pill-surface);
+      border-radius: 999px;
+      box-shadow: 0 3px 12px rgba(15, 23, 42, 0.08);
+      transition: transform 0.42s var(--ease-spring),
+                  background-color 0.4s ease;
+      z-index: 0;
+    }
+
+    .gemini-tabs[data-mode="finds"] .tab-glider {
+      transform: translateX(100%);
+    }
+
+    .gemini-tab-btn {
+      position: relative;
+      z-index: 1;
+      border: none;
+      background: transparent;
+      padding: 8px 22px;
+      border-radius: 999px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: color 0.3s ease;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .gemini-tab-btn.active {
+      color: var(--theme-tab-text);
+      font-weight: 700;
+    }
+
+    /* ================= 9. 大圆角悬浮搜索框 ================= */
+    .gemini-search-card {
+      background-color: var(--pill-surface);
+      border-radius: 26px;
+      padding: 9px 10px 9px 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 28px -6px rgba(15, 23, 42, 0.10), 0 2px 6px rgba(15, 23, 42, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      transition: box-shadow 0.45s ease,
+                  transform 0.25s ease,
+                  border-color 0.35s ease,
+                  background-color 0.4s ease;
+    }
+
+    [data-dark="true"] .gemini-search-card {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .gemini-search-card:focus-within {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 32px -4px rgba(15, 23, 42, 0.12);
+    }
+
+    .plus-action-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .plus-action-btn:hover {
+      background-color: var(--theme-tag-bg);
+    }
+
+    .search-input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 14px;
+      color: var(--text-primary);
+      background: transparent;
+      font-weight: 500;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .clear-input-btn {
+      border: none;
+      background: rgba(148, 163, 184, 0.18);
+      color: var(--text-secondary);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 12px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .clear-input-btn.visible {
+      display: inline-flex;
+    }
+
+    .action-circle-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background-color: var(--send-circle-bg);
+      color: var(--send-circle-icon);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background-color 0.5s ease,
+                  transform 0.25s var(--ease-spring);
+    }
+
+    .action-circle-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .action-circle-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* ================= 10. 手机端主分类快捷栏 + 子标签筛选栏 ================= */
+    .mobile-section-bar {
+      display: none;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 2px 0;
+    }
+
+    .mobile-section-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .subtag-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 2px 0;
+    }
+
+    .subtag-filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .subtag-chip {
+      border: 1px solid var(--card-border);
+      background-color: var(--card-bg);
+      color: var(--text-secondary);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .subtag-chip:hover {
+      border-color: var(--theme-accent);
+      color: var(--text-primary);
+    }
+
+    .subtag-chip.active {
+      background-color: var(--theme-accent);
+      color: #FFFFFF;
+      border-color: var(--theme-accent);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.14);
+    }
+
+    /* ================= 11. 五大板块内容区（文字 100% 完整展示，绝不遮挡或截断） ================= */
+    .catalogue-body {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      min-width: 0;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    .catalogue-body.switching {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    .catalogue-section {
+      scroll-margin-top: 20px;
+    }
+
+    .section-head-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .section-title-group {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .section-title {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.35px;
+      color: var(--text-primary);
+    }
+
+    .section-meta-count {
+      font-variant-numeric: tabular-nums;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .section-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    /* 桌面端 3 列，平板/手机端 2 列双栏网格（文字自然换行不截断） */
+    .finds-poster-grid,
+    .cards-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    /* === Finds 视觉海报卡片 === */
+    .find-poster-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+      transition: transform 0.25s var(--ease-spring),
+                  box-shadow 0.28s ease,
+                  border-color 0.28s ease;
+    }
+
+    .find-poster-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--theme-accent);
+      box-shadow: 0 10px 24px -8px rgba(15, 23, 42, 0.12);
+    }
+
+    .poster-visual-stage {
+      min-height: 136px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .poster-mock-window {
+      width: 100%;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 10px 11px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      color: #FFFFFF;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+      transition: transform 0.32s var(--ease-spring);
+    }
+
+    .find-poster-card:hover .poster-mock-window {
+      transform: scale(1.02);
+    }
+
+    .mock-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .mock-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .mock-dots span {
+      width: 5.5px;
+      height: 5.5px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .mock-tag-pill {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.28);
+      color: #FFFFFF;
+    }
+
+    .mock-caption-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      line-height: 1.32;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    /* 作者与账号完整显示，支持自适应换行，绝不出现半截省略号 */
+    .poster-author-bar {
+      padding: 10px 13px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      border-top: 1px solid var(--card-border);
+      background-color: var(--card-bg);
+    }
+
+    .poster-author-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .poster-author-handle {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* === Inspiration / Resources / Tools / Portfolios 卡片（完整展示全部文字） === */
+    .catalogue-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 124px;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+      transition: transform 0.24s var(--ease-spring),
+                  border-color 0.24s ease,
+                  box-shadow 0.28s ease,
+                  background-color 0.35s ease;
+    }
+
+    .catalogue-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--refresh-btn-bg);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .catalogue-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--orb-color-2);
+      box-shadow: 0 10px 24px -6px rgba(15, 23, 42, 0.12);
+    }
+
+    .catalogue-card:hover::before {
+      opacity: 1;
+    }
+
+    .catalogue-card:active {
+      transform: scale(0.98);
+    }
+
+    .card-header-line {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      margin-bottom: 6px;
+    }
+
+    .card-title-text {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      line-height: 1.35;
+    }
+
+    .card-arrow-icon {
+      font-size: 11.5px;
+      color: var(--theme-accent);
+      transition: transform 0.2s ease;
+    }
+
+    .catalogue-card:hover .card-arrow-icon {
+      transform: translate(2px, -2px);
+    }
+
+    .card-domain-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .card-desc-text {
+      font-size: 12.5px;
+      line-height: 1.48;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .card-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .designeer-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2.5px 8px;
+      border-radius: 6px;
+      background-color: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      line-height: 1.35;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    .designeer-badge.pricing-freemium {
+      background-color: #EEF2FF;
+      color: #4338CA;
+    }
+
+    .designeer-badge.pricing-paid {
+      background-color: #FEF3C7;
+      color: #B45309;
+    }
+
+    [data-dark="true"] .designeer-badge {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: var(--orb-color-2);
+    }
+
+    .section-expand-bar {
+      margin-top: 12px;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .show-all-btn {
+      border: 1px solid var(--card-border);
+      background-color: var(--card-bg);
+      color: var(--text-primary);
+      padding: 7px 16px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.22s ease;
+    }
+
+    .show-all-btn:hover {
+      border-color: var(--theme-accent);
+      color: var(--theme-accent);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.14);
+    }
+
+    /* ================= 12. 原站页脚 ================= */
+    .catalogue-footer {
+      border-top: 1px solid var(--card-border);
+      padding-top: 16px;
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    /* ================= 13. 像素级交互【登录 / 注册 / 提交作品】模态框组件 ================= */
+    .auth-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 220;
+      background: rgba(15, 23, 42, 0.48);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s var(--ease-smooth);
+    }
+
+    .auth-modal-backdrop.open {
+      display: flex;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .auth-modal-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 24px 20px 20px;
+      box-shadow: 0 28px 60px -12px rgba(15, 23, 42, 0.32);
+      position: relative;
+      overflow: hidden;
+      transform: translateY(16px) scale(0.95);
+      transition: transform 0.34s var(--ease-spring);
+    }
+
+    .auth-modal-backdrop.open .auth-modal-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .auth-modal-glow {
+      position: absolute;
+      top: -55px;
+      left: -30px;
+      right: -30px;
+      height: 120px;
+      background: linear-gradient(120deg, var(--orb-color-1), var(--orb-color-2));
+      filter: blur(36px);
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .auth-modal-header {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .auth-brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .auth-close-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--card-border);
+      background: var(--page-bg);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .auth-close-btn:hover {
+      color: var(--text-primary);
+      transform: rotate(90deg);
+    }
+
+    .auth-tabs-bar {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 3.5px;
+      background: var(--page-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      margin-bottom: 18px;
+    }
+
+    .auth-tab-indicator {
+      position: absolute;
+      top: 3.5px;
+      left: 3.5px;
+      width: calc((100% - 7px) / 3);
+      height: calc(100% - 7px);
+      background: var(--card-bg);
+      border-radius: 9px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+      transition: transform 0.38s var(--ease-spring);
+      z-index: 0;
+    }
+
+    .auth-tab-item {
+      position: relative;
+      z-index: 1;
+      border: none;
+      background: transparent;
+      padding: 7px 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.25s ease;
+    }
+
+    .auth-tab-item.active {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .auth-form-pane {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      animation: fadeSlideIn 0.26s var(--ease-smooth);
+    }
+
+    .auth-form-pane.active {
+      display: flex;
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateX(8px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .floating-field {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .floating-input {
+      width: 100%;
+      height: 48px;
+      padding: 17px 56px 5px 13px;
+      border-radius: 12px;
+      border: 1.5px solid var(--card-border);
+      background: var(--page-bg);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+    }
+
+    .floating-input:focus {
+      background: var(--card-bg);
+      box-shadow: 0 0 0 2px var(--search-glow);
+    }
+
+    .floating-label {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: all 0.2s var(--ease-smooth);
+    }
+
+    .floating-input:focus + .floating-label,
+    .floating-input:not(:placeholder-shown) + .floating-label {
+      top: 11px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--theme-accent);
+    }
+
+    .field-action-icons {
+      position: absolute;
+      right: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .field-icon-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .field-icon-btn:hover {
+      color: var(--text-primary);
+      background: var(--badge-bg);
+    }
+
+    .auth-submit-btn {
+      height: 44px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--theme-accent), var(--refresh-btn-bg));
+      color: #FFFFFF;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 18px -4px rgba(15, 23, 42, 0.12);
+      transition: transform 0.2s var(--ease-spring), filter 0.2s ease;
+    }
+
+    .auth-submit-btn:active {
+      transform: scale(0.97);
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 16px 0 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--card-border);
+    }
+
+    .social-login-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .social-btn {
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: var(--page-bg);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .social-btn:hover {
+      border-color: var(--theme-accent);
+      background: var(--card-bg);
+    }
+
+    .toast-banner {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--text-primary);
+      color: var(--card-bg);
+      padding: 9px 16px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.22);
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      white-space: nowrap;
+      transition: opacity 0.24s ease, transform 0.26s var(--ease-spring);
+    }
+
+    .toast-banner.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .empty-state-box {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 36px 18px;
+      border: 1px dashed var(--card-border);
+      border-radius: 16px;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    /* ================= 14. 手机端与平板响应式断点（手机端释放全宽，1:1 还原 Ai比价.html 手机布局） ================= */
+    @media (max-width: 980px) {
+      .finds-poster-grid,
+      .cards-grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      /* 手机端不显示左栏侧边栏，主容器居中全宽展示，彻底杜绝文字挤压截断 */
+      .workspace-shell {
+        max-width: 560px;
+        grid-template-columns: minmax(0, 1fr);
+        padding: 0 0 48px;
+        gap: 0;
+      }
+
+      .designeer-sidebar {
+        display: none;
+      }
+
+      .main-column {
+        gap: 14px;
+      }
+
+      .hero-header {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-bottom-left-radius: 30px;
+        border-bottom-right-radius: 30px;
+        padding: 16px 18px 24px;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+      }
+
+
+      .mobile-section-bar {
+        display: flex;
+        padding: 4px 18px 0;
+      }
+
+      .subtag-filter-bar {
+        padding: 0 18px;
+      }
+
+      .catalogue-body,
+      .catalogue-footer {
+        margin-left: 18px;
+        margin-right: 18px;
+      }
+
+      .finds-poster-grid,
+      .cards-grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 11px;
+      }
+    }
+  
+    /* ================= 15. 合并版补充：真实海报瀑布流 / 搜索计数 / 展开与空态 / 深色按下态 ================= */
+    :root { color-scheme: light; }
+    [data-dark="true"] { color-scheme: dark; }
+
+    .finds-masonry { columns: 3; column-gap: 14px; }
+    .finds-masonry .find-poster-card { break-inside: avoid; margin-bottom: 14px; cursor: default; }
+    .find-poster-card .poster-img { display: block; width: 100%; height: auto; }
+    @media (max-width: 980px) { .finds-masonry { columns: 2; } }
+
+    .search-note { display: none; font-size: 12.5px; color: var(--text-muted); padding: 0 2px; }
+    .empty { display: none; font-size: 13px; color: var(--text-muted); padding: 10px 2px 0; }
+
+    /* 深色模式按下态：白色微透 / 主题派生，绝不借浅色底变实心白；高亮跟随元素自身形状 */
+    [data-dark="true"] .refresh-btn:active { background-color: var(--refresh-btn-bg); filter: brightness(1.18); }
+    [data-dark="true"] .action-circle-btn:active { background-color: var(--send-circle-bg); filter: brightness(1.1); }
+    [data-dark="true"] .lang-pill-btn:active,
+    [data-dark="true"] .theme-mode-btn:active { background-color: rgba(255, 255, 255, 0.12); }
+    [data-dark="true"] .subtag-chip:active { background-color: rgba(255, 255, 255, 0.1); color: var(--text-primary); }
+    [data-dark="true"] .plus-action-btn:active { background-color: rgba(255, 255, 255, 0.22); }
+    [data-dark="true"] .sidebar-nav-btn:active { background-color: rgba(255, 255, 255, 0.08); }
+
+    /* 搜索框左 + 圆钮：深色下常驻白色微透底 + 白色图标，悬停（含触屏粘滞）/点按同样不许借主题浅色标签底变实心浅盘 */
+    [data-dark="true"] .plus-action-btn { background-color: rgba(255, 255, 255, 0.09); color: #F8FAFC; }
+    [data-dark="true"] .plus-action-btn:hover { background-color: rgba(255, 255, 255, 0.16); }
+
+    /* 12 色面板选中/滑动悬停项：深色下不用浅色标签底（否则近白字压近白底看不清），改白色微透 + 主题描边 */
+    [data-dark="true"] .theme-swatch-item.active,
+    [data-dark="true"] .theme-swatch-item.sliding-hover { background: rgba(255, 255, 255, 0.1); border-color: var(--theme-accent); }
+
+    /* Toast：深色下不再是实心近白胶囊，改深色抬升面 + 浅字 + 微透描边 */
+    [data-dark="true"] .toast-banner { background: rgba(30, 41, 59, 0.94); color: #F8FAFC; border: 1px solid rgba(255, 255, 255, 0.14); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45); }
+    .refresh-btn, .action-circle-btn, .lang-pill-btn, .subtag-chip, .submit-cta-btn, .login-trigger-btn, .show-all-btn { -webkit-tap-highlight-color: transparent; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .refresh-btn, .submit-cta-btn, .action-circle-btn, .swatch-orb-preview.holo-animated { animation: none !important; }
+      html { scroll-behavior: auto; }
+    }
+
+    .sidebar-brand-title { cursor: pointer; }
+    .field-icon-btn.on { color: var(--theme-accent); }
+
+  </style>
+</head>
+<body>
+
+  <div class="workspace-shell">
+    <!-- 左侧导航栏（与 Hero 同源 12 色弥散毛玻璃配色） -->
+    <aside class="designeer-sidebar" aria-label="Designeer Sidebar Navigation">
+
+      <div class="sidebar-top-stack">
+        <div>
+          <div class="sidebar-brand-header">
+            <span class="sidebar-brand-title" id="brandHome" role="button" tabindex="0" title="Home">
+              <span class="sidebar-brand-bar"></span>
+              <span>designeer</span>
+            </span>
+            <span class="sidebar-brand-dot"></span>
+          </div>
+          <p class="sidebar-brand-desc" id="sidebarBrandDesc">人工严选的界面设计、组件库、AI 工具与创作者资源目录</p>
+        </div>
+
+        <div class="sidebar-section-label" id="sidebarBrowseLabel">分类浏览</div>
+
+        <ul class="sidebar-nav-list" id="sidebarNavList">
+          <li><button type="button" class="sidebar-nav-btn" data-nav="home"><span data-nav-label>首页</span><span class="sidebar-nav-count">827</span></button></li>
+          <li><button type="button" class="sidebar-nav-btn" data-nav="finds"><span data-nav-label>海报</span><span class="sidebar-nav-count">157</span></button></li>
+          <li><button type="button" class="sidebar-nav-btn" data-nav="inspiration"><span data-nav-label>灵感</span><span class="sidebar-nav-count">137</span></button></li>
+          <li><button type="button" class="sidebar-nav-btn" data-nav="resources"><span data-nav-label>资源</span><span class="sidebar-nav-count">205</span></button></li>
+          <li><button type="button" class="sidebar-nav-btn" data-nav="tools"><span data-nav-label>工具</span><span class="sidebar-nav-count">158</span></button></li>
+          <li><button type="button" class="sidebar-nav-btn" data-nav="portfolios"><span data-nav-label>作品集</span><span class="sidebar-nav-count">170</span></button></li>
+        </ul>
+
+        <div class="sidebar-actions">
+          <button type="button" class="submit-cta-btn" id="sidebarSubmitBtn">
+            <span id="sidebarSubmitText">提交作品</span>
+            <span>↗</span>
+          </button>
+          <button type="button" class="login-trigger-btn" id="sidebarLoginBtn">
+            <span id="sidebarLoginText">策展人登录</span>
+          </button>
+        </div>
+      </div>
+
+      <p class="sidebar-footer-note" id="sidebarFooterNote">每条均经人工审阅；研究复刻版</p>
+    </aside>
+
+    <!-- 右侧主内容区 -->
+    <div class="main-column">
+      <header class="hero-header">
+
+        <div class="top-nav-bar">
+          <div class="brand-tag">
+            <span class="brand-bar"></span>
+            <span>DESIGNEER · UI</span>
+          </div>
+
+          <div class="top-right-widgets">
+            <button type="button" class="lang-pill-btn" id="langBtn" title="切换语言 / Switch Language">
+              <svg class="globe-svg" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+              <span class="lang-text" id="langText">中文</span>
+            </button>
+
+            <button type="button" class="theme-mode-btn" id="darkModeBtn" title="单击切换日夜 / 长按滑动选12色主题">
+              <svg class="sun-moon-svg" id="sunMoonIcon" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="4"></circle>
+                <line x1="12" y1="2" x2="12" y2="4.5"></line>
+                <line x1="12" y1="19.5" x2="12" y2="22"></line>
+                <line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line>
+                <line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line>
+                <line x1="2" y1="12" x2="4.5" y2="12"></line>
+                <line x1="19.5" y1="12" x2="22" y2="12"></line>
+                <line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line>
+                <line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line>
+              </svg>
+            </button>
+
+            <div class="theme-panel-backdrop" id="themeBackdrop"></div>
+
+            <div class="theme-popover-panel" id="themePopover">
+              <div class="panel-header">
+                <span class="panel-title" id="panelTitle">12 色弥散主题</span>
+                <span class="panel-hint" id="panelHint">滑动或点选</span>
+              </div>
+              <div class="theme-swatch-grid" id="themeSwatchGrid"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="heroBlock">
+          <div class="eyebrow-subtitle" id="eyebrowText">INSPIRATION · RESOURCES · TOOLS · PORTFOLIOS</div>
+          <h1 class="hero-main-heading" id="heroMainHeading">Designeer · 设计师与开发者精选目录</h1>
+          <p class="hero-lead-paragraph" id="heroLeadParagraph">设计灵感、UI 资源、开发工具与个人作品集，每一条均由人工审阅；下方展示来自全网的最新视觉佳作</p>
+
+          <div class="status-row">
+            <span class="update-time" id="updateTime">2026-11-06 更新 · 共 827 条精选</span>
+            <button type="button" class="refresh-btn" id="refreshBtn">
+              <svg class="refresh-svg" viewBox="0 0 24 24">
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                <path d="M16 16h5v5"></path>
+              </svg>
+              <span id="refreshBtnText">刷新数据</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="gemini-search-card">
+          <button type="button" class="plus-action-btn" id="plusBtn" title="重置筛选 / Reset filters">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+
+          <input
+            type="search"
+            class="search-input"
+            id="search"
+            placeholder="搜索名称、简介或分类标签..."
+            autocomplete="off"
+            aria-label="Search the catalogue"
+          >
+
+          <button type="button" class="clear-input-btn" id="clearBtn" title="清除搜索">✕</button>
+
+          <button type="button" class="action-circle-btn" id="searchGoBtn" title="Search">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="19" x2="12" y2="5"></line>
+              <polyline points="5 12 12 5 19 12"></polyline>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- 手机端主分类导航胶囊条（桌面端隐藏） -->
+      <nav class="mobile-section-bar" id="mobileSectionBar" aria-label="Mobile Section Navigation">
+        <button type="button" class="subtag-chip" data-nav="home"><span data-nav-label>首页</span> (827)</button>
+        <button type="button" class="subtag-chip" data-nav="finds"><span data-nav-label>海报</span> (157)</button>
+        <button type="button" class="subtag-chip" data-nav="inspiration"><span data-nav-label>灵感</span> (137)</button>
+        <button type="button" class="subtag-chip" data-nav="resources"><span data-nav-label>资源</span> (205)</button>
+        <button type="button" class="subtag-chip" data-nav="tools"><span data-nav-label>工具</span> (158)</button>
+        <button type="button" class="subtag-chip" data-nav="portfolios"><span data-nav-label>作品集</span> (170)</button>
+        <button type="button" class="subtag-chip" id="mobSubmitBtn">Submit ↗</button>
+      </nav>
+
+      <!-- 子分类与付费模式快捷筛选胶囊栏（按真实分类生成） -->
+      <nav class="subtag-filter-bar" id="subtagFilterBar" aria-label="Category Tag Filters"></nav>
+      <p class="search-note" id="searchNote"></p>
+
+      <!-- 五大板块 -->
+      <main class="catalogue-body" id="catalogueBody">
+
+        <section class="catalogue-section" id="finds">
+          <div class="section-head-row">
+            <div class="section-title-group">
+              <h2 class="section-title">Finds</h2>
+              <span class="section-meta-count" data-finds-meta>原站 157 幅 — 最新 24 期海报精选</span>
+            </div>
+          </div>
+          <p class="section-desc" data-finds-desc>来自全网独立设计师与开发者的最新视觉界面佳作</p>
+          <div class="finds-masonry" id="findsGrid"></div>
+          <p class="empty" data-empty>没有符合搜索的海报</p>
+        </section>
+
+        <section class="catalogue-section" id="inspiration">
+          <div class="section-head-row">
+            <div class="section-title-group">
+              <h2 class="section-title" data-sec-title>Inspiration · 灵感画廊</h2>
+              <span class="section-meta-count" data-sec-count>137 条</span>
+            </div>
+          </div>
+          <p class="section-desc" data-sec-desc>精选动效流畅、排版考究的界面设计与网页灵感画廊</p>
+          <div class="cards-grid-3" data-grid="inspiration"></div>
+          <div class="section-expand-bar"><button class="show-all-btn" data-more="inspiration" type="button"></button></div>
+          <p class="empty" data-empty>没有符合当前筛选的条目</p>
+        </section>
+
+        <section class="catalogue-section" id="resources">
+          <div class="section-head-row">
+            <div class="section-title-group">
+              <h2 class="section-title" data-sec-title>Resources · 设计与组件资源</h2>
+              <span class="section-meta-count" data-sec-count>205 条</span>
+            </div>
+          </div>
+          <p class="section-desc" data-sec-desc>字体、色彩、图标、视觉素材与可直接复用的前端组件原语</p>
+          <div class="cards-grid-3" data-grid="resources"></div>
+          <div class="section-expand-bar"><button class="show-all-btn" data-more="resources" type="button"></button></div>
+          <p class="empty" data-empty>没有符合当前筛选的条目</p>
+        </section>
+
+        <section class="catalogue-section" id="tools">
+          <div class="section-head-row">
+            <div class="section-title-group">
+              <h2 class="section-title" data-sec-title>Tools · 设计与开发利器</h2>
+              <span class="section-meta-count" data-sec-count>158 条</span>
+            </div>
+          </div>
+          <p class="section-desc" data-sec-desc>提升设计、编码、图像压缩与产品交付效率的实用软件工具</p>
+          <div class="cards-grid-3" data-grid="tools"></div>
+          <div class="section-expand-bar"><button class="show-all-btn" data-more="tools" type="button"></button></div>
+          <p class="empty" data-empty>没有符合当前筛选的条目</p>
+        </section>
+
+        <section class="catalogue-section" id="portfolios">
+          <div class="section-head-row">
+            <div class="section-title-group">
+              <h2 class="section-title" data-sec-title>Portfolios · 创作者作品集</h2>
+              <span class="section-meta-count" data-sec-count>170 条</span>
+            </div>
+          </div>
+          <p class="section-desc" data-sec-desc>值得深入研读的设计工程师、独立创作者与前端极客个人主页</p>
+          <div class="cards-grid-3" data-grid="portfolios"></div>
+          <div class="section-expand-bar"><button class="show-all-btn" data-more="portfolios" type="button"></button></div>
+          <p class="empty" data-empty>没有符合当前筛选的条目</p>
+        </section>
+
+      </main>
+
+      <footer class="catalogue-footer" id="pageFooter">
+        Content from Designeer, replica for study purposes.<br>
+        All 670 catalogue entries and the latest finds were pulled from the original site's public catalogue on 6 Nov 2026; every card links to the entry's real page.
+      </footer>
+    </div>
+  </div>
+
+  <!-- 登录 / 注册 / 提交作品 模态框（装饰性） -->
+  <div class="auth-modal-backdrop" id="authModalBackdrop">
+    <div class="auth-modal-card">
+      <div class="auth-modal-glow"></div>
+
+      <div class="auth-modal-header">
+        <div class="auth-brand-badge">
+          <span class="sidebar-brand-dot"></span>
+          <span id="authModalTitle">designeer · Curator Portal</span>
+        </div>
+        <button type="button" class="auth-close-btn" id="authCloseBtn">✕</button>
+      </div>
+
+      <div class="auth-tabs-bar" id="authTabsBar">
+        <div class="auth-tab-indicator" id="authTabIndicator"></div>
+        <button type="button" class="auth-tab-item active" data-auth-tab="login">Sign In</button>
+        <button type="button" class="auth-tab-item" data-auth-tab="register">Join</button>
+        <button type="button" class="auth-tab-item" data-auth-tab="submit">Submit ↗</button>
+      </div>
+
+      <form class="auth-form-pane active" id="pane-login">
+        <div class="floating-field">
+          <input type="email" class="floating-input" id="loginEmail" placeholder=" " required>
+          <label class="floating-label" for="loginEmail">Email or Handle (@username)</label>
+          <div class="field-action-icons">
+            <button type="button" class="field-icon-btn" data-clear="loginEmail" title="Clear">✕</button>
+          </div>
+        </div>
+
+        <div class="floating-field">
+          <input type="password" class="floating-input" id="loginPassword" placeholder=" " required>
+          <label class="floating-label" for="loginPassword">Password</label>
+          <div class="field-action-icons">
+            <button type="button" class="field-icon-btn" data-eye="loginPassword" title="Toggle password">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="auth-submit-btn">Sign in to Designeer</button>
+      </form>
+
+      <form class="auth-form-pane" id="pane-register">
+        <div class="floating-field">
+          <input type="text" class="floating-input" id="regHandle" placeholder=" " required>
+          <label class="floating-label" for="regHandle">Creator Handle (e.g. @emil)</label>
+          <div class="field-action-icons">
+            <button type="button" class="field-icon-btn" data-clear="regHandle" title="Clear">✕</button>
+          </div>
+        </div>
+
+        <div class="floating-field">
+          <input type="email" class="floating-input" id="regEmail" placeholder=" " required>
+          <label class="floating-label" for="regEmail">Work Email</label>
+        </div>
+
+        <div class="floating-field">
+          <input type="password" class="floating-input" id="regPassword" placeholder=" " required>
+          <label class="floating-label" for="regPassword">Create Password</label>
+          <div class="field-action-icons">
+            <button type="button" class="field-icon-btn" data-eye="regPassword" title="Toggle password">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="auth-submit-btn">Create Curator Account</button>
+      </form>
+
+      <form class="auth-form-pane" id="pane-submit">
+        <div class="floating-field">
+          <input type="text" class="floating-input" id="subTitleInput" placeholder=" " required>
+          <label class="floating-label" for="subTitleInput">Resource / Site Name</label>
+        </div>
+
+        <div class="floating-field">
+          <input type="url" class="floating-input" id="subUrlInput" placeholder=" " required>
+          <label class="floating-label" for="subUrlInput">URL (https://...)</label>
+        </div>
+
+        <div class="floating-field">
+          <input type="text" class="floating-input" id="subDescInput" placeholder=" " required>
+          <label class="floating-label" for="subDescInput">One-line tagline &amp; category</label>
+        </div>
+
+        <button type="submit" class="auth-submit-btn">Submit for Hand Review ↗</button>
+      </form>
+
+      <div class="auth-divider">or continue with</div>
+
+      <div class="social-login-grid">
+        <button type="button" class="social-btn" data-social="GitHub">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+          </svg>
+          <span>GitHub</span>
+        </button>
+
+        <button type="button" class="social-btn" data-social="Google">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M12 12h8.5"></path>
+          </svg>
+          <span>Google</span>
+        </button>
+
+        <button type="button" class="social-btn" data-social="X.com">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+          <span>X.com</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部轻量 Toast 提示 -->
+  <div class="toast-banner" id="toastBanner"></div>
+
+
+  <script>
+var allThemes = [
+      {
+        name: "01 · 冰川晴空", nameEn: "01 · Glacier Sky",
+        orb1: "#BCE0FD", orb2: "#93C5FD", refreshBg: "#60A5FA", sendCircleBg: "#9CCAF9",
+        accent: "#2563EB", tagBg: "#EBF5FF", tagText: "#1D4ED8", pageBg: "#F4F8FC", glow: "rgba(147, 197, 253, 0.38)"
+      },
+      {
+        name: "02 · 薄荷微风", nameEn: "02 · Mint Breeze",
+        orb1: "#A7F3D0", orb2: "#6EE7B7", refreshBg: "#34D399", sendCircleBg: "#86EFAC",
+        accent: "#059669", tagBg: "#ECFDF5", tagText: "#047857", pageBg: "#F2FBF7", glow: "rgba(110, 231, 183, 0.36)"
+      },
+      {
+        name: "03 · 极光青蓝", nameEn: "03 · Aurora Cyan",
+        orb1: "#A5F3FC", orb2: "#818CF8", refreshBg: "#6366F1", sendCircleBg: "#A5B4FC",
+        accent: "#4F46E5", tagBg: "#EEF2FF", tagText: "#4338CA", pageBg: "#F4F6FC", glow: "rgba(129, 140, 248, 0.34)"
+      },
+      {
+        name: "04 · 抹茶森屿", nameEn: "04 · Matcha Isle",
+        orb1: "#D9F99D", orb2: "#86EFAC", refreshBg: "#4ADE80", sendCircleBg: "#BEF264",
+        accent: "#16A34A", tagBg: "#F0FDF4", tagText: "#15803D", pageBg: "#F6FAF5", glow: "rgba(134, 239, 172, 0.36)"
+      },
+      {
+        name: "05 · 碧海晴空", nameEn: "05 · Azure Lagoon",
+        orb1: "#99F6E4", orb2: "#7DD3FC", refreshBg: "#2DD4BF", sendCircleBg: "#67E8F9",
+        accent: "#0D9488", tagBg: "#F0FDFA", tagText: "#0F766E", pageBg: "#F2F9FA", glow: "rgba(125, 211, 252, 0.36)"
+      },
+      {
+        name: "06 · 深海星雾", nameEn: "06 · Mist Slate",
+        orb1: "#CBD5E1", orb2: "#93C5FD", refreshBg: "#64748B", sendCircleBg: "#CBD5E1",
+        accent: "#334155", tagBg: "#F1F5F9", tagText: "#1E293B", pageBg: "#F5F7FA", glow: "rgba(148, 163, 184, 0.32)"
+      },
+      {
+        name: "07 · 星云幻紫", nameEn: "07 · Nebula Violet",
+        orb1: "#E9D5FF", orb2: "#C4B5FD", refreshBg: "#8B5CF6", sendCircleBg: "#A396F8",
+        accent: "#6D28D9", tagBg: "#F3E8FF", tagText: "#6D28D9", pageBg: "#F8F5FD", glow: "rgba(167, 139, 250, 0.38)"
+      },
+      {
+        name: "08 · 蜜桃乌龙", nameEn: "08 · Peach Oolong",
+        orb1: "#FBCFE8", orb2: "#FDA4AF", refreshBg: "#F472B6", sendCircleBg: "#F9A8D4",
+        accent: "#DB2777", tagBg: "#FDF2F8", tagText: "#BE185D", pageBg: "#FDF6F9", glow: "rgba(244, 114, 182, 0.34)"
+      },
+      {
+        name: "09 · 晨曦微光", nameEn: "09 · Dawn Amber",
+        orb1: "#FDE68A", orb2: "#FDBA74", refreshBg: "#FB923C", sendCircleBg: "#FCD34D",
+        accent: "#EA580C", tagBg: "#FFF7ED", tagText: "#C2410C", pageBg: "#FCF9F4", glow: "rgba(251, 146, 60, 0.34)"
+      },
+      {
+        name: "10 · 落日粉紫", nameEn: "10 · Sunset Glow",
+        orb1: "#F5D0FE", orb2: "#FECDD3", refreshBg: "#C084FC", sendCircleBg: "#F0ABFC",
+        accent: "#9333EA", tagBg: "#FAF5FF", tagText: "#7E22CE", pageBg: "#FAF6FC", glow: "rgba(192, 132, 252, 0.35)"
+      },
+      {
+        name: "11 · 香槟流金", nameEn: "11 · Champagne Gold",
+        orb1: "#FEF08A", orb2: "#FDE047", refreshBg: "#EAB308", sendCircleBg: "#FDE047",
+        accent: "#CA8A04", tagBg: "#FEFCE8", tagText: "#A16207", pageBg: "#FAF9F2", glow: "rgba(234, 179, 8, 0.32)"
+      },
+      {
+        name: "12 · 幻彩全息", nameEn: "12 · Gemini Holo",
+        isHolo: true,
+        orb1: "#8FDBB8", orb2: "#9CC8F7", refreshBg: "#4FA8F6", sendCircleBg: "#9EE0C5",
+        accent: "#1A73E8", tagBg: "#E6F4EA", tagText: "#137333", pageBg: "#F3F8FA", glow: "rgba(143, 219, 184, 0.44)"
+      }
+    ];
+var CATALOG = { inspiration: null, resources: null, tools: null, portfolios: null };
+var ALL_CATS = ["Galleries", "Reading", "Type & Colour", "Components", "Motion & 3D", "Icons", "Development", "Capture & Media", "Design & Canvas", "Productivity & Desktop", "AI & Agents", "Founders & Makers", "Design", "Creative Development", "Design Engineering", "Studios"];
+var FINDS = null;
+
+/* ================= 状态与板块文案 ================= */
+var SECTION_META = {
+  inspiration: { n: 137, titleEn: "Inspiration", titleZh: "Inspiration · 灵感画廊",
+    descEn: "Galleries and references of interfaces that move and read well.",
+    descZh: "精选动效流畅、排版考究的界面设计与网页灵感画廊" },
+  resources: { n: 205, titleEn: "Resources", titleZh: "Resources · 设计与组件资源",
+    descEn: "Fonts, colour, icons, imagery and reusable building blocks.",
+    descZh: "字体、色彩、图标、视觉素材与可直接复用的前端组件原语" },
+  tools: { n: 158, titleEn: "Tools", titleZh: "Tools · 设计与开发利器",
+    descEn: "Practical software for designing, building and shipping.",
+    descZh: "提升设计、编码、图像压缩与产品交付效率的实用软件工具" },
+  portfolios: { n: 170, titleEn: "Portfolios", titleZh: "Portfolios · 创作者作品集",
+    descEn: "Personal sites of designers, engineers and makers worth studying.",
+    descZh: "值得深入研读的设计工程师、独立创作者与前端极客个人主页" }
+};
+var COLLECTIONS = ["inspiration", "resources", "tools", "portfolios"];
+var PAGE = 24;
+
+var state = { q: "", tag: "all", expanded: {}, themeIdx: 11, dark: false, lang: "zh" };
+
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function pricingLabel(p){ return p === "free" ? "Free" : p === "freemium" ? "Freemium" : p === "paid" ? "Paid" : ""; }
+function zh(){ return state.lang === "zh"; }
+
+/* ================= 偏好存储：Cookie A 优先，其次本站 localStorage =================
+   Cookie A 格式：第 1 位语言（0 中文 / 1 英语）、第 2 位日夜（0 黑 / 1 浅）、其余主题号 1–12
+   无 A 且无本站记录时只用默认值，不写任何种子 */
+function readCookieA(){
+  var m = document.cookie.match(/(?:^|;\s*)A=([0-9]+)/);
+  if (!m) return null;
+  var v = m[1];
+  var t = parseInt(v.slice(2), 10);
+  if (!(t >= 1 && t <= 12)) return null;
+  return { idx: t - 1, dark: v.charAt(1) === "0", lang: v.charAt(0) === "1" ? "en" : "zh" };
+}
+function loadPrefs(){
+  var a = readCookieA();
+  if (a) return a;
+  var p = { idx: 11, dark: false, lang: "zh" };
+  try {
+    var ti = localStorage.getItem("ui-theme-idx");
+    if (ti !== null) { var n = parseInt(ti, 10); if (n >= 0 && n < 12) p.idx = n; }
+    var dk = localStorage.getItem("ui-dark");
+    if (dk !== null) p.dark = dk === "1";
+    var lg = localStorage.getItem("ui-lang");
+    if (lg === "en" || lg === "zh") p.lang = lg;
+  } catch (e) {}
+  return p;
+}
+function savePrefs(){
+  try {
+    localStorage.setItem("ui-theme-idx", String(state.themeIdx));
+    localStorage.setItem("ui-dark", state.dark ? "1" : "0");
+    localStorage.setItem("ui-lang", state.lang);
+  } catch (e) {}
+  var a = (state.lang === "en" ? "1" : "0") + (state.dark ? "0" : "1") + String(state.themeIdx + 1);
+  try { document.cookie = "A=" + a + "; Domain=jpedu.asia; Path=/; Max-Age=31536000; SameSite=Lax"; } catch (e) {}
+}
+
+/* ================= Toast ================= */
+var toastTimer = null;
+function showToast(msg){
+  var banner = document.getElementById("toastBanner");
+  banner.textContent = msg;
+  banner.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ banner.classList.remove("show"); }, 2400);
+}
+
+/* ================= 12 色主题 ================= */
+function applyThemeByGlobalIndex(index){
+  state.themeIdx = index;
+  var themeObj = allThemes[index];
+  if (!themeObj) return;
+  var root = document.documentElement;
+  root.style.setProperty("--orb-color-1", themeObj.orb1);
+  root.style.setProperty("--orb-color-2", themeObj.orb2);
+  root.style.setProperty("--refresh-btn-bg", themeObj.refreshBg);
+  root.style.setProperty("--send-circle-bg", themeObj.sendCircleBg);
+  root.style.setProperty("--theme-accent", themeObj.accent);
+  root.style.setProperty("--theme-tag-bg", themeObj.tagBg);
+  root.style.setProperty("--theme-tag-text", themeObj.tagText);
+  root.style.setProperty("--search-glow", themeObj.glow);
+  if (themeObj.isHolo) root.setAttribute("data-holo", "true");
+  else root.removeAttribute("data-holo");
+  if (!state.dark) root.style.setProperty("--page-bg", themeObj.pageBg);
+  updateSwatchActiveState();
+}
+function renderThemeSwatches(){
+  var grid = document.getElementById("themeSwatchGrid");
+  grid.innerHTML = allThemes.map(function(t, idx){
+    var label = zh() ? t.name : t.nameEn;
+    var isActive = idx === state.themeIdx ? " active" : "";
+    var holoClass = t.isHolo ? " holo-animated" : "";
+    return '<div class="theme-swatch-item' + isActive + '" data-theme-idx="' + idx + '">' +
+      '<span class="swatch-orb-preview' + holoClass + '" style="background: linear-gradient(135deg, ' + t.orb1 + ' 0%, ' + t.orb2 + ' 65%, ' + t.refreshBg + ' 100%);"></span>' +
+      '<span class="swatch-label">' + esc(label) + "</span></div>";
+  }).join("");
+  grid.querySelectorAll(".theme-swatch-item").forEach(function(el){
+    el.addEventListener("click", function(){ selectThemeFromPanel(Number(el.getAttribute("data-theme-idx"))); });
+  });
+}
+function updateSwatchActiveState(){
+  document.querySelectorAll(".theme-swatch-item").forEach(function(el){
+    el.classList.toggle("active", Number(el.getAttribute("data-theme-idx")) === state.themeIdx);
+  });
+}
+function openThemePanel(){
+  document.getElementById("themePopover").classList.add("open");
+  document.getElementById("themeBackdrop").classList.add("open");
+  if (navigator.vibrate) navigator.vibrate(18);
+}
+function closeThemePanel(){
+  document.getElementById("themePopover").classList.remove("open");
+  document.getElementById("themeBackdrop").classList.remove("open");
+  document.querySelectorAll(".theme-swatch-item").forEach(function(el){ el.classList.remove("sliding-hover"); });
+}
+function selectThemeFromPanel(idx){
+  applyThemeByGlobalIndex(idx);
+  savePrefs();
+  closeThemePanel();
+  var t = allThemes[idx];
+  showToast(zh() ? "已切换主题：" + t.name : "Theme applied: " + t.nameEn);
+}
+document.getElementById("themeBackdrop").addEventListener("click", closeThemePanel);
+
+/* 日夜切换（单击主题按钮） */
+var SUN_ICON = '<circle cx="12" cy="12" r="4"></circle>' +
+  '<line x1="12" y1="2" x2="12" y2="4.5"></line><line x1="12" y1="19.5" x2="12" y2="22"></line>' +
+  '<line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line><line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line>' +
+  '<line x1="2" y1="12" x2="4.5" y2="12"></line><line x1="19.5" y1="12" x2="22" y2="12"></line>' +
+  '<line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line><line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line>';
+var MOON_ICON = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+function setDark(on){
+  state.dark = on;
+  var root = document.documentElement;
+  var icon = document.getElementById("sunMoonIcon");
+  if (on) {
+    root.setAttribute("data-dark", "true");
+    root.style.setProperty("--page-bg", "#090D16");
+    icon.innerHTML = MOON_ICON;
+  } else {
+    root.removeAttribute("data-dark");
+    icon.innerHTML = SUN_ICON;
+    applyThemeByGlobalIndex(state.themeIdx);
+  }
+}
+function toggleDarkMode(){
+  var btn = document.getElementById("darkModeBtn");
+  btn.classList.add("rotating");
+  setTimeout(function(){ btn.classList.remove("rotating"); }, 450);
+  setDark(!state.dark);
+  savePrefs();
+}
+
+/* 主题按钮手势：单击切日夜，长按开 12 色面板并可滑动预览 */
+(function initThemeButtonGestures(){
+  var btn = document.getElementById("darkModeBtn");
+  var pressTimer = null, isLongPressTriggered = false, isPointerDown = false, lastHoveredIdx = null;
+  btn.addEventListener("pointerdown", function(e){
+    if (e.button && e.button !== 0) return;
+    isPointerDown = true; isLongPressTriggered = false; lastHoveredIdx = null;
+    btn.classList.add("pressing");
+    try { btn.setPointerCapture(e.pointerId); } catch (err) {}
+    pressTimer = setTimeout(function(){
+      if (!isPointerDown) return;
+      isLongPressTriggered = true;
+      openThemePanel();
+    }, 320);
+  });
+  btn.addEventListener("pointermove", function(e){
+    if (!isPointerDown || !isLongPressTriggered) return;
+    var targetEl = document.elementFromPoint(e.clientX, e.clientY);
+    var swatchItem = targetEl ? targetEl.closest(".theme-swatch-item") : null;
+    document.querySelectorAll(".theme-swatch-item").forEach(function(el){
+      el.classList.toggle("sliding-hover", el === swatchItem);
+    });
+    if (swatchItem) {
+      var idx = Number(swatchItem.getAttribute("data-theme-idx"));
+      if (idx !== lastHoveredIdx) {
+        lastHoveredIdx = idx;
+        applyThemeByGlobalIndex(idx);
+        if (navigator.vibrate) navigator.vibrate(8);
+      }
+    }
+  });
+  function finishGesture(){
+    if (!isPointerDown) return;
+    isPointerDown = false;
+    clearTimeout(pressTimer);
+    btn.classList.remove("pressing");
+    if (!isLongPressTriggered) {
+      var popover = document.getElementById("themePopover");
+      if (popover.classList.contains("open")) closeThemePanel();
+      else toggleDarkMode();
+    } else {
+      if (lastHoveredIdx !== null) savePrefs();
+      closeThemePanel();
+    }
+  }
+  btn.addEventListener("pointerup", finishGesture);
+  btn.addEventListener("pointercancel", finishGesture);
+  btn.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+})();
+
+/* ================= 语言切换 ================= */
+function applyLang(){
+  var z = zh();
+  document.documentElement.lang = z ? "zh-CN" : "en";
+  document.getElementById("langText").textContent = z ? "中文" : "EN";
+  document.getElementById("heroMainHeading").textContent = z
+    ? "Designeer · 设计师与开发者精选目录"
+    : "Designeer is a curated catalogue for designers and developers.";
+  document.getElementById("heroLeadParagraph").textContent = z
+    ? "设计灵感、UI 资源、开发工具与个人作品集，每一条均由人工审阅；下方展示来自全网的最新视觉佳作"
+    : "Design inspiration, UI resources, tools and portfolios, each reviewed by hand. Below, the latest visual work picked from across the web.";
+  document.getElementById("updateTime").textContent = z ? "2026-11-06 更新 · 共 827 条精选" : "Updated 6 Nov 2026 · 827 entries";
+  document.getElementById("refreshBtnText").textContent = z ? "刷新数据" : "Refresh";
+  document.getElementById("search").placeholder = z ? "搜索名称、简介或分类标签..." : "Search names, taglines, categories...";
+  document.getElementById("sidebarBrandDesc").textContent = z
+    ? "人工严选的界面设计、组件库、AI 工具与创作者资源目录"
+    : "A curated collection of interface craft, component libraries, AI tools, and resources for builders.";
+  document.getElementById("sidebarBrowseLabel").textContent = z ? "分类浏览" : "BROWSE";
+  var navLabels = z
+    ? { home: "首页", finds: "海报", inspiration: "灵感", resources: "资源", tools: "工具", portfolios: "作品集" }
+    : { home: "Home", finds: "Finds", inspiration: "Inspiration", resources: "Resources", tools: "Tools", portfolios: "Portfolios" };
+  document.querySelectorAll("[data-nav]").forEach(function(btn){
+    var label = btn.querySelector("[data-nav-label]");
+    if (label) label.textContent = navLabels[btn.getAttribute("data-nav")];
+  });
+  document.getElementById("sidebarSubmitText").textContent = z ? "提交作品" : "Submit Entry";
+  document.getElementById("sidebarLoginText").textContent = z ? "策展人登录" : "Curator Sign In";
+  document.getElementById("sidebarFooterNote").textContent = z
+    ? "每条均经人工审阅；研究复刻版"
+    : "Every entry reviewed by hand. Replica built for study.";
+  document.getElementById("panelTitle").textContent = z ? "12 色弥散主题" : "12 Aura Themes";
+  document.getElementById("panelHint").textContent = z ? "滑动或点选" : "Slide or tap";
+  var findsSec = document.getElementById("finds");
+  findsSec.querySelector("[data-finds-meta]").textContent = z ? "原站 157 幅 — 最新 24 期海报精选" : "157 on the original — 27 posters from the latest 24 below";
+  findsSec.querySelector("[data-finds-desc]").textContent = z ? "来自全网独立设计师与开发者的最新视觉界面佳作" : "The latest visual work picked from across the web.";
+  findsSec.querySelector("[data-empty]").textContent = z ? "没有符合搜索的海报" : "No finds match your search.";
+  COLLECTIONS.forEach(function(k){
+    var sec = document.getElementById(k);
+    var meta = SECTION_META[k];
+    sec.querySelector("[data-sec-title]").textContent = z ? meta.titleZh : meta.titleEn;
+    sec.querySelector("[data-sec-count]").textContent = z ? meta.n + " 条" : meta.n + " entries";
+    sec.querySelector("[data-sec-desc]").textContent = z ? meta.descZh : meta.descEn;
+    sec.querySelector("[data-empty]").textContent = z ? "没有符合当前筛选的条目" : "No entries match your current filters.";
+  });
+  renderThemeSwatches();
+  buildTagChips();
+}
+document.getElementById("langBtn").addEventListener("click", function(){
+  state.lang = zh() ? "en" : "zh";
+  applyLang();
+  renderAll();
+  savePrefs();
+});
+
+/* ================= 标签筛选（按真实分类生成） ================= */
+function buildTagChips(){
+  var bar = document.getElementById("subtagFilterBar");
+  var cats = ALL_CATS.slice();
+  var tags = ["all"].concat(cats).concat(["Free", "Freemium", "Paid"]);
+  bar.innerHTML = tags.map(function(t){
+    var label = t === "all" ? (zh() ? "全部标签" : "All Tags") : t;
+    return '<button type="button" class="subtag-chip' + (state.tag === t ? " active" : "") + '" data-tag="' + esc(t) + '">' + esc(label) + "</button>";
+  }).join("");
+  bar.querySelectorAll(".subtag-chip").forEach(function(chip){
+    chip.addEventListener("click", function(){
+      state.tag = chip.getAttribute("data-tag");
+      bar.querySelectorAll(".subtag-chip").forEach(function(c){ c.classList.toggle("active", c === chip); });
+      renderAll();
+    });
+  });
+}
+
+/* ================= 条目渲染 ================= */
+function matches(it){
+  if (state.tag !== "all") {
+    if (state.tag === "Free" && it.pricing !== "free") return false;
+    if (state.tag === "Freemium" && it.pricing !== "freemium") return false;
+    if (state.tag === "Paid" && it.pricing !== "paid") return false;
+    if (state.tag !== "Free" && state.tag !== "Freemium" && state.tag !== "Paid" && it.cat !== state.tag) return false;
+  }
+  if (!state.q) return true;
+  var hay = (it.name + " " + (it.tagline || "") + " " + (it.descZh || "") + " " + (it.cat || "") + " " + (it.host || "")).toLowerCase();
+  return hay.indexOf(state.q) !== -1;
+}
+function cardHtml(it){
+  var desc = zh() ? (it.descZh || it.tagline) : it.tagline;
+  if (desc) desc = desc.replace(/\u3002$/, "");
+  var chips = "";
+  if (it.cat) chips += '<span class="designeer-badge">' + esc(it.cat) + "</span>";
+  var pl = pricingLabel(it.pricing);
+  if (pl) chips += '<span class="designeer-badge' + (it.pricing === "freemium" ? " pricing-freemium" : it.pricing === "paid" ? " pricing-paid" : "") + '">' + pl + "</span>";
+  return '<a class="catalogue-card" href="' + esc(it.url) + '" target="_blank" rel="noopener">' +
+    "<div>" +
+      '<div class="card-header-line"><span class="card-title-text"><span>' + esc(it.name) + '</span><span class="card-arrow-icon">↗</span></span>' +
+      (it.host ? '<span class="card-domain-hint">' + esc(it.host) + "</span>" : "") + "</div>" +
+      '<p class="card-desc-text">' + esc(desc) + "</p>" +
+    "</div>" +
+    '<div class="card-tags-row">' + chips + "</div></a>";
+}
+function renderCollection(key){
+  if (!CATALOG[key]) { var g0 = document.querySelector('[data-grid="' + key + '"]'); if (g0) g0.innerHTML = ""; var b0 = document.querySelector('[data-more="' + key + '"]'); if (b0) b0.style.display = "none"; var s0 = document.getElementById(key); if (s0) s0.querySelector("[data-empty]").style.display = "none"; return; }
+  var grid = document.querySelector('[data-grid="' + key + '"]');
+  var items = CATALOG[key].filter(matches);
+  var showAll = state.expanded[key] || !!state.q || state.tag !== "all";
+  var shown = showAll ? items : items.slice(0, PAGE);
+  grid.innerHTML = shown.map(cardHtml).join("");
+  var btn = document.querySelector('[data-more="' + key + '"]');
+  if (!showAll && items.length > PAGE) {
+    btn.style.display = "";
+    btn.textContent = zh() ? "显示全部 " + items.length + " 条" : "Show all " + items.length + " entries";
+  } else { btn.style.display = "none"; }
+  var sec = document.getElementById(key);
+  sec.querySelector("[data-empty]").style.display = items.length ? "none" : "block";
+}
+function renderFinds(){
+  if (!FINDS) { document.getElementById("findsGrid").innerHTML = ""; document.getElementById("finds").querySelector("[data-empty]").style.display = "none"; return; }
+  var grid = document.getElementById("findsGrid");
+  var items = FINDS.filter(function(f){
+    if (state.tag !== "all") return false;
+    if (!state.q) return true;
+    return (f.name + " " + (f.handle || "")).toLowerCase().indexOf(state.q) !== -1;
+  });
+  grid.innerHTML = items.map(function(f){
+    var ratio = (f.w && f.h) ? ' style="aspect-ratio:' + f.w + "/" + f.h + '"' : "";
+    return '<article class="find-poster-card">' +
+      '<img class="poster-img" data-src="' + esc(f.local) + '" alt="Find by ' + esc(f.name) + '"' + ratio + ">" +
+      '<div class="poster-author-bar"><span class="poster-author-name">' + esc(f.name) + "</span>" +
+      (f.handle ? '<span class="poster-author-handle">@' + esc(f.handle) + "</span>" : "") + "</div></article>";
+  }).join("");
+  bindPosterLazy(grid);
+  document.getElementById("finds").querySelector("[data-empty]").style.display = items.length ? "none" : "block";
+}
+function renderAll(){
+  COLLECTIONS.forEach(renderCollection);
+  renderFinds();
+  var note = document.getElementById("searchNote");
+  if (state.q) {
+    var n = 0;
+    COLLECTIONS.forEach(function(k){ n += (CATALOG[k] || []).filter(matches).length; });
+    note.style.display = "block";
+    note.textContent = zh() ? "共 " + n + " 条目录条目匹配「" + state.q + "」" : n + " catalogue entries match \u201C" + state.q + "\u201D";
+  } else { note.style.display = "none"; }
+}
+document.querySelectorAll("[data-more]").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    state.expanded[btn.getAttribute("data-more")] = true;
+    renderCollection(btn.getAttribute("data-more"));
+  });
+});
+
+/* ================= 搜索与重置 ================= */
+var searchInput = document.getElementById("search");
+var clearBtn = document.getElementById("clearBtn");
+var debounce = null;
+searchInput.addEventListener("input", function(){
+  clearBtn.classList.toggle("visible", searchInput.value.length > 0);
+  clearTimeout(debounce);
+  debounce = setTimeout(function(){
+    ensureAllData().then(function(){
+      state.q = searchInput.value.trim().toLowerCase();
+      renderAll();
+    });
+  }, 120);
+});
+clearBtn.addEventListener("click", function(){
+  searchInput.value = "";
+  clearBtn.classList.remove("visible");
+  state.q = "";
+  renderAll();
+  searchInput.focus();
+});
+function resetFiltersAndHome(){
+  state.q = "";
+  state.tag = "all";
+  searchInput.value = "";
+  clearBtn.classList.remove("visible");
+  buildTagChips();
+  renderAll();
+  navigate("home");
+  showToast(zh() ? "已重置全部筛选" : "All filters reset");
+}
+document.getElementById("plusBtn").addEventListener("click", resetFiltersAndHome);
+document.getElementById("refreshBtn").addEventListener("click", function(){
+  var btn = this;
+  btn.classList.add("spinning");
+  setTimeout(function(){ btn.classList.remove("spinning"); }, 520);
+  resetFiltersAndHome();
+});
+document.getElementById("searchGoBtn").addEventListener("click", function(){
+  if (!searchInput.value.trim()) searchInput.focus();
+  else document.getElementById("catalogueBody").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+/* ================= 登录 / 提交 模态框（装饰性） ================= */
+var authTabOrder = ["login", "register", "submit"];
+function switchAuthTab(tabName){
+  var idx = Math.max(0, authTabOrder.indexOf(tabName));
+  var indicator = document.getElementById("authTabIndicator");
+  if (indicator) indicator.style.transform = "translateX(" + (idx * 100) + "%)";
+  document.querySelectorAll(".auth-tab-item").forEach(function(btn){
+    btn.classList.toggle("active", btn.getAttribute("data-auth-tab") === tabName);
+  });
+  authTabOrder.forEach(function(t){
+    var pane = document.getElementById("pane-" + t);
+    if (pane) pane.classList.toggle("active", t === tabName);
+  });
+}
+function openAuthModal(tab){
+  switchAuthTab(tab || "login");
+  document.getElementById("authModalBackdrop").classList.add("open");
+}
+function closeAuthModal(){ document.getElementById("authModalBackdrop").classList.remove("open"); }
+document.getElementById("sidebarSubmitBtn").addEventListener("click", function(){ openAuthModal("submit"); });
+document.getElementById("sidebarLoginBtn").addEventListener("click", function(){ openAuthModal("login"); });
+document.getElementById("mobSubmitBtn").addEventListener("click", function(){ openAuthModal("submit"); });
+document.getElementById("authCloseBtn").addEventListener("click", closeAuthModal);
+document.getElementById("authModalBackdrop").addEventListener("click", function(e){ if (e.target === this) closeAuthModal(); });
+document.querySelectorAll(".auth-tab-item").forEach(function(btn){
+  btn.addEventListener("click", function(){ switchAuthTab(btn.getAttribute("data-auth-tab")); });
+});
+document.querySelectorAll("[data-clear]").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    var el = document.getElementById(btn.getAttribute("data-clear"));
+    if (el) { el.value = ""; el.focus(); }
+  });
+});
+document.querySelectorAll("[data-eye]").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    var el = document.getElementById(btn.getAttribute("data-eye"));
+    if (!el) return;
+    el.type = el.type === "password" ? "text" : "password";
+    btn.classList.toggle("on", el.type === "text");
+  });
+});
+[["pane-login", "login"], ["pane-register", "register"], ["pane-submit", "submit"]].forEach(function(pair){
+  document.getElementById(pair[0]).addEventListener("submit", function(e){
+    e.preventDefault();
+    var mode = pair[1];
+    if (mode === "submit") {
+      var name = document.getElementById("subTitleInput").value.trim();
+      closeAuthModal();
+      showToast(zh() ? "已提交「" + name + "」，等待人工审阅" : 'Submitted "' + name + '" for hand review');
+    } else {
+      closeAuthModal();
+      showToast(zh() ? "验证通过 · 欢迎来到 Designeer" : "Signed in to Designeer Curator Portal");
+    }
+  });
+});
+document.querySelectorAll("[data-social]").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    var provider = btn.getAttribute("data-social");
+    closeAuthModal();
+    showToast(zh() ? "已通过 " + provider + " 登录" : "Signed in with " + provider);
+  });
+});
+
+/* ================= 单页视图路由（就地切换 + hash + 返回恢复） ================= */
+var VIEWS = ["home", "finds", "inspiration", "resources", "tools", "portfolios"];
+var SECTION_IDS = ["finds", "inspiration", "resources", "tools", "portfolios"];
+var currentView = "home";
+function viewFromHash(){
+  var h = (location.hash || "").replace(/^#/, "");
+  return VIEWS.indexOf(h) !== -1 ? h : "home";
+}
+function showView(view, scrollTop){
+  if (VIEWS.indexOf(view) === -1) view = "home";
+  currentView = view;
+  var isHome = view === "home";
+  document.getElementById("heroBlock").style.display = isHome ? "" : "none";
+  document.getElementById("pageFooter").style.display = isHome ? "" : "none";
+  SECTION_IDS.forEach(function(id){
+    document.getElementById(id).style.display = (isHome || view === id) ? "" : "none";
+  });
+  document.querySelectorAll("[data-nav]").forEach(function(btn){
+    btn.classList.toggle("active", btn.getAttribute("data-nav") === view);
+  });
+  if (scrollTop) window.scrollTo(0, 0);
+  if (view === "finds") loadFinds();
+  else if (COLLECTIONS.indexOf(view) !== -1) loadCollection(view);
+}
+function navigate(view){
+  if (view === currentView && location.hash === "#" + view) { showView(view, true); return; }
+  history.pushState(null, "", "#" + view);
+  showView(view, true);
+}
+document.querySelectorAll("[data-nav]").forEach(function(btn){
+  btn.addEventListener("click", function(){ navigate(btn.getAttribute("data-nav")); });
+});
+var brandHome = document.getElementById("brandHome");
+brandHome.addEventListener("click", function(){ navigate("home"); });
+brandHome.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigate("home"); } });
+window.addEventListener("hashchange", function(){ showView(viewFromHash(), false); });
+window.addEventListener("popstate", function(){ showView(viewFromHash(), false); });
+
+/* ================= 数据按需加载（瘦身拆分：数据在 data/ 下按集合分文件） =================
+   打开先出 UI；首个集合与 Finds 紧随拉取，其余集合顺序预热，
+   切视图时该集合插队，搜索时先补齐未拉集合再渲染。拉过缓存、不重复请求 */
+var __dataPromises = {};
+function loadCollection(key){
+  if (CATALOG[key]) return Promise.resolve();
+  if (!__dataPromises[key]) {
+    __dataPromises[key] = fetch("data/" + key + ".json").then(function(r){ return r.json(); }).then(function(d){
+      CATALOG[key] = d;
+      renderCollection(key);
+      if (state.q) renderAll();
+    }).catch(function(){ delete __dataPromises[key]; });
+  }
+  return __dataPromises[key];
+}
+function loadFinds(){
+  if (FINDS) return Promise.resolve();
+  if (!__dataPromises.__finds) {
+    __dataPromises.__finds = fetch("data/finds.json").then(function(r){ return r.json(); }).then(function(d){
+      FINDS = d;
+      renderFinds();
+    }).catch(function(){ delete __dataPromises.__finds; });
+  }
+  return __dataPromises.__finds;
+}
+function ensureAllData(){
+  return Promise.all(COLLECTIONS.map(loadCollection).concat([loadFinds()]));
+}
+function warmRemaining(){
+  var chain = Promise.resolve();
+  COLLECTIONS.forEach(function(k){
+    chain = chain.then(function(){ return loadCollection(k); });
+  });
+  return chain;
+}
+
+var __posterIO = null;
+function bindPosterLazy(scope){
+  var imgs = scope.querySelectorAll("img.poster-img[data-src]");
+  if (!("IntersectionObserver" in window)) {
+    imgs.forEach(function(im){ im.src = im.getAttribute("data-src"); im.removeAttribute("data-src"); });
+    return;
+  }
+  if (!__posterIO) {
+    __posterIO = new IntersectionObserver(function(es){
+      es.forEach(function(en){
+        if (en.isIntersecting) { var im = en.target; im.src = im.getAttribute("data-src"); im.removeAttribute("data-src"); __posterIO.unobserve(im); }
+      });
+    }, { rootMargin: "300px" });
+  }
+  imgs.forEach(function(im){ __posterIO.observe(im); });
+}
+
+/* ================= 初始化 ================= */
+var PREFS = loadPrefs();
+state.themeIdx = PREFS.idx;
+state.lang = PREFS.lang;
+if (PREFS.dark) setDark(true); else state.dark = false;
+applyThemeByGlobalIndex(state.themeIdx);
+applyLang();
+renderAll();
+var initialView = viewFromHash();
+showView(initialView, initialView !== "home");
+loadFinds();
+loadCollection(COLLECTIONS.indexOf(initialView) !== -1 ? initialView : "inspiration");
+setTimeout(warmRemaining, 900);
+
+  </script>
+</body>
+</html>

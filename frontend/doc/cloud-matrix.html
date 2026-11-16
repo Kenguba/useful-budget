@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>云电脑矩阵框架图</title>
+  <style>
+    :root[data-theme="dark"] {
+      --bg-page: #0b0e14;
+      --bg-dot: rgba(148, 163, 184, 0.11);
+      --toolbar-bg: #0f131c;
+      --toolbar-border: #1e2533;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #8b95a5;
+      --text-faint: #64748b;
+
+      /* 第一层：首脑（强调色突出） */
+      --head-bg: #111d38;
+      --head-border: #3b82f6;
+      --head-divider: rgba(59, 130, 246, 0.25);
+      --head-badge-bg: rgba(37, 99, 235, 0.22);
+      --head-badge-border: rgba(96, 165, 250, 0.4);
+      --head-badge-text: #93c5fd;
+      --head-title: #ffffff;
+      --head-desc: #dbeafe;
+
+      /* 第二层：机器卡（中性底色） */
+      --machine-bg: #151922;
+      --machine-border: #262d3b;
+      --machine-hover-border: #3b465c;
+      --machine-icon-bg: #1e2433;
+      --machine-icon-color: #cbd5e1;
+      --machine-divider: #202634;
+
+      /* 状态标签 */
+      --tag-ok-bg: rgba(16, 185, 129, 0.12);
+      --tag-ok-border: rgba(16, 185, 129, 0.35);
+      --tag-ok-text: #34d399;
+      --tag-browser-bg: rgba(245, 158, 11, 0.12);
+      --tag-browser-border: rgba(245, 158, 11, 0.35);
+      --tag-browser-text: #fbbf24;
+
+      /* 第三层：产出层（再降一档，无外框包裹） */
+      --output-card-bg: #10141c;
+      --output-card-border: #1c222e;
+      --output-title: #8b95a5;
+      --output-desc: #cbd5e1;
+
+      /* 第四层：底部小字 */
+      --footer-text: #64748b;
+      --footer-label: #8b95a5;
+
+      /* 树形连接线与标注 */
+      --tree-line-primary: #3b82f6;
+      --tree-line-secondary: #334155;
+      --tree-node-fill: #0b0e14;
+      --pill-bg: #131b2e;
+      --pill-border: #2b4470;
+      --pill-text: #93c5fd;
+      --pill-sub-bg: #131720;
+      --pill-sub-border: #283040;
+      --pill-sub-text: #94a3b8;
+
+      --btn-bg: #171c27;
+      --btn-border: #262f40;
+      --btn-hover: #222a3a;
+      --btn-active-bg: rgba(59, 130, 246, 0.2);
+      --btn-active-border: #3b82f6;
+      --btn-active-text: #93c5fd;
+    }
+
+    :root[data-theme="light"] {
+      --bg-page: #f4f6f9;
+      --bg-dot: rgba(100, 116, 139, 0.15);
+      --toolbar-bg: #ffffff;
+      --toolbar-border: #dce2ec;
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --text-faint: #94a3b8;
+
+      /* 第一层：首脑（强调色突出） */
+      --head-bg: #eff6ff;
+      --head-border: #2563eb;
+      --head-divider: rgba(37, 99, 235, 0.18);
+      --head-badge-bg: rgba(37, 99, 235, 0.1);
+      --head-badge-border: rgba(37, 99, 235, 0.3);
+      --head-badge-text: #1d4ed8;
+      --head-title: #0f172a;
+      --head-desc: #1e3a8a;
+
+      /* 第二层：机器卡（中性底色） */
+      --machine-bg: #ffffff;
+      --machine-border: #cbd5e1;
+      --machine-hover-border: #94a3b8;
+      --machine-icon-bg: #f1f5f9;
+      --machine-icon-color: #334155;
+      --machine-divider: #e2e8f0;
+
+      /* 状态标签 */
+      --tag-ok-bg: #ecfdf5;
+      --tag-ok-border: #6ee7b7;
+      --tag-ok-text: #047857;
+      --tag-browser-bg: #fffbeb;
+      --tag-browser-border: #fcd34d;
+      --tag-browser-text: #b45309;
+
+      /* 第三层：产出层（再降一档，无外框包裹） */
+      --output-card-bg: #edf1f7;
+      --output-card-border: #d5deeb;
+      --output-title: #64748b;
+      --output-desc: #334155;
+
+      /* 第四层：底部小字 */
+      --footer-text: #64748b;
+      --footer-label: #475569;
+
+      /* 树形连接线与标注 */
+      --tree-line-primary: #2563eb;
+      --tree-line-secondary: #94a3b8;
+      --tree-node-fill: #f4f6f9;
+      --pill-bg: #eff6ff;
+      --pill-border: #93c5fd;
+      --pill-text: #1d4ed8;
+      --pill-sub-bg: #eaeff7;
+      --pill-sub-border: #cbd5e1;
+      --pill-sub-text: #475569;
+
+      --btn-bg: #f8fafc;
+      --btn-border: #cbd5e1;
+      --btn-hover: #e2e8f0;
+      --btn-active-bg: #dbeafe;
+      --btn-active-border: #2563eb;
+      --btn-active-text: #1d4ed8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      width: 100%;
+      min-height: 100vh;
+      height: auto;
+      overflow-x: hidden;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100vh;
+      height: auto;
+      overflow-x: hidden;
+      background-color: var(--bg-page);
+      background-image: radial-gradient(var(--bg-dot) 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      padding: 12px 16px 28px;
+      user-select: none;
+    }
+
+    /* 顶部控制栏：无外框限制，直接融入 body 顶部 */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 4px 0 14px;
+      width: 100%;
+      z-index: 60;
+      position: relative;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .topbar-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+
+    .topbar-title svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      color: var(--head-border);
+    }
+
+    .topbar-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .topbar-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .ctrl-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 28px;
+      padding: 0 10px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .ctrl-btn:hover {
+      background: var(--btn-hover);
+      color: var(--text-primary);
+    }
+
+    .ctrl-btn.is-active {
+      background: var(--btn-active-bg);
+      border-color: var(--btn-active-border);
+      color: var(--btn-active-text);
+    }
+
+    .ctrl-btn svg {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
+    }
+
+    /* 矩阵主体：直接位于 body 内，无外层边框或固定高度裁剪 */
+    .matrix-stage {
+      position: relative;
+      width: 100%;
+      flex: 1 0 auto;
+    }
+
+    /* 动态树形连接线 SVG 图层 */
+    .tree-svg-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: visible;
+    }
+
+    #matrix-content {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    /* 通用节点定位（静态布局，位置按默认排版写死） */
+    .node {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* 可跳转节点：整卡可点，悬停时边框略亮 */
+    .is-link {
+      cursor: pointer;
+    }
+
+    .output-card.is-link:hover {
+      border-color: var(--machine-hover-border);
+    }
+
+    .footer-line.is-link:hover {
+      color: var(--text-secondary);
+    }
+
+    /* 外链小箭头 */
+    .ext-arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--text-faint);
+    }
+
+    .ext-arrow svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .output-card .ext-arrow {
+      margin-left: auto;
+      align-self: center;
+    }
+
+    /* 第一层：首脑卡（整行，强调色突出） */
+    .layer-head-wrap {
+      width: 100%;
+    }
+
+    .head-card {
+      width: 100%;
+      background: var(--head-bg);
+      border: 1.5px solid var(--head-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+    }
+
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .head-top-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .head-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--head-badge-text);
+      background: var(--head-badge-bg);
+      border: 1px solid var(--head-badge-border);
+      border-radius: 5px;
+    }
+
+    .head-badge svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    .head-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--head-title);
+      letter-spacing: 0.01em;
+    }
+
+    .collapse-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .collapse-btn:hover {
+      background: rgba(148, 163, 184, 0.12);
+      color: var(--text-primary);
+    }
+
+    .collapse-btn svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .is-collapsed .collapse-btn svg {
+      transform: rotate(-90deg);
+    }
+
+    .head-body {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--head-divider);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13.5px;
+      color: var(--head-desc);
+    }
+
+    .is-collapsed .card-body-collapsible {
+      display: none;
+    }
+
+    .tree-prefix {
+      color: var(--head-border);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.4;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    /* 树干连接区（预留给 SVG 树形分叉线与中间胶囊标签） */
+    .tree-connector-zone {
+      position: relative;
+      width: 100%;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .tree-connector-zone.zone-secondary {
+      height: 60px;
+    }
+
+    .connector-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--pill-bg);
+      border: 1px solid var(--pill-border);
+      color: var(--pill-text);
+      pointer-events: auto;
+    }
+
+    .connector-pill.pill-secondary {
+      background: var(--pill-sub-bg);
+      border: 1px solid var(--pill-sub-border);
+      color: var(--pill-sub-text);
+    }
+
+    .connector-pill svg {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
+    }
+
+    /* 第二层：四台机器（始终四卡并排，构成树形四分叉） */
+    .machines-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    .machine-card {
+      background: var(--machine-bg);
+      border: 1px solid var(--machine-border);
+      border-radius: 10px;
+      padding: 13px 13px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .machine-card.is-collapsed {
+      align-self: start;
+    }
+
+    .machine-card:hover {
+      border-color: var(--machine-hover-border);
+    }
+
+    .machine-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .machine-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .machine-icon-box {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--machine-icon-bg);
+      color: var(--machine-icon-color);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .machine-icon-box svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .machine-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .machine-tag-row {
+      margin-top: 8px;
+    }
+
+    .machine-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 500;
+      max-width: 100%;
+      line-height: 1.35;
+    }
+
+    .machine-tag svg {
+      width: 11px;
+      height: 11px;
+      flex-shrink: 0;
+    }
+
+    .machine-tag.tone-ok {
+      background: var(--tag-ok-bg);
+      border: 1px solid var(--tag-ok-border);
+      color: var(--tag-ok-text);
+    }
+
+    .machine-tag.tone-browser {
+      background: var(--tag-browser-bg);
+      border: 1px solid var(--tag-browser-border);
+      color: var(--tag-browser-text);
+    }
+
+    .machine-list {
+      list-style: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--machine-divider);
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .machine-list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .branch-char {
+      color: var(--text-faint);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    /* 第三层：产出层（无外框限制，四块直接并排，层级底色再降一档） */
+    .output-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      width: 100%;
+    }
+
+    .output-card {
+      background: var(--output-card-bg);
+      border: 1px solid var(--output-card-border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .output-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 5px;
+      background: rgba(148, 163, 184, 0.08);
+      color: var(--output-title);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .output-icon svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    .output-text-wrap {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .output-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--output-title);
+    }
+
+    .output-desc {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--output-desc);
+      margin-top: 2px;
+      word-break: break-word;
+    }
+
+    /* 第四层：底部小字两行（无外框包裹，干净克制） */
+    .footer-layer {
+      margin-top: 16px;
+      padding: 4px 2px 0;
+      width: 100%;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .footer-line {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--footer-text);
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .footer-line svg {
+      width: 13px;
+      height: 13px;
+      color: var(--footer-label);
+      flex-shrink: 0;
+    }
+
+    .footer-key {
+      color: var(--footer-label);
+      font-weight: 600;
+    }
+
+    /* 手机端与窄屏适配：保持四卡并排树形结构、完整显示机器名且不横向溢出 */
+    @media (max-width: 768px) {
+      body {
+        padding: 8px 6px 20px;
+      }
+      .topbar {
+        padding: 2px 2px 10px;
+        gap: 6px;
+      }
+      .topbar-title {
+        font-size: 13px;
+      }
+      .topbar-hint {
+        display: none;
+      }
+      .ctrl-btn {
+        height: 26px;
+        padding: 0 7px;
+        font-size: 11px;
+        gap: 3px;
+      }
+      .ctrl-btn svg {
+        width: 12px;
+        height: 12px;
+      }
+      .head-card {
+        padding: 10px 12px;
+      }
+      .head-title {
+        font-size: 14px;
+      }
+      .head-body {
+        font-size: 11.5px;
+        margin-top: 8px;
+        padding-top: 8px;
+      }
+      .tree-connector-zone {
+        height: 50px;
+      }
+      .tree-connector-zone.zone-secondary {
+        height: 46px;
+      }
+      .connector-pill {
+        font-size: 10.5px;
+        padding: 2px 9px;
+      }
+      .machines-row {
+        gap: 5px;
+      }
+      .machine-card {
+        padding: 7px 5px;
+        border-radius: 8px;
+      }
+      .machine-header {
+        gap: 2px;
+      }
+      .machine-icon-box {
+        width: 15px;
+        height: 15px;
+        background: transparent;
+        border-radius: 0;
+      }
+      .machine-icon-box svg {
+        width: 12px;
+        height: 12px;
+      }
+      .machine-title-group {
+        gap: 3px;
+      }
+      .machine-name {
+        font-size: 11px;
+        letter-spacing: -0.01em;
+      }
+      .collapse-btn {
+        width: 15px;
+        height: 15px;
+      }
+      .collapse-btn svg {
+        width: 11px;
+        height: 11px;
+      }
+      .machine-tag-row {
+        margin-top: 5px;
+      }
+      .machine-tag {
+        font-size: 9px;
+        padding: 2px 4px;
+        gap: 2px;
+        line-height: 1.25;
+      }
+      .machine-tag svg {
+        width: 8.5px;
+        height: 8.5px;
+      }
+      .machine-list {
+        margin-top: 6px;
+        padding-top: 6px;
+        gap: 5px;
+      }
+      .machine-list-item {
+        font-size: 10px;
+        gap: 2px;
+        line-height: 1.35;
+      }
+      .branch-char {
+        font-size: 9px;
+      }
+      .output-grid {
+        gap: 5px;
+      }
+      .output-card {
+        padding: 6px 5px;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .output-icon {
+        width: 16px;
+        height: 16px;
+      }
+      .output-icon svg {
+        width: 10px;
+        height: 10px;
+      }
+      .output-label {
+        font-size: 10px;
+      }
+      .output-desc {
+        font-size: 9.5px;
+        line-height: 1.3;
+      }
+      .footer-layer {
+        margin-top: 12px;
+        padding: 2px 2px 0;
+      }
+      .footer-line {
+        font-size: 10.5px;
+        align-items: flex-start;
+      }
+      .footer-line svg {
+        margin-top: 2px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 顶部工具栏（直接位于 body 内） -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="ui-page-title"></div>
+      <span class="topbar-hint" id="ui-page-hint"></span>
+    </div>
+    <div class="topbar-controls">
+      <button type="button" class="ctrl-btn" id="btn-toggle-all">
+        <span id="icon-toggle-all"></span>
+        <span id="label-toggle-all">全部收起</span>
+      </button>
+      <button type="button" class="ctrl-btn" id="btn-theme">
+        <span id="icon-theme"></span>
+        <span id="label-theme">浅色</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 矩阵主体（直接位于 body 内，无外框限制） -->
+  <main class="matrix-stage" id="matrix-stage">
+    <svg class="tree-svg-layer" id="tree-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="matrix-content"></div>
+  </main>
+
+  <script>
+    /**
+     * ============================================================================
+     * 数据驱动配置对象（修改此对象即可更新全部界面文字与层级内容，无需改动下方视图代码）
+     * 注意：严格遵守每行文字末尾不加句号
+     * ============================================================================
+     */
+    const MATRIX_DATA = {
+      meta: {
+        pageTitle: "云电脑矩阵框架图",
+        pageHint: "点机器卡跳到对应控制台 · 点产出块跳到对应去处",
+        collapseAllText: "全部收起",
+        expandAllText: "全部展开",
+        lightModeText: "浅色",
+        darkModeText: "深色"
+      },
+
+      // 第一层：首脑（整行，强调色突出）
+      layer1Head: {
+        id: "node-head",
+        badge: "ROOT · 首脑总控",
+        title: "首脑 · 豆包（Muse VM）",
+        description: "总控派发：派活 → 盯进度 → 回收产物 → 复验 → 关机收尾；每天出额度日报；结果报主聊 + 微信"
+      },
+
+      // 第一层与第二层之间的树形主干连接线标注
+      dispatchConnector: {
+        id: "pill-dispatch",
+        label: "命令行调度"
+      },
+
+      // 第二层：四台机器（并排四张卡）
+      layer2Machines: [
+        {
+          id: "node-kaggle",
+          url: "https://www.kaggle.com",
+          name: "Kaggle",
+          icon: "bolt",
+          tag: "命令行 · API 已通",
+          tagTone: "ok",
+          tagIcon: "terminal",
+          items: [
+            "打包主力：构建与测试首选",
+            "GPU 跑批：T4 x2 / TPU",
+            "额度：GPU 30 小时/周 · TPU 20 小时/周；活干完停会话"
+          ]
+        },
+        {
+          id: "node-instabox",
+          url: "",
+          name: "InstaBox",
+          icon: "server",
+          tag: "命令行 · CLI 已通",
+          tagTone: "ok",
+          tagIcon: "terminal",
+          items: [
+            "网页托管：站点镜像、例子站",
+            "文件分发：下载目录对外直链",
+            "不耗额度、常开；闲置约 30 分钟休眠，可唤醒"
+          ]
+        },
+        {
+          id: "node-simular",
+          url: "https://simular.ai/",
+          name: "Simular",
+          icon: "desktop",
+          tag: "命令行 · MCP 已通",
+          tagTone: "ok",
+          tagIcon: "terminal",
+          items: [
+            "打包备份腿：构建替补",
+            "桌面机：带桌面的活",
+            "100 点/小时；活干完休眠；连睡 14 天删文件"
+          ]
+        },
+        {
+          id: "node-colab",
+          url: "https://colab.research.google.com/",
+          name: "Colab",
+          icon: "browser",
+          tag: "仅浏览器 · 无命令行",
+          tagTone: "browser",
+          tagIcon: "globe",
+          items: [
+            "临时算力：GPU T4 临时跑批",
+            "浏览器活：只能网页操作的任务",
+            "无常驻硬盘，会话关文件即失；不存文件"
+          ]
+        }
+      ],
+
+      // 第二层与第三层之间的树形汇聚连接线标注
+      outputConnector: {
+        id: "pill-output",
+        label: "四台机器共同扛的活"
+      },
+
+      // 第三层：产出层（整行，四块并排）
+      layer3Outputs: [
+        {
+          id: "node-out-web",
+          url: "",
+          icon: "globe",
+          category: "网页",
+          detail: "InstaBox 托管"
+        },
+        {
+          id: "node-out-file",
+          url: "",
+          icon: "folder",
+          category: "文件",
+          detail: "下载分发与产物回收"
+        },
+        {
+          id: "node-out-pkg",
+          url: "",
+          icon: "package",
+          category: "打包",
+          detail: "jpcard 多腿构建 → 发 Release"
+        },
+        {
+          id: "node-out-data",
+          url: "",
+          icon: "database",
+          category: "数据",
+          detail: "比价抓取与跑批"
+        }
+      ],
+
+      // 第四层：底部小字两行
+      layer4Footer: {
+        id: "node-footer",
+        lines: [
+          {
+            icon: "key",
+            prefix: "后勤：",
+            url: "",
+            content: "钥匙库（四台钥匙已全量备份）· GitHub 仓库存代码与产物"
+          },
+          {
+            icon: "shield",
+            prefix: "矩阵外：",
+            content: "新加坡生产机只收产物、跑正式站点，永不进调度池"
+          }
+        ]
+      }
+    };
+
+    /**
+     * 内联 SVG 图标集（纯矢量线条，不使用任何 emoji）
+     */
+    const SVG_ICONS = {
+      cpu: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>`,
+      terminal: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>`,
+      bolt: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+      server: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/><line x1="6" y1="6.5" x2="6.01" y2="6.5"/><line x1="6" y1="17.5" x2="6.01" y2="17.5"/></svg>`,
+      desktop: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+      browser: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="7" y1="6.5" x2="7.01" y2="6.5"/><line x1="10" y1="6.5" x2="10.01" y2="6.5"/></svg>`,
+      globe: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3a14.5 14.5 0 0 0 0 18 14.5 14.5 0 0 0 0-18"/></svg>`,
+      folder: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`,
+      package: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>`,
+      database: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>`,
+      key: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>`,
+      shield: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+      chevronDown: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`,
+      external: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`,
+      layers: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>`,
+      sun: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
+      moon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`
+    };
+
+    // 状态与几何缓存
+    const state = {
+      theme: "dark",
+      allCollapsed: false,
+      collapsedMap: {}
+    };
+
+    // 预缓存 DOM 引用与基准坐标（展开/收起、窗口缩放时才重新测量）
+    const domCache = {
+      stage: null,
+      svg: null,
+      content: null,
+      nodes: {},
+      baseBoxes: {},
+      svgNodes: null,
+      rafId: 0
+    };
+
+    function getIcon(name) {
+      return SVG_ICONS[name] || SVG_ICONS.layers;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    /**
+     * 根据 MATRIX_DATA 渲染完整视图
+     */
+    function renderMatrix(data) {
+      domCache.stage = document.getElementById("matrix-stage");
+      domCache.svg = document.getElementById("tree-svg");
+      domCache.content = document.getElementById("matrix-content");
+
+      document.getElementById("ui-page-title").innerHTML = `${getIcon("layers")}<span>${escapeHtml(data.meta.pageTitle)}</span>`;
+      document.getElementById("ui-page-hint").textContent = data.meta.pageHint;
+      document.getElementById("icon-toggle-all").innerHTML = getIcon("chevronDown");
+      updateToolbarLabels();
+
+      // 第一层：首脑
+      const headCollapsed = !!state.collapsedMap[data.layer1Head.id];
+      const layer1Html = `
+        <section class="layer-head-wrap">
+          <article class="head-card node ${headCollapsed ? "is-collapsed" : ""}" id="${data.layer1Head.id}" data-node-id="${data.layer1Head.id}">
+            <div class="card-header-row">
+              <div class="head-top-meta">
+                <span class="head-badge">${getIcon("cpu")}<span>${escapeHtml(data.layer1Head.badge)}</span></span>
+                <h1 class="head-title">${escapeHtml(data.layer1Head.title)}</h1>
+              </div>
+              <button type="button" class="collapse-btn" data-toggle-id="${data.layer1Head.id}" aria-label="展开或收起">
+                ${getIcon("chevronDown")}
+              </button>
+            </div>
+            <div class="head-body card-body-collapsible">
+              <span class="tree-prefix">└─</span>
+              <span>${escapeHtml(data.layer1Head.description)}</span>
+            </div>
+          </article>
+        </section>
+      `;
+
+      // 第一层 → 第二层 树形连接标注区
+      const connector1Html = `
+        <div class="tree-connector-zone" id="connector-zone-1">
+          <div class="connector-pill node" id="${data.dispatchConnector.id}" data-node-id="${data.dispatchConnector.id}">
+            ${getIcon("terminal")}
+            <span>${escapeHtml(data.dispatchConnector.label)}</span>
+          </div>
+        </div>
+      `;
+
+      // 第二层：四台机器并排
+      const machinesCardsHtml = data.layer2Machines.map((m) => {
+        const isCollapsed = !!state.collapsedMap[m.id];
+        const toneClass = m.tagTone === "browser" ? "tone-browser" : "tone-ok";
+        const itemsHtml = m.items.map((item, idx) => {
+          const prefix = idx === m.items.length - 1 ? "└─" : "├─";
+          return `
+            <li class="machine-list-item">
+              <span class="branch-char">${prefix}</span>
+              <span>${escapeHtml(item)}</span>
+            </li>
+          `;
+        }).join("");
+
+        return `
+          <article class="machine-card node ${isCollapsed ? "is-collapsed" : ""}${m.url ? " is-link" : ""}" id="${m.id}" data-node-id="${m.id}"${m.url ? ` data-url="${escapeHtml(m.url)}"` : ""}>
+            <div class="machine-header">
+              <div class="machine-title-group">
+                <span class="machine-icon-box">${getIcon(m.icon)}</span>
+                <h2 class="machine-name">${escapeHtml(m.name)}</h2>
+                ${m.url ? `<span class="ext-arrow">${getIcon("external")}</span>` : ""}
+              </div>
+              <button type="button" class="collapse-btn" data-toggle-id="${m.id}" aria-label="展开或收起">
+                ${getIcon("chevronDown")}
+              </button>
+            </div>
+            <div class="machine-tag-row">
+              <span class="machine-tag ${toneClass}">
+                ${getIcon(m.tagIcon)}
+                <span>${escapeHtml(m.tag)}</span>
+              </span>
+            </div>
+            <ul class="machine-list card-body-collapsible">
+              ${itemsHtml}
+            </ul>
+          </article>
+        `;
+      }).join("");
+
+      const layer2Html = `
+        <section class="machines-row" id="machines-row">
+          ${machinesCardsHtml}
+        </section>
+      `;
+
+      // 第二层 → 第三层 树形汇聚标注区
+      const connector2Html = `
+        <div class="tree-connector-zone zone-secondary" id="connector-zone-2">
+          <div class="connector-pill pill-secondary node" id="${data.outputConnector.id}" data-node-id="${data.outputConnector.id}">
+            ${getIcon("layers")}
+            <span>${escapeHtml(data.outputConnector.label)}</span>
+          </div>
+        </div>
+      `;
+
+      // 第三层：产出层（直接四块并排，无外框限制）
+      const outputCardsHtml = data.layer3Outputs.map((out) => {
+        return `
+          <div class="output-card node${out.url ? " is-link" : ""}" id="${out.id}" data-node-id="${out.id}"${out.url ? ` data-url="${escapeHtml(out.url)}"` : ""}>
+            <span class="output-icon">${getIcon(out.icon)}</span>
+            <div class="output-text-wrap">
+              <div class="output-label">${escapeHtml(out.category)}</div>
+              <div class="output-desc">${escapeHtml(out.detail)}</div>
+            </div>
+            ${out.url ? `<span class="ext-arrow">${getIcon("external")}</span>` : ""}
+          </div>
+        `;
+      }).join("");
+
+      const layer3Html = `
+        <section class="output-grid" id="output-grid">
+          ${outputCardsHtml}
+        </section>
+      `;
+
+      // 第四层：底部小字两行
+      const footerLinesHtml = data.layer4Footer.lines.map((line) => {
+        return `
+          <div class="footer-line${line.url ? " is-link" : ""}"${line.url ? ` data-url="${escapeHtml(line.url)}"` : ""}>
+            ${getIcon(line.icon)}
+            <span><strong class="footer-key">${escapeHtml(line.prefix)}</strong>${escapeHtml(line.content)}</span>
+            ${line.url ? `<span class="ext-arrow">${getIcon("external")}</span>` : ""}
+          </div>
+        `;
+      }).join("");
+
+      const layer4Html = `
+        <footer class="footer-layer node" id="${data.layer4Footer.id}" data-node-id="${data.layer4Footer.id}">
+          ${footerLinesHtml}
+        </footer>
+      `;
+
+      domCache.content.innerHTML = layer1Html + connector1Html + layer2Html + connector2Html + layer3Html + layer4Html;
+
+      // 缓存节点引用
+      domCache.nodes = {};
+      domCache.content.querySelectorAll(".node").forEach((el) => {
+        domCache.nodes[el.getAttribute("data-node-id")] = el;
+      });
+
+      initSvgPool(data.layer2Machines.length, data.layer3Outputs.length);
+      bindInteractions();
+      refreshLayoutCacheAndDraw();
+    }
+
+    /**
+     * 预创建持久化 SVG 节点池，后续拖动时只改属性，零 DOM 销毁重建
+     */
+    function initSvgPool(machineCount, outputCount) {
+      const svg = domCache.svg;
+      const ns = "http://www.w3.org/2000/svg";
+      svg.innerHTML = "";
+
+      function createEl(tag, attrs) {
+        const el = document.createElementNS(ns, tag);
+        for (const k in attrs) el.setAttribute(k, attrs[k]);
+        svg.appendChild(el);
+        return el;
+      }
+
+      const pool = {
+        trunkTop: createEl("path", { stroke: "var(--tree-line-primary)", "stroke-width": "2", fill: "none" }),
+        busTop: createEl("path", { stroke: "var(--tree-line-primary)", "stroke-width": "2", fill: "none" }),
+        machineTopStems: [],
+        machineTopDots: [],
+        headDot: createEl("circle", { r: "3.5", fill: "var(--tree-node-fill)", stroke: "var(--tree-line-primary)", "stroke-width": "2" }),
+        busTopJoint: createEl("circle", { r: "3", fill: "var(--tree-line-primary)" }),
+        busBottom: createEl("path", { stroke: "var(--tree-line-secondary)", "stroke-width": "1.5", "stroke-dasharray": "4 3", fill: "none" }),
+        machineBottomStems: [],
+        machineBottomDots: [],
+        outputTopStems: [],
+        outputTopDots: []
+      };
+
+      for (let i = 0; i < machineCount; i++) {
+        pool.machineTopStems.push(
+          createEl("path", { stroke: "var(--tree-line-primary)", "stroke-width": "2", fill: "none" })
+        );
+        pool.machineTopDots.push(
+          createEl("circle", { r: "3.5", fill: "var(--tree-node-fill)", stroke: "var(--tree-line-primary)", "stroke-width": "2" })
+        );
+        pool.machineBottomStems.push(
+          createEl("path", { stroke: "var(--tree-line-secondary)", "stroke-width": "1.5", "stroke-dasharray": "4 3", fill: "none" })
+        );
+        pool.machineBottomDots.push(
+          createEl("circle", { r: "2.8", fill: "var(--tree-node-fill)", stroke: "var(--tree-line-secondary)", "stroke-width": "1.6" })
+        );
+      }
+
+      for (let j = 0; j < outputCount; j++) {
+        pool.outputTopStems.push(
+          createEl("path", { stroke: "var(--tree-line-secondary)", "stroke-width": "1.5", "stroke-dasharray": "4 3", fill: "none" })
+        );
+        pool.outputTopDots.push(
+          createEl("circle", { r: "2.8", fill: "var(--tree-node-fill)", stroke: "var(--tree-line-secondary)", "stroke-width": "1.6" })
+        );
+      }
+
+      domCache.svgNodes = pool;
+    }
+
+    /**
+     * 仅在初始化、窗口缩放、卡片展开/收起时测量一次基准坐标
+     */
+    function measureBaseGeometry() {
+      const stageRect = domCache.stage.getBoundingClientRect();
+      domCache.baseBoxes = {};
+
+      for (const id in domCache.nodes) {
+        const el = domCache.nodes[id];
+        const r = el.getBoundingClientRect();
+        const left = r.left - stageRect.left;
+        const top = r.top - stageRect.top;
+        domCache.baseBoxes[id] = {
+          left,
+          top,
+          right: left + r.width,
+          bottom: top + r.height,
+          cx: left + r.width * 0.5,
+          cy: top + r.height * 0.5,
+          width: r.width,
+          height: r.height
+        };
+      }
+    }
+
+    function getLiveBox(id) {
+      return domCache.baseBoxes[id] || null;
+    }
+
+    /**
+     * 纯内存数值计算更新 SVG 属性（零布局回流）
+     */
+    function updateTreePathsFast() {
+      domCache.rafId = 0;
+      const pool = domCache.svgNodes;
+      if (!pool) return;
+
+      const headBox = getLiveBox(MATRIX_DATA.layer1Head.id);
+      if (!headBox) return;
+
+      const pillDispatchBox = getLiveBox(MATRIX_DATA.dispatchConnector.id);
+      const pillOutputBox = getLiveBox(MATRIX_DATA.outputConnector.id);
+      const machineBoxes = MATRIX_DATA.layer2Machines.map((m) => getLiveBox(m.id));
+      const outputBoxes = MATRIX_DATA.layer3Outputs.map((o) => getLiveBox(o.id));
+
+      // 第一层 → 第二层 一分四树形线
+      const startX = headBox.cx;
+      const startY = headBox.bottom;
+      let minMachineTop = Infinity;
+      let leftMostX1 = startX;
+      let rightMostX1 = startX;
+
+      for (let i = 0; i < machineBoxes.length; i++) {
+        const mb = machineBoxes[i];
+        if (mb.top < minMachineTop) minMachineTop = mb.top;
+        if (mb.cx < leftMostX1) leftMostX1 = mb.cx;
+        if (mb.cx > rightMostX1) rightMostX1 = mb.cx;
+      }
+
+      let busY1 = startY + (minMachineTop - startY) * 0.72;
+      if (pillDispatchBox) {
+        busY1 = Math.max(pillDispatchBox.bottom + 8, Math.min(minMachineTop - 8, (pillDispatchBox.bottom + minMachineTop) * 0.5));
+      }
+
+      pool.trunkTop.setAttribute("d", `M ${startX.toFixed(1)} ${startY.toFixed(1)} L ${startX.toFixed(1)} ${busY1.toFixed(1)}`);
+      pool.busTop.setAttribute("d", `M ${leftMostX1.toFixed(1)} ${busY1.toFixed(1)} L ${rightMostX1.toFixed(1)} ${busY1.toFixed(1)}`);
+
+      pool.headDot.setAttribute("cx", startX.toFixed(1));
+      pool.headDot.setAttribute("cy", startY.toFixed(1));
+      pool.busTopJoint.setAttribute("cx", startX.toFixed(1));
+      pool.busTopJoint.setAttribute("cy", busY1.toFixed(1));
+
+      for (let i = 0; i < machineBoxes.length; i++) {
+        const mb = machineBoxes[i];
+        pool.machineTopStems[i].setAttribute("d", `M ${mb.cx.toFixed(1)} ${busY1.toFixed(1)} L ${mb.cx.toFixed(1)} ${mb.top.toFixed(1)}`);
+        pool.machineTopDots[i].setAttribute("cx", mb.cx.toFixed(1));
+        pool.machineTopDots[i].setAttribute("cy", mb.top.toFixed(1));
+      }
+
+      // 第二层 → 第三层 四合一汇聚分发线
+      if (outputBoxes.length > 0) {
+        let maxMachineBottom = -Infinity;
+        let minOutputTop = Infinity;
+        let leftMostX2 = Infinity;
+        let rightMostX2 = -Infinity;
+
+        for (let i = 0; i < machineBoxes.length; i++) {
+          const mb = machineBoxes[i];
+          if (mb.bottom > maxMachineBottom) maxMachineBottom = mb.bottom;
+          if (mb.cx < leftMostX2) leftMostX2 = mb.cx;
+          if (mb.cx > rightMostX2) rightMostX2 = mb.cx;
+        }
+        for (let j = 0; j < outputBoxes.length; j++) {
+          const ob = outputBoxes[j];
+          if (ob.top < minOutputTop) minOutputTop = ob.top;
+          if (ob.cx < leftMostX2) leftMostX2 = ob.cx;
+          if (ob.cx > rightMostX2) rightMostX2 = ob.cx;
+        }
+
+        let busY2 = maxMachineBottom + (minOutputTop - maxMachineBottom) * 0.5;
+        if (pillOutputBox) {
+          busY2 = pillOutputBox.cy;
+        }
+
+        pool.busBottom.setAttribute("d", `M ${leftMostX2.toFixed(1)} ${busY2.toFixed(1)} L ${rightMostX2.toFixed(1)} ${busY2.toFixed(1)}`);
+
+        for (let i = 0; i < machineBoxes.length; i++) {
+          const mb = machineBoxes[i];
+          pool.machineBottomStems[i].setAttribute("d", `M ${mb.cx.toFixed(1)} ${mb.bottom.toFixed(1)} L ${mb.cx.toFixed(1)} ${busY2.toFixed(1)}`);
+          pool.machineBottomDots[i].setAttribute("cx", mb.cx.toFixed(1));
+          pool.machineBottomDots[i].setAttribute("cy", mb.bottom.toFixed(1));
+        }
+
+        for (let j = 0; j < outputBoxes.length; j++) {
+          const ob = outputBoxes[j];
+          pool.outputTopStems[j].setAttribute("d", `M ${ob.cx.toFixed(1)} ${busY2.toFixed(1)} L ${ob.cx.toFixed(1)} ${ob.top.toFixed(1)}`);
+          pool.outputTopDots[j].setAttribute("cx", ob.cx.toFixed(1));
+          pool.outputTopDots[j].setAttribute("cy", ob.top.toFixed(1));
+        }
+      }
+    }
+
+    function refreshLayoutCacheAndDraw() {
+      requestAnimationFrame(() => {
+        measureBaseGeometry();
+        updateTreePathsFast();
+      });
+    }
+
+    /**
+     * 事件委托绑定：
+     * 1. 收起箭头只展开/收起，不跳转
+     * 2. 带 data-url 的卡/块/行整块点击，在新标签页打开对应地址
+     */
+    let interactionsBound = false;
+    function bindInteractions() {
+      if (interactionsBound) return;
+      interactionsBound = true;
+
+      const contentEl = domCache.content;
+
+      contentEl.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-toggle-id]");
+        if (btn) {
+          e.stopPropagation();
+          const id = btn.getAttribute("data-toggle-id");
+          state.collapsedMap[id] = !state.collapsedMap[id];
+          const card = domCache.nodes[id];
+          if (card) {
+            card.classList.toggle("is-collapsed", !!state.collapsedMap[id]);
+          }
+          syncToggleAllStatus();
+          refreshLayoutCacheAndDraw();
+          return;
+        }
+
+        const linkEl = e.target.closest("[data-url]");
+        if (linkEl) {
+          window.open(linkEl.getAttribute("data-url"), "_blank", "noopener");
+        }
+      });
+    }
+
+    function syncToggleAllStatus() {
+      const collapsibleIds = [
+        MATRIX_DATA.layer1Head.id,
+        ...MATRIX_DATA.layer2Machines.map((m) => m.id)
+      ];
+      state.allCollapsed = collapsibleIds.every((id) => !!state.collapsedMap[id]);
+      updateToolbarLabels();
+    }
+
+    function updateToolbarLabels() {
+      const labelToggle = document.getElementById("label-toggle-all");
+      const labelTheme = document.getElementById("label-theme");
+      const iconTheme = document.getElementById("icon-theme");
+
+      if (labelToggle) {
+        labelToggle.textContent = state.allCollapsed
+          ? MATRIX_DATA.meta.expandAllText
+          : MATRIX_DATA.meta.collapseAllText;
+      }
+      if (labelTheme && iconTheme) {
+        if (state.theme === "dark") {
+          labelTheme.textContent = MATRIX_DATA.meta.lightModeText;
+          iconTheme.innerHTML = getIcon("sun");
+        } else {
+          labelTheme.textContent = MATRIX_DATA.meta.darkModeText;
+          iconTheme.innerHTML = getIcon("moon");
+        }
+      }
+    }
+
+    // 绑定顶部工具栏事件
+    document.getElementById("btn-toggle-all").addEventListener("click", () => {
+      const nextCollapsed = !state.allCollapsed;
+      const collapsibleIds = [
+        MATRIX_DATA.layer1Head.id,
+        ...MATRIX_DATA.layer2Machines.map((m) => m.id)
+      ];
+      collapsibleIds.forEach((id) => {
+        state.collapsedMap[id] = nextCollapsed;
+        const el = domCache.nodes[id];
+        if (el) el.classList.toggle("is-collapsed", nextCollapsed);
+      });
+      state.allCollapsed = nextCollapsed;
+      updateToolbarLabels();
+      refreshLayoutCacheAndDraw();
+    });
+
+    document.getElementById("btn-theme").addEventListener("click", () => {
+      state.theme = state.theme === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", state.theme);
+      updateToolbarLabels();
+    });
+
+    window.addEventListener("resize", () => {
+      refreshLayoutCacheAndDraw();
+    }, { passive: true });
+
+    // 初始化渲染
+    renderMatrix(MATRIX_DATA);
+  </script>
+</body>
+</html>

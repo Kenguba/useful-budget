@@ -1,0 +1,150 @@
+{
+ "site": "skill",
+ "dir": "skill-board",
+ "source_bytes": 113861,
+ "script_blocks": [
+  {
+   "idx": 0,
+   "offset": 47663,
+   "line": 480,
+   "region": "body",
+   "bytes": 23203,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  },
+  {
+   "idx": 1,
+   "offset": 68549,
+   "line": 796,
+   "region": "body",
+   "bytes": 42038,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  },
+  {
+   "idx": 2,
+   "offset": 110026,
+   "line": 1405,
+   "region": "body",
+   "bytes": 185,
+   "src": null,
+   "ids_defined_after_block": [],
+   "top_level_awaits": 0
+  }
+ ],
+ "bootstrap_hazards": [
+  {
+   "kind": "load_listener",
+   "target": "window",
+   "event": "load",
+   "line": 927,
+   "note": "window load / DOMContentLoaded already fired before module import; this listener never fires in hub mode"
+  }
+ ],
+ "head_scripts": [],
+ "global_listeners": [
+  {
+   "target": "window",
+   "event": "resize",
+   "line": 9,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "scroll",
+   "line": 711,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "pageshow",
+   "line": 717,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "popstate",
+   "line": 718,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "resize",
+   "line": 883,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "scroll",
+   "line": 895,
+   "recycled_on_unmount": true
+  },
+  {
+   "target": "window",
+   "event": "load",
+   "line": 927,
+   "recycled_on_unmount": true
+  }
+ ],
+ "element_listeners_count": 34,
+ "dangers": {
+  "document_write": [],
+  "eval": [],
+  "new_function": [],
+  "location_nav": [],
+  "history_writes": [
+   {
+    "line": 662,
+    "text": " history.scrollRestoration=\"manual\"; history.replaceState({secNavSession,y:window.scrollY},\"\",location.href); }catch(e){} funct"
+   },
+   {
+    "line": 667,
+    "text": "==secNavSession||st.y===y)return; try{history.replaceState({...st,y},\"\",location.href)}catch(e){} } function paintSec(secId,anim"
+   },
+   {
+    "line": 688,
+    "text": ")return; saveSecPosition(); try{history.pushState({secNavSession,y:window.scrollY},\"\",\"#\"+secId)}catch(e){} /* Use ful"
+   },
+   {
+    "line": 714,
+    "text": "dow.scrollY<=0&&location.hash){ try{history.replaceState(history.state,\"\",location.pathname+location.search)}catch(e){} } },"
+   }
+  ],
+  "window_assignments": [],
+  "service_worker": [
+   {
+    "line": 927,
+    "text": " updateDockVisibility(); })(); if (\"serviceWorker\" in navigator) { window.addEventListener(\"load\", () => navigator.serviceWork"
+   },
+   {
+    "line": 927,
+    "text": "ddEventListener(\"load\", () => navigator.serviceWorker.register(\"./sw.js\", {updateViaCache: \"none\"}).then(r => r.update()).catch(()"
+   }
+  ],
+  "set_interval": []
+ },
+ "timers_note": "setInterval/setTimeout are NOT suspended on unmount (modules are never unloaded; intervals keep running against hidden DOM — see audit.md)",
+ "fetch_points": {
+  "literal_urls": [
+   "data/boards/${d}.json?t=",
+   "data/dates.json?t=",
+   "data/video.json?t="
+  ],
+  "dynamic_fetch_calls": 4,
+  "xhr": 0,
+  "rule": "all fetch() calls in module scope pass the generated __fetch shadow: relative URLs resolve against /frontend/skill-board/"
+ },
+ "shadow_name_declarations": [],
+ "inline_handler_bridge": {
+  "names": [],
+  "declared_in_source": [],
+  "not_found_as_declaration": []
+ },
+ "localstorage_keys": [
+  "skill-open-groups",
+  "skill-prefs"
+ ],
+ "ui_relative_assets_rebased": []
+}

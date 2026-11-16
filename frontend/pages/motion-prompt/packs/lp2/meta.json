@@ -1,0 +1,726 @@
+{
+  "pack": "lp2",
+  "order": 7,
+  "title": { "ja": "LP・Webサイトの演出 第2弾", "en": "Landing page & web effects, part 2", "es": "Efectos de landing pages y sitios web, parte 2", "zh-Hans": "落地页与网页效果（第 2 弹）", "zh-Hant": "Landing Page 與網站效果 第 2 彈" },
+  "categories": [
+    { "slug": "scroll", "ja": "スクロールで起きる演出", "en": "Scroll effects", "es": "Efectos al hacer scroll", "zh-Hans": "滚动效果", "zh-Hant": "捲動時的效果" },
+    { "slug": "mouse-input", "ja": "マウス・入力への反応", "en": "Mouse & input interactions", "es": "Interacciones con el mouse y los formularios", "zh-Hans": "鼠标与输入交互", "zh-Hant": "滑鼠與輸入的互動" },
+    { "slug": "showcase", "ja": "見せ場の演出", "en": "Showcase effects", "es": "Efectos para destacar", "zh-Hans": "亮点展示", "zh-Hant": "吸睛展示效果" }
+  ],
+  "elements": [
+    {
+      "no": "01", "slug": "timeline-on-scroll", "category": "scroll",
+      "name": { "ja": "タイムラインアニメーション", "en": "Timeline on scroll", "es": "Línea de tiempo al hacer scroll", "zh-Hans": "滚动时间轴", "zh-Hant": "時間軸動畫" },
+      "meaning": { "ja": "スクロールで年表の線が伸びる", "en": "A timeline line grows as you scroll", "es": "Una línea de tiempo crece a medida que haces scroll", "zh-Hans": "滚动时时间轴的线条随之延伸", "zh-Hant": "捲動時，年表的線條跟著延伸" },
+      "ask": { "ja": "会社のあゆみをタイムラインアニメーションにして。スクロールに合わせて縦線を伸ばし、線が届いた年から順に出して。", "en": "Turn the company history into a timeline on scroll: grow the vertical line with the scroll and reveal each year as the line reaches it.", "es": "Convierte la historia de la empresa en una línea de tiempo al hacer scroll: que la línea vertical crezca con el scroll y muestre cada año cuando la línea llega a él.", "zh-Hans": "把公司沿革做成滚动时间轴：竖线随滚动延伸，线到达哪一年就依次显示该年内容。", "zh-Hant": "公司沿革請做成時間軸動畫：縱線隨著捲動延伸，線延伸到哪一年，就依序顯示那一年。" },
+      "summary": {
+        "ja": "ページを下へスクロールすると、年表の縦線が朱色で上から伸び、線の先が届いた年の点が塗られて、年と出来事が右から現れる。上へ戻すと逆にたどる。",
+        "en": "As the page scrolls down, an orange line grows down the timeline; each dot it reaches fills in and its year and event slide in from the right. Scrolling back up reverses it."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168 のブラウザの窓。スクロール量: 0.3〜2.3秒で 0→190px、3.0〜4.3秒で 190→0（easeInOut 3乗）。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "年表の縦線は x=168。灰色の線（幅3）の上を朱色の線が伸びる。線の先＝スクロール量＋126px（いつも画面の上から126px、下から42pxの位置）",
+          "項目5つ（2018〜2026）。ページ上の y=72・126・180・234・288 に点（白・半径7.5・輪の線幅2.5）",
+          "線の先が点を過ぎてから22px伸びる間に（easeOut 3乗）: 輪が朱色になり、中の点が半径0→4に育ち、年（18px・朱）と出来事（15px）が右16pxから元の位置へ動きながら現れる",
+          "上へ戻すと線が縮み、同じ式で項目が消える。右端のスクロールバーも連動"
+        ],
+        "en": [
+          "A 511 × 168 browser viewport. Scroll: 0→190 px over 0.3–2.3 s, 190→0 over 3.0–4.3 s (cubic ease-in-out). One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "The timeline line is at x = 168: an orange line grows over a gray track (width 3). Its tip sits at scroll + 126 px, so always 126 px from the top of the viewport (42 px from the bottom).",
+          "Five items (2018–2026), with dots (white, radius 7.5, ring width 2.5) at page y = 72, 126, 180, 234 and 288.",
+          "Over the 22 px of line growth after the tip passes a dot (cubic ease-out): the ring turns orange, an inner dot grows from radius 0 to 4, and the year (18 px, orange) and event (15 px) fade in while sliding 16 px from the right.",
+          "Scrolling back shrinks the line and hides the items by the same formula. The scrollbar thumb on the right follows the scroll."
+        ]
+      },
+      "use": {
+        "ja": "会社のあゆみ・沿革・導入までの流れなど、時間の順に並ぶ内容を読ませたいとき。",
+        "en": "Use it for company history, milestones or a step-by-step process that reads in time order."
+      },
+      "tags": ["timeline", "scroll", "history", "milestones", "scroll-driven", "progress-line"]
+    },
+    {
+      "no": "02", "slug": "scroll-text-reveal", "category": "scroll",
+      "name": { "ja": "スクロールテキストリビール", "en": "Scroll text reveal", "es": "Revelado de texto al hacer scroll", "zh-Hans": "滚动文字显现", "zh-Hant": "捲動文字浮現" },
+      "meaning": { "ja": "読み進めると文字が順に濃くなる", "en": "Text darkens letter by letter as you scroll", "es": "El texto se oscurece letra por letra mientras haces scroll", "zh-Hans": "随着阅读，文字逐字变深", "zh-Hant": "往下捲動時，文字依序變深" },
+      "ask": { "ja": "コンセプト文にスクロールテキストリビールを付けて。最初は薄いグレーで、スクロールに合わせて1文字ずつ濃くして。", "en": "Add a scroll text reveal to the concept statement: start in light gray and darken it one character at a time as the page scrolls.", "es": "Agrega un revelado de texto al hacer scroll a la frase de concepto: que empiece en gris claro y se oscurezca un carácter a la vez mientras se desplaza la página.", "zh-Hans": "给理念文案加上滚动文字显现：初始为浅灰色，随滚动逐字加深。", "zh-Hant": "理念文案加上捲動文字浮現：一開始是淺灰色，隨著捲動一個字一個字變深。" },
+      "summary": {
+        "ja": "薄いグレーの見出しの文字が、スクロールに合わせて左上から1文字ずつ濃くなり、戻すと後ろから薄くなる。",
+        "en": "A light gray headline darkens one character at a time from the top left as the page scrolls, and fades back from the end when scrolling up."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。スクロールの進み p: 0.3〜2.6秒で 0→1、3.2〜4.4秒で 1→0（easeInOut 3乗）。ページは p×40px だけ上へ動く。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "見出し3行・計24文字（27px・太さ800・行送り38px）。最初は全部薄いグレー（#D6DBE4）",
+          "n文字目（0から数える）の濃さ = clamp(p×26 − n)。スクロールに比例して、1文字あたり進みの1/26で文字色（#1C2333）まで濃くなる",
+          "戻すと同じ式で後ろの文字から薄くなる。下の本文の棒と右端のスクロールバーも連動"
+        ],
+        "en": [
+          "A 511 × 168 viewport. Scroll progress p: 0→1 over 0.3–2.6 s, 1→0 over 3.2–4.4 s (cubic ease-in-out). The page moves up by p × 40 px. One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "A three-line headline, 24 characters in all (27 px, weight 800, 38 px line height), all light gray (#D6DBE4) at the start.",
+          "Character n (counting from 0) has darkness clamp(p × 26 − n): each character takes 1/26 of the progress to reach the text color (#1C2333), in step with the scroll.",
+          "Scrolling back fades them from the last character by the same formula. The body-text bars and the scrollbar thumb move with the page."
+        ]
+      },
+      "use": {
+        "ja": "コンセプトや代表メッセージなど、1文ずつ読んでほしい短い文章に。",
+        "en": "Use it on a short statement, such as a concept or a message from the founder, that should be read slowly."
+      },
+      "tags": ["scroll", "text-reveal", "scroll-driven", "typography", "opacity", "storytelling"]
+    },
+    {
+      "no": "03", "slug": "stacking-cards", "category": "scroll",
+      "name": { "ja": "スタッキングカード", "en": "Stacking cards", "es": "Tarjetas apiladas (stacking cards)", "zh-Hans": "堆叠卡片", "zh-Hant": "堆疊卡片" },
+      "meaning": { "ja": "スクロールでカードが積み重なる", "en": "Cards stack on top of each other on scroll", "es": "Las tarjetas se apilan una sobre otra al hacer scroll", "zh-Hans": "滚动时卡片层层叠起", "zh-Hant": "捲動時，卡片一張張疊上來" },
+      "ask": { "ja": "サービスの3ステップをスタッキングカードにして。スクロールで次のカードが下から来て、12pxずつずらして重なるように。", "en": "Show the three service steps as stacking cards: on scroll, each card slides up and stacks 12 px below the top of the one before.", "es": "Muestra los tres pasos del servicio como tarjetas apiladas: al hacer scroll, cada tarjeta sube y se apila 12 px por debajo del borde superior de la anterior.", "zh-Hans": "把服务的三个步骤做成堆叠卡片：滚动时下一张从下方升起，每张比前一张错开 12 px 叠上去。", "zh-Hant": "服務的三個步驟做成堆疊卡片：捲動時下一張卡片從下方上來，每張錯開 12 px 疊上去。" },
+      "summary": {
+        "ja": "スクロールすると、次のカードが下から上がってきて、前のカードに少しずらして重なる。下になったカードは少し縮んで暗くなる。",
+        "en": "On scroll, the next card rises from below and stacks over the previous one with a small offset; the cards underneath shrink a little and darken."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。スクロールの段 s: 0.3〜1.1秒で 0→1、1.6〜2.4秒で 1→2、3.2〜4.4秒で 2→0（easeInOut 3乗）。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "カード3枚（371×124・角丸12・左右中央）。ページ上で170pxずつ離れて並び、s が1進むごとに170px上がる",
+          "止まる位置は上から 14・26・38px（1枚ごとに12pxずつずらした position: sticky と同じ）。後のカードが前のカードの上に重なる",
+          "上に1枚重なるたびに、下のカードは上辺の中央を軸に4.5%ずつ縮み（2枚で9%）、濃紺の幕（最大16%）で暗くなる",
+          "カードの影はぼかし14px・上へ2px。右端のスクロールバーも連動"
+        ],
+        "en": [
+          "A 511 × 168 viewport. Scroll step s: 0→1 over 0.3–1.1 s, 1→2 over 1.6–2.4 s, 2→0 over 3.2–4.4 s (cubic ease-in-out). One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "Three cards (371 × 124, radius 12, centered), 170 px apart on the page; each step of s moves them up 170 px.",
+          "They stop 14, 26 and 38 px from the top (position: sticky with the top offset 12 px larger for each card), so each new card covers the one before.",
+          "For each card stacked on top, the card underneath shrinks 4.5% (9% for two) around the middle of its top edge and darkens under a navy layer (up to 16%).",
+          "Card shadow: 14 px blur, 2 px upward. The scrollbar thumb follows the scroll."
+        ]
+      },
+      "use": {
+        "ja": "手順・特長・プランなど、順番に1枚ずつ見せたい内容に。",
+        "en": "Use it for steps, features or plans that should be shown one card at a time, in order."
+      },
+      "tags": ["stacking-cards", "sticky", "scroll", "cards", "position-sticky", "steps"]
+    },
+    {
+      "no": "04", "slug": "background-color-change", "category": "scroll",
+      "name": { "ja": "背景色の切り替え", "en": "Background color change on scroll", "es": "Cambio de color de fondo al hacer scroll", "zh-Hans": "滚动切换背景色", "zh-Hant": "捲動切換背景色" },
+      "meaning": { "ja": "セクションごとに背景の色が変わる", "en": "The page background changes color by section", "es": "El fondo de la página cambia de color en cada sección", "zh-Hans": "按区块切换页面背景色", "zh-Hant": "背景顏色隨區塊切換" },
+      "ask": { "ja": "セクションごとに背景色の切り替えを入れて。スクロールで朝はクリーム、夜は濃紺、休日は水色へなめらかに変えて。", "en": "Add a background color change on scroll: blend smoothly from cream for the morning section to navy for night and light blue for the holiday section.", "es": "Agrega un cambio de color de fondo al hacer scroll: que pase suavemente de crema en la sección de la mañana a azul marino en la de la noche y a celeste en la de los días libres.", "zh-Hans": "给各区块加上滚动切换背景色：滚动时从早晨区块的奶油色平滑过渡到夜晚的藏蓝色，再到假日的浅蓝色。", "zh-Hant": "每個區塊加上捲動切換背景色：隨著捲動，從早晨的奶油色、夜晚的深藍色到假日的淺藍色，平順地漸變。" },
+      "summary": {
+        "ja": "スクロールしてセクションが変わるたびに、ページ全体の背景がクリーム→濃紺→水色となめらかに変わる。暗い背景では文字が白になる。",
+        "en": "Each time the scroll moves into a new section, the whole page background blends from cream to navy to light blue; on the dark background the text turns white."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。セクション3つ（各168px＝画面1つ分）。スクロール量: 0.3〜1.2秒 0→168px、1.8〜2.7秒 168→336px、3.3〜4.4秒 336→0（easeInOut 3乗）。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "背景色: 朝 #FFEBD9 → 夜 #1E2A4A → 休日 #DDE6FF。ページ全体を1色で塗り、セクションの境目を越える間に混ぜる",
+          "混ぜる割合: 次のセクションまでのスクロールの5%〜95%の区間で 0→1（easeInOut 2乗）。時間ではなくスクロール量で決まる",
+          "夜に近いほど見出しの文字を濃紺→白、本文の棒をベージュ→紺に混ぜる。見出しの番号（01 MORNING など）は朱のまま",
+          "各セクションの絵（太陽・月と星・山の写真）はページと一緒に動く。右端のスクロールバーも連動"
+        ],
+        "en": [
+          "A 511 × 168 viewport with three sections, each 168 px (one screen). Scroll: 0→168 px over 0.3–1.2 s, 168→336 over 1.8–2.7 s, 336→0 over 3.3–4.4 s (cubic ease-in-out). One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "Background colors: morning #FFEBD9 → night #1E2A4A → holiday #DDE6FF, painted as one color behind the whole page and blended while crossing a section boundary.",
+          "Blend: 0→1 between 5% and 95% of the scroll to the next section (quadratic ease-in-out), driven by scroll position, not by time.",
+          "Toward night the headline blends from navy to white and the body bars from beige to blue-gray; the section labels (01 MORNING …) stay orange.",
+          "Each section's picture (sun, moon and stars, mountain photo) moves with the page. The scrollbar thumb follows the scroll."
+        ]
+      },
+      "use": {
+        "ja": "章ごとに雰囲気を変えたいストーリー型のページや、昼と夜・季節など場面の違いを見せたいとき。",
+        "en": "Use it on story-style pages where each chapter has its own mood, or to contrast scenes such as day and night or the seasons."
+      },
+      "tags": ["background-color", "scroll", "section", "color-transition", "scroll-driven", "storytelling"]
+    },
+    {
+      "no": "05", "slug": "hide-on-scroll-header", "category": "scroll",
+      "name": { "ja": "隠れるヘッダー", "en": "Hide-on-scroll header", "es": "Encabezado que se oculta al hacer scroll", "zh-Hans": "滚动隐藏页头", "zh-Hant": "自動隱藏 Header" },
+      "meaning": { "ja": "下へで隠れて上へで出てくる", "en": "Hides on scroll down, returns on scroll up", "es": "Se oculta al bajar y vuelve al subir", "zh-Hans": "向下滚动时隐藏，向上滚动时出现", "zh-Hant": "往下捲時隱藏，往上捲時出現" },
+      "ask": { "ja": "ヘッダーを隠れるヘッダーにして。下へスクロールしたら0.3秒で上へ隠し、少しでも上へ戻したら出して。", "en": "Make the header hide on scroll: slide it up out of view over 0.3 s when scrolling down, and bring it back as soon as the user scrolls up.", "es": "Haz un encabezado que se oculta al hacer scroll: que suba fuera de la vista en 0,3 s al bajar y vuelva apenas se haga scroll hacia arriba.", "zh-Hans": "把页头做成滚动隐藏页头：向下滚动时用 0.3 s 向上隐藏，只要稍微向上滚动就重新出现。", "zh-Hant": "把 Header 做成自動隱藏 Header：往下捲動時在 0.3 秒內往上收起，只要稍微往上捲就重新出現。" },
+      "summary": {
+        "ja": "下へスクロールするとヘッダーが上へ引っ込んで読む場所が広くなり、少し上へ戻すとすぐに出てくる。",
+        "en": "Scrolling down slides the header up out of view to free the screen; scrolling up even a little brings it straight back."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。ヘッダー（高さ34px）を上に固定。スクロール量: 0.3〜1.1秒 0→170px（下へ）、1.5〜1.9秒 170→100（上へ）、2.4〜2.9秒 100→230（下へ）、3.3〜4.3秒 230→0（上へ）。各区間 easeInOut 3乗。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "最後に動いた向きが下なら隠し、上なら出す。ページの先頭から34px以内では常に出す",
+          "隠すときも出すときも0.3秒（easeInOut 2乗）で上へ36px動かす（transform: translateY と transition の組み合わせと同じ）",
+          "スクロールしている間はヘッダーの下に12pxの影（濃さはスクロール量30pxまでで0→0.14）。右端のスクロールバーも連動"
+        ],
+        "en": [
+          "A 511 × 168 viewport with a 34 px header fixed at the top. Scroll: 0→170 px over 0.3–1.1 s (down), 170→100 over 1.5–1.9 s (up), 100→230 over 2.4–2.9 s (down), 230→0 over 3.3–4.3 s (up), each with cubic ease-in-out. One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "If the last movement was downward the header hides; if upward it shows. Within 34 px of the top of the page it always shows.",
+          "Hiding and showing both move it 36 px upward over 0.3 s (quadratic ease-in-out), like transform: translateY with a transition.",
+          "While scrolled, a 12 px shadow sits under the header (opacity 0→0.14 over the first 30 px of scroll). The scrollbar thumb follows the scroll."
+        ]
+      },
+      "use": {
+        "ja": "スマホなど画面が狭いときに読む場所を広く取りつつ、メニューにすぐ戻れるようにしたいとき。",
+        "en": "Use it when screen space is tight, as on phones, to give the content more room while keeping the menu one small scroll away."
+      },
+      "tags": ["header", "hide-on-scroll", "headroom", "navigation", "sticky-header", "scroll-direction"]
+    },
+    {
+      "no": "06", "slug": "scrollspy", "category": "scroll",
+      "name": { "ja": "スクロールスパイ", "en": "Scrollspy", "es": "Scrollspy", "zh-Hans": "滚动监听", "zh-Hant": "Scrollspy" },
+      "meaning": { "ja": "読んでいる見出しが目次で光る", "en": "Highlights the current section in the menu", "es": "Resalta en el menú la sección que estás leyendo", "zh-Hans": "目录高亮当前阅读的章节", "zh-Hant": "在目錄中標示正在閱讀的段落" },
+      "ask": { "ja": "記事の目次にスクロールスパイを付けて。今読んでいる見出しの項目を朱色にして、切り替えは0.25秒で。", "en": "Add scrollspy to the article's table of contents: highlight the item for the section being read in orange, switching over 0.25 s.", "es": "Agrega scrollspy al índice del artículo: resalta en naranja el elemento de la sección que se está leyendo, con un cambio de 0,25 s.", "zh-Hans": "给文章目录加上滚动监听：当前阅读章节的条目显示为朱红色，切换用时 0.25 s。", "zh-Hant": "文章目錄加上 Scrollspy：正在閱讀的段落所對應的項目變成橘紅色，切換時間 0.25 秒。" },
+      "summary": {
+        "ja": "本文をスクロールすると、左の目次のうち、いま読んでいる見出しの項目に色が付き、次の見出しに入ると印が移る。",
+        "en": "As the article scrolls, the table-of-contents item for the section being read lights up, and the highlight moves on when the next heading comes in."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。左に目次（幅150px・4項目）、右に本文。見出し4つはページ上で100pxおき。スクロール量: 0.3〜0.9秒 0→100、1.35〜1.95秒 →200、2.4〜3.0秒 →300、3.5〜4.4秒 300→0（easeInOut 3乗）。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "今の項目＝上端が「スクロール量＋40px」より上にある見出しのうち最後の1つ（判定線は画面の上から40px）",
+          "今の項目が変わると0.25秒（easeOut 3乗）で、目次の項目に薄い朱の地（126×26・角丸6）と左端の朱の線（幅4）を付け、文字を灰色→朱・太字にする。前の項目は同じ0.25秒で戻る",
+          "目次は動かず、本文だけがスクロールする。右端のスクロールバーも連動"
+        ],
+        "en": [
+          "A 511 × 168 viewport: a table of contents on the left (150 px wide, 4 items) and the article on the right, with headings 100 px apart. Scroll: 0→100 over 0.3–0.9 s, →200 over 1.35–1.95 s, →300 over 2.4–3.0 s, 300→0 over 3.5–4.4 s (cubic ease-in-out). One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "Current item = the last heading whose top is above scroll + 40 px (a trigger line 40 px below the top of the viewport).",
+          "When it changes, over 0.25 s (cubic ease-out) the item gets a pale orange background (126 × 26, radius 6) and an orange bar on its left (width 4), and its text turns from gray to bold orange; the previous item reverts over the same 0.25 s.",
+          "The table of contents stays put; only the article scrolls. The scrollbar thumb follows the scroll."
+        ]
+      },
+      "use": {
+        "ja": "長い記事・ドキュメント・FAQで、いまどこを読んでいるかを全体の中で示したいとき。",
+        "en": "Use it on long articles, documentation or FAQs to show where the reader is within the whole page."
+      },
+      "tags": ["scrollspy", "table-of-contents", "toc", "navigation", "active-state", "scroll"]
+    },
+    {
+      "no": "07", "slug": "back-to-top-button", "category": "scroll",
+      "name": { "ja": "トップへ戻るボタン", "en": "Back-to-top button", "es": "Botón de volver arriba", "zh-Hans": "回到顶部按钮", "zh-Hant": "回到頂端按鈕" },
+      "meaning": { "ja": "下まで読むと現れて押すと先頭へ", "en": "Appears lower down and returns you to the top", "es": "Aparece más abajo y te regresa al inicio", "zh-Hans": "往下滚动后出现，点击回到顶部", "zh-Hant": "往下捲後出現，點擊就回到最上方" },
+      "ask": { "ja": "記事ページにトップへ戻るボタンを付けて。少しスクロールしたら右下に出して、押したら0.6秒で先頭まで戻して。", "en": "Add a back-to-top button to the article page: show it at the bottom right once the reader has scrolled a little, and scroll to the top in 0.6 s when clicked.", "es": "Agrega un botón de volver arriba a la página del artículo: que aparezca abajo a la derecha cuando el lector haya bajado un poco, y que suba hasta arriba en 0,6 s al hacer clic.", "zh-Hans": "给文章页加上回到顶部按钮：稍微滚动后显示在右下角，点击后用 0.6 s 滚回顶部。", "zh-Hant": "文章頁加上回到頂端按鈕：稍微往下捲之後出現在右下角，點擊後在 0.6 秒內回到頁面最上方。" },
+      "summary": {
+        "ja": "下までスクロールすると右下に丸い矢印のボタンが現れ、押すとページが一気に先頭まで戻る。",
+        "en": "After scrolling down, a round arrow button appears at the bottom right; clicking it takes the page straight back to the top."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。0.2〜1.7秒でスクロール量 0→300px（ページの一番下まで・easeInOut 3乗）。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "ボタン: 右下（中心 x=472, y=138）の朱の丸（半径19・白い上向きの矢印・影ぼかし10）。スクロール量80〜140pxの間に透明から現れ、10px下から上がる（easeOut 3乗）",
+          "2.6秒にボタンをクリック。カーソルが乗っている間は0.2秒で色を濃くする（#FF5A2C→#D9431C）",
+          "クリックの後 2.66〜3.26秒（0.6秒）でスクロール量 300→0（easeInOut 3乗）。80pxを切るとボタンは同じ式で消える"
+        ],
+        "en": [
+          "A 511 × 168 viewport. Scroll 0→300 px (to the bottom of the page) over 0.2–1.7 s, cubic ease-in-out. One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "Button: an orange circle at the bottom right (center x = 472, y = 138; radius 19; white up arrow; 10 px shadow blur). Between 80 and 140 px of scroll it fades in while rising 10 px (cubic ease-out).",
+          "It is clicked at 2.6 s. While the cursor is on it, it darkens over 0.2 s (#FF5A2C → #D9431C).",
+          "After the click the scroll goes 300→0 over 2.66–3.26 s (0.6 s, cubic ease-in-out); below 80 px the button fades out by the same formula."
+        ]
+      },
+      "use": {
+        "ja": "ブログ・長いLP・商品一覧など、縦に長いページで先頭のメニューへすぐ戻れるようにしたいとき。",
+        "en": "Use it on long pages such as blog posts, long landing pages or product lists, so readers can get back to the menu at the top."
+      },
+      "tags": ["back-to-top", "scroll-to-top", "button", "navigation", "floating-button", "smooth-scroll"]
+    },
+    {
+      "no": "08", "slug": "zoom-on-scroll", "category": "scroll",
+      "name": { "ja": "スクロールで拡大", "en": "Zoom on scroll", "es": "Zoom al hacer scroll", "zh-Hans": "滚动放大", "zh-Hant": "捲動放大" },
+      "meaning": { "ja": "画像が画面いっぱいまで広がる", "en": "An image grows to fill the screen as you scroll", "es": "Una imagen crece hasta llenar la pantalla al hacer scroll", "zh-Hans": "图片随滚动放大至铺满屏幕", "zh-Hant": "捲動時，圖片放大到填滿畫面" },
+      "ask": { "ja": "ファーストビューの写真をスクロールで拡大にして。中央の小さな写真をスクロールに合わせて画面いっぱいまで広げ、広がりきったら見出しを重ねて。", "en": "Use zoom on scroll for the hero image: grow the small centered photo to fill the viewport as the user scrolls, then fade a headline in over it.", "es": "Usa zoom al hacer scroll en la imagen del hero: que la foto pequeña del centro crezca hasta llenar la pantalla mientras se hace scroll, y luego funde un titular encima.", "zh-Hans": "首屏照片做成滚动放大：中央的小照片随滚动放大到铺满视口，完全展开后叠上标题。", "zh-Hant": "Hero 區塊的照片做成捲動放大：中央的小照片隨著捲動放大到填滿畫面，完全放大後再疊上標題。" },
+      "summary": {
+        "ja": "スクロールに合わせて、ページ中央の小さな写真が窓いっぱいまで広がり、周りの文字が消えて、写真の上に見出しが出る。",
+        "en": "As the page scrolls, a small photo in the middle grows to fill the window, the text around it fades away and a headline appears over the photo."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。スクロールの進み p: 0.3〜2.3秒で 0→1、3.0〜4.4秒で 1→0（easeInOut 3乗）。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "写真の枠: 中央の 155×90（位置 x=178, y=58・角丸8）から窓いっぱいの 511×168（角丸0）まで、位置・幅・高さ・角丸を p に比例して変える",
+          "周りの見出しと文字は p が0〜0.45の間に消える（不透明度 1 − 2.2p）",
+          "p が0.7〜1の間に、写真の中央に白い見出し（26px・字間2px）が現れる。右端のスクロールバーも連動"
+        ],
+        "en": [
+          "A 511 × 168 viewport. Scroll progress p: 0→1 over 0.3–2.3 s, 1→0 over 3.0–4.4 s (cubic ease-in-out). One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "Photo frame: from 155 × 90 in the middle (x = 178, y = 58, radius 8) to the full 511 × 168 window (radius 0); position, width, height and radius change in proportion to p.",
+          "The heading and text around it fade out while p goes 0→0.45 (opacity 1 − 2.2p).",
+          "While p goes 0.7→1, a white headline (26 px, 2 px letter spacing) fades in at the center of the photo. The scrollbar thumb follows the scroll."
+        ]
+      },
+      "use": {
+        "ja": "旅・不動産・ブランドサイトなどで、写真の世界に入り込む感じを出したいとき。",
+        "en": "Use it on travel, real-estate or brand sites to pull the visitor into the photo."
+      },
+      "tags": ["zoom", "scroll", "image", "scale", "scroll-driven", "hero", "fullscreen"]
+    },
+    {
+      "no": "09", "slug": "3d-tilt", "category": "mouse-input",
+      "name": { "ja": "3Dチルト", "en": "3D tilt on hover", "es": "Tilt 3D (inclinación 3D)", "zh-Hans": "3D 倾斜", "zh-Hant": "3D 傾斜效果" },
+      "meaning": { "ja": "カーソルの向きにカードが傾く", "en": "The card tilts in 3D following the cursor", "es": "La tarjeta se inclina en 3D siguiendo el cursor", "zh-Hans": "卡片随光标方向立体倾斜", "zh-Hant": "卡片跟著游標方向立體傾斜" },
+      "ask": { "ja": "会員カードに3Dチルトを付けて。カーソルの位置に合わせて最大18°傾けて、光の反射も動かして。", "en": "Add a 3D tilt on hover to the member card: tilt it up to 18° following the cursor, with a moving glare.", "es": "Agrega un tilt 3D al pasar el cursor a la tarjeta de miembro: que se incline hasta 18° siguiendo el cursor, con un reflejo de luz que se mueve.", "zh-Hans": "给会员卡加上 3D 倾斜：随光标位置最大倾斜 18°，反光也跟着移动。", "zh-Hant": "會員卡加上 3D 傾斜效果：跟著游標位置最多傾斜 18 度，表面的反光也跟著移動。" },
+      "summary": {
+        "ja": "カーソルがカードの上を動くと、カードがカーソルの位置に合わせて奥行きをもって傾き、表面の光の反射も一緒に動く。離れると平らに戻る。",
+        "en": "As the cursor moves over the card, the card tilts in depth to match the cursor position and a glare moves across its surface; it settles flat when the cursor leaves."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。カード 220×132（角丸14）を中央に置く。カーソルは外から入ってカードの四隅の近くへ0.6秒おきに動き、外へ出る（easeInOut 3乗）。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "傾き: カードの中心からカーソルまでのずれを幅・高さの半分で割って −1〜1 にし、横のずれ×0.32rad（約18°）を Y軸回り、縦のずれ×0.32rad を X軸回りの回転にする。カーソルのある側が奥へ沈む",
+          "遠近: 視点までの距離520px（perspective: 520px 相当）。手前の部分ほど大きく描く",
+          "カーソルが乗ると0.4秒（easeOut 3乗）で傾きと光を強め、離れると同じ0.4秒で平らに戻る",
+          "光: カーソルの位置に半径130pxの白い光（中心の不透明度0.42）。床の影は傾きと逆へ最大10pxずれる"
+        ],
+        "en": [
+          "A 511 × 168 viewport with a 220 × 132 card (radius 14) in the middle. The cursor comes in, visits points near the card's corners every 0.6 s and leaves (cubic ease-in-out). One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "Tilt: the cursor offset from the card center is divided by half the width and height to give −1…1; the horizontal offset × 0.32 rad (about 18°) is the rotation about Y, the vertical offset × 0.32 rad the rotation about X. The side under the cursor tips away.",
+          "Depth: viewer distance 520 px (like perspective: 520px); nearer parts are drawn larger.",
+          "On hover the tilt and glare ramp up over 0.4 s (cubic ease-out); on leave the card returns flat over the same 0.4 s.",
+          "Glare: a white radial light of radius 130 px at the cursor (opacity 0.42 at the center). The floor shadow shifts up to 10 px against the tilt."
+        ]
+      },
+      "use": {
+        "ja": "会員カード・商品パッケージ・料金プランなど、手に取りたくなる物を立体的に見せたいとき。",
+        "en": "Use it on member cards, product packaging or pricing cards to make them feel like objects you can pick up."
+      },
+      "tags": ["tilt", "3d", "hover", "perspective", "card", "glare", "parallax"]
+    },
+    {
+      "no": "10", "slug": "spotlight-hover", "category": "mouse-input",
+      "name": { "ja": "スポットライトホバー", "en": "Spotlight hover", "es": "Spotlight hover (foco al pasar el cursor)", "zh-Hans": "聚光灯悬停", "zh-Hant": "Hover 聚光燈效果" },
+      "meaning": { "ja": "カーソルの周りだけ明るくなる", "en": "Only the area around the cursor lights up", "es": "Solo se ilumina la zona alrededor del cursor", "zh-Hans": "只有光标周围变亮", "zh-Hant": "只有游標周圍會變亮" },
+      "ask": { "ja": "特長のカードにスポットライトホバーを付けて。暗いカードの上で、カーソルの周り半径120pxくらいだけ明るくして、縁も光らせて。", "en": "Add a spotlight hover to the feature cards: on the dark cards, light up only a circle of about 120 px around the cursor and make the borders glow too.", "es": "Agrega un spotlight hover a las tarjetas de características: sobre las tarjetas oscuras, ilumina solo un círculo de unos 120 px de radio alrededor del cursor y haz que los bordes también brillen.", "zh-Hans": "给特色卡片加上聚光灯悬停：在深色卡片上只照亮光标周围半径约 120 px 的范围，边框也一起发光。", "zh-Hant": "特色卡片加上 Hover 聚光燈效果：在深色卡片上，只照亮游標周圍半徑約 120 px 的範圍，卡片邊框也要發光。" },
+      "summary": {
+        "ja": "暗いカードの上をカーソルが動くと、カーソルの周りだけが丸く明るく照らされ、近くのカードの縁も光る。",
+        "en": "As the cursor moves over the dark cards, only a circle around it is lit, and the edges of nearby cards glow."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。暗い地（#121828）に暗いカード3枚（147×116・角丸10）。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "カーソルは8の字に動き続ける: x = 255 + 190·sin(2πt/4.7)、y = 92 + 40·sin(4πt/4.7)",
+          "各カードの中だけに、カーソルを中心とした半径115pxの白い光（中心の不透明度0.34→外で0）を重ねる。カードの外には漏れない",
+          "カードの縁（線幅2）もカーソルからの距離で光る: 半径120pxの朱の光（rgb(255,122,82)）。遠い縁は元の薄い線（白8%）だけ",
+          "遅れはない。光はカーソルの位置にそのまま付いてくる（座標を CSS 変数に入れて radial-gradient の中心にする作り方と同じ）"
+        ],
+        "en": [
+          "A 511 × 168 viewport: a dark page (#121828) with three dark cards (147 × 116, radius 10). One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "The cursor keeps moving in a figure eight: x = 255 + 190·sin(2πt/4.7), y = 92 + 40·sin(4πt/4.7).",
+          "Inside each card only, a white radial light of radius 115 px is centered on the cursor (opacity 0.34 at the center → 0); it does not spill outside the cards.",
+          "Card borders (width 2) glow by distance from the cursor: an orange radial light (rgb(255,122,82)) of radius 120 px. Far edges keep only the faint base line (8% white).",
+          "No lag: the light sits exactly at the cursor (the usual build puts the coordinates in CSS variables used as the radial-gradient center)."
+        ]
+      },
+      "use": {
+        "ja": "暗い配色のサイトで特長や料金のカードを並べるとき、触っている場所を目立たせたいとき。",
+        "en": "Use it on dark-themed sites with rows of feature or pricing cards, to make the spot under the pointer stand out."
+      },
+      "tags": ["spotlight", "hover", "glow", "cursor", "radial-gradient", "dark-mode", "card"]
+    },
+    {
+      "no": "11", "slug": "image-swap-on-hover", "category": "mouse-input",
+      "name": { "ja": "ホバーで画像切り替え", "en": "Image swap on hover", "es": "Cambio de imagen al pasar el cursor", "zh-Hans": "悬停切换图片", "zh-Hant": "Hover 切換圖片" },
+      "meaning": { "ja": "乗せると別の写真に切り替わる", "en": "Hovering swaps the photo for another shot", "es": "Al pasar el cursor, la foto cambia por otra toma", "zh-Hans": "悬停时换成另一张照片", "zh-Hant": "滑鼠移上去時換成另一張照片" },
+      "ask": { "ja": "商品一覧にホバーで画像切り替えを付けて。カーソルを乗せたら0.3秒で後ろ姿の写真にクロスフェードして。", "en": "Add an image swap on hover to the product grid: cross-fade to the back view over 0.3 s when the cursor is on a card.", "es": "Agrega un cambio de imagen al pasar el cursor a la cuadrícula de productos: un fundido cruzado a la vista de espalda en 0,3 s cuando el cursor esté sobre una tarjeta.", "zh-Hans": "给商品列表加上悬停切换图片：光标停在卡片上时，用 0.3 s 叠化为背面照片。", "zh-Hant": "商品列表加上 Hover 切換圖片：游標移到卡片上時，用 0.3 秒交叉溶解成背面照片。" },
+      "summary": {
+        "ja": "商品カードにカーソルを乗せると、Tシャツの正面の写真が後ろ姿の写真にふわっと切り替わり、離れると正面に戻る。",
+        "en": "With the cursor on a product card, the front photo of the T-shirt cross-fades to a back view; it returns to the front when the cursor leaves."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。商品カード2枚（写真の枠 196×112・角丸8、下に商品名と価格）。カーソルは左のカード、右のカードの順に約1.3秒ずつ乗る。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "乗ったら0.3秒（easeInOut 2乗）で、正面の写真（胸に小さな丸）から後ろ姿の写真（背中に大きな星）へクロスフェード。離れたら同じ0.3秒で正面に戻す",
+          "写真の下の点2つ（半径3）で、今どちらの写真かを示す（濃い点が今の写真）",
+          "判定は写真と商品名を含むカード全体。枠・商品名・価格は動かない"
+        ],
+        "en": [
+          "A 511 × 168 viewport with two product cards (photo frame 196 × 112, radius 8, name and price below). The cursor rests on the left card, then the right one, for about 1.3 s each. One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "On hover, over 0.3 s (quadratic ease-in-out), the front photo (small dot on the chest) cross-fades to the back photo (large star on the back); on leave it fades back over the same 0.3 s.",
+          "Two dots under the photo (radius 3) show which photo is showing (the dark dot is the current one).",
+          "The hover area is the whole card, including the name. The frame, name and price do not move."
+        ]
+      },
+      "use": {
+        "ja": "ECの商品一覧で、一覧のまま別の角度や着用写真を見せたいとき。",
+        "en": "Use it on e-commerce product grids to show another angle or an on-model shot without leaving the list."
+      },
+      "tags": ["image-swap", "hover", "crossfade", "product-card", "ecommerce", "thumbnail"]
+    },
+    {
+      "no": "12", "slug": "text-roll-on-hover", "category": "mouse-input",
+      "name": { "ja": "テキストロール", "en": "Text roll on hover", "es": "Text roll (texto que rueda)", "zh-Hans": "悬停文字翻滚", "zh-Hant": "Hover 文字翻滾" },
+      "meaning": { "ja": "文字が上に回って入れ替わる", "en": "Letters roll up and swap on hover", "es": "Las letras ruedan hacia arriba y se reemplazan al pasar el cursor", "zh-Hans": "文字向上翻转并替换", "zh-Hant": "滑鼠移上去時，文字往上翻滾替換" },
+      "ask": { "ja": "グローバルメニューにテキストロールを付けて。カーソルを乗せたら文字が1文字ずつ0.035秒ずらして上へ回り、朱色の同じ文字が下から出るように。", "en": "Give the main menu a text roll on hover: the letters roll up one by one, 0.035 s apart, revealing the same word in orange from below.", "es": "Ponle un text roll al pasar el cursor al menú principal: que las letras rueden hacia arriba una por una, con 0,035 s de diferencia, y aparezca desde abajo la misma palabra en naranja.", "zh-Hans": "给主导航加上悬停文字翻滚：光标悬停时文字逐字向上翻出，每字间隔 0.035 s，同样的朱红色文字从下方翻入。", "zh-Hant": "主選單加上 Hover 文字翻滾：游標移上去時，文字一個字一個字往上翻出，每個字錯開 0.035 秒，同時橘紅色的同一組字從下方翻上來。" },
+      "summary": {
+        "ja": "メニューの文字にカーソルを乗せると、文字が1文字ずつ上へ回って消え、同じ文字が朱色で下から出てくる。離れると元に戻る。",
+        "en": "With the cursor on a menu word, its letters roll up and out one by one while the same word rolls in from below in orange; it rolls back when the cursor leaves."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。メニューの文字3つ（WORKS・ABOUT・CONTACT、30px・太さ800・字間1px）。カーソルが左から順に約0.85秒ずつ乗る。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "各文字の40px下に、同じ文字の朱色の複製を置き、高さ39pxの枠で切り抜く（overflow: hidden）",
+          "乗ると1文字ずつ0.035秒ずらして、各0.36秒（easeInOut 3乗）で元の文字が40px上へ抜け、朱色の文字が下から入る",
+          "離れると同じずらし方・同じ時間で逆に下へ回り、元の文字に戻る"
+        ],
+        "en": [
+          "A 511 × 168 viewport with three menu words (WORKS, ABOUT, CONTACT; 30 px, weight 800, 1 px letter spacing). The cursor rests on each, left to right, for about 0.85 s. One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "An orange copy of each word sits 40 px below it, and both are clipped to a 39 px tall box (overflow: hidden).",
+          "On hover each letter, staggered by 0.035 s, moves 40 px up and out over 0.36 s (cubic ease-in-out) while its orange copy rises into place.",
+          "On leave the letters roll back down with the same stagger and timing."
+        ]
+      },
+      "use": {
+        "ja": "ヘッダーのメニューやボタンなど、短い文字のリンクに触った手ごたえを付けたいとき。",
+        "en": "Use it on header menus or buttons to give short text links a tactile response."
+      },
+      "tags": ["text-roll", "hover", "menu", "link", "stagger", "typography"]
+    },
+    {
+      "no": "13", "slug": "hover-image-reveal", "category": "mouse-input",
+      "name": { "ja": "ホバーで画像プレビュー", "en": "Hover image reveal", "es": "Hover image reveal (imagen que aparece al pasar el cursor)", "zh-Hans": "悬停图片预览", "zh-Hant": "Hover 圖片預覽" },
+      "meaning": { "ja": "リストに乗せると写真が出る", "en": "Hovering a list item shows its photo", "es": "Al pasar el cursor por un elemento de la lista aparece su foto", "zh-Hans": "悬停列表项时显示对应照片", "zh-Hant": "滑鼠移到列表項目上就顯示照片" },
+      "ask": { "ja": "施設一覧をホバーで画像プレビューにして。行にカーソルを乗せたら、その写真をカーソルの横に0.25秒で出して、カーソルについて動かして。", "en": "Turn the property list into a hover image reveal: when the cursor is on a row, show its photo beside the cursor over 0.25 s and let it follow the cursor.", "es": "Convierte la lista de propiedades en un hover image reveal: cuando el cursor esté sobre una fila, muestra su foto junto al cursor en 0,25 s y que lo siga.", "zh-Hans": "把设施列表做成悬停图片预览：光标停在某行时，用 0.25 s 在光标旁显示该行照片，并跟随光标移动。", "zh-Hant": "設施列表做成 Hover 圖片預覽：游標移到某一列時，在 0.25 秒內於游標旁邊顯示那一列的照片，並跟著游標移動。" },
+      "summary": {
+        "ja": "文字だけのリストの行にカーソルを乗せると、その行の写真がカーソルの横にふわっと出て、カーソルについて動く。",
+        "en": "With the cursor on a row of a text-only list, that row's photo fades in beside the cursor and follows it."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。文字だけのリスト4行（行の高さ39px・名前17px）。カーソルが上の行から順に約1秒ずつ乗って下へ進む。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "乗った行: 0.25秒（easeOut 3乗）で名前が右へ8px動き、名前と右端の矢印が朱色に変わる。離れると同じ0.25秒で戻る",
+          "写真: その行の写真（132×84・角丸6・影）をカーソルの右26pxに、カーソルより少し上の高さで出す。上下は窓からはみ出さないように止める",
+          "写真は同じ0.25秒で不透明度0→1、大きさ0.85→1倍。カーソルに遅れずについて動き、次の行に移ると前の写真が消えながら次の写真が出る"
+        ],
+        "en": [
+          "A 511 × 168 viewport with a text-only list of four rows (39 px rows, 17 px names). The cursor moves down the rows, about 1 s on each. One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "Hovered row: over 0.25 s (cubic ease-out) the name shifts 8 px right and the name and the arrow at the right turn orange; on leave they return over 0.25 s.",
+          "Photo: that row's photo (132 × 84, radius 6, drop shadow) appears 26 px right of the cursor, a little above it, kept inside the window vertically.",
+          "Over the same 0.25 s the photo goes from opacity 0 to 1 and from 0.85× to 1×. It follows the cursor without lag; moving to the next row fades the old photo out as the new one comes in."
+        ]
+      },
+      "use": {
+        "ja": "実績・作品・物件の一覧を文字だけで軽く見せつつ、気になった行だけ写真で確かめさせたいとき。",
+        "en": "Use it on lists of work, projects or properties that stay text-only and light, while letting people check a photo for the rows they care about."
+      },
+      "tags": ["hover", "image-reveal", "list", "cursor-follow", "preview", "portfolio"]
+    },
+    {
+      "no": "14", "slug": "floating-label", "category": "mouse-input",
+      "name": { "ja": "フローティングラベル", "en": "Floating label", "es": "Etiqueta flotante (floating label)", "zh-Hans": "浮动标签", "zh-Hant": "浮動標籤" },
+      "meaning": { "ja": "入力するとラベルが上へ移る", "en": "The label floats up when you start typing", "es": "La etiqueta sube cuando empiezas a escribir", "zh-Hans": "开始输入时标签上移", "zh-Hant": "開始輸入時，標籤移到上方" },
+      "ask": { "ja": "フォームの入力欄をフローティングラベルにして。フォーカスしたらラベルを0.24秒で小さくして枠の上の線へ移して。", "en": "Use floating labels in the form: on focus, shrink each label and move it onto the top border over 0.24 s.", "es": "Ponle etiqueta flotante a cada campo del formulario: al enfocarlo, que la etiqueta se achique y pase al borde superior en 0,24 s.", "zh-Hans": "表单输入框使用浮动标签：获得焦点时，标签用 0.24 s 缩小并移到边框顶线上。", "zh-Hant": "表單的輸入欄位改成浮動標籤：聚焦時，標籤在 0.24 秒內縮小並移到外框的上緣線上。" },
+      "summary": {
+        "ja": "入力欄をクリックするとラベルが小さくなって欄の上の線へ移り、空いた欄に文字を打てる。空にして外すとラベルが中に戻る。",
+        "en": "Clicking the field shrinks the label and moves it onto the top border, leaving the field free for typing; empty and unfocused, the label moves back inside."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。入力欄 300×46（角丸8）の中にラベル「メールアドレス」（15px）。0.65秒に欄をクリック、3.95秒に欄の外をクリックしてフォーカスを外す。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "フォーカスがあるか文字があるとき、0.24秒（easeOut 3乗）でラベルを 15px→11.5px に縮め、欄の中央の高さから上の線の上へ動かす（左の余白 14→10px）。線はラベルの後ろだけ白で切る",
+          "フォーカス中は0.15秒（easeOut 3乗）で枠線を灰色→朱・太さ1.5→2.2px、ラベルを灰色→朱にする",
+          "1.0秒から0.075秒に1文字ずつ「hello@example.com」を入力し、3.2秒から0.03秒に1文字ずつ消す。空になってフォーカスが外れると、ラベルは同じ0.24秒で欄の中に戻る",
+          "入力位置の縦線は0.9秒ごとに点滅（打っている間は点けたまま）"
+        ],
+        "en": [
+          "A 511 × 168 viewport with a 300 × 46 field (radius 8) holding the label \"メールアドレス\" (email address, 15 px). The field is clicked at 0.65 s, and a click outside at 3.95 s removes focus. One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "While focused or not empty, over 0.24 s (cubic ease-out) the label shrinks 15 → 11.5 px and moves from the middle of the field onto the top border (left padding 14 → 10 px); the border is masked in white behind it.",
+          "While focused, over 0.15 s (cubic ease-out) the border turns from gray to orange and 1.5 → 2.2 px wide, and the label turns orange.",
+          "\"hello@example.com\" is typed one character per 0.075 s from 1.0 s and deleted one per 0.03 s from 3.2 s. Once empty and unfocused, the label moves back inside over the same 0.24 s.",
+          "The text caret blinks every 0.9 s (it stays on while typing)."
+        ]
+      },
+      "use": {
+        "ja": "入力欄の多いフォームで、ラベルを残したまま場所を取らないようにしたいとき。",
+        "en": "Use it on forms with many fields, to keep each label visible without taking extra space."
+      },
+      "tags": ["floating-label", "form", "input", "label", "focus", "material-design"]
+    },
+    {
+      "no": "15", "slug": "inline-validation", "category": "mouse-input",
+      "name": { "ja": "インラインバリデーション", "en": "Inline validation", "es": "Validación en línea (inline validation)", "zh-Hans": "实时校验", "zh-Hant": "即時驗證" },
+      "meaning": { "ja": "入力中に正誤をその場で表示", "en": "Shows right or wrong while you type", "es": "Muestra si está bien o mal mientras escribes", "zh-Hans": "输入时即时显示对错", "zh-Hant": "輸入的同時當場顯示是否正確" },
+      "ask": { "ja": "お問い合わせフォームにインラインバリデーションを入れて。メールアドレスを打っている間は赤で「形式が正しくありません」、正しくなったら緑のチェックを出して。", "en": "Add inline validation to the contact form: while the email address is incomplete show a red \"invalid format\" message, and switch to a green check once it is valid.", "es": "Agrega validación en línea al formulario de contacto: mientras el correo esté incompleto, muestra en rojo \"Formato inválido\", y cambia a un check verde en cuanto sea válido.", "zh-Hans": "给联系表单加上实时校验：邮箱地址未输完整时显示红色“格式不正确”，正确后显示绿色对勾。", "zh-Hant": "聯絡表單加上即時驗證：電子郵件地址還沒輸入完整時，顯示紅色的「格式不正確」，格式正確後改成綠色勾勾。" },
+      "summary": {
+        "ja": "メールアドレスを打っている途中は欄が赤くなって「形式が正しくありません」と出て、正しく打ち終わった瞬間に緑のチェックとOKに変わる。",
+        "en": "While the email address is half typed the field turns red with an \"invalid format\" message; the moment it is complete it switches to a green check and \"OK\"."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。メールアドレスの入力欄 300×44（角丸8）。0.45秒にクリック、4.2秒に外をクリック。0.75秒から0.115秒に1文字ずつ「hana@example.com」（16文字）を打ち、3.6秒から0.03秒に1文字ずつ消す。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "2文字目から打ち終わる直前まではエラー: 0.15秒（easeOut 3乗）で枠を赤（#E5383B）・地を薄い赤（#FFF1F1）にし、欄の下に赤い丸の「!」と「形式が正しくありません」（13px）を出す",
+          "最後の1文字で正しい形式になったら、0.25秒で枠を緑（#1E9E5A）にし、欄の右端に緑の丸（半径11・GSAP の elastic.out(1, 0.3) で弾んで出る）と白いチェック、欄の下に「OK」を出す",
+          "フォーカス中は0.15秒で枠を灰色→濃紺・太さ1.5→2.2pxにする。消し始めると表示は元に戻る"
+        ],
+        "en": [
+          "A 511 × 168 viewport with a 300 × 44 email field (radius 8). Clicked at 0.45 s, clicked away at 4.2 s. \"hana@example.com\" (16 characters) is typed one character per 0.115 s from 0.75 s and deleted one per 0.03 s from 3.6 s. One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "From the second character until the last one is typed it is invalid: over 0.15 s (cubic ease-out) the border turns red (#E5383B), the fill pale red (#FFF1F1), and a red \"!\" circle with \"形式が正しくありません\" (invalid format, 13 px) appears below.",
+          "When the last character makes it valid, over 0.25 s the border turns green (#1E9E5A), a green circle (radius 11, bouncing in with GSAP elastic.out(1, 0.3)) with a white check appears at the right end, and \"OK\" appears below.",
+          "While focused, the border turns from gray to navy and 1.5 → 2.2 px wide over 0.15 s. Once deletion starts, the messages go away."
+        ]
+      },
+      "use": {
+        "ja": "会員登録やお問い合わせのフォームで、送信する前に入力の間違いに気づかせたいとき。",
+        "en": "Use it on sign-up or contact forms so people notice mistakes before they submit."
+      },
+      "tags": ["validation", "form", "inline-validation", "error-message", "input", "feedback"]
+    },
+    {
+      "no": "16", "slug": "loading-button", "category": "mouse-input",
+      "name": { "ja": "ローディングボタン", "en": "Loading button", "es": "Botón de carga (loading button)", "zh-Hans": "加载按钮", "zh-Hant": "Loading 按鈕" },
+      "meaning": { "ja": "押すと読み込み中から完了に変わる", "en": "Shows loading, then done, inside the button", "es": "Muestra que está cargando y luego que terminó, dentro del botón", "zh-Hans": "点击后在按钮内显示加载中到完成", "zh-Hant": "按鈕內顯示處理中，再變成完成" },
+      "ask": { "ja": "送信ボタンをローディングボタンにして。押したら0.3秒で丸く縮めて回る表示にし、終わったら緑のチェックと「完了」に変えて。", "en": "Make the submit button a loading button: on click, shrink it to a circle with a spinner over 0.3 s, then turn it green with a check and \"Done\".", "es": "Haz del botón de enviar un botón de carga: al hacer clic, que se encoja a un círculo con un spinner en 0,3 s y luego se ponga verde con un check y \"Listo\".", "zh-Hans": "把提交按钮做成加载按钮：点击后用 0.3 s 收缩成圆形并显示加载圆环，完成后变成绿色对勾和“完成”。", "zh-Hant": "送出按鈕做成 Loading 按鈕：點擊後 0.3 秒內縮成圓形並顯示轉圈的載入圖示，完成後變成綠色，顯示勾勾和「完成」。" },
+      "summary": {
+        "ja": "送信ボタンを押すと、ボタンが丸く縮んで中で読み込み表示が回り、終わると緑色のチェック付き「完了」に広がる。",
+        "en": "Clicking the submit button shrinks it to a circle with a spinner inside; when it finishes it widens into a green \"Done\" with a check."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。朱のボタン 220×36（両端が丸い）「送信する」。0.8秒にクリック。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "0.85〜1.15秒（0.3秒・easeInOut 3乗）で幅 220→36px の丸に縮め、文字は縮み始めの1/3で消す",
+          "1.1〜2.3秒、丸の中で白い読み込み表示（半径10・線幅3・弧は0.7π）が0.7秒で1回転する",
+          "2.25〜2.45秒で色を朱→緑（#1E9E5A）、2.25〜2.5秒で白いチェックを描く。2.45〜2.8秒（easeInOut 3乗）で幅 36→150px に広げ、チェックを左へ26px寄せて「完了」を出す",
+          "3.9〜4.1秒で消え、4.1〜4.4秒で元の「送信する」が6px下から戻る（easeOut 3乗）"
+        ],
+        "en": [
+          "A 511 × 168 viewport with an orange pill button, 220 × 36, labeled \"送信する\" (Send). It is clicked at 0.8 s. One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "Over 0.85–1.15 s (0.3 s, cubic ease-in-out) it shrinks from 220 to 36 px wide, a circle; the label fades in the first third of the shrink.",
+          "From 1.1 to 2.3 s a white spinner (radius 10, line width 3, 0.7π arc) turns once every 0.7 s inside the circle.",
+          "Over 2.25–2.45 s the color goes orange → green (#1E9E5A) and a white check draws over 2.25–2.5 s; over 2.45–2.8 s (cubic ease-in-out) it widens 36 → 150 px, the check moves 26 px left and \"完了\" (Done) appears.",
+          "It fades out over 3.9–4.1 s and the original \"送信する\" button comes back, rising 6 px, over 4.1–4.4 s (cubic ease-out)."
+        ]
+      },
+      "use": {
+        "ja": "フォームの送信・購入・保存など、押してから結果が出るまで少し待たせるボタンに。",
+        "en": "Use it on buttons that make people wait a moment for a result, such as submit, purchase or save."
+      },
+      "tags": ["loading-button", "button", "spinner", "submit", "success-state", "microinteraction"]
+    },
+    {
+      "no": "17", "slug": "view-transition", "category": "showcase",
+      "name": { "ja": "ビュートランジション", "en": "View transition (shared element)", "es": "View transition (elemento compartido)", "zh-Hans": "视图过渡", "zh-Hant": "View Transition" },
+      "meaning": { "ja": "一覧の写真がそのまま詳細へ広がる", "en": "A list photo expands into the detail page", "es": "La foto de la lista se expande hasta la página de detalle", "zh-Hans": "列表中的照片直接展开为详情页", "zh-Hant": "列表中的照片直接放大成詳細頁" },
+      "ask": { "ja": "実績一覧から詳細ページへの移動をビュートランジションにして。押した写真がそのまま0.6秒で詳細の上部まで広がるように。", "en": "Use a view transition from the works list to the detail page: the clicked photo should grow into the top of the detail page over 0.6 s.", "es": "Usa una view transition de la lista de trabajos a la página de detalle: la foto en la que se hace clic debe crecer hasta la parte superior del detalle en 0,6 s.", "zh-Hans": "从作品列表进入详情页时使用视图过渡：被点击的照片用 0.6 s 直接放大到详情页顶部。", "zh-Hant": "從作品列表到詳細頁的換頁做成 View Transition：點擊的照片直接在 0.6 秒內放大成詳細頁最上方的圖片。" },
+      "summary": {
+        "ja": "一覧の写真を押すと、その写真が1枚のまま大きくなって詳細ページの上部の写真になり、周りが詳細ページに入れ替わる。戻ると元の位置へ縮む。",
+        "en": "Clicking a photo in the list grows that same photo into the image at the top of the detail page while the rest changes to the detail page; going back shrinks it into place."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。一覧に写真3枚（143×80・角丸6）。0.75秒に真ん中の写真をクリック、3.05秒に詳細の「← 一覧へ」をクリック。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "行き: 0.85〜1.45秒（0.6秒・easeInOut 3乗）で、押した写真の位置と大きさを一覧の枠から詳細ページ上部の 479×94（角丸8）まで連続して変える。写真は1枚のまま移る",
+          "ほかの写真と見出しは進み0〜62%で消え、詳細の見出し・本文・戻るボタンは進み60〜100%で現れる。進み50%でURLを /works から /works/02 に変える",
+          "戻り: 3.15〜3.75秒（0.6秒）で同じ動きを逆にたどり、一覧の位置へ戻す",
+          "一覧と詳細の写真に同じ view-transition-name を付けたときの View Transitions API の見え方"
+        ],
+        "en": [
+          "A 511 × 168 viewport with three photos in a list (143 × 80, radius 6). The middle photo is clicked at 0.75 s, and \"← 一覧へ\" (back to list) on the detail page at 3.05 s. One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "Forward: over 0.85–1.45 s (0.6 s, cubic ease-in-out) the clicked photo moves and resizes continuously from its list slot to the 479 × 94 image at the top of the detail page (radius 8). It stays one photo throughout.",
+          "The other photos and the heading fade out over the first 62% of the move; the detail title, text and back button fade in over the last 40%. At 50% the URL changes from /works to /works/02.",
+          "Back: over 3.15–3.75 s (0.6 s) the same move runs in reverse to the list slot.",
+          "This is how the View Transitions API looks when the list photo and the detail photo share the same view-transition-name."
+        ]
+      },
+      "use": {
+        "ja": "一覧と詳細を行き来するギャラリーや商品ページで、どの項目を開いたかを見失わせたくないとき。",
+        "en": "Use it on galleries or product pages that go back and forth between a list and a detail view, so people never lose track of what they opened."
+      },
+      "tags": ["view-transition", "shared-element", "page-transition", "morph", "gallery", "navigation"]
+    },
+    {
+      "no": "18", "slug": "lightbox", "category": "showcase",
+      "name": { "ja": "ライトボックス", "en": "Lightbox", "es": "Lightbox", "zh-Hans": "灯箱", "zh-Hant": "Lightbox 燈箱" },
+      "meaning": { "ja": "画像を押すと暗い背景の上で拡大", "en": "Opens an image large over a dimmed page", "es": "Abre una imagen en grande sobre la página oscurecida", "zh-Hans": "点击图片后在变暗的背景上放大", "zh-Hant": "點擊圖片後在變暗的頁面上放大" },
+      "ask": { "ja": "施工事例の写真をライトボックスで見られるようにして。押したら背景を暗くして写真を中央に拡大し、左右の矢印で前後に送れるように。", "en": "Let visitors view the case-study photos in a lightbox: on click, dim the page and enlarge the photo in the center, with arrows to go to the previous or next photo.", "es": "Muestra las fotos de los proyectos realizados en un lightbox: al hacer clic, oscurece la página y agranda la foto en el centro, con flechas para ir a la anterior o a la siguiente.", "zh-Hans": "让施工案例照片可以在灯箱中查看：点击后背景变暗、照片在中央放大，用左右箭头切换上一张和下一张。", "zh-Hant": "施工案例的照片改成用 Lightbox 燈箱觀看：點擊後背景變暗，照片在中央放大，可用左右箭頭切換上一張、下一張。" },
+      "summary": {
+        "ja": "ギャラリーのサムネを押すと周りが暗くなり、その写真が画面の中央で大きく表示される。×を押すと元のサムネへ縮んで戻る。",
+        "en": "Clicking a thumbnail in the gallery dims the page and shows that photo large in the center; the × shrinks it back into its thumbnail."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。ギャラリーにサムネ4枚（108×72・角丸6）。0.75秒に3枚目をクリック、3.0秒に右上の×をクリック。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "開く: 0.85〜1.3秒（0.45秒・easeOut 3乗）で、ページ全体に暗い幕（rgb(14,18,28)・不透明度0→0.82）をかけ、押したサムネを中央の 261×128 まで拡大する",
+          "進み50〜100%で、写真の下に「3 / 4」、左右に前後の矢印、右上に×を出す",
+          "閉じる: 3.05〜3.4秒（0.35秒・easeInOut 3乗）で同じ動きを逆にたどり、写真はサムネの位置へ戻る"
+        ],
+        "en": [
+          "A 511 × 168 viewport with four thumbnails (108 × 72, radius 6). The third is clicked at 0.75 s, and the × at the top right at 3.0 s. One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "Open: over 0.85–1.3 s (0.45 s, cubic ease-out) a dark overlay (rgb(14,18,28), opacity 0 → 0.82) covers the page and the clicked thumbnail grows to 261 × 128 in the center.",
+          "Over the second half of the open, \"3 / 4\" appears below the photo, previous/next arrows at the sides and a × at the top right.",
+          "Close: over 3.05–3.4 s (0.35 s, cubic ease-in-out) the same move runs in reverse and the photo returns to its thumbnail."
+        ]
+      },
+      "use": {
+        "ja": "施工事例・作品・商品写真など、ページを移らずに写真を大きく見せたいとき。",
+        "en": "Use it for case studies, portfolios or product photos that should be seen large without leaving the page."
+      },
+      "tags": ["lightbox", "modal", "gallery", "image", "overlay", "zoom"]
+    },
+    {
+      "no": "19", "slug": "hotspots", "category": "showcase",
+      "name": { "ja": "ホットスポット", "en": "Hotspots", "es": "Hotspots (puntos interactivos)", "zh-Hans": "图片热点", "zh-Hant": "Hotspot 熱點" },
+      "meaning": { "ja": "画像の点を押すと説明が出る", "en": "Dots on an image open notes when clicked", "es": "Puntos sobre una imagen que abren notas al hacer clic", "zh-Hans": "点击图片上的圆点显示说明", "zh-Hant": "點擊圖片上的圓點就顯示說明" },
+      "ask": { "ja": "商品写真にホットスポットを付けて。特長の場所に脈打つ点を置き、押したら説明の吹き出しを0.25秒で出して。", "en": "Add hotspots to the product photo: put pulsing dots on the key features and open a tooltip over 0.25 s when one is clicked.", "es": "Agrega hotspots a la foto del producto: pon puntos que laten sobre las características clave y abre un tooltip en 0,25 s al hacer clic en uno.", "zh-Hans": "给商品照片加上图片热点：在特色部位放置脉动的圆点，点击后用 0.25 s 弹出说明气泡。", "zh-Hant": "商品照片加上 Hotspot 熱點：在特色的位置放上會脈動的圓點，點擊後在 0.25 秒內跳出說明的 Tooltip。" },
+      "summary": {
+        "ja": "製品の絵の上で白い点が脈打ち、点を押すとその部分の説明が吹き出しで出る。別の点を押すと吹き出しが入れ替わる。",
+        "en": "White dots pulse on the product picture; clicking one opens a tooltip about that part, and clicking another dot swaps the tooltip."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。左に製品の絵（リュック）、右に商品名と価格。絵の上に点2つ（白い丸 半径8・影、中に朱の点 半径4）。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "脈打つ輪: 各点から白い輪（線幅2）が半径8→20に広がりながら不透明度0.75→0で消える。1.57秒（4.7秒の1/3）ごとに、2本を半周期ずらして出し続ける",
+          "0.9秒に上の点をクリックすると、点の左に吹き出し（136×48・角丸8・点を指す三角）が0.25秒（easeOut 3乗）で現れ、6px下から上がる",
+          "2.4秒に下の点をクリックすると、上の吹き出しが同じ0.25秒で消え、下の点の右に次の吹き出しが出る。3.8秒にもう一度押すと閉じる"
+        ],
+        "en": [
+          "A 511 × 168 viewport: a product picture (a backpack) on the left, name and price on the right, with two dots on the picture (white circle, radius 8, drop shadow; orange center, radius 4). One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "Pulse: from each dot a white ring (width 2) grows from radius 8 to 20 while fading from 0.75 to 0 opacity, every 1.57 s (a third of 4.7 s), two rings half a period apart.",
+          "At 0.9 s the upper dot is clicked: a tooltip (136 × 48, radius 8, with a pointer toward the dot) appears to its left over 0.25 s (cubic ease-out), rising 6 px.",
+          "At 2.4 s the lower dot is clicked: the first tooltip fades over 0.25 s and the next one opens to the right of the lower dot. A second click at 3.8 s closes it."
+        ]
+      },
+      "use": {
+        "ja": "製品・間取り・地図など、1枚の絵の中で場所ごとに説明したいとき。",
+        "en": "Use it on products, floor plans or maps, to explain different spots within one picture."
+      },
+      "tags": ["hotspots", "image", "tooltip", "pulse", "product", "interactive-image"]
+    },
+    {
+      "no": "20", "slug": "countdown-timer", "category": "showcase",
+      "name": { "ja": "カウントダウンタイマー", "en": "Countdown timer", "es": "Cuenta regresiva (countdown timer)", "zh-Hans": "倒计时", "zh-Hant": "倒數計時器" },
+      "meaning": { "ja": "締切までの残り時間が減っていく", "en": "Counts down the time left to a deadline", "es": "Cuenta el tiempo que falta para una fecha límite", "zh-Hans": "显示距截止时间的剩余时间并递减", "zh-Hant": "顯示距離截止還剩多少時間" },
+      "ask": { "ja": "キャンペーンの締切にカウントダウンタイマーを付けて。時:分:秒で、数字が変わるたびに0.3秒で下から入れ替わるように。", "en": "Add a countdown timer for the campaign deadline: hours, minutes and seconds, with each changing digit rolling in from below over 0.3 s.", "es": "Agrega una cuenta regresiva para el cierre de la campaña: horas, minutos y segundos, y que cada dígito que cambia aparezca rodando desde abajo en 0,3 s.", "zh-Hans": "给活动截止时间加上倒计时：以时:分:秒显示，每次数字变化时新数字用 0.3 s 从下方滚入。", "zh-Hant": "活動截止時間加上倒數計時器：以時:分:秒顯示，數字每次變動時，用 0.3 秒從下方換上新的數字。" },
+      "summary": {
+        "ja": "「キャンペーン終了まで」の 時:分:秒 が1秒ごとに減り、変わった数字だけが上へ抜けて新しい数字が下から入る。",
+        "en": "The hours, minutes and seconds under \"キャンペーン終了まで\" (until the campaign ends) count down every second; only the digits that change slide up and out as new ones come in from below."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。朱のグラデーションの帯に「キャンペーン終了まで」と、時・分・秒の数字のタイル6枚（各34×50・角丸6・数字32px）。このカードだけ9.4秒で1回（パックの周期と同じ）",
+          "02:15:04 から始め、0.4秒から1秒ごとに9回、1秒ずつ減らして 02:14:55 まで進める。4.4秒の 02:15:00 → 02:14:59 で分が1つ繰り下がる",
+          "変わる桁のタイルだけ、0.32秒（easeInOut 3乗）で古い数字が上へ抜け、新しい数字が下から入る。タイルの外は切り抜く",
+          "9.4秒で最初の 02:15:04 に戻る（動きを付けずに切り替わる）"
+        ],
+        "en": [
+          "A 511 × 168 viewport: an orange gradient band with \"キャンペーン終了まで\" (until the campaign ends) and six digit tiles for hours, minutes and seconds (34 × 50 each, radius 6, 32 px digits). This card alone runs once per 9.4 s (the pack cycle).",
+          "It starts at 02:15:04 and counts down one second at a time, nine times, every 1 s from 0.4 s, ending at 02:14:55. At 4.4 s, 02:15:00 → 02:14:59 rolls the minutes over.",
+          "Only the tiles whose digit changes animate: over 0.32 s (cubic ease-in-out) the old digit slides up and out and the new one slides in from below, clipped to the tile.",
+          "At 9.4 s it goes back to 02:15:04 with a plain cut."
+        ]
+      },
+      "use": {
+        "ja": "期間限定のキャンペーンや申し込み締切の前で、残り時間をはっきり見せたいとき。",
+        "en": "Use it before a limited-time offer or an application deadline, to make the time left plain to see."
+      },
+      "tags": ["countdown", "timer", "deadline", "campaign", "flip", "urgency"]
+    },
+    {
+      "no": "21", "slug": "animated-shape-divider", "category": "showcase",
+      "name": { "ja": "シェイプディバイダー", "en": "Animated shape divider", "es": "Divisor de forma animado (shape divider)", "zh-Hans": "动态形状分隔线", "zh-Hant": "形狀分隔線" },
+      "meaning": { "ja": "区切りの波形がゆれ続ける", "en": "A wavy section divider that keeps moving", "es": "Un divisor ondulado entre secciones que no deja de moverse", "zh-Hans": "持续摆动的波浪形区块分隔线", "zh-Hant": "區塊交界的波浪不斷擺動" },
+      "ask": { "ja": "ファーストビューと次のセクションの境目にシェイプディバイダーを入れて。白い波を2枚重ねて、ゆっくり逆向きに揺らし続けて。", "en": "Add an animated shape divider between the hero and the next section: two white wave layers drifting slowly in opposite directions.", "es": "Agrega un divisor de forma animado entre el hero y la sección siguiente: dos capas de olas blancas que se desplazan despacio en direcciones opuestas.", "zh-Hans": "在首屏与下一节之间加入动态形状分隔线：叠放两层白色波浪，缓慢地反向持续摆动。", "zh-Hant": "Hero 區塊和下一個區塊的交界加上形狀分隔線：疊兩層白色波浪，持續朝相反方向慢慢擺動。" },
+      "summary": {
+        "ja": "青いセクションと白いセクションの境目にある波の形が、2枚重なってゆっくりゆれ続ける。",
+        "en": "Where a blue section meets a white one, two layered wave shapes keep swaying slowly."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。上は青のグラデーション（#3B64E8→#8FA9F7）のセクション、下は白のセクション。境目に波の形を2枚重ねる。4.7秒で1周（パックの周期9.4秒で2周）",
+          "奥の波（白・不透明度0.45）: 高さ y=100 を中心に、波長260px・振れ幅8px と 波長130px・振れ幅4px の正弦波を足した形",
+          "手前の波（白）: y=110 を中心に、波長300px・振れ幅9px と 波長110px・振れ幅3.5px の正弦波を足した形。下は白のセクションにつながる",
+          "位相 a = 2π·t/4.7 として、奥は a+1 と −2a、手前は −a と 2a+0.5 で動かす。1枚の中の2つの正弦波が逆向きに流れるので形が変わり続け、4.7秒ごとに元の形に戻る"
+        ],
+        "en": [
+          "A 511 × 168 viewport: a blue gradient section on top (#3B64E8 → #8FA9F7) and a white section below, with two wave shapes layered at the boundary. One loop takes 4.7 s (two per 9.4 s pack cycle).",
+          "Back wave (white, opacity 0.45): centered at y = 100, the sum of a sine with wavelength 260 px, amplitude 8 px and one with wavelength 130 px, amplitude 4 px.",
+          "Front wave (white): centered at y = 110, wavelength 300 px / amplitude 9 px plus wavelength 110 px / amplitude 3.5 px; it runs into the white section below.",
+          "With phase a = 2π·t/4.7, the back wave uses a + 1 and −2a, the front wave −a and 2a + 0.5. The two sines in each wave run in opposite directions, so the shape keeps changing and returns to where it started every 4.7 s."
+        ]
+      },
+      "use": {
+        "ja": "セクションの境目をまっすぐな線でなく柔らかく見せたい、海・夏・子ども向けなどのサイトに。",
+        "en": "Use it where section edges should look soft rather than ruled, on sites about the sea, summer or children, for example."
+      },
+      "tags": ["shape-divider", "wave", "section-divider", "svg", "ambient", "loop"]
+    },
+    {
+      "no": "22", "slug": "like-button-animation", "category": "showcase",
+      "name": { "ja": "いいねアニメーション", "en": "Like button animation", "es": "Animación de like (botón de me gusta)", "zh-Hans": "点赞动画", "zh-Hant": "按讚動畫" },
+      "meaning": { "ja": "押すとハートが弾ける", "en": "The heart pops with a burst when liked", "es": "El corazón estalla con un rebote al dar like", "zh-Hans": "点击后爱心迸发弹出", "zh-Hant": "按下後愛心彈跳並迸出粒子" },
+      "ask": { "ja": "投稿のいいねボタンにいいねアニメーションを付けて。押したらハートを赤く塗って1.45倍まで弾ませ、周りに小さな粒を散らして、数字も1増やして。", "en": "Add a like button animation to posts: fill the heart red, bounce it up to 1.45×, scatter a few small particles and count up by one.", "es": "Agrega una animación de like a las publicaciones: que el corazón se llene de rojo, rebote hasta 1,45×, suelte unas cuantas partículas pequeñas y el contador suba en uno.", "zh-Hans": "给帖子的点赞按钮加上点赞动画：点击后爱心填充红色并弹到 1.45×，周围散开小颗粒，数字加 1。", "zh-Hant": "貼文的讚按鈕加上按讚動畫：點擊後愛心變成紅色、彈到 1.45 倍，周圍散出小顆粒，數字也加 1。" },
+      "summary": {
+        "ja": "ハートを押すと赤く塗られてポンと弾み、周りに小さな粒が散って、横の数字が1つ増える。もう一度押すと元に戻る。",
+        "en": "Clicking the heart fills it red with a springy pop, small particles burst around it and the count beside it goes up by one; clicking again undoes it."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。投稿カードの右にハート（輪郭・線幅2.4）と数字「128」。0.9秒にハートをクリック、3.3秒にもう一度クリックして取り消す。4.7秒でひと回り（パックの周期9.4秒で2回）",
+          "押す直前の0.1秒でハートを0.78倍まで縮め、押した瞬間に赤（#F23D5C）で塗る。0.12秒で 0.78→1.45倍（easeOut 3乗）、そこから 1 + 0.45·e^(−7t)·cos(15t) で揺れながら1倍に戻す",
+          "押して0.08〜0.58秒: ハートの周りに赤い輪（半径15→33・不透明度0.5→0）、6方向に小さな粒（赤・黄・朱、半径24→37の位置へ飛びながら消える）",
+          "数字: 押して0.05〜0.35秒（easeOut 3乗）で 128 が上へ抜け、赤い 129 が下から入る。取り消しでは逆に下へ動いて 128 に戻る",
+          "取り消し: 輪郭だけのハートに戻し、押す前後の0.4秒で0.84倍まで沈んで戻る（粒は出さない）"
+        ],
+        "en": [
+          "A 511 × 168 viewport: a post card with an outlined heart (line width 2.4) and the count \"128\" on the right. The heart is clicked at 0.9 s and clicked again at 3.3 s to undo. One pass takes 4.7 s (twice per 9.4 s pack cycle).",
+          "In the 0.1 s before the click it squeezes to 0.78×; at the click it fills red (#F23D5C), grows 0.78 → 1.45× in 0.12 s (cubic ease-out), then settles to 1× as 1 + 0.45·e^(−7t)·cos(15t).",
+          "0.08–0.58 s after the click: a red ring (radius 15 → 33, opacity 0.5 → 0) and six small particles in six directions (red, yellow, orange) flying out from radius 24 to 37 as they fade.",
+          "Count: 0.05–0.35 s after the click (cubic ease-out) 128 slides up and out and a red 129 comes in from below; undoing slides it back down to 128.",
+          "Undo: the heart goes back to an outline and dips to 0.84× and back over 0.4 s around the click (no particles)."
+        ]
+      },
+      "use": {
+        "ja": "お気に入り・いいね・保存など、押したことをはっきり、気持ちよく伝えたいボタンに。",
+        "en": "Use it on like, favorite or save buttons, to confirm the tap clearly and pleasantly."
+      },
+      "tags": ["like-button", "heart", "microinteraction", "burst", "favorite", "counter"]
+    },
+    {
+      "no": "23", "slug": "scroll-down-cue", "category": "showcase",
+      "name": { "ja": "スクロールダウンの合図", "en": "Scroll-down cue", "es": "Indicador de scroll (scroll-down cue)", "zh-Hans": "向下滚动提示", "zh-Hant": "向下捲動提示" },
+      "meaning": { "ja": "下へ促す矢印が動き続ける", "en": "A looping cue that invites you to scroll down", "es": "Una señal en bucle que invita a bajar", "zh-Hans": "持续循环、引导向下滚动的动画", "zh-Hant": "不斷重複、引導往下捲的提示" },
+      "ask": { "ja": "ファーストビューの下にスクロールダウンの合図を入れて。マウスの形の中の点が約1.5秒ごとに下へ動いて消えるのをくり返して。", "en": "Add a scroll-down cue below the hero: a dot inside a mouse outline slides down and fades about every 1.5 s, on repeat.", "es": "Agrega un indicador de scroll debajo del hero: un punto dentro del contorno de un mouse que baja y se desvanece más o menos cada 1,5 s, en bucle.", "zh-Hans": "在首屏下方加入向下滚动提示：鼠标轮廓内的小圆点约每 1.5 s 向下移动并消失，循环播放。", "zh-Hant": "Hero 區塊下方加上向下捲動提示：滑鼠外框裡的小圓點約每 1.5 秒往下移動並消失，不斷重複。" },
+      "summary": {
+        "ja": "ファーストビューの下で、「SCROLL」の文字とマウスの形の中の点、両わきの矢印が、下へ促す動きをくり返す。",
+        "en": "Below the hero, the word \"SCROLL\", a dot inside a mouse outline and arrows on either side keep repeating a downward motion."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。ファーストビューの下の中央に「SCROLL」（11px・字間3px）とマウスの形の枠（24×38・角丸12・線幅2.2）。1回の動きは1.57秒（4.7秒に3回、パックの周期9.4秒で6回）",
+          "枠の中の朱の点（5×9）: 1回の最初の70%で14px下がり（easeInOut 2乗）、45%〜75%の間に消えて、次の回の頭に上で現れる",
+          "枠の左右40pxに下向きの矢印（線幅2.5）を2つずつ、半周期ずらして24px下へ流す。不透明度は sin で 0→0.8→0（出て、消える）"
+        ],
+        "en": [
+          "A 511 × 168 viewport. Centered below the hero: \"SCROLL\" (11 px, 3 px letter spacing) and a mouse outline (24 × 38, radius 12, line width 2.2). One beat takes 1.57 s (three per 4.7 s, six per 9.4 s pack cycle).",
+          "The orange dot inside (5 × 9) drops 14 px over the first 70% of the beat (quadratic ease-in-out), fades out between 45% and 75%, and reappears at the top on the next beat.",
+          "40 px to each side, two down-chevrons (line width 2.5) per side, half a beat apart, drift 24 px downward; their opacity follows a sine, 0 → 0.8 → 0."
+        ]
+      },
+      "use": {
+        "ja": "ファーストビューが画面いっぱいで、その下にも続きがあることを伝えたいとき。",
+        "en": "Use it when the hero fills the screen and people need a hint that the page goes on below."
+      },
+      "tags": ["scroll-cue", "scroll-indicator", "scroll-down", "hero", "arrow", "loop"]
+    },
+    {
+      "no": "24", "slug": "background-video", "category": "showcase",
+      "name": { "ja": "背景動画", "en": "Background video", "es": "Video de fondo", "zh-Hans": "背景视频", "zh-Hant": "背景影片" },
+      "meaning": { "ja": "ファーストビューの背景で映像が流れる", "en": "A video plays behind the hero section", "es": "Un video se reproduce detrás de la sección hero", "zh-Hans": "首屏背景中播放视频", "zh-Hant": "Hero 區塊的背景播放影片" },
+      "ask": { "ja": "ファーストビューを背景動画にして。音なしでくり返し流し、文字が読めるように左側に暗いグラデーションを重ねて。", "en": "Give the hero a background video: muted and looping, with a dark gradient on the left so the headline stays readable.", "es": "Ponle al hero un video de fondo: sin sonido y en bucle, con un degradado oscuro a la izquierda para que el titular se lea bien.", "zh-Hans": "首屏使用背景视频：静音循环播放，左侧叠加深色渐变，保证标题清晰可读。", "zh-Hant": "Hero 區塊做成背景影片：靜音循環播放，左側疊上深色漸層，讓標題看得清楚。" },
+      "summary": {
+        "ja": "ファーストビューの背景で雲と波が流れ続け、その上に見出しとボタンが動かずに乗っている。",
+        "en": "In the hero background, clouds and waves keep moving, while the headline and button sit still on top."
+      },
+      "spec": {
+        "ja": [
+          "表示域 511×168。ファーストビュー全体に背景の映像（空・雲・山・海）を流し、その上に見出し（28px・白）とボタンを動かさずに重ねる。4.7秒で映像が1周（パックの周期9.4秒で2周）",
+          "雲: 遠い雲は170pxごとの柄が4.7秒で170px（約36px/秒）、近い雲は340pxごとの柄が4.7秒で340px（約72px/秒）右へ流れる。山は動かない",
+          "海: 波3本（y=118・130・146、振れ幅2.5〜3px、波長90・60・120px）。真ん中の1本だけ逆向きで、4.7秒に2周期ぶん動く（ほかの2本は右へ1周期ぶん）",
+          "文字を読みやすくするため、映像の上に濃紺12%の幕と、左の300pxに左ほど濃いグラデーション（不透明度0.45→0）を重ね、見出しに影（ぼかし10）を付ける",
+          "右下に再生中の印（一時停止・音なし）。実際のサイトでは video を autoplay・muted・loop・playsinline で流す"
+        ],
+        "en": [
+          "A 511 × 168 viewport. Background footage (sky, clouds, mountains, sea) fills the hero, with a still headline (28 px, white) and button on top. The footage loops every 4.7 s (twice per 9.4 s pack cycle).",
+          "Clouds: the far layer repeats every 170 px and moves 170 px right per 4.7 s (about 36 px/s); the near layer repeats every 340 px and moves 340 px per 4.7 s (about 72 px/s). The mountains stay still.",
+          "Sea: three waves (y = 118, 130, 146; amplitude 2.5–3 px; wavelength 90, 60, 120 px); only the middle one runs the other way and moves two wavelengths per 4.7 s (the other two move one wavelength to the right).",
+          "For legibility, a 12% navy layer covers the footage, a gradient darkens the left 300 px (opacity 0.45 → 0), and the headline has a shadow (10 px blur).",
+          "A playing badge (pause, muted) sits at the bottom right. On a real site the video uses autoplay, muted, loop and playsinline."
+        ]
+      },
+      "use": {
+        "ja": "旅・ホテル・飲食・採用など、写真1枚より空気感や動きで印象を伝えたいファーストビューに。",
+        "en": "Use it on hero sections for travel, hotels, restaurants or recruiting, where atmosphere and motion say more than one photo."
+      },
+      "tags": ["background-video", "hero", "video", "autoplay", "loop", "first-view"]
+    }
+  ]
+}

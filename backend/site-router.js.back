@@ -1,0 +1,76 @@
+// ============================================================
+// 子域名分发服务 site-router 的源码留档副本。
+// 真正运行的是部署在 Cloudflare（站长账号）上的 Worker
+// 「site-router」（版本 b382c868，2026-11-07 更新：新增总汇短路径 HUB_SHORT，主域名短路径回总汇外壳；同日晚再更新：ROUTES 新增 wechat 子域名，仅子域名、不进总汇，HUB_SHORT 未动）；2026-11-10 再更新：新增 2fa 专属规则（/<密钥> 与 /tok/<密钥> 直达 2fa 首页，密钥由页面本地解析），守在通配路由 *.xxxxx.asia/*
+// 2026-11-15 留档更新：ROUTES 新增 blog 子域名（实战笔记博客，仅子域名、不进总汇，HUB_SHORT 未动）；本行待 Cloudflare 部署后生效，部署前 blog 子域名仍 404
+// 与主域名路由 xxxxx.asia/* 上，按子域名前缀把七个项目分发到
+// GitHub Pages 对应目录；主域名（无前缀）分发到仓库根导航页（总体预览页）。
+// 把副本放在仓库里，是为了迁移时直接拿这一份部署，不用去控制台翻。
+// 同步规则：线上代码有任何改动，先部署到 Cloudflare，再同步回本文件。
+//
+// （缺了会出事）
+// 1. 通配 DNS：*.xxxxx.asia AAAA 100::，代理开启；
+// 2. 通配路由：给本 Worker 绑 *.xxxxx.asia/*；
+// 2b. 主域名单独配（通配不覆盖主域名）：主域名须有一条已代理的 DNS
+//     记录（现行 @ A 记录指向站长服务器、已代理；也可用 @ AAAA 100::
+//     占位）+ 路由 xxxxx.asia/* 给本 Worker；请求被路由拦截、不打源站；
+// 3. 精确路由护住老服务：api 子域名 -> backend-proxy、img 子域名 -> jpcard
+// 各有一条精确路由（优先级高于通配）。没有这一步，通配会把
+// api/img 的自定义域请求截走回 404（2026-11-02 踩过一次）。
+// ============================================================
+// 通用解析：不数第几段，从右砍掉主域名（最后两段），左边剩下的整串就是前缀键。
+const ROUTES = {
+skill: "frontend/pages/skill-board",
+ai: "frontend/pages/ai-shop",
+phone: "frontend/pages/cloud-phone",
+pan: "frontend/pages/cloud-pan",
+ip: "frontend/pages/ip-check",
+"2fa": "frontend/pages/2fa-auth",
+ui: "frontend/pages/ui-design",
+wechat: "frontend/pages/wechat-bridge",
+motion: "frontend/pages/motion-prompt",
+blog: "frontend/pages/blog",
+};
+
+const HUB_SHORT = { ai: 1, phone: 1, skill: 1, ip: 1, pan: 1, '2fa': 1, ui: 1 };
+
+export default {
+async fetch(request) {
+const url = new URL(request.url);
+const labels = url.hostname.split(".");
+const sub = labels.slice(0, -2).join("."); // 前缀键，可多级，如 "a.b"
+// 主域名（无前缀）= 总体预览页：转发到 GitHub Pages 仓库根目录（导航页）
+if (sub === "") {
+// 总汇短路径：第一段命中短路径表时，直接回总汇外壳（仓库根 index.html）
+const seg = url.pathname.split('/')[1];
+if (seg && HUB_SHORT[seg]) {
+return fetch(new URL('https://kenguba.github.io/useful-budget/index.html'), { cf: { cacheEverything: false } });
+}
+let q = url.pathname;
+if (q !== "/useful-budget" && !q.startsWith("/useful-budget/")) {
+q = "/useful-budget" + (q === "/" ? "/" : q);
+}
+return fetch("https://kenguba.github.io" + q + url.search, request);
+}
+
+const dir = ROUTES[sub];
+if (!dir) return new Response("Not Found", { status: 404});
+
+const p = url.pathname;
+// pan 的专属规则：接口请求同域转发给后端（api.xxxxx.asia）
+if (sub === "pan" && (p.startsWith("/api/") || p === "/app/android/latest.json")) {
+return fetch("https://api.jpedu.asia" + p + url.search, request);
+}
+// 其余：一律转发到 GitHub Pages 上对应项目目录
+const prefix = "/useful-budget/" + dir;
+// 2fa 专属规则：/<密钥> 与 /tok/<密钥> 直接回 2fa 首页（密钥由页面在本地解析出码，带空格分段的密钥在网址里是 %20 分隔）
+if (sub === "2fa" && /^\/([A-Za-z0-9%]{8,200}\/?|tok\/[A-Za-z0-9%]{8,200}\/?)$/.test(p)) {
+return fetch("https://kenguba.github.io" + prefix + "/", request);
+}
+let q = p;
+if (q!== prefix &&!q.startsWith(prefix + "/")) {
+q = prefix + (q === "/"? "/": q);
+}
+return fetch("https://kenguba.github.io" + q + url.search, request);
+},
+};

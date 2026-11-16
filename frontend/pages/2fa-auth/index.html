@@ -1,0 +1,2458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#F3F8FA">
+<title>2FA Auth - 谷歌验证器网页版</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<script>
+/* early prefs: Cookie A > local, applied before first paint to avoid flash */
+(function(){try{
+  var m=document.cookie.match(/(?:^|;\s*)A=(\d{3,4})(?:;|$)/), a=null;
+  if(m){var v=m[1],t=parseInt(v.slice(2),10); if((v.charAt(1)==='0'||v.charAt(1)==='1')&&t>=1&&t<=12) a={l:v.charAt(0),m:v.charAt(1),t:t};}
+  var lt=null; try{var s=localStorage.getItem('2fa-aura-theme'); if(s!==null){var n=parseInt(s,10); if(n>=0&&n<=11) lt=n;}}catch(e){}
+  var idx=a?a.t-1:(lt!==null?lt:11);
+  document.documentElement.setAttribute('data-theme-idx', idx);
+  if(a){document.documentElement.setAttribute('data-lang-init', a.l==='1'?'en':'zh'); if(a.m==='0'){document.documentElement.setAttribute('data-dark','true'); var mt=document.querySelector('meta[name="theme-color"]'); if(mt)mt.setAttribute('content','#0B1120');}}
+}catch(e){}})();
+</script>
+<style>
+
+    /* ================= 1. 核心动态 CSS 变量体系（1:1 源自 Ai比价.html 12色弥散光晕） ================= */
+    :root {
+      /* 顶部弥散渐变与三光斑色值（默认激活第12号：幻彩全息 Gemini Holo） */
+      --hero-bg-base: #FFFFFF;
+      --orb-color-1: #8FDBB8;
+      --orb-color-2: #9CC8F7;
+      
+      /* 按钮与组件专属联动色 */
+      --refresh-btn-bg: #4FA8F6;
+      --refresh-btn-text: #FFFFFF;
+      --send-circle-bg: #9EE0C5;
+      --send-circle-icon: #0F172A;
+      
+      /* 主题强调色与标签配比 */
+      --theme-accent: #1A73E8;
+      --theme-tab-text: #0F172A;
+      --theme-tag-bg: #E6F4EA;
+      --theme-tag-text: #137333;
+      --search-glow: rgba(143, 219, 184, 0.44);
+
+      /* 页面背景与卡片表面色（随主题微染 + 支持深色模式） */
+      --page-bg: #F3F8FA;
+      --card-bg: #FFFFFF;
+      --card-border: rgba(226, 232, 240, 0.82);
+      --input-bg: rgba(248, 250, 252, 0.85);
+      --sidebar-bg: rgba(255, 255, 255, 0.86);
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+      --pill-surface: #FFFFFF;
+      --pill-shadow: 0 6px 20px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03);
+      --card-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.03);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+
+      /* 同心圆角规范变量：外圈 = 里圈 + 缝 */
+      --card-outer-radius: 26px;
+      --card-pad: 14px;
+      --card-inner-radius: 12px; /* 26 - 14 = 12 */
+    }
+
+    /* 深色模式覆盖变量（单击右上角太阳按钮切换） */
+    [data-dark="true"] {
+      --hero-bg-base: #0B1120;
+      --page-bg: #090D16;
+      --card-bg: #151F32;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --input-bg: rgba(15, 23, 42, 0.68);
+      --sidebar-bg: rgba(21, 31, 50, 0.88);
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --pill-surface: #1E293B;
+      --pill-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      --card-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.45);
+      --theme-tab-text: #F8FAFC;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    *::-webkit-scrollbar,
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    body {
+      background-color: var(--page-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color 0.55s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s ease;
+    }
+
+    /* ================= 2. 网页端 + 手机端双端自适应骨架 (Responsive Shell) ================= */
+    .layout-shell {
+      max-width: 1360px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 272px minmax(0, 1fr);
+      gap: 20px;
+      padding: 18px 20px 48px;
+    }
+
+    /* ================= 3. 左侧导航栏 Sidebar（同心圆角：外圈 26 = 里圈 12 + 缝 14） ================= */
+    .sidebar-drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.42);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 140;
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transition: opacity 0.28s ease, visibility 0s linear 0.3s;
+    }
+
+    .sidebar-drawer-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.28s ease, visibility 0s;
+      pointer-events: auto;
+      touch-action: none;
+      overscroll-behavior: none;
+    }
+
+    .app-sidebar {
+      background: var(--sidebar-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--card-outer-radius);
+      padding: var(--card-pad);
+      box-shadow: var(--card-shadow);
+      transition: background-color 0.45s ease, border-color 0.45s ease, transform 0.35s var(--ease-smooth);
+      z-index: 145;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .sidebar-brand-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 4px 10px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-icon-box {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--card-inner-radius);
+      background: linear-gradient(135deg, var(--orb-color-1), var(--refresh-btn-bg));
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0F172A;
+      font-weight: 900;
+      font-size: 15px;
+      box-shadow: 0 6px 16px -4px var(--search-glow);
+      flex-shrink: 0;
+    }
+
+    .brand-title-main {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-badge-mini {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+    }
+
+    [data-dark="true"] .brand-badge-mini {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--orb-color-2);
+    }
+
+    .brand-sub-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .mobile-close-drawer {
+      display: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--card-border);
+      background: var(--pill-surface);
+      color: var(--text-secondary);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .sidebar-section-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 1.2px;
+      padding: 0 6px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      position: relative;
+    }
+
+    .sidebar-nav-item {
+      width: 100%;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      padding: 10px 12px;
+      border-radius: var(--card-inner-radius);
+      font-size: 13.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-align: left;
+      position: relative;
+      transition: all 0.28s var(--ease-smooth);
+    }
+
+    .sidebar-nav-item.active {
+      background: var(--card-bg);
+      color: var(--theme-accent);
+      font-weight: 700;
+      border-color: var(--card-border);
+      box-shadow: 0 6px 18px -6px var(--search-glow);
+    }
+
+    /* No decorative vertical rail beside the selected sidebar item. */
+    .sidebar-nav-item.active::before,
+    .sidebar-nav-item.active::after {
+      content: none;
+      display: none;
+    }
+
+    [data-dark="true"] .sidebar-nav-item.active {
+      color: var(--orb-color-1);
+      background: rgba(30, 41, 59, 0.9);
+    }
+
+    .nav-item-index {
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      background: var(--input-bg);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+      transition: transform 0.25s var(--ease-spring), background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .sidebar-nav-item.active .nav-item-index {
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      transform: scale(1.05);
+    }
+
+    [data-dark="true"] .sidebar-nav-item.active .nav-item-index {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--orb-color-1);
+    }
+
+    .nav-item-label {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-item-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+    }
+
+    [data-dark="true"] .nav-item-tag {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--orb-color-2);
+    }
+
+    .sidebar-footer-card {
+      margin-top: auto;
+      padding: 12px;
+      border-radius: var(--card-inner-radius);
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .sidebar-footer-card strong {
+      color: var(--text-primary);
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    /* ================= 4. 右侧主工作区与顶部弥散渐变 Hero Header（同心圆角：外圈 28 = 里圈 14 + 缝 14） ================= */
+    .main-stage {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hero-header {
+      position: relative;
+      background-color: var(--hero-bg-base);
+      background-image:
+        radial-gradient(130% 105% at 10% 112%, color-mix(in srgb, var(--orb-color-1) 52%, transparent) 0%, transparent 62%),
+        radial-gradient(130% 105% at 90% 112%, color-mix(in srgb, var(--orb-color-2) 52%, transparent) 0%, transparent 62%);
+      padding: 14px;
+      border-radius: 28px;
+      box-shadow: 0 14px 34px -12px var(--search-glow);
+      border: 1px solid var(--card-border);
+      transition: background-color 0.55s ease, box-shadow 0.6s ease;
+      z-index: 20;
+    }
+
+    [data-dark="true"] .hero-header {
+      background-image:
+        radial-gradient(130% 105% at 10% 112%, color-mix(in srgb, var(--orb-color-1) 30%, transparent) 0%, transparent 62%),
+        radial-gradient(130% 105% at 90% 112%, color-mix(in srgb, var(--orb-color-2) 30%, transparent) 0%, transparent 62%);
+    }
+
+    @keyframes videoHoloBtn {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    [data-holo="true"] .primary-aura-btn {
+      background: linear-gradient(120deg, #56C596, #4FA8F6, #74B9FF, #68D391);
+      background-size: 240% 240%;
+      animation: videoHoloBtn 4.2s ease infinite;
+    }
+
+    /* ================= 4.1 顶部第一行：左侧标识 + 右侧语言与主题按钮 ================= */
+    .top-nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: nowrap;
+      margin-bottom: 10px;
+      position: relative;
+      gap: 8px;
+    }
+
+    .brand-tag {
+      display: inline-flex;
+      align-items: center;
+      height: 36px;
+      line-height: 1;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-width: 0;
+    }
+
+    .drawer-trigger-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--pill-surface);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: var(--pill-shadow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-primary);
+      margin-right: 10px;
+      flex-shrink: 0;
+      transition: transform 0.25s var(--ease-spring),
+                  background-color 0.4s ease,
+                  color 0.3s ease,
+                  box-shadow 0.3s ease;
+    }
+
+    [data-dark="true"] .drawer-trigger-btn {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .drawer-trigger-btn:active {
+      transform: scale(0.92);
+    }
+
+    .drawer-trigger-svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.1;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .layout-shell.desktop-sidebar-hidden {
+      grid-template-columns: 1fr;
+      max-width: 1080px;
+    }
+
+    .layout-shell.desktop-sidebar-hidden .app-sidebar {
+      display: none;
+    }
+
+    .top-right-widgets {
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 10px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .lang-pill-btn {
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background-color: var(--pill-surface);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: var(--pill-shadow);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: transform 0.25s var(--ease-spring),
+                  box-shadow 0.3s ease,
+                  background-color 0.4s ease;
+    }
+
+    [data-dark="true"] .lang-pill-btn,
+    [data-dark="true"] .theme-mode-btn {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .lang-pill-btn:active {
+      transform: scale(0.93);
+    }
+
+    .globe-svg {
+      width: 17px;
+      height: 17px;
+      stroke: var(--theme-accent);
+      fill: none;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+      transition: stroke 0.45s ease, transform 0.4s ease;
+    }
+
+    .lang-text {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+      transition: color 0.3s ease;
+    }
+
+    /* 右侧日夜切换按钮（单击切换日夜，长按弹出12色主题面板） */
+    .theme-mode-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--pill-surface);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: var(--pill-shadow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-primary);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      position: relative;
+      z-index: 102;
+      flex-shrink: 0;
+      transition: transform 0.25s var(--ease-spring),
+                  background-color 0.4s ease,
+                  color 0.3s ease,
+                  box-shadow 0.3s ease;
+    }
+
+    .theme-mode-btn.pressing {
+      transform: scale(0.9);
+      box-shadow: 0 0 0 4px var(--search-glow);
+    }
+
+    .sun-moon-svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+      transition: transform 0.5s var(--ease-spring);
+    }
+
+    .theme-mode-btn.rotating .sun-moon-svg {
+      transform: rotate(180deg) scale(0.85);
+    }
+
+    /* ================= 4.2 长按弹出的 12 色主题悬浮面板（同心圆角：外圈 22 = 里圈 10 + 缝 12） ================= */
+    .theme-panel-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 98;
+      background: rgba(15, 23, 42, 0.06);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .theme-panel-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .theme-popover-panel {
+      position: absolute;
+      top: 46px;
+      right: 0;
+      width: min(300px, calc(100vw - 36px));
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      border-radius: 22px;
+      padding: 12px;
+      box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.18),
+                  0 4px 16px rgba(15, 23, 42, 0.06);
+      z-index: 101;
+      opacity: 0;
+      transform: translateY(-10px) scale(0.92);
+      transform-origin: top right;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      transition: opacity 0.26s var(--ease-smooth),
+                  transform 0.3s var(--ease-spring);
+    }
+
+    [data-dark="true"] .theme-popover-panel {
+      background: rgba(21, 31, 50, 0.96);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 22px 44px -8px rgba(0, 0, 0, 0.55);
+    }
+
+    .theme-popover-panel.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 0 2px;
+    }
+
+    .panel-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: 0.3px;
+    }
+
+    .panel-hint {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .theme-swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .theme-swatch-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(248, 250, 252, 0.82);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: transform 0.18s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    [data-dark="true"] .theme-swatch-item {
+      background: rgba(30, 41, 59, 0.78);
+    }
+
+    [data-dark="true"] .theme-swatch-item.active,
+    [data-dark="true"] .theme-swatch-item.sliding-hover {
+      background: rgba(30, 41, 59, 0.78);
+    }
+
+    .theme-swatch-item.active,
+    .theme-swatch-item.sliding-hover {
+      background: var(--theme-tag-bg);
+      border-color: var(--theme-accent);
+      transform: scale(1.04);
+      box-shadow: 0 6px 16px -4px var(--search-glow);
+    }
+
+    .swatch-orb-preview {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6), 0 2px 5px rgba(15, 23, 42, 0.1);
+    }
+
+    .swatch-orb-preview.holo-animated {
+      background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%) !important;
+      background-size: 220% 220% !important;
+      animation: videoHoloBtn 3.2s ease infinite;
+    }
+
+    .swatch-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+
+    /* ================= 4.3 主标题与状态徽章行（无Emoji，整洁排版） ================= */
+    .shop-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .shop-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+      line-height: 1.25;
+    }
+
+    .shop-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      line-height: 1.45;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      overflow: visible;
+    }
+
+    .status-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.66);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: visible;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    [data-dark="true"] .status-badge-pill {
+      background: rgba(15, 23, 42, 0.58);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      margin-left: 2px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.24);
+      flex-shrink: 0;
+      animation: pulseDot 2.2s infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.12); opacity: 0.82; }
+    }
+
+    /* ================= 5. 2行×3列 工具切换栏（严格同心圆角：Hero 28 - 缝 14 = 14；外框 14 - 缝 4 = 按钮 10） ================= */
+    .header-tools-pill-wrap {
+      background: rgba(255, 255, 255, 0.52);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: 14px;
+      padding: 4px;
+      overflow: hidden;
+    }
+
+    [data-dark="true"] .header-tools-pill-wrap {
+      background: rgba(15, 23, 42, 0.5);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .quick-tool-bar {
+      display: grid;
+      grid-template-rows: repeat(2, 1fr);
+      grid-auto-flow: column;
+      grid-auto-columns: calc((100% - 12px) / 3);
+      column-gap: 6px;
+      row-gap: 5px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      scroll-behavior: smooth;
+    }
+
+    .quick-tool-bar::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    .tool-chip {
+      scroll-snap-align: start;
+      width: 100%;
+      border: 1px solid transparent;
+      background-color: transparent;
+      color: var(--text-secondary);
+      padding: 9px 6px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.24s var(--ease-smooth);
+    }
+
+    .tool-chip-inner {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 7px;
+      width: 114px;
+      max-width: 100%;
+    }
+
+    .tool-chip-svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+      display: block;
+      transition: stroke 0.24s ease, transform 0.24s ease;
+    }
+
+    .tool-chip.active .tool-chip-svg {
+      stroke: var(--theme-accent);
+    }
+
+    [data-dark="true"] .tool-chip.active .tool-chip-svg {
+      stroke: var(--orb-color-1);
+    }
+
+    .tool-chip.active {
+      background-color: var(--pill-surface);
+      color: var(--theme-tab-text);
+      font-weight: 800;
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.07);
+    }
+
+    /* ================= 6. 核心双栏工作台（严格同心圆角：外圈 26 = 里圈 12 + 缝 14） ================= */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      align-items: stretch;
+      transition: opacity 0.24s ease, transform 0.24s ease;
+    }
+
+    .workspace-grid.switching {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    .aura-card {
+      background-color: var(--card-bg);
+      border-radius: var(--card-outer-radius);
+      padding: var(--card-pad);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--card-shadow);
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.28s var(--ease-smooth),
+                  box-shadow 0.35s ease,
+                  border-color 0.35s ease,
+                  background-color 0.4s ease;
+    }
+
+    .aura-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3.5px;
+      background: linear-gradient(90deg, var(--orb-color-1), var(--refresh-btn-bg), var(--orb-color-2));
+      opacity: 0.85;
+    }
+
+    /* 卡片头部：第1行左标题+右按钮，第2行通栏展示副标题说明，无Emoji挤压 */
+    .card-header-line {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .card-header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+      flex-wrap: nowrap;
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    /* 隐藏旧版 Emoji 徽章容器，保持 DOM ID 兼容 */
+    .card-icon-badge {
+      display: none;
+    }
+
+    .card-title-text {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .card-title-text h2 {
+      font-size: 16.5px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-subtitle-row {
+      width: 100%;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .card-header-tools {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* 多行输入容器：内圆角 12px 与外卡片 26px（缝 14px）严格同心 */
+    .textarea-box-wrapper {
+      position: relative;
+      border-radius: var(--card-inner-radius);
+      background: var(--input-bg);
+      border: none;
+      padding: 12px 8px 40px 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 200px;
+      transition: border-color 0.3s ease, box-shadow 0.35s ease, background-color 0.3s ease;
+    }
+
+    .textarea-box-wrapper:focus-within {
+      background: var(--card-bg);
+    }
+
+    .secret-textarea {
+      width: 100%;
+      flex: 1;
+      min-height: 150px;
+      padding-right: 10px;
+      border: none;
+      outline: none;
+      resize: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 13.5px;
+      line-height: 1.65;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+    }
+
+    .secret-textarea.masked-mode {
+      -webkit-text-security: disc;
+      text-security: disc;
+      letter-spacing: 2px;
+    }
+
+    .secret-textarea::placeholder {
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      letter-spacing: 0;
+    }
+
+    .textarea-clear-x {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(148, 163, 184, 0.2);
+      color: var(--text-secondary);
+      font-size: 12px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .textarea-clear-x.visible {
+      display: inline-flex;
+    }
+
+    /* 输入框底部状态栏（行数统计 + 隐藏密钥切换） */
+    .textarea-footer-bar {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      padding-top: 6px;
+      border-top: 1px dashed var(--card-border);
+    }
+
+    .line-counter-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .mask-toggle-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    /* 核心主操作按钮（内圆角 12px 与外圈 26px 同心对齐） */
+    .primary-action-row {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .primary-aura-btn {
+      flex: 1;
+      height: 46px;
+      border: none;
+      border-radius: var(--card-inner-radius);
+      background-color: var(--refresh-btn-bg);
+      color: #FFFFFF;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 10px 24px -6px var(--search-glow);
+      transition: transform 0.25s var(--ease-spring),
+                  box-shadow 0.35s ease,
+                  filter 0.25s ease;
+    }
+
+    .primary-aura-btn:active {
+      transform: scale(0.96);
+    }
+
+    .totp-results-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+    }
+
+    /* 单个验证码卡片：上下两行结构
+       第1行：左侧账号标签 + 右上角密钥摘要（同一行不折行）
+       第2行：左侧6位大号验证码 + 右侧复制按钮（跟验证码同一行对齐，无“下一组”行） */
+    .totp-code-item {
+      padding: 12px;
+      border-radius: var(--card-inner-radius);
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.24s var(--ease-spring),
+                  border-color 0.25s ease,
+                  box-shadow 0.25s ease,
+                  background-color 0.25s ease;
+    }
+
+    .totp-label-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+      flex-wrap: nowrap;
+      min-width: 0;
+    }
+
+    .totp-account-tag {
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 52%;
+      flex-shrink: 0;
+    }
+
+    [data-dark="true"] .totp-account-tag {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--orb-color-2);
+    }
+
+    /* 密钥摘要向右上移动，与左侧标签保持在同一行靠右对齐 */
+    .totp-secret-preview {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: right;
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* 验证码与复制按钮严格处在同一水平行 */
+    .totp-digits-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .totp-big-code {
+      font-size: 25px;
+      line-height: 1.15;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      color: var(--theme-accent);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      cursor: pointer;
+      user-select: all;
+      white-space: nowrap;
+      transition: transform 0.2s ease, color 0.3s ease;
+    }
+
+    [data-dark="true"] .totp-big-code {
+      color: var(--orb-color-1);
+    }
+
+    .copy-code-btn {
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text-primary);
+      font-size: 12.5px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      flex-shrink: 0;
+      transition: all 0.22s var(--ease-spring);
+    }
+
+    .copy-code-btn.copied {
+      background: #10B981;
+      color: #FFFFFF;
+      border-color: #10B981;
+    }
+
+    .copy-code-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* ================= 8. 通用结果表格与多工具视图样式 ================= */
+    .tool-output-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--card-inner-radius);
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      flex: 1;
+    }
+
+    .aura-data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+    }
+
+    .aura-data-table th {
+      background: var(--card-bg);
+      color: var(--text-secondary);
+      font-weight: 800;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--card-border);
+      white-space: nowrap;
+    }
+
+    .aura-data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--card-border);
+      color: var(--text-primary);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .aura-data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-pill-alive {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      background: #DCFCE7;
+      color: #15803D;
+      white-space: nowrap;
+    }
+
+    .status-pill-dead {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      background: #FEE2E2;
+      color: #B91C1C;
+      white-space: nowrap;
+    }
+
+    [data-dark="true"] .status-pill-alive {
+      background: rgba(34, 197, 94, 0.2);
+      color: #86EFAC;
+    }
+
+    [data-dark="true"] .status-pill-dead {
+      background: rgba(239, 68, 68, 0.2);
+      color: #FCA5A5;
+    }
+
+    /* ================= 9. 底部使用说明与流光箭头步骤流（同心圆角：外圈 26 = 里圈 12 + 缝 14） ================= */
+    .guide-section-card {
+      background: var(--card-bg);
+      border-radius: var(--card-outer-radius);
+      padding: var(--card-pad);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--card-shadow);
+      position: relative;
+      overflow: hidden;
+      flex-grow: 1;
+    }
+
+    .guide-section-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--orb-color-2), var(--refresh-btn-bg), var(--orb-color-1));
+      opacity: 0.7;
+    }
+
+    .guide-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .guide-intro-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    /* 5步流程横向链路容器 */
+    .guide-steps-flow {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .guide-step-box {
+      flex: 1;
+      min-width: 0;
+      padding: 12px;
+      border-radius: var(--card-inner-radius);
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      position: relative;
+      transition: transform 0.25s var(--ease-spring),
+                  box-shadow 0.28s ease,
+                  border-color 0.28s ease,
+                  background-color 0.28s ease;
+    }
+
+    .step-top-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .step-num-circle {
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, var(--orb-color-1), var(--refresh-btn-bg));
+      color: #0F172A;
+      font-size: 10.5px;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px -2px var(--search-glow);
+      flex-shrink: 0;
+    }
+
+    .step-tag-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--theme-accent);
+      opacity: 0.9;
+      white-space: nowrap;
+    }
+
+    [data-dark="true"] .step-tag-label {
+      color: var(--orb-color-1);
+    }
+
+    .step-desc-text {
+      font-size: 12.5px;
+      color: var(--text-primary);
+      line-height: 1.48;
+      font-weight: 600;
+    }
+
+    .step-flow-connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 26px;
+      color: var(--theme-accent);
+    }
+
+    [data-dark="true"] .step-flow-connector {
+      color: var(--orb-color-1);
+    }
+
+    .flow-arrow-pill {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--theme-tag-bg);
+      border: 1px solid var(--card-border);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px -2px var(--search-glow);
+      animation: flowArrowNudge 3.2s ease-in-out infinite;
+    }
+
+    [data-dark="true"] .flow-arrow-pill {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .flow-arrow-svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    @keyframes flowArrowNudge {
+      0%, 100% { transform: translateX(0); opacity: 0.86; }
+      50% { transform: translateX(0.75px); opacity: 1; }
+    }
+
+    @keyframes flowArrowNudgeVertical {
+      0%, 100% { transform: rotate(90deg) translateX(0); opacity: 0.86; }
+      50% { transform: rotate(90deg) translateX(0.75px); opacity: 1; }
+    }
+
+    .security-alert-banner {
+      padding: 10px 14px;
+      border-radius: var(--card-inner-radius);
+      background: var(--theme-tag-bg);
+      color: var(--theme-tag-text);
+      font-size: 12.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    [data-dark="true"] .security-alert-banner {
+      background: rgba(147, 197, 253, 0.12);
+      color: var(--orb-color-2);
+    }
+
+    /* 全局轻量 Toast 提示 */
+    .aura-toast {
+      position: fixed;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(15, 23, 42, 0.92);
+      color: #FFFFFF;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.28s var(--ease-spring);
+    }
+
+    .aura-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ================= 10. 响应式断点适配（平板、手机桌面模式 & 手机竖屏自适应） ================= */
+    @media (max-width: 1120px) {
+      /* Keep the background at its existing scroll position while the mobile drawer is open. */
+      html.sidebar-drawer-open {
+        overflow: hidden;
+      }
+      html.sidebar-drawer-open body {
+        position: fixed;
+        width: 100%;
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+
+      .layout-shell {
+        grid-template-columns: 1fr;
+        max-width: 1080px;
+        padding: 14px 16px 40px;
+        gap: 16px;
+      }
+
+      .app-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 286px;
+        max-height: 100vh;
+        border-radius: 0 26px 26px 0;
+        transform: translateX(-104%);
+        overscroll-behavior-y: contain;
+        visibility: hidden;
+        transition: background-color 0.45s ease, border-color 0.45s ease, transform 0.35s var(--ease-smooth), visibility 0s linear 0.4s;
+      }
+
+      .app-sidebar.open {
+        transform: translateX(0);
+        visibility: visible;
+        transition: background-color 0.45s ease, border-color 0.45s ease, transform 0.35s var(--ease-smooth), visibility 0s;
+      }
+
+      .mobile-close-drawer {
+        display: inline-flex;
+      }
+    }
+
+    @media (max-width: 760px) {
+      :root {
+        --card-outer-radius: 24px;
+        --card-pad: 12px;
+        --card-inner-radius: 12px; /* 24 - 12 = 12 同心圆角 */
+      }
+
+      .layout-shell {
+        padding: 0 0 36px;
+        gap: 14px;
+      }
+
+      .hero-header {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-bottom-left-radius: 28px;
+        border-bottom-right-radius: 28px;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        padding: 14px;
+      }
+
+      .workspace-grid {
+        grid-template-columns: 1fr;
+        margin-left: 14px;
+        margin-right: 14px;
+      }
+
+      .guide-section-card {
+        margin-left: 14px;
+        margin-right: 14px;
+      }
+
+      .guide-steps-flow {
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .step-flow-connector {
+        width: 100%;
+        height: 24px;
+      }
+
+      .flow-arrow-pill {
+        animation: flowArrowNudgeVertical 3.2s ease-in-out infinite;
+      }
+
+      .shop-title {
+        font-size: 21px;
+      }
+
+      .totp-big-code {
+        font-size: 23px;
+      }
+    }
+  
+/* hover isolated to mouse devices (site norm) */
+@media (hover:hover) and (pointer:fine){
+
+
+    .sidebar-nav-item:hover {
+      background: var(--input-bg);
+      color: var(--text-primary);
+      transform: translateX(2px);
+    }
+
+
+    .drawer-trigger-btn:hover {
+      transform: translateY(-1px);
+      color: var(--theme-accent);
+    }
+
+
+    .lang-pill-btn:hover {
+      transform: translateY(-1px);
+    }
+
+
+    .lang-pill-btn:hover .globe-svg {
+      transform: rotate(15deg);
+    }
+
+
+    .tool-chip:hover {
+      color: var(--text-primary);
+      background-color: rgba(255, 255, 255, 0.45);
+    }
+
+
+    [data-dark="true"] .tool-chip:hover {
+      background-color: rgba(255, 255, 255, 0.06);
+    }
+
+
+    .textarea-clear-x:hover {
+      background: rgba(239, 68, 68, 0.15);
+      color: #EF4444;
+    }
+
+
+    .mask-toggle-btn:hover {
+      background: var(--theme-tag-bg);
+      color: var(--theme-accent);
+    }
+
+    [data-dark="true"] .mask-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.10);
+    }
+
+
+    .primary-aura-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.04);
+      box-shadow: 0 14px 28px -4px var(--search-glow);
+    }
+
+
+    .totp-code-item:hover {
+      background: var(--card-bg);
+      border-color: var(--orb-color-2);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px -8px var(--search-glow);
+    }
+
+
+    .copy-code-btn:hover {
+      background: var(--theme-accent);
+      color: #FFFFFF;
+      border-color: var(--theme-accent);
+      box-shadow: 0 4px 12px var(--search-glow);
+    }
+
+
+    .guide-step-box:hover {
+      background: var(--card-bg);
+      border-color: var(--orb-color-2);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px -8px var(--search-glow);
+    }
+}
+
+#outputSectionCard::before{display:none}
+.guide-section-card::before{display:none}
+#inputSectionCard::before{display:none}
+
+
+/* ===== graft additions: current-logic elements in the new skin ===== */
+::selection{background:var(--theme-tag-bg)}
+[data-dark="true"] ::selection{background:rgba(255,255,255,.25)}
+.nav-item-index svg{width:15px;height:15px;flex-shrink:0}
+.tool-chip-inner svg{width:16px;height:16px;flex-shrink:0}
+.tool-chip.active .tool-chip-inner svg{color:var(--theme-accent)}
+[data-dark="true"] .tool-chip.active .tool-chip-inner svg{color:var(--orb-color-1)}
+.theme-mode-btn .icon-moon{display:none}
+[data-dark="true"] .theme-mode-btn .icon-sun{display:none}
+[data-dark="true"] .theme-mode-btn .icon-moon{display:block}
+.aura-card form{display:flex;flex-direction:column;flex:1;min-height:0}
+.primary-aura-btn{position:relative;overflow:hidden}
+.primary-aura-btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;filter:saturate(.5)}
+.primary-aura-btn .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:rippleAnim .55s var(--ease-smooth) forwards;pointer-events:none}
+@keyframes rippleAnim{to{transform:scale(4);opacity:0}}
+.textarea-box-wrapper.error{animation:shakeX .35s var(--ease-smooth)}
+@keyframes shakeX{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.otp-empty{display:none;margin-top:10px;font-size:12.5px;font-weight:600;color:#E11D48;line-height:1.5}
+.otp-empty.show{display:block}
+.results-empty-note{flex:1;display:flex;align-items:center;justify-content:center;padding:16px 14px;border-radius:var(--card-inner-radius);border:1.5px dashed var(--card-border);background:var(--input-bg);color:var(--text-muted);font-size:12.5px;line-height:1.6;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.totp-ring-wrap{position:relative;width:30px;height:30px;flex-shrink:0;margin-left:auto}
+.totp-ring{width:30px;height:30px;transform:rotate(-90deg);display:block}
+.totp-ring .ring-bg{fill:none;stroke:rgba(148,163,184,.28);stroke-width:3}
+.totp-ring .ring-fg{fill:none;stroke:var(--theme-accent);stroke-width:3;stroke-linecap:round;stroke-dasharray:81.68;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s ease}
+[data-dark="true"] .totp-ring .ring-fg{stroke:var(--orb-color-1)}
+.ring-sec{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:var(--theme-accent);font-variant-numeric:tabular-nums}
+[data-dark="true"] .ring-sec{color:var(--orb-color-1)}
+.totp-ring-wrap.urgent .ring-fg{stroke:#EF4444}
+.totp-ring-wrap.urgent .ring-sec{color:#EF4444}
+.aura-toast.error{background:rgba(190,18,60,.94)}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+</style>
+</head>
+<body>
+
+<div class="sidebar-drawer-backdrop" id="sidebarBackdrop"></div>
+
+<div class="layout-shell">
+  <aside class="app-sidebar" id="appSidebar" aria-label="功能导航菜单">
+    <div class="sidebar-brand-head">
+      <a href="#" class="brand-logo-wrap" data-menu-home>
+        <span class="brand-icon-box">2FA</span>
+        <div>
+          <div class="brand-title-main"><span>2FA.FUN</span><span class="brand-badge-mini">AURA</span></div>
+          <div class="brand-sub-text" data-i18n="brandSub">安全双因素验证工作台</div>
+        </div>
+      </a>
+      <button class="mobile-close-drawer" type="button" id="drawerCloseBtn" aria-label="关闭菜单">✕</button>
+    </div>
+    <div class="sidebar-section-label"><span data-i18n="menuTitle">功能菜单</span><span>10</span></div>
+    <nav class="sidebar-menu-list" id="sidebarMenuList"></nav>
+    <div class="sidebar-footer-card">
+      <strong data-i18n="footerTitle">纯前端本地计算</strong>
+      <span data-i18n="footerText">所有 2FA 密钥解析与动态验证码均在浏览器本地生成，零网络上传</span>
+    </div>
+  </aside>
+
+  <div class="main-stage" id="top">
+    <header class="hero-header">
+      <div class="top-nav-bar">
+        <div class="brand-tag">
+          <button class="drawer-trigger-btn" id="drawerTriggerBtn" type="button" aria-label="打开功能菜单">
+            <svg class="drawer-trigger-svg" viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="16" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg>
+          </button>
+          <span>2FA.FUN · TOOLS</span>
+        </div>
+
+        <div class="top-right-widgets">
+          <button class="lang-pill-btn" data-action="lang" type="button">
+            <svg class="globe-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            <span class="lang-text">中文</span>
+          </button>
+
+          <button class="theme-mode-btn" id="themeModeBtn" type="button" aria-label="切换日夜 / 长按选择主题"></button>
+
+          <div class="theme-panel-backdrop" id="themeBackdrop"></div>
+          <div class="theme-popover-panel" id="themePopover">
+            <div class="panel-header">
+              <span class="panel-title" data-i18n="panelTitle">12色弥散主题</span>
+              <span class="panel-hint" data-i18n="panelHint">滑动或点击选择</span>
+            </div>
+            <div class="theme-swatch-grid" id="themeSwatchGrid"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="shop-title-row"><h1 class="shop-title" data-i18n="2faTitle">在线2FA验证工具</h1></div>
+      <p class="shop-subtitle" data-i18n="2faLabel">2FA双重验证码（谷歌身份验证器的网页版）</p>
+
+      <div class="status-row">
+        <div class="status-badge-pill"><span class="live-dot"></span><span data-i18n="statusBadge">RFC 6238 · 30s 实时同步</span></div>
+      </div>
+
+      <div class="header-tools-pill-wrap">
+        <nav class="quick-tool-bar" id="quickToolBar" aria-label="快捷工具切换"></nav>
+      </div>
+    </header>
+
+    <main class="workspace-grid" id="workspaceGrid">
+      <section class="aura-card" id="inputSectionCard">
+        <form id="formSecret" autocomplete="off">
+          <div class="textarea-box-wrapper" id="textareaWrap">
+            <textarea class="secret-textarea" id="SECRET2FA" spellcheck="false" data-i18n-ph="2faPlaceholder" placeholder="也可以输入完整格式：UID|密码|2FA|邮箱|邮箱密码... 每行1个账户"></textarea>
+            <button class="textarea-clear-x" id="inlineClearX" type="button" aria-label="清空输入">✕</button>
+            <div class="textarea-footer-bar">
+              <span class="line-counter-badge" id="lineCount">0 行</span>
+              <button class="mask-toggle-btn" id="btnMask" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <span data-i18n="maskKey">隐藏密钥</span>
+              </button>
+            </div>
+          </div>
+
+          <p class="otp-empty" id="otpEmpty" data-i18n="emptyTip">没有识别到有效的 2FA 密钥，请检查格式（Base32 密钥，或每行 UID|密码|2FA|...）</p>
+
+          <div class="primary-action-row">
+            <button class="primary-aura-btn" id="btnGet" type="submit" disabled>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4.5"/><path d="m11.2 11.8 8.3-8.3M17 5l3 3M14 8l2.5 2.5"/></svg>
+              <span data-i18n="getCodeBtn" id="btnGetLabel">获取验证码</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="aura-card" id="outputSectionCard">
+        <div class="totp-results-list" id="otpList">
+          <div class="results-empty-note" data-i18n="emptyState">验证码会显示在这里</div>
+        </div>
+      </section>
+    </main>
+
+    <section class="guide-section-card" aria-label="使用说明">
+      <div class="guide-header"><span data-i18n="usageTitle">使用说明</span></div>
+      <p class="guide-intro-text"><span data-i18n="usageDesc1">2FA双重验证（Two-factor authentication）是保障账户安全的重要机制，在登录时除密码外还需输入动态验证码</span><br><span data-i18n="usageDesc2">本工具作为谷歌身份验证器(Google Authenticator)的网页版本，支持通过2FA密钥生成6位动态验证码</span></p>
+      <div class="guide-steps-flow" id="guideStepsFlow"></div>
+      <div class="security-alert-banner"><span data-i18n="tip">提示：请妥善保管您的2FA密钥，不要泄露给他人，以确保您的账户安全</span></div>
+    </section>
+  </div>
+</div>
+
+<div class="aura-toast" id="auraToast"></div>
+
+<script>
+'use strict';
+const ICONS = {
+  key:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4.5"/><path d="m11.2 11.8 8.3-8.3M17 5l3 3M14 8l2.5 2.5"/></svg>',
+  facebook:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7.2h2.4l.4-2.8h-2.8V9.2c0-.8.2-1.4 1.4-1.4h1.5V5.3c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2H8v2.8h2.5V21h3Z"/></svg>',
+  instagram:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6" fill="currentColor"/></svg>',
+  threads:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21c-4.8-.4-8-3.9-8-9s3.2-8.6 8-9c4.9.4 7.8 3.6 8 8-.1 2.8-1.6 4.4-3.6 4.3-1.7-.1-2.7-1.3-2.6-2.9.1-1.7 1.4-2.8 3.2-2.7 1.5.1 2.6 1 3.2 2.3"/><path d="M12 9.2c-1.9.6-3 2-3 3.9 0 2.3 1.5 3.7 3 3.7s3-1.4 3-3.7c0-1.9-1.1-3.3-3-3.9Z"/></svg>',
+  tiktok:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 3c.4 2.1 1.8 3.6 4 3.9v3c-1.6 0-3-.5-4-1.3v6.2a6.1 6.1 0 1 1-6.1-6.1c.3 0 .7 0 1 .1v3.1a3 3 0 1 0 2 2.9V3h3Z"/></svg>',
+  cookie:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5A9 9 0 1 1 11.5 3a3.5 3.5 0 0 0 4.6 4.6A3.5 3.5 0 0 0 21 12.5Z"/><circle cx="9" cy="10" r=".7" fill="currentColor"/><circle cx="13.5" cy="15" r=".7" fill="currentColor"/><circle cx="8" cy="15.5" r=".7" fill="currentColor"/></svg>',
+  mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>',
+  file:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>',
+  table:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M3.5 14.5h17M9.5 4.5v15M15.5 9.5v10"/></svg>',
+  pencil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3.5a2.6 2.6 0 1 1 3.5 3.5L8 19.5l-4.2 1.2L5 16.5Z"/></svg>',
+  globe:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.6 3.8 9S14.5 18.5 12 21c-2.5-2.5-3.8-5.6-3.8-9S9.5 5.5 12 3Z"/></svg>',
+  sun:'<svg class="icon-sun" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5 5l1.6 1.6M17.4 17.4 19 19M19 5l-1.6 1.6M6.6 17.4 5 19"/></svg>',
+  moon:'<svg class="icon-moon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13.2A8.2 8.2 0 0 1 10.8 4 8.5 8.5 0 1 0 20 13.2Z"/></svg>',
+  copy:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+  check:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></svg>',
+  clock:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>'
+};
+
+/* ================= Menu data (same list as before) ================= */
+const MENU = [
+  {icon:'key',       zh:'在线获取2FA验证码',     en:'2FA OTP Generator',       mZh:'2FA验证码',  mEn:'2FA',       active:true},
+  {icon:'facebook',  zh:'检测Facebook账户存活',  en:'Check Live Facebook',     mZh:'FB检测',     mEn:'Facebook'},
+  {icon:'instagram', zh:'检测Instagram账户存活', en:'Check Live Instagram',    mZh:'IG检测',     mEn:'Instagram'},
+  {icon:'threads',   zh:'检测Threads账户存活',   en:'Check Live Threads',      mZh:'Threads',    mEn:'Threads'},
+  {icon:'tiktok',    zh:'检测TikTok账户存活',    en:'Check Live TikTok',       mZh:'TikTok',     mEn:'TikTok'},
+  {icon:'cookie',    zh:'在线Cookie格式转换',    en:'Cookie Converter',        mZh:'Cookie', mEn:'Cookie'},
+  {icon:'mail',      zh:'快速阅读微软邮件',      en:'Email Reader',            mZh:'邮件阅读',   mEn:'Email'},
+  {icon:'file',      zh:'在线文本处理工具',      en:'Text Processor',          mZh:'文本处理',   mEn:'Text'},
+  {icon:'table',     zh:'文本转表格工具',        en:'Text to Table',           mZh:'文本转表格', mEn:'Table'},
+  {icon:'pencil',    zh:'在线笔记分享工具',      en:'Note Sharing',            mZh:'笔记分享',   mEn:'Notes'}
+];
+const MENU_BADGES = [
+  {zh:'核心', en:'Core'}, {zh:'批量', en:'Batch'}, {zh:'社媒', en:'Social'}, {zh:'社媒', en:'Social'}, {zh:'热门', en:'Hot'},
+  {zh:'互转', en:'Convert'}, {zh:'接码', en:'Mail'}, {zh:'清洗', en:'Clean'}, {zh:'表格', en:'Table'}, {zh:'便签', en:'Notes'}
+];
+let activeMenuIdx = 0;
+function renderMenus(lang){
+  const zh = lang === 'zh';
+  document.getElementById('sidebarMenuList').innerHTML = MENU.map((m, i) =>
+    '<button type="button" class="sidebar-nav-item' + (i === activeMenuIdx ? ' active' : '') + '" data-menu-idx="' + i + '">' +
+      '<span class="nav-item-index">' + ICONS[m.icon] + '</span>' +
+      '<span class="nav-item-label">' + (zh ? m.zh : m.en) + '</span>' +
+      '<span class="nav-item-tag">' + (zh ? MENU_BADGES[i].zh : MENU_BADGES[i].en) + '</span>' +
+    '</button>').join('');
+  document.getElementById('quickToolBar').innerHTML = MENU.map((m, i) =>
+    '<button type="button" class="tool-chip' + (i === activeMenuIdx ? ' active' : '') + '" data-menu-idx="' + i + '">' +
+      '<span class="tool-chip-inner">' + ICONS[m.icon] + '<span>' + (zh ? m.mZh : m.mEn) + '</span></span>' +
+    '</button>').join('');
+}
+document.addEventListener('click', e => {
+  const item = e.target.closest('[data-menu-idx]');
+  if (item){ activeMenuIdx = Number(item.getAttribute('data-menu-idx')); renderMenus(currentLang); toggleMobileSidebar(false); return; }
+  if (e.target.closest('[data-menu-home]')){ e.preventDefault(); activeMenuIdx = 0; renderMenus(currentLang); toggleMobileSidebar(false); }
+});
+
+/* ================= i18n (same dictionary as before + new UI keys) ================= */
+const i18n = {
+  zh:{menuTitle:'功能菜单', brandSub:'安全双因素验证工作台', footerTitle:'纯前端本地计算',
+      footerText:'所有 2FA 密钥解析与动态验证码均在浏览器本地生成，零网络上传',
+      '2faTitle':'在线2FA验证工具', inputTitle:'在线获取2FA验证码',
+      '2faLabel':'2FA双重验证码（谷歌身份验证器的网页版）',
+      '2faPlaceholder':'也可以输入完整格式：UID|密码|2FA|邮箱|邮箱密码... 每行1个账户',
+      getCodeBtn:'获取验证码', generatedBtn:'已生成验证码', maskKey:'隐藏密钥', 
+      otpFrom:'来自2FA的信息', refreshIn:'刷新倒计时', codeLabel:'验证码', copyBtn:'复制', copiedBtn:'已复制',
+      outputSub:'每 30 秒自动更新 · 点复制按钮复制验证码',
+      statusBadge:'RFC 6238 · 30s 实时同步', panelTitle:'12色弥散主题', panelHint:'滑动或点击选择',
+      emptyState:'验证码会显示在这里',
+      emptyTip:'没有识别到有效的 2FA 密钥，请检查格式（Base32 密钥，或每行 UID|密码|2FA|...）',
+      usageTitle:'使用说明',
+      usageDesc1:'2FA双重验证（Two-factor authentication）是保障账户安全的重要机制，在登录时除密码外还需输入动态验证码',
+      usageDesc2:'本工具作为谷歌身份验证器(Google Authenticator)的网页版本，支持通过2FA密钥生成6位动态验证码',
+      stepTag1:'输入密钥', step1:'输入您的2FA密钥',
+      stepTag2:'获取验证码', step2:'点击"获取验证码"按钮',
+      stepTag3:'复制使用', step3:'系统将生成当前有效的验证码，您可以复制使用',
+      stepTag4:'30秒更新', step4:'验证码每30秒自动更新一次',
+      stepTag5:'更多工具', step5:'本站还免费提供账号检测、Cookie转换、文本处理等工具',
+      tip:'提示：请妥善保管您的2FA密钥，不要泄露给他人，以确保您的账户安全',
+      lines:'行', toastCopied:'已复制', toastCopyFail:'复制失败，请手动复制', toastInvalid:'未识别到有效密钥'},
+  en:{menuTitle:'TOOLS', brandSub:'Secure two-factor workspace', footerTitle:'Local-only computing',
+      footerText:'All secrets are parsed and codes are generated locally in your browser. Nothing is uploaded',
+      '2faTitle':'Online 2FA Authenticator', inputTitle:'2FA OTP Generator',
+      '2faLabel':'Two-factor Authentication (Web version of Google Authenticator)',
+      '2faPlaceholder':'Format: UID|password|2FA|email|emailPwd... one per line',
+      getCodeBtn:'Get Codes', generatedBtn:'Generated', maskKey:'Mask keys', 
+      otpFrom:'Codes from 2FA', refreshIn:'Refresh in', codeLabel:'Code', copyBtn:'Copy', copiedBtn:'Copied',
+      outputSub:'Auto-refreshes every 30s · Copy with the copy button',
+      statusBadge:'RFC 6238 · 30s live sync', panelTitle:'12 Aura Themes', panelHint:'Slide or tap to pick',
+      emptyState:'Codes will appear here',
+      emptyTip:'No valid 2FA secret found. Check the format (Base32 secret, or UID|password|2FA|... per line).',
+      usageTitle:'Instructions',
+      usageDesc1:'Two-factor authentication adds an extra layer of security. After password, enter a dynamic 6-digit code.',
+      usageDesc2:'This web tool works like Google Authenticator: generate 2FA codes from your secret keys.',
+      stepTag1:'Enter', step1:'Paste your 2FA secret(s)',
+      stepTag2:'Generate', step2:'Click "Get Codes"',
+      stepTag3:'Copy', step3:'Current valid codes will be displayed, ready to copy',
+      stepTag4:'30s refresh', step4:'Codes refresh every 30 seconds',
+      stepTag5:'More tools', step5:'This site also offers free account checks, cookie converter, text tools...',
+      tip:'Keep your 2FA secrets safe. Never share them.',
+      lines:'lines', toastCopied:'Copied', toastCopyFail:'Copy failed, please copy manually', toastInvalid:'No valid secret found'}
+};
+let currentLang = (navigator.language || 'zh').toLowerCase().startsWith('zh') ? 'zh' : 'en';
+(function(){ var li = document.documentElement.getAttribute('data-lang-init'); if (li) currentLang = li; })();
+
+/* ================= Shared prefs Cookie A ================= */
+function readSharedA(){try{var m=document.cookie.match(/(?:^|;\s*)A=(\d{3,4})(?:;|$)/);if(!m)return null;var v=m[1],t=parseInt(v.slice(2),10);if(v.charAt(1)!=='0'&&v.charAt(1)!=='1')return null;if(!(t>=1&&t<=12))return null;return{l:v.charAt(0),m:v.charAt(1),t:t};}catch(e){return null;}}
+function writeSharedA(){try{var s='A='+(currentLang==='en'?'1':'0')+(isDarkMode?'0':'1')+(currentThemeIdx+1)+';path=/;max-age=31536000;SameSite=Lax';var h=location.hostname;if(h==='jpedu.asia'||h.slice(-11)==='.jpedu.asia')s+=';domain=jpedu.asia';if(location.protocol==='https:')s+=';Secure';document.cookie=s;}catch(e){}}
+function persistTheme(){ try{ localStorage.setItem('2fa-aura-theme', String(currentThemeIdx)); }catch(e){} writeSharedA(); }
+
+/* ================= 12 aura themes ================= */
+const allThemes = [
+      {
+        name: "01 · 冰川晴空",
+        nameEn: "01 · Glacier Sky",
+        orb1: "#BCE0FD",
+        orb2: "#93C5FD",
+        refreshBg: "#60A5FA",
+        sendCircleBg: "#9CCAF9",
+        accent: "#2563EB",
+        tagBg: "#EBF5FF",
+        tagText: "#1D4ED8",
+        pageBg: "#F4F8FC",
+        glow: "rgba(147, 197, 253, 0.38)"
+      },
+      {
+        name: "02 · 薄荷微风",
+        nameEn: "02 · Mint Breeze",
+        orb1: "#A7F3D0",
+        orb2: "#6EE7B7",
+        refreshBg: "#34D399",
+        sendCircleBg: "#86EFAC",
+        accent: "#059669",
+        tagBg: "#ECFDF5",
+        tagText: "#047857",
+        pageBg: "#F2FBF7",
+        glow: "rgba(110, 231, 183, 0.36)"
+      },
+      {
+        name: "03 · 极光青蓝",
+        nameEn: "03 · Aurora Cyan",
+        orb1: "#A5F3FC",
+        orb2: "#818CF8",
+        refreshBg: "#6366F1",
+        sendCircleBg: "#A5B4FC",
+        accent: "#4F46E5",
+        tagBg: "#EEF2FF",
+        tagText: "#4338CA",
+        pageBg: "#F4F6FC",
+        glow: "rgba(129, 140, 248, 0.34)"
+      },
+      {
+        name: "04 · 抹茶森屿",
+        nameEn: "04 · Matcha Isle",
+        orb1: "#D9F99D",
+        orb2: "#86EFAC",
+        refreshBg: "#4ADE80",
+        sendCircleBg: "#BEF264",
+        accent: "#16A34A",
+        tagBg: "#F0FDF4",
+        tagText: "#15803D",
+        pageBg: "#F6FAF5",
+        glow: "rgba(134, 239, 172, 0.36)"
+      },
+      {
+        name: "05 · 碧海晴空",
+        nameEn: "05 · Azure Lagoon",
+        orb1: "#99F6E4",
+        orb2: "#7DD3FC",
+        refreshBg: "#2DD4BF",
+        sendCircleBg: "#67E8F9",
+        accent: "#0D9488",
+        tagBg: "#F0FDFA",
+        tagText: "#0F766E",
+        pageBg: "#F2F9FA",
+        glow: "rgba(125, 211, 252, 0.36)"
+      },
+      {
+        name: "06 · 深海星雾",
+        nameEn: "06 · Mist Slate",
+        orb1: "#CBD5E1",
+        orb2: "#93C5FD",
+        refreshBg: "#64748B",
+        sendCircleBg: "#CBD5E1",
+        accent: "#334155",
+        tagBg: "#F1F5F9",
+        tagText: "#1E293B",
+        pageBg: "#F5F7FA",
+        glow: "rgba(148, 163, 184, 0.32)"
+      },
+      {
+        name: "07 · 星云幻紫",
+        nameEn: "07 · Nebula Violet",
+        orb1: "#E9D5FF",
+        orb2: "#C4B5FD",
+        refreshBg: "#8B5CF6",
+        sendCircleBg: "#A396F8",
+        accent: "#6D28D9",
+        tagBg: "#F3E8FF",
+        tagText: "#6D28D9",
+        pageBg: "#F8F5FD",
+        glow: "rgba(167, 139, 250, 0.38)"
+      },
+      {
+        name: "08 · 蜜桃乌龙",
+        nameEn: "08 · Peach Oolong",
+        orb1: "#FBCFE8",
+        orb2: "#FDA4AF",
+        refreshBg: "#F472B6",
+        sendCircleBg: "#F9A8D4",
+        accent: "#DB2777",
+        tagBg: "#FDF2F8",
+        tagText: "#BE185D",
+        pageBg: "#FDF6F9",
+        glow: "rgba(244, 114, 182, 0.34)"
+      },
+      {
+        name: "09 · 晨曦微光",
+        nameEn: "09 · Dawn Amber",
+        orb1: "#FDE68A",
+        orb2: "#FDBA74",
+        refreshBg: "#FB923C",
+        sendCircleBg: "#FCD34D",
+        accent: "#EA580C",
+        tagBg: "#FFF7ED",
+        tagText: "#C2410C",
+        pageBg: "#FCF9F4",
+        glow: "rgba(251, 146, 60, 0.34)"
+      },
+      {
+        name: "10 · 落日粉紫",
+        nameEn: "10 · Sunset Glow",
+        orb1: "#F5D0FE",
+        orb2: "#FECDD3",
+        refreshBg: "#C084FC",
+        sendCircleBg: "#F0ABFC",
+        accent: "#9333EA",
+        tagBg: "#FAF5FF",
+        tagText: "#7E22CE",
+        pageBg: "#FAF6FC",
+        glow: "rgba(192, 132, 252, 0.35)"
+      },
+      {
+        name: "11 · 香槟流金",
+        nameEn: "11 · Champagne Gold",
+        orb1: "#FEF08A",
+        orb2: "#FDE047",
+        refreshBg: "#EAB308",
+        sendCircleBg: "#FDE047",
+        accent: "#CA8A04",
+        tagBg: "#FEFCE8",
+        tagText: "#A16207",
+        pageBg: "#FAF9F2",
+        glow: "rgba(234, 179, 8, 0.32)"
+      },
+      {
+        name: "12 · 幻彩全息",
+        nameEn: "12 · Gemini Holo",
+        isHolo: true,
+        orb1: "#8FDBB8",
+        orb2: "#9CC8F7",
+        refreshBg: "#4FA8F6",
+        sendCircleBg: "#9EE0C5",
+        accent: "#1A73E8",
+        tagBg: "#E6F4EA",
+        tagText: "#137333",
+        pageBg: "#F3F8FA",
+        glow: "rgba(143, 219, 184, 0.44)"
+      }
+    ];
+let currentThemeIdx = 11;
+(function(){ var ti = document.documentElement.getAttribute('data-theme-idx'); if (ti !== null){ var n = parseInt(ti, 10); if (n >= 0 && n <= 11) currentThemeIdx = n; } })();
+let isDarkMode = document.documentElement.getAttribute('data-dark') === 'true';
+
+function applyTheme(idx){
+  currentThemeIdx = idx;
+  const th = allThemes[idx]; if (!th) return;
+  const root = document.documentElement;
+  root.style.setProperty('--orb-color-1', th.orb1);
+  root.style.setProperty('--orb-color-2', th.orb2);
+  root.style.setProperty('--refresh-btn-bg', th.refreshBg);
+  root.style.setProperty('--send-circle-bg', th.sendCircleBg);
+  root.style.setProperty('--theme-accent', th.accent);
+  root.style.setProperty('--theme-tag-bg', th.tagBg);
+  root.style.setProperty('--theme-tag-text', th.tagText);
+  root.style.setProperty('--search-glow', th.glow);
+  if (th.isHolo) root.setAttribute('data-holo', 'true'); else root.removeAttribute('data-holo');
+  if (!isDarkMode){
+    root.style.setProperty('--page-bg', th.pageBg);
+    const mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute('content', th.pageBg);
+  }
+  updateSwatchActiveState();
+}
+function renderThemeSwatches(){
+  const zh = currentLang === 'zh';
+  document.getElementById('themeSwatchGrid').innerHTML = allThemes.map((t, idx) =>
+    '<div class="theme-swatch-item' + (idx === currentThemeIdx ? ' active' : '') + '" data-theme-idx="' + idx + '">' +
+      '<span class="swatch-orb-preview' + (t.isHolo ? ' holo-animated' : '') + '" style="background:linear-gradient(135deg,' + t.orb1 + ' 0%,' + t.orb2 + ' 65%,' + t.refreshBg + ' 100%)"></span>' +
+      '<span class="swatch-label">' + (zh ? t.name : t.nameEn) + '</span>' +
+    '</div>').join('');
+}
+function updateSwatchActiveState(){
+  document.querySelectorAll('.theme-swatch-item').forEach(el => {
+    el.classList.toggle('active', Number(el.getAttribute('data-theme-idx')) === currentThemeIdx);
+  });
+}
+function openThemePanel(){
+  document.getElementById('themePopover').classList.add('open');
+  document.getElementById('themeBackdrop').classList.add('open');
+  if (navigator.vibrate) navigator.vibrate(18);
+}
+function closeThemePanel(){
+  document.getElementById('themePopover').classList.remove('open');
+  document.getElementById('themeBackdrop').classList.remove('open');
+  document.querySelectorAll('.theme-swatch-item').forEach(el => el.classList.remove('sliding-hover'));
+}
+document.getElementById('themeBackdrop').addEventListener('click', closeThemePanel);
+document.getElementById('themeSwatchGrid').addEventListener('click', e => {
+  const item = e.target.closest('.theme-swatch-item'); if (!item) return;
+  applyTheme(Number(item.getAttribute('data-theme-idx'))); persistTheme(); closeThemePanel();
+});
+
+/* theme button: tap = day/night, long-press = open panel + slide to pick */
+const themeBtn = document.getElementById('themeModeBtn');
+function renderThemeBtnIcon(){
+  themeBtn.innerHTML =
+    '<svg class="sun-moon-svg icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4.5"></line><line x1="12" y1="19.5" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="6.7" y2="6.7"></line><line x1="17.3" y1="17.3" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="4.5" y2="12"></line><line x1="19.5" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="6.7" y2="17.3"></line><line x1="17.3" y1="6.7" x2="19.07" y2="4.93"></line></svg>' +
+    '<svg class="sun-moon-svg icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+}
+function toggleDarkMode(){
+  isDarkMode = !isDarkMode;
+  const root = document.documentElement;
+  themeBtn.classList.add('rotating'); setTimeout(() => themeBtn.classList.remove('rotating'), 450);
+  const mt = document.querySelector('meta[name="theme-color"]');
+  if (isDarkMode){ root.setAttribute('data-dark', 'true'); root.style.setProperty('--page-bg', '#090D16'); if (mt) mt.setAttribute('content', '#0B1120'); }
+  else { root.removeAttribute('data-dark'); const th = allThemes[currentThemeIdx]; root.style.setProperty('--page-bg', th.pageBg); if (mt) mt.setAttribute('content', th.pageBg); }
+  writeSharedA();
+}
+(function initThemeButtonGestures(){
+  let pressTimer = null, isLong = false, isDown = false, lastHover = null;
+  themeBtn.addEventListener('pointerdown', e => {
+    if (e.button && e.button !== 0) return;
+    isDown = true; isLong = false; lastHover = null;
+    themeBtn.classList.add('pressing');
+    try { themeBtn.setPointerCapture(e.pointerId); } catch(_){}
+    pressTimer = setTimeout(() => { if (!isDown) return; isLong = true; openThemePanel(); }, 340);
+  });
+  themeBtn.addEventListener('pointermove', e => {
+    if (!isDown || !isLong) return;
+    const target = document.elementFromPoint(e.clientX, e.clientY);
+    const item = target ? target.closest('.theme-swatch-item') : null;
+    document.querySelectorAll('.theme-swatch-item').forEach(el => el.classList.toggle('sliding-hover', el === item));
+    if (item){ const idx = Number(item.getAttribute('data-theme-idx'));
+      if (idx !== lastHover){ lastHover = idx; applyTheme(idx); if (navigator.vibrate) navigator.vibrate(8); } }
+  });
+  const finish = () => {
+    if (!isDown) return;
+    isDown = false; clearTimeout(pressTimer); themeBtn.classList.remove('pressing');
+    if (!isLong){
+      if (document.getElementById('themePopover').classList.contains('open')) closeThemePanel();
+      else toggleDarkMode();
+    } else if (lastHover !== null){ persistTheme(); closeThemePanel(); }
+  };
+  themeBtn.addEventListener('pointerup', finish);
+  themeBtn.addEventListener('pointercancel', finish);
+  themeBtn.addEventListener('contextmenu', e => e.preventDefault());
+})();
+
+/* ================= Sidebar drawer ================= */
+let sidebarLockedScrollY = null;
+function toggleMobileSidebar(open){
+  const mobileOpen = !!open && window.innerWidth <= 1120;
+  const wasOpen = sidebarLockedScrollY !== null;
+  if(mobileOpen && !wasOpen){
+    sidebarLockedScrollY = window.scrollY;
+    document.body.style.top = -sidebarLockedScrollY + 'px';
+  }
+  document.getElementById('appSidebar').classList.toggle('open', mobileOpen);
+  document.getElementById('sidebarBackdrop').classList.toggle('open', mobileOpen);
+  document.documentElement.classList.toggle('sidebar-drawer-open', mobileOpen);
+  if(!mobileOpen && wasOpen){
+    const y = sidebarLockedScrollY;
+    sidebarLockedScrollY = null;
+    document.body.style.top = '';
+    window.scrollTo({top:y,behavior:'instant'});
+  }
+}
+document.getElementById('sidebarBackdrop').addEventListener('click', () => toggleMobileSidebar(false));
+document.getElementById('drawerCloseBtn').addEventListener('click', () => toggleMobileSidebar(false));
+document.getElementById('drawerTriggerBtn').addEventListener('click', () => {
+  if (window.innerWidth <= 1120) toggleMobileSidebar(!document.getElementById('appSidebar').classList.contains('open'));
+  else document.querySelector('.layout-shell').classList.toggle('desktop-sidebar-hidden');
+});
+
+/* ================= Guide steps ================= */
+function renderGuideSteps(){
+  const t = i18n[currentLang];
+  const arrow = '<div class="step-flow-connector" aria-hidden="true"><span class="flow-arrow-pill"><svg class="flow-arrow-svg" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="13 6 19 12 13 18"></polyline></svg></span></div>';
+  let out = '';
+  for (let n = 1; n <= 5; n++){
+    if (n > 1) out += arrow;
+    out += '<div class="guide-step-box"><div class="step-top-head"><span class="step-num-circle">STEP 0' + n + '</span><span class="step-tag-label">' + t['stepTag' + n] + '</span></div><span class="step-desc-text">' + t['step' + n] + '</span></div>';
+  }
+  document.getElementById('guideStepsFlow').innerHTML = out;
+}
+
+/* ================= Language ================= */
+function applyLanguage(lang){
+  currentLang = lang;
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  document.querySelectorAll('[data-i18n]').forEach(el => { const k = el.getAttribute('data-i18n'); if (i18n[lang][k]) el.innerText = i18n[lang][k]; });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { const k = el.getAttribute('data-i18n-ph'); if (i18n[lang][k]) el.placeholder = i18n[lang][k]; });
+  document.querySelectorAll('.lang-text').forEach(el => { el.textContent = lang === 'zh' ? '中文' : 'English'; });
+  renderMenus(lang); renderThemeSwatches(); renderGuideSteps(); updateMeta(); renderOtpCodes(true);
+}
+document.querySelectorAll('[data-action="lang"]').forEach(b => b.addEventListener('click', () => { applyLanguage(currentLang === 'zh' ? 'en' : 'zh'); writeSharedA(); }));
+
+/* ================= Toast ================= */
+let toastTimer = null;
+function toast(msg, isError){
+  const el = document.getElementById('auraToast');
+  el.textContent = msg;
+  el.classList.toggle('error', !!isError);
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+/* ================= TOTP core (RFC 4226 / 6238, HMAC-SHA1) ================= */
+const B32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+function base32Decode(str){
+  const clean = String(str).toUpperCase().replace(/=+$/,'').replace(/[^A-Z2-7]/g,'');
+  if (!clean) return null;
+  let bits = 0, value = 0; const out = [];
+  for (const ch of clean){
+    value = (value << 5) | B32.indexOf(ch); bits += 5;
+    if (bits >= 8){ out.push((value >>> (bits - 8)) & 0xff); bits -= 8; }
+  }
+  return new Uint8Array(out);
+}
+function isValidSecret(s){
+  if (!s || !/^[0-9a-zA-Z]+$/.test(s)) return false;
+  try { const d = base32Decode(s); return !!d && d.length >= 6; } catch(e){ return false; }
+}
+async function totp(secret, epochSec){
+  const keyBytes = base32Decode(secret);
+  const counter = Math.floor(epochSec / 30);
+  const msg = new ArrayBuffer(8); const view = new DataView(msg);
+  view.setUint32(4, counter >>> 0); view.setUint32(0, Math.floor(counter / 4294967296));
+  const key = await crypto.subtle.importKey('raw', keyBytes, {name:'HMAC', hash:'SHA-1'}, false, ['sign']);
+  const sig = new Uint8Array(await crypto.subtle.sign('HMAC', key, msg));
+  const offset = sig[sig.length - 1] & 0xf;
+  const binary = ((sig[offset] & 0x7f) << 24) | ((sig[offset+1] & 0xff) << 16) | ((sig[offset+2] & 0xff) << 8) | (sig[offset+3] & 0xff);
+  return String(binary % 1000000).padStart(6,'0');
+}
+/* Same parsing rule as original get-2fa-otp.js:
+   per line split by | , title = first email-like field or first field,
+   secret = field[2] or field[0] that decodes as base32. */
+function parseSecrets(text){
+  const emailRe = /\S+@\S+\.\S+/;
+  const seen = new Set(); const out = [];
+  for (const rawLine of String(text).split('\n')){
+    const parts = rawLine.replace(/ /g,'').split('|');
+    if (!parts.length || !parts[0]) continue;
+    const title = parts.find(p => emailRe.test(p)) || parts[0];
+    const secret = [parts[2], parts[0]].find(isValidSecret);
+    if (secret && !seen.has(secret.toUpperCase())){ seen.add(secret.toUpperCase()); out.push({title, secret:secret.toUpperCase()}); }
+  }
+  return out;
+}
+
+/* ================= Form + result rendering ================= */
+const textarea  = document.getElementById('SECRET2FA');
+const btnGet    = document.getElementById('btnGet');
+const btnGetLabel = document.getElementById('btnGetLabel');
+const inlineClearX = document.getElementById('inlineClearX');
+const btnMask   = document.getElementById('btnMask');
+const lineCount = document.getElementById('lineCount');
+const otpList   = document.getElementById('otpList');
+const otpEmpty  = document.getElementById('otpEmpty');
+const wrapEl    = document.getElementById('textareaWrap');
+let activated = false;
+let codesGenerated = false;
+let lastSignature = '';
+
+function emptyNoteHtml(){ return '<div class="results-empty-note">' + i18n[currentLang].emptyState + '</div>'; }
+function refreshGetBtn(){
+  btnGet.disabled = codesGenerated || !textarea.value.trim();
+  btnGetLabel.textContent = i18n[currentLang][codesGenerated ? 'generatedBtn' : 'getCodeBtn'];
+}
+function updateMeta(){
+  const n = textarea.value ? textarea.value.split('\n').filter(l => l.trim()).length : 0;
+  lineCount.textContent = n + ' ' + i18n[currentLang].lines;
+  refreshGetBtn();
+  inlineClearX.classList.toggle('visible', !!textarea.value);
+}
+textarea.addEventListener('input', () => { codesGenerated = false; wrapEl.classList.remove('error'); otpEmpty.classList.remove('show'); updateMeta(); if (activated) renderOtpCodes(true); });
+textarea.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ e.preventDefault(); document.getElementById('formSecret').requestSubmit(); } });
+function clearInput(){
+  textarea.value = ''; activated = false; codesGenerated = false; lastSignature = '';
+  otpList.innerHTML = emptyNoteHtml(); updateMeta(); textarea.focus();
+}
+inlineClearX.addEventListener('click', clearInput);
+btnMask.addEventListener('click', () => textarea.classList.toggle('masked-mode'));
+
+document.getElementById('formSecret').addEventListener('submit', e => {
+  e.preventDefault();
+  const secrets = parseSecrets(textarea.value);
+  if (!secrets.length){
+    wrapEl.classList.remove('error'); void wrapEl.offsetWidth; wrapEl.classList.add('error');
+    otpEmpty.classList.add('show'); toast(i18n[currentLang].toastInvalid, true); return;
+  }
+  activated = true; codesGenerated = true; refreshGetBtn(); renderOtpCodes(true);
+});
+
+/* button ripple */
+btnGet.addEventListener('click', e => {
+  const r = document.createElement('span'); r.className = 'ripple';
+  const rect = btnGet.getBoundingClientRect(); const size = Math.max(rect.width, rect.height);
+  r.style.width = r.style.height = size + 'px';
+  r.style.left = (e.clientX - rect.left - size/2) + 'px'; r.style.top = (e.clientY - rect.top - size/2) + 'px';
+  btnGet.appendChild(r); setTimeout(() => r.remove(), 600);
+});
+
+function secretPreview(secret){ return '\u2022\u2022\u2022\u2022 ' + secret.slice(-4); }
+function updateRings(remain){
+  const off = (81.68 * (1 - remain/30)).toFixed(2);
+  document.querySelectorAll('.totp-ring-wrap').forEach(w => {
+    w.classList.toggle('urgent', remain <= 5);
+    const fg = w.querySelector('.ring-fg'); if (fg) fg.style.strokeDashoffset = off;
+    const sec = w.querySelector('.ring-sec'); if (sec) sec.textContent = remain;
+  });
+}
+async function renderOtpCodes(force){
+  const remain = 30 - (Math.floor(Date.now()/1000) % 30);
+  updateRings(remain);
+  if (!activated) return;
+  const secrets = parseSecrets(textarea.value);
+  if (!secrets.length){ otpList.innerHTML = emptyNoteHtml(); return; }
+  const now = Math.floor(Date.now()/1000);
+  const codes = await Promise.all(secrets.map(s => totp(s.secret, now)));
+  const signature = secrets.map(s => s.secret).join(',') + '|' + Math.floor(now/30) + '|' + currentLang;
+  if (!force && signature === lastSignature) return;
+  lastSignature = signature;
+  const t = i18n[currentLang];
+  otpList.innerHTML = secrets.map((s, i) =>
+    '<div class="totp-code-item">' +
+      '<div class="totp-label-line">' +
+        '<span class="totp-account-tag">' + escapeHtml(s.title && s.title.toUpperCase() !== s.secret ? shortTitle(s.title) : t.codeLabel) + '</span>' +
+        '<span class="totp-secret-preview">' + secretPreview(s.secret) + '</span>' +
+      '</div>' +
+      '<div class="totp-digits-row">' +
+        '<div class="totp-big-code">' + codes[i] + '</div>' +
+        '<div class="totp-ring-wrap"><svg class="totp-ring" viewBox="0 0 30 30"><circle class="ring-bg" cx="15" cy="15" r="13"></circle><circle class="ring-fg" cx="15" cy="15" r="13"></circle></svg><span class="ring-sec">' + remain + '</span></div>' +
+        '<button type="button" class="copy-code-btn" data-code="' + codes[i] + '">' + ICONS.copy + '<span>' + t.copyBtn + '</span></button>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+  updateRings(remain);
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function shortTitle(s){ return s.length > 26 ? s.slice(0,26) + '…' : s; }
+
+
+otpList.addEventListener('click', async e => {
+  const btn = e.target.closest('.copy-code-btn'); if (!btn) return;
+  const code = btn.getAttribute('data-code');
+  try { await navigator.clipboard.writeText(code); }
+  catch(err){
+    const ta = document.createElement('textarea'); ta.value = code; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch(e2){ toast(i18n[currentLang].toastCopyFail, true); ta.remove(); return; }
+    ta.remove();
+  }
+  const span = btn.querySelector('span'); const old = span.textContent;
+  btn.classList.add('copied'); span.textContent = i18n[currentLang].copiedBtn;
+  toast(i18n[currentLang].toastCopied + ': ' + code);
+  setTimeout(() => { btn.classList.remove('copied'); span.textContent = old; }, 1600);
+});
+
+/* per-second tick: countdown + auto refresh at window rollover (same as original) */
+setInterval(() => { renderOtpCodes(false); }, 1000);
+
+/* ================= Init ================= */
+/* Link-in: secret carried at the end of the URL is filled in and generated on load.
+   Supported: #tok/<secret>, #<secret>, ?tok=<secret>, and path forms /tok/<secret> or /<secret> when a host rewrites them to this page.
+   The # form never leaves the browser; all codes are computed locally as usual. */
+(function(){
+  var cand = '';
+  try { cand = decodeURIComponent(location.hash.replace(/^#\/?/, '').replace(/^tok\//, '')); } catch(e){}
+  if (!parseSecrets(cand).length){
+    cand = '';
+    try { var q = new URLSearchParams(location.search); cand = q.get('tok') || q.get('key') || q.get('secret') || ''; } catch(e){}
+  }
+  if (!parseSecrets(cand).length){
+    cand = '';
+    var segs = location.pathname.split('/').filter(function(x){ return x; });
+    var last = segs.length ? segs[segs.length - 1] : '';
+    if (last && last !== 'tok'){ try { cand = decodeURIComponent(last); } catch(e){ cand = last; } }
+  }
+  if (parseSecrets(cand).length){ textarea.value = cand; activated = true; codesGenerated = true; }
+})();
+/* A # link opened in a tab already showing this page fires hashchange without reloading; reload so the new secret takes effect. */
+window.addEventListener('hashchange', function(){ location.reload(); });
+renderThemeBtnIcon();
+applyTheme(currentThemeIdx);
+if (isDarkMode){ document.documentElement.style.setProperty('--page-bg', '#090D16'); const mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute('content', '#0B1120'); }
+applyLanguage(currentLang);
+otpList.innerHTML = emptyNoteHtml();
+updateMeta();
+renderOtpCodes(true);
+</script>
+</body>
+</html>

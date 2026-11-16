@@ -1,0 +1,7 @@
+[Unit]
+Description=Refresh Global Skills Board data
+After=network-online.target
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/skills-board
+ExecStart=/usr/bin/python3 scripts/refresh.py

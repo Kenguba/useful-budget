@@ -1,0 +1,1036 @@
+{
+ "date": "2026-11-16",
+ "generatedAt": "2026-11-17T01:01:46.323915Z",
+ "stats": {
+  "trackedSkills": "10,000+",
+  "dataSources": 4,
+  "boards": 9,
+  "maxInstalls": 11513897,
+  "maxInstallsSkill": "dev-god"
+ },
+ "highlights": [
+  "7 日动能最强：video-edit 周涨幅 -1.7%，安装量 575,601",
+  "社交声量第一：agent-browser，近 7 天 X 提及 73+ 次、GitHub 提及 39 次",
+  "30 天新星第一：proactive-agent 首次上榜仅 20 天，热度 0.845",
+  "星标日增最高：morluto/rea 单日 +2,173★"
+ ],
+ "installs": [
+  {
+   "rank": 1,
+   "skill": "find-skills",
+   "category": "AI 智能体",
+   "platform": "skills.sh",
+   "blurb": "不知道装什么就用它：用自然语言说需求，它去三大注册中心检索、挑一个并装好",
+   "installCmd": "npx skills add https://github.com/vercel-labs/skills --skill find-skills",
+   "url": "https://www.skills.sh/vercel-labs/skills/find-skills",
+   "repoUrl": "https://github.com/vercel-labs/skills",
+   "installsSkillssh": 4377540,
+   "downloadsClawhub": null,
+   "downloadsSkillhub": null
+  },
+  {
+   "rank": 2,
+   "skill": "dev-god",
+   "category": "编程开发",
+   "platform": "SkillHub CN",
+   "blurb": "给一句目标就接手陌生仓库：拆需求、补实现、追根因、重构到能跑能交付",
+   "installCmd": "",
+   "url": "",
+   "repoUrl": "",
+   "installsSkillssh": null,
+   "downloadsClawhub": null,
+   "downloadsSkillhub": 11513897
+  },
+  {
+   "rank": 3,
+   "skill": "hyperframes-cli",
+   "category": "设计媒体",
+   "platform": "skills.sh",
+   "blurb": "HeyGen 视频栈的命令行入口：用代码批量渲染视频与动效，可接进 CI",
+   "installCmd": "npx skills add https://github.com/heygen-com/hyperframes --skill hyperframes-cli",
+   "url": "https://www.skills.sh/heygen-com/hyperframes/hyperframes-cli",
+   "repoUrl": "https://github.com/heygen-com/hyperframes",
+   "installsSkillssh": 1578855,
+   "downloadsClawhub": null,
+   "downloadsSkillhub": null
+  },
+  {
+   "rank": 4,
+   "skill": "multi-search-engine",
+   "category": "知识管理",
+   "platform": "SkillHub CN",
+   "blurb": "16 个搜索引擎跨源检索、去重与交叉验证，不需要 API Key",
+   "installCmd": "",
+   "url": "",
+   "repoUrl": "",
+   "installsSkillssh": null,
+   "downloadsClawhub": null,
+   "downloadsSkillhub": 11053328
+  },
+  {
+   "rank": 5,
+   "skill": "grill-me",
+   "category": "编程开发",
+   "platform": "skills.sh",
+   "blurb": "开工前先把你拷问一遍，问到没有歧义、方案没有漏洞，再动手写代码",
+   "installCmd": "npx skills add https://github.com/mattpocock/skills --skill grill-me",
+   "url": "https://www.skills.sh/mattpocock/skills/grill-me",
+   "repoUrl": "https://github.com/mattpocock/skills",
+   "installsSkillssh": 1556610,
+   "downloadsClawhub": null,
+   "downloadsSkillhub": null
+  },
+  {
+   "rank": 6,
+   "skill": "hyperframes",
+   "category": "设计媒体",
+   "platform": "skills.sh",
+   "blurb": "用代码批量渲染视频模板与动效",
+   "installCmd": "npx skills add https://github.com/heygen-com/hyperframes --skill hyperframes",
+   "url": "https://www.skills.sh/heygen-com/hyperframes/hyperframes",
+   "repoUrl": "https://github.com/heygen-com/hyperframes",
+   "installsSkillssh": 1541802,
+   "downloadsClawhub": null,
+   "downloadsSkillhub": null
+  },
+  {
+   "rank": 7,
+   "skill": "dev-expert-pro",
+   "category": "编程开发",
+   "platform": "SkillHub CN",
+   "blurb": "编程专家 Pro：鸿蒙 ArkTS/ArkUI、微信小程序与游戏、项目实现与根因调试",
+   "installCmd": "",
+   "url": "",
+   "repoUrl": "",
+   "installsSkillssh": null,
+   "downloadsClawhub": null,
+   "downloadsSkillhub": 6314514
+  },
+  {
+   "rank": 8,
+   "skill": "agent-browser",
+   "category": "AI 智能体",
+   "platform": "skills.sh",
+   "blurb": "给 Agent 一个浏览器：导航、填表、点按钮、截图，做端到端验证",
+   "installCmd": "npx skills add https://github.com/vercel-labs/agent-browser --skill agent-browser",
+   "url": "https://www.skills.sh/vercel-labs/agent-browser/agent-browser",
+   "repoUrl": "https://github.com/vercel-labs/agent-browser",
+   "installsSkillssh": 1539065,
+   "downloadsClawhub": null,
+   "downloadsSkillhub": null
+  }
+ ],
+ "repos": [
+  {
+   "rank": 1,
+   "repo": "morluto/rea",
+   "stars": 464154,
+   "starsDelta1d": 2173,
+   "blurb": "用 Agent 做软件逆向与二进制分析",
+   "maintainer": "社区",
+   "url": "https://github.com/morluto/rea"
+  },
+  {
+   "rank": 2,
+   "repo": "mattpocock/skills",
+   "stars": 325963,
+   "starsDelta1d": 689,
+   "blurb": "实战技能：作者 .agents 目录原样公开",
+   "maintainer": "知名开发者",
+   "url": "https://github.com/mattpocock/skills"
+  },
+  {
+   "rank": 3,
+   "repo": "obra/superpowers",
+   "stars": 318694,
+   "starsDelta1d": 426,
+   "blurb": "技能框架 + 软件开发方法论",
+   "maintainer": "知名开发者",
+   "url": "https://github.com/obra/superpowers"
+  },
+  {
+   "rank": 4,
+   "repo": "affaan-m/ECC",
+   "stars": 304658,
+   "starsDelta1d": 783,
+   "blurb": "Agent 优化：技能、记忆、安全",
+   "maintainer": "社区",
+   "url": "https://github.com/affaan-m/ECC"
+  },
+  {
+   "rank": 5,
+   "repo": "multica-ai/andrej-karpathy-skills",
+   "stars": 233746,
+   "starsDelta1d": 288,
+   "blurb": "一个 CLAUDE.md 纠正编码坏习惯",
+   "maintainer": "社区",
+   "url": "https://github.com/multica-ai/andrej-karpathy-skills"
+  },
+  {
+   "rank": 6,
+   "repo": "anthropics/skills",
+   "stars": 196056,
+   "starsDelta1d": 735,
+   "blurb": "官方 Agent Skills 公开仓库",
+   "maintainer": "官方组织",
+   "url": "https://github.com/anthropics/skills"
+  },
+  {
+   "rank": 7,
+   "repo": "DietrichGebert/ponytail",
+   "stars": 192179,
+   "starsDelta1d": 524,
+   "blurb": "让 Agent 像最懒的资深工程师",
+   "maintainer": "社区",
+   "url": "https://github.com/DietrichGebert/ponytail"
+  },
+  {
+   "rank": 8,
+   "repo": "anthropics/claude-code",
+   "stars": 155926,
+   "starsDelta1d": 104,
+   "blurb": "Claude Code 官方仓库",
+   "maintainer": "官方组织",
+   "url": "https://github.com/anthropics/claude-code"
+  },
+  {
+   "rank": 9,
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "stars": 150441,
+   "starsDelta1d": 439,
+   "blurb": "专业 UI/UX 设计智能技能",
+   "maintainer": "社区",
+   "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill"
+  },
+  {
+   "rank": 10,
+   "repo": "shadcn-ui/ui",
+   "stars": 128346,
+   "starsDelta1d": 55,
+   "blurb": "可组合 React 组件库",
+   "maintainer": "官方组织",
+   "url": "https://github.com/shadcn-ui/ui"
+  }
+ ],
+ "favorites": [
+  {
+   "rank": 1,
+   "repo": "alchaincyf/nuwa-skill",
+   "stars": 38425,
+   "starsDelta1d": 76,
+   "blurb": "女娲：蒸馏任何人的思维方式——心智模型、决策启发式与表达 DNA",
+   "maintainer": "知名开发者",
+   "url": "https://github.com/alchaincyf/nuwa-skill"
+  },
+  {
+   "rank": 2,
+   "repo": "alchaincyf/huashu-design",
+   "stars": 29650,
+   "starsDelta1d": 72,
+   "blurb": "Huashu Design：在 Agent 里打一句话，拿回能交付的设计——网页 / App 原型 / 可编辑 PPTX / 动画 / 信息图",
+   "maintainer": "知名开发者",
+   "url": "https://github.com/alchaincyf/huashu-design"
+  },
+  {
+   "rank": 3,
+   "repo": "suling-fun/software-copyright-materials-skill",
+   "stars": 126,
+   "starsDelta1d": null,
+   "blurb": "软著申请：从真实项目生成代码、操作手册与申请表三份材料，校验后辅助在版权保护中心填报与签章",
+   "maintainer": "社区",
+   "url": "https://github.com/suling-fun/software-copyright-materials-skill"
+  }
+ ],
+ "platforms": {
+  "skillssh": [
+   {
+    "rank": 1,
+    "skill": "find-skills",
+    "value": 4377540,
+    "blurb": "不知道装什么就用它：用自然语言说需求，它去三大注册中心检索、挑一个并装好",
+    "url": "https://www.skills.sh/vercel-labs/skills/find-skills",
+    "installCmd": ""
+   },
+   {
+    "rank": 2,
+    "skill": "hyperframes-cli",
+    "value": 1578855,
+    "blurb": "HeyGen 视频栈的命令行入口：用代码批量渲染视频与动效，可接进 CI",
+    "url": "https://www.skills.sh/heygen-com/hyperframes/hyperframes-cli",
+    "installCmd": ""
+   },
+   {
+    "rank": 3,
+    "skill": "grill-me",
+    "value": 1556610,
+    "blurb": "开工前先把你拷问一遍，问到没有歧义、方案没有漏洞，再动手写代码",
+    "url": "https://www.skills.sh/mattpocock/skills/grill-me",
+    "installCmd": ""
+   },
+   {
+    "rank": 4,
+    "skill": "hyperframes",
+    "value": 1541802,
+    "blurb": "用代码批量渲染视频模板与动效",
+    "url": "https://www.skills.sh/heygen-com/hyperframes/hyperframes",
+    "installCmd": ""
+   },
+   {
+    "rank": 5,
+    "skill": "agent-browser",
+    "value": 1539065,
+    "blurb": "给 Agent 一个浏览器：导航、填表、点按钮、截图，做端到端验证",
+    "url": "https://www.skills.sh/vercel-labs/agent-browser/agent-browser",
+    "installCmd": ""
+   },
+   {
+    "rank": 6,
+    "skill": "media-use",
+    "value": 1451298,
+    "blurb": "HeyGen 媒体素材读取与处理",
+    "url": "https://www.skills.sh/heygen-com/hyperframes/media-use",
+    "installCmd": ""
+   }
+  ],
+  "clawhub": [
+   {
+    "rank": 1,
+    "skill": "self-improving-agent",
+    "value": 493211,
+    "blurb": "把纠正与故障写进长期记忆",
+    "url": "https://clawhub.ai/pskoett/skills/self-improving-agent",
+    "installCmd": ""
+   },
+   {
+    "rank": 2,
+    "skill": "skill-vetter",
+    "value": 282881,
+    "blurb": "装任何技能之前先做安全预审",
+    "url": "https://clawhub.ai/spclaudehome/skills/skill-vetter",
+    "installCmd": ""
+   },
+   {
+    "rank": 3,
+    "skill": "self-improving",
+    "value": 215004,
+    "blurb": "自反思 + 自批评 + 自组织记忆",
+    "url": "https://clawhub.ai/ivangdavila/skills/self-improving",
+    "installCmd": ""
+   },
+   {
+    "rank": 4,
+    "skill": "github",
+    "value": 205298,
+    "blurb": "用 gh CLI 管 issue、PR、CI",
+    "url": "https://clawhub.ai/steipete/skills/github",
+    "installCmd": ""
+   },
+   {
+    "rank": 5,
+    "skill": "ontology",
+    "value": 201850,
+    "blurb": "类型化知识图谱，做结构化记忆",
+    "url": "https://clawhub.ai/oswalpalash/skills/ontology",
+    "installCmd": ""
+   },
+   {
+    "rank": 6,
+    "skill": "skillscan",
+    "value": 183596,
+    "blurb": "Security gate for skills. Every new skill MUST pass Skill…",
+    "url": "",
+    "installCmd": ""
+   }
+  ],
+  "skillhub": [
+   {
+    "rank": 1,
+    "skill": "dev-god",
+    "value": 11513897,
+    "blurb": "给一句目标就接手陌生仓库：拆需求、补实现、追根因、重构到能跑能交付",
+    "url": "",
+    "installCmd": ""
+   },
+   {
+    "rank": 2,
+    "skill": "multi-search-engine",
+    "value": 11053328,
+    "blurb": "16 个搜索引擎跨源检索、去重与交叉验证，不需要 API Key",
+    "url": "",
+    "installCmd": ""
+   },
+   {
+    "rank": 3,
+    "skill": "dev-expert-pro",
+    "value": 6314514,
+    "blurb": "编程专家 Pro：鸿蒙 ArkTS/ArkUI、微信小程序与游戏、项目实现与根因调试",
+    "url": "",
+    "installCmd": ""
+   },
+   {
+    "rank": 4,
+    "skill": "aigccerts",
+    "value": 6210434,
+    "blurb": "AIGC 创作过程存证，带电子印章",
+    "url": "",
+    "installCmd": ""
+   },
+   {
+    "rank": 5,
+    "skill": "dev-expert",
+    "value": 6097528,
+    "blurb": "P8 全栈：API、诊断、审查、选型",
+    "url": "",
+    "installCmd": ""
+   },
+   {
+    "rank": 6,
+    "skill": "parenting-expert",
+    "value": 3111867,
+    "blurb": "0–18 岁养育全场景问答",
+    "url": "",
+    "installCmd": ""
+   }
+  ]
+ },
+ "wis": [
+  {
+   "rank": 1,
+   "skill": "agent-browser",
+   "wis": 81.1,
+   "popularity": 0.997,
+   "momentum": 0.968,
+   "buzz": 0.911,
+   "maintenance": null,
+   "trust": 0.7,
+   "coverage": "C",
+   "category": "AI 智能体",
+   "platform": "skills.sh",
+   "blurb": "给 Agent 一个浏览器：导航、填表、点按钮、截图，做端到端验证",
+   "installCmd": "npx skills add https://github.com/vercel-labs/agent-browser --skill agent-browser",
+   "url": "https://www.skills.sh/vercel-labs/agent-browser/agent-browser"
+  },
+  {
+   "rank": 2,
+   "skill": "find-skills",
+   "wis": 76.3,
+   "popularity": 1.0,
+   "momentum": 0.982,
+   "buzz": 0.654,
+   "maintenance": null,
+   "trust": 0.7,
+   "coverage": "C",
+   "category": "AI 智能体",
+   "platform": "skills.sh",
+   "blurb": "不知道装什么就用它：用自然语言说需求，它去三大注册中心检索、挑一个并装好",
+   "installCmd": "npx skills add https://github.com/vercel-labs/skills --skill find-skills",
+   "url": "https://www.skills.sh/vercel-labs/skills/find-skills"
+  },
+  {
+   "rank": 3,
+   "skill": "frontend-design",
+   "wis": 72.5,
+   "popularity": 0.989,
+   "momentum": 0.855,
+   "buzz": 0.575,
+   "maintenance": null,
+   "trust": 0.7,
+   "coverage": "C",
+   "category": "设计媒体",
+   "platform": "skills.sh",
+   "blurb": "前端界面设计（Anthropic 官方技能）",
+   "installCmd": "npx skills add https://github.com/anthropics/skills --skill frontend-design",
+   "url": "https://www.skills.sh/anthropics/skills/frontend-design"
+  },
+  {
+   "rank": 4,
+   "skill": "remotion-best-practices",
+   "wis": 67.3,
+   "popularity": 0.948,
+   "momentum": 0.96,
+   "buzz": null,
+   "maintenance": null,
+   "trust": 0.7,
+   "coverage": "C",
+   "category": "编程开发",
+   "platform": "skills.sh",
+   "blurb": "暂无说明",
+   "installCmd": "npx skills add https://github.com/remotion-dev/skills --skill remotion-best-practices",
+   "url": "https://www.skills.sh/remotion-dev/skills/remotion-best-practices"
+  },
+  {
+   "rank": 5,
+   "skill": "grill-with-docs",
+   "wis": 66.4,
+   "popularity": 0.994,
+   "momentum": 0.848,
+   "buzz": 0.767,
+   "maintenance": null,
+   "trust": 0.2,
+   "coverage": "C",
+   "category": "编程开发",
+   "platform": "skills.sh",
+   "blurb": "带着项目文档一起拷问需求，让答案锚定在你自己代码库的事实上",
+   "installCmd": "npx skills add https://github.com/mattpocock/skills --skill grill-with-docs",
+   "url": "https://www.skills.sh/mattpocock/skills/grill-with-docs"
+  },
+  {
+   "rank": 6,
+   "skill": "web-design-guidelines",
+   "wis": 65.9,
+   "popularity": 0.953,
+   "momentum": 0.852,
+   "buzz": null,
+   "maintenance": null,
+   "trust": 0.7,
+   "coverage": "C",
+   "category": "设计媒体",
+   "platform": "skills.sh",
+   "blurb": "暂无说明",
+   "installCmd": "npx skills add https://github.com/vercel-labs/agent-skills --skill web-design-guidelines",
+   "url": "https://www.skills.sh/vercel-labs/agent-skills/web-design-guidelines"
+  },
+  {
+   "rank": 7,
+   "skill": "microsoft-foundry",
+   "wis": 65.4,
+   "popularity": 0.939,
+   "momentum": 0.847,
+   "buzz": null,
+   "maintenance": null,
+   "trust": 0.7,
+   "coverage": "C",
+   "category": "it-ops-security",
+   "platform": "skills.sh",
+   "blurb": "暂无说明",
+   "installCmd": "npx skills add https://github.com/microsoft/azure-skills --skill microsoft-foundry",
+   "url": "https://www.skills.sh/microsoft/azure-skills/microsoft-foundry"
+  },
+  {
+   "rank": 8,
+   "skill": "grill-me",
+   "wis": 65.3,
+   "popularity": 0.998,
+   "momentum": 0.857,
+   "buzz": 0.702,
+   "maintenance": null,
+   "trust": 0.2,
+   "coverage": "C",
+   "category": "编程开发",
+   "platform": "skills.sh",
+   "blurb": "开工前先把你拷问一遍，问到没有歧义、方案没有漏洞，再动手写代码",
+   "installCmd": "npx skills add https://github.com/mattpocock/skills --skill grill-me",
+   "url": "https://www.skills.sh/mattpocock/skills/grill-me"
+  },
+  {
+   "rank": 9,
+   "skill": "azure-diagnostics",
+   "wis": 65.3,
+   "popularity": 0.938,
+   "momentum": 0.845,
+   "buzz": null,
+   "maintenance": null,
+   "trust": 0.7,
+   "coverage": "C",
+   "category": "it-ops-security",
+   "platform": "skills.sh",
+   "blurb": "暂无说明",
+   "installCmd": "npx skills add https://github.com/microsoft/azure-skills --skill azure-diagnostics",
+   "url": "https://www.skills.sh/microsoft/azure-skills/azure-diagnostics"
+  },
+  {
+   "rank": 10,
+   "skill": "azure-prepare",
+   "wis": 65.2,
+   "popularity": 0.937,
+   "momentum": 0.84,
+   "buzz": null,
+   "maintenance": null,
+   "trust": 0.7,
+   "coverage": "C",
+   "category": "it-ops-security",
+   "platform": "skills.sh",
+   "blurb": "暂无说明",
+   "installCmd": "npx skills add https://github.com/microsoft/azure-skills --skill azure-prepare",
+   "url": "https://www.skills.sh/microsoft/azure-skills/azure-prepare"
+  }
+ ],
+ "trending": [
+  {
+   "rank": 1,
+   "skill": "design-mobile-apps",
+   "growthPct": -1.8,
+   "installs": 1444639,
+   "blurb": "移动端 App 界面设计",
+   "installCmd": "npx skills add https://github.com/designed-by-ai/skills --skill design-mobile-apps",
+   "url": "https://www.skills.sh/designed-by-ai/skills/design-mobile-apps"
+  },
+  {
+   "rank": 2,
+   "skill": "website-builder",
+   "growthPct": null,
+   "installs": 15629,
+   "blurb": "暂无说明",
+   "installCmd": "npx skills add https://github.com/flowkit-labs/skills --skill website-builder",
+   "url": "https://www.skills.sh/flowkit-labs/skills/website-builder"
+  },
+  {
+   "rank": 3,
+   "skill": "video-edit",
+   "growthPct": -1.7,
+   "installs": 575601,
+   "blurb": "暂无说明",
+   "installCmd": "npx skills add https://github.com/gencraft-labs/skills --skill video-edit",
+   "url": "https://www.skills.sh/gencraft-labs/skills/video-edit"
+  },
+  {
+   "rank": 4,
+   "skill": "ai-image-generation",
+   "growthPct": -2.1,
+   "installs": 574857,
+   "blurb": "AI 图像生成",
+   "installCmd": "npx skills add https://github.com/gencraft-labs/skills --skill ai-image-generation",
+   "url": "https://www.skills.sh/gencraft-labs/skills/ai-image-generation"
+  },
+  {
+   "rank": 5,
+   "skill": "image-to-video",
+   "growthPct": -1.9,
+   "installs": 574673,
+   "blurb": "暂无说明",
+   "installCmd": "npx skills add https://github.com/gencraft-labs/skills --skill image-to-video",
+   "url": "https://www.skills.sh/gencraft-labs/skills/image-to-video"
+  },
+  {
+   "rank": 6,
+   "skill": "ai-video-generation",
+   "growthPct": -1.8,
+   "installs": 575383,
+   "blurb": "AI 视频生成",
+   "installCmd": "npx skills add https://github.com/gencraft-labs/skills --skill ai-video-generation",
+   "url": "https://www.skills.sh/gencraft-labs/skills/ai-video-generation"
+  }
+ ],
+ "buzz": [
+  {
+   "rank": 1,
+   "skill": "agent-browser",
+   "score": 0.911,
+   "x": 73,
+   "xTruncated": true,
+   "hn": 7,
+   "bsky": 20,
+   "gh": 39,
+   "blurb": "给 Agent 一个浏览器：导航、填表、点按钮、截图，做端到端验证",
+   "installCmd": "npx skills add https://github.com/vercel-labs/agent-browser --skill agent-browser",
+   "url": "https://www.skills.sh/vercel-labs/agent-browser/agent-browser"
+  },
+  {
+   "rank": 2,
+   "skill": "self-improving",
+   "score": 0.901,
+   "x": 81,
+   "xTruncated": true,
+   "hn": 7,
+   "bsky": 34,
+   "gh": 6,
+   "blurb": "自反思 + 自批评 + 自组织记忆",
+   "installCmd": "",
+   "url": ""
+  },
+  {
+   "rank": 3,
+   "skill": "grill-with-docs",
+   "score": 0.767,
+   "x": 15,
+   "xTruncated": false,
+   "hn": 1,
+   "bsky": 1,
+   "gh": 8,
+   "blurb": "带着项目文档一起拷问需求，让答案锚定在你自己代码库的事实上",
+   "installCmd": "npx skills add https://github.com/mattpocock/skills --skill grill-with-docs",
+   "url": "https://www.skills.sh/mattpocock/skills/grill-with-docs"
+  },
+  {
+   "rank": 4,
+   "skill": "grill-me",
+   "score": 0.702,
+   "x": 72,
+   "xTruncated": true,
+   "hn": 0,
+   "bsky": 6,
+   "gh": 44,
+   "blurb": "开工前先把你拷问一遍，问到没有歧义、方案没有漏洞，再动手写代码",
+   "installCmd": "npx skills add https://github.com/mattpocock/skills --skill grill-me",
+   "url": "https://www.skills.sh/mattpocock/skills/grill-me"
+  },
+  {
+   "rank": 5,
+   "skill": "skill-creator",
+   "score": 0.694,
+   "x": 61,
+   "xTruncated": false,
+   "hn": 0,
+   "bsky": 2,
+   "gh": 141,
+   "blurb": "创建新技能的技能",
+   "installCmd": "npx skills add https://github.com/anthropics/skills --skill skill-creator",
+   "url": "https://www.skills.sh/anthropics/skills/skill-creator"
+  },
+  {
+   "rank": 6,
+   "skill": "proactive-agent",
+   "score": 0.677,
+   "x": 91,
+   "xTruncated": true,
+   "hn": 0,
+   "bsky": 9,
+   "gh": 2,
+   "blurb": "让 Agent 主动预判需求",
+   "installCmd": "openclaw skills install @halthelobster/proactive-agent",
+   "url": "https://clawhub.ai/halthelobster/skills/proactive-agent"
+  }
+ ],
+ "rising": [
+  {
+   "rank": 1,
+   "skill": "proactive-agent",
+   "ageDays": 20,
+   "heat": 0.845,
+   "value": 172651,
+   "valueLabel": "SkillHub CN 安装",
+   "platform": "SkillHub CN",
+   "blurb": "让 Agent 主动预判需求",
+   "installCmd": "",
+   "url": ""
+  },
+  {
+   "rank": 2,
+   "skill": "patent-search-i",
+   "ageDays": 22,
+   "heat": 0.841,
+   "value": 168519,
+   "valueLabel": "SkillHub CN 安装",
+   "platform": "SkillHub CN",
+   "blurb": "全球专利检索与统计分析，覆盖中国、美国、欧洲、日本、韩国和 WIPO，中国专利收录最全。支持关键词和检索式检索、按…",
+   "installCmd": "",
+   "url": ""
+  },
+  {
+   "rank": 3,
+   "skill": "design-image-search",
+   "ageDays": 22,
+   "heat": 0.811,
+   "value": 142080,
+   "valueLabel": "SkillHub CN 安装",
+   "platform": "SkillHub CN",
+   "blurb": "外观专利检索-以图搜图：拍一张产品照片，查外观相近的外观设计专利。当用户说「这个产品外观有没有专利」「拍照查外观专…",
+   "installCmd": "",
+   "url": ""
+  },
+  {
+   "rank": 4,
+   "skill": "patent-novelty-i",
+   "ageDays": 21,
+   "heat": 0.802,
+   "value": 136597,
+   "valueLabel": "SkillHub CN 安装",
+   "platform": "SkillHub CN",
+   "blurb": "专利查新与可专利性判断。当用户问一个技术方案有没有人做过、能不能申请专利、有没有新颖性或创造性、申请前要做查新、立…",
+   "installCmd": "",
+   "url": ""
+  },
+  {
+   "rank": 5,
+   "skill": "patent-disclosure-i",
+   "ageDays": 21,
+   "heat": 0.794,
+   "value": 129608,
+   "valueLabel": "SkillHub CN 安装",
+   "platform": "SkillHub CN",
+   "blurb": "技术交底书生成。当用户要写技术交底书、专利交底、把研发材料或技术方案整理成交底书、挖专利点、只有一个想法想看看能往…",
+   "installCmd": "",
+   "url": ""
+  },
+  {
+   "rank": 6,
+   "skill": "dy-search",
+   "ageDays": 18,
+   "heat": 0.785,
+   "value": 126559,
+   "valueLabel": "SkillHub CN 安装",
+   "platform": "SkillHub CN",
+   "blurb": "抖音搜索视频采集工具（关键词搜索）。当用户需要按关键词搜索抖音视频并采集结果列表——视频文案、点赞/评论/收藏/分…",
+   "installCmd": "",
+   "url": ""
+  }
+ ],
+ "active": [
+  {
+   "rank": 1,
+   "skill": "ai-insurance-advisor",
+   "lastUpdate": "2026-11-15",
+   "versions": 288,
+   "blurb": "中国大陆保险顾问。本 skill 覆盖 8 项能力：保险需求分析（needs_analyzer.py）、产品对比（…",
+   "installCmd": "",
+   "url": ""
+  },
+  {
+   "rank": 2,
+   "skill": "insurance-advisor-china",
+   "lastUpdate": "2026-11-15",
+   "versions": 277,
+   "blurb": "中国大陆AI保险顾问。为个人和家庭提供全方位的保险咨询、产品对比、方案设计、投保指导。当用户询问保险配置、保险方案…",
+   "installCmd": "",
+   "url": ""
+  },
+  {
+   "rank": 3,
+   "skill": "chinese-official-writing",
+   "lastUpdate": "2026-11-13",
+   "versions": 172,
+   "blurb": "中文公文写作",
+   "installCmd": "openclaw skills install @gongyu0918-debug/chinese-official-writing",
+   "url": "https://clawhub.ai/gongyu0918-debug/skills/chinese-official-writing"
+  },
+  {
+   "rank": 4,
+   "skill": "planning-with-files",
+   "lastUpdate": "2026-11-10",
+   "versions": 30,
+   "blurb": "实现 Manus 风格的文件规划，用于组织和跟踪复杂任务进度",
+   "installCmd": "openclaw skills install @othmanadi/planning-with-files",
+   "url": "https://clawhub.ai/othmanadi/skills/planning-with-files"
+  },
+  {
+   "rank": 5,
+   "skill": "api-gateway",
+   "lastUpdate": "2026-11-07",
+   "versions": 191,
+   "blurb": "通过 Maton 管理的 API 路由连接外部服务；仅在用户指定目标应用、账户和任务后使用；以读取/列...",
+   "installCmd": "openclaw skills install @byungkyu/api-gateway",
+   "url": "https://clawhub.ai/byungkyu/skills/api-gateway"
+  },
+  {
+   "rank": 6,
+   "skill": "getnote",
+   "lastUpdate": "2026-11-06",
+   "versions": 52,
+   "blurb": "得到大脑（Get笔记）- 保存、搜索、管理个人笔记和知识库。适用场景：① 保存内容（链接、图片、语音指令如「记一下…",
+   "installCmd": "openclaw skills install @iswalle/getnote",
+   "url": "https://clawhub.ai/iswalle/skills/getnote"
+  }
+ ],
+ "vendors": [
+  {
+   "rank": 1,
+   "vendor": "microsoft",
+   "platform": "skills.sh",
+   "skillsCount": 582,
+   "total": 7098914,
+   "note": "体量第一"
+  },
+  {
+   "rank": 2,
+   "vendor": "vercel-labs",
+   "platform": "skills.sh",
+   "skillsCount": 252,
+   "total": 3192303,
+   "note": "质量第一"
+  },
+  {
+   "rank": 3,
+   "vendor": "github",
+   "platform": "skills.sh",
+   "skillsCount": 406,
+   "total": 2002122,
+   "note": "基础类"
+  },
+  {
+   "rank": 4,
+   "vendor": "anthropics",
+   "platform": "skills.sh",
+   "skillsCount": 605,
+   "total": 1942412,
+   "note": "技能最多"
+  },
+  {
+   "rank": 5,
+   "vendor": "firebase",
+   "platform": "skills.sh",
+   "skillsCount": 55,
+   "total": 685617,
+   "note": "少而精"
+  },
+  {
+   "rank": 6,
+   "vendor": "firecrawl",
+   "platform": "skills.sh",
+   "skillsCount": 286,
+   "total": 482310,
+   "note": "抓取"
+  },
+  {
+   "rank": 7,
+   "vendor": "nvidia",
+   "platform": "skills.sh",
+   "skillsCount": 1320,
+   "total": 443217,
+   "note": "数量最猛"
+  },
+  {
+   "rank": 8,
+   "vendor": "remotion-dev",
+   "platform": "skills.sh",
+   "skillsCount": 19,
+   "total": 305359,
+   "note": "单技能最强"
+  }
+ ],
+ "glossary": [
+  {
+   "skill": "find-skills",
+   "blurb": "不知道装什么就用它：用自然语言说需求，它去三大注册中心检索、挑一个并装好"
+  },
+  {
+   "skill": "dev-god",
+   "blurb": "给一句目标就接手陌生仓库：拆需求、补实现、追根因、重构到能跑能交付"
+  },
+  {
+   "skill": "hyperframes-cli",
+   "blurb": "HeyGen 视频栈的命令行入口：用代码批量渲染视频与动效，可接进 CI"
+  },
+  {
+   "skill": "multi-search-engine",
+   "blurb": "16 个搜索引擎跨源检索、去重与交叉验证，不需要 API Key"
+  },
+  {
+   "skill": "grill-me",
+   "blurb": "开工前先把你拷问一遍，问到没有歧义、方案没有漏洞，再动手写代码"
+  },
+  {
+   "skill": "hyperframes",
+   "blurb": "用代码批量渲染视频模板与动效"
+  },
+  {
+   "skill": "dev-expert-pro",
+   "blurb": "编程专家 Pro：鸿蒙 ArkTS/ArkUI、微信小程序与游戏、项目实现与根因调试"
+  },
+  {
+   "skill": "agent-browser",
+   "blurb": "给 Agent 一个浏览器：导航、填表、点按钮、截图，做端到端验证"
+  },
+  {
+   "skill": "frontend-design",
+   "blurb": "前端界面设计（Anthropic 官方技能）"
+  },
+  {
+   "skill": "grill-with-docs",
+   "blurb": "带着项目文档一起拷问需求，让答案锚定在你自己代码库的事实上"
+  },
+  {
+   "skill": "design-mobile-apps",
+   "blurb": "移动端 App 界面设计"
+  },
+  {
+   "skill": "ai-image-generation",
+   "blurb": "AI 图像生成"
+  },
+  {
+   "skill": "ai-video-generation",
+   "blurb": "AI 视频生成"
+  },
+  {
+   "skill": "self-improving",
+   "blurb": "自反思 + 自批评 + 自组织记忆"
+  },
+  {
+   "skill": "skill-creator",
+   "blurb": "创建新技能的技能"
+  },
+  {
+   "skill": "proactive-agent",
+   "blurb": "让 Agent 主动预判需求"
+  },
+  {
+   "skill": "patent-search-i",
+   "blurb": "全球专利检索与统计分析，覆盖中国、美国、欧洲、日本、韩国和 WIPO，中国专利收录最全。支持关键词和检索式检索、按…"
+  },
+  {
+   "skill": "design-image-search",
+   "blurb": "外观专利检索-以图搜图：拍一张产品照片，查外观相近的外观设计专利。当用户说「这个产品外观有没有专利」「拍照查外观专…"
+  },
+  {
+   "skill": "patent-novelty-i",
+   "blurb": "专利查新与可专利性判断。当用户问一个技术方案有没有人做过、能不能申请专利、有没有新颖性或创造性、申请前要做查新、立…"
+  },
+  {
+   "skill": "patent-disclosure-i",
+   "blurb": "技术交底书生成。当用户要写技术交底书、专利交底、把研发材料或技术方案整理成交底书、挖专利点、只有一个想法想看看能往…"
+  },
+  {
+   "skill": "dy-search",
+   "blurb": "抖音搜索视频采集工具（关键词搜索）。当用户需要按关键词搜索抖音视频并采集结果列表——视频文案、点赞/评论/收藏/分…"
+  },
+  {
+   "skill": "ai-insurance-advisor",
+   "blurb": "中国大陆保险顾问。本 skill 覆盖 8 项能力：保险需求分析（needs_analyzer.py）、产品对比（…"
+  },
+  {
+   "skill": "insurance-advisor-china",
+   "blurb": "中国大陆AI保险顾问。为个人和家庭提供全方位的保险咨询、产品对比、方案设计、投保指导。当用户询问保险配置、保险方案…"
+  },
+  {
+   "skill": "chinese-official-writing",
+   "blurb": "中文公文写作"
+  },
+  {
+   "skill": "planning-with-files",
+   "blurb": "实现 Manus 风格的文件规划，用于组织和跟踪复杂任务进度"
+  },
+  {
+   "skill": "api-gateway",
+   "blurb": "通过 Maton 管理的 API 路由连接外部服务；仅在用户指定目标应用、账户和任务后使用；以读取/列..."
+  },
+  {
+   "skill": "getnote",
+   "blurb": "得到大脑（Get笔记）- 保存、搜索、管理个人笔记和知识库。适用场景：① 保存内容（链接、图片、语音指令如「记一下…"
+  },
+  {
+   "skill": "media-use",
+   "blurb": "HeyGen 媒体素材读取与处理"
+  },
+  {
+   "skill": "self-improving-agent",
+   "blurb": "把纠正与故障写进长期记忆"
+  },
+  {
+   "skill": "skill-vetter",
+   "blurb": "装任何技能之前先做安全预审"
+  },
+  {
+   "skill": "github",
+   "blurb": "用 gh CLI 管 issue、PR、CI"
+  },
+  {
+   "skill": "ontology",
+   "blurb": "类型化知识图谱，做结构化记忆"
+  },
+  {
+   "skill": "skillscan",
+   "blurb": "Security gate for skills. Every new skill MUST pass Skill…"
+  },
+  {
+   "skill": "aigccerts",
+   "blurb": "AIGC 创作过程存证，带电子印章"
+  },
+  {
+   "skill": "dev-expert",
+   "blurb": "P8 全栈：API、诊断、审查、选型"
+  },
+  {
+   "skill": "parenting-expert",
+   "blurb": "0–18 岁养育全场景问答"
+  }
+ ]
+}

@@ -1,0 +1,45 @@
+name: Cloud Phone Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      apk_url:
+        description: "APK URL to auto-install at boot"
+        required: false
+        default: "https://down.ziwan.cn/202611010432/e3f5cb8f68f9c84842147554170ba5be/ziwan_1.2.68.apk"
+
+jobs:
+  phone:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - name: Check KVM and resources
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules || true
+          sudo udevadm trigger --name-match=kvm || true
+          ls -l /dev/kvm || echo NO_KVM
+          nproc; free -h
+      - name: Start docker-android, auto-install APK, open tunnel
+        run: |
+          docker pull budtmo/docker-android:emulator_11.0
+          docker run -d -p 6080:6080 -e EMULATOR_DEVICE="Samsung Galaxy S10" -e WEB_VNC=true --device /dev/kvm --name android budtmo/docker-android:emulator_11.0
+          for i in $(seq 1 60); do
+            B=$(docker exec android adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+            if [ "$B" = "1" ]; then echo ANDROID_BOOTED; break; fi
+            sleep 10
+          done
+          curl -sL -o /tmp/app.apk "${{ inputs.apk_url }}"
+          ls -l /tmp/app.apk; file /tmp/app.apk || true
+          docker cp /tmp/app.apk android:/tmp/app.apk
+          docker exec android adb install -r /tmp/app.apk 2>&1 | tee /tmp/install.log || true
+          echo "INSTALL_RESULT: $(tail -2 /tmp/install.log)"
+          docker exec android adb shell pm list packages | grep -i wan || echo PACKAGE_NOT_FOUND
+          for i in $(seq 1 40); do curl -s -o /dev/null http://localhost:6080 && echo WEBUI_UP && break || sleep 10; done
+          curl -sL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x cloudflared
+          nohup ./cloudflared tunnel --url http://localhost:6080 > tunnel.log 2>&1 &
+          sleep 20
+          grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' tunnel.log | head -1 || cat tunnel.log
+          echo "=== SESSION HOLD ==="
+          sleep 3000
