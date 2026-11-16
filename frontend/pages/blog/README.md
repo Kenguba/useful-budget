@@ -3,42 +3,41 @@
 公开版博客文档站：https://kenguba.github.io/useful-budget/frontend/pages/blog/
 
 - 类别（2026-11-15 ken 点选）：仅子域名 `blog.xxxxx.asia`，不进总汇——不加总汇短路径、不上首页卡片（与 wechat 同类）；子域名经 site-router 转发，留档改动见 `backend/site-router.js.back`
-- 形态：照 Oil Book 的三段结构（模型与工具分工 / 原创系列 / 精选收录）建的 SPA 单页；列表视图与文章阅读视图同页切换，hash 路由 `#/article/<slug>`，返回恢复列表滚动位置与筛选、搜索状态
-- 版式（照 Oil Book 网站画面与视频录屏实地核对）：顶栏是左标志与站名加域名胶囊、中导航（首页 / 原创 / 精选锚点）、右主题钮，无登录与订阅；三个分区标题行都是左标题、右端计数胶囊（分工区「N 个环节」、文章区「共 N 篇」，按数据实数由视图生成）
-- 分工区是左右联动——桌面左栏 53fr 是环节清单与模型书签、右栏 47fr 是选中模型的档案面板（761–1080px 改 42fr / 58fr、≤760px 收单列）；模型是档案库加环节引用：同一模型在不同环节共用同一份档案
-- 文章区是多列网格——桌面 4 列、≤960px 3 列、≤760px 2 列、≤420px 1 列且每篇变 96px 封面在左、正文在右；封面是竖版书封（约 3:4）：主题色底、书脊、图案、章号与短题
-- 阅读视图是左目录右正文：宽屏（>860px）左栏约 272px 常驻（返回、章节目录、字号三档），目录由正文小标题同源生成、点按平滑滚动（不动路由 hash）、滚动时当前章高亮跟随；右栏是正文卡，标题区小封面在左、标题与元信息在右，正文小节带 § 编号；窄屏目录收成正文上方折叠条
-- `index.html` — 页面本体（视图层）：顶栏、筛选条（全部 / 原创 / 精选，搜索框上方、单行横滚）、搜索（输 1 字即查、带命中计数、自动定位首个命中，聚焦只给整卡淡淡光晕、定位高亮只给淡色背景）、列表触底自动加载（哨兵 + 每批 4 篇 + 「已展示全部 N 篇」）、阅读视图
-- `data/articles.js` — 文章数据（数据层）：`window.BLOG_DATA = { articles }`；加文章只改这个文件，不动视图代码
-- `data/roles.js` — 分工区数据（数据层）：`window.BLOG_ROLES = { models, steps }`；加模型先在档案库加档案，再在环节里引用 id
+- 形态（2026-11-17 ken 定）：排版、设计、UI 与逻辑全照 ken 提供的 Oil Book 全站 SPA 新版复刻稿重做，内容换成博客现有的文章与分工数据；SPA 单页，hash 路由 `#/`、`#/articles`、`#/curated`、`#/routes`、`#/articles/<slug>`
+- 版式：米纸底色加网格线、金色点缀、纸卡；顶栏左标志与站名加域名胶囊、中导航（首页 / 原创 / 精选收录 / 全站路由）、右主题钮与投稿 / 登录 / 订阅 Pro 钮；深浅两套配色由顶栏钮切换（新版逻辑自带，不再走 12 色主题与 Cookie A）
+- 首页三段：我平时使用的模型（左四类紧凑网格加右选中模型详情大卡，左右联动）、原创预览、精选收录预览；文章以竖版 3:4 实体书封卡陈列（桌面 4 列 / 平板 3 列 / 手机 2 列）
+- 列表页：标题行加搜索框，分类筛选胶囊按数据分类生成，计数按数据实数
+- 阅读页：桌面左目录右正文（目录吸顶，手机收成正文上方折叠手风琴），字体衬线 / 非衬线与字号三档可切，带语音伴读条、反馈组件与延伸阅读；目录与 § 编号在数据里同源（toc 与 sections）
+- 全站路由页：主导航路由加全部文章子路由一览，计数按数据实数生成
+- `index.html` — 页面本体（视图与逻辑层）：顶栏、各视图渲染、路由、弹窗（投稿 / 登录 / Pro）、主题切换；数据经 `data/articles.js` 与 `data/roles.js` 注入组装，视图不写死文章内容
+- `data/articles.js` — 文章数据（数据层）：`window.BLOG_ARTICLES = { siteMeta, originalCategories, curatedCategories, articles }`；加文章只改这个文件，不动视图代码
+- `data/roles.js` — 分工区数据（数据层）：`window.BLOG_ROLES = { modelCategories }`；每个分类含 models 档案数组
 
 ## 数据结构
 
-- `models{}`：档案库，`id → { name, icon（chat / pen / code / shield / image）, badge, quote, strengths, limits, scenes }`，只写公开的模型名与角色，不编造版本号与价格
-- `steps[]`：`{ step, name, models: [id, ...] }` — 左栏环节清单与其引用的模型 id；现行排布为 01 [muse, claude, gemini]、02 [codex, claude]、03 [gpt, claude, gemini]、04 [gemini]，默认选中 01 的 muse
-- `articles[]`：`{ slug, type（原创 / 精选）, chapter, coverNo（封面大字）, coverPat（封面图案：steps / shield / rings / book）, coverTitle（书封短题）, title, date, minutes（阅读时长估算）, summary, body, author?, source?, video? }`；书封由视图按当前主题色渲染，不用外部图片；阅读页目录与 § 编号由 `body` 里的小标题自动生成，加小节只改数据
+- `modelCategories[]`：`{ id, num, title, models: [{ id, name, badge, shortTag, quote, pros, cons, scenarios }] }`；现行四类为 01 主 Agent 沟通规划 [muse, claude, gemini]、02 高性价比执行 [codex, claude]、03 前端审美与疑难定位 [gpt, claude, gemini]、04 图片生成 [gemini]，默认选中 muse；只写公开的模型名与角色，不编造版本号与价格
+- `originalCategories[]` / `curatedCategories[]`：`{ id, num, title, badge?, count }`，count 与实际文章数一致
+- `articles[]`：`{ slug, type（original / curated）, categoryId, chapter, isPro, homeFeatured, title, coverLines[3], coverStyle, author, date（YYYY.MM.DD）, readTime, audioTime, themeHue, summary, toc[], sections[{ heading, paragraphs[], bullets? }], relatedSlugs[], externalLinks?, oilNote? }`
   - `slug` 是网址里的文章标识，定了不要改（改 = 链接失效）
-  - `body` 是块数组：`{ h }` 小标题、`{ p }` 段落、`{ list: [] }` 列表
-  - 精选文章必须带 `author` 与 `source`（原文链接），只写摘要、不转载全文；有视频讲解的再带 `video`
+  - `coverStyle` 取值：warm-yellow-wave / charcoal-rays / charcoal-vintage / parchment-blueprint / sage-nodes / terracotta-sun / teal-hyperbolic
+  - `toc` 与 `sections` 的 heading 同源：toc 是小标题原文，heading 带 `§ NN` 前缀
+  - 精选文章必须带 `author` 与 `externalLinks`（原文链接），只写摘要、不转载全文；`oilNote` 写精选说明
 
 ## 加一篇文章
 
-1. 在 `data/articles.js` 的 `articles` 里加一项，`slug` 用全小写英文 + 连字符，原创按顺序续章号
-2. 正文写实内容，不写占位；`minutes` 按正文字数约 400 字 / 分钟估算
-3. 过一遍脱敏红线与全站文案规范（见下），本地打开页面核对列表与阅读视图，再推送
+1. 在 `data/articles.js` 的 `articles` 里加一项，`slug` 用全小写英文 + 连字符，原创按顺序续章号，并同步对应分类的 count
+2. 正文写实内容，不写占位；`readTime` 按正文字数约 400 字 / 分钟估算，`audioTime` 按约 280 字 / 分钟估算
+3. 过一遍脱敏红线与全站文案规范（见下），本地打开页面核对首页、列表与阅读视图，再推送
 
 ## 脱敏红线（公开版，入库前必查）
 
 - 禁止出现：真实邮箱、完整 IP、手机号、账号标识、带 ID 的控制台直达链接、服务器细节、密钥类任何信息
 - 精选收录只写摘要 + 作者 + 原文链接，不转载全文
-- 功能代码里必须出现的真实地址（如 Cookie 的 Domain）不打码，其余文档与文案按仓库根 README 的隐私保护口径
-
-## Cookie A 实现细则
-
-blog 是单槽、仅中文：localStorage 键为 `blog-theme-idx` / `blog-dark`，与 `A` 双写；读 `A` 后主题号 1–12、日夜全部跟 `A` 走，语言位本站不管理、写 `A` 时原样保留；`A` 与本站记录都不存在时默认跟随系统深浅、主题第 12 套，且不写 `A`（无存量可种）；主题钮单击切深浅、长按约 0.34 秒开 12 色面板点选
+- 其余文档与文案按仓库根 README 的隐私保护口径
 
 ## 部署留名
 
 豆包 → GitHub 直推（2026-11-15 建站）
 豆包 → GitHub 直推（2026-11-15 改 Oil Book 同款左右结构）
 豆包 → GitHub 直推（2026-11-15 按画面复核改三处：阅读页左目录右正文、首页顶栏与计数标题行、分工区多模型一排与书封式封面）
+豆包 → GitHub 直推（2026-11-17 按 ken 提供的新版复刻稿整套换排版/设计/UI/逻辑，内容换回博客现有文章与分工数据）
