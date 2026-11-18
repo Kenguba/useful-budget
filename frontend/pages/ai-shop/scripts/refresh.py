@@ -534,7 +534,7 @@ def slim(rows):
                  stock=o['stock'], title=o['title'], url=o['url'],
                  kind=o.get('kind', ''), same_source=o.get('same_source', 1))
         if o.get('b'):
-            d['b'] = o['b']  # 引流核查戳（ken 2026-11-18）：已审非引流的低价条目才带，值是核查时刻短码；无此字段=默认空
+            d['b'] = o['b']  # 引流字段 b（ken 2026-11-18 定）：1=人工拉黑（不进看板故不会出现）、0=低价引流待审（只在 bait.json）、无此字段=正常
         if o.get('minq') and o['minq'] <= 1000:
             d['minq'] = o['minq']  # 起购量（>1 才有）：价格是单价，但必须买满 minq 个；>1000 视为卖家乱填的假值（如 9999）丢弃
         src = o.get('sources') or []
@@ -1159,10 +1159,12 @@ def main():
             print(f'{_plat_name} direct: {len(_fresh)} fresh ({_ok} shops), {_applied2} applied from cache', file=sys.stderr)
     except Exception as e:
         print(f'aicdks/catfk direct failed: {e}', file=sys.stderr)
-    # ken 人工终审结论（2026-11-18 2b 定版）：页面引流页签的结论经 ai-refresh Worker 存 KV，
-    # 本脚本每轮从 /api/reviews 读回合并：bait=按引流拉黑（全组生效、含接码组）；
-    # pass/fav=已审清白（凭结论里的时间短码过地板恢复，fav 与 pass 管线待遇相同、区别只在页面收藏）。
-    # pass/fav 同时能解开 BLOCKED_URLS 的定点剔除（ken 在页签里改判即生效）。读不到就按空表走、不拖垮刷新。
+    # ken 人工终审结论（2026-11-18 定版）：页面引流页签的结论经 ai-refresh Worker 存 KV，
+    # 本脚本每轮从 /api/reviews 读回合并。引流字段 b 三态（ken 定）：b=1 人工确认拉黑
+    # （该详情链接永不进排序、全组生效含接码组）；b=0 低价引流待审（只出现在待审清单
+    # bait.json 里）；不填 = 正常。bait 落 b=1；pass = 恢复正常（过地板回看板，也能解开
+    # BLOCKED_URLS 的定点剔除，ken 在页签里改判即生效）；历史 fav 按 pass 兼容。
+    # 读不到就按空表走、不拖垮刷新。
     _REVIEWS = {}
     try:
         _rv = json.loads(fetch('https://ai.jpedu.asia/api/reviews').decode('utf-8', 'ignore'))
@@ -1269,20 +1271,19 @@ def main():
     pai = prepare_offers(pai)
     # 低价地板（ken 2026-11-18 定）：看板 ¥1 以下先全删，唯一例外是 Codex 接码组
     # （真接码 ¥0.1–0.8 是行情、分组规则已保证是接码服务才进组，故 g6 不过地板）。
-    # 引流字段 b 三态：默认空（¥1 以上不带、数据里不出现不占位）；¥1 以下先标 1（引流待审、
-    # 不进看板）；逐条进详情审完、不是引流的把登记值换成核查时刻短码并恢复上架，
-    # 条目带 b=短码输出。短码=距 2026-01-01 00:00（+08）整小时数、64 进制（字符表 0-9A-Za-z-_）。
-    # 确认引流的进 BLOCKED_URLS 永久挡住，不在此表。
-    LOW_CHECK = {'https://www.16688.com.cn/goods/G39414072': '1ub',
-                 'https://wzyp.cn/item/12bdf4': '1ub',
-                 'https://wzyp.cn/item/b0lfvi': '1ub',
-                 'https://wzyp.cn/item/9ehsro': '1ub',
-                 'https://wzyp.cn/item/bt9cui': '1ub',
-                 'https://www.16688.com.cn/goods/G79137209': '1ub'}
+    # 被地板拦下的记 b=0（低价引流）进待审清单等 ken 终审：ken 右滑拉黑落 b=1 永不进
+    # 排序，左滑恢复正常回看板不带 b。LOW_CLEARED 是助手已逐条进详情审过、确认非引流
+    # 的低价条目（原短码戳口径废除，统一按恢复正常处理），照常上看板、不带 b。
+    LOW_CLEARED = {'https://www.16688.com.cn/goods/G39414072',
+                   'https://wzyp.cn/item/12bdf4',
+                   'https://wzyp.cn/item/b0lfvi',
+                   'https://wzyp.cn/item/9ehsro',
+                   'https://wzyp.cn/item/bt9cui',
+                   'https://www.16688.com.cn/goods/G79137209'}
     _baitq = []  # 引流待审清单（落盘 data/bait.json，页面引流页签据此渲染，ken 人工终审）
     def _q(gid, o, s):
         d = dict(g=gid, price=o['price'], shop=o['shop'], platform=o['platform'],
-                 stock=o['stock'], title=o['title'], url=o['url'], s=s)
+                 stock=o['stock'], title=o['title'], url=o['url'], s=s, b='0')
         if o.get('minq') and o['minq'] <= 1000:
             d['minq'] = o['minq']
         _baitq.append(d)
@@ -1294,11 +1295,10 @@ def main():
             if _v and _v['a'] == 'bait':
                 continue  # ken 已定性引流：全组拉黑，不进看板也不进待审
             if floor and o['price'] is not None and o['price'] < 1:
-                _stamp = (_v.get('t') if _v and _v['a'] in ('pass', 'fav') else None) or LOW_CHECK.get(_u)
-                if not _stamp:
-                    _q(gid, o, 'pending')  # 标 1 待审：不进看板，进待审清单等 ken 终审
+                _cleared = (_v and _v['a'] in ('pass', 'fav')) or _u in LOW_CLEARED
+                if not _cleared:
+                    _q(gid, o, 'pending')  # b=0 低价引流待审：不进看板，进待审清单等 ken 终审
                     continue
-                o = dict(o, b=_stamp)
             out.append(o)
         return out
     g1, g2, g3 = gpt_groups(rows + [o for o in pai if o['url']])
@@ -1316,7 +1316,7 @@ def main():
     _claude = _apply_floor(claude_group(rows + pai), 'claude')
     _muse = _apply_floor(muse_group(rows + pai), 'muse')
     _vcc = _apply_floor(vcc_group(rows + pai), 'vcc')
-    # 已定点拉黑但池里还在的条目也进待审清单（s=blocked），ken 在页签里改判 pass/fav 即可解开；
+    # 已定点拉黑但池里还在的条目也进待审清单（s=blocked），ken 在页签里左滑恢复正常即可解开；
     # 已被分组清单收录的不重复列，ken 已下过结论的不再列
     _q_seen = {d['url'].split('?')[0] for d in _baitq}
     for o in _pre_block:
