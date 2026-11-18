@@ -1693,12 +1693,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC"
     /* 引流待审（ken 2026-11-18）：行样式与看板明细行完全一致（通栏平铺、发丝分隔），滑动照 Gmail 归档：整行单色动作底随方向切换、图标居中于露出区 */
     .bait-row { position: relative; overflow: hidden; }
     .bait-row + .bait-row { border-top: 1px solid var(--card-border); }
-    .bait-bg { position: absolute; top: 6px; bottom: 6px; left: 8px; right: 8px; border-radius: 999px; background: #ba4549; }
+    .bait-bg { position: absolute; top: 0; bottom: 0; left: 0; width: 0; border-radius: 999px; background: #ba4549; overflow: hidden; }
     .bait-row[data-dir="l"] .bait-bg { background: #2e7d46; }
     .bic { position: absolute; top: 50%; display: none; align-items: center; gap: 6px; color: #fff; font-size: 13px; font-weight: 600; white-space: nowrap; }
     .bic svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .bait-row[data-dir="r"] .bic-l { display: flex; transform: translate(-50%, -50%); }
-    .bait-row[data-dir="l"] .bic-r { display: flex; transform: translate(50%, -50%); }
+    .bait-row[data-dir="r"] .bic-l { display: flex; left: 50%; transform: translate(-50%, -50%); }
+    .bait-row[data-dir="l"] .bic-r { display: flex; right: 50%; transform: translate(50%, -50%); }
     .bait-row.armed .bic { font-size: 14px; }
     .bait-card { position: relative; background: var(--card-bg); touch-action: pan-y; }
     .bait-row.banned .bait-card { opacity: .55; }
@@ -2786,7 +2786,7 @@ window.selBait = false; window.baitCount = 0;
         var btags = '<span class="attr-pill-tag tag-sold">已拉黑</span>'
           + (it.minq ? '<span class="attr-pill-tag tag-amber">' + it.minq + ' 个起购</span>' : '');
         return div + '<div class="bait-row banned" data-banned="1" data-burl="' + esc(it.url) + '">'
-        + '<div class="bait-bg"><span class="bic bic-r">' + PASS_ICON + '<span>恢复</span></span></div>'
+        + '<div class="bait-bg"><span class="bic bic-r">' + PASS_ICON + '</span></div>'
         + '<div class="bait-card"><div class="real-offer-row"><div class="offer-col-left"><span class="offer-price-val">' + fmtP(it.price) + '</span><span class="platform-source-badge">' + esc(it.platform) + '</span></div><div class="offer-col-mid"><div class="offer-item-title"><a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.title) + '</a></div><div class="offer-badges-line">' + btags + '</div><div class="shoprow"><span class="shopname">' + esc(it.shop) + '</span><span class="stk">' + stockTxt(it) + '</span></div></div></div></div>'
         + '</div>';
       }
@@ -2794,8 +2794,8 @@ window.selBait = false; window.baitCount = 0;
         + '<span class="attr-pill-tag tag-gray">' + esc(gname(it.g)) + '</span>'
         + (it.minq ? '<span class="attr-pill-tag tag-amber">' + it.minq + ' 个起购</span>' : '');
       return '<div class="bait-row" data-burl="' + esc(it.url) + '">'
-        + '<div class="bait-bg"><span class="bic bic-l">' + BAIT_ICON + '<span>拉黑</span></span>'
-        + '<span class="bic bic-r">' + PASS_ICON + '<span>恢复</span></span></div>'
+        + '<div class="bait-bg"><span class="bic bic-l">' + BAIT_ICON + '</span>'
+        + '<span class="bic bic-r">' + PASS_ICON + '</span></div>'
         + '<div class="bait-card"><div class="real-offer-row"><div class="offer-col-left"><span class="offer-price-val">' + fmtP(it.price) + '</span><span class="platform-source-badge">' + esc(it.platform) + '</span></div><div class="offer-col-mid"><div class="offer-item-title"><a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.title) + '</a></div><div class="offer-badges-line">' + tags + '</div><div class="shoprow"><span class="shopname">' + esc(it.shop) + '</span><span class="stk">' + stockTxt(it) + '</span></div></div></div></div>'
         + '</div>';
     }).join('');
@@ -2804,6 +2804,8 @@ window.selBait = false; window.baitCount = 0;
   }
   function snapBait(row){
     var card = row.querySelector('.bait-card'); if(!card) return;
+    var bg = row.querySelector('.bait-bg');
+    if(bg){ bg.style.transition = 'width .38s cubic-bezier(.25, 1.35, .35, 1)'; bg.style.width = '0px'; }
     card.style.transition = 'transform .38s cubic-bezier(.25, 1.35, .35, 1)';
     card.style.transform = 'translate3d(0,0,0)';
     row.classList.remove('armed');
@@ -2874,6 +2876,12 @@ window.selBait = false; window.baitCount = 0;
     updateCount();
     showUndoBar(act);
     var card = row.querySelector('.bait-card');
+    var bg = row.querySelector('.bait-bg');
+    if(bg){
+      bg.style.transition = 'width .25s ease';
+      bg.style.left = '0px'; bg.style.right = '0px'; bg.style.width = 'auto';
+      bg.querySelectorAll('.bic').forEach(function(s){ s.style.display = 'none'; });
+    }
     var W = row.offsetWidth || 360;
     card.style.transition = 'transform .28s cubic-bezier(.35,.65,.25,1)';
     card.style.transform = 'translate3d(' + (dir > 0 ? (W + 60) : -(W + 60)) + 'px,0,0)';
@@ -2884,7 +2892,7 @@ window.selBait = false; window.baitCount = 0;
       row.style.overflow = 'hidden';
       requestAnimationFrame(function(){
         row.style.transition = 'height .45s cubic-bezier(.3,1.25,.4,1)';
-        row.style.height = Math.round(H * 1.13) + 'px';
+        row.style.height = Math.round(H * 1.25) + 'px';
       });
       setTimeout(function(){
         if(!row.isConnected) return;
@@ -2923,12 +2931,20 @@ window.selBait = false; window.baitCount = 0;
       if(g.row.dataset.banned === '1' && g.dx > 0) g.dx = 0;
       g.card.style.transform = 'translate3d(' + g.dx + 'px,0,0)';
       g.row.classList.toggle('armed', Math.abs(g.dx) > 40);
-      if(g.dx > 0){
-        g.row.dataset.dir = 'r';
-        var icl = g.row.querySelector('.bic-l'); if(icl) icl.style.left = (g.dx / 2) + 'px';
-      } else if(g.dx < 0){
-        g.row.dataset.dir = 'l';
-        var icr = g.row.querySelector('.bic-r'); if(icr) icr.style.right = (-g.dx / 2) + 'px';
+      var bgx = g.row.querySelector('.bait-bg');
+      if(bgx){
+        bgx.style.transition = 'none';
+        if(g.dx > 0){
+          g.row.dataset.dir = 'r';
+          bgx.style.left = '0px'; bgx.style.right = 'auto';
+          bgx.style.width = Math.max(0, g.dx - 8) + 'px';
+        } else if(g.dx < 0){
+          g.row.dataset.dir = 'l';
+          bgx.style.right = '0px'; bgx.style.left = 'auto';
+          bgx.style.width = Math.max(0, -g.dx - 8) + 'px';
+        } else {
+          bgx.style.width = '0px';
+        }
       }
     }, true);
     function bFinish(e, cancelled){
