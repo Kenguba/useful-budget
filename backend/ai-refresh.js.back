@@ -5,6 +5,12 @@
 //   POST /api/refresh-board  手动全量刷新（5 分钟全局冷却）
 //   GET  /api/stock-check    进站库存现核（60 秒节流，结果存 KV）
 //   GET  /api/stock-status   给 GitHub 轻量任务读访客核对结果
+//   POST /api/review         引流人工终审结论写入（ken 2026-11-18 2b）：须带请求头
+//                            X-Review-Key 与 Worker secret REVIEW_KEY 一致；
+//                            体 {u:商品链接, a:'bait'|'pass'|'fav'|'clear'}，存 KV 键
+//                            review:<链接> = {a, t:核查时刻短码（距 2026-01-01 +08
+//                            整小时数、64 进制，字符表 0-9A-Za-z-_）}；clear 为撤销结论。
+//   GET  /api/reviews        给 refresh.py 读回全部终审结论（公开读：只是商品链接与结论）。
 // 另有 Cron 触发器 * * * * *（每分钟）：scheduled() 检查数据
 // 新鲜度，过期（超 10 分钟）或仓库无数据时触发一次全量拉取。
 // 把副本放在仓库里，是为了迁移时直接拿这一份部署，不用去控制台翻。
@@ -59,7 +65,7 @@ function cors() {
   return {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Review-Key',
   };
 }
 function json(obj, status = 200) {
@@ -381,6 +387,51 @@ async function handleStockStatus(env) {
   return json({ ok: true, lastcheck, board_updated_at: board ? board.updated_at : null, groups });
 }
 
+// 引流终审短码：距 2026-01-01 00:00（+08）的整小时数、64 进制，与 refresh.py 的 b 字段同口径
+function hourStamp() {
+  const base = Date.UTC(2025, 11, 31, 16, 0, 0);
+  const h = Math.max(0, Math.floor((Date.now() - base) / 3600000));
+  const D = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
+  let s = '', n = h;
+  while (n > 0) { s = D[n % 64] + s; n = Math.floor(n / 64); }
+  return s || '0';
+}
+async function handleReviewPost(req, env) {
+  if (!env.REVIEW_KEY || req.headers.get('X-Review-Key') !== env.REVIEW_KEY) {
+    return json({ ok: false, error: 'bad key' }, 401);
+  }
+  let d;
+  try { d = await req.json(); } catch (e) { return json({ ok: false, error: 'bad json' }, 400); }
+  const u = String(d.u || '').split('?')[0];
+  const a = String(d.a || '');
+  if (!/^https?:\/\//.test(u) || !['bait', 'pass', 'fav', 'clear'].includes(a)) {
+    return json({ ok: false, error: 'bad args' }, 400);
+  }
+  const key = 'review:' + u;
+  if (a === 'clear') {
+    await env.REFRESH_KV.delete(key);
+    return json({ ok: true, u, cleared: true });
+  }
+  const v = { a, t: hourStamp() };
+  await env.REFRESH_KV.put(key, JSON.stringify(v));
+  return json({ ok: true, u, ...v });
+}
+async function handleReviewsGet(env) {
+  const out = {};
+  let cursor;
+  do {
+    const page = await env.REFRESH_KV.list({ prefix: 'review:', cursor });
+    for (const k of page.keys) {
+      try {
+        const v = await env.REFRESH_KV.get(k.name);
+        if (v) out[k.name.slice(7)] = JSON.parse(v);
+      } catch (e) {}
+    }
+    cursor = page.list_complete ? null : page.cursor;
+  } while (cursor);
+  return json(out);
+}
+
 export default {
   // 每分钟自愈检查（Cron 触发器 * * * * *）：数据过期/仓库无数据才拉全量
   async scheduled(event, env, ctx) {
@@ -399,6 +450,16 @@ export default {
       if (req.method === 'OPTIONS') return new Response(null, { headers: cors() });
       if (req.method !== 'GET') return json({ ok: false, error: 'method not allowed' }, 405);
       return handleStockCheck(req, env, ctx);
+    }
+    if (url.pathname === '/api/review') {
+      if (req.method === 'OPTIONS') return new Response(null, { headers: cors() });
+      if (req.method !== 'POST') return json({ ok: false, error: 'method not allowed' }, 405);
+      return handleReviewPost(req, env);
+    }
+    if (url.pathname === '/api/reviews') {
+      if (req.method === 'OPTIONS') return new Response(null, { headers: cors() });
+      if (req.method !== 'GET') return json({ ok: false, error: 'method not allowed' }, 405);
+      return handleReviewsGet(env);
     }
     if (url.pathname === '/api/stock-status') {
       if (req.method === 'OPTIONS') return new Response(null, { headers: cors() });
