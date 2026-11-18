@@ -2,7 +2,7 @@
 // 子域名分发服务 site-router 的源码留档副本。
 // 真正运行的是部署在 Cloudflare（站长账号）上的 Worker
 // 「site-router」（版本 b382c868，2026-11-07 更新：新增总汇短路径 HUB_SHORT，主域名短路径回总汇外壳；同日晚再更新：ROUTES 新增 wechat 子域名，仅子域名、不进总汇，HUB_SHORT 未动）；2026-11-10 再更新：新增 2fa 专属规则（/<密钥> 与 /tok/<密钥> 直达 2fa 首页，密钥由页面本地解析），守在通配路由 *.xxxxx.asia/*
-// 2026-11-15 留档更新：ROUTES 新增 blog 子域名（实战笔记博客，仅子域名、不进总汇，HUB_SHORT 未动）；本行待 Cloudflare 部署后生效，部署前 blog 子域名仍 404
+// 2026-11-15 留档更新：ROUTES 新增 blog 子域名（实战笔记博客，仅子域名、不进总汇，HUB_SHORT 未动）；2026-11-18 已部署到 Cloudflare（site-router 版本 f8237c9f），blog.jpedu.asia 实测 200、与 Pages 最新版逐字节一致
 // 2026-11-18 留档更新：ROUTES 新增 pc 子域名（云电脑，仅子域名、不进总汇，HUB_SHORT 未动）；同日已部署到 Cloudflare（site-router 版本 564c9f21），pc.jpedu.asia 实测 200、与 Pages 最新版逐字节一致
 // 与主域名路由 xxxxx.asia/* 上，按子域名前缀把七个项目分发到
 // GitHub Pages 对应目录；主域名（无前缀）分发到仓库根导航页（总体预览页）。
