@@ -27,9 +27,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python3 frontend/pages/skill-board/scripts/refresh.py
-          python3 frontend/pages/ai-shop/scripts/refresh.py
-          if [ "$(TZ=Asia/Shanghai date +%u)" = "1" ] || [ "$(TZ=Asia/Shanghai date +%u)" = "4" ]; then python3 frontend/pages/phone-cloud/scripts/refresh.py || echo "::warning::cloud-phone refresh failed, keeping previous data"; fi
+          python3 frontend/pages/skill-board/scripts/refresh.py & p_skill=$!
+          python3 frontend/pages/ai-shop/scripts/refresh.py & p_ai=$!
+          p_phone=""
+          if [ "$(TZ=Asia/Shanghai date +%u)" = "1" ] || [ "$(TZ=Asia/Shanghai date +%u)" = "4" ]; then
+            python3 frontend/pages/phone-cloud/scripts/refresh.py & p_phone=$!
+          fi
+          rc=0
+          wait "$p_skill" || rc=$?
+          wait "$p_ai" || rc=$?
+          if [ -n "$p_phone" ]; then
+            wait "$p_phone" || echo "::warning::phone-cloud refresh failed, keeping previous data"
+          fi
+          exit "$rc"
       - name: Commit data
         run: |
           git config user.name "skills-board-bot"

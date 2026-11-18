@@ -17,7 +17,9 @@ phone-cloud 价格脚本刷新（零依赖，纯标准库）
 import json
 import re
 import sys
+import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -44,10 +46,27 @@ CHECK_SITES = [
 ]
 
 
-def fetch(url, timeout=30):
-    req = urllib.request.Request(url, headers=HEADERS)
+def fetch(url, timeout=30, method="GET"):
+    req = urllib.request.Request(url, headers=HEADERS, method=method)
     with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return resp.status, resp.read().decode("utf-8", errors="ignore")
+        return resp.status, ("" if method == "HEAD" else resp.read().decode("utf-8", errors="ignore"))
+
+
+def _check_site(item):
+    name, url = item
+    try:
+        st, _ = fetch(url, timeout=15, method="HEAD")
+        return {"name": name, "url": url, "http": st}
+    except urllib.error.HTTPError as e:
+        if e.code in (405, 501):
+            try:
+                st, _ = fetch(url, timeout=15, method="GET")
+                return {"name": name, "url": url, "http": st}
+            except Exception as e2:
+                return {"name": name, "url": url, "http": None, "error": type(e2).__name__}
+        return {"name": name, "url": url, "http": e.code}
+    except Exception as e:
+        return {"name": name, "url": url, "http": None, "error": type(e).__name__}
 
 
 def parse_gangan(html):
@@ -105,15 +124,8 @@ def main():
         print(f"gangan parse failed: {e}", file=sys.stderr)
         return 1
 
-    checks = []
-    for name, url in CHECK_SITES:
-        try:
-            st, _ = fetch(url, timeout=15)
-        except Exception as e:
-            checks.append({"name": name, "url": url, "http": None,
-                           "error": type(e).__name__})
-        else:
-            checks.append({"name": name, "url": url, "http": st})
+    with ThreadPoolExecutor(max_workers=len(CHECK_SITES)) as ex:
+        checks = list(ex.map(_check_site, CHECK_SITES))
 
     data = {
         "updated_at": now,

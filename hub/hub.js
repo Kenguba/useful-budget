@@ -19,7 +19,7 @@
   var BASE = '/hub/modules/';
   /* 资源版本戳：改任何 hub/模块文件，必须同步 bump 这里的 MV 与根 index.html 里 hub.js/hub.css 的 ?v=，
      否则 CDN 对 .js 有 4 小时缓存，会出现新 ui.html 配旧 module.js 的混搭（2026-11-09 实测 ip 模块中招） */
-  var MV = '20261118a';
+  var MV = '20261119a';
   var MODULES = {
     phone: { proj: 'cloud-phone', dir: '/frontend/pages/phone-cloud/', tier: 'light' },
     '2fa': { proj: '2fa-auth',    dir: '/frontend/pages/2fa-auth/',    tier: 'light' },
@@ -141,7 +141,6 @@
       return true;
     }).then(function () {
       st.status = 'ready';
-      var sk = root.querySelector('#hubSkeleton'); if (sk) sk.remove();
       return true;
     }).catch(function (err) {
       st.status = 'idle'; st.promise = null;
@@ -255,12 +254,12 @@
   function warm(name) {
     if (MODULES[name] && MODULES[name].subapp) return; /* pan: any warm boots the app and fires realtime API calls — entry only */
     if (warmed[name] || (state[name] && state[name].status !== 'idle')) return; warmed[name] = 1;
-    fetchText(BASE + name + '/ui.html').catch(function () {});
+    fetchText(BASE + name + '/ui.html?v=' + MV).catch(function () {});
     var pl = document.createElement('link');
-    pl.rel = 'preload'; pl.as = 'style'; pl.href = BASE + name + '/module.css';
+    pl.rel = 'preload'; pl.as = 'style'; pl.href = BASE + name + '/module.css?v=' + MV;
     document.head.appendChild(pl);
     var l = document.createElement('link');
-    l.rel = 'modulepreload'; l.href = BASE + name + '/module.js';
+    l.rel = 'modulepreload'; l.href = BASE + name + '/module.js?v=' + MV;
     document.head.appendChild(l);
   }
   /* light tier: idle SEQUENTIAL preload once the home page is interactive */
@@ -273,11 +272,14 @@
 
   /* focus card = strong intent: warm that module (code+ui only, no data) */
   var stackVp = document.getElementById('stackViewport');
+  var warmTapTimer = 0;
   if (stackVp) stackVp.addEventListener('pointerup', function () {
-    setTimeout(function () {
+    clearTimeout(warmTapTimer);
+    warmTapTimer = setTimeout(function () {
       var cards = stackVp.querySelectorAll('.app-window-card');
       var vr = stackVp.getBoundingClientRect(), cx = vr.left + vr.width / 2, best = null, bd = 1e9;
       cards.forEach(function (c) {
+        if (c.style.display === 'none') return;
         var r = c.getBoundingClientRect(), d = Math.abs(r.left + r.width / 2 - cx);
         if (d < bd) { bd = d; best = c; }
       });
@@ -409,8 +411,7 @@
     var root = state[current].root, tops = [], el = target;
     while (el && el !== view) {
       if (el === root) { tops.push(el.scrollTop); break; }
-      var cs = getComputedStyle(el);
-      if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight + 1) tops.push(el.scrollTop);
+      if (el.scrollHeight > el.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(el).overflowY)) tops.push(el.scrollTop);
       el = el.parentElement;
     }
     return tops.length ? tops : null;
@@ -431,8 +432,7 @@
     var tops = [], el = target, inHome = false;
     while (el && el !== document.body) {
       if (el.id === 'masterPhoneChassis') { inHome = true; break; }
-      var cs = getComputedStyle(el);
-      if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight + 1) tops.push(el.scrollTop);
+      if (el.scrollHeight > el.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(el).overflowY)) tops.push(el.scrollTop);
       el = el.parentElement;
     }
     return inHome ? tops : null;

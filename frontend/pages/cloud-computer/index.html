@@ -238,8 +238,6 @@
   :root[data-theme="dark"] body{background-image:none}
   /* 第 12 套幻彩全息：ai-shop 头部没有光斑流光动画，流光只保留在主题面板的色点预览上；
      头部渐变直接用第 12 套自己的两团淡色（#8FDBB8 / #9CC8F7）走同一条径向渐变 */
-  @keyframes videoHoloBtn{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-  @media(prefers-reduced-motion:reduce){.theme-item .orb.holo{animation:none}}
 
   .kicker{display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:11.5px;letter-spacing:.14em;padding-right:48px}
   .kicker svg{width:16px;height:16px;flex:0 0 auto;color:var(--theme-accent);transition:color .5s ease}
@@ -289,7 +287,7 @@
   }
   .theme-item:active{border-radius:14px}
   .theme-item .orb{width:22px;height:22px;border-radius:50%;flex:0 0 auto;background:linear-gradient(135deg,var(--orb1) 0%,var(--orb2) 65%,var(--rf) 100%);box-shadow:inset 0 1px 3px rgba(255,255,255,.6),0 2px 5px rgba(15,23,42,.1)}
-  .theme-item .orb.holo{background:linear-gradient(135deg,#B2E2B4 0%,#8FDBB8 35%,#92C6F2 72%,#B9CFF8 100%);background-size:220% 220%;animation:videoHoloBtn 3.2s ease infinite}
+  .theme-item .orb.holo{background:linear-gradient(135deg,#B2E2B4 0%,#8FDBB8 35%,#92C6F2 72%,#B9CFF8 100%)}
   .theme-item.on,.theme-item.hl{background:var(--theme-tag-bg);border-color:var(--theme-accent);transform:scale(1.04);box-shadow:0 6px 16px -4px var(--search-glow)}
   @media(prefers-reduced-motion:reduce){.ic-wrap,.theme-panel,.theme-item{transition:none}}
 
@@ -2339,8 +2337,9 @@
       backdrop.classList.add('open');
       btn.setAttribute('aria-expanded', 'true');
     }
-    window.addEventListener('resize', function(){ if (panelOpen) placePanel(); });
-    window.addEventListener('scroll', function(){ if (panelOpen) placePanel(); }, true);
+    var panelScrollRaf = 0;
+    window.addEventListener('resize', function(){ if (panelOpen) placePanel(); }, { passive: true });
+    window.addEventListener('scroll', function(){ if (!panelOpen || panelScrollRaf) return; panelScrollRaf = requestAnimationFrame(function(){ panelScrollRaf = 0; if (panelOpen) placePanel(); }); }, true);
     function closePanel(){
       if (panelOpen) unlockBgScroll();
       panelOpen = false;
@@ -2860,8 +2859,9 @@
     }
     specBackdrop.addEventListener('click', closeSpecPanel);
     document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && specPanelOpen) closeSpecPanel(); });
-    window.addEventListener('resize', function(){ if (specPanelOpen) placeSpecPanel(); });
-    window.addEventListener('scroll', function(){ if (specPanelOpen) placeSpecPanel(); }, true);
+    var specScrollRaf = 0;
+    window.addEventListener('resize', function(){ if (specPanelOpen) placeSpecPanel(); }, { passive: true });
+    window.addEventListener('scroll', function(){ if (!specPanelOpen || specScrollRaf) return; specScrollRaf = requestAnimationFrame(function(){ specScrollRaf = 0; if (specPanelOpen) placeSpecPanel(); }); }, true);
 
 
     /* ---------- 规格区手势：双击才轮换这张卡（两次点击合为一次切换，不各切一次）；长按 0.34 秒弹面板，滑动当场换、松手关 ----------
@@ -3118,19 +3118,30 @@
     var PC_PUNCT = /[\s·•・.,，。、;；:：!！?？%‰'"‘’“”'()（）\[\]【】{}<>《》〈〉「」『』\-—–―_~`@#^&*+=|\\\/]/;
     function pcLineInfo(el){
       if (!el || !el.firstChild || !el.getClientRects().length) return null;
-      var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
       var range = document.createRange();
-      var lines = 0, top = null, last = 0, node, i, rects;
-      while ((node = walker.nextNode())) {
-        for (i = 0; i < node.nodeValue.length; i++) {
-          range.setStart(node, i); range.setEnd(node, i + 1);
-          rects = range.getClientRects();
+      range.selectNodeContents(el);
+      var allRects = range.getClientRects();
+      if (allRects.length <= 1) return allRects.length ? { lines: 1, last: el.textContent.length } : null;
+      var lines = 1, prevTop = allRects[0].top;
+      for (var r = 1; r < allRects.length; r++) {
+        if (Math.abs(allRects[r].top - prevTop) > 2) { lines++; prevTop = allRects[r].top; }
+      }
+      if (lines < 2) return { lines: 1, last: el.textContent.length };
+      var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      var nodes = [], n;
+      while ((n = walker.nextNode())) nodes.push(n);
+      var lastTop = allRects[allRects.length - 1].top, last = 0;
+      for (var ni = nodes.length - 1; ni >= 0; ni--) {
+        var nd = nodes[ni], txt = nd.nodeValue;
+        for (var i = txt.length - 1; i >= 0; i--) {
+          range.setStart(nd, i); range.setEnd(nd, i + 1);
+          var rects = range.getClientRects();
           if (!rects.length) continue;
-          if (top === null || Math.abs(rects[0].top - top) > 2) { lines++; top = rects[0].top; last = 0; }
-          if (!PC_PUNCT.test(node.nodeValue.charAt(i))) last++;
+          if (Math.abs(rects[0].top - lastTop) > 2) return { lines: lines, last: last };
+          if (!PC_PUNCT.test(txt.charAt(i))) last++;
         }
       }
-      return lines ? { lines: lines, last: last } : null;
+      return { lines: lines, last: last };
     }
     function pcFixOneOrphan(el){
       var info = pcLineInfo(el);
@@ -3422,8 +3433,9 @@
     if (gridBtn) gridBtn.addEventListener('click', function(){ if (gridPanelOpen) closeGridPanel(); else openGridPanel(); });
     gridBackdrop.addEventListener('click', closeGridPanel);
     document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && gridPanelOpen) closeGridPanel(); });
-    window.addEventListener('resize', function(){ if (gridPanelOpen) placeGridPanel(); });
-    window.addEventListener('scroll', function(){ if (gridPanelOpen) placeGridPanel(); }, true);
+    var gridScrollRaf = 0;
+    window.addEventListener('resize', function(){ if (gridPanelOpen) placeGridPanel(); }, { passive: true });
+    window.addEventListener('scroll', function(){ if (!gridPanelOpen || gridScrollRaf) return; gridScrollRaf = requestAnimationFrame(function(){ gridScrollRaf = 0; if (gridPanelOpen) placeGridPanel(); }); }, true);
 
     /* 智能模式随屏幕走：存的始终是「智能」本身，resize / 转屏时用 rAF 合并重算，
        算出的规格没变就不碰布局；手动选的固定规格不进这个通道、不跟着变 */
@@ -4473,7 +4485,7 @@
         return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
       }
 
-      window.addEventListener("touchstart", (e) => {
+      function onMxTouchStart(e) {
         if (MX_ROOT.hidden) return;
         if (e.touches.length === 2) {
           e.preventDefault();
@@ -4495,9 +4507,9 @@
           pinchOriginX = r.left + r.width * 0.5 - state.panX;
           pinchOriginY = r.top - state.panY;
         }
-      }, { passive: false });
+      }
 
-      window.addEventListener("touchmove", (e) => {
+      function onMxTouchMovePinch(e) {
         if (!isPinching || e.touches.length < 2) return;
         e.preventDefault();
 
@@ -4516,7 +4528,7 @@
         state.panY = curMidY - pinchOriginY - (pinchStartMidY - pinchOriginY - pinchStartPanY) * ratio;
 
         scheduleStageTransform();
-      }, { passive: false });
+      }
 
       function endTouchPinch(e) {
         if (!isPinching) return;
@@ -4529,23 +4541,20 @@
         }
       }
 
-      window.addEventListener("touchend", endTouchPinch, { passive: true });
-      window.addEventListener("touchcancel", endTouchPinch, { passive: true });
-
       // 拖拽进行中（节点拖动 / 空白平移 / 框选 / 捏合）一律拦下 touchmove，
       // 杜绝拖拽触发浏览器下拉刷新或页面滚动、重载；手势结束不重置任何状态
-      document.addEventListener("touchmove", (e) => {
+      function onMxDocTouchMove(e) {
         if (MX_ROOT.hidden) return;
         if (dragType || isPinching) {
           if (e.cancelable) e.preventDefault();
         }
-      }, { passive: false });
+      }
 
       // 滚轮缩放（围绕光标平滑缩放）：触控板双指捏合走 wheel + ctrlKey / metaKey；
       // 桌面鼠标滚轮（无修饰键）只在矩阵画布上生效，滚轮停下后同样写入持久化存档
       let wheelEndTimer = 0;
       let wheelOriginCache = null;
-      window.addEventListener("wheel", (e) => {
+      function onMxWheel(e) {
         if (MX_ROOT.hidden) return;
         const isPinchGesture = !!(e.ctrlKey || e.metaKey);
         if (!isPinchGesture && !(e.target instanceof Element && stageEl.contains(e.target))) return;
@@ -4583,7 +4592,29 @@
           syncBodyAutoHeight();
           saveMxLayout();
         }, 120);
-      }, { passive: false });
+      }
+
+      let mxGesturesAttached = false;
+      window.__aiYunSetMatrixGestures = function(on) {
+        if (on && !mxGesturesAttached) {
+          mxGesturesAttached = true;
+          window.addEventListener("touchstart", onMxTouchStart, { passive: false });
+          window.addEventListener("touchmove", onMxTouchMovePinch, { passive: false });
+          window.addEventListener("touchend", endTouchPinch, { passive: true });
+          window.addEventListener("touchcancel", endTouchPinch, { passive: true });
+          document.addEventListener("touchmove", onMxDocTouchMove, { passive: false });
+          window.addEventListener("wheel", onMxWheel, { passive: false });
+        } else if (!on && mxGesturesAttached) {
+          mxGesturesAttached = false;
+          window.removeEventListener("touchstart", onMxTouchStart, { passive: false });
+          window.removeEventListener("touchmove", onMxTouchMovePinch, { passive: false });
+          window.removeEventListener("touchend", endTouchPinch, { passive: true });
+          window.removeEventListener("touchcancel", endTouchPinch, { passive: true });
+          document.removeEventListener("touchmove", onMxDocTouchMove, { passive: false });
+          window.removeEventListener("wheel", onMxWheel, { passive: false });
+        }
+      };
+      if (!MX_ROOT.hidden) window.__aiYunSetMatrixGestures(true);
 
       // 单指/鼠标 Pointer 交互
       stageEl.addEventListener("pointerdown", (e) => {
@@ -4993,10 +5024,12 @@
         setMatrixScrollLock(true);
         viewList.hidden = true;
         viewMatrix.hidden = false;
+        if (typeof window.__aiYunSetMatrixGestures === 'function') window.__aiYunSetMatrixGestures(true);
         if (restoreScroll) window.scrollTo(0, savedY.matrix || 0);
         if (typeof refreshLayoutCacheAndDraw === 'function') refreshLayoutCacheAndDraw();
       } else {
         if (typeof window.__aiYunThemeColor === 'function' && typeof window.__aiYunMainDark === 'function') window.__aiYunThemeColor(window.__aiYunMainDark());
+        if (typeof window.__aiYunSetMatrixGestures === 'function') window.__aiYunSetMatrixGestures(false);
         setMatrixScrollLock(false);
         viewMatrix.hidden = true;
         viewList.hidden = false;

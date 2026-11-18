@@ -14,6 +14,7 @@ import json
 import re
 import sys
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 BASE = "https://designeer.xyz"
@@ -71,13 +72,16 @@ def fetch_finds():
 
 def main():
     data = {"source": "Designeer", "source_url": BASE, "collections": {}}
+    with ThreadPoolExecutor(max_workers=5) as ex:
+        col_futs = {name: ex.submit(fetch_collection, name) for name in COLLECTIONS}
+        finds_fut = ex.submit(fetch_finds)
     for name in COLLECTIONS:
-        items = fetch_collection(name)
+        items = col_futs[name].result()
         if len(items) != EXPECTED[name]:
             print(f"[abort] {name} 期望 {EXPECTED[name]} 条，实际 {len(items)} 条，不覆盖旧数据", file=sys.stderr)
             return 1
         data["collections"][name] = items
-    finds = fetch_finds()
+    finds = finds_fut.result()
     if len(finds) != EXPECTED["finds"]:
         print(f"[abort] finds 期望 {EXPECTED['finds']} 条，实际 {len(finds)} 条，不覆盖旧数据", file=sys.stderr)
         return 1

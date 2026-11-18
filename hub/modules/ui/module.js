@@ -177,6 +177,7 @@ function __restoreBridge() {
   }
 }
 const __bridgeFns = {};
+let __rebindPosters = null, __disconnectPosterIO = null;
 
 function __boot() {
   const document = __docProxy;
@@ -569,8 +570,9 @@ function cardHtml(it){
     "</div>" +
     '<div class="card-tags-row">' + chips + "</div></a>";
 }
+var __lastFindsSig = "";
 function renderCollection(key){
-  if (!CATALOG[key]) { var g0 = document.querySelector('[data-grid="' + key + '"]'); if (g0) g0.innerHTML = ""; var b0 = document.querySelector('[data-more="' + key + '"]'); if (b0) b0.style.display = "none"; var s0 = document.getElementById(key); if (s0) s0.querySelector("[data-empty]").style.display = "none"; return; }
+  if (!CATALOG[key]) { var g0 = document.querySelector('[data-grid="' + key + '"]'); if (g0) g0.innerHTML = ""; var b0 = document.querySelector('[data-more="' + key + '"]'); if (b0) b0.style.display = "none"; var s0 = document.getElementById(key); if (s0) s0.querySelector("[data-empty]").style.display = "none"; return 0; }
   var grid = document.querySelector('[data-grid="' + key + '"]');
   var items = CATALOG[key].filter(matches);
   var showAll = state.expanded[key] || !!state.q || state.tag !== "all";
@@ -583,10 +585,14 @@ function renderCollection(key){
   } else { btn.style.display = "none"; }
   var sec = document.getElementById(key);
   sec.querySelector("[data-empty]").style.display = items.length ? "none" : "block";
+  return items.length;
 }
 function renderFinds(){
-  if (!FINDS) { document.getElementById("findsGrid").innerHTML = ""; document.getElementById("finds").querySelector("[data-empty]").style.display = "none"; return; }
   var grid = document.getElementById("findsGrid");
+  if (!FINDS) { __lastFindsSig = ""; grid.innerHTML = ""; document.getElementById("finds").querySelector("[data-empty]").style.display = "none"; return; }
+  var sig = state.tag + "|" + state.q + "|" + FINDS.length;
+  if (sig === __lastFindsSig) return;
+  __lastFindsSig = sig;
   var items = FINDS.filter(function(f){
     if (state.tag !== "all") return false;
     if (!state.q) return true;
@@ -595,7 +601,7 @@ function renderFinds(){
   grid.innerHTML = items.map(function(f){
     var ratio = (f.w && f.h) ? ' style="aspect-ratio:' + f.w + "/" + f.h + '"' : "";
     return '<article class="find-poster-card">' +
-      '<img class="poster-img" data-src="' + esc(f.local) + '" alt="Find by ' + esc(f.name) + '"' + ratio + ">" +
+      '<img class="poster-img" decoding="async" data-src="' + esc(f.local) + '" alt="Find by ' + esc(f.name) + '"' + ratio + ">" +
       '<div class="poster-author-bar"><span class="poster-author-name">' + esc(f.name) + "</span>" +
       (f.handle ? '<span class="poster-author-handle">@' + esc(f.handle) + "</span>" : "") + "</div></article>";
   }).join("");
@@ -603,12 +609,11 @@ function renderFinds(){
   document.getElementById("finds").querySelector("[data-empty]").style.display = items.length ? "none" : "block";
 }
 function renderAll(){
-  COLLECTIONS.forEach(renderCollection);
+  var n = 0;
+  COLLECTIONS.forEach(function(k){ n += renderCollection(k); });
   renderFinds();
   var note = document.getElementById("searchNote");
   if (state.q) {
-    var n = 0;
-    COLLECTIONS.forEach(function(k){ n += (CATALOG[k] || []).filter(matches).length; });
     note.style.display = "block";
     note.textContent = zh() ? "共 " + n + " 条目录条目匹配「" + state.q + "」" : n + " catalogue entries match \u201C" + state.q + "\u201D";
   } else { note.style.display = "none"; }
@@ -793,11 +798,7 @@ function ensureAllData(){
   return Promise.all(COLLECTIONS.map(loadCollection).concat([loadFinds()]));
 }
 function warmRemaining(){
-  var chain = Promise.resolve();
-  COLLECTIONS.forEach(function(k){
-    chain = chain.then(function(){ return loadCollection(k); });
-  });
-  return chain;
+  return Promise.all(COLLECTIONS.map(loadCollection).concat([loadFinds()]));
 }
 
 var __posterIO = null;
@@ -816,6 +817,13 @@ function bindPosterLazy(scope){
   }
   imgs.forEach(function(im){ __posterIO.observe(im); });
 }
+__rebindPosters = function(){
+  var fg = document.getElementById("findsGrid");
+  if (fg) bindPosterLazy(fg);
+};
+__disconnectPosterIO = function(){
+  if (__posterIO) { __posterIO.disconnect(); __posterIO = null; }
+};
 
 /* ================= 初始化 ================= */
 var PREFS = loadPrefs();
@@ -827,7 +835,7 @@ applyLang();
 renderAll();
 var initialView = viewFromHash();
 showView(initialView, initialView !== "home");
-loadFinds();
+if (initialView === "home" || initialView === "finds") loadFinds();
 loadCollection(COLLECTIONS.indexOf(initialView) !== -1 ? initialView : "inspiration");
 setTimeout(warmRemaining, 900);
 
@@ -841,7 +849,10 @@ export function mount(root, ctx) {
   __root = root; __ctx = ctx || {};
   if (__ctx.standalone) __standalone = true;
   if (!__booted) { __booted = true; __boot(); }
-  else __resumeAll();
+  else {
+    __resumeAll();
+    if (__rebindPosters) __rebindPosters();
+  }
   __applyBridge();
   __startRelWatch();
   return Promise.resolve(true);
@@ -849,6 +860,7 @@ export function mount(root, ctx) {
 export function unmount() {
   __fetchSuspended = true;
   __abortFetchSession();
+  if (__disconnectPosterIO) __disconnectPosterIO();
   __suspendAll();
   __restoreBridge();
   __stopRelWatch();

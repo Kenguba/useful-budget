@@ -603,7 +603,7 @@ def fetch_16688_shop(code, name):
                               category='', ts=int(time.time() * 1000),
                               minq=lq if isinstance(lq, int) and lq > 1 else None))
             new += 1
-        if new == 0:
+        if new == 0 or len(lst) < 200:
             break
     return items
 
@@ -1070,37 +1070,52 @@ def main():
             _direct_box['e'] = e
     _crawl_thread = threading.Thread(target=_crawl, daemon=True)
     _crawl_thread.start()
-    # aicdks / catfk 直拉同样放后台线程并行（预算见 DIRECT_EXTRA_BUDGET）
+    # aicdks / catfk 直拉并发启动（预算见 DIRECT_EXTRA_BUDGET）
     _extra_box = {}
     def _crawl_extra():
-        r = {}
-        try:
-            r['aicdks'] = (fetch_aicdks_direct(), 1)
-        except Exception as e:
-            print(f'aicdks crawl error: {e}', file=sys.stderr)
-            r['aicdks'] = ({}, 0)
-        try:
-            r['catfk'] = fetch_catfk_direct(_t0 + DIRECT_EXTRA_BUDGET)
-        except Exception as e:
-            print(f'catfk crawl error: {e}', file=sys.stderr)
-            r['catfk'] = ({}, 0)
-        _extra_box['r'] = r
+        from concurrent.futures import ThreadPoolExecutor as _TPE
+        def _run_aicdks():
+            try:
+                return (fetch_aicdks_direct(), 1)
+            except Exception as e:
+                print(f'aicdks crawl error: {e}', file=sys.stderr)
+                return ({}, 0)
+        def _run_catfk():
+            try:
+                return fetch_catfk_direct(_t0 + DIRECT_EXTRA_BUDGET)
+            except Exception as e:
+                print(f'catfk crawl error: {e}', file=sys.stderr)
+                return ({}, 0)
+        with _TPE(max_workers=2) as _ex:
+            fa = _ex.submit(_run_aicdks)
+            fc = _ex.submit(_run_catfk)
+            _extra_box['r'] = {'aicdks': fa.result(), 'catfk': fc.result()}
     _extra_thread = threading.Thread(target=_crawl_extra, daemon=True)
     _extra_thread.start()
     all_offers = {}
-    for name, url in (('aiprice', 'https://aiprice.club/api/shop-products.json'),
-                      ('cardnav', 'https://cardnav.xyz/api/shop-products.json')):
+    def _load_src(item):
+        name, url = item
         try:
-            rows = load_shop_products(url)
-            print(f'{name}: {len(rows)} products', file=sys.stderr)
-            for o in rows:
-                key = urllib.parse.unquote(o['url'].split('?')[0])
-                cur = all_offers.get(key)
-                if cur is None or (o['ts'] or 0) > (cur['ts'] or 0):
-                    o['url'] = o['url'].split('?')[0]
-                    all_offers[key] = o
+            return name, load_shop_products(url), None
         except Exception as e:
-            print(f'{name} failed: {e}', file=sys.stderr)
+            return name, [], e
+    from concurrent.futures import ThreadPoolExecutor as _TPE0
+    with _TPE0(max_workers=2) as _ex0:
+        _src_results = list(_ex0.map(_load_src, (
+            ('aiprice', 'https://aiprice.club/api/shop-products.json'),
+            ('cardnav', 'https://cardnav.xyz/api/shop-products.json'),
+        )))
+    for name, rows, err in _src_results:
+        if err:
+            print(f'{name} failed: {err}', file=sys.stderr)
+            continue
+        print(f'{name}: {len(rows)} products', file=sys.stderr)
+        for o in rows:
+            key = urllib.parse.unquote(o['url'].split('?')[0])
+            cur = all_offers.get(key)
+            if cur is None or (o['ts'] or 0) > (cur['ts'] or 0):
+                o['url'] = o['url'].split('?')[0]
+                all_offers[key] = o
     # 16688 直拉覆盖（ken 2026-11-05）：本轮新拉先并入缓存，再用可用缓存覆盖聚合——
     # 同链接以一手价为准（但缓存比聚合快照旧 30 分钟以上的不覆盖），库存直拉无效时保留聚合值
     _dead_urls = set()  # 已核实失效链接（direct stock=null 标记，下方合并段计算）
@@ -1256,12 +1271,13 @@ def main():
     pai = []
     _slugs = priceai_slugs()
     from concurrent.futures import ThreadPoolExecutor as _TPE2
-    with _TPE2(max_workers=6) as _ex2:
+    with _TPE2(max_workers=7) as _ex2:
+        _abj_fut = _ex2.submit(fetch_aibijia)
         _pai_rows = list(_ex2.map(fetch_priceai, _slugs))
+        _abj = _abj_fut.result()
     for slug, r in zip(_slugs, _pai_rows):
         print(f'priceai {slug}: {len(r)} rows', file=sys.stderr)
         pai += [o for o in r if o['url'] not in _BLOCKED_EFF]
-    _abj = fetch_aibijia()
     print(f'aibijia: {len(_abj)} rows', file=sys.stderr)
     pai += [o for o in _abj if o['url'] not in _BLOCKED_EFF]
 

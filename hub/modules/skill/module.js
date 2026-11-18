@@ -27,10 +27,31 @@ function __resumeAll() { for (const e of __listeners) if (!e.active) { e.t.addEv
 
 /* ---- fetch shadow: relative URLs resolve against the site's real dir ---- */
 const __realFetch = window.fetch.bind(window);
+const __fetchSession = new Set();
+let __fetchSuspended = true;
+function __abortFetchSession() {
+  for (const ctl of Array.from(__fetchSession)) { try { ctl.abort(); } catch (e) {} }
+  __fetchSession.clear();
+}
 function __fetch(u, o) {
+  if (__fetchSuspended) return Promise.reject(new DOMException('hub: module suspended', 'AbortError'));
   if (typeof u === 'string' && u.charAt(0) !== '/' && !/^[a-z][a-z0-9+.-]*:/i.test(u))
     u = new URL(u, location.origin + __base).href;
-  return __realFetch(u, o);
+  const ctl = new AbortController();
+  const opts = Object.assign({}, o || {});
+  if (opts.signal) {
+    const ext = opts.signal;
+    if (ext.aborted) ctl.abort();
+    else ext.addEventListener('abort', () => ctl.abort(), { once: true });
+  }
+  opts.signal = ctl.signal;
+  __fetchSession.add(ctl);
+  let p;
+  try { p = __realFetch(u, opts); }
+  catch (e) { __fetchSession.delete(ctl); throw e; }
+  const settle = () => __fetchSession.delete(ctl);
+  if (p && typeof p.then === 'function') p.then(settle, settle);
+  return p;
 }
 
 /* ---- scoped document: root-first lookups; documentElement/body are the
@@ -45,7 +66,11 @@ const __docProxy = new Proxy(document, {
   get(t, k) {
     if (k === 'documentElement' || k === 'body') return __root || t.documentElement;
     if (k === 'head') return t.head;
-    if (k === 'getElementById') return id => (__root && __root.querySelector('#' + CSS.escape(String(id)))) || t.getElementById(id);
+    if (k === 'getElementById') return id => {
+      if (id === '' || id === null || id === undefined) return null;
+      if (__root) { try { const el = __root.querySelector('#' + CSS.escape(String(id))); if (el) return el; } catch (e) {} }
+      return t.getElementById(id);
+    };
     if (k === 'querySelector') return sel => __rootQS(sel) || t.querySelector(sel);
     if (k === 'querySelectorAll') return sel => {
       const s = String(sel).trim();
@@ -125,7 +150,16 @@ const compact=n=>n==null?"—":(n>=1e6?(n/1e6).toFixed(2)+"M":n>=1e3?(n/1e3).toF
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1600)}
 function doCopy(text){const done=()=>showToast(STR[LANG].copied);const fb=()=>{const a=document.createElement("textarea");a.value=text;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy");done()}catch(e){showToast(STR[LANG].copyFail)}a.remove()};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(fb)}else fb()}
-function fitCmds(){document.querySelectorAll("code.cmd").forEach(el=>{let s=12;el.style.fontSize=s+"px";while(el.scrollWidth>el.clientWidth&&s>10){s-=0.5;el.style.fontSize=s+"px"}})}
+function fitCmds(){
+  const els=[...document.querySelectorAll("code.cmd")];
+  for(const el of els) el.style.fontSize="12px";
+  const adj=[];
+  for(const el of els){
+    const cw=el.clientWidth, sw=el.scrollWidth;
+    if(cw>0&&sw>cw) adj.push({el,s:Math.max(10,Math.floor((12*cw/sw)*2)/2)});
+  }
+  for(const a of adj) a.el.style.fontSize=a.s+"px";
+}
 let _rzT;window.addEventListener("resize",()=>{clearTimeout(_rzT);_rzT=setTimeout(fitCmds,150)});
 
 /* ================= 12 套主题（全套搬入新稿，不缩水） ================= */
@@ -513,8 +547,9 @@ function bindGroups(root){
   });
 }
 function render(b){
+  const dateChanged=!board||board.date!==b.date;
   board=b;
-  HIST=null; HIST_KEY="";
+  if(dateChanged){ HIST=null; HIST_KEY=""; }
   const s=b.stats, tt=T();
   document.getElementById("statSummary").innerHTML=
     `<div class="stat-cell"><span class="stat-cell-val">${esc(s.trackedSkills)}</span><span class="stat-cell-label">${tt.statTracked}</span><span class="stat-cell-sub">${esc(tt.asOf(b.date))}</span></div>`+
@@ -710,11 +745,11 @@ function renderStatsViz(){
   if(risingTop) rows.push({dim:tt.dims[2],name:risingTop.skill,plat:risingTop.platform||"",sub:tt.installsSub(risingTop.ageDays),main:risingTop.heat!=null?tt.heat(risingTop.heat):fmt(risingTop.value),series:HIST?HIST.series.rising:null,color:"#8B5CF6",sec:"sec-04",grp:"g-rising"});
   if(repoGainTop) rows.push({dim:tt.dims[3],name:repoGainTop.repo,plat:"GitHub",sub:tt.totalStars(fmt(repoGainTop.stars)),main:`+${fmt(repoGainTop.starsDelta1d)} ${tt.perDay}`,series:HIST?HIST.series.repoGain:null,color:"#F59E0B",sec:"sec-01",grp:"g-repos"});
   const tableHtml=`<table class="stat-data-table"><thead><tr><th>${esc(tt.tableHeads[0])}</th><th>${esc(tt.tableHeads[1])}</th><th>${esc(tt.tableHeads[2])}</th></tr></thead><tbody>
-    ${rows.map(r=>`<tr data-jump-sec="${r.sec}" data-jump-group="${r.grp}">
+    ${rows.map(r=>{const sp=r.series?sparkPoints(r.series,60,22,2):"";return `<tr data-jump-sec="${r.sec}" data-jump-group="${r.grp}">
       <td><div style="display:flex;align-items:center;gap:5px;min-width:0;"><span style="font-weight:800;font-family:ui-monospace,monospace;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;">${esc(r.name)}</span><span class="dim-tag">${esc(r.dim)}</span></div><div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;">${esc(r.sub)}</div></td>
-      <td>${r.series&&sparkPoints(r.series,60,22,2)?`<svg class="mini-spark-svg" viewBox="0 0 60 22"><polyline fill="none" stroke="${r.color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" points="${sparkPoints(r.series,60,22,2)}"/></svg>`:""}</td>
+      <td>${sp?`<svg class="mini-spark-svg" viewBox="0 0 60 22"><polyline fill="none" stroke="${r.color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" points="${sp}"/></svg>`:""}</td>
       <td style="font-weight:800;color:var(--theme-accent);font-family:ui-monospace,monospace;">${esc(r.main)}</td>
-    </tr>`).join("")}
+    </tr>`;}).join("")}
     </tbody></table>`;
   if(VIZ==="bar") container.innerHTML=barHtml;
   else if(VIZ==="line") container.innerHTML=(lineHtml||"")+tableHtml;
@@ -734,7 +769,8 @@ async function loadHistory(endDate){
     const idx=DATES.indexOf(endDate);
     const dates=(idx>=0?DATES.slice(idx,idx+7):[endDate]).slice().reverse();
     const boards=await Promise.all(dates.map(async d=>{
-      try{const r=await fetch(`data/boards/${d}.json?t=`+Date.now()); if(r.ok) return await r.json()}catch(e){}
+      if(board&&d===board.date) return board;
+      try{const r=await fetch(`data/boards/${d}.json`); if(r.ok) return await r.json()}catch(e){}
       return null;
     }));
     if(!board||board.date!==endDate) return;
@@ -855,7 +891,8 @@ document.querySelectorAll(".sec-sq-btn").forEach(c=>{
 
 /* ================= 搜索 ================= */
 const qEl=document.getElementById("q"), clearBtn=document.getElementById("btnClearSearch");
-qEl.addEventListener("input",()=>{clearBtn.classList.toggle("visible",qEl.value.trim().length>0); applyFilter()});
+let qDebounce=0;
+qEl.addEventListener("input",()=>{clearBtn.classList.toggle("visible",qEl.value.trim().length>0); clearTimeout(qDebounce); qDebounce=setTimeout(applyFilter,120)});
 clearBtn.addEventListener("click",()=>{qEl.value="";clearBtn.classList.remove("visible");applyFilter()});
 document.getElementById("btnResetSearch").addEventListener("click",()=>{qEl.value="";clearBtn.classList.remove("visible");applyFilter();qEl.focus()});
 document.getElementById("btnTriggerSearch").addEventListener("click",()=>{
@@ -947,7 +984,7 @@ function unstashDockFromEdge(){
   saveDockState(applyDockState(targetLeft,curTop,null,true));
 }
 (function initDraggableDock(){
-  let isDragging=false,startX=0,startY=0,initialLeft=0,initialTop=0,currentDragLeft=0,currentDragTop=0,lastClientX=0,lastMoveTime=0,velocityX=0,pendingStashSide=null;
+  let isDragging=false,startX=0,startY=0,initialLeft=0,initialTop=0,currentDragLeft=0,currentDragTop=0,lastClientX=0,lastMoveTime=0,velocityX=0,pendingStashSide=null,dockRaf=0;
   floatingDockEl.addEventListener("pointerdown",e=>{
     if(e.button&&e.button!==0) return;
     isDragging=true; dockWasDragged=false; pendingStashSide=null;
@@ -968,10 +1005,10 @@ function unstashDockFromEdge(){
     if(!dockWasDragged) return;
     if(dockStashedSide==="right"){
       if(dx<-14){ dockStashedSide=null; floatingDockEl.classList.remove("stashed-right"); const w=measureExpandedWidth(); initialLeft=e.clientX-w*0.65-dx }
-      else{ const h=floatingDockEl.offsetHeight||46; currentDragTop=Math.min(Math.max(10,initialTop+dy),window.innerHeight-h-10); floatingDockEl.style.top=Math.round(currentDragTop)+"px"; return }
+      else{ const h=floatingDockEl.offsetHeight||46; currentDragTop=Math.min(Math.max(10,initialTop+dy),window.innerHeight-h-10); if(!dockRaf) dockRaf=requestAnimationFrame(()=>{ dockRaf=0; floatingDockEl.style.top=Math.round(currentDragTop)+"px"; }); return }
     }else if(dockStashedSide==="left"){
       if(dx>14){ dockStashedSide=null; floatingDockEl.classList.remove("stashed-left"); const w=measureExpandedWidth(); initialLeft=e.clientX-w*0.35-dx }
-      else{ const h=floatingDockEl.offsetHeight||46; currentDragTop=Math.min(Math.max(10,initialTop+dy),window.innerHeight-h-10); floatingDockEl.style.top=Math.round(currentDragTop)+"px"; return }
+      else{ const h=floatingDockEl.offsetHeight||46; currentDragTop=Math.min(Math.max(10,initialTop+dy),window.innerHeight-h-10); if(!dockRaf) dockRaf=requestAnimationFrame(()=>{ dockRaf=0; floatingDockEl.style.top=Math.round(currentDragTop)+"px"; }); return }
     }
     const w=cachedExpandedWidth, h=floatingDockEl.offsetHeight||38;
     const rawLeft=initialLeft+dx, rawTop=initialTop+dy;
@@ -983,11 +1020,14 @@ function unstashDockFromEdge(){
     if(currentDragLeft>=maxInScreen+16){ pendingStashSide="right"; floatingDockEl.classList.add("edge-ready") }
     else if(currentDragLeft<=-16){ pendingStashSide="left"; floatingDockEl.classList.add("edge-ready") }
     else{ pendingStashSide=null; floatingDockEl.classList.remove("edge-ready") }
-    floatingDockEl.style.left=Math.round(currentDragLeft)+"px"; floatingDockEl.style.top=Math.round(currentDragTop)+"px"; floatingDockEl.style.right="auto"; floatingDockEl.style.bottom="auto";
+    if(!dockRaf) dockRaf=requestAnimationFrame(()=>{
+      dockRaf=0;
+      floatingDockEl.style.left=Math.round(currentDragLeft)+"px"; floatingDockEl.style.top=Math.round(currentDragTop)+"px"; floatingDockEl.style.right="auto"; floatingDockEl.style.bottom="auto";
+    });
   });
   const endDockDrag=e=>{
     if(!isDragging) return;
-    isDragging=false; floatingDockEl.classList.remove("dragging","edge-ready");
+    isDragging=false; if(dockRaf){cancelAnimationFrame(dockRaf);dockRaf=0;} floatingDockEl.classList.remove("dragging","edge-ready");
     try{floatingDockEl.releasePointerCapture(e.pointerId)}catch(_){}
     if(dockWasDragged){
       const w=cachedExpandedWidth, maxInScreen=window.innerWidth-w;
@@ -1053,6 +1093,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => naviga
 }
 
 export function mount(root, ctx) {
+  __fetchSuspended = false;
   __root = root; __ctx = ctx || {};
   if (__ctx.standalone) __standalone = true;
   if (!__booted) { __booted = true; __boot(); }
@@ -1061,6 +1102,8 @@ export function mount(root, ctx) {
   return Promise.resolve(true);
 }
 export function unmount() {
+  __fetchSuspended = true;
+  __abortFetchSession();
   __suspendAll();
   __restoreBridge();
 }

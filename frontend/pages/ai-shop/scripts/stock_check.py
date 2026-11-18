@@ -174,16 +174,26 @@ def main():
     with open(board_path, encoding='utf-8') as f:
         board = json.load(f)
 
-    status = fetch_status()
+    board_checked_ts = bjts(board.get('stock_checked_at'))
+    board_updated_ts = bjts(board.get('updated_at'))
+    local_last = max(board_checked_ts, board_updated_ts)
+    if local_last and now - local_last < interval * 60:
+        print(f'debounced locally: age {now - local_last:.0f}s < {interval * 60}s, skip')
+        return
+
+    with ThreadPoolExecutor(max_workers=2) as ex:
+        fut_status = ex.submit(fetch_status)
+        fut_own = ex.submit(own_last_run)
+        status = fut_status.result()
+        own_ts = fut_own.result()
     visitor_last = ((status or {}).get('lastcheck') or 0) / 1000.0
-    anchors = [visitor_last, bjts(board.get('stock_checked_at')),
-               bjts(board.get('updated_at')), own_last_run()]
+    anchors = [visitor_last, board_checked_ts, board_updated_ts, own_ts]
     last_act = max(anchors)
     age = now - last_act if last_act else float('inf')
     print(f'interval {interval}min; last activity age '
           f'{age:.0f}s (visitor {visitor_last:.0f}, board_checked '
-          f'{bjts(board.get("stock_checked_at")):.0f}, board_updated '
-          f'{bjts(board.get("updated_at")):.0f})')
+          f'{board_checked_ts:.0f}, board_updated '
+          f'{board_updated_ts:.0f})')
     if age < interval * 60:
         print('debounced: fresh enough, skip')
         return

@@ -252,7 +252,7 @@
         var c = cards.filter(function (x) { return x.el === e.target; })[0];
         if (c && !c.shown) show(c);
       });
-    }, { rootMargin: '1200px 0px' });
+    }, { rootMargin: '300px 0px' });
     cards.forEach(function (c) { io.observe(c.el); });
   }
 
@@ -297,7 +297,7 @@
   // ------------------------------------------------------------------ start
   if (store.get('mp-lang') === 'ja') store.set('mp-lang', state.lang); // migrate a saved ja preference to the resolved zh/en
   applyText();
-  fetch('examples/found.json', { cache: 'no-cache' })
+  fetch('examples/found.json')
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(function (data) {
       state.data = data;

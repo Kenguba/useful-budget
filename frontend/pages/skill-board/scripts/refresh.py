@@ -23,6 +23,7 @@
   data/dates.json          全部期数日期（倒序）
 """
 import argparse, csv, io, json, os, re, sys, urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -70,19 +71,24 @@ def load_json(path, default):
     except Exception:
         return default
 
-def build_glossary():
-    """词条优先级：手工词条 scripts/glossary.json > 历史快照里已沉淀的 blurb。"""
+def _scan_boards(day):
+    """单次读取 data/boards/*.json，同时构建 glossary 与前一期快照，避免重复扫盘/解析。"""
     g = {}
+    prev_day, prev = None, {}
     boards_dir = os.path.join(ROOT, "data", "boards")
     if os.path.isdir(boards_dir):
         for fn in sorted(os.listdir(boards_dir)):
-            if fn.endswith(".json"):
-                b = load_json(os.path.join(boards_dir, fn), {})
-                for item in b.get("glossary", []):
-                    if item.get("blurb") and item["blurb"] != "暂无说明":
-                        g[item["skill"]] = item["blurb"]
+            if not fn.endswith(".json"):
+                continue
+            b = load_json(os.path.join(boards_dir, fn), {})
+            for item in b.get("glossary", []):
+                if item.get("blurb") and item["blurb"] != "暂无说明":
+                    g[item["skill"]] = item["blurb"]
+            bd = b.get("date")
+            if bd and bd < day and (prev_day is None or bd > prev_day):
+                prev_day, prev = bd, b
     g.update(load_json(os.path.join(ROOT, "scripts", "glossary.json"), {}))
-    return g
+    return g, prev
 
 def make_blurb(glossary, skill, row):
     if skill in glossary:
@@ -107,19 +113,12 @@ def build_board(day, token="", is_latest=None):
     if is_latest is None:
         is_latest = (day == latest_date())
     src_day = "latest" if is_latest else day
-    data = {name: fetch_csv(src_day, name) for name in LISTS}
-    glossary = build_glossary()
+    with ThreadPoolExecutor(max_workers=len(LISTS)) as ex:
+        fetched = list(ex.map(lambda name: fetch_csv(src_day, name), LISTS))
+    data = dict(zip(LISTS, fetched))
+    glossary, prev = _scan_boards(day)
     repo_meta = load_json(os.path.join(ROOT, "scripts", "repo_meta.json"), {})
     vendor_notes = load_json(os.path.join(ROOT, "scripts", "vendor_notes.json"), {})
-    prev_boards = {}
-    boards_dir = os.path.join(ROOT, "data", "boards")
-    if os.path.isdir(boards_dir):
-        for fn in os.listdir(boards_dir):
-            if fn.endswith(".json"):
-                b = load_json(os.path.join(boards_dir, fn), {})
-                if b.get("date") and b["date"] < day:
-                    prev_boards[b["date"]] = b
-    prev = prev_boards[max(prev_boards)] if prev_boards else {}
     prev_stars = {r["repo"]: r["stars"] for r in prev.get("repos", [])}
 
     def blurb(skill, row):
@@ -139,13 +138,15 @@ def build_board(day, token="", is_latest=None):
 
     repos = []
     if is_latest:
-        # 最新一期：固定观察名单 10 仓（与 Muse 版同口径），GitHub API 直查实时 star，
+        # 最新一期：固定观察名单 10 仓（与 Muse 版同口径），GitHub API 并发直查实时 star，
         # 日增 = 与上一期快照的差。这样从今天起每一期历史都是当天真实快照。
         watchlist = list(repo_meta.keys()) or [r["repo"] for r in data["top-repos"][:10]]
         csv_by_repo = {r["repo"]: r for r in data["top-repos"]}
-        for repo in watchlist:
+        with ThreadPoolExecutor(max_workers=min(8, max(1, len(watchlist)))) as ex:
+            live_stars = list(ex.map(lambda r: gh_stars(r, token), watchlist))
+        for repo, live in zip(watchlist, live_stars):
             crow = csv_by_repo.get(repo, {})
-            stars = gh_stars(repo, token) or num(crow.get("stars"))
+            stars = live or num(crow.get("stars"))
             delta = num(crow.get("stars_1d"))
             if delta is None and repo in prev_stars and stars:
                 delta = stars - prev_stars[repo]
@@ -303,8 +304,8 @@ def main():
     ap.add_argument("--backfill", nargs="*", default=[], help="批量补抓的历史日期")
     a = ap.parse_args()
     token = os.environ.get("GITHUB_TOKEN", "")
-    days = a.backfill or [a.date or latest_date()]
     latest = latest_date()
+    days = a.backfill or [a.date or latest]
     for day in days:
         save(build_board(day, token, is_latest=(day == latest)))
 

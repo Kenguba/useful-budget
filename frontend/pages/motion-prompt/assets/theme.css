@@ -66,12 +66,9 @@
 :root[data-tidx] .btn-main:hover { border-color: var(--accent); }
 :root[data-holo="true"] .btn-main {
   background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%);
-  background-size: 220% 220%;
   border-color: transparent;
   color: #0F172A;
-  animation: mp-holo 3.2s ease infinite;
 }
-@keyframes mp-holo { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
 /* ---------- type: headings 500, tabular numbers ---------- */
 h1, h2, h3, .sec-h, .f-h1, .pack-h h3, .d-head h2 { font-weight: 500; }

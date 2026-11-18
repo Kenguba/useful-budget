@@ -14,8 +14,8 @@
      RELAY 为空字符串表示同域请求（pan.xxxxx.asia），属正常配置，不是未配置。 */
   var RELAY = (typeof window.PAN_RELAY === "string") ? window.PAN_RELAY : "https://api.jpedu.asia";
   function relayReady() { return typeof RELAY === "string" && RELAY.indexOf("example.workers.dev") < 0; }
-  function apiGet(path) {
-    return fetch(RELAY + "/api/public" + path).then(function (r) {
+  function apiGet(path, signal) {
+    return fetch(RELAY + "/api/public" + path, signal ? { signal: signal } : undefined).then(function (r) {
       if (!r.ok) throw new Error("api " + r.status);
       return r.json();
     }).then(function (j) {
@@ -102,13 +102,6 @@
     if (typeof url === "string" && url.charAt(0) === "/") return ORIGIN + url;
     return url;
   }
-  var CHANNELS = [
-    { id: "movie", name: "电影" },
-    { id: "tv", name: "剧集" },
-    { id: "anime", name: "动漫" },
-    { id: "variety", name: "综艺" },
-    { id: "short", name: "短剧" }
-  ];
   var PAN_FALLBACK = {
     xunlei: "迅雷", quark: "夸克", baidu: "百度", magnet: "磁力", uc: "UC",
     aliyun: "阿里", tianyi: "天翼", mobile: "移动", "115": "115", "123": "123",
@@ -146,29 +139,33 @@
   function panBtnCls(id) { return "btn-pan" + (panHasIcon(id) ? " has-ico" : ""); }
   function panBtnInner(id, text) {
     var ico = "";
-    if (PAN_ICONS[id]) ico = '<img class="pan-ico" src="' + PAN_ICONS[id] + '" alt="" loading="lazy" onerror="this.parentNode.classList.remove(\'has-ico\');this.remove()">';
+    if (PAN_ICONS[id]) ico = '<img class="pan-ico" src="' + PAN_ICONS[id] + '" alt="" loading="lazy" decoding="async" onerror="this.parentNode.classList.remove(\'has-ico\');this.remove()">';
     else if (PAN_ICON_EMOJI[id]) ico = '<span class="pan-ico-em" aria-hidden="true">' + PAN_ICON_EMOJI[id] + "</span>";
     return ico + '<span class="pan-txt">' + esc(text) + "</span>";
   }
+  var FMT_YMD = new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit" });
+  var FMT_HM = new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", hour: "2-digit", minute: "2-digit", hour12: false });
+  var FMT_MD = new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", month: "2-digit", day: "2-digit" });
   function fmtTime(iso) {
     if (!iso) return "";
     var d = new Date(iso);
     if (isNaN(d)) return "";
-    var now = new Date();
-    var f = new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit" });
-    var dayStr = f.format(d), todayStr = f.format(now);
-    var yest = new Date(now.getTime() - 864e5);
-    var hm = new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", hour: "2-digit", minute: "2-digit", hour12: false }).format(d);
+    var now = Date.now();
+    var dayStr = FMT_YMD.format(d), todayStr = FMT_YMD.format(now);
+    var hm = FMT_HM.format(d);
     if (dayStr === todayStr) return "今天 " + hm;
-    if (dayStr === f.format(yest)) return "昨天 " + hm;
-    var md = new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", month: "2-digit", day: "2-digit" }).format(d);
-    return md + " " + hm;
+    if (dayStr === FMT_YMD.format(now - 864e5)) return "昨天 " + hm;
+    return FMT_MD.format(d) + " " + hm;
+  }
+  function debounceFn(fn, ms) {
+    var t = null;
+    return function () { clearTimeout(t); t = setTimeout(fn, ms || 100); };
   }
   function load(name) {
     return fetch(BASE + "data/" + name + ".json").then(function (r) { return r.json(); });
   }
   /* 优先实时（经中转），失败回退快照；live=true 表示本次走的是实时数据。
-     实时请求加 10 秒上限：中转慢/挂起时不等死，按失败口径回退快照先把页面渲染出来，避免长时间白屏 */
+     实时请求加 4.5 秒 AbortController 超时：中转慢/挂起时立即中止连接并回退快照 */
   var staleMap = {};
   function snapDate(d) {
     if (!d) return "";
@@ -186,15 +183,22 @@
   }
   function liveOr(path, snapName, onLive) {
     if (!relayReady()) return load(snapName).then(function (d) { markStale(snapName, d); return d; }).catch(function () { return null; });
-    var api = apiGet(path).then(function (d) {
+    var ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    var timer = null;
+    var api = apiGet(path, ctl ? ctl.signal : undefined).then(function (d) {
+      clearTimeout(timer);
       if (onLive) onLive();
       delete staleMap[snapName];
       return d;
     });
     var slow = new Promise(function (resolve, reject) {
-      setTimeout(function () { reject(new Error("api timeout")); }, 10000);
+      timer = setTimeout(function () {
+        if (ctl) try { ctl.abort(); } catch (e) {}
+        reject(new Error("api timeout"));
+      }, 4500);
     });
     return Promise.race([api, slow]).catch(function () {
+      clearTimeout(timer);
       return load(snapName).then(function (d) { markStale(snapName, d); return d; }).catch(function () { return null; });
     });
   }
@@ -325,7 +329,57 @@
     dockEl.addEventListener("pointercancel", endDrag);
     dockEl.addEventListener("contextmenu", function (e) { e.preventDefault(); });
     dockEl.addEventListener("selectstart", function (e) { e.preventDefault(); });
-    window.addEventListener("resize", function () { applyDockPosition(false); });
+    window.addEventListener("resize", debounceFn(function () { applyDockPosition(false); }, 100));
+  }
+  function mountContactDock(pres) {
+    if (!pres || !pres.contact_image || document.getElementById("contactDock")) return;
+    var cc =
+      '<div class="contact-card" id="contactCard" style="display:none"><div class="cc-t"><span>保持联系</span>' +
+      '<button class="cc-x" id="ccClose">✕</button></div>' +
+      '<img loading="lazy" decoding="async" src="' + esc(pres.contact_image) + '" alt="二维码">' +
+      '<div class="cc-c">' + esc(pres.contact_caption || "扫码加入交流群") + "<br>点击放大查看</div>" +
+      '<button type="button" class="cc-ask" id="ccAsk">在线求片</button></div>' +
+      '<div class="floating-contact-dock docked-right" id="contactDock" title="可自由拖拽移动，松手自动贴边吸附；点击打开联系我们">' +
+      '<span class="dock-stash-ear" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></span>' +
+      '<button type="button" class="contact-float-btn" id="contactFloatBtn"><span>保持联系</span></button></div>';
+    document.body.insertAdjacentHTML("beforeend", cc);
+    var card = document.getElementById("contactCard");
+    document.getElementById("ccClose").onclick = function () {
+      card.style.display = "none";
+      var d = document.getElementById("contactDock");
+      if (d) d.style.display = "";
+    };
+    document.querySelector("#contactCard img").onclick = function () { window.open(pres.contact_image, "_blank"); };
+    initContactDock(document.getElementById("contactDock"), function () {
+      card.style.display = "block";
+      var d = document.getElementById("contactDock");
+      if (d) d.style.display = "none";
+    });
+    var ccAsk = document.getElementById("ccAsk");
+    if (ccAsk) ccAsk.onclick = function () {
+      card.style.display = "none";
+      var d = document.getElementById("contactDock");
+      if (d) d.style.display = "";
+      document.getElementById("askDone").style.display = "none";
+      document.getElementById("askForm").style.display = "block";
+      document.getElementById("askOv").classList.add("open");
+    };
+  }
+  function applySiteInfo(siteRes) {
+    state.site = siteRes || {};
+    var pres = state.site.presentation || {};
+    if (pres.contact_image) pres.contact_image = absolutize(pres.contact_image);
+    var name = (state.site.site && state.site.site.site_name) || "基德盘搜";
+    var bn = document.getElementById("brandNameText");
+    if (bn && bn.textContent !== name) bn.textContent = name;
+    mountContactDock(pres);
+    var slot = document.getElementById("homeAnnounceSlot");
+    var content = state.site.content || {};
+    if (slot) {
+      slot.innerHTML = (content.announcement_enabled && content.announcement)
+        ? '<div class="announce"><div class="announce-in"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px"><path d="M3 10.5v3h3l6 4.5v-12L6 10.5H3z"/><path d="M15.5 9.8a3.6 3.6 0 0 1 0 4.4"/><path d="M18.2 7.2a7.4 7.4 0 0 1 0 9.6"/></svg></span><b>站点公告</b><span>' + esc(content.announcement) + "</span></div></div>"
+        : "";
+    }
   }
   function renderShell(active) {
     var site = state.site || {};
@@ -402,7 +456,7 @@
         }
       }
       setBar(activeLink, false);
-      window.addEventListener("resize", function () { setBar(navEl.querySelector("a.on"), false); });
+      window.addEventListener("resize", debounceFn(function () { setBar(navEl.querySelector("a.on"), false); }, 100));
     }
     initCaterpillar();
     var tsForm = document.getElementById("topSearch");
@@ -412,31 +466,8 @@
       if (q) navigate(BASE + "search/?q=" + encodeURIComponent(q));
     };
 
-    // 右侧联系卡 + 磁吸竖签（按新稿 floating-contact-dock：可拖拽、松手磁吸左右边缘、拉到最外侧或甩向边缘半收起露耳片，点击展开二维码卡）
-    if (pres.contact_image) {
-      var cc =
-        '<div class="contact-card" id="contactCard" style="display:none"><div class="cc-t"><span>保持联系</span>' +
-        '<button class="cc-x" id="ccClose">✕</button></div>' +
-        '<img src="' + esc(pres.contact_image) + '" alt="二维码">' +
-        '<div class="cc-c">' + esc(pres.contact_caption || "扫码加入交流群") + "<br>点击放大查看</div>" +
-        '<button type="button" class="cc-ask" id="ccAsk">在线求片</button></div>' +
-        '<div class="floating-contact-dock docked-right" id="contactDock" title="可自由拖拽移动，松手自动贴边吸附；点击打开联系我们">' +
-        '<span class="dock-stash-ear" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></span>' +
-        '<button type="button" class="contact-float-btn" id="contactFloatBtn"><span>保持联系</span></button></div>';
-      document.body.insertAdjacentHTML("beforeend", cc);
-      var card = document.getElementById("contactCard");
-      document.getElementById("ccClose").onclick = function () {
-        card.style.display = "none";
-        var d = document.getElementById("contactDock");
-        if (d) d.style.display = "";
-      };
-      document.querySelector("#contactCard img").onclick = function () { window.open(pres.contact_image, "_blank"); };
-      initContactDock(document.getElementById("contactDock"), function () {
-        card.style.display = "block";
-        var d = document.getElementById("contactDock");
-        if (d) d.style.display = "none";
-      });
-    }
+    // 右侧联系卡 + 磁吸竖签（按新稿 floating-contact-dock）
+    mountContactDock(pres);
 
     // 资源获取弹窗（全站共用）
     document.body.insertAdjacentHTML("beforeend",
@@ -516,7 +547,9 @@
       '<input id="searchInput" placeholder="搜索你想找的资源" value="' + esc(prefill || "") + '" autocomplete="off">' +
       '<button class="btn-search" id="searchBtn" type="submit">搜索</button></form>';
   }
+  var searchBarCleanup = null;
   function bindSearchbar() {
+    if (searchBarCleanup) { try { searchBarCleanup(); } catch (e) {} searchBarCleanup = null; }
     var form = document.getElementById("searchForm");
     if (!form) return;
     var input = document.getElementById("searchInput");
@@ -583,9 +616,12 @@
     }
     document.addEventListener("click", docClick);
     document.addEventListener("keydown", docKey);
-    onCleanup(function () {
+    searchBarCleanup = function () {
       document.removeEventListener("click", docClick);
       document.removeEventListener("keydown", docKey);
+    };
+    onCleanup(function () {
+      if (searchBarCleanup) { searchBarCleanup(); searchBarCleanup = null; }
     });
 
     renderMenu();
@@ -619,7 +655,7 @@
       ? '<span class="sm">' + esc(meta.slice(0, mi)) + '</span><span class="ss">' + esc(meta.slice(mi + 2).trim()) + "</span>"
       : esc(meta);
     return '<a class="poster" href="' + BASE + "search/?q=" + encodeURIComponent(item.name) + '">' +
-      '<div class="ph"><img loading="lazy" src="' + esc(item.poster_url) + '" alt="' + esc(item.name) + '">' +
+      '<div class="ph"><img loading="lazy" decoding="async" src="' + esc(item.poster_url) + '" alt="' + esc(item.name) + '">' +
       '<span class="' + rankCls + '">' + item.rank + "</span></div>" +
       '<div class="meta"><div class="t">' + esc(item.name) + '</div><div class="s">' + sHtml + "</div></div></a>";
   }
@@ -722,56 +758,77 @@
     row2.innerHTML = row2Items.map(hotChipHtml).join("");
     if (!window.__panKwResizeBound) {
       window.__panKwResizeBound = true;
-      window.addEventListener("resize", layoutHotKeywords);
+      window.addEventListener("resize", debounceFn(layoutHotKeywords, 120));
     }
   }
 
   /* ---------------- 首页 ---------------- */
+  var homeBoardCat = "rec", homeBoardKind = "all";
+  function homeUpdatesHtml() {
+    var upd8 = dataCache.updates ? state.updates.slice(0, 8).map(function (it, i) { return updRow(it, i); }).join("") : sklUpdRows(8);
+    return staleNote("updates") + upd8;
+  }
+  function homeHotRowsHtml() {
+    return dataCache.hot ? state.hot.slice(0, 9).map(function (h, i) {
+      return '<div class="hot-row"><span class="hot-rank">' + (i + 1) + '</span>' +
+        '<span class="hot-name"><a href="' + BASE + "search/?q=" + encodeURIComponent(h.query) + '">' + esc(h.query) + "</a></span>" +
+        (i < 3 ? '<span class="tag-hot">热</span>' : "") + "</div>";
+    }).join("") : sklHotRows(9);
+  }
+  function updateHomeHot() {
+    window.__panHotItems = state.hot.slice(0, 10).map(function (h, i) { return { q: h.query, hot: i < 3 }; });
+    var hotBox = document.getElementById("homeHotSlot");
+    if (hotBox) hotBox.innerHTML = homeHotRowsHtml();
+    layoutHotKeywords();
+  }
+  function updateHomeUpdates() {
+    var updBox = document.getElementById("homeUpdatesSlot");
+    if (updBox) updBox.innerHTML = homeUpdatesHtml();
+  }
+  function drawHomeBoard() {
+    var grid = document.getElementById("boardGrid");
+    if (!grid) return;
+    var items = boardFilter(homeBoardCat, homeBoardKind);
+    grid.innerHTML = !dataCache.discovery ? sklPosters(16)
+      : (items.slice(0, 16).map(function (it) { return posterCard(it); }).join("") ||
+         '<div style="color:var(--faint);font-size:14px;padding:12px 0">该分类暂无快照数据</div>');
+    boardPills(document.getElementById("fCat"), BOARD_CATS, homeBoardCat, function (id) { homeBoardCat = id; drawHomeBoard(); });
+    boardPills(document.getElementById("fKind"),
+      [{ id: "all", name: "全部" }, { id: "电影", name: "电影" }, { id: "剧集", name: "剧集" }], homeBoardKind,
+      function (id) { homeBoardKind = id; drawHomeBoard(); });
+    boardPills(document.getElementById("fSort"),
+      [{ id: "week", name: "本周热门" }, { id: "day", name: "今日热门" }], "week",
+      function () { drawHomeBoard(); });
+  }
   function renderHome() {
     var main = document.getElementById("main");
-    /* 数据分批到达会重画整页：先存下搜索框里已敲的字和焦点，画完恢复，不能把用户输入冲掉 */
-    var prevIn = document.getElementById("searchInput");
-    var prevQ = prevIn ? prevIn.value : "";
-    var prevFocus = !!(prevIn && document.activeElement === prevIn);
-    var pres = state.site.presentation || {};
-    var content = state.site.content || {};
-    var hotItems = state.hot.slice(0, 10).map(function (h, i) {
-      return { q: h.query, hot: i < 3 };
-    });
+    var content = (state.site && state.site.content) || {};
+    var hotItems = state.hot.slice(0, 10).map(function (h, i) { return { q: h.query, hot: i < 3 }; });
     window.__panHotItems = hotItems;
     var hotBar =
       '<div class="hot-keywords-bar" id="hotKeywordsBar">' +
       '<div class="hot-kw-pc"><span class="lbl">大家都在搜</span><div class="hot-kw-pc-wrap" id="hotKwPcWrap">' + (dataCache.hot ? "" : sklChips(6)) + '</div></div>' +
       '<div class="hot-kw-mobile-wrap" id="hotKwMobileWrap"><div class="hot-kw-mobile-row" id="hotKwRow1">' + (dataCache.hot ? "" : sklChips(3)) + '</div><div class="hot-kw-mobile-row" id="hotKwRow2">' + (dataCache.hot ? "" : sklChips(3)) + '</div></div>' +
       '<div class="kw-measure-sandbox" id="kwMeasureSandbox" aria-hidden="true"></div></div>';
+    var annHtml = '<div id="homeAnnounceSlot">' + ((content.announcement_enabled && content.announcement)
+      ? '<div class="announce"><div class="announce-in"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px"><path d="M3 10.5v3h3l6 4.5v-12L6 10.5H3z"/><path d="M15.5 9.8a3.6 3.6 0 0 1 0 4.4"/><path d="M18.2 7.2a7.4 7.4 0 0 1 0 9.6"/></svg></span><b>站点公告</b><span>' + esc(content.announcement) + "</span></div></div>"
+      : "") + "</div>";
     var html =
       '<section class="hero">' +
       '<div class="hero-badge">⚡ 夸克网盘搜索 · 迅雷会员特权直达 · 磁力聚合</div>' +
       '<h1>好内容，<span class="b">一搜就有</span></h1>' +
       searchbarHtml("") +
-      hotBar + "</section>";
-    if (content.announcement_enabled && content.announcement) {
-      html += '<div class="announce"><div class="announce-in"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px"><path d="M3 10.5v3h3l6 4.5v-12L6 10.5H3z"/><path d="M15.5 9.8a3.6 3.6 0 0 1 0 4.4"/><path d="M18.2 7.2a7.4 7.4 0 0 1 0 9.6"/></svg></span><b>站点公告</b><span>' +
-        esc(content.announcement) + "</span></div></div>";
-    }
-    // 两栏：每日更新 + 热门搜索
-    var upd8 = dataCache.updates ? state.updates.slice(0, 8).map(function (it, i) { return updRow(it, i); }).join("") : sklUpdRows(8);
-    var hot9 = dataCache.hot ? state.hot.slice(0, 9).map(function (h, i) {
-      return '<div class="hot-row"><span class="hot-rank">' + (i + 1) + '</span>' +
-        '<span class="hot-name"><a href="' + BASE + "search/?q=" + encodeURIComponent(h.query) + '">' + esc(h.query) + "</a></span>" +
-        (i < 3 ? '<span class="tag-hot">热</span>' : "") + "</div>";
-    }).join("") : sklHotRows(9);
-    html += '<div class="section"><div class="cols">' +
+      hotBar + "</section>" + annHtml +
+      '<div class="section"><div class="cols">' +
       '<div class="card"><div class="card-head"><span class="ic ic-green">🕐</span><div><h2>每日更新</h2>' +
       '<div class="desc">新发布与追更内容，随时发现更新</div></div>' +
-      '<a class="more" href="' + BASE + 'today/">全部更新 →</a></div>' + staleNote("updates") + upd8 +
+      '<a class="more" href="' + BASE + 'today/">全部更新 →</a></div><div id="homeUpdatesSlot">' + homeUpdatesHtml() + '</div>' +
       '<div class="card-foot"><a href="' + BASE + 'today/">浏览每日更新 →</a></div></div>' +
       '<div class="card"><div class="card-head"><span class="ic ic-orange">🔥</span><div><h2>热门搜索</h2>' +
       '<div class="desc">看看大家正在寻找什么</div></div>' +
-      '<a class="more" href="' + BASE + 'hot/">全部 →</a></div>' + hot9 + "</div>" +
-      "</div></div>";
-    // 热播榜
-    html += '<div class="section"><div class="card" style="padding:24px 26px">' +
+      '<a class="more" href="' + BASE + 'hot/">全部 →</a></div><div id="homeHotSlot">' + homeHotRowsHtml() + "</div></div>" +
+      "</div></div>" +
+      '<div class="section"><div class="card" style="padding:24px 26px">' +
       '<div class="board-head"><div><h2>热播榜</h2><div style="color:var(--mut);font-size:13px;margin-top:3px">从热门榜单，发现下一部好内容</div></div>' +
       '<a class="more" href="' + BASE + 'discover/">发现更多 →</a></div>' +
       '<div class="filters">' +
@@ -783,26 +840,8 @@
       "</div></div>";
     main.innerHTML = html;
     bindSearchbar();
-    if (prevQ) { var ni = document.getElementById("searchInput"); if (ni) ni.value = prevQ; }
-    if (prevFocus) { var nf = document.getElementById("searchInput"); if (nf) { nf.focus(); try { nf.setSelectionRange(nf.value.length, nf.value.length); } catch (e) {} } }
     layoutHotKeywords();
-    // 导航签按 ken 2026-11-07 指示放回顶栏原位：首页不再移签，顶栏导航与子页面同款分段控件
-    var curCat = "rec", curKind = "all";
-    function drawBoard() {
-      var items = boardFilter(curCat, curKind);
-      document.getElementById("boardGrid").innerHTML =
-        !dataCache.discovery ? sklPosters(16) :
-        (items.slice(0, 16).map(function (it) { return posterCard(it); }).join("") ||
-         '<div style="color:var(--faint);font-size:14px;padding:12px 0">该分类暂无快照数据</div>');
-      boardPills(document.getElementById("fCat"), BOARD_CATS, curCat, function (id) { curCat = id; drawBoard(); });
-      boardPills(document.getElementById("fKind"),
-        [{ id: "all", name: "全部" }, { id: "电影", name: "电影" }, { id: "剧集", name: "剧集" }], curKind,
-        function (id) { curKind = id; drawBoard(); });
-      boardPills(document.getElementById("fSort"),
-        [{ id: "week", name: "本周热门" }, { id: "day", name: "今日热门" }], "week",
-        function () { drawBoard(); });
-    }
-    drawBoard();
+    drawHomeBoard();
   }
 
   /* ---------------- 热播榜页 ---------------- */
@@ -909,7 +948,7 @@
           else tLoadFailed = true; /* 拉取失败不空转重试，draw 里给一次点击重试 */
         });
       } else {
-        setTimeout(finish, 300);
+        requestAnimationFrame(finish);
       }
     }
     if (typeof IntersectionObserver !== "undefined") {
@@ -1057,12 +1096,6 @@
       var sub = (it.title && it.note && it.title !== it.note) ? it.note : "";
       var tag = it.mine ? '<span class="res-tag res-tag-mine">本站</span>'
         : (it.result_source && it.result_source !== "local" ? '<span class="res-tag res-tag-ext">外部</span>' : "");
-      var href, target = "";
-      if (it.provider === "magnet" && String(it.id).indexOf("magnet:") === 0) {
-        href = "magnet:?xt=urn:btih:" + it.id.slice(7); target = ' target="_blank" rel="noopener"';
-      } else {
-        href = BASE + "resource/?id=" + encodeURIComponent(it.id);
-      }
       return '<div class="res-row"><div class="res-main"><div class="res-title">' + hl(mainText) + tag + "</div>" +
         (sub ? '<div class="res-note">' + esc(sub) + "</div>" : "") +
         '<div class="res-meta">' + esc(panName(it.provider)) + "网盘 · " + fmtTime(it.discovered_at) +
@@ -1070,7 +1103,39 @@
         (invalid ? '<span class="btn-pan" style="opacity:.45">已失效</span>'
                  : '<button class="' + panBtnCls(it.provider) + '" type="button" data-acc="' + esc(it.id) + '" title="获取' + esc(panName(it.provider)) + '资源">' + panBtnInner(it.provider, "获取" + panName(it.provider) + "资源") + "</button>") + "</div>";
     }
+    var paintTimer = null, streamDelegated = false;
+    function schedulePaint() {
+      if (paintTimer) return;
+      paintTimer = setTimeout(function () { paintTimer = null; paint(); }, 60);
+    }
+    function bindStreamDelegation() {
+      if (streamDelegated) return;
+      streamDelegated = true;
+      var fbox = document.getElementById("streamFilters");
+      var box = document.getElementById("streamResults");
+      if (fbox) fbox.addEventListener("click", function (e) {
+        var b = e.target.closest(".pill");
+        if (!b) return;
+        curProv = b.getAttribute("data-prov") || "";
+        paint();
+      });
+      if (box) box.addEventListener("click", function (e) {
+        var b = e.target.closest("[data-acc]");
+        if (b) {
+          var it = byId[b.getAttribute("data-acc")];
+          if (it) openAccess({ id: it.id, provider: it.provider, mine: it.mine, title: dispText(it) });
+          return;
+        }
+        if (e.target.closest("button, a")) return;
+        var row = e.target.closest(".res-row");
+        if (row) {
+          var btn = row.querySelector("[data-acc], a.btn-pan");
+          if (btn) btn.click();
+        }
+      });
+    }
     function paint() {
+      bindStreamDelegation();
       var box = document.getElementById("streamResults");
       if (!box) return;
       var counts = {};
@@ -1084,12 +1149,7 @@
       });
       fhtml += "</span></div>";
       var fbox = document.getElementById("streamFilters");
-      if (fbox) {
-        fbox.innerHTML = fhtml;
-        Array.prototype.forEach.call(fbox.querySelectorAll(".pill"), function (b) {
-          b.onclick = function () { curProv = b.getAttribute("data-prov") || ""; paint(); };
-        });
-      }
+      if (fbox) fbox.innerHTML = fhtml;
       var list = curProv ? items.filter(function (it) { return it.provider === curProv; }) : items;
       box.innerHTML = list.length ? list.map(rowHtml).join("")
         : (done ? '<div class="empty">没有找到相关资源，可以精简关键词，或换个名称再试试。</div>'
@@ -1097,23 +1157,10 @@
       var desc = document.getElementById("searchDesc");
       if (desc) desc.textContent = done ? "共 " + items.length + " 条结果"
         : "正在搜索…已找到 " + items.length + " 条，结果将陆续显示";
-      Array.prototype.forEach.call(box.querySelectorAll("[data-acc]"), function (b) {
-        b.onclick = function () {
-          var it = byId[b.getAttribute("data-acc")];
-          if (it) openAccess({ id: it.id, provider: it.provider, mine: it.mine, title: dispText(it) });
-        };
-      });
-      Array.prototype.forEach.call(box.querySelectorAll(".res-row"), function (row) {
-        row.style.cursor = "pointer";
-        row.onclick = function (e) {
-          if (e.target.closest("button, a")) return;
-          var btn = row.querySelector("[data-acc], a.btn-pan");
-          if (btn) btn.click();
-        };
-      });
     }
     function failover() {
       if (failed) return; failed = true;
+      clearTimeout(paintTimer); paintTimer = null;
       var snap = document.getElementById("snapResults");
       var box = document.getElementById("streamResults");
       var desc = document.getElementById("searchDesc");
@@ -1128,10 +1175,10 @@
       es = new EventSource(RELAY + "/api/search/stream?q=" + encodeURIComponent(q));
     } catch (e) { failover(); return; }
     var timer = setTimeout(function () { if (!done && !items.length) { try { es.close(); } catch (e) {} failover(); } }, 40000);
-    onCleanup(function () { done = true; clearTimeout(timer); try { es.close(); } catch (e) {} });
+    onCleanup(function () { done = true; clearTimeout(timer); clearTimeout(paintTimer); paintTimer = null; try { es.close(); } catch (e) {} });
     es.addEventListener("start", function (e) {
       try { providers = JSON.parse(e.data).providers || []; } catch (err) {}
-      paint();
+      schedulePaint();
     });
     es.addEventListener("items", function (e) {
       var d; try { d = JSON.parse(e.data); } catch (err) { return; }
@@ -1143,7 +1190,7 @@
           items[items.indexOf(old)] = it; byId[it.id] = it; it.result_source = keepLocal === "local" ? old.result_source : it.result_source;
         } else { byId[it.id] = it; items.push(it); }
       });
-      paint();
+      schedulePaint();
     });
     es.addEventListener("suggestions", function (e) {
       var d; try { d = JSON.parse(e.data); } catch (err) { return; }
@@ -1156,7 +1203,7 @@
       }
     });
     es.addEventListener("complete", function () {
-      done = true; clearTimeout(timer);
+      done = true; clearTimeout(timer); clearTimeout(paintTimer); paintTimer = null;
       try { es.close(); } catch (e) {}
       if (!items.length) failover(); else paint();
     });
@@ -1238,7 +1285,7 @@
       '<details class="about"><summary>也可以直接添加到主屏幕</summary><p>用 Safari 或支持此功能的 Chrome 打开本站，在分享菜单中选择「添加到主屏幕」<br>描述文件仅添加本站图标，系统可能显示「未签名」<br>桌面版使用网页，网盘唤起以手机实际支持为准</p></details></div>' +
       "</div>" +
       '<div class="card" style="max-width:520px;margin:24px auto 0;text-align:center;padding:28px">' +
-      '<img src="https://api.qrserver.com/v1/create-qr-code/?size=168x168&data=' + encodeURIComponent(appUrl) +
+      '<img loading="lazy" decoding="async" width="168" height="168" src="https://api.qrserver.com/v1/create-qr-code/?size=168x168&data=' + encodeURIComponent(appUrl) +
       '" alt="本站 APP 下载页面二维码" style="width:168px;height:168px" onerror="this.style.display=\'none\'">' +
       '<div style="font-weight:800;font-size:16px;margin-top:12px">用手机扫码打开</div>' +
       '<div style="color:var(--mut);font-size:13.5px;margin-top:5px">在手机上下载，连接本站</div></div>';
@@ -1406,16 +1453,18 @@
     function live(fn) { return function () { if (seq === renderSeq) fn(); }; }
     /* 先行渲染（ken 规范）：静态区不等数据先画，数据区由渲染器按 dataCache 出骨架，哪份先到就重渲染补哪份 */
     if (key === "home") {
-      var rh = live(renderHome); rh();
+      live(renderHome)();
       var ph = getHot(), pu = getUpdates(), pd = getDiscovery();
-      ph.then(rh); pu.then(rh); pd.then(rh);
+      ph.then(live(updateHomeHot));
+      pu.then(live(updateHomeUpdates));
+      pd.then(live(drawHomeBoard));
       return Promise.all([ph, pu, pd]);
     }
     if (key === "search") { paintSearchPreload(seq); return Promise.all([getHot(), getUpdates(), getDiscovery()]).then(live(renderSearch)); }
     if (key === "discover") { var rd = live(renderDiscover); rd(); return getDiscovery().then(rd); }
     if (key === "today") { var rt = live(renderToday); rt(); return getUpdates().then(rt); }
     if (key === "hot") { var rk = live(renderHot); rk(); return getHot().then(rk); }
-    if (key === "resource") return load("updates").then(function (u) { fillUpdates(u); if (seq === renderSeq) renderResource(); }).catch(function () { if (seq === renderSeq) renderResource(); });
+    if (key === "resource") return getUpdates().then(live(renderResource)).catch(live(renderResource));
     if (key === "app") { var ra = live(renderApp); ra(); return getApp().then(ra); }
     if (key === "apply") return getFriend().then(live(renderApply));
     renderHome();
@@ -1530,11 +1579,9 @@
   else if (page === "app") getApp();
   else if (page === "apply") getFriend();
 
-  liveOr("/site", "site", function () { state.live = true; }).then(function (siteRes) {
-    state.site = siteRes || {};
-    if (state.site.presentation) state.site.presentation.contact_image = absolutize(state.site.presentation.contact_image);
-    renderShell(page);
-    currentKey = page;
-    loadAndRender(page, ++renderSeq).then(function () { installRouter(); });
-  });
+  state.site = {};
+  renderShell(page);
+  currentKey = page;
+  loadAndRender(page, ++renderSeq).then(function () { installRouter(); });
+  liveOr("/site", "site", function () { state.live = true; }).then(applySiteInfo);
 })();

@@ -240,12 +240,6 @@
       color: var(--text-primary);
     }
 
-    .ctrl-btn.is-active {
-      background: var(--btn-active-bg);
-      border-color: var(--btn-active-border);
-      color: var(--btn-active-text);
-    }
-
     .ctrl-btn svg {
       width: 13px;
       height: 13px;
@@ -1378,7 +1372,9 @@
     }
 
     function refreshLayoutCacheAndDraw() {
-      requestAnimationFrame(() => {
+      if (domCache.rafId) cancelAnimationFrame(domCache.rafId);
+      domCache.rafId = requestAnimationFrame(() => {
+        domCache.rafId = 0;
         measureBaseGeometry();
         updateTreePathsFast();
       });

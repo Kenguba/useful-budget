@@ -674,11 +674,6 @@ body{
       letter-spacing: -0.2px;
       transition: opacity 0.2s ease, transform 0.2s ease;
     }
-#masterPhoneChassis .app-window-card.is-non-focus .floating-app-name{
-      opacity: 0;
-      pointer-events: none;
-      transform: translateX(-4px);
-    }
 #masterPhoneChassis .app-card-body{
       display: flex;
       flex-direction: column;
@@ -1262,7 +1257,7 @@ body{
     r.style.setProperty('--theme-accent',th[4]);r.style.setProperty('--theme-tag-bg',th[5]);
     r.style.setProperty('--theme-tag-text',th[6]);r.style.setProperty('--search-glow',th[8]);})();
   </script>
-<link rel="stylesheet" href="hub/hub.css?v=20261118a">
+<link rel="stylesheet" href="hub/hub.css?v=20261119a">
   <style>html.hub-deep #masterPhoneChassis{visibility:hidden}</style>
   <script>
     /* 深链首帧防闪：直达 /pan、/ai 等短路径时，总汇外壳 hub.js 在 body 末尾才执行，
@@ -1685,6 +1680,7 @@ body{
     // 每个模式各自记住滚动位置：切走时存、切回时在本函数同一同步段里
     // （浏览器重绘之前）就恢复到位，眼睛看不到任何跳动或滚动过程
     const savedScrollByMode = { stack: 0, grid: 0 };
+    let lastPortalRenderKey = null;
     function setDisplayMode(mode) {
       const screenEl = document.querySelector('.iphone18-master-screen');
       if (screenEl) savedScrollByMode[currentDisplayMode] = screenEl.scrollTop;
@@ -1695,7 +1691,13 @@ body{
       document.getElementById('contentGrid').classList.toggle('active-mode', mode === 'grid');
       document.getElementById('masterPhoneChassis').classList.toggle('wide-grid-chassis', mode === 'grid');
       document.getElementById('viewGlider').style.transform = mode === 'grid' ? 'translateX(100%)' : 'translateX(0)';
-      renderPortalCards();
+      const kw = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+      if (lastPortalRenderKey !== (currentLang + '|' + kw)) {
+        renderPortalCards();
+      } else if (mode === 'stack') {
+        measureStackMetrics();
+        updateStackTransforms();
+      }
       if (screenEl) screenEl.scrollTop = savedScrollByMode[mode] || 0;
     }
 
@@ -2008,8 +2010,11 @@ body{
       };
       flyAnimRaf = requestAnimationFrame(step);
     }
+    let stackDotRefs = [];
     function renderPortalCards() {
       stopStackAnimation();
+      const kw = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+      lastPortalRenderKey = currentLang + '|' + kw;
       const filtered = getFilteredProjects();
       const grid = document.getElementById('contentGrid');
       const emptyHtml = `<div class="empty-state">${L(UI_TEXT.emptyState)}</div>`;
@@ -2025,6 +2030,7 @@ body{
         viewport.innerHTML = emptyHtml;
         dotsBarEl.innerHTML = '';
         stackCardRefs = [];
+        stackDotRefs = [];
         stackNameWidths = [];
         stackLastSig = [];
         return;
@@ -2063,6 +2069,7 @@ body{
         header: el.querySelector('.floating-card-app-header'),
         name: el.querySelector('.floating-app-name')
       }));
+      stackDotRefs = Array.from(dotsBarEl.querySelectorAll('.stack-dot'));
       stackNameWidths = stackCardRefs.map((refs, idx) => (stackDomOrder[idx] >= 0 && refs.name ? (refs.name.offsetWidth || 64) : 64));
       stackLastSig = [];
       measureStackMetrics();
@@ -2076,12 +2083,12 @@ body{
       const safeIdx = Math.max(0, Math.min(filtered.length - 1, activeStackIdx));
       const activeProj = filtered[safeIdx];
       const name = L(activeProj.shortApp);
-      document.getElementById('stackViewport').querySelectorAll('.app-window-card').forEach((el, idx) => {
-        el.classList.toggle('is-stacked-card', stackDomOrder[idx] !== safeIdx);
-      });
-      document.getElementById('stackDotsBar').querySelectorAll('.stack-dot').forEach((dot, idx) => {
-        dot.classList.toggle('active', idx === safeIdx);
-      });
+      for (let idx = 0; idx < stackCardRefs.length; idx++) {
+        stackCardRefs[idx].card.classList.toggle('is-stacked-card', stackDomOrder[idx] !== safeIdx);
+      }
+      for (let idx = 0; idx < stackDotRefs.length; idx++) {
+        stackDotRefs[idx].classList.toggle('active', idx === safeIdx);
+      }
       document.getElementById('stackBottomPillText').textContent = activeProj.url
         ? L([`打开「${name}」 ↗`, `Open ${name} ↗`])
         : L([`${name} · 筹备中`, `${name} · Upcoming`]);
@@ -2154,7 +2161,6 @@ body{
           }
           return;
         }
-        cardEl.classList.remove('is-non-focus');
 
         let finalOpacity = opacity;
         let flyTy = 0;
@@ -2468,17 +2474,28 @@ body{
         startStackFreeMomentum((dominantDelta / pxPerCard) * 5.2);
       }, { passive: false });
 
-      window.addEventListener('resize', () => {
-        if (currentDisplayMode === 'stack') { measureStackMetrics(); updateStackTransforms(); }
-      });
       if ('ResizeObserver' in window) {
         new ResizeObserver(() => {
           if (currentDisplayMode === 'stack') { measureStackMetrics(); updateStackTransforms(); }
         }).observe(viewport);
+      } else {
+        window.addEventListener('resize', () => {
+          if (currentDisplayMode === 'stack') { measureStackMetrics(); updateStackTransforms(); }
+        });
       }
     })();
 
     // ================= 7. 12 色主题渲染与手势 =================
+    let swatchItemCache = [];
+    let swatchRectCache = [];
+    function refreshSwatchRects() {
+      swatchItemCache = Array.from(document.querySelectorAll('.theme-swatch-item'));
+      swatchRectCache = swatchItemCache.map(el => ({
+        el,
+        idx: Number(el.getAttribute('data-theme-idx')),
+        r: el.getBoundingClientRect()
+      }));
+    }
     function applyThemeByGlobalIndex(index) {
       currentGlobalThemeIndex = index;
       const t = allThemes[index];
@@ -2509,9 +2526,11 @@ body{
         orbLeft.style.transform = orbRight.style.transform = '';
       }
 
-      document.querySelectorAll('.theme-swatch-item').forEach(el => {
+      if (!swatchItemCache.length) swatchItemCache = Array.from(document.querySelectorAll('.theme-swatch-item'));
+      for (let i = 0; i < swatchItemCache.length; i++) {
+        const el = swatchItemCache[i];
         el.classList.toggle('active', Number(el.getAttribute('data-theme-idx')) === currentGlobalThemeIndex);
-      });
+      }
     }
 
     function renderThemeSwatches() {
@@ -2521,18 +2540,22 @@ body{
           <span class="swatch-label">${t.num} · ${L(t.label)}</span>
         </div>
       `).join('');
+      swatchItemCache = Array.from(document.querySelectorAll('.theme-swatch-item'));
+      swatchRectCache = [];
     }
 
     function openThemePanel() {
       document.getElementById('themePopover').classList.add('open');
       document.getElementById('themeBackdrop').classList.add('open');
+      requestAnimationFrame(refreshSwatchRects);
       if (navigator.vibrate) navigator.vibrate(18);
     }
 
     function closeThemePanel() {
       document.getElementById('themePopover').classList.remove('open');
       document.getElementById('themeBackdrop').classList.remove('open');
-      document.querySelectorAll('.theme-swatch-item').forEach(el => el.classList.remove('sliding-hover'));
+      for (let i = 0; i < swatchItemCache.length; i++) swatchItemCache[i].classList.remove('sliding-hover');
+      swatchRectCache = [];
     }
 
     function selectThemeFromPanel(idx) {
@@ -2544,13 +2567,14 @@ body{
 
     (function initThemeButtonGestures() {
       const btn = document.getElementById('darkModeBtn');
-      let pressTimer = null, isLongPress = false, isDown = false, lastIdx = null;
+      let pressTimer = null, isLongPress = false, isDown = false, lastIdx = null, lastHoverEl = null;
 
       btn.addEventListener('pointerdown', (e) => {
         if (e.button && e.button !== 0) return;
         isDown = true;
         isLongPress = false;
         lastIdx = null;
+        lastHoverEl = null;
         btn.classList.add('pressing');
         try { btn.setPointerCapture(e.pointerId); } catch (_) {}
         pressTimer = setTimeout(() => {
@@ -2560,16 +2584,23 @@ body{
 
       btn.addEventListener('pointermove', (e) => {
         if (!isDown || !isLongPress) return;
-        const target = document.elementFromPoint(e.clientX, e.clientY);
-        const swatch = target ? target.closest('.theme-swatch-item') : null;
-        document.querySelectorAll('.theme-swatch-item').forEach(el => el.classList.toggle('sliding-hover', el === swatch));
-        if (swatch) {
-          const idx = Number(swatch.getAttribute('data-theme-idx'));
-          if (idx !== lastIdx) {
-            lastIdx = idx;
-            applyThemeByGlobalIndex(idx);
-            if (navigator.vibrate) navigator.vibrate(8);
-          }
+        if (!swatchRectCache.length) refreshSwatchRects();
+        const x = e.clientX, y = e.clientY;
+        let hit = null;
+        for (let i = 0; i < swatchRectCache.length; i++) {
+          const item = swatchRectCache[i], r = item.r;
+          if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) { hit = item; break; }
+        }
+        const hitEl = hit ? hit.el : null;
+        if (hitEl !== lastHoverEl) {
+          if (lastHoverEl) lastHoverEl.classList.remove('sliding-hover');
+          if (hitEl) hitEl.classList.add('sliding-hover');
+          lastHoverEl = hitEl;
+        }
+        if (hit && hit.idx !== lastIdx) {
+          lastIdx = hit.idx;
+          applyThemeByGlobalIndex(hit.idx);
+          if (navigator.vibrate) navigator.vibrate(8);
         }
       });
 
@@ -2703,6 +2734,6 @@ body{
     document.getElementById('sunMoonIcon').innerHTML = isDarkMode ? MOON_SVG : SUN_SVG;
     syncStaticUIText();
   </script>
-<script src="hub/hub.js?v=20261118a"></script>
+<script src="hub/hub.js?v=20261119a"></script>
 </body>
 </html>

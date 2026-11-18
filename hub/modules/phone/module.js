@@ -27,10 +27,31 @@ function __resumeAll() { for (const e of __listeners) if (!e.active) { e.t.addEv
 
 /* ---- fetch shadow: relative URLs resolve against the site's real dir ---- */
 const __realFetch = window.fetch.bind(window);
+const __fetchSession = new Set();
+let __fetchSuspended = true;
+function __abortFetchSession() {
+  for (const ctl of Array.from(__fetchSession)) { try { ctl.abort(); } catch (e) {} }
+  __fetchSession.clear();
+}
 function __fetch(u, o) {
+  if (__fetchSuspended) return Promise.reject(new DOMException('hub: module suspended', 'AbortError'));
   if (typeof u === 'string' && u.charAt(0) !== '/' && !/^[a-z][a-z0-9+.-]*:/i.test(u))
     u = new URL(u, location.origin + __base).href;
-  return __realFetch(u, o);
+  const ctl = new AbortController();
+  const opts = Object.assign({}, o || {});
+  if (opts.signal) {
+    const ext = opts.signal;
+    if (ext.aborted) ctl.abort();
+    else ext.addEventListener('abort', () => ctl.abort(), { once: true });
+  }
+  opts.signal = ctl.signal;
+  __fetchSession.add(ctl);
+  let p;
+  try { p = __realFetch(u, opts); }
+  catch (e) { __fetchSession.delete(ctl); throw e; }
+  const settle = () => __fetchSession.delete(ctl);
+  if (p && typeof p.then === 'function') p.then(settle, settle);
+  return p;
 }
 
 /* ---- scoped document: root-first lookups; documentElement/body are the
@@ -45,7 +66,11 @@ const __docProxy = new Proxy(document, {
   get(t, k) {
     if (k === 'documentElement' || k === 'body') return __root || t.documentElement;
     if (k === 'head') return t.head;
-    if (k === 'getElementById') return id => (__root && __root.querySelector('#' + CSS.escape(String(id)))) || t.getElementById(id);
+    if (k === 'getElementById') return id => {
+      if (id === '' || id === null || id === undefined) return null;
+      if (__root) { try { const el = __root.querySelector('#' + CSS.escape(String(id))); if (el) return el; } catch (e) {} }
+      return t.getElementById(id);
+    };
     if (k === 'querySelector') return sel => __rootQS(sel) || t.querySelector(sel);
     if (k === 'querySelectorAll') return sel => {
       const s = String(sel).trim();
@@ -1330,13 +1355,16 @@ function __boot() {
       clearSearch();
     }
 
+    let __searchDebounceTimer = 0;
     function handleSearchInput() {
       const val = document.getElementById('searchInput').value.trim();
       document.getElementById('clearBtn').classList.toggle('visible', val.length > 0);
-      renderAll();
+      clearTimeout(__searchDebounceTimer);
+      __searchDebounceTimer = setTimeout(renderAll, 120);
     }
 
     function clearSearch() {
+      clearTimeout(__searchDebounceTimer);
       const input = document.getElementById('searchInput');
       input.value = '';
       document.getElementById('clearBtn').classList.remove('visible');
@@ -1348,6 +1376,7 @@ function __boot() {
       if (!input.value.trim()) {
         input.focus();
       } else {
+        clearTimeout(__searchDebounceTimer);
         renderAll();
       }
     }
@@ -1375,10 +1404,22 @@ function __boot() {
     }
 
     function toggleCheckStep(stepNum) {
+      let done = false;
       if (completedSteps.has(stepNum)) {
         completedSteps.delete(stepNum);
       } else {
         completedSteps.add(stepNum);
+        done = true;
+      }
+      const card = document.getElementById('selfTestSpecialCard');
+      const item = card && card.querySelector(`.checklist-item[data-step="${stepNum}"]`);
+      if (item) {
+        item.classList.toggle('done', done);
+        const badge = item.querySelector('.step-num-badge');
+        if (badge) badge.textContent = done ? '✓' : String(stepNum);
+        const cnt = card.querySelector('.site-list-count');
+        if (cnt) cnt.textContent = `已完成 ${completedSteps.size} / 8 步`;
+        return;
       }
       renderAll();
     }
@@ -1434,7 +1475,7 @@ function __boot() {
       const stepsHtml = selfTestSteps.map(s => {
         const isDone = completedSteps.has(s.step);
         return `
-          <div class="checklist-item ${isDone ? 'done' : ''}" onclick="toggleCheckStep(${s.step})">
+          <div class="checklist-item ${isDone ? 'done' : ''}" data-step="${s.step}" onclick="toggleCheckStep(${s.step})">
             <span class="step-num-badge">${isDone ? '✓' : s.step}</span>
             <div class="checklist-body">
               <div class="checklist-title">${zh ? s.title : s.titleEn}</div>
@@ -1741,6 +1782,7 @@ function __boot() {
 }
 
 export function mount(root, ctx) {
+  __fetchSuspended = false;
   __root = root; __ctx = ctx || {};
   if (__ctx.standalone) __standalone = true;
   if (!__booted) { __booted = true; __boot(); }
@@ -1749,6 +1791,8 @@ export function mount(root, ctx) {
   return Promise.resolve(true);
 }
 export function unmount() {
+  __fetchSuspended = true;
+  __abortFetchSession();
   __suspendAll();
   __restoreBridge();
 }

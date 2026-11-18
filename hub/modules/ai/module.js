@@ -27,10 +27,31 @@ function __resumeAll() { for (const e of __listeners) if (!e.active) { e.t.addEv
 
 /* ---- fetch shadow: relative URLs resolve against the site's real dir ---- */
 const __realFetch = window.fetch.bind(window);
+const __fetchSession = new Set();
+let __fetchSuspended = true;
+function __abortFetchSession() {
+  for (const ctl of Array.from(__fetchSession)) { try { ctl.abort(); } catch (e) {} }
+  __fetchSession.clear();
+}
 function __fetch(u, o) {
+  if (__fetchSuspended) return Promise.reject(new DOMException('hub: module suspended', 'AbortError'));
   if (typeof u === 'string' && u.charAt(0) !== '/' && !/^[a-z][a-z0-9+.-]*:/i.test(u))
     u = new URL(u, location.origin + __base).href;
-  return __realFetch(u, o);
+  const ctl = new AbortController();
+  const opts = Object.assign({}, o || {});
+  if (opts.signal) {
+    const ext = opts.signal;
+    if (ext.aborted) ctl.abort();
+    else ext.addEventListener('abort', () => ctl.abort(), { once: true });
+  }
+  opts.signal = ctl.signal;
+  __fetchSession.add(ctl);
+  let p;
+  try { p = __realFetch(u, opts); }
+  catch (e) { __fetchSession.delete(ctl); throw e; }
+  const settle = () => __fetchSession.delete(ctl);
+  if (p && typeof p.then === 'function') p.then(settle, settle);
+  return p;
 }
 
 /* ---- scoped document: root-first lookups; documentElement/body are the
@@ -45,7 +66,11 @@ const __docProxy = new Proxy(document, {
   get(t, k) {
     if (k === 'documentElement' || k === 'body') return __root || t.documentElement;
     if (k === 'head') return t.head;
-    if (k === 'getElementById') return id => (__root && __root.querySelector('#' + CSS.escape(String(id)))) || t.getElementById(id);
+    if (k === 'getElementById') return id => {
+      if (id === '' || id === null || id === undefined) return null;
+      if (__root) { try { const el = __root.querySelector('#' + CSS.escape(String(id))); if (el) return el; } catch (e) {} }
+      return t.getElementById(id);
+    };
     if (k === 'querySelector') return sel => __rootQS(sel) || t.querySelector(sel);
     if (k === 'querySelectorAll') return sel => {
       const s = String(sel).trim();
@@ -248,7 +273,9 @@ function revealGroupForJump(grp){
   if(tr)tr.setAttribute('aria-expanded','true');
 }
 const GCAT=id=>id.indexOf('gpt-')===0?'GPT':id.indexOf('ag-')===0?'Antigravity':id.indexOf('codex-')===0?'Codex':id.indexOf('grok-')===0?'Grok':id.indexOf('muse')===0?'Muse':id.indexOf('vcc')===0?'VCC':'Claude';
-const GICON={'vcc':'<svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(7.5, 7.5) scale(0.875)"><path fill="currentColor" fill-rule="evenodd" d="M4 3h16a2 2 0 012 2v14a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2zm0 2v14h16V5H4z"/><path fill="currentColor" d="M2 8h20v3H2z"/><path fill="currentColor" d="M5 14h5v3H5z"/></g></svg>','muse':'<svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(7.5, 7.5) scale(0.875)"><path fill="currentColor" d="M12 1.5l2.1 8.4 8.4 2.1-8.4 2.1L12 22.5l-2.1-8.4L1.5 12l8.4-2.1L12 1.5z"/></g></svg>','gpt-unbound':'<svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(7.5, 7.5) scale(0.875)"><path fill="currentColor" fill-rule="evenodd" d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 005.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0010.205 0a5.947 5.947 0 00-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 004.162 1.713z"></path></g></svg>','gpt-bound':'<svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(7.5, 7.5) scale(0.875)"><path fill="currentColor" fill-rule="evenodd" d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 005.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0010.205 0a5.947 5.947 0 00-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 004.162 1.713z"></path></g></svg>','gpt-weekly':'<svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(7.5, 7.5) scale(0.875)"><path fill="currentColor" fill-rule="evenodd" d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 005.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0010.205 0a5.947 5.947 0 00-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 004.162 1.713z"></path></g></svg>','ag-cheapest':'<svg class="ic-gem" viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(8.5, 8.5) scale(0.7917)"><path fill="currentColor" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"></path></g></svg>','ag-verified':'<svg class="ic-gem" viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(8.5, 8.5) scale(0.7917)"><path fill="currentColor" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"></path></g></svg>','codex-sms':'<svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(7.5, 7.5) scale(0.875)"><path fill="currentColor" fill-rule="evenodd" d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 005.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0010.205 0a5.947 5.947 0 00-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 004.162 1.713z"></path></g></svg>','grok-heavy':'<svg class="ic-grok" viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(8, 8) scale(0.8333)"><path fill="currentColor" fill-rule="evenodd" d="M9.27 15.29l7.978-5.897c.391-.29.95-.177 1.137.272.98 2.369.542 5.215-1.41 7.169-1.951 1.954-4.667 2.382-7.149 1.406l-2.711 1.257c3.889 2.661 8.611 2.003 11.562-.953 2.341-2.344 3.066-5.539 2.388-8.42l.006.007c-.983-4.232.242-5.924 2.75-9.383.06-.082.12-.164.179-.248l-3.301 3.305v-.01L9.267 15.292M7.623 16.723c-2.792-2.67-2.31-6.801.071-9.184 1.761-1.763 4.647-2.483 7.166-1.425l2.705-1.25a7.808 7.808 0 00-1.829-1A8.975 8.975 0 005.984 5.83c-2.533 2.536-3.33 6.436-1.962 9.764 1.022 2.487-.653 4.246-2.34 6.022-.599.63-1.199 1.259-1.682 1.925l7.62-6.815"></path></g></svg>','claude':'<svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(8, 8) scale(0.8333)"><path fill="currentColor" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"></path></g></svg>'};
+const _OPENAI_SVG='<svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(7.5, 7.5) scale(0.875)"><path fill="currentColor" fill-rule="evenodd" d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 005.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0010.205 0a5.947 5.947 0 00-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 004.162 1.713z"></path></g></svg>';
+const _GEM_SVG='<svg class="ic-gem" viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(8.5, 8.5) scale(0.7917)"><path fill="currentColor" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"></path></g></svg>';
+const GICON={'vcc':'<svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(7.5, 7.5) scale(0.875)"><path fill="currentColor" fill-rule="evenodd" d="M4 3h16a2 2 0 012 2v14a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2zm0 2v14h16V5H4z"/><path fill="currentColor" d="M2 8h20v3H2z"/><path fill="currentColor" d="M5 14h5v3H5z"/></g></svg>','muse':'<svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(7.5, 7.5) scale(0.875)"><path fill="currentColor" d="M12 1.5l2.1 8.4 8.4 2.1-8.4 2.1L12 22.5l-2.1-8.4L1.5 12l8.4-2.1L12 1.5z"/></g></svg>','gpt-unbound':_OPENAI_SVG,'gpt-bound':_OPENAI_SVG,'gpt-weekly':_OPENAI_SVG,'ag-cheapest':_GEM_SVG,'ag-verified':_GEM_SVG,'codex-sms':_OPENAI_SVG,'grok-heavy':'<svg class="ic-grok" viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(8, 8) scale(0.8333)"><path fill="currentColor" fill-rule="evenodd" d="M9.27 15.29l7.978-5.897c.391-.29.95-.177 1.137.272.98 2.369.542 5.215-1.41 7.169-1.951 1.954-4.667 2.382-7.149 1.406l-2.711 1.257c3.889 2.661 8.611 2.003 11.562-.953 2.341-2.344 3.066-5.539 2.388-8.42l.006.007c-.983-4.232.242-5.924 2.75-9.383.06-.082.12-.164.179-.248l-3.301 3.305v-.01L9.267 15.292M7.623 16.723c-2.792-2.67-2.31-6.801.071-9.184 1.761-1.763 4.647-2.483 7.166-1.425l2.705-1.25a7.808 7.808 0 00-1.829-1A8.975 8.975 0 005.984 5.83c-2.533 2.536-3.33 6.436-1.962 9.764 1.022 2.487-.653 4.246-2.34 6.022-.599.63-1.199 1.259-1.682 1.925l7.62-6.815"></path></g></svg>','claude':'<svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><g transform="translate(8, 8) scale(0.8333)"><path fill="currentColor" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"></path></g></svg>'};
 function renderBoard(){if(drag){pendingSwipeRender=true;return;}
   const keepOpenW=document.querySelector('#groups .swipe[data-open="1"]'); const keepOpenUrl=keepOpenW?keepOpenW.dataset.surl:null;
   const q=$('#q').value.trim(); const lk=linkCodeOf(q);
@@ -338,13 +365,24 @@ function renderBoard(){if(drag){pendingSwipeRender=true;return;}
   const go=$('#gotoShops');
   if(go) go.onclick=()=>{ shopShown=300; switchTab(true); renderShops(); };
 }
-function renderShops(){
-  if(!shops){$('#shopList').innerHTML=SKEL_SHOPS;return;}
+function shopRowHtml(s){
+  return '<div class="shop"><div class="nm">'+(s.url?'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.name)+' ↗</a>':esc(s.name))+'</div>'+(s.url?'':'<span class="only">仅店名</span>')+'<div class="pf">'+esc(s.platform)+(s.code?' · '+esc(s.code):'')+'</div></div>';
+}
+let _lastShopKey='';
+function renderShops(appendFrom){
+  if(!shops){$('#shopList').innerHTML=SKEL_SHOPS;_lastShopKey='';return;}
   const q=$('#q').value.trim().toLowerCase(); const lk=linkCodeOf(q);
+  const key=shopFilter+'|'+q+'|'+(shops.updated_at||'');
   const list=shops.shops.filter(s=>(shopFilter==='全部'||s.platform===shopFilter)&&(!q||fuzzy(q,s.name,s.platform,s.code)||(lk&&String(s.code||'').toLowerCase().indexOf(lk)>=0)));
   $('#shopMeta').textContent='共 '+list.length+' 家（目录快照 '+shops.updated_at+' · 同店多平台/多代码分别列）';
   shopListTotal=list.length;
-  $('#shopList').innerHTML=list.slice(0,shopShown).map(s=>'<div class="shop"><div class="nm">'+(s.url?'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.name)+' ↗</a>':esc(s.name))+'</div>'+(s.url?'':'<span class="only">仅店名</span>')+'<div class="pf">'+esc(s.platform)+(s.code?' · '+esc(s.code):'')+'</div></div>').join('');
+  const el=$('#shopList');
+  if(appendFrom>0&&key===_lastShopKey&&el.children.length>=appendFrom){
+    el.insertAdjacentHTML('beforeend', list.slice(appendFrom,shopShown).map(shopRowHtml).join(''));
+  }else{
+    _lastShopKey=key;
+    el.innerHTML=list.slice(0,shopShown).map(shopRowHtml).join('');
+  }
 }
 function switchTab(shopsView){
   $('#q').placeholder=shopsView?'搜店名，如 985ai':'搜商品或店名，如 xai 超市';
@@ -367,13 +405,26 @@ function switchTab(shopsView){
 }
 /* 总览卡店名：先自动缩小字号尽量显全（11→9px，0.5 步进），缩到最小仍放不下才加渐隐 */
 function fitLeaderShops(){
-  document.querySelectorAll('.product-card .shop-name').forEach(el=>{
-    el.classList.remove('fade');
-    el.style.fontSize='';
-    let size=11.5;
-    while(el.clientWidth>0&&el.scrollWidth>el.clientWidth&&size>9){ size-=0.5; el.style.fontSize=size+'px'; }
-    if(el.clientWidth>0&&el.scrollWidth>el.clientWidth)el.classList.add('fade');
-  });
+  const els=[...document.querySelectorAll('.product-card .shop-name')];
+  const resets=[];
+  for(const el of els){ el.classList.remove('fade'); el.style.fontSize=''; }
+  for(const el of els){
+    const cw=el.clientWidth, sw=el.scrollWidth;
+    if(cw>0&&sw>cw){
+      const est=Math.max(9,Math.min(11,Math.floor((11.5*cw/sw)*2)/2));
+      resets.push({el,est});
+    }
+  }
+  for(const r of resets) r.el.style.fontSize=r.est+'px';
+  for(const r of resets){
+    if(r.el.clientWidth>0&&r.el.scrollWidth>r.el.clientWidth){
+      if(r.est>9){
+        const next=Math.max(9,r.est-0.5);
+        r.el.style.fontSize=next+'px';
+        if(r.el.scrollWidth>r.el.clientWidth) r.el.classList.add('fade');
+      }else r.el.classList.add('fade');
+    }
+  }
 }
 let leaderRsz;
 window.addEventListener('resize',()=>{ clearTimeout(leaderRsz); leaderRsz=setTimeout(fitLeaderShops,150); });
@@ -749,8 +800,9 @@ new IntersectionObserver(es=>{
   if($('#viewShops').classList.contains('hide')) return;
   if(shopShown>=shopListTotal) return;
   shopLoading=true;
-  $('#shopLoading').classList.remove('hide');
-  setTimeout(()=>{ shopShown+=300; renderShops(); $('#shopLoading').classList.add('hide'); shopLoading=false; },350);
+  const prev=shopShown;
+  shopShown+=300;
+  requestAnimationFrame(()=>{ renderShops(prev); shopLoading=false; });
 },{rootMargin:'300px'}).observe($('#shopSentinel'));
 // 锚点路由：点商品离开前先把 #it-<组>-<序号>（或 #grp-<组>）写入地址并留一条历史，
 // 从商品页返回时按锚点滚回那一条并高亮；带锚点的链接也可直接分享定位。
@@ -822,9 +874,17 @@ function fitStatusRow(){
   const row=document.querySelector('.status-row'),btn=$('#refreshBtn');
   if(!row||!btn) return;
   btn.style.fontSize=''; btn.style.padding='';
-  const cs=getComputedStyle(btn); const f0=parseFloat(cs.fontSize)||13; let fs=f0;
-  const pt=parseFloat(cs.paddingTop)||8, pl=parseFloat(cs.paddingLeft)||15;
-  while(row.scrollWidth>row.clientWidth+0.5&&fs>10){ fs=Math.max(10,fs-0.5); btn.style.fontSize=fs+'px'; btn.style.padding=(pt*fs/f0)+'px '+(pl*fs/f0)+'px'; }
+  const cs=getComputedStyle(btn), f0=parseFloat(cs.fontSize)||13;
+  const cw=row.clientWidth, sw=row.scrollWidth;
+  if(sw>cw+0.5){
+    const pt=parseFloat(cs.paddingTop)||8, pl=parseFloat(cs.paddingLeft)||15;
+    const over=sw-cw, bw=btn.offsetWidth||80;
+    let fs=Math.max(10,Math.floor((f0*Math.max(0.75,(bw-over)/bw))*2)/2);
+    btn.style.fontSize=fs+'px'; btn.style.padding=(pt*fs/f0)+'px '+(pl*fs/f0)+'px';
+    if(row.scrollWidth>row.clientWidth+0.5&&fs>10){
+      fs=10; btn.style.fontSize='10px'; btn.style.padding=(pt*10/f0)+'px '+(pl*10/f0)+'px';
+    }
+  }
   row.classList.add('ready');
 }
 let statusRsz;
@@ -834,7 +894,6 @@ if(window.INLINE_BOARD){
   board=window.INLINE_BOARD;
   fillMeta(board);
   renderBoard();
-  verifyStocks();
   setTimeout(jumpToHash,60);
 }else{
   $('#refreshBtn').classList.add('loading');
@@ -843,15 +902,19 @@ fetch('data/board.json',{cache:'no-store'}).then(r=>r.json()).then(b=>{
   $('#refreshBtn').classList.remove('loading');
   if(!board||b.updated_at!==board.updated_at){board=b;fillMeta(board);renderBoard();}
   verifyStocks();
-}).catch(e=>{$('#refreshBtn').classList.remove('loading');if(!board){const mt=$('#metaTime'),mc=$('#metaCount');mt.textContent='—';mt.className='';mc.textContent='—';mc.className='';const sr=document.querySelector('.status-row');if(sr)sr.classList.add('ready');$('#leaders').innerHTML='';$('#groups').innerHTML='<p class="sub">数据加载失败，请稍后刷新。</p>';}});
+}).catch(e=>{$('#refreshBtn').classList.remove('loading');if(board){verifyStocks();return;}const mt=$('#metaTime'),mc=$('#metaCount');mt.textContent='—';mt.className='';mc.textContent='—';mc.className='';const sr=document.querySelector('.status-row');if(sr)sr.classList.add('ready');$('#leaders').innerHTML='';$('#groups').innerHTML='<p class="sub">数据加载失败，请稍后刷新。</p>';});
 function loadShops(){ fetch('data/shops.json').then(r=>r.json()).then(s=>{
   shops=s;
-  const plats=['全部',...[...new Set(s.shops.map(x=>x.platform))].sort((a,b)=>s.shops.filter(x=>x.platform===b).length-s.shops.filter(x=>x.platform===a).length)];
-  $('#chips').innerHTML=plats.map(p=>'<button type="button" class="platform-filter-chip'+(p==='全部'?' active':'')+'" data-p="'+esc(p)+'">'+esc(p)+' ('+(p==='全部'?s.shops.length:s.shops.filter(x=>x.platform===p).length)+')</button>').join('');
+  const counts=new Map();
+  for(const item of s.shops) counts.set(item.platform,(counts.get(item.platform)||0)+1);
+  const plats=['全部',...[...counts.keys()].sort((a,b)=>counts.get(b)-counts.get(a))];
+  $('#chips').innerHTML=plats.map(p=>'<button type="button" class="platform-filter-chip'+(p==='全部'?' active':'')+'" data-p="'+esc(p)+'">'+esc(p)+' ('+(p==='全部'?s.shops.length:counts.get(p))+')</button>').join('');
   document.querySelectorAll('#chips button').forEach(btn=>btn.onclick=()=>{shopFilter=btn.dataset.p;shopShown=300;document.querySelectorAll('#chips button').forEach(x=>x.classList.toggle('active',x===btn));renderShops();});
-  renderShops();
-  if(board)renderBoard();
-}).catch(e=>{ if(shopsRetry<2){ shopsRetry++; setTimeout(loadShops,1500); } else { shopsFailed=true; if($('#q').value.trim()) renderBoard(); } }); } loadShops(); loadMaps();
+  if(!$('#viewShops').classList.contains('hide')) renderShops();
+  if(board&&$('#q').value.trim()) renderBoard();
+}).catch(e=>{ if(shopsRetry<2){ shopsRetry++; setTimeout(loadShops,1500); } else { shopsFailed=true; if($('#q').value.trim()) renderBoard(); } }); }
+if('requestIdleCallback' in window) requestIdleCallback(()=>{ loadShops(); loadMaps(); },{timeout:1500});
+else setTimeout(()=>{ loadShops(); loadMaps(); },120);
 
 /* ---- original script block #3 (source line 2608) ---- */
 
@@ -973,6 +1036,7 @@ window.__applyTabTheme=function(){}; /* 全站单槽：切页签不换主题 */
 }
 
 export function mount(root, ctx) {
+  __fetchSuspended = false;
   __root = root; __ctx = ctx || {};
   if (__ctx.standalone) __standalone = true;
   if (!__booted) { __booted = true; __boot(); }
@@ -981,6 +1045,8 @@ export function mount(root, ctx) {
   return Promise.resolve(true);
 }
 export function unmount() {
+  __fetchSuspended = true;
+  __abortFetchSession();
   __suspendAll();
   __restoreBridge();
 }

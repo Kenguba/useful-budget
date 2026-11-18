@@ -132,16 +132,8 @@
       background-image: none;
     }
 
-    @keyframes videoHoloBtn {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
     [data-holo="true"] .action-circle-btn {
       background: linear-gradient(135deg, #B2E2B4 0%, #98DBC5 45%, #9CC8F7 100%);
-      background-size: 200% 200%;
-      animation: videoHoloBtn 4.2s ease infinite;
     }
 
     /* 顶部第一行：左侧品牌标识 + 右上角组件 */
@@ -390,8 +382,6 @@
 
     .swatch-orb-preview.holo-animated {
       background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%) !important;
-      background-size: 220% 220% !important;
-      animation: videoHoloBtn 3.2s ease infinite;
     }
 
     .swatch-label {
@@ -698,7 +688,7 @@
       font-weight: 600;
       white-space: nowrap;
       cursor: pointer;
-      transition: all 0.28s ease;
+      transition: background-color 0.28s ease, border-color 0.28s ease, color 0.28s ease;
     }
 
     .cat-chip.active {
@@ -1042,7 +1032,7 @@
       font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
-      transition: all 0.22s ease;
+      transition: background-color 0.22s ease, border-color 0.22s ease, color 0.22s ease;
     }
 
     .platform-filter-chip.active,
@@ -1353,7 +1343,7 @@
       display: inline-flex;
       align-items: center;
       gap: 2px;
-      transition: all 0.2s ease;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     .same-source-btn:hover {
@@ -1541,7 +1531,7 @@
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.22s ease;
+      transition: background-color 0.22s ease, border-color 0.22s ease, color 0.22s ease;
     }
 
     .arch-tabs button[aria-selected="true"] {
@@ -3093,9 +3083,18 @@
       });
     }
 
+    let swatchItemRects = [];
+    function refreshSwatchRects() {
+      swatchItemRects = Array.from(document.querySelectorAll('.theme-swatch-item')).map(el => ({
+        el, idx: Number(el.getAttribute('data-theme-idx')), rect: el.getBoundingClientRect()
+      }));
+    }
+
     function openThemePanel() {
       document.getElementById('themePopover').classList.add('open');
       document.getElementById('themeBackdrop').classList.add('open');
+      swatchItemRects = [];
+      requestAnimationFrame(refreshSwatchRects);
       if (navigator.vibrate) navigator.vibrate(18);
     }
 
@@ -3116,12 +3115,14 @@
       let isLongPressTriggered = false;
       let isPointerDown = false;
       let lastHoveredIdx = null;
+      let lastHoverEl = null;
 
       btn.addEventListener('pointerdown', (e) => {
         if (e.button && e.button !== 0) return;
         isPointerDown = true;
         isLongPressTriggered = false;
         lastHoveredIdx = null;
+        lastHoverEl = null;
         btn.classList.add('pressing');
 
         try { btn.setPointerCapture(e.pointerId); } catch (_) {}
@@ -3135,21 +3136,23 @@
 
       btn.addEventListener('pointermove', (e) => {
         if (!isPointerDown || !isLongPressTriggered) return;
-
-        const targetEl = document.elementFromPoint(e.clientX, e.clientY);
-        const swatchItem = targetEl ? targetEl.closest('.theme-swatch-item') : null;
-
-        document.querySelectorAll('.theme-swatch-item').forEach(el => {
-          el.classList.toggle('sliding-hover', el === swatchItem);
-        });
-
-        if (swatchItem) {
-          const idx = Number(swatchItem.getAttribute('data-theme-idx'));
-          if (idx !== lastHoveredIdx) {
-            lastHoveredIdx = idx;
-            applyThemeByGlobalIndex(idx);
-            if (navigator.vibrate) navigator.vibrate(8);
-          }
+        if (!swatchItemRects.length) refreshSwatchRects();
+        const x = e.clientX, y = e.clientY;
+        let hit = null;
+        for (let i = 0; i < swatchItemRects.length; i++) {
+          const r = swatchItemRects[i].rect;
+          if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) { hit = swatchItemRects[i]; break; }
+        }
+        const swatchItem = hit ? hit.el : null;
+        if (lastHoverEl !== swatchItem) {
+          if (lastHoverEl) lastHoverEl.classList.remove('sliding-hover');
+          if (swatchItem) swatchItem.classList.add('sliding-hover');
+          lastHoverEl = swatchItem;
+        }
+        if (hit && hit.idx !== lastHoveredIdx) {
+          lastHoveredIdx = hit.idx;
+          applyThemeByGlobalIndex(hit.idx);
+          if (navigator.vibrate) navigator.vibrate(8);
         }
       });
 
@@ -3232,7 +3235,6 @@
       renderThemeSwatches();
       renderSummaryCards();
       renderRouteComparisonRows();
-      renderDoubtsAccordion();
     }
 
     function toggleLanguage() {
@@ -3328,15 +3330,20 @@
       clearSearch();
     }
 
+    let __wbSearchTimer = 0;
     function handleSearchInput() {
       const val = document.getElementById('searchInput').value.trim();
       document.getElementById('clearBtn').classList.toggle('visible', val.length > 0);
-      renderSummaryCards();
-      renderRouteComparisonRows();
-      renderDoubtsAccordion();
+      clearTimeout(__wbSearchTimer);
+      __wbSearchTimer = setTimeout(() => {
+        renderSummaryCards();
+        renderRouteComparisonRows();
+        renderDoubtsAccordion();
+      }, 120);
     }
 
     function clearSearch() {
+      clearTimeout(__wbSearchTimer);
       const input = document.getElementById('searchInput');
       input.value = '';
       document.getElementById('clearBtn').classList.remove('visible');
@@ -3350,8 +3357,10 @@
       if (!input.value.trim()) {
         input.focus();
       } else {
+        clearTimeout(__wbSearchTimer);
         renderSummaryCards();
         renderRouteComparisonRows();
+        renderDoubtsAccordion();
       }
     }
 
@@ -3605,6 +3614,7 @@
     applyDarkModeState();
     switchArchView('wecom', document.querySelector('.arch-tabs button[data-view="wecom"]'));
     syncLanguageUI();
+    renderDoubtsAccordion();
   </script>
 </body>
 </html>

@@ -41,6 +41,7 @@ TOKEN_RE = re.compile(r"^t([a-z0-9]{10,24})-(\d{1,2})$")
 
 _lock = threading.Lock()
 _log = {}  # token -> {"created": ts, "queries": [ {ip, ecs, qtype, ts} ]}
+_last_prune = 0.0
 
 
 # ---------- DNS 报文解析 ----------
@@ -119,6 +120,7 @@ def extract_ecs(msg, arcount, off):
 # ---------- 记录 ----------
 
 def record_query(qname_l, resolver_ip, ecs, qtype):
+    global _last_prune
     first = qname_l.split(".")[0]
     m = TOKEN_RE.match(first)
     if not m:
@@ -130,10 +132,12 @@ def record_query(qname_l, resolver_ip, ecs, qtype):
         if ent is None:
             ent = _log[token] = {"created": now, "queries": []}
         ent["queries"].append({"ip": resolver_ip, "ecs": ecs, "qtype": qtype, "ts": now})
-        # 顺手清理过期令牌
-        dead = [k for k, v in _log.items() if now - v["created"] > KEEP_SECONDS]
-        for k in dead:
-            _log.pop(k, None)
+        # 均摊过期清理：每 30 秒或条目过多时扫描一次，避免每包 O(N) 持锁遍历
+        if now - _last_prune >= 30.0 or len(_log) > 2000:
+            _last_prune = now
+            dead = [k for k, v in _log.items() if now - v["created"] > KEEP_SECONDS]
+            for k in dead:
+                _log.pop(k, None)
 
 
 # ---------- 应答构造 ----------
@@ -200,6 +204,7 @@ class UDPHandler(BaseRequestHandler):
 
 class TCPHandler(BaseRequestHandler):
     def handle(self):
+        self.request.settimeout(5.0)
         while True:
             hdr = self.request.recv(2)
             if len(hdr) < 2:
@@ -256,7 +261,10 @@ def main():
     # 与本机 systemd-resolved 的 127.0.*.* 存根共存：SO_REUSEADDR 下通配绑定可成功，
     # 发往 127.0.*.* 的本机解析仍归存根，外网查询落到本服务
     ThreadingUDPServer.allow_reuse_address = True
+    ThreadingUDPServer.daemon_threads = True
     ThreadingTCPServer.allow_reuse_address = True
+    ThreadingTCPServer.daemon_threads = True
+    ThreadingHTTPServer.daemon_threads = True
     udp = ThreadingUDPServer((BIND_IP, DNS_PORT), UDPHandler)
     tcp = ThreadingTCPServer((BIND_IP, DNS_PORT), TCPHandler)
     http = ThreadingHTTPServer(("127.0.*.*", HTTP_PORT), ResultHandler)

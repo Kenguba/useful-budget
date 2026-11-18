@@ -49,10 +49,6 @@ button{font-family:inherit;cursor:pointer}
   background:var(--hero-bg-base);background-image:radial-gradient(115% 110px at 26% calc(100% - 46px),color-mix(in srgb,var(--orb-color-1) 42%,transparent) 0%,transparent 88%),radial-gradient(115% 110px at 74% calc(100% - 46px),color-mix(in srgb,var(--orb-color-2) 42%,transparent) 0%,transparent 88%);border-radius:28px;
   box-shadow:0 16px 40px -12px rgba(15,23,42,.13),0 4px 14px rgba(15,23,42,.03);
   transition:background-color .55s ease,box-shadow .6s ease}
-[data-dark="true"] /* 头卡下缘渐变过渡（ken 2026-11-07 定）：光斑在贴近卡片底边前先融进页面底色，绿色不再硬切；顶栏与 Hero 共用此层（初版融卡底色 #FFF 显出白带，已改融页面底色） */
-[data-holo="true"] [data-holo="true"] [data-holo="true"] [data-holo="true"] 50%{transform:translate(16px,-8px)}}
-50%{transform:translate(-14px,-6px)}}
-50%{transform:translate(-10px,-4px) scale(1.06)}}
 [data-dark="true"] body{background-image:none}
 .topbar-in{position:relative;z-index:1;display:flex;flex-direction:column;gap:10px;padding:14px 16px 12px}
 /* 第一行不换行：品牌可收缩省略，右侧控件组 flex:none 不许压（主题钮防消失的机制修复） */

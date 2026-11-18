@@ -697,8 +697,9 @@ async function fetchJSON(url,ms){
   try{const r=await fetch(url,{signal:ctl.signal});if(!r.ok)throw new Error("http "+r.status);return await r.json()}
   finally{clearTimeout(t)}
 }
-async function fetchText(url,ms){
+async function fetchText(url,ms,extSig){
   const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),ms||5000);
+  if(extSig){if(extSig.aborted)ctl.abort();else extSig.addEventListener("abort",()=>ctl.abort(),{once:true})}
   try{const r=await fetch(url,{signal:ctl.signal});if(!r.ok)throw new Error("http "+r.status);return await r.text()}
   finally{clearTimeout(t)}
 }
@@ -835,9 +836,9 @@ function render(d,final){
   const num=ipToBig(d.ip);
   $("valDecimalIp").dataset.num=num!=null?String(num):"—";$("valDecimalIp").textContent=state.numVisible?$("valDecimalIp").dataset.num:"********";syncNumEye();
   $("scenarioGrid").innerHTML=d.scenes.map((sc,i)=>"<div class='scenario-cell'><div class='scenario-cell-name'>"+DYN.sceneNames[currentLang][i]+"</div><div class='scenario-stars-row'>"+starsHtml(sc[1])+"</div><div class='scenario-verdict verdict-"+suitCls(sc[1])+"'><span class='verdict-emoji'>"+suitIcon(sc[1])+"</span><span>"+suitText(sc[1])+"</span></div></div>").join("");
-  if(d.histAsn)renderExtra(d);
+  if(d.histAsn||detailsOpen)renderExtra(d);
   markPreset(d.ip);
-  if(final){updateReportDynamic(d);reportPrefetch(d)}
+  if(final)updateReportDynamic(d);
   $("mainIpCard").classList.remove("loading");hideErr();
 }
 function attrName(d){return currentLang==="zh"?d.attr:(d.cls&&d.cls.type==="residential"?TD("residential"):d.cls&&d.cls.type==="hosting"?TD("hosting"):TD("business"))}
@@ -855,9 +856,10 @@ function renderExtra(d){
   $("histCompany").innerHTML=(d.histCompany||[]).map(histItem).join("");
   $("histReg").innerHTML=(d.histReg||[]).map(histItem).join("");
   $("histLoc").innerHTML=(d.histLoc||[]).map(histItem).join("");
-  if(d.lat!=null&&d.lon!=null){
+  if(detailsOpen&&d.lat!=null&&d.lon!=null){
     const la=Number(d.lat),lo=Number(d.lon);
-    $("mapFrame").src="https://www.openstreetmap.org/export/embed.html?bbox="+(lo-0.09)+"%2C"+(la-0.05)+"%2C"+(lo+0.09)+"%2C"+(la+0.05)+"&layer=mapnik&marker="+la+"%2C"+lo;
+    const ms="https://www.openstreetmap.org/export/embed.html?bbox="+(lo-0.09)+"%2C"+(la-0.05)+"%2C"+(lo+0.09)+"%2C"+(la+0.05)+"&layer=mapnik&marker="+la+"%2C"+lo;
+    if($("mapFrame").dataset.src!==ms){$("mapFrame").dataset.src=ms;$("mapFrame").src=ms}
   }
   const ups=(d.neighbours||[]).filter(n=>n.side==="left").slice(0,3);
   const downCount=(d.neighbours||[]).filter(n=>n.side==="right").length;
@@ -979,34 +981,37 @@ async function runQuery(ip,selfMode,fromHist){
     render(d,true);
     if(!fromHist)pushHistory(d.ip,d.cc);
     if(seq===state.querySeq)setBusy(false);
-    // 第三阶段（不阻塞主结果）：ASN 历史 / BGP 邻居最后加载，到齐后补进详情
-    (async()=>{
+    // PTR 保持实时探测，ASN 历史 / BGP 邻居 / 地图延后至详情展开时按需拉取
+    if(!d.host){ptrP.then(ptrHost=>{if(seq===state.querySeq){if(ptrHost)d.host=ptrHost;d.hostDone=true;$("valHostname").textContent=d.host||TD("noHostname")}})}
+    d._loadExtra=async()=>{
+      if(d._extraStarted||seq!==state.querySeq)return;
+      d._extraStarted=true;
       const routingP=ripe("routing-history",targetIp,12000),neighP=asn?ripe("asn-neighbours",asn,12000):Promise.resolve(null);
-      if(!d.host){const ptrHost=await ptrP;if(seq===state.querySeq){if(ptrHost)d.host=ptrHost;d.hostDone=true;$("valHostname").textContent=d.host||TD("noHostname")}}
       const[routing,neigh]=await settled([routingP,neighP]);
       if(seq!==state.querySeq)return;
-    if(routing&&routing.by_origin){
-      const items=[];
-      routing.by_origin.forEach(o=>{
-        (o.prefixes||[]).forEach(p=>{
-          const tls=p.timelines||[];if(!tls.length)return;
-          items.push({ttl:"AS"+o.origin,org:d.asnHolder||"",cidr:p.prefix,first:fmtDT(tls[0].starttime),last:fmtDT(tls[tls.length-1].endtime),mine:o.origin===String(asn).replace("AS","")});
+      if(routing&&routing.by_origin){
+        const items=[];
+        routing.by_origin.forEach(o=>{
+          (o.prefixes||[]).forEach(p=>{
+            const tls=p.timelines||[];if(!tls.length)return;
+            items.push({ttl:"AS"+o.origin,org:d.asnHolder||"",cidr:p.prefix,first:fmtDT(tls[0].starttime),last:fmtDT(tls[tls.length-1].endtime),mine:o.origin===String(asn).replace("AS","")});
+          });
         });
-      });
-      items.sort((a,b)=>(b.mine-a.mine)||(a.first<b.first?-1:1));
-      d.histAsn=items.slice(0,3).map(i=>({ttl:i.ttl,org:i.org,cidr:i.cidr,first:i.first,last:i.last}));
-    }
-    if(neigh&&Array.isArray(neigh.neighbours)){
-      const all=neigh.neighbours.map(n=>({asn:n.asn,power:n.power,side:n.type==="right"?"right":"left"}));
-      all.sort((a,b)=>b.power-a.power);
-      const top=all.slice(0,10);
-      const overs=await settled(top.map(n=>ripe("as-overview","AS"+n.asn,4000)));
-      if(seq!==state.querySeq)return;
-      top.forEach((n,i)=>{n.holder=(overs[i]&&overs[i].holder)||"";n.idc=HOST_KW.some(k=>(n.holder||"").toLowerCase().includes(k))?1:0});
-      d.neighbours=top;
-    }
-      if(d.histAsn||d.neighbours)renderExtra(d);
-    })();
+        items.sort((a,b)=>(b.mine-a.mine)||(a.first<b.first?-1:1));
+        d.histAsn=items.slice(0,3).map(i=>({ttl:i.ttl,org:i.org,cidr:i.cidr,first:i.first,last:i.last}));
+      }
+      if(neigh&&Array.isArray(neigh.neighbours)){
+        const all=neigh.neighbours.map(n=>({asn:n.asn,power:n.power,side:n.type==="right"?"right":"left"}));
+        all.sort((a,b)=>b.power-a.power);
+        const top=all.slice(0,10);
+        const overs=await settled(top.map(n=>ripe("as-overview","AS"+n.asn,4000)));
+        if(seq!==state.querySeq)return;
+        top.forEach((n,i)=>{n.holder=(overs[i]&&overs[i].holder)||"";n.idc=HOST_KW.some(k=>(n.holder||"").toLowerCase().includes(k))?1:0});
+        d.neighbours=top;
+      }
+      renderExtra(d);
+    };
+    if(detailsOpen)d._loadExtra();
     // 地理补充源后到合并：CF / DB-IP 等到了再重排列位行，不阻塞主结果
     geoP.then(proxy=>{
       if(seq!==state.querySeq||!proxy||!proxy.sources)return;
@@ -1079,11 +1084,15 @@ function fitProtoFont(){
     const row=el.closest(".proto-row");if(!row)return;
     const badge=row.querySelector(".proto-badge");
     const act=row.querySelector(".ip-Quick-actions");const avail=row.clientWidth-(badge?badge.offsetWidth:52)-(act?act.offsetWidth+8:0)-14;
-    let fs=parseFloat(getComputedStyle(el).fontSize)||15.5;
-    while(el.scrollWidth>avail&&fs>10){fs-=0.5;el.style.fontSize=fs+"px"}
+    const sw=el.scrollWidth;
+    if(sw>avail&&avail>40){
+      const fs=parseFloat(getComputedStyle(el).fontSize)||15.5;
+      el.style.fontSize=Math.max(10,Math.floor((fs*avail/sw)*2)/2)+"px";
+    }
   });
 }
-window.addEventListener("resize",()=>{fitProtoFont();fitGeoFont();fitReportScale()});
+let __ipResizeRaf=0;
+window.addEventListener("resize",()=>{if(__ipResizeRaf)return;__ipResizeRaf=requestAnimationFrame(()=>{__ipResizeRaf=0;fitProtoFont();fitGeoFont();fitReportScale()})},{passive:true});
 function setMyIp(ip,primary){
   if(!ip)return;
   if(ip.includes(":")){myIpState.v6=ip;if(primary)myIpState.primary6=true}
@@ -1287,9 +1296,10 @@ function probeRtcFill(){
   if(rptRun.rtcActive)return;
   rptRun.rtcActive=true;
   const seq=++rptRun.rtc;
-  const found=[];let done=false;
+  const found=[];let done=false;let pc=null;
   const finish=()=>{
     if(done)return;done=true;rptRun.rtcActive=false;
+    if(pc){try{pc.close()}catch(_){}pc=null}
     if(seq!==rptRun.rtc)return;
     const srflx=found.filter(c=>c.typ==="srflx").map(c=>c.addr);
     const relay=found.filter(c=>c.typ==="relay");
@@ -1304,16 +1314,16 @@ function probeRtcFill(){
     paintRptRtc();rptRefit();
   };
   try{
-    const pc=new RTCPeerConnection({iceServers:[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302","stun:stun.cloudflare.com:3478","stun:stun.nextcloud.com:443"]}]});
+    pc=new RTCPeerConnection({iceServers:[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302","stun:stun.cloudflare.com:3478","stun:stun.nextcloud.com:443"]}]});
     pc.createDataChannel("x");
     pc.onicecandidate=e=>{
-      if(!e.candidate){try{pc.close()}catch(_){}finish();return}
+      if(!e.candidate){finish();return}
       const parts=(e.candidate.candidate||"").split(" ");
       const addr=parts[4],typ=parts[7]||"";
       if(addr)found.push({addr:addr,typ:typ,mdns:addr.includes(".local")});
     };
-    pc.onicegatheringstatechange=()=>{if(pc.iceGatheringState==="complete"){try{pc.close()}catch(_){}finish()}};
-    pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(finish);
+    pc.onicegatheringstatechange=()=>{if(pc&&pc.iceGatheringState==="complete")finish()};
+    pc.createOffer().then(o=>pc&&pc.setLocalDescription(o)).catch(finish);
     setTimeout(finish,4500);
   }catch(e){finish()}
 }
@@ -1478,22 +1488,30 @@ async function paintBoardNative(board,scale){
     const range=document.createRange();
     let pos=0;
     while(pos<text.length){
-      let end=pos+1;
-      range.setStart(node,pos);range.setEnd(node,end);
-      let rects=range.getClientRects();
-      if(!rects.length){pos++;continue}
-      const top0=rects[rects.length-1].top;
-      while(end<text.length){
-        range.setEnd(node,end+1);
+      range.setStart(node,pos);range.setEnd(node,text.length);
+      const full=range.getClientRects();
+      if(full.length===1){
+        const r0=rel(full[0]),frag=text.slice(pos);
+        const m=ctx.measureText(frag);
+        const asc=m.fontBoundingBoxAscent||parseFloat(cs.fontSize)*0.8;
+        ctx.fillText(frag,r0.x,r0.y+asc);
+        break;
+      }
+      range.setStart(node,pos);range.setEnd(node,pos+1);
+      const first=range.getClientRects();
+      if(!first.length){pos++;continue}
+      const top0=first[first.length-1].top;
+      let lo=pos+1,hi=text.length,end=pos+1;
+      while(lo<=hi){
+        const mid=(lo+hi)>>1;
+        range.setStart(node,pos);range.setEnd(node,mid);
         const rs=range.getClientRects();
-        if(!rs.length||rs[rs.length-1].top!==top0)break;
-        end++;
+        if(rs.length&&rs[rs.length-1].top===top0){end=mid;lo=mid+1}else{hi=mid-1}
       }
       range.setStart(node,pos);range.setEnd(node,end);
       const lr=range.getClientRects();
       if(lr.length){
-        const r0=rel(lr[0]);
-        const frag=text.slice(pos,end);
+        const r0=rel(lr[0]),frag=text.slice(pos,end);
         const m=ctx.measureText(frag);
         const asc=m.fontBoundingBoxAscent||parseFloat(cs.fontSize)*0.8;
         ctx.fillText(frag,r0.x,r0.y+asc);
@@ -1510,8 +1528,12 @@ async function paintBoardNative(board,scale){
     let t=text;
     const maxW=rect.w;
     if(ctx.measureText(t).width>maxW){
-      while(t.length&&ctx.measureText(t+"…").width>maxW)t=t.slice(0,-1);
-      t=t+"…";
+      let lo=0,hi=text.length,best=0;
+      while(lo<=hi){
+        const mid=(lo+hi)>>1;
+        if(ctx.measureText(text.slice(0,mid)+"…").width<=maxW){best=mid;lo=mid+1}else{hi=mid-1}
+      }
+      t=text.slice(0,best)+"…";
     }
     const m=ctx.measureText(t);
     const asc=m.fontBoundingBoxAscent||parseFloat(cs.fontSize)*0.8;
@@ -1599,6 +1621,7 @@ async function captureReport(){
 }
 function openReport(){
   if(!state.data){toast(TD("rptWait"));return}
+  if(rptData.ip!==state.data.ip)reportPrefetch(state.data);
   spaPush({rpt:true});rptVisual(true);buildReport();
 }
 $("reportRoot").addEventListener("click",async e=>{
@@ -1618,6 +1641,7 @@ $("reportRoot").addEventListener("click",async e=>{
     if(ip){try{await navigator.clipboard.writeText(ip);toast(TD("copied")+ip)}catch(err){toast(TD("copyFail"))}}
   }
 });
+$("shotBtn").addEventListener("pointerdown",()=>{if(state.data&&rptData.ip!==state.data.ip)reportPrefetch(state.data)},{passive:true});
 $("shotBtn").addEventListener("click",()=>{const f=$("flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");openReport()});
 $("reportModalBackdrop").addEventListener("click",e=>{if(e.target===$("reportModalBackdrop"))closeReportModal()});
 let detailsOpen=false;
@@ -1629,6 +1653,10 @@ function toggleDetails(force){
   $("expandDetailsBtn").classList.toggle("open",detailsOpen);
   $("asnHead").setAttribute("aria-expanded",String(detailsOpen));
   syncExpandText();
+  if(detailsOpen&&state.data){
+    renderExtra(state.data);
+    if(state.data._loadExtra)state.data._loadExtra();
+  }
 }
 function userToggleDetails(){
   $("detailsCollapsible").classList.remove("jump-open");
@@ -1684,24 +1712,24 @@ function paintLlm(d){
 }
 $("companyHead").addEventListener("click",()=>{const b=$("companyBody"),open=b.style.display!=="none";b.style.display=open?"none":"block";$("companyHead").classList.toggle("open",!open)});
 function runWebrtc(){
-  const box=$("rtcResult");const btn=$("btnRunAllLeak");btn.textContent=TD("rtcTesting");const found=new Map();let done=false;
+  const box=$("rtcResult");const btn=$("btnRunAllLeak");btn.textContent=TD("rtcTesting");const found=new Map();let done=false;let pc=null;
   box.innerHTML="<span class='rtc-skl'><span class='geo-skl'></span><span class='geo-skl'></span><span class='geo-skl'></span><span class='geo-skl'></span><span class='geo-skl'></span></span>";
-  const render=()=>{if(done)return;done=true;btn.textContent=T("retest");
+  const render=()=>{if(done)return;done=true;if(pc){try{pc.close()}catch(_){}pc=null}btn.textContent=T("retest");
     box.innerHTML=found.size?("<span class='rtc-cands'>"+TD("rtcFound")+"<br>"+[...found.values()].map(escapeHtml).join("<br>")+"<br>"+TD("rtcConclusion")+"</span>"):TD("rtcNone");};
   try{
-    const pc=new RTCPeerConnection({iceServers:[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302","stun:stun.cloudflare.com:3478","stun:stun.nextcloud.com:443"]}]});
+    pc=new RTCPeerConnection({iceServers:[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302","stun:stun.cloudflare.com:3478","stun:stun.nextcloud.com:443"]}]});
     pc.createDataChannel("x");
     pc.onicecandidate=e=>{
-      if(!e.candidate){try{pc.close()}catch(_){}render();return}
+      if(!e.candidate){render();return}
       const parts=(e.candidate.candidate||"").split(" ");const addr=parts[4];const typ=parts[7]||"";
       if(addr&&!found.has(addr))found.set(addr,addr+(addr.includes(".local")?TD("rtcLocalMask"):typ==="srflx"?TD("rtcSrflx"):typ==="host"?" (local)":""));
     };
-    pc.onicegatheringstatechange=()=>{if(pc.iceGatheringState==="complete"){try{pc.close()}catch(_){}render()}};
-    pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(()=>{if(!done){done=true;btn.textContent=T("retest");box.textContent=TD("rtcFail")}});
+    pc.onicegatheringstatechange=()=>{if(pc&&pc.iceGatheringState==="complete")render()};
+    pc.createOffer().then(o=>pc&&pc.setLocalDescription(o)).catch(()=>{if(!done){done=true;if(pc){try{pc.close()}catch(_){}pc=null}btn.textContent=T("retest");box.textContent=TD("rtcFail")}});
     setTimeout(render,9000);
   }catch(err){box.textContent=TD("rtcUnsupported");btn.textContent=T("retest")}
 }
-$("btnRunAllLeak").addEventListener("click",runWebrtc);;
+$("btnRunAllLeak").addEventListener("click",runWebrtc);
 $("fpUa").textContent=navigator.userAgent||"—";
 $("fpLang").textContent=(navigator.languages&&navigator.languages.join(", "))||navigator.language||"—";
 try{$("fpTz").textContent=Intl.DateTimeFormat().resolvedOptions().timeZone||"—"}catch(e){$("fpTz").textContent="—"}
@@ -1714,8 +1742,9 @@ async function probeV4(){
   const eps=["https://api4.ipify.org?format=json","https://ipv4.icanhazip.com","https://v4.ident.me","https://v4.seeip.org/jsonip","https://api4.my-ip.io/ip"];
   for(let round=0;round<3;round++){
     const v4=await new Promise(res=>{
-      let done=false;const finish=v=>{if(!done){done=true;res(v||"")}};
-      eps.forEach(u=>{fetchText(u,4000).then(r=>{let ip=(r||"").trim();if(ip.startsWith("{")){try{ip=JSON.parse(ip).ip||""}catch(e){ip=""}}if(/^\d{1,3}(\.\d{1,3}){3}$/.test(ip))finish(ip)}).catch(()=>{})});
+      let done=false;const roundCtl=new AbortController();
+      const finish=v=>{if(!done){done=true;try{roundCtl.abort()}catch(_){}res(v||"")}};
+      eps.forEach(u=>{fetchText(u,4000,roundCtl.signal).then(r=>{let ip=(r||"").trim();if(ip.startsWith("{")){try{ip=JSON.parse(ip).ip||""}catch(e){ip=""}}if(/^\d{1,3}(\.\d{1,3}){3}$/.test(ip))finish(ip)}).catch(()=>{})});
       setTimeout(()=>finish(""),5000);
     });
     if(v4)return v4;

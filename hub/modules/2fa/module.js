@@ -27,10 +27,31 @@ function __resumeAll() { for (const e of __listeners) if (!e.active) { e.t.addEv
 
 /* ---- fetch shadow: relative URLs resolve against the site's real dir ---- */
 const __realFetch = window.fetch.bind(window);
+const __fetchSession = new Set();
+let __fetchSuspended = true;
+function __abortFetchSession() {
+  for (const ctl of Array.from(__fetchSession)) { try { ctl.abort(); } catch (e) {} }
+  __fetchSession.clear();
+}
 function __fetch(u, o) {
+  if (__fetchSuspended) return Promise.reject(new DOMException('hub: module suspended', 'AbortError'));
   if (typeof u === 'string' && u.charAt(0) !== '/' && !/^[a-z][a-z0-9+.-]*:/i.test(u))
     u = new URL(u, location.origin + __base).href;
-  return __realFetch(u, o);
+  const ctl = new AbortController();
+  const opts = Object.assign({}, o || {});
+  if (opts.signal) {
+    const ext = opts.signal;
+    if (ext.aborted) ctl.abort();
+    else ext.addEventListener('abort', () => ctl.abort(), { once: true });
+  }
+  opts.signal = ctl.signal;
+  __fetchSession.add(ctl);
+  let p;
+  try { p = __realFetch(u, opts); }
+  catch (e) { __fetchSession.delete(ctl); throw e; }
+  const settle = () => __fetchSession.delete(ctl);
+  if (p && typeof p.then === 'function') p.then(settle, settle);
+  return p;
 }
 
 /* ---- scoped document: root-first lookups; documentElement/body are the
@@ -45,7 +66,11 @@ const __docProxy = new Proxy(document, {
   get(t, k) {
     if (k === 'documentElement' || k === 'body') return __root || t.documentElement;
     if (k === 'head') return t.head;
-    if (k === 'getElementById') return id => (__root && __root.querySelector('#' + CSS.escape(String(id)))) || t.getElementById(id);
+    if (k === 'getElementById') return id => {
+      if (id === '' || id === null || id === undefined) return null;
+      if (__root) { try { const el = __root.querySelector('#' + CSS.escape(String(id))); if (el) return el; } catch (e) {} }
+      return t.getElementById(id);
+    };
     if (k === 'querySelector') return sel => __rootQS(sel) || t.querySelector(sel);
     if (k === 'querySelectorAll') return sel => {
       const s = String(sel).trim();
@@ -109,6 +134,7 @@ function __restoreBridge() {
 }
 const __bridgeFns = {};
 
+let __modStopOtpTimer = null, __modResumeOtpTimer = null;
 function __boot() {
   const document = __docProxy;
   const window = __winProxy;
@@ -545,13 +571,13 @@ function renderGuideSteps(){
 }
 
 /* ================= Language ================= */
-function applyLanguage(lang){
+function applyLanguage(lang, skipOtp){
   currentLang = lang;
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
   document.querySelectorAll('[data-i18n]').forEach(el => { const k = el.getAttribute('data-i18n'); if (i18n[lang][k]) el.innerText = i18n[lang][k]; });
   document.querySelectorAll('[data-i18n-ph]').forEach(el => { const k = el.getAttribute('data-i18n-ph'); if (i18n[lang][k]) el.placeholder = i18n[lang][k]; });
   document.querySelectorAll('.lang-text').forEach(el => { el.textContent = lang === 'zh' ? '中文' : 'English'; });
-  renderMenus(lang); renderThemeSwatches(); renderGuideSteps(); updateMeta(); renderOtpCodes(true);
+  renderMenus(lang); renderThemeSwatches(); renderGuideSteps(); updateMeta(); if (!skipOtp) renderOtpCodes(true);
 }
 document.querySelectorAll('[data-action="lang"]').forEach(b => b.addEventListener('click', () => { applyLanguage(currentLang === 'zh' ? 'en' : 'zh'); writeSharedA(); }));
 
@@ -582,12 +608,21 @@ function isValidSecret(s){
   if (!s || !/^[0-9a-zA-Z]+$/.test(s)) return false;
   try { const d = base32Decode(s); return !!d && d.length >= 6; } catch(e){ return false; }
 }
+const __totpKeyCache = new Map();
+async function getTotpKey(secret){
+  let keyPromise = __totpKeyCache.get(secret);
+  if (!keyPromise){
+    const keyBytes = base32Decode(secret);
+    keyPromise = crypto.subtle.importKey('raw', keyBytes, {name:'HMAC', hash:'SHA-1'}, false, ['sign']);
+    __totpKeyCache.set(secret, keyPromise);
+  }
+  return keyPromise;
+}
 async function totp(secret, epochSec){
-  const keyBytes = base32Decode(secret);
   const counter = Math.floor(epochSec / 30);
   const msg = new ArrayBuffer(8); const view = new DataView(msg);
   view.setUint32(4, counter >>> 0); view.setUint32(0, Math.floor(counter / 4294967296));
-  const key = await crypto.subtle.importKey('raw', keyBytes, {name:'HMAC', hash:'SHA-1'}, false, ['sign']);
+  const key = await getTotpKey(secret);
   const sig = new Uint8Array(await crypto.subtle.sign('HMAC', key, msg));
   const offset = sig[sig.length - 1] & 0xf;
   const binary = ((sig[offset] & 0x7f) << 24) | ((sig[offset+1] & 0xff) << 16) | ((sig[offset+2] & 0xff) << 8) | (sig[offset+3] & 0xff);
@@ -634,7 +669,13 @@ function updateMeta(){
   refreshGetBtn();
   inlineClearX.classList.toggle('visible', !!textarea.value);
 }
-textarea.addEventListener('input', () => { codesGenerated = false; wrapEl.classList.remove('error'); otpEmpty.classList.remove('show'); updateMeta(); if (activated) renderOtpCodes(true); });
+let __otpInputTimer = null;
+textarea.addEventListener('input', () => {
+  codesGenerated = false; wrapEl.classList.remove('error'); otpEmpty.classList.remove('show'); updateMeta();
+  if (!activated) return;
+  clearTimeout(__otpInputTimer);
+  __otpInputTimer = setTimeout(() => renderOtpCodes(true), 120);
+});
 textarea.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ e.preventDefault(); document.getElementById('formSecret').requestSubmit(); } });
 function clearInput(){
   textarea.value = ''; activated = false; codesGenerated = false; lastSignature = '';
@@ -663,24 +704,28 @@ btnGet.addEventListener('click', e => {
 });
 
 function secretPreview(secret){ return '\u2022\u2022\u2022\u2022 ' + secret.slice(-4); }
+let __ringWraps = [];
 function updateRings(remain){
   const off = (81.68 * (1 - remain/30)).toFixed(2);
-  document.querySelectorAll('.totp-ring-wrap').forEach(w => {
-    w.classList.toggle('urgent', remain <= 5);
-    const fg = w.querySelector('.ring-fg'); if (fg) fg.style.strokeDashoffset = off;
-    const sec = w.querySelector('.ring-sec'); if (sec) sec.textContent = remain;
-  });
+  for (let i = 0; i < __ringWraps.length; i++){
+    const { wrap, fg, sec } = __ringWraps[i];
+    wrap.classList.toggle('urgent', remain <= 5);
+    if (fg) fg.style.strokeDashoffset = off;
+    if (sec) sec.textContent = remain;
+  }
 }
 async function renderOtpCodes(force){
-  const remain = 30 - (Math.floor(Date.now()/1000) % 30);
-  updateRings(remain);
   if (!activated) return;
-  const secrets = parseSecrets(textarea.value);
-  if (!secrets.length){ otpList.innerHTML = emptyNoteHtml(); return; }
   const now = Math.floor(Date.now()/1000);
-  const codes = await Promise.all(secrets.map(s => totp(s.secret, now)));
+  const remain = 30 - (now % 30);
+  const secrets = parseSecrets(textarea.value);
+  if (!secrets.length){ lastSignature = ''; __ringWraps = []; otpList.innerHTML = emptyNoteHtml(); return; }
   const signature = secrets.map(s => s.secret).join(',') + '|' + Math.floor(now/30) + '|' + currentLang;
-  if (!force && signature === lastSignature) return;
+  if (!force && signature === lastSignature){
+    updateRings(remain);
+    return;
+  }
+  const codes = await Promise.all(secrets.map(s => totp(s.secret, now)));
   lastSignature = signature;
   const t = i18n[currentLang];
   otpList.innerHTML = secrets.map((s, i) =>
@@ -696,6 +741,11 @@ async function renderOtpCodes(force){
       '</div>' +
     '</div>'
   ).join('');
+  __ringWraps = Array.from(otpList.querySelectorAll('.totp-ring-wrap')).map(wrap => ({
+    wrap,
+    fg: wrap.querySelector('.ring-fg'),
+    sec: wrap.querySelector('.ring-sec')
+  }));
   updateRings(remain);
 }
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -717,31 +767,48 @@ otpList.addEventListener('click', async e => {
   setTimeout(() => { btn.classList.remove('copied'); span.textContent = old; }, 1600);
 });
 
-/* per-second tick: countdown + auto refresh at window rollover (same as original) */
-setInterval(() => { renderOtpCodes(false); }, 1000);
+/* per-second tick: countdown + auto refresh at window rollover; suspended on unmount & hidden tab */
+let __otpInterval = null;
+function startOtpTimer(){
+  if (__otpInterval !== null || document.hidden) return;
+  __otpInterval = setInterval(() => { renderOtpCodes(false); }, 1000);
+}
+function stopOtpTimer(){
+  if (__otpInterval !== null){ clearInterval(__otpInterval); __otpInterval = null; }
+}
+__modStopOtpTimer = stopOtpTimer;
+__modResumeOtpTimer = () => { if (!document.hidden){ renderOtpCodes(false); startOtpTimer(); } };
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopOtpTimer();
+  else if (!__fetchSuspended) { renderOtpCodes(false); startOtpTimer(); }
+});
+startOtpTimer();
 
 /* ================= Init ================= */
 renderThemeBtnIcon();
 applyTheme(currentThemeIdx);
 if (isDarkMode){ document.documentElement.style.setProperty('--page-bg', '#090D16'); const mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute('content', '#0B1120'); }
-applyLanguage(currentLang);
+applyLanguage(currentLang, true);
 otpList.innerHTML = emptyNoteHtml();
 updateMeta();
-renderOtpCodes(true);
 
   /* ================= end original scripts ================= */
   /* no inline handlers to bridge */
 }
 
 export function mount(root, ctx) {
+  __fetchSuspended = false;
   __root = root; __ctx = ctx || {};
   if (__ctx.standalone) __standalone = true;
   if (!__booted) { __booted = true; __boot(); }
-  else __resumeAll();
+  else { __resumeAll(); if (__modResumeOtpTimer) __modResumeOtpTimer(); }
   __applyBridge();
   return Promise.resolve(true);
 }
 export function unmount() {
+  __fetchSuspended = true;
+  if (__modStopOtpTimer) __modStopOtpTimer();
+  __abortFetchSession();
   __suspendAll();
   __restoreBridge();
 }

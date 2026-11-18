@@ -72,7 +72,7 @@
     .paper-card {
       background-color: var(--bg-card);
       border: 1px solid var(--border-subtle);
-      transition: all 0.18s ease;
+      transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
     }
     .paper-card-elevated {
       background-color: var(--bg-elevated);
@@ -721,7 +721,7 @@
     .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.28); }
     .ring-1 { box-shadow: 0 0 0 1px rgba(180, 120, 36, 0.35); }
     .backdrop-blur-xs { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-    .transition-all { transition: all 0.18s ease; }
+    .transition-all { transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, opacity 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease; }
     .transition-colors { transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease; }
     .transition-opacity { transition: opacity 0.15s ease; }
     .transition-transform { transition: transform 0.2s ease; }
@@ -934,27 +934,6 @@
             <text x="43" y="364" fill="#F5E1A4" font-size="9" font-weight="700" letter-spacing="0.12em">实战笔记</text>
           </svg>
         `;
-      } else if (style === "charcoal-rays") {
-        return `
-          <svg class="w-full h-full block" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="300" height="400" fill="#18181B"/>
-            <g opacity="0.85">
-              <polygon points="300,0 120,170 155,195" fill="#F59E0B" opacity="0.7"/>
-              <polygon points="300,0 60,120 95,155" fill="#EF4444" opacity="0.65"/>
-              <polygon points="300,0 185,220 230,240" fill="#38BDF8" opacity="0.65"/>
-              <polygon points="300,0 35,70 55,105" fill="#A855F7" opacity="0.55"/>
-            </g>
-            <text x="32" y="44" fill="#A1A1AA" font-size="9.5" font-weight="700" letter-spacing="0.16em">实战笔记 EDITION</text>
-            <text x="32" y="242" fill="#FAFAFA" font-size="25" font-weight="900">${l1}</text>
-            <text x="32" y="280" fill="#FBBF24" font-size="25" font-weight="900">${l2}</text>
-            <path d="M32 294 Q 82 288, 132 294 T 232 294" fill="none" stroke="#EF4444" stroke-width="3.2" stroke-linecap="round"/>
-            <text x="32" y="322" fill="#D4D4D8" font-size="14.5" font-weight="600">${l3}</text>
-            <g stroke="#52525B" stroke-width="1" opacity="0.6">
-              <path d="M24 352 Q 150 332, 276 352"/>
-              <path d="M24 366 Q 150 346, 276 366"/>
-            </g>
-          </svg>
-        `;
       } else if (style === "charcoal-vintage") {
         return `
           <svg class="w-full h-full block" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -999,59 +978,6 @@
               <line x1="155" y1="218" x2="155" y2="352" stroke-dasharray="3 3"/>
             </g>
             <text x="32" y="372" fill="#44403C" font-size="10" font-weight="700" letter-spacing="0.14em">实战笔记</text>
-          </svg>
-        `;
-      } else if (style === "sage-nodes") {
-        return `
-          <svg class="w-full h-full block" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="300" height="400" fill="#C9D6C8"/>
-            <g stroke="#2F4838" stroke-width="1.1" opacity="0.55">
-              <line x1="35" y1="45" x2="95" y2="75"/>
-              <line x1="95" y1="75" x2="175" y2="48"/>
-              <line x1="175" y1="48" x2="255" y2="82"/>
-              <line x1="95" y1="75" x2="145" y2="102"/>
-              <circle cx="35" cy="45" r="4" fill="#2F4838"/>
-              <circle cx="95" cy="75" r="5" fill="#2F4838"/>
-              <circle cx="175" cy="48" r="4" fill="#2F4838"/>
-              <circle cx="255" cy="82" r="5" fill="#2F4838"/>
-              <circle cx="145" cy="102" r="3.5" fill="#2F4838"/>
-            </g>
-            <text x="32" y="150" fill="#16291E" font-size="24" font-weight="900">${l1}</text>
-            <text x="32" y="186" fill="#16291E" font-size="24" font-weight="900">${l2}</text>
-            <text x="32" y="220" fill="#2A4B37" font-size="19" font-weight="800">${l3}</text>
-            <rect x="32" y="250" width="236" height="86" rx="4" fill="#DCE6DB" stroke="#2F4838" stroke-width="1.2"/>
-            <g stroke="#4338CA" stroke-width="1.1" opacity="0.75">
-              <line x1="40" y1="256" x2="260" y2="330"/>
-              <line x1="75" y1="256" x2="225" y2="330"/>
-              <line x1="115" y1="256" x2="185" y2="330"/>
-              <line x1="150" y1="256" x2="150" y2="330"/>
-              <line x1="185" y1="256" x2="115" y2="330"/>
-              <line x1="225" y1="256" x2="75" y2="330"/>
-              <line x1="260" y1="256" x2="40" y2="330"/>
-            </g>
-            <text x="32" y="368" fill="#16291E" font-size="10" font-weight="700" letter-spacing="0.16em">✦ OIL BOOK</text>
-          </svg>
-        `;
-      } else if (style === "terracotta-sun") {
-        return `
-          <svg class="w-full h-full block" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="300" height="400" fill="#C85A3B"/>
-            <g stroke="#FCD34D" stroke-width="1" opacity="0.45">
-              <circle cx="150" cy="300" r="42"/>
-              <circle cx="150" cy="300" r="72"/>
-              <circle cx="150" cy="300" r="102"/>
-              <line x1="150" y1="300" x2="40" y2="185"/>
-              <line x1="150" y1="300" x2="100" y2="165"/>
-              <line x1="150" y1="300" x2="150" y2="155"/>
-              <line x1="150" y1="300" x2="200" y2="165"/>
-              <line x1="150" y1="300" x2="260" y2="185"/>
-            </g>
-            <text x="32" y="44" fill="#FDE68A" font-size="10" font-weight="700" letter-spacing="0.16em">实战笔记</text>
-            <text x="32" y="100" fill="#FFFBEB" font-size="24" font-weight="900">${l1}</text>
-            <ellipse cx="118" cy="134" rx="88" ry="22" fill="none" stroke="#FDE047" stroke-width="3" transform="rotate(-2 118 134)"/>
-            <text x="32" y="141" fill="#FFFBEB" font-size="24" font-weight="900">${l2}</text>
-            <text x="32" y="180" fill="#FEF08A" font-size="18" font-weight="800">${l3}</text>
-            <circle cx="150" cy="300" r="16" fill="#FDE047" opacity="0.88"/>
           </svg>
         `;
       } else if (style === "teal-hyperbolic") {
@@ -1250,8 +1176,10 @@
           if (m.id === state.activeModelId) {
             selectedModel = m;
             selectedCat = cat;
+            break;
           }
         }
+        if (selectedModel) break;
       }
       if (!selectedModel) {
         selectedCat = OIL_BOOK_DATA.modelCategories[0];
@@ -1451,10 +1379,39 @@
       `;
     }
 
+    function renderOriginalListSections() {
+      const allOriginals = OIL_BOOK_DATA.articles.filter(a => a.type === "original");
+      const query = state.originalSearch.trim().toLowerCase();
+      return OIL_BOOK_DATA.originalCategories
+        .filter(cat => state.originalFilterCat === "all" || state.originalFilterCat === cat.id)
+        .map(cat => {
+          const items = allOriginals.filter(a => {
+            if (a.categoryId !== cat.id) return false;
+            if (!query) return true;
+            return a.title.toLowerCase().includes(query) || a.summary.toLowerCase().includes(query) || a.slug.toLowerCase().includes(query);
+          });
+          if (items.length === 0) return "";
+          return `
+            <section>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-amber-500/15 text-[var(--accent-gold)]">${cat.num}</span>
+                  <h2 class="text-base sm:text-xl font-bold text-[var(--text-main)]">${cat.title}</h2>
+                  ${cat.badge ? `<span class="text-[11px] px-2 py-0.5 rounded-full pro-badge font-medium">${cat.badge}</span>` : ""}
+                </div>
+                <span class="text-xs text-[var(--text-muted)]">${items.length} 篇</span>
+              </div>
+              <div class="books-shelf-grid">
+                ${items.map(art => renderArticleCard(art)).join("")}
+              </div>
+            </section>
+          `;
+        }).join("");
+    }
+
     // 渲染原创列表页 (/articles)
     function renderOriginalListView() {
       const allOriginals = OIL_BOOK_DATA.articles.filter(a => a.type === "original");
-      const query = state.originalSearch.trim().toLowerCase();
 
       return `
         <div class="mb-8 sm:mb-10">
@@ -1468,6 +1425,8 @@
               <input
                 type="search"
                 value="${state.originalSearch}"
+                oncompositionstart="window.__blogComposing=true"
+                oncompositionend="window.__blogComposing=false;updateOriginalSearch(this.value,true)"
                 oninput="updateOriginalSearch(this.value)"
                 placeholder="搜索原创文章标题或关键词…"
                 class="w-full px-3.5 py-2 rounded-xl text-xs sm:text-sm paper-card-elevated focus:outline-none focus:border-[var(--accent-gold)]"
@@ -1499,40 +1458,44 @@
           </div>
         </div>
 
-        <div class="space-y-12 sm:space-y-14">
-          ${OIL_BOOK_DATA.originalCategories
-            .filter(cat => state.originalFilterCat === "all" || state.originalFilterCat === cat.id)
-            .map(cat => {
-              const items = allOriginals.filter(a => {
-                if (a.categoryId !== cat.id) return false;
-                if (!query) return true;
-                return a.title.toLowerCase().includes(query) || a.summary.toLowerCase().includes(query) || a.slug.toLowerCase().includes(query);
-              });
-              if (items.length === 0) return "";
-              return `
-                <section>
-                  <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-                    <div class="flex flex-wrap items-center gap-2">
-                      <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-amber-500/15 text-[var(--accent-gold)]">${cat.num}</span>
-                      <h2 class="text-base sm:text-xl font-bold text-[var(--text-main)]">${cat.title}</h2>
-                      ${cat.badge ? `<span class="text-[11px] px-2 py-0.5 rounded-full pro-badge font-medium">${cat.badge}</span>` : ""}
-                    </div>
-                    <span class="text-xs text-[var(--text-muted)]">${items.length} 篇</span>
-                  </div>
-                  <div class="books-shelf-grid">
-                    ${items.map(art => renderArticleCard(art)).join("")}
-                  </div>
-                </section>
-              `;
-            }).join("")}
+        <div id="original-list-sections" class="space-y-12 sm:space-y-14">
+          ${renderOriginalListSections()}
         </div>
       `;
+    }
+
+    function renderCuratedListSections() {
+      const allCurated = OIL_BOOK_DATA.articles.filter(a => a.type === "curated");
+      const query = state.curatedSearch.trim().toLowerCase();
+      return OIL_BOOK_DATA.curatedCategories
+        .filter(cat => state.curatedFilterCat === "all" || state.curatedFilterCat === cat.id)
+        .map(cat => {
+          const items = allCurated.filter(a => {
+            if (a.categoryId !== cat.id) return false;
+            if (!query) return true;
+            return a.title.toLowerCase().includes(query) || a.author.toLowerCase().includes(query) || a.summary.toLowerCase().includes(query);
+          });
+          if (items.length === 0) return "";
+          return `
+            <section>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-amber-500/15 text-[var(--accent-gold)]">${cat.num}</span>
+                  <h2 class="text-base sm:text-xl font-bold text-[var(--text-main)]">${cat.title}</h2>
+                </div>
+                <span class="text-xs text-[var(--text-muted)]">${items.length} 篇</span>
+              </div>
+              <div class="books-shelf-grid">
+                ${items.map(art => renderArticleCard(art)).join("")}
+              </div>
+            </section>
+          `;
+        }).join("");
     }
 
     // 渲染精选收录列表页 (/curated)
     function renderCuratedListView() {
       const allCurated = OIL_BOOK_DATA.articles.filter(a => a.type === "curated");
-      const query = state.curatedSearch.trim().toLowerCase();
 
       return `
         <div class="mb-8 sm:mb-10">
@@ -1546,6 +1509,8 @@
               <input
                 type="search"
                 value="${state.curatedSearch}"
+                oncompositionstart="window.__blogComposing=true"
+                oncompositionend="window.__blogComposing=false;updateCuratedSearch(this.value,true)"
                 oninput="updateCuratedSearch(this.value)"
                 placeholder="搜索收录文章或原作者…"
                 class="w-full px-3.5 py-2 rounded-xl text-xs sm:text-sm paper-card-elevated focus:outline-none focus:border-[var(--accent-gold)]"
@@ -1577,31 +1542,8 @@
           </div>
         </div>
 
-        <div class="space-y-12 sm:space-y-14">
-          ${OIL_BOOK_DATA.curatedCategories
-            .filter(cat => state.curatedFilterCat === "all" || state.curatedFilterCat === cat.id)
-            .map(cat => {
-              const items = allCurated.filter(a => {
-                if (a.categoryId !== cat.id) return false;
-                if (!query) return true;
-                return a.title.toLowerCase().includes(query) || a.author.toLowerCase().includes(query) || a.summary.toLowerCase().includes(query);
-              });
-              if (items.length === 0) return "";
-              return `
-                <section>
-                  <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-                    <div class="flex items-center gap-2">
-                      <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-amber-500/15 text-[var(--accent-gold)]">${cat.num}</span>
-                      <h2 class="text-base sm:text-xl font-bold text-[var(--text-main)]">${cat.title}</h2>
-                    </div>
-                    <span class="text-xs text-[var(--text-muted)]">${items.length} 篇</span>
-                  </div>
-                  <div class="books-shelf-grid">
-                    ${items.map(art => renderArticleCard(art)).join("")}
-                  </div>
-                </section>
-              `;
-            }).join("")}
+        <div id="curated-list-sections" class="space-y-12 sm:space-y-14">
+          ${renderCuratedListSections()}
         </div>
       `;
     }
@@ -1781,7 +1723,7 @@
                           <div class="min-w-0">
                             <div class="flex flex-wrap items-center gap-1.5">
                               <span class="text-xs font-semibold text-[var(--text-main)]">听文章</span>
-                              <span class="text-xs font-mono text-[var(--text-secondary)]">${isPlaying ? formatSec(state.audioProgressSec) + ' / ' : ''}${art.audioTime}</span>
+                              <span class="text-xs font-mono text-[var(--text-secondary)]"><span id="audio-progress-time">${isPlaying ? formatSec(state.audioProgressSec) + ' / ' : ''}</span>${art.audioTime}</span>
                               <span class="text-[10px] font-bold px-1.5 py-0.2 rounded pro-badge">✦ Pro</span>
                             </div>
                           </div>
@@ -2081,14 +2023,18 @@
       renderApp();
     }
 
-    function updateOriginalSearch(val) {
+    let __searchDebounceOrig = null;
+    function updateOriginalSearch(val, immediate) {
+      if (window.__blogComposing && !immediate) return;
       state.originalSearch = val;
-      renderApp();
-      const input = document.querySelector('input[type="search"]');
-      if (input) {
-        input.focus();
-        input.setSelectionRange(val.length, val.length);
-      }
+      clearTimeout(__searchDebounceOrig);
+      const apply = () => {
+        const box = document.getElementById("original-list-sections");
+        if (box) box.innerHTML = renderOriginalListSections();
+        else renderApp();
+      };
+      if (immediate) apply();
+      else __searchDebounceOrig = setTimeout(apply, 150);
     }
 
     function setCuratedCategory(catId) {
@@ -2096,14 +2042,18 @@
       renderApp();
     }
 
-    function updateCuratedSearch(val) {
+    let __searchDebounceCurated = null;
+    function updateCuratedSearch(val, immediate) {
+      if (window.__blogComposing && !immediate) return;
       state.curatedSearch = val;
-      renderApp();
-      const input = document.querySelector('input[type="search"]');
-      if (input) {
-        input.focus();
-        input.setSelectionRange(val.length, val.length);
-      }
+      clearTimeout(__searchDebounceCurated);
+      const apply = () => {
+        const box = document.getElementById("curated-list-sections");
+        if (box) box.innerHTML = renderCuratedListSections();
+        else renderApp();
+      };
+      if (immediate) apply();
+      else __searchDebounceCurated = setTimeout(apply, 150);
     }
 
     function setReaderFont(font) {
@@ -2190,7 +2140,8 @@
 
       audioTimer = setInterval(() => {
         state.audioProgressSec += 1;
-        renderApp();
+        const tEl = document.getElementById("audio-progress-time");
+        if (tEl) tEl.textContent = formatSec(state.audioProgressSec) + " / ";
       }, 1000);
       renderApp();
     }
@@ -2226,10 +2177,23 @@
       if (!backdrop) return;
       backdrop.classList.remove("hidden");
       renderModalContent();
+      if (type === "pro" && !countdownTimer) {
+        countdownTimer = setInterval(() => {
+          if (state.countdownSec > 0) {
+            state.countdownSec -= 1;
+            const el = document.getElementById("pro-modal-countdown");
+            if (el) el.textContent = formatCountdown(state.countdownSec);
+          }
+        }, 1000);
+      }
     }
 
     function closeModal() {
       state.activeModal = null;
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
       const backdrop = document.getElementById("modal-backdrop");
       if (backdrop) backdrop.classList.add("hidden");
     }
@@ -2476,16 +2440,9 @@
       }, 2600);
     }
 
-    // 启动 Pro 倒计时与初始渲染
+    // 初始路由渲染
     window.addEventListener("DOMContentLoaded", () => {
       syncRouteFromHash();
-      countdownTimer = setInterval(() => {
-        if (state.countdownSec > 0) {
-          state.countdownSec -= 1;
-          const el = document.getElementById("pro-modal-countdown");
-          if (el) el.textContent = formatCountdown(state.countdownSec);
-        }
-      }, 1000);
     });
   </script>
 </body>

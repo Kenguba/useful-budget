@@ -110,34 +110,28 @@
       el.classList.toggle('active', Number(el.getAttribute('data-theme-idx')) === state.idx);
     });
   }
-  function build() {
-    var en = uiLang() === 'en';
+  var builtLang = null;
+  var lastHover = null;
+  function build(en) {
+    builtLang = en;
+    lastHover = null;
     grid.innerHTML = THEMES.map(function (t, i) {
       return '<div class="theme-swatch-item' + (i === state.idx ? ' active' : '') + '" data-theme-idx="' + i + '" role="button" tabindex="0" aria-pressed="' + (i === state.idx) + '">' +
         '<span class="swatch-orb-preview' + (t.isHolo ? ' holo-animated' : '') + '" style="background: linear-gradient(135deg, ' + t.orb1 + ' 0%, ' + t.orb2 + ' 65%, ' + t.refreshBg + ' 100%);"></span>' +
         '<span class="swatch-label">' + (en ? t.nameEn : t.name) + '</span></div>';
     }).join('');
-    grid.querySelectorAll('.theme-swatch-item').forEach(function (el) {
-      var i = Number(el.getAttribute('data-theme-idx'));
-      el.addEventListener('pointerover', function () {
-        grid.querySelectorAll('.theme-swatch-item').forEach(function (x) { x.classList.toggle('sliding-hover', x === el); });
-        applyVisual(i);
-      });
-      el.addEventListener('click', function () { commit(i); });
-      el.addEventListener('keydown', function (ev) {
-        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); commit(i); }
-      });
-    });
   }
   function open() {
-    labels(); build();
+    var en = uiLang() === 'en';
+    labels();
+    if (builtLang !== en) build(en); else markActive();
     pop.classList.add('open'); bd.classList.add('open');
     pickBtn.setAttribute('aria-expanded', 'true');
   }
   function close(commitDone) {
     pop.classList.remove('open'); bd.classList.remove('open');
     pickBtn.setAttribute('aria-expanded', 'false');
-    grid.querySelectorAll('.theme-swatch-item').forEach(function (x) { x.classList.remove('sliding-hover'); });
+    if (lastHover) { lastHover.classList.remove('sliding-hover'); lastHover = null; }
     if (!commitDone) { applyVisual(state.idx); markActive(); }
   }
   function commit(i) {
@@ -148,6 +142,23 @@
     markActive();
     close(true);
   }
+  grid.addEventListener('pointerover', function (ev) {
+    var el = ev.target && ev.target.closest ? ev.target.closest('.theme-swatch-item') : null;
+    if (!el || el === lastHover) return;
+    if (lastHover) lastHover.classList.remove('sliding-hover');
+    el.classList.add('sliding-hover');
+    lastHover = el;
+    applyVisual(Number(el.getAttribute('data-theme-idx')));
+  });
+  grid.addEventListener('click', function (ev) {
+    var el = ev.target && ev.target.closest ? ev.target.closest('.theme-swatch-item') : null;
+    if (el) commit(Number(el.getAttribute('data-theme-idx')));
+  });
+  grid.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Enter' && ev.key !== ' ') return;
+    var el = ev.target && ev.target.closest ? ev.target.closest('.theme-swatch-item') : null;
+    if (el) { ev.preventDefault(); commit(Number(el.getAttribute('data-theme-idx'))); }
+  });
   pickBtn.addEventListener('click', function () {
     if (pop.classList.contains('open')) close(false); else open();
   });
@@ -157,6 +168,5 @@
   });
 
   labels();
-  build();
   applyVisual(state.idx);
 })();

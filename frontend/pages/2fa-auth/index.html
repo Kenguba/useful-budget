@@ -82,7 +82,6 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
       -webkit-tap-highlight-color: transparent;
       scrollbar-width: none;
       -ms-overflow-style: none;
@@ -103,12 +102,14 @@
     }
 
     body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
       background-color: var(--page-bg);
       color: var(--text-primary);
       min-height: 100vh;
       overflow-x: hidden;
       transition: background-color 0.55s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s ease;
     }
+    button, input, textarea { font-family: inherit; }
 
     /* ================= 2. 网页端 + 手机端双端自适应骨架 (Responsive Shell) ================= */
     .layout-shell {
@@ -268,7 +269,7 @@
       cursor: pointer;
       text-align: left;
       position: relative;
-      transition: all 0.28s var(--ease-smooth);
+      transition: background-color 0.28s var(--ease-smooth), color 0.28s var(--ease-smooth), border-color 0.28s var(--ease-smooth), box-shadow 0.28s var(--ease-smooth);
     }
 
     .sidebar-nav-item.active {
@@ -384,16 +385,8 @@
         radial-gradient(130% 105% at 90% 112%, color-mix(in srgb, var(--orb-color-2) 30%, transparent) 0%, transparent 62%);
     }
 
-    @keyframes videoHoloBtn {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
     [data-holo="true"] .primary-aura-btn {
       background: linear-gradient(120deg, #56C596, #4FA8F6, #74B9FF, #68D391);
-      background-size: 240% 240%;
-      animation: videoHoloBtn 4.2s ease infinite;
     }
 
     /* ================= 4.1 顶部第一行：左侧标识 + 右侧语言与主题按钮 ================= */
@@ -691,8 +684,6 @@
 
     .swatch-orb-preview.holo-animated {
       background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%) !important;
-      background-size: 220% 220% !important;
-      animation: videoHoloBtn 3.2s ease infinite;
     }
 
     .swatch-label {
@@ -766,12 +757,6 @@
       background: #10B981;
       box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.24);
       flex-shrink: 0;
-      animation: pulseDot 2.2s infinite;
-    }
-
-    @keyframes pulseDot {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.12); opacity: 0.82; }
     }
 
     /* ================= 5. 2行×3列 工具切换栏（严格同心圆角：Hero 28 - 缝 14 = 14；外框 14 - 缝 4 = 按钮 10） ================= */
@@ -828,7 +813,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.24s var(--ease-smooth);
+      transition: background-color 0.24s var(--ease-smooth), border-color 0.24s var(--ease-smooth), color 0.24s var(--ease-smooth), box-shadow 0.24s var(--ease-smooth);
     }
 
     .tool-chip-inner {
@@ -1031,7 +1016,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease;
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     }
 
     .textarea-clear-x.visible {
@@ -1222,7 +1207,7 @@
       justify-content: center;
       gap: 5px;
       flex-shrink: 0;
-      transition: all 0.22s var(--ease-spring);
+      transition: background-color 0.22s var(--ease-spring), border-color 0.22s var(--ease-spring), color 0.22s var(--ease-spring), transform 0.22s var(--ease-spring);
     }
 
     .copy-code-btn.copied {
@@ -1438,7 +1423,6 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 3px 10px -2px var(--search-glow);
-      animation: flowArrowNudge 3.2s ease-in-out infinite;
     }
 
     [data-dark="true"] .flow-arrow-pill {
@@ -1453,16 +1437,6 @@
       fill: none;
       stroke-linecap: round;
       stroke-linejoin: round;
-    }
-
-    @keyframes flowArrowNudge {
-      0%, 100% { transform: translateX(0); opacity: 0.86; }
-      50% { transform: translateX(0.75px); opacity: 1; }
-    }
-
-    @keyframes flowArrowNudgeVertical {
-      0%, 100% { transform: rotate(90deg) translateX(0); opacity: 0.86; }
-      50% { transform: rotate(90deg) translateX(0.75px); opacity: 1; }
     }
 
     .security-alert-banner {
@@ -1597,7 +1571,7 @@
       }
 
       .flow-arrow-pill {
-        animation: flowArrowNudgeVertical 3.2s ease-in-out infinite;
+        transform: rotate(90deg);
       }
 
       .shop-title {
@@ -2250,13 +2224,13 @@ function renderGuideSteps(){
 }
 
 /* ================= Language ================= */
-function applyLanguage(lang){
+function applyLanguage(lang, skipOtp){
   currentLang = lang;
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
   document.querySelectorAll('[data-i18n]').forEach(el => { const k = el.getAttribute('data-i18n'); if (i18n[lang][k]) el.innerText = i18n[lang][k]; });
   document.querySelectorAll('[data-i18n-ph]').forEach(el => { const k = el.getAttribute('data-i18n-ph'); if (i18n[lang][k]) el.placeholder = i18n[lang][k]; });
   document.querySelectorAll('.lang-text').forEach(el => { el.textContent = lang === 'zh' ? '中文' : 'English'; });
-  renderMenus(lang); renderThemeSwatches(); renderGuideSteps(); updateMeta(); renderOtpCodes(true);
+  renderMenus(lang); renderThemeSwatches(); renderGuideSteps(); updateMeta(); if (!skipOtp) renderOtpCodes(true);
 }
 document.querySelectorAll('[data-action="lang"]').forEach(b => b.addEventListener('click', () => { applyLanguage(currentLang === 'zh' ? 'en' : 'zh'); writeSharedA(); }));
 
@@ -2287,12 +2261,21 @@ function isValidSecret(s){
   if (!s || !/^[0-9a-zA-Z]+$/.test(s)) return false;
   try { const d = base32Decode(s); return !!d && d.length >= 6; } catch(e){ return false; }
 }
+const __totpKeyCache = new Map();
+async function getTotpKey(secret){
+  let keyPromise = __totpKeyCache.get(secret);
+  if (!keyPromise){
+    const keyBytes = base32Decode(secret);
+    keyPromise = crypto.subtle.importKey('raw', keyBytes, {name:'HMAC', hash:'SHA-1'}, false, ['sign']);
+    __totpKeyCache.set(secret, keyPromise);
+  }
+  return keyPromise;
+}
 async function totp(secret, epochSec){
-  const keyBytes = base32Decode(secret);
   const counter = Math.floor(epochSec / 30);
   const msg = new ArrayBuffer(8); const view = new DataView(msg);
   view.setUint32(4, counter >>> 0); view.setUint32(0, Math.floor(counter / 4294967296));
-  const key = await crypto.subtle.importKey('raw', keyBytes, {name:'HMAC', hash:'SHA-1'}, false, ['sign']);
+  const key = await getTotpKey(secret);
   const sig = new Uint8Array(await crypto.subtle.sign('HMAC', key, msg));
   const offset = sig[sig.length - 1] & 0xf;
   const binary = ((sig[offset] & 0x7f) << 24) | ((sig[offset+1] & 0xff) << 16) | ((sig[offset+2] & 0xff) << 8) | (sig[offset+3] & 0xff);
@@ -2339,7 +2322,13 @@ function updateMeta(){
   refreshGetBtn();
   inlineClearX.classList.toggle('visible', !!textarea.value);
 }
-textarea.addEventListener('input', () => { codesGenerated = false; wrapEl.classList.remove('error'); otpEmpty.classList.remove('show'); updateMeta(); if (activated) renderOtpCodes(true); });
+let __otpInputTimer = null;
+textarea.addEventListener('input', () => {
+  codesGenerated = false; wrapEl.classList.remove('error'); otpEmpty.classList.remove('show'); updateMeta();
+  if (!activated) return;
+  clearTimeout(__otpInputTimer);
+  __otpInputTimer = setTimeout(() => renderOtpCodes(true), 120);
+});
 textarea.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ e.preventDefault(); document.getElementById('formSecret').requestSubmit(); } });
 function clearInput(){
   textarea.value = ''; activated = false; codesGenerated = false; lastSignature = '';
@@ -2368,24 +2357,28 @@ btnGet.addEventListener('click', e => {
 });
 
 function secretPreview(secret){ return '\u2022\u2022\u2022\u2022 ' + secret.slice(-4); }
+let __ringWraps = [];
 function updateRings(remain){
   const off = (81.68 * (1 - remain/30)).toFixed(2);
-  document.querySelectorAll('.totp-ring-wrap').forEach(w => {
-    w.classList.toggle('urgent', remain <= 5);
-    const fg = w.querySelector('.ring-fg'); if (fg) fg.style.strokeDashoffset = off;
-    const sec = w.querySelector('.ring-sec'); if (sec) sec.textContent = remain;
-  });
+  for (let i = 0; i < __ringWraps.length; i++){
+    const { wrap, fg, sec } = __ringWraps[i];
+    wrap.classList.toggle('urgent', remain <= 5);
+    if (fg) fg.style.strokeDashoffset = off;
+    if (sec) sec.textContent = remain;
+  }
 }
 async function renderOtpCodes(force){
-  const remain = 30 - (Math.floor(Date.now()/1000) % 30);
-  updateRings(remain);
   if (!activated) return;
-  const secrets = parseSecrets(textarea.value);
-  if (!secrets.length){ otpList.innerHTML = emptyNoteHtml(); return; }
   const now = Math.floor(Date.now()/1000);
-  const codes = await Promise.all(secrets.map(s => totp(s.secret, now)));
+  const remain = 30 - (now % 30);
+  const secrets = parseSecrets(textarea.value);
+  if (!secrets.length){ lastSignature = ''; __ringWraps = []; otpList.innerHTML = emptyNoteHtml(); return; }
   const signature = secrets.map(s => s.secret).join(',') + '|' + Math.floor(now/30) + '|' + currentLang;
-  if (!force && signature === lastSignature) return;
+  if (!force && signature === lastSignature){
+    updateRings(remain);
+    return;
+  }
+  const codes = await Promise.all(secrets.map(s => totp(s.secret, now)));
   lastSignature = signature;
   const t = i18n[currentLang];
   otpList.innerHTML = secrets.map((s, i) =>
@@ -2401,6 +2394,11 @@ async function renderOtpCodes(force){
       '</div>' +
     '</div>'
   ).join('');
+  __ringWraps = Array.from(otpList.querySelectorAll('.totp-ring-wrap')).map(wrap => ({
+    wrap,
+    fg: wrap.querySelector('.ring-fg'),
+    sec: wrap.querySelector('.ring-sec')
+  }));
   updateRings(remain);
 }
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -2422,8 +2420,20 @@ otpList.addEventListener('click', async e => {
   setTimeout(() => { btn.classList.remove('copied'); span.textContent = old; }, 1600);
 });
 
-/* per-second tick: countdown + auto refresh at window rollover (same as original) */
-setInterval(() => { renderOtpCodes(false); }, 1000);
+/* per-second tick: countdown + auto refresh at window rollover; pause in background */
+let __otpInterval = null;
+function startOtpTimer(){
+  if (__otpInterval !== null || document.hidden) return;
+  __otpInterval = setInterval(() => { renderOtpCodes(false); }, 1000);
+}
+function stopOtpTimer(){
+  if (__otpInterval !== null){ clearInterval(__otpInterval); __otpInterval = null; }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopOtpTimer();
+  else { renderOtpCodes(false); startOtpTimer(); }
+});
+startOtpTimer();
 
 /* ================= Init ================= */
 /* Link-in: secret carried at the end of the URL is filled in and generated on load.
@@ -2449,10 +2459,10 @@ window.addEventListener('hashchange', function(){ location.reload(); });
 renderThemeBtnIcon();
 applyTheme(currentThemeIdx);
 if (isDarkMode){ document.documentElement.style.setProperty('--page-bg', '#090D16'); const mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute('content', '#0B1120'); }
-applyLanguage(currentLang);
-otpList.innerHTML = emptyNoteHtml();
+applyLanguage(currentLang, true);
+if (activated) renderOtpCodes(true);
+else otpList.innerHTML = emptyNoteHtml();
 updateMeta();
-renderOtpCodes(true);
 </script>
 </body>
 </html>

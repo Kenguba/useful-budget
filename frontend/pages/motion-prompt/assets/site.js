@@ -271,10 +271,14 @@
   }
 
   // ------------------------------------------------------------------ drawing
-  var tiles = [];        // { el, a, canvas, ctx, visible, dirty, offset, broken }
+  var tiles = [];        // { el, a, box, pick, nameEl, subEl, canvas, ctx, visible, dirty, offset, broken }
+  var packHeaders = [];  // { p, h3 }
   var detail = { canvas: $('#d-canvas'), ctx: null, scale: 1, dirty: false, el: null, broken: false, u: 0 };
   var STILL = 0.4; // paused views show this fraction of the loop, where most moves have something on screen
-  var clock = 0, lastNow = 0;
+  var clock = 0, lastNow = 0, rafId = 0;
+  function scheduleFrame() {
+    if (!rafId && !document.hidden) rafId = requestAnimationFrame(frame);
+  }
 
   function paint(ctx, el, u, scale) {
     var reg = MP.packs[el.pack];
@@ -301,9 +305,11 @@
   function markDirty(pack) {
     tiles.forEach(function (tl) { if (!pack || tl.el.pack === pack) tl.dirty = true; });
     detail.dirty = true;
+    scheduleFrame();
   }
   function frame(now) {
-    requestAnimationFrame(frame);
+    rafId = 0;
+    if (document.hidden) { lastNow = 0; return; }
     var dt = lastNow ? Math.min((now - lastNow) / 1000, 0.1) : 0;
     lastNow = now;
     if (state.playing) clock += dt;
@@ -314,6 +320,7 @@
         if (state.playing) detail.u = (detail.u + dt) % el.cycle;
         if (!paint(detail.ctx, el, detail.u, detail.scale)) detail.broken = true;
       }
+      if (state.playing) scheduleFrame();
       return;
     }
     for (var i = 0; i < tiles.length; i++) {
@@ -321,16 +328,20 @@
       if (!tl.visible || tl.broken || ready[tl.el.pack] !== 'ok') continue;
       if (!state.playing && !tl.dirty) continue;
       tl.dirty = false;
+      if (!tl.ctx) tl.ctx = tl.canvas.getContext('2d');
       if (!paint(tl.ctx, tl.el, timeFor(tl.el, tl.offset), 1)) breakTile(tl);
     }
+    if (state.playing) scheduleFrame();
   }
   var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
+    var need = false;
     entries.forEach(function (en) {
       var tl = en.target._tile;
       if (!tl) return;
       tl.visible = en.isIntersecting;
-      if (tl.visible) tl.dirty = true;
+      if (tl.visible) { tl.dirty = true; need = true; }
     });
+    if (need) scheduleFrame();
   }, { rootMargin: '120px 0px' }) : null;
 
   // ------------------------------------------------------------------ gallery
@@ -338,6 +349,7 @@
   function buildGrid() {
     if (io) io.disconnect();
     tiles = [];
+    packHeaders = [];
     grid.textContent = '';
     CAT.packs.forEach(function (p) {
       var list = h('div', { class: 'tiles' });
@@ -345,19 +357,21 @@
         if (el.pack !== p.pack) return;
         var nm = names(el);
         var canvas = h('canvas', { width: el.width, height: el.height, 'aria-hidden': 'true' });
+        var nameEl = h('span', { class: 'tile-name', text: nm.main });
+        var subEl = h('span', { class: 'tile-sub', text: nm.sub });
         var a = h('a', { class: 'tile', href: '#' + el.id, 'data-id': el.id, 'aria-label': t('openLabel', { id: el.id, name: nm.main }) }, [
           h('span', { class: 'tile-stage', style: 'aspect-ratio:' + el.width + '/' + el.height }, [canvas]),
           h('span', { class: 'tile-cap' }, [
             h('span', { class: 'tile-id', text: el.id }),
-            h('span', { class: 'tile-name', text: nm.main }),
-            h('span', { class: 'tile-sub', text: nm.sub }),
+            nameEl,
+            subEl,
           ]),
         ]);
         var pb = h('button', { type: 'button', class: 'tile-pick', 'aria-pressed': 'false', 'data-pick': el.id }, [
           pickBox(), h('span', { class: 'tile-pick-t' }),
         ]);
         var box = h('div', { class: 'tile-box' }, [a, pb]);
-        var tl = { el: el, a: a, box: box, pick: pb, canvas: canvas, ctx: canvas.getContext('2d'), visible: !io, dirty: true, broken: false,
+        var tl = { el: el, a: a, box: box, pick: pb, nameEl: nameEl, subEl: subEl, canvas: canvas, ctx: null, visible: !io, dirty: true, broken: false,
           offset: reduceMotion.matches ? STILL : (el._i * 0.6180339887) % 1 };
         a._tile = tl;
         pb.addEventListener('click', function () { togglePick(el.id); });
@@ -371,14 +385,28 @@
         list.appendChild(box);
         if (io) io.observe(a);
       });
+      var ph = h('h3', { id: 'pack-' + p.pack, text: p.title[clang()] });
+      packHeaders.push({ p: p, h3: ph });
       var sec = h('section', { class: 'pack', 'data-pack': p.pack, 'aria-labelledby': 'pack-' + p.pack }, [
         h('div', { class: 'pack-h' }, [
-          h('h3', { id: 'pack-' + p.pack, text: p.title[clang()] }),
+          ph,
           h('span', { text: '#' + p.first + '–' + p.last }),
         ]),
         list,
       ]);
       grid.appendChild(sec);
+    });
+    applyFilter();
+    scheduleFrame();
+  }
+  function refreshGridLang() {
+    packHeaders.forEach(function (ph) { ph.h3.textContent = ph.p.title[clang()]; });
+    tiles.forEach(function (tl) {
+      var nm = names(tl.el);
+      tl.a.setAttribute('aria-label', t('openLabel', { id: tl.el.id, name: nm.main }));
+      tl.nameEl.textContent = nm.main;
+      tl.subEl.textContent = nm.sub;
+      markTile(tl);
     });
     applyFilter();
   }
@@ -507,7 +535,7 @@
     if (detail.canvas.width !== el.width * scale || detail.canvas.height !== el.height * scale) {
       detail.canvas.width = el.width * scale; detail.canvas.height = el.height * scale;
     }
-    detail.scale = scale; detail.dirty = true;
+    detail.scale = scale; detail.dirty = true; scheduleFrame();
   }
   function fillDetail(el) {
     var p = packBy[el.pack], nm = names(el), lang = alang();
@@ -817,8 +845,8 @@
       var q = new URLSearchParams(location.search); q.set('lang', lang);
       history.replaceState(history.state, '', location.pathname + '?' + q.toString() + location.hash);
     }
-    applyText(); buildChips(); buildGrid(); renderTray();
-    if (state.open) fillDetail(elBy[state.open]);
+    applyText(); buildChips(); refreshGridLang(); renderTray();
+    if (state.open) { fillDetail(elBy[state.open]); scheduleFrame(); }
   }
   $$('[data-lang]').forEach(function (b) { b.addEventListener('click', function () { setLang(b.getAttribute('data-lang')); }); });
 
@@ -843,12 +871,23 @@
     d.setAttribute('aria-label', t(state.playing ? 'pause' : 'play'));
     $('#play-t').textContent = t(state.playing ? 'pause' : 'play');
   }
-  function togglePlay() { state.playing = !state.playing; applyPlay(); }
+  function togglePlay() {
+    state.playing = !state.playing;
+    applyPlay();
+    if (state.playing) { lastNow = 0; scheduleFrame(); }
+  }
   $('#play').addEventListener('click', togglePlay);
   $('#d-play').addEventListener('click', togglePlay);
 
-  var q = $('#q');
-  q.addEventListener('input', function () { state.q = q.value.trim(); applyFilter(); });
+  var q = $('#q'), qTimer = 0;
+  q.addEventListener('input', function () {
+    clearTimeout(qTimer);
+    qTimer = setTimeout(function () { state.q = q.value.trim(); applyFilter(); }, 90);
+  });
+  document.addEventListener('visibilitychange', function () {
+    lastNow = 0;
+    if (!document.hidden && (state.playing || detail.dirty || tiles.some(function (tl) { return tl.visible && tl.dirty; }))) scheduleFrame();
+  });
   document.addEventListener('keydown', function (ev) {
     if (ev.key !== '/' || ev.metaKey || ev.ctrlKey || ev.altKey || dlg.open) return;
     var tag = document.activeElement && document.activeElement.tagName;
@@ -864,7 +903,7 @@
   buildGrid();
   renderTray();
   CAT.packs.forEach(loadPack);
-  requestAnimationFrame(frame);
+  scheduleFrame();
   syncFromHash();
   if ((state.cb || state.pack !== 'all') && !hashId()) $('#gallery').scrollIntoView({ block: 'start' }); // opened by an agent: go straight to the samples
 })();

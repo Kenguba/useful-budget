@@ -145,21 +145,12 @@
       }
     }
 
-    @keyframes videoHoloBtn {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
     [data-holo="true"] .refresh-btn {
       background: linear-gradient(120deg, #56C596, #4FA8F6, #74B9FF, #68D391);
-      background-size: 240% 240%;
-      animation: videoHoloBtn 4.2s ease infinite;
     }
 
     [data-holo="true"] .action-circle-btn {
       background: linear-gradient(135deg, #B2E2B4 0%, #98DBC5 45%, #9CC8F7 100%);
-      background-size: 200% 200%;
-      animation: videoHoloBtn 4.2s ease infinite;
     }
 
     /* 顶部第一行：左侧品牌标识 + 右上角组件 */
@@ -397,8 +388,6 @@
 
     .swatch-orb-preview.holo-animated {
       background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%) !important;
-      background-size: 220% 220% !important;
-      animation: videoHoloBtn 3.2s ease infinite;
     }
 
     .swatch-label {
@@ -671,7 +660,7 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
-      transition: all 0.25s ease;
+      transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
     }
 
     .cat-chip.active {
@@ -717,7 +706,7 @@
       user-select: none;
       white-space: nowrap;
       flex-shrink: 0;
-      transition: all 0.22s ease;
+      transition: background-color 0.22s ease, color 0.22s ease;
     }
 
     /* 激活态采用柔和弥散胶囊填充，无生硬蓝框与方框 */
@@ -738,7 +727,7 @@
       border-radius: 50%;
       background-color: var(--text-muted);
       opacity: 0.45;
-      transition: all 0.22s ease;
+      transition: background-color 0.22s ease, opacity 0.22s ease, transform 0.22s ease;
     }
 
     .filter-toggle-pill.checked .pill-status-dot {
@@ -1436,7 +1425,7 @@
       background: var(--card-sub-bg);
       border: none;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
     .checklist-item.done {
@@ -3007,13 +2996,16 @@
       clearSearch();
     }
 
+    let __searchDebounceTimer = 0;
     function handleSearchInput() {
       const val = document.getElementById('searchInput').value.trim();
       document.getElementById('clearBtn').classList.toggle('visible', val.length > 0);
-      renderAll();
+      clearTimeout(__searchDebounceTimer);
+      __searchDebounceTimer = setTimeout(renderAll, 120);
     }
 
     function clearSearch() {
+      clearTimeout(__searchDebounceTimer);
       const input = document.getElementById('searchInput');
       input.value = '';
       document.getElementById('clearBtn').classList.remove('visible');
@@ -3025,6 +3017,7 @@
       if (!input.value.trim()) {
         input.focus();
       } else {
+        clearTimeout(__searchDebounceTimer);
         renderAll();
       }
     }
@@ -3052,10 +3045,22 @@
     }
 
     function toggleCheckStep(stepNum) {
+      let done = false;
       if (completedSteps.has(stepNum)) {
         completedSteps.delete(stepNum);
       } else {
         completedSteps.add(stepNum);
+        done = true;
+      }
+      const card = document.getElementById('selfTestSpecialCard');
+      const item = card && card.querySelector(`.checklist-item[data-step="${stepNum}"]`);
+      if (item) {
+        item.classList.toggle('done', done);
+        const badge = item.querySelector('.step-num-badge');
+        if (badge) badge.textContent = done ? '✓' : String(stepNum);
+        const cnt = card.querySelector('.site-list-count');
+        if (cnt) cnt.textContent = `已完成 ${completedSteps.size} / 8 步`;
+        return;
       }
       renderAll();
     }
@@ -3111,7 +3116,7 @@
       const stepsHtml = selfTestSteps.map(s => {
         const isDone = completedSteps.has(s.step);
         return `
-          <div class="checklist-item ${isDone ? 'done' : ''}" onclick="toggleCheckStep(${s.step})">
+          <div class="checklist-item ${isDone ? 'done' : ''}" data-step="${s.step}" onclick="toggleCheckStep(${s.step})">
             <span class="step-num-badge">${isDone ? '✓' : s.step}</span>
             <div class="checklist-body">
               <div class="checklist-title">${zh ? s.title : s.titleEn}</div>

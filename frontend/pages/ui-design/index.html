@@ -91,23 +91,13 @@
 
 
 
-    @keyframes videoHoloBtn {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
     [data-holo="true"] .refresh-btn,
     [data-holo="true"] .submit-cta-btn {
       background: linear-gradient(120deg, #56C596, #4FA8F6, #74B9FF, #68D391);
-      background-size: 240% 240%;
-      animation: videoHoloBtn 4.2s ease infinite;
     }
 
     [data-holo="true"] .action-circle-btn {
       background: linear-gradient(135deg, #B2E2B4 0%, #98DBC5 45%, #9CC8F7 100%);
-      background-size: 200% 200%;
-      animation: videoHoloBtn 4.2s ease infinite;
     }
 
     /* ================= 3. 电脑端双栏（左导航+右内容） vs 手机端全宽（无侧栏挤压） ================= */
@@ -225,7 +215,7 @@
       font-weight: 600;
       color: var(--text-secondary);
       cursor: pointer;
-      transition: all 0.22s ease;
+      transition: background-color 0.22s ease, border-color 0.22s ease, color 0.22s ease, box-shadow 0.22s ease;
       text-align: left;
     }
 
@@ -260,7 +250,7 @@
       color: var(--theme-tag-text);
       padding: 1.5px 7px;
       border-radius: 999px;
-      transition: all 0.3s ease;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     [data-dark="true"] .sidebar-nav-count {
@@ -318,7 +308,7 @@
       justify-content: center;
       gap: 6px;
       box-shadow: var(--pill-shadow);
-      transition: all 0.22s ease;
+      transition: color 0.22s ease, transform 0.22s ease, border-color 0.22s ease;
     }
 
     [data-dark="true"] .login-trigger-btn {
@@ -624,8 +614,6 @@
 
     .swatch-orb-preview.holo-animated {
       background: linear-gradient(135deg, #B2E2B4 0%, #8FDBB8 35%, #92C6F2 72%, #B9CFF8 100%) !important;
-      background-size: 220% 220% !important;
-      animation: videoHoloBtn 3.2s ease infinite;
     }
 
     .swatch-label {
@@ -724,71 +712,7 @@
       transform: rotate(360deg);
     }
 
-    /* ================= 8. 悬浮滑动胶囊 Tab（1:1 复刻 Ai比价.html 双项胶囊） ================= */
-    .gemini-tab-section {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    .gemini-tabs {
-      position: relative;
-      display: inline-grid;
-      grid-template-columns: 1fr 1fr;
-      padding: 4px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.48);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.68);
-    }
-
-    [data-dark="true"] .gemini-tabs {
-      background: rgba(15, 23, 42, 0.48);
-      border-color: rgba(255, 255, 255, 0.08);
-    }
-
-    .tab-glider {
-      position: absolute;
-      top: 4px;
-      left: 4px;
-      width: calc(50% - 4px);
-      height: calc(100% - 8px);
-      background-color: var(--pill-surface);
-      border-radius: 999px;
-      box-shadow: 0 3px 12px rgba(15, 23, 42, 0.08);
-      transition: transform 0.42s var(--ease-spring),
-                  background-color 0.4s ease;
-      z-index: 0;
-    }
-
-    .gemini-tabs[data-mode="finds"] .tab-glider {
-      transform: translateX(100%);
-    }
-
-    .gemini-tab-btn {
-      position: relative;
-      z-index: 1;
-      border: none;
-      background: transparent;
-      padding: 8px 22px;
-      border-radius: 999px;
-      font-size: 13.5px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: color 0.3s ease;
-      white-space: nowrap;
-      text-align: center;
-    }
-
-    .gemini-tab-btn.active {
-      color: var(--theme-tab-text);
-      font-weight: 700;
-    }
-
-    /* ================= 9. 大圆角悬浮搜索框 ================= */
+    /* ================= 8. 大圆角悬浮搜索框 ================= */
     .gemini-search-card {
       background-color: var(--pill-surface);
       border-radius: 26px;
@@ -927,7 +851,7 @@
       white-space: nowrap;
       flex-shrink: 0;
       cursor: pointer;
-      transition: all 0.25s ease;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
     }
 
     .subtag-chip:hover {
@@ -948,12 +872,6 @@
       flex-direction: column;
       gap: 32px;
       min-width: 0;
-      transition: opacity 0.22s ease, transform 0.22s ease;
-    }
-
-    .catalogue-body.switching {
-      opacity: 0;
-      transform: translateY(6px);
     }
 
     .catalogue-section {
@@ -998,7 +916,6 @@
     }
 
     /* 桌面端 3 列，平板/手机端 2 列双栏网格（文字自然换行不截断） */
-    .finds-poster-grid,
     .cards-grid-3 {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1024,75 +941,6 @@
       transform: translateY(-2px);
       border-color: var(--theme-accent);
       box-shadow: 0 10px 24px -8px rgba(15, 23, 42, 0.12);
-    }
-
-    .poster-visual-stage {
-      min-height: 136px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-      padding: 12px;
-    }
-
-    .poster-mock-window {
-      width: 100%;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.16);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 10px 11px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 12px;
-      color: #FFFFFF;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
-      transition: transform 0.32s var(--ease-spring);
-    }
-
-    .find-poster-card:hover .poster-mock-window {
-      transform: scale(1.02);
-    }
-
-    .mock-top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .mock-dots {
-      display: flex;
-      gap: 4px;
-    }
-
-    .mock-dots span {
-      width: 5.5px;
-      height: 5.5px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.7);
-    }
-
-    .mock-tag-pill {
-      font-size: 9.5px;
-      font-weight: 700;
-      letter-spacing: 0.4px;
-      text-transform: uppercase;
-      padding: 2px 7px;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.28);
-      color: #FFFFFF;
-    }
-
-    .mock-caption-title {
-      font-size: 12.5px;
-      font-weight: 800;
-      letter-spacing: -0.2px;
-      line-height: 1.32;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
     }
 
     /* 作者与账号完整显示，支持自适应换行，绝不出现半截省略号 */
@@ -1261,7 +1109,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.22s ease;
+      transition: border-color 0.22s ease, color 0.22s ease, box-shadow 0.22s ease;
     }
 
     .show-all-btn:hover {
@@ -1361,7 +1209,7 @@
       align-items: center;
       justify-content: center;
       font-size: 12px;
-      transition: all 0.2s ease;
+      transition: color 0.2s ease, transform 0.2s ease;
     }
 
     .auth-close-btn:hover {
@@ -1461,7 +1309,7 @@
       font-size: 12px;
       color: var(--text-muted);
       pointer-events: none;
-      transition: all 0.2s var(--ease-smooth);
+      transition: top 0.2s var(--ease-smooth), font-size 0.2s var(--ease-smooth), color 0.2s var(--ease-smooth);
     }
 
     .floating-input:focus + .floating-label,
@@ -1551,7 +1399,7 @@
       font-size: 11.5px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
     }
 
     .social-btn:hover {
@@ -1583,19 +1431,8 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    .empty-state-box {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 36px 18px;
-      border: 1px dashed var(--card-border);
-      border-radius: 16px;
-      color: var(--text-secondary);
-      font-size: 13px;
-    }
-
     /* ================= 14. 手机端与平板响应式断点（手机端释放全宽，1:1 还原 Ai比价.html 手机布局） ================= */
     @media (max-width: 980px) {
-      .finds-poster-grid,
       .cards-grid-3 {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
@@ -1645,7 +1482,6 @@
         margin-right: 18px;
       }
 
-      .finds-poster-grid,
       .cards-grid-3 {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 11px;
@@ -2414,8 +2250,9 @@ function cardHtml(it){
     "</div>" +
     '<div class="card-tags-row">' + chips + "</div></a>";
 }
+var __lastFindsSig = "";
 function renderCollection(key){
-  if (!CATALOG[key]) { var g0 = document.querySelector('[data-grid="' + key + '"]'); if (g0) g0.innerHTML = ""; var b0 = document.querySelector('[data-more="' + key + '"]'); if (b0) b0.style.display = "none"; var s0 = document.getElementById(key); if (s0) s0.querySelector("[data-empty]").style.display = "none"; return; }
+  if (!CATALOG[key]) { var g0 = document.querySelector('[data-grid="' + key + '"]'); if (g0) g0.innerHTML = ""; var b0 = document.querySelector('[data-more="' + key + '"]'); if (b0) b0.style.display = "none"; var s0 = document.getElementById(key); if (s0) s0.querySelector("[data-empty]").style.display = "none"; return 0; }
   var grid = document.querySelector('[data-grid="' + key + '"]');
   var items = CATALOG[key].filter(matches);
   var showAll = state.expanded[key] || !!state.q || state.tag !== "all";
@@ -2428,10 +2265,14 @@ function renderCollection(key){
   } else { btn.style.display = "none"; }
   var sec = document.getElementById(key);
   sec.querySelector("[data-empty]").style.display = items.length ? "none" : "block";
+  return items.length;
 }
 function renderFinds(){
-  if (!FINDS) { document.getElementById("findsGrid").innerHTML = ""; document.getElementById("finds").querySelector("[data-empty]").style.display = "none"; return; }
   var grid = document.getElementById("findsGrid");
+  if (!FINDS) { __lastFindsSig = ""; grid.innerHTML = ""; document.getElementById("finds").querySelector("[data-empty]").style.display = "none"; return; }
+  var sig = state.tag + "|" + state.q + "|" + FINDS.length;
+  if (sig === __lastFindsSig) return;
+  __lastFindsSig = sig;
   var items = FINDS.filter(function(f){
     if (state.tag !== "all") return false;
     if (!state.q) return true;
@@ -2440,7 +2281,7 @@ function renderFinds(){
   grid.innerHTML = items.map(function(f){
     var ratio = (f.w && f.h) ? ' style="aspect-ratio:' + f.w + "/" + f.h + '"' : "";
     return '<article class="find-poster-card">' +
-      '<img class="poster-img" data-src="' + esc(f.local) + '" alt="Find by ' + esc(f.name) + '"' + ratio + ">" +
+      '<img class="poster-img" decoding="async" data-src="' + esc(f.local) + '" alt="Find by ' + esc(f.name) + '"' + ratio + ">" +
       '<div class="poster-author-bar"><span class="poster-author-name">' + esc(f.name) + "</span>" +
       (f.handle ? '<span class="poster-author-handle">@' + esc(f.handle) + "</span>" : "") + "</div></article>";
   }).join("");
@@ -2448,12 +2289,11 @@ function renderFinds(){
   document.getElementById("finds").querySelector("[data-empty]").style.display = items.length ? "none" : "block";
 }
 function renderAll(){
-  COLLECTIONS.forEach(renderCollection);
+  var n = 0;
+  COLLECTIONS.forEach(function(k){ n += renderCollection(k); });
   renderFinds();
   var note = document.getElementById("searchNote");
   if (state.q) {
-    var n = 0;
-    COLLECTIONS.forEach(function(k){ n += (CATALOG[k] || []).filter(matches).length; });
     note.style.display = "block";
     note.textContent = zh() ? "共 " + n + " 条目录条目匹配「" + state.q + "」" : n + " catalogue entries match \u201C" + state.q + "\u201D";
   } else { note.style.display = "none"; }
@@ -2638,11 +2478,7 @@ function ensureAllData(){
   return Promise.all(COLLECTIONS.map(loadCollection).concat([loadFinds()]));
 }
 function warmRemaining(){
-  var chain = Promise.resolve();
-  COLLECTIONS.forEach(function(k){
-    chain = chain.then(function(){ return loadCollection(k); });
-  });
-  return chain;
+  return Promise.all(COLLECTIONS.map(loadCollection).concat([loadFinds()]));
 }
 
 var __posterIO = null;
@@ -2672,7 +2508,7 @@ applyLang();
 renderAll();
 var initialView = viewFromHash();
 showView(initialView, initialView !== "home");
-loadFinds();
+if (initialView === "home" || initialView === "finds") loadFinds();
 loadCollection(COLLECTIONS.indexOf(initialView) !== -1 ? initialView : "inspiration");
 setTimeout(warmRemaining, 900);
 
