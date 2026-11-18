@@ -1708,10 +1708,15 @@
       align-items: center;
       justify-content: center;
       padding: 18px;
+      overscroll-behavior: none;
     }
 
     .modal-backdrop.open {
       display: flex;
+    }
+
+    html.rpt-open, body.rpt-open {
+      overflow: hidden;
     }
 
     .modal-card {
@@ -1881,7 +1886,7 @@
 .rtc-skl .geo-skl:nth-child(4){width:92%}
 .rtc-skl .geo-skl:nth-child(5){width:48%}
 /* ================= 截图报告弹窗（ken 模板 3×3 九宫格，1000px 画板等比缩放） ================= */
-    #reportModalBackdrop .modal-card { max-width: 432px; max-height: 92vh; overflow-y: auto; padding: 10px; }
+    #reportModalBackdrop .modal-card { max-width: 432px; max-height: 92vh; overflow-y: auto; overscroll-behavior: contain; padding: 10px; }
     .rpt-scale-wrap { position: relative; overflow: hidden; width: 100%; }
     .rpt-scale-wrap.capturing { position: fixed; left: -99999px; top: 0; height: auto !important; overflow: visible; }
     .rpt-scale-wrap.capturing .rpt-board { transform: none !important; }
@@ -2644,7 +2649,7 @@ function closeSnapshotModal(){
   if(history.state&&history.state.spa&&history.state.spa.modal){history.back();return}
   spaState.modal=false;modalVisual(false);
 }
-function rptVisual(open){$("reportModalBackdrop").classList.toggle("open",open)}
+function rptVisual(open){$("reportModalBackdrop").classList.toggle("open",open);document.documentElement.classList.toggle("rpt-open",open);document.body.classList.toggle("rpt-open",open)}
 function closeReportModal(){
   if(history.state&&history.state.spa&&history.state.spa.rpt){history.back();return}
   rptShot.active=false;spaState.rpt=false;rptVisual(false);
