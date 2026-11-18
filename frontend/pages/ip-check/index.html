@@ -3676,11 +3676,10 @@ async function paintBoardNative(board,scale){
       rrPath(ctx,x+bw[0]/2,y+bw[0]/2,w-bw[0],h-bw[0],radii.map(r=>Math.max(0,r-bw[0]/2)));
       ctx.stroke();
     }else{
-      ctx.fillStyle=bc[2];
-      if(bw[0]>0&&cs.borderTopStyle==="solid")ctx.fillRect(x,y,w,bw[0]);
-      if(bw[2]>0&&cs.borderBottomStyle==="solid")ctx.fillRect(x,y+h-bw[2],w,bw[2]);
-      if(bw[3]>0&&cs.borderLeftStyle==="solid")ctx.fillRect(x,y,bw[3],h);
-      if(bw[1]>0&&cs.borderRightStyle==="solid")ctx.fillRect(x+w-bw[1],y,bw[1],h);
+      if(bw[0]>0&&cs.borderTopStyle==="solid"){ctx.fillStyle=bc[0];ctx.fillRect(x,y,w,bw[0]);}
+      if(bw[2]>0&&cs.borderBottomStyle==="solid"){ctx.fillStyle=bc[2];ctx.fillRect(x,y+h-bw[2],w,bw[2]);}
+      if(bw[3]>0&&cs.borderLeftStyle==="solid"){ctx.fillStyle=bc[3];ctx.fillRect(x,y,bw[3],h);}
+      if(bw[1]>0&&cs.borderRightStyle==="solid"){ctx.fillStyle=bc[1];ctx.fillRect(x+w-bw[1],y,bw[1],h);}
     }
   }
   function paintTextNode(node,parentEl){
