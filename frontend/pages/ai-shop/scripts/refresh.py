@@ -1329,14 +1329,31 @@ def main():
     _baitq.sort(key=lambda d: -(d['price'] or 0))  # ken 口径：核查从高价到低价
     # ken 已拉黑的（b=1）不消失：沉到待审清单最下面留档（ken 2026-11-18 定），
     # 页面里左滑可恢复正常。数据来自终审结论里 a=bait 的条目，池里还在的才列。
+    # 留档期限（ken 2026-11-18 定）：结论里存着拉黑时刻的短码 t（距 2026-01-01 +08
+    # 整小时数、64 进制），超过 3 个月（2160 小时）的只不再显示，拉黑本身仍永久生效。
+    _STAMP_CH = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_'
+    def _stamp_h(s):
+        try:
+            _v2 = 0
+            for _c in str(s):
+                _v2 = _v2 * 64 + _STAMP_CH.index(_c)
+            return _v2
+        except Exception:
+            return None
+    _now_h = int((time.time() - 1767196800) // 3600)
     _bq_seen = {d['url'].split('?')[0] for d in _baitq}
     for o in _pre_block:
         _u = o['url'].split('?')[0]
         _v = _v_of(_u)
         if (_v and _v['a'] == 'bait' and _u not in _bq_seen
                 and o.get('price') is not None and o['price'] > 0):
+            _th = _stamp_h(_v.get('t')) if _v.get('t') else None
+            if _th is not None and _now_h - _th > 2160:
+                continue  # 拉黑已超 3 个月：底部留档不再显示（拉黑照旧生效）
             _q('banned', o, 'banned')
             _baitq[-1]['b'] = '1'
+            if _v.get('t'):
+                _baitq[-1]['t'] = _v['t']
             _bq_seen.add(_u)
 
     groups = [
