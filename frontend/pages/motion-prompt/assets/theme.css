@@ -144,18 +144,19 @@ h1, h2, h3, .sec-h, .f-h1, .pack-h h3, .d-head h2 { font-weight: 500; }
   :root[data-holo="true"] .btn-main, .swatch-orb-preview.holo-animated { animation: none; }
 }
 
+@media (max-width: 720px) {
+  .theme-popover-panel { position: fixed; top: calc(var(--top-h) + 8px); right: 12px; left: 12px; width: auto; }
+  /* the extra picker button crowds the bar: keep every item on one line */
+  .top-nav { min-width: 0; }
+  .logo, .top-link, .seg { flex: none; }
+  .seg-b { flex: none; white-space: nowrap; padding: 4px 8px; }
+  #themePick, #theme { flex: none; }
+}
+
 @media (max-width: 480px) {
   /* narrow screens: the EN language segment makes the header row wider than
      the viewport (measured 424px at 390px) — compact the header items */
   .seg-b { padding: 4px; }
   .icon-b { width: 32px; height: 32px; }
   .logo { font-size: 16px; }
-}
-
-@media (max-width: 720px) {
-  .theme-popover-panel { position: fixed; top: calc(var(--top-h) + 8px); right: 12px; left: 12px; width: auto; }
-  /* the extra picker button crowds the bar: keep every item on one line */
-  .logo, .top-link, .seg { flex: none; }
-  .seg-b { flex: none; white-space: nowrap; padding: 4px 8px; }
-  #themePick, #theme { flex: none; }
 }

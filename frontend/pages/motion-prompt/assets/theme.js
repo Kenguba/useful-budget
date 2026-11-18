@@ -90,7 +90,7 @@
      root.lang first (their listeners were registered earlier); mirror the
      new language into Cookie A's language digit, keeping day/night + theme. */
   document.querySelectorAll('[data-lang]').forEach(function (b) {
-    b.addEventListener('click', function () { writeA(); });
+    b.addEventListener('click', function () { labels(); builtLang = null; writeA(); });
   });
 
   /* ---------- theme picker ---------- */
@@ -107,7 +107,9 @@
   }
   function markActive() {
     grid.querySelectorAll('.theme-swatch-item').forEach(function (el) {
-      el.classList.toggle('active', Number(el.getAttribute('data-theme-idx')) === state.idx);
+      var on = Number(el.getAttribute('data-theme-idx')) === state.idx;
+      el.classList.toggle('active', on);
+      el.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
   }
   var builtLang = null;

@@ -3247,10 +3247,10 @@ function setMyIp(ip,primary){
   renderMyIp();
 }
 async function fetchAltFamily(want6){
-  const eps=want6?["https://api6.ipify.org?format=json","https://ipv6.icanhazip.com","https://v6.ident.me","https://v6.seeip.org/jsonip","https://api6.my-ip.io/ip"]:["https://api4.ipify.org?format=json","https://ipv4.icanhazip.com","https://v4.ident.me","https://v4.seeip.org/jsonip","https://api4.my-ip.io/ip"];
+  const eps=want6?["https://ipv6.icanhazip.com","https://v6.ident.me","https://api6.ipify.org?format=json"]:["https://ipv4.icanhazip.com","https://v4.ident.me","https://api4.ipify.org?format=json"];
   for(const u of eps){
     try{
-      const r=await fetchText(u,3500);let ip=(r||"").trim();
+      const r=await fetchText(u,2500);let ip=(r||"").trim();
       if(ip.startsWith("{")){try{ip=JSON.parse(ip).ip||""}catch(e){ip=""}}
       if(ip&&(want6?ip.includes(":"):(/^\d{1,3}(\.\d{1,3}){3}$/.test(ip))))return ip;
     }catch(e){/* 换下一个端点 */}
@@ -3947,15 +3947,15 @@ $("fpPlat").textContent=(navigator.userAgentData&&navigator.userAgentData.platfo
 /* ---------- 初始化：直接实时检测本机出口 ---------- */
 $("myV4").textContent=TD("detecting");
 async function probeV4(){
-  const eps=["https://api4.ipify.org?format=json","https://ipv4.icanhazip.com","https://v4.ident.me","https://v4.seeip.org/jsonip","https://api4.my-ip.io/ip"];
+  const eps=["https://ipv4.icanhazip.com","https://v4.ident.me","https://api4.ipify.org?format=json"];
   for(let round=0;round<3;round++){
-    const v4=await new Promise(res=>{
-      let done=false;const roundCtl=new AbortController();
-      const finish=v=>{if(!done){done=true;try{roundCtl.abort()}catch(_){}res(v||"")}};
-      eps.forEach(u=>{fetchText(u,4000,roundCtl.signal).then(r=>{let ip=(r||"").trim();if(ip.startsWith("{")){try{ip=JSON.parse(ip).ip||""}catch(e){ip=""}}if(/^\d{1,3}(\.\d{1,3}){3}$/.test(ip))finish(ip)}).catch(()=>{})});
-      setTimeout(()=>finish(""),5000);
-    });
-    if(v4)return v4;
+    for(const u of eps){
+      try{
+        const r=await fetchText(u,2500);let ip=(r||"").trim();
+        if(ip.startsWith("{")){try{ip=JSON.parse(ip).ip||""}catch(e){ip=""}}
+        if(/^\d{1,3}(\.\d{1,3}){3}$/.test(ip))return ip;
+      }catch(e){/* 换下一个端点 */}
+    }
     if(round<2)await new Promise(r=>setTimeout(r,800));
   }
   return "";

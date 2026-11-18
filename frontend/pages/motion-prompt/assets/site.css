@@ -29,7 +29,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--top-h) + 16px); }
+html { -webkit-text-size-adjust: 100%; overflow-x: clip; scroll-padding-top: calc(var(--top-h) + 16px); }
 @media (hover: hover) and (pointer: fine) { html { scrollbar-gutter: stable; } }
 html.modal-open { overflow: hidden; }
 body {
@@ -82,11 +82,12 @@ h1 { font-size: clamp(40px, 6.1vw, 92px); line-height: 1.1; letter-spacing: -.03
 .facts { display: flex; gap: 36px; margin-top: 36px; }
 .facts dt { font-size: 12px; color: var(--muted); letter-spacing: 0; }
 .facts dd { font: 600 30px/1.2 var(--mono); letter-spacing: -.03em; }
+.hero-copy { min-width: 0; }
 .hero-install { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; min-width: 0; }
-.install { border: 1px solid var(--line); border-radius: 16px; background: var(--surface); padding: 20px; }
+.install { min-width: 0; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); padding: 20px; }
 .install-h { font-size: 15px; font-weight: 600; }
 .install-p { font-size: 13.5px; line-height: 1.7; color: var(--muted); margin-top: 4px; }
-.copyfield { display: flex; align-items: center; gap: 8px; margin-top: 16px; padding: 8px 8px 8px 16px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--bg); }
+.copyfield { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; margin-top: 16px; padding: 8px 8px 8px 16px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--bg); }
 .copyfield code { flex: 1; min-width: 0; font: 14px/1.5 var(--mono); overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
 .copyfield code::-webkit-scrollbar { display: none; }
 .copyfield-text { align-items: flex-start; }
@@ -107,7 +108,8 @@ h1 { font-size: clamp(40px, 6.1vw, 92px); line-height: 1.1; letter-spacing: -.03
 /* ---------- filter bar ---------- */
 .tools { position: sticky; top: var(--top-h); z-index: 10; background: var(--bg); border-block: 1px solid var(--line); }
 .tools-in { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 20px; padding-block: 12px; }
-.chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 4px; margin: -4px; }
+.tools-in > * { min-width: 0; }
+.chips { display: flex; gap: 8px; overflow-x: auto; max-width: 100%; min-width: 0; scrollbar-width: none; padding: 4px 0; }
 .chips::-webkit-scrollbar { display: none; }
 .chips-sub { grid-column: 1 / -1; }
 @media (min-width: 1021px) { .chips { flex-wrap: wrap; overflow: visible; } .tools-in { align-items: start; } }

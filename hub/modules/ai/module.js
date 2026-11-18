@@ -308,6 +308,7 @@ function renderBoard(){if(drag){pendingSwipeRender=true;return;}
       favExtraHtml='<div class="site-list-group open" id="grp-favs"><button class="site-list-trigger" type="button" data-gtoggle aria-expanded="true"><span class="site-list-brand-icon">★</span><span class="site-list-main"><span class="site-list-name">收藏</span><span class="site-list-detail" style="display:block">已收藏 '+ex.length+' 条（已下榜，价格为收藏时快照）</span></span><span class="site-list-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="site-list-collapsible"><div class="site-list-inner"><div class="site-list-offers">'+erows+'</div></div></div></div>';
     }
   }
+  let shownGroups=0, shownItems=0;
   $('#groups').innerHTML=favExtraHtml+board.groups.map((g,gi)=>{
     let shown=0; let firstShown=null;
     const rows=g.items.map((it,ii)=>{
@@ -319,9 +320,12 @@ function renderBoard(){if(drag){pendingSwipeRender=true;return;}
         return '<div class="swipe" data-surl="'+esc(it.url)+'"><div class="swipe-actions"><button type="button" class="sw-fav" data-act="fav" aria-label="'+(favSet.has(it.url)?'取消收藏':'收藏')+'">'+SWIPE_FAV_ICON+'<span>'+(favSet.has(it.url)?'取消收藏':'收藏')+'</span></button><button type="button" class="sw-del" data-act="del" aria-label="删除">'+SWIPE_DEL_ICON+'<span>删除</span></button></div><div class="real-offer-row" id="it-'+esc(g.id)+'-'+ii+'"><div class="offer-col-left"><span class="offer-price-val">'+fmtP(it.price)+'</span><span class="platform-source-badge">'+esc(it.platform)+'</span></div><div class="offer-col-mid"><div class="offer-item-title"><a data-anchor="it-'+esc(g.id)+'-'+ii+'" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+esc(it.title)+'</a></div>'+(tagrow?'<div class="offer-badges-line">'+tagrow+'</div>':'')+'<div class="shoprow"><span class="shopname">'+esc(it.shop)+'</span><span class="stk">'+stockTxt(it)+'</span></div></div></div></div>';
       }).join('');
     if(!shown) return '';
+    shownGroups++; shownItems+=shown;
     const first=firstShown; const open=searching||userOpen.has('grp-'+g.id);
     return '<div class="site-list-group'+(open?' open':'')+'" id="grp-'+esc(g.id)+'"><button class="site-list-trigger" type="button" data-gtoggle aria-expanded="'+open+'"><span class="site-list-brand-icon">'+(GICON[g.id]||'✦')+'</span><span class="site-list-main"><span class="site-list-name">'+esc(g.name)+'</span><span class="site-list-detail" style="display:block">有货最低 '+shown+' 条'+(shown<30?'（不足 30 条，如实显示）':'')+'</span></span>'+(first?'<span class="site-list-minimum"><small>有货最低</small><strong>'+fmtP(first.price)+'</strong></span>':'')+'<span class="site-list-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="site-list-collapsible"><div class="site-list-inner"><div class="site-list-offers">'+rows+'</div></div></div></div>';
   }).join('')||'<p class="sub">'+(q?'没有匹配的报价。报价单只收录每组最低 30 条，找某家店请切到「店铺目录」搜。':'没有匹配的报价。')+'</p>';
+  const lt=$('#listTitle'); if(lt) lt.textContent=searching?'搜索结果':'10 大分组 · 真实报价明细';
+  const lc=$('#listCount'); if(lc&&$('#viewShops').classList.contains('hide')) lc.textContent=shownGroups+' 组 · '+shownItems+' 条报价';
   if(keepOpenUrl) window.dispatchEvent(new CustomEvent('aishop:openrestore',{detail:keepOpenUrl}));
   /* The API can rerender the group list after a click; re-anchor only while the
      visitor has not started a new manual gesture or history navigation. */
@@ -398,7 +402,10 @@ function switchTab(shopsView){
   $('#featuredHint').style.display=vis;
   document.querySelector('.site-list-topline').style.display=shopsView?'none':'';
   $('#listSub').style.display=shopsView?'none':'';
-  if(board){ $('#listCount').textContent=board.groups.length+' 组 · '+board.groups.reduce((a,g)=>a+g.items.length,0)+' 条报价'; }
+  if(!shopsView){
+    if($('#q').value.trim()) renderBoard();
+    else if(board) $('#listCount').textContent=board.groups.length+' 组 · '+board.groups.reduce((a,g)=>a+g.items.length,0)+' 条报价';
+  }
   if(window.__applyTabTheme)window.__applyTabTheme(shopsView);
   if(shopsView&&!shops)renderShops();
   if(!shopsView)fitLeaderShops();
@@ -654,6 +661,8 @@ $('#tabBoard').onclick=()=>switchTab(false);
 $('#tabShops').onclick=()=>switchTab(true);
 let qTimer=0;
 $('#q').oninput=(immediate)=>{ $('#clearBtn').classList.toggle('visible',$('#q').value.length>0); const run=()=>{ if($('#viewShops').classList.contains('hide')) renderBoard(); else { shopShown=300; renderShops(); } }; if(immediate===true){ clearTimeout(qTimer); run(); } else { clearTimeout(qTimer); qTimer=setTimeout(run,160); } };
+$('#q').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); $('#q').oninput(true); } };
+$('#q').onchange=()=>{ $('#q').oninput(true); };
 document.querySelectorAll('#categoryBar .cat-chip').forEach(ch=>{ ch.onclick=()=>{ const c=ch.dataset.cat; if(c==='all'){ selCats.clear(); selFav=false; } else if(c==='__fav'){ selFav=!selFav; } else if(selCats.has(c)){ selCats.delete(c); } else { selCats.add(c); } paintChips(); renderBoard(); }; });
 paintChips();
 $('#clearBtn').onclick=()=>{ $('#q').value=''; $('#q').oninput(true); $('#q').focus(); };
@@ -889,7 +898,7 @@ function fitStatusRow(){
 }
 let statusRsz;
 window.addEventListener('resize',()=>{ clearTimeout(statusRsz); statusRsz=setTimeout(fitStatusRow,150); });
-function fillMeta(b){const mt=$('#metaTime'),mc=$('#metaCount');mt.textContent=b.updated_at;mt.className='';mc.textContent=b.groups.reduce((a,g)=>a+g.items.length,0);mc.className='';const lc=$('#listCount');if(lc&&$('#viewShops').classList.contains('hide'))lc.textContent=b.groups.length+' 组 · '+mc.textContent+' 条报价';requestAnimationFrame(fitStatusRow);}
+function fillMeta(b){const mt=$('#metaTime'),mc=$('#metaCount');mt.textContent=b.updated_at;mt.className='';mc.textContent=b.groups.reduce((a,g)=>a+g.items.length,0);mc.className='';const lc=$('#listCount');if(lc&&$('#viewShops').classList.contains('hide')&&!$('#q').value.trim()&&allSel())lc.textContent=b.groups.length+' 组 · '+mc.textContent+' 条报价';requestAnimationFrame(fitStatusRow);}
 if(window.INLINE_BOARD){
   board=window.INLINE_BOARD;
   fillMeta(board);
