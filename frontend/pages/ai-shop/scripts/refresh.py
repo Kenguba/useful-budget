@@ -533,6 +533,8 @@ def slim(rows):
         d = dict(price=o['price'], shop=o['shop'], platform=o['platform'],
                  stock=o['stock'], title=o['title'], url=o['url'],
                  kind=o.get('kind', ''), same_source=o.get('same_source', 1))
+        if o.get('b'):
+            d['b'] = o['b']  # 引流核查戳（ken 2026-11-18）：已审非引流的低价条目才带，值是核查时刻短码；无此字段=默认空
         if o.get('minq') and o['minq'] <= 1000:
             d['minq'] = o['minq']  # 起购量（>1 才有）：价格是单价，但必须买满 minq 个；>1000 视为卖家乱填的假值（如 9999）丢弃
         src = o.get('sources') or []
@@ -1160,6 +1162,7 @@ def main():
     # 定点剔除（ken 2026-11-02 裁定）：异次元店铺 ¥1.85 为引流价（单源、库存未显示），从看板剔除
     # G47831683（ken 2026-11-05 裁定）：¥0.02 只卖渠道介绍、真卡人工发货 12–35 元，同为引流品剔除
     # 2026-11-18 ken 裁定：¥0.02/¥0.03 引流嫌疑 6 条先删并在此标记，详情核查定性后可恢复
+    # fj8f30（2026-11-18 核查定性）：¥0.10 付完只发一个源头网页地址、卡要去源头另买，确认引流
     BLOCKED_URLS = {'https://fk.rupap.cn/item/10',
                     'https://www.16688.com.cn/goods/G47831683',
                     'https://aicdks.com/product/107472',
@@ -1167,7 +1170,8 @@ def main():
                     'https://www.16688.com.cn/goods/G88531984',
                     'https://www.16688.com.cn/goods/G86178035',
                     'https://www.16688.com.cn/goods/G17925487',
-                    'https://wzyp.cn/item/m96hgl'}
+                    'https://wzyp.cn/item/m96hgl',
+                    'https://wzyp.cn/item/fj8f30'}
     rows = [o for o in list(all_offers.values()) if o['url'].split('?')[0] not in BLOCKED_URLS]
     print(f'merged unique products: {len(rows)}', file=sys.stderr)
     _pool_rows = list(rows)  # 价格日志全量池用门前全量（僵尸条目只增不删、继续跟踪）
@@ -1245,11 +1249,38 @@ def main():
     _full_pai = list(pai)
     rows = prepare_offers(rows)
     pai = prepare_offers(pai)
+    # 低价地板（ken 2026-11-18 定）：看板 ¥1 以下先全删，唯一例外是 Codex 接码组
+    # （真接码 ¥0.1–0.8 是行情、分组规则已保证是接码服务才进组，故 g6 不过地板）。
+    # 引流字段 b 三态：默认空（¥1 以上不带、数据里不出现不占位）；¥1 以下先标 1（引流待审、
+    # 不进看板）；逐条进详情审完、不是引流的把登记值换成核查时刻短码并恢复上架，
+    # 条目带 b=短码输出。短码=距 2026-01-01 00:00（+08）整小时数、64 进制（字符表 0-9A-Za-z-_）。
+    # 确认引流的进 BLOCKED_URLS 永久挡住，不在此表。
+    LOW_CHECK = {'https://www.16688.com.cn/goods/G39414072': '1ub',
+                 'https://wzyp.cn/item/12bdf4': '1ub',
+                 'https://wzyp.cn/item/b0lfvi': '1ub',
+                 'https://wzyp.cn/item/9ehsro': '1ub',
+                 'https://wzyp.cn/item/bt9cui': '1ub',
+                 'https://www.16688.com.cn/goods/G79137209': '1ub'}
+    def _low_floor(lst):
+        out = []
+        for o in lst:
+            if o['price'] is not None and o['price'] < 1:
+                _stamp = LOW_CHECK.get(o['url'].split('?')[0])
+                if not _stamp:
+                    continue  # 标 1 待审/未审：不进看板
+                o = dict(o, b=_stamp)
+            out.append(o)
+        return out
     g1, g2, g3 = gpt_groups(rows + [o for o in pai if o['url']])
     # PriceAI 的 GPT 行 category 为空，已在 gpt_groups 内按标题判断；其余分组同理合并
     g4, g5 = ag_groups(rows + pai)
     g6 = codex_group(rows + pai)  # PriceAI 补充行也走同一套权重规则，不开后门
     g7 = grok_group(rows) + [o for o in pai if grok_marker(o['title']) and has(o['title'], 'Heavy', 'HEAVY', 'Ultra', 'ULTRA') and not has(o['title'], '号池', '额度', '速刷')]
+    g1, g2, g3, g4, g5, g7 = (_low_floor(g1), _low_floor(g2), _low_floor(g3),
+                              _low_floor(g4), _low_floor(g5), _low_floor(g7))
+    _claude = _low_floor(claude_group(rows + pai))
+    _muse = _low_floor(muse_group(rows + pai))
+    _vcc = _low_floor(vcc_group(rows + pai))
 
     groups = [
         dict(id='gpt-unbound', name='GPT 日抛/Plus 成品号 — 未接马', items=slim(top30(g1, None, 45))),
@@ -1258,10 +1289,10 @@ def main():
         dict(id='ag-cheapest', name='Antigravity 反重力 — 最便宜', items=slim(top30(g4, ag_type, 45))),
         dict(id='ag-verified', name='Antigravity 反重力 — 已过验证成品号', items=slim(top30(g5, ag_type, 45))),
         dict(id='grok-heavy', name='Grok Heavy（SuperGrok Heavy/Ultra）', items=slim(top30(g7, lambda t: '代充' if has(t, '代充', '直充') else '成品号', 45))),
-        dict(id='claude', name='Claude — 最便宜', items=slim(top30(claude_group(rows + pai), claude_kind, 45))),
+        dict(id='claude', name='Claude — 最便宜', items=slim(top30(_claude, claude_kind, 45))),
         dict(id='codex-sms', name='Codex 接码 — 单次', items=slim(top30(g6, None, 45))),
-        dict(id='muse', name='Muse — 最便宜', items=slim(top30(muse_group(rows + pai), muse_kind, 45))),
-        dict(id='vcc', name='虚拟卡 — 最便宜', items=slim(top30(vcc_group(rows + pai), vcc_kind, 45))),
+        dict(id='muse', name='Muse — 最便宜', items=slim(top30(_muse, muse_kind, 45))),
+        dict(id='vcc', name='虚拟卡 — 最便宜', items=slim(top30(_vcc, vcc_kind, 45))),
     ]
     from datetime import datetime, timezone, timedelta
     bj_now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M')
