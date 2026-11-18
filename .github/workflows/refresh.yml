@@ -29,12 +29,12 @@ jobs:
         run: |
           python3 frontend/pages/skill-board/scripts/refresh.py
           python3 frontend/pages/ai-shop/scripts/refresh.py
-          if [ "$(TZ=Asia/Shanghai date +%u)" = "1" ] || [ "$(TZ=Asia/Shanghai date +%u)" = "4" ]; then python3 frontend/pages/cloud-phone/scripts/refresh.py || echo "::warning::cloud-phone refresh failed, keeping previous data"; fi
+          if [ "$(TZ=Asia/Shanghai date +%u)" = "1" ] || [ "$(TZ=Asia/Shanghai date +%u)" = "4" ]; then python3 frontend/pages/phone-cloud/scripts/refresh.py || echo "::warning::cloud-phone refresh failed, keeping previous data"; fi
       - name: Commit data
         run: |
           git config user.name "skills-board-bot"
           git config user.email "bot@localhost"
-          git add frontend/pages/skill-board/data/ frontend/pages/ai-shop/data/ frontend/pages/cloud-phone/data/ frontend/pages/ai-shop/index.html
+          git add frontend/pages/skill-board/data/ frontend/pages/ai-shop/data/ frontend/pages/phone-cloud/data/ frontend/pages/ai-shop/index.html
           git diff --cached --quiet || git commit -m "data: refresh $(date -u +%F)"
           git push
       - uses: actions/configure-pages@v5
