@@ -1327,6 +1327,17 @@ def main():
             _q('blocked', o, 'blocked')
             _q_seen.add(_u)
     _baitq.sort(key=lambda d: -(d['price'] or 0))  # ken 口径：核查从高价到低价
+    # ken 已拉黑的（b=1）不消失：沉到待审清单最下面留档（ken 2026-11-18 定），
+    # 页面里左滑可恢复正常。数据来自终审结论里 a=bait 的条目，池里还在的才列。
+    _bq_seen = {d['url'].split('?')[0] for d in _baitq}
+    for o in _pre_block:
+        _u = o['url'].split('?')[0]
+        _v = _v_of(_u)
+        if (_v and _v['a'] == 'bait' and _u not in _bq_seen
+                and o.get('price') is not None and o['price'] > 0):
+            _q('banned', o, 'banned')
+            _baitq[-1]['b'] = '1'
+            _bq_seen.add(_u)
 
     groups = [
         dict(id='gpt-unbound', name='GPT 日抛/Plus 成品号 — 未接马', items=slim(top30(g1, None, 45))),
