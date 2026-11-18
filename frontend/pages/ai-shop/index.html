@@ -1693,7 +1693,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC"
     /* 引流待审（ken 2026-11-18）：行样式与看板明细行完全一致（通栏平铺、发丝分隔），滑动照 Gmail 归档：整行单色动作底随方向切换、图标居中于露出区 */
     .bait-row { position: relative; overflow: hidden; }
     .bait-row + .bait-row { border-top: 1px solid var(--card-border); }
-    .bait-bg { position: absolute; top: 0; bottom: 0; left: 0; right: 0; background: #ba4549; }
+    .bait-bg { position: absolute; top: 6px; bottom: 6px; left: 8px; right: 8px; border-radius: 999px; background: #ba4549; }
     .bait-row[data-dir="l"] .bait-bg { background: #2e7d46; }
     .bic { position: absolute; top: 50%; display: none; align-items: center; gap: 6px; color: #fff; font-size: 13px; font-weight: 600; white-space: nowrap; }
     .bic svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -1707,9 +1707,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC"
     .bait-keybar { display: flex; align-items: center; gap: 8px; padding: 10px 15px; border-bottom: 1px solid var(--card-border); font-size: 13px; color: var(--text-secondary); flex-wrap: wrap; }
     .bait-keybar input { flex: 1; min-width: 120px; padding: 7px 10px; border: 1px solid var(--card-border); border-radius: 8px; background: var(--card-bg); color: var(--text-primary); font-size: 13px; }
     .bait-keybar button { padding: 7px 14px; border: 1px solid var(--card-border); border-radius: 8px; background: var(--card-bg); color: var(--text-primary); font-size: 13px; cursor: pointer; }
-    #baitUndo { position: fixed; left: 50%; bottom: 84px; transform: translate(-50%, 16px); background: #1c1c1e; color: #f5f5f7; padding: 11px 16px; border-radius: 12px; display: flex; gap: 14px; align-items: center; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease; z-index: 1200; box-shadow: 0 8px 24px rgba(0,0,0,.28); max-width: calc(100vw - 32px); }
-    #baitUndo.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
-    #baitUndoBtn { background: none; border: 0; color: #ffd08c; font-size: 14px; font-weight: 600; cursor: pointer; padding: 2px 4px; }
+    #baitUndo { position: fixed; left: 10px; right: 10px; bottom: calc(12px + env(safe-area-inset-bottom)); transform: translateY(16px); background: #1c1c1e; color: #f5f5f7; padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease; z-index: 1200; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
+    #baitUndo.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    #baitUndoBtn { background: none; border: 0; color: #8ab4f8; font-size: 14px; font-weight: 600; cursor: pointer; padding: 2px 4px; }
 </style>
 </head>
 <body>
@@ -2804,7 +2804,7 @@ window.selBait = false; window.baitCount = 0;
   }
   function snapBait(row){
     var card = row.querySelector('.bait-card'); if(!card) return;
-    card.style.transition = 'transform .28s cubic-bezier(.34, 1.2, .4, 1)';
+    card.style.transition = 'transform .38s cubic-bezier(.25, 1.35, .35, 1)';
     card.style.transform = 'translate3d(0,0,0)';
     row.classList.remove('armed');
     delete row.dataset.dir;
@@ -2875,15 +2875,25 @@ window.selBait = false; window.baitCount = 0;
     showUndoBar(act);
     var card = row.querySelector('.bait-card');
     var W = row.offsetWidth || 360;
-    card.style.transition = 'transform .22s ease-in';
+    card.style.transition = 'transform .28s cubic-bezier(.35,.65,.25,1)';
     card.style.transform = 'translate3d(' + (dir > 0 ? (W + 60) : -(W + 60)) + 'px,0,0)';
     setTimeout(function(){
       if(!row.isConnected) return;
-      row.style.height = row.offsetHeight + 'px';
-      row.classList.add('bye');
-      requestAnimationFrame(function(){ row.style.height = '0px'; });
-      setTimeout(function(){ if(row.isConnected) row.remove(); }, 300);
-    }, 260);
+      var H = row.offsetHeight;
+      row.style.height = H + 'px';
+      row.style.overflow = 'hidden';
+      requestAnimationFrame(function(){
+        row.style.transition = 'height .45s cubic-bezier(.3,1.25,.4,1)';
+        row.style.height = Math.round(H * 1.13) + 'px';
+      });
+      setTimeout(function(){
+        if(!row.isConnected) return;
+        row.style.transition = 'height .3s ease, opacity .3s ease';
+        row.style.height = '0px';
+        row.style.opacity = '0';
+        setTimeout(function(){ if(row.isConnected) row.remove(); }, 320);
+      }, 470);
+    }, 290);
   }
   /* ---------- 手势：横向明显大于纵向才接管 ---------- */
   var box = document.getElementById('groups');
