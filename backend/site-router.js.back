@@ -23,14 +23,14 @@
 const ROUTES = {
 skill: "frontend/pages/skill-board",
 ai: "frontend/pages/ai-shop",
-phone: "frontend/pages/cloud-phone",
-pan: "frontend/pages/cloud-pan",
+phone: "frontend/pages/phone-cloud",
+pan: "frontend/pages/pan-cloud",
 ip: "frontend/pages/ip-check",
 "2fa": "frontend/pages/2fa-auth",
 ui: "frontend/pages/ui-design",
 wechat: "frontend/pages/wechat-bridge",
 motion: "frontend/pages/motion-prompt",
-blog: "frontend/pages/blog",
+blog: "frontend/pages/blog-posts",
 pc: "frontend/pages/cloud-computer",
 };
 

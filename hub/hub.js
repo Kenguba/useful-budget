@@ -19,9 +19,9 @@
   var BASE = '/hub/modules/';
   /* 资源版本戳：改任何 hub/模块文件，必须同步 bump 这里的 MV 与根 index.html 里 hub.js/hub.css 的 ?v=，
      否则 CDN 对 .js 有 4 小时缓存，会出现新 ui.html 配旧 module.js 的混搭（2026-11-09 实测 ip 模块中招） */
-  var MV = '20261113a';
+  var MV = '20261118a';
   var MODULES = {
-    phone: { proj: 'cloud-phone', dir: '/frontend/pages/cloud-phone/', tier: 'light' },
+    phone: { proj: 'cloud-phone', dir: '/frontend/pages/phone-cloud/', tier: 'light' },
     '2fa': { proj: '2fa-auth',    dir: '/frontend/pages/2fa-auth/',    tier: 'light' },
     skill: { proj: 'skill-board', dir: '/frontend/pages/skill-board/', tier: 'light' },
     /* ai is on-demand (heaviest: code 320KB + board ~424KB): never in the
@@ -44,7 +44,7 @@
      * document-global; same-document mounting would fight the shell).
      * Its internal history entries are unstamped -> the A1 contract treats
      * them as module-internal, exactly like ai/skill state entries. */
-    pan:   { proj: 'cloud-pan',   dir: '/frontend/pages/cloud-pan/',   tier: 'subapp', subapp: true },
+    pan:   { proj: 'cloud-pan',   dir: '/frontend/pages/pan-cloud/',   tier: 'subapp', subapp: true },
     /* ui (phase 5, after ken picked slimming plan A): the standalone was
      * split first (data per collection in data/*.json, 27 posters as
      * files), so the pipeline module is ui 19K + css 51K + js 41K ~112K.

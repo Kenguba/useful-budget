@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-cloud-phone 价格脚本刷新（零依赖，纯标准库）
+phone-cloud 价格脚本刷新（零依赖，纯标准库）
 
 每周两次由根 workflow 在北京时间周一/周四运行（门控在 workflow 步骤里）。
 职责边界（诚实口径）：

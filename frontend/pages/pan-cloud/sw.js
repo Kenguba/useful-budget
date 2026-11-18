@@ -1,4 +1,4 @@
-// 基德盘搜（cloud-pan）PWA service worker
+// 基德盘搜（pan-cloud）PWA service worker
 // 策略与 skill-board 同口径：页面外壳与数据一律网络优先（保证看到最新版），断网回落缓存
 const CACHE = "pan-v23";
 const SHELL = [
