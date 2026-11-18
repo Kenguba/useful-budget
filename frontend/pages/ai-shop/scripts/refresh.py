@@ -12,7 +12,7 @@
 店铺目录由 data/shops.csv 转 data/shops.json（独立文件，不进映射表）。
 
 用法：python3 scripts/refresh.py
-产出：data/board.json（含 prices 价格史段）、data/shops.json、data/maps.json（仅平台映射）、data/price-log/（按来源分片）
+产出：data/board.json（含 prices 价格史段）、data/bait.json（引流待审清单）、data/shops.json、data/maps.json（仅平台映射）、data/price-log/（按来源分片）
 """
 import csv, html, io, json, os, re, sys, time, urllib.parse, urllib.request
 
@@ -1159,6 +1159,21 @@ def main():
             print(f'{_plat_name} direct: {len(_fresh)} fresh ({_ok} shops), {_applied2} applied from cache', file=sys.stderr)
     except Exception as e:
         print(f'aicdks/catfk direct failed: {e}', file=sys.stderr)
+    # ken 人工终审结论（2026-11-18 2b 定版）：页面引流页签的结论经 ai-refresh Worker 存 KV，
+    # 本脚本每轮从 /api/reviews 读回合并：bait=按引流拉黑（全组生效、含接码组）；
+    # pass/fav=已审清白（凭结论里的时间短码过地板恢复，fav 与 pass 管线待遇相同、区别只在页面收藏）。
+    # pass/fav 同时能解开 BLOCKED_URLS 的定点剔除（ken 在页签里改判即生效）。读不到就按空表走、不拖垮刷新。
+    _REVIEWS = {}
+    try:
+        _rv = json.loads(fetch('https://ai.jpedu.asia/api/reviews').decode('utf-8', 'ignore'))
+        if isinstance(_rv, dict):
+            _REVIEWS = {str(k).split('?')[0]: v for k, v in _rv.items()
+                        if isinstance(v, dict) and v.get('a') in ('bait', 'pass', 'fav')}
+        print(f'reviews: {len(_REVIEWS)} verdicts', file=sys.stderr)
+    except Exception as e:
+        print(f'reviews fetch failed: {e}', file=sys.stderr)
+    def _v_of(u):
+        return _REVIEWS.get(u.split('?')[0])
     # 定点剔除（ken 2026-11-02 裁定）：异次元店铺 ¥1.85 为引流价（单源、库存未显示），从看板剔除
     # G47831683（ken 2026-11-05 裁定）：¥0.02 只卖渠道介绍、真卡人工发货 12–35 元，同为引流品剔除
     # 2026-11-18 ken 裁定：¥0.02/¥0.03 引流嫌疑 6 条先删并在此标记，详情核查定性后可恢复
@@ -1172,7 +1187,10 @@ def main():
                     'https://www.16688.com.cn/goods/G17925487',
                     'https://wzyp.cn/item/m96hgl',
                     'https://wzyp.cn/item/fj8f30'}
-    rows = [o for o in list(all_offers.values()) if o['url'].split('?')[0] not in BLOCKED_URLS]
+    _BLOCKED_EFF = {u for u in BLOCKED_URLS if not (_v_of(u) and _v_of(u)['a'] in ('pass', 'fav'))}
+    _BLOCKED_EFF |= {u for u, v in _REVIEWS.items() if v['a'] == 'bait'}
+    _pre_block = list(all_offers.values())  # 拉黑前全量：待审清单要把被拉黑但池里还在的条目也列给 ken 复审
+    rows = [o for o in list(all_offers.values()) if o['url'].split('?')[0] not in _BLOCKED_EFF]
     print(f'merged unique products: {len(rows)}', file=sys.stderr)
     _pool_rows = list(rows)  # 价格日志全量池用门前全量（僵尸条目只增不删、继续跟踪）
     # 快照新鲜度门（ken 2026-11-06）：最新快照超过 48 小时的条目不进看板——价格/库存都可能已变。
@@ -1240,10 +1258,10 @@ def main():
         _pai_rows = list(_ex2.map(fetch_priceai, _slugs))
     for slug, r in zip(_slugs, _pai_rows):
         print(f'priceai {slug}: {len(r)} rows', file=sys.stderr)
-        pai += [o for o in r if o['url'] not in BLOCKED_URLS]
+        pai += [o for o in r if o['url'] not in _BLOCKED_EFF]
     _abj = fetch_aibijia()
     print(f'aibijia: {len(_abj)} rows', file=sys.stderr)
-    pai += [o for o in _abj if o['url'] not in BLOCKED_URLS]
+    pai += [o for o in _abj if o['url'] not in _BLOCKED_EFF]
 
     _full_rows = list(_pool_rows)  # prepare 前的全量原始行（价格日志全量维护用，含被新鲜度门拦下的）
     _full_pai = list(pai)
@@ -1261,13 +1279,25 @@ def main():
                  'https://wzyp.cn/item/9ehsro': '1ub',
                  'https://wzyp.cn/item/bt9cui': '1ub',
                  'https://www.16688.com.cn/goods/G79137209': '1ub'}
-    def _low_floor(lst):
+    _baitq = []  # 引流待审清单（落盘 data/bait.json，页面引流页签据此渲染，ken 人工终审）
+    def _q(gid, o, s):
+        d = dict(g=gid, price=o['price'], shop=o['shop'], platform=o['platform'],
+                 stock=o['stock'], title=o['title'], url=o['url'], s=s)
+        if o.get('minq') and o['minq'] <= 1000:
+            d['minq'] = o['minq']
+        _baitq.append(d)
+    def _apply_floor(lst, gid, floor=True):
         out = []
         for o in lst:
-            if o['price'] is not None and o['price'] < 1:
-                _stamp = LOW_CHECK.get(o['url'].split('?')[0])
+            _u = o['url'].split('?')[0]
+            _v = _v_of(_u)
+            if _v and _v['a'] == 'bait':
+                continue  # ken 已定性引流：全组拉黑，不进看板也不进待审
+            if floor and o['price'] is not None and o['price'] < 1:
+                _stamp = (_v.get('t') if _v and _v['a'] in ('pass', 'fav') else None) or LOW_CHECK.get(_u)
                 if not _stamp:
-                    continue  # 标 1 待审/未审：不进看板
+                    _q(gid, o, 'pending')  # 标 1 待审：不进看板，进待审清单等 ken 终审
+                    continue
                 o = dict(o, b=_stamp)
             out.append(o)
         return out
@@ -1276,11 +1306,27 @@ def main():
     g4, g5 = ag_groups(rows + pai)
     g6 = codex_group(rows + pai)  # PriceAI 补充行也走同一套权重规则，不开后门
     g7 = grok_group(rows) + [o for o in pai if grok_marker(o['title']) and has(o['title'], 'Heavy', 'HEAVY', 'Ultra', 'ULTRA') and not has(o['title'], '号池', '额度', '速刷')]
-    g1, g2, g3, g4, g5, g7 = (_low_floor(g1), _low_floor(g2), _low_floor(g3),
-                              _low_floor(g4), _low_floor(g5), _low_floor(g7))
-    _claude = _low_floor(claude_group(rows + pai))
-    _muse = _low_floor(muse_group(rows + pai))
-    _vcc = _low_floor(vcc_group(rows + pai))
+    g1 = _apply_floor(g1, 'gpt-unbound')
+    g2 = _apply_floor(g2, 'gpt-bound')
+    g3 = _apply_floor(g3, 'gpt-weekly')
+    g4 = _apply_floor(g4, 'ag-cheapest')
+    g5 = _apply_floor(g5, 'ag-verified')
+    g7 = _apply_floor(g7, 'grok-heavy')
+    g6 = _apply_floor(g6, 'codex-sms', floor=False)  # 接码组照旧挂板（ken 2026-11-18 定）：只拦 ken 定性的引流
+    _claude = _apply_floor(claude_group(rows + pai), 'claude')
+    _muse = _apply_floor(muse_group(rows + pai), 'muse')
+    _vcc = _apply_floor(vcc_group(rows + pai), 'vcc')
+    # 已定点拉黑但池里还在的条目也进待审清单（s=blocked），ken 在页签里改判 pass/fav 即可解开；
+    # 已被分组清单收录的不重复列，ken 已下过结论的不再列
+    _q_seen = {d['url'].split('?')[0] for d in _baitq}
+    for o in _pre_block:
+        _u = o['url'].split('?')[0]
+        if (_u in _BLOCKED_EFF and _u not in _q_seen and not _v_of(_u)
+                and o.get('price') is not None and o['price'] > 0
+                and not (o.get('stock') is not None and o['stock'] <= 0)):
+            _q('blocked', o, 'blocked')
+            _q_seen.add(_u)
+    _baitq.sort(key=lambda d: -(d['price'] or 0))  # ken 口径：核查从高价到低价
 
     groups = [
         dict(id='gpt-unbound', name='GPT 日抛/Plus 成品号 — 未接马', items=slim(top30(g1, None, 45))),
@@ -1530,6 +1576,17 @@ def main():
     os.makedirs(DATA, exist_ok=True)
     with open(os.path.join(DATA, 'board.json'), 'w', encoding='utf-8') as f:
         json.dump(board, f, ensure_ascii=False, indent=1)
+    try:
+        _seen = set(); _items = []
+        for _d in _baitq:
+            _k = _d['url'].split('?')[0]
+            if _k in _seen: continue
+            _seen.add(_k); _items.append(_d)
+        with open(os.path.join(DATA, 'bait.json'), 'w', encoding='utf-8') as f:
+            json.dump(dict(updated_at=bj_now, items=_items), f, ensure_ascii=False, indent=1)
+        print(f'bait queue: {len(_items)} items', file=sys.stderr)
+    except Exception as e:
+        print(f'bait.json skipped: {e}', file=sys.stderr)
 
     # 把最新报价内嵌进 index.html：页面一打开就渲染价格/库存，不必等 board.json 下载（ken 2026-11-02「立马就给出」）。
     # 只替换 INLINE-BOARD 标记之间的内容，其余页面内容不动；失败不影响 board.json 已落盘的结果。
