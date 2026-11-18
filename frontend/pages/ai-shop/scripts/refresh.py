@@ -1159,8 +1159,15 @@ def main():
         print(f'aicdks/catfk direct failed: {e}', file=sys.stderr)
     # 定点剔除（ken 2026-11-02 裁定）：异次元店铺 ¥1.85 为引流价（单源、库存未显示），从看板剔除
     # G47831683（ken 2026-11-05 裁定）：¥0.02 只卖渠道介绍、真卡人工发货 12–35 元，同为引流品剔除
+    # 2026-11-18 ken 裁定：¥0.02/¥0.03 引流嫌疑 6 条先删并在此标记，详情核查定性后可恢复
     BLOCKED_URLS = {'https://fk.rupap.cn/item/10',
-                    'https://www.16688.com.cn/goods/G47831683'}
+                    'https://www.16688.com.cn/goods/G47831683',
+                    'https://aicdks.com/product/107472',
+                    'https://aicdks.com/product/108777',
+                    'https://www.16688.com.cn/goods/G88531984',
+                    'https://www.16688.com.cn/goods/G86178035',
+                    'https://www.16688.com.cn/goods/G17925487',
+                    'https://wzyp.cn/item/m96hgl'}
     rows = [o for o in list(all_offers.values()) if o['url'].split('?')[0] not in BLOCKED_URLS]
     print(f'merged unique products: {len(rows)}', file=sys.stderr)
     _pool_rows = list(rows)  # 价格日志全量池用门前全量（僵尸条目只增不删、继续跟踪）
