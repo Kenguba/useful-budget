@@ -6,7 +6,8 @@
 //   GET  /api/stock-check    进站库存现核（60 秒节流，结果存 KV）
 //   GET  /api/stock-status   给 GitHub 轻量任务读访客核对结果
 //   POST /api/review         引流人工终审结论写入（ken 2026-11-18 2b）：须带请求头
-//                            X-Review-Key 与 Worker secret REVIEW_KEY 一致；
+//                            X-Review-Key，命中 Worker secret REVIEW_KEY 里任一口令即可
+//                            （多口令以竖线 | 分隔，ken 2026-11-18 自定 5 条短语 + 系统生成 1 条）；
 //                            体 {u:商品链接, a:'bait'|'pass'|'fav'|'clear'}，存 KV 键
 //                            review:<链接> = {a, t:核查时刻短码（距 2026-01-01 +08
 //                            整小时数、64 进制，字符表 0-9A-Za-z-_）}；clear 为撤销结论。
@@ -397,7 +398,8 @@ function hourStamp() {
   return s || '0';
 }
 async function handleReviewPost(req, env) {
-  if (!env.REVIEW_KEY || req.headers.get('X-Review-Key') !== env.REVIEW_KEY) {
+  const keys = (env.REVIEW_KEY || '').split('|').map(s => s.trim()).filter(Boolean);
+  if (!keys.length || !keys.includes(req.headers.get('X-Review-Key') || '')) {
     return json({ ok: false, error: 'bad key' }, 401);
   }
   let d;
