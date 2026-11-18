@@ -1254,6 +1254,9 @@
     }
 
     .map-coord-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       font-size: 12px;
       font-weight: 700;
       background: var(--card-bg);
@@ -2785,6 +2788,7 @@ function suitText(n){const L=DYN.verdict[currentLang];return n>=5?L[0]:n===4?L[1
 const state={data:null,ipVisible:true,numVisible:true,busy:false,querySeq:0};
 function flagEmoji(cc){if(!cc||cc.length!==2)return"🌐";return String.fromCodePoint(...[...cc.toUpperCase()].map(c=>127397+c.charCodeAt(0)))}
 function flagImg(cc){if(!cc||!/^[A-Za-z]{2}$/.test(cc))return"";const c=cc.toLowerCase();return "<img class='flag-img' src='https://flagcdn.com/w80/"+c+".png' srcset='https://flagcdn.com/w160/"+c+".png 2x' alt='' loading='lazy' onerror='this.style.display=\"none\"'>"}
+function locSort(rows,cc){if(!cc)return rows;const m=[],o=[];rows.forEach(r=>{(r.cc&&String(r.cc).toUpperCase()===String(cc).toUpperCase()?m:o).push(r)});return m.concat(o)}
 function isIPv4(ip){return /^\d{1,3}(\.\d{1,3}){3}$/.test(ip)}
 function validIp(ip){
   if(!ip)return false;
@@ -2964,7 +2968,7 @@ function render(d,final){
   $("valTimezone").textContent=(d.tz||"—")+(d.postal?" • "+d.postal:"");
   $("valSubnet").textContent=d.prefix?(d.prefix+" • "+prefixSize(d.prefix)):"—";
   $("valCoords").textContent=(d.lat!=null&&d.lon!=null)?(Number(d.lat).toFixed(4)+", "+Number(d.lon).toFixed(4)):"—";
-  $("mapCityLabel").textContent=[flagEmoji(d.cc),d.country,d.region,d.city].filter(Boolean).join(", ")||"—";
+  $("mapCityLabel").innerHTML=(d.cc?"<span class='flag-badge'>"+flagImg(d.cc)+"</span>":"")+escapeHtml([d.country,d.region,d.city].filter(Boolean).join(", ")||"—");
   $("valAsnOwner").textContent=d.asnHolder||d.isp||"—";
   $("valCompany").textContent=(d.company||d.isp||"—")+(d.netname?" · netname "+d.netname:"");
   $("valIsp").textContent=d.isp||"—";
@@ -3081,7 +3085,7 @@ async function runQuery(ip,selfMode,fromHist){
       prefix:(netData&&netData.prefix)||first.network||"",isp:first.isp||first.asnName||"",
       company:"",host:(srcs[1]&&srcs[1].host)||"",country:loc.country,cc:loc.cc,region:loc.region,city:loc.city,
       lat:loc.lat,lon:loc.lon,postal:loc.postal,tz:loc.tz,conf:loc.agree,whoisCountry:"",native:null,
-      locRows:ok.map(s=>({src:s.src,cc:s.cc,place:[s.country||s.cc,s.region,s.city].filter(Boolean).join(", ")})),
+      locRows:locSort(ok.map(s=>({src:s.src,cc:s.cc,place:[s.country||s.cc,s.region,s.city].filter(Boolean).join(", ")})),loc.cc),
       scenes:[["TikTok",3],["跨境电商",3],["社媒运营",3],["AI 应用",3]],
       histAsn:null,neighbours:null,cls:null,tagsFinal:false,score:null,riskTags:TD("riskTagsPending"),note:TD("summarizing")
     };
@@ -3114,8 +3118,8 @@ async function runQuery(ip,selfMode,fromHist){
     }
     const geoLocs=geo&&geo.located_resources&&geo.located_resources[0]&&geo.located_resources[0].locations;
     if(geoLocs&&geoLocs.length){
-      d.histLoc=geoLocs.slice(0,3).map(l=>({org:[l.country,l.city].filter(Boolean).join(" "),cidr:(l.resources&&l.resources[0])||d.prefix,extra:"经纬度 "+(l.latitude!=null?Number(l.latitude).toFixed(4):"—")+", "+(l.longitude!=null?Number(l.longitude).toFixed(4):"—")+" · 覆盖 "+(l.covered_percentage!=null?l.covered_percentage+"%":"—")}));
-    }else d.histLoc=[{org:[loc.country,loc.region,loc.city].filter(Boolean).join(" "),cidr:d.prefix,extra:"多源共识定位"}];
+      d.histLoc=geoLocs.slice(0,3).map(l=>({org:[l.country,l.city].filter(Boolean).join(" "),cc:l.country||"",place:[l.country,l.city].filter(Boolean).join(", "),cidr:(l.resources&&l.resources[0])||d.prefix,extra:"经纬度 "+(l.latitude!=null?Number(l.latitude).toFixed(4):"—")+", "+(l.longitude!=null?Number(l.longitude).toFixed(4):"—")+" · 覆盖 "+(l.covered_percentage!=null?l.covered_percentage+"%":"—")}));
+    }else d.histLoc=[{org:[loc.country,loc.region,loc.city].filter(Boolean).join(" "),cc:loc.cc||"",place:[loc.country,loc.region,loc.city].filter(Boolean).join(", "),cidr:d.prefix,extra:"多源共识定位"}];
     d.native=d.whoisCountry&&d.cc?(d.whoisCountry===d.cc):null;
     d.cls=classify(d);applyType(d);
     const sc=computeScore(d,d.cls,bl);d.score=sc.score;d.bl=bl;
@@ -3172,7 +3176,7 @@ async function runQuery(ip,selfMode,fromHist){
         bySrc["ipwho.is"]?{src:"ipwho.is",cc:bySrc["ipwho.is"].cc,place:[bySrc["ipwho.is"].country,bySrc["ipwho.is"].region,bySrc["ipwho.is"].city].filter(Boolean).join(", ")}:null,
         bySrc["ipapi.co"]?{src:"ipapi.co",cc:bySrc["ipapi.co"].cc,place:[bySrc["ipapi.co"].country,bySrc["ipapi.co"].region,bySrc["ipapi.co"].city].filter(Boolean).join(", ")}:null
       ].filter(Boolean);
-      if(rows.length){d.locRows=rows;d.conf=rows.filter(r=>r.cc&&r.cc===d.cc).length}
+      if(rows.length){d.locRows=locSort(rows,d.cc);d.conf=rows.filter(r=>r.cc&&r.cc===d.cc).length}
     }
       if(d._why)d.note="纯净度按实时信号计算："+d._why.join("；")+"；定位 "+(d.locRows?d.locRows.length:0)+" 源共识（"+(d.conf||0)+" 个一致）";
       render(d);
