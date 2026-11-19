@@ -2442,7 +2442,7 @@ $('#plusBtn').onclick=()=>{
       samples:[{x:e.clientX,t:performance.now()}]};
     if(drag.tag){
       const gd=drag;
-      gd.lpT=setTimeout(()=>{ if(drag===gd&&gd.axis===null){ gd.axis='tag'; gd.tagStart=gd.tag.scrollLeft; } }, 380);
+      gd.lpT=setTimeout(()=>{ if(drag===gd&&gd.axis===null){ gd.axis='tag'; gd.tagStart=gd.tag.scrollLeft; } }, 500);
     }
   });
   box.addEventListener('pointermove',e=>{
