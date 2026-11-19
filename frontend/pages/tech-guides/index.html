@@ -1,0 +1,991 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="data:," />
+<title>开发文档</title>
+<style>
+:root{
+  --bg:#000000;
+  --card:#0A0A0C;
+  --card2:#121214;
+  --card3:#1C1C1E;
+  --line:rgba(235,235,245,.12);
+  --line2:rgba(235,235,245,.08);
+  --t100:rgba(235,235,245,1);
+  --t60:rgba(235,235,245,.6);
+  --t30:rgba(235,235,245,.3);
+  --orange:#FF9F0A;
+  --orange-dim:rgba(255,159,10,.14);
+  --blue:#409CFF;
+  --green:#30D158;
+  --red:#FF453A;
+  --radius:14px;
+  --mono:"SF Mono",ui-monospace,Menlo,Consolas,"Courier New",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--t100);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+::selection{background:rgba(255,159,10,.35)}
+
+/* ---------- 吸顶导航 ---------- */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(0,0,0,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line2);
+}
+.topbar-in{max-width:1120px;margin:0 auto;padding:0 20px;height:58px;display:flex;align-items:center;gap:14px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:.02em;white-space:nowrap}
+.brand svg{flex:none}
+.topnav{display:flex;gap:4px;margin-left:8px}
+.topnav a{padding:8px 14px;border-radius:999px;font-size:14px;color:var(--t60);min-height:36px;display:inline-flex;align-items:center}
+.topnav a.on{color:var(--t100);background:var(--card3)}
+.topbar .sp{flex:1}
+.count-badge{
+  font-family:var(--mono);font-size:12px;color:var(--orange);
+  background:var(--orange-dim);border:1px solid rgba(255,159,10,.4);
+  padding:3px 10px;border-radius:999px;white-space:nowrap;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+
+/* ---------- Hero ---------- */
+.hero{padding:52px 0 8px}
+.hero h1{font-size:clamp(34px,6vw,56px);line-height:1.12;font-weight:900;margin:0 0 14px;letter-spacing:.01em}
+.hero h1 .accent{color:var(--orange)}
+.hero p{margin:0;color:var(--t60);font-size:16px;max-width:640px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.chip{
+  font-family:var(--mono);font-size:12.5px;color:var(--orange);
+  background:var(--card2);border:1px solid rgba(255,159,10,.45);
+  padding:4px 10px;border-radius:8px;white-space:nowrap;
+}
+.chip.gray{color:var(--t60);border-color:var(--line)}
+
+/* ---------- 筛选条 + 搜索 ---------- */
+.filterbar{
+  display:flex;gap:8px;overflow-x:auto;white-space:nowrap;
+  padding:26px 2px 12px;scrollbar-width:none;-ms-overflow-style:none;
+}
+.filterbar::-webkit-scrollbar{display:none}
+.fbtn{
+  flex:none;border:1px solid var(--line);background:var(--card);color:var(--t60);
+  font-size:14px;padding:8px 16px;border-radius:999px;min-height:38px;
+}
+.fbtn.on{color:#000;background:var(--t100);border-color:var(--t100);font-weight:700}
+.searchbox{position:relative;margin-bottom:8px}
+.searchbox svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none}
+.searchbox input{
+  width:100%;background:var(--card2);border:1px solid var(--line);border-radius:12px;
+  color:var(--t100);font-size:15px;padding:13px 14px 13px 42px;outline:none;font-family:inherit;min-height:48px;
+}
+.searchbox input:focus{border-color:rgba(255,159,10,.6)}
+.searchbox input::placeholder{color:var(--t30)}
+
+/* ---------- 书架 ---------- */
+.shelf{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));
+  gap:26px 20px;padding:22px 0 10px;
+}
+.book{
+  display:block;background:none;border:none;padding:0;text-align:left;width:100%;
+}
+.book-cover{
+  position:relative;aspect-ratio:3/4;border-radius:6px 12px 12px 6px;
+  padding:20px 16px 16px 22px;display:flex;flex-direction:column;
+  box-shadow:6px 6px 0 -1px #2a2a2e, 7px 7px 0 -1px #3a3a3e, 0 18px 34px rgba(0,0,0,.55);
+  transition:transform .25s ease, box-shadow .25s ease;
+  overflow:hidden;
+}
+.book-cover::before{ /* 书脊高光 */
+  content:"";position:absolute;left:0;top:0;bottom:0;width:14px;
+  background:linear-gradient(90deg,rgba(0,0,0,.45),rgba(255,255,255,.14) 55%,rgba(0,0,0,.25));
+}
+.book-cover::after{ /* 书页厚度边 */
+  content:"";position:absolute;right:0;top:3px;bottom:3px;width:4px;
+  background:repeating-linear-gradient(90deg,#e8e4da 0 1px,#c9c4b8 1px 2px);
+  border-radius:0 2px 2px 0;opacity:.85;
+}
+.book:hover .book-cover,.book:focus-visible .book-cover{
+  transform:translateY(-8px);
+  box-shadow:6px 6px 0 -1px #2a2a2e, 7px 7px 0 -1px #3a3a3e, 0 30px 44px rgba(0,0,0,.65);
+}
+.book-cat{font-family:var(--mono);font-size:11px;letter-spacing:.14em;opacity:.75;text-transform:uppercase;flex:none}
+.book-title{font-size:19px;font-weight:800;line-height:1.35;margin-top:10px;flex:none;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.book-sub{font-size:12.5px;line-height:1.5;opacity:.78;margin-top:8px;min-height:0;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.book-foot{margin-top:auto;padding-top:10px;display:flex;align-items:center;gap:8px;flex:none}
+.status{
+  font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;
+  background:rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.35);color:#fff;white-space:nowrap;
+}
+.book-date{font-family:var(--mono);font-size:11px;opacity:.7}
+.book-meta{padding:16px 2px 0;position:relative;z-index:1}
+.book-meta .m-title{display:block;font-size:14.5px;font-weight:700;line-height:1.45}
+.book-meta .m-desc{font-size:12.5px;color:var(--t60);line-height:1.55;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.empty-note{color:var(--t60);font-size:14px;padding:28px 0;text-align:center}
+.end-note{text-align:center;color:var(--t30);font-size:13px;padding:26px 0 6px;font-family:var(--mono)}
+.howto{
+  background:var(--card);border:1px solid var(--line2);border-radius:var(--radius);
+  padding:18px 20px;margin:14px 0 8px;color:var(--t60);font-size:14px;line-height:1.7;
+}
+.howto b{color:var(--t100)}
+.howto code{font-family:var(--mono);color:var(--orange);font-size:13px}
+footer.site{border-top:1px solid var(--line2);margin-top:44px;padding:26px 0 40px;color:var(--t30);font-size:13px}
+footer.site .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center}
+
+/* ---------- 阅读页 ---------- */
+.doc-head{padding:44px 0 6px}
+.backlink{
+  display:inline-flex;align-items:center;gap:6px;color:var(--t60);font-size:14px;
+  padding:8px 4px;min-height:38px;background:none;border:none;
+}
+.backlink:active{color:var(--t100)}
+.doc-head h1{font-size:clamp(30px,5.4vw,50px);line-height:1.18;font-weight:900;margin:10px 0 16px}
+.doc-sub{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--t60);font-size:15px}
+.doc-sub .sep{color:var(--t30)}
+.doc-status{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--t60)}
+.doc-status.done{color:var(--green);border-color:rgba(48,209,88,.45)}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 6px}
+.toc a{
+  border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:14px;
+  color:var(--t100);background:var(--card);min-height:40px;display:inline-flex;align-items:center;
+}
+.toc a:active{background:var(--card3)}
+section.blk{padding-top:38px;scroll-margin-top:76px}
+section.blk h2{
+  font-size:clamp(21px,3.4vw,27px);font-weight:800;line-height:1.35;margin:0 0 16px;
+  padding-left:14px;border-left:4px solid var(--blue);
+}
+section.blk p{color:var(--t60);font-size:15.5px;margin:0 0 14px}
+section.blk p b,section.blk li b{color:var(--t100)}
+section.blk ul{margin:0 0 14px;padding-left:20px;color:var(--t60);font-size:15.5px}
+section.blk li{margin-bottom:7px}
+section.blk li::marker{color:var(--orange)}
+code.inl{font-family:var(--mono);font-size:.88em;color:var(--orange);background:var(--orange-dim);padding:1px 6px;border-radius:6px;white-space:nowrap}
+.codecard{
+  background:var(--card2);border:1px solid var(--line2);border-radius:var(--radius);
+  margin:0 0 16px;overflow:hidden;
+}
+.codecard .cc-head{
+  display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--line2);
+  font-family:var(--mono);font-size:12px;color:var(--t30);
+}
+.codecard .dot{width:9px;height:9px;border-radius:50%}
+.codecard pre{margin:0;padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.7;color:#d7d7de}
+.codecard pre .tk-com{color:#84848f;font-style:italic}
+.codecard pre .tk-kw{color:#C586C0}
+.codecard pre .tk-tag{color:#569CD6}
+.codecard pre .tk-attr{color:#9CDCFE}
+.codecard pre .tk-str{color:#E5C07B}
+.codecard pre .tk-num{color:#B5CEA8}
+.codecard pre .tk-fn{color:#DCDCAA}
+.codecard pre .tk-punc{color:#8E8E93}
+.tablecard{background:var(--card);border:1px solid var(--line2);border-radius:var(--radius);margin:0 0 16px;overflow:hidden}
+.tablecard table{width:100%;border-collapse:collapse;font-size:14px}
+.tablecard th{
+  text-align:left;padding:11px 14px;background:var(--card2);color:var(--t100);
+  font-weight:700;border-bottom:1px solid var(--line);white-space:nowrap;
+}
+.tablecard td{padding:11px 14px;color:var(--t60);border-bottom:1px solid var(--line2);vertical-align:top}
+.tablecard tr:last-child td{border-bottom:none}
+.tablecard td b{color:var(--t100)}
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:0 0 16px}
+.concept{
+  background:var(--card);border:1px solid var(--line2);border-radius:var(--radius);padding:16px 18px;
+}
+.concept .c-name{font-size:16.5px;font-weight:800;margin-bottom:4px}
+.concept .c-en{font-family:var(--mono);font-size:12px;color:var(--orange);margin-bottom:8px}
+.concept p{font-size:13.5px;margin:0;color:var(--t60)}
+.callout{
+  background:var(--card2);border:1px solid rgba(255,159,10,.35);border-radius:var(--radius);
+  padding:14px 18px;margin:0 0 16px;font-size:14.5px;color:var(--t60);
+}
+.callout b{color:var(--orange)}
+.callout.blue{border-color:rgba(64,156,255,.4)}
+.callout.blue b{color:var(--blue)}
+/* 时间线图 */
+.timeline{background:var(--card);border:1px solid var(--line2);border-radius:var(--radius);padding:18px;margin:0 0 16px;overflow-x:auto}
+.tl-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;min-width:520px}
+.tl-row:last-child{margin-bottom:4px}
+.tl-name{width:86px;flex:none;font-family:var(--mono);font-size:13px;color:var(--t100)}
+.tl-track{flex:1;display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--card3)}
+.tl-seg{display:flex;align-items:center;justify-content:center;font-size:11px;color:#000;font-weight:700;white-space:nowrap;overflow:hidden}
+.seg-parse{background:#8E8E93;color:#fff}
+.seg-dl{background:#409CFF;color:#fff}
+.seg-exec{background:#FF9F0A}
+.seg-wait{background:transparent}
+.tl-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--t60);margin-top:6px;min-width:520px}
+.tl-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.doc-foot-nav{margin:44px 0 10px;display:flex;gap:10px;flex-wrap:wrap}
+.doc-foot-nav button{
+  border:1px solid var(--line);background:var(--card);color:var(--t100);
+  border-radius:999px;padding:10px 18px;font-size:14px;min-height:42px;
+}
+/* ---- 图三：阶梯时间轴 ---- */
+.staircard{background:linear-gradient(180deg,#0b1e3a,#081426);border:1px solid rgba(64,156,255,.25);border-radius:14px;padding:18px 16px 14px;margin:0 0 14px;overflow:hidden}
+.stair-labels{position:relative;height:118px}
+.stair-tag{position:absolute;border-radius:8px;padding:7px 10px;font-size:12.5px;font-weight:700;line-height:1.35;border:1.5px solid;white-space:normal}
+.stair-tag small{display:block;font-weight:600;opacity:.9}
+.stag-blue{left:0;top:0;width:34%;background:rgba(64,156,255,.18);border-color:#409CFF;color:#9ecbff}
+.stag-pink{left:22%;top:32px;width:38%;background:rgba(255,107,157,.16);border-color:#ff6b9d;color:#ffb3c9}
+.stag-green{left:46%;top:64px;width:36%;background:rgba(48,209,88,.16);border-color:#30D158;color:#8be9a8}
+.stag-orange{left:66%;top:88px;width:34%;background:rgba(255,159,10,.18);border-color:#FF9F0A;color:#ffcf7a}
+.stair-axis{position:relative;height:2px;background:rgba(235,235,245,.35);margin:10px 2px 0}
+.stair-ticks{display:flex;justify-content:space-between;margin-top:10px}
+.stair-ticks span{font-size:12px;color:var(--t60);position:relative;padding-top:2px}
+.stair-ticks span::before{content:"";position:absolute;left:50%;top:-14px;width:2px;height:10px;background:rgba(235,235,245,.5)}
+/* ---- 图三：四张彩色概念卡 ---- */
+.concept4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 16px}
+.c4{border-radius:12px;padding:14px 14px 12px;background:#0a1526;border:1px solid var(--line2);border-top:4px solid}
+.c4.blue{border-top-color:#409CFF}.c4.green{border-top-color:#30D158}.c4.orange{border-top-color:#FF9F0A}.c4.pink{border-top-color:#ff6b9d}
+.c4-head{display:flex;align-items:center;gap:7px;font-weight:800;font-size:14.5px;line-height:1.3;margin-bottom:8px}
+.c4-dot{width:11px;height:11px;border-radius:50%;flex:none}
+.c4 p{font-size:13px !important;margin:0 0 8px !important;line-height:1.6}
+.c4 ul{font-size:13px !important;padding-left:16px !important;margin:0 !important}
+.c4 li{margin-bottom:5px;line-height:1.55}
+.c4 .ex{font-size:12.5px;color:var(--t60);line-height:1.6;margin-top:8px;border-top:1px dashed rgba(235,235,245,.15);padding-top:8px}
+.c4 code{font-family:var(--mono);font-size:11.5px;color:#FFD60A;background:rgba(255,214,10,.12);padding:1px 5px;border-radius:5px}
+/* ---- 通用徽标 ---- */
+.type-badge{display:inline-block;font-family:var(--mono);font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;line-height:1.5;white-space:nowrap}
+.tb-script{background:#2f6fd6;color:#fff}.tb-fetch{background:#1a9e4b;color:#fff}.tb-xhr{background:#c75b12;color:#fff}.tb-gray{background:#3a3a3e;color:#d7d7de}.tb-doc{background:#5e5ce6;color:#fff}
+/* ---- 图一：口诀条 ---- */
+.mnemonic{background:linear-gradient(90deg,#3a2f00,#2a2200);border-left:5px solid #FFD60A;border-radius:10px;padding:13px 16px;margin:0 0 16px;font-size:14.5px;line-height:1.65;color:#f5e6a0}
+.mnemonic b{color:#FFD60A}
+.mnemonic code{font-family:var(--mono);color:#FFD60A;background:rgba(255,214,10,.15);padding:1px 6px;border-radius:6px;font-size:.88em}
+/* ---- 图二：DevTools 示意 ---- */
+.devtools{background:#1e1e1e;border:1px solid #3a3a3e;border-radius:12px;overflow:hidden;margin:0 0 16px}
+.dt-tabs{display:flex;gap:0;background:#2c2c2e;border-bottom:1px solid #3a3a3e;padding:0 10px;overflow-x:auto;white-space:nowrap}
+.dt-tabs span{font-size:12.5px;color:#aeaeb2;padding:9px 12px}
+.dt-tabs span.on{color:#fff;border-bottom:2px solid #409CFF;font-weight:700}
+.dt-filters{display:flex;gap:6px;padding:8px 10px;background:#252526;border-bottom:1px solid #3a3a3e;overflow-x:auto;white-space:nowrap}
+.dt-filters span{font-size:12px;color:#aeaeb2;padding:3px 9px;border-radius:999px;border:1px solid transparent}
+.dt-filters span.on{background:#409CFF;color:#fff;font-weight:700}
+.dt-scroll{overflow-x:auto}
+.dt-table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+.dt-table th{text-align:left;padding:8px 12px;background:#2c2c2e;color:#aeaeb2;font-weight:600;border-bottom:1px solid #3a3a3e;white-space:nowrap}
+.dt-table td{padding:8px 12px;color:#e5e5ea;border-bottom:1px solid #2c2c2e;vertical-align:top}
+.dt-table tr.hl td{background:rgba(255,159,10,.28);color:#fff}
+.dt-table td.mono{font-family:var(--mono);font-size:12.5px}
+/* ---- 图四上：四者区别时间线 ---- */
+.tl2{background:linear-gradient(180deg,#0b1e3a,#081426);border:1px solid rgba(64,156,255,.22);border-radius:14px;padding:16px;margin:0 0 10px;overflow-x:auto}
+.tl2-title{font-weight:800;font-size:15px;margin-bottom:10px;min-width:560px}
+.tl2-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--t60);margin-bottom:14px;min-width:560px}
+.tl2-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.tl2-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;min-width:560px}
+.tl2-name{width:110px;flex:none;font-family:var(--mono);font-size:12.5px;color:var(--t100)}
+.tl2-track{flex:1;position:relative;height:26px;background:rgba(255,255,255,.04);border-radius:6px}
+.tl2-seg{position:absolute;top:3px;height:20px;border-radius:5px}
+.s-parse{background:#5b7aa6}.s-dl{background:#7dd3fc}.s-dep{background:#30D158}.s-exec{background:#ff8fab}
+.tl2-note{font-size:13.5px;color:var(--t60);line-height:1.65;margin:0 0 16px}
+/* ---- 图四下：甘特图 ---- */
+.gantt{background:linear-gradient(180deg,#0b1e3a,#081426);border:1px solid rgba(64,156,255,.22);border-radius:14px;padding:16px;margin:0 0 16px;overflow-x:auto}
+.gantt-title{font-weight:800;font-size:15px;margin-bottom:12px;min-width:620px}
+.gantt-body{position:relative;min-width:620px}
+.g-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.g-name{width:190px;flex:none;font-family:var(--mono);font-size:11.5px;color:#d7d7de;text-align:right;padding-right:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-track{flex:1;position:relative;height:20px}
+.g-bar{position:absolute;top:2px;height:16px;border-radius:5px}
+.g-bar span{position:absolute;left:100%;top:0;margin-left:6px;font-size:11px;white-space:nowrap;color:var(--t60)}
+.gb-pre{background:#7dd3fc}.gb-ondemand{background:#30D158}.gb-delay{background:#ff8fab}.gb-prefetch{background:#409CFF}.gb-click{background:#FF9F0A}.gb-doc{background:#e9a8e9}
+.g-vline{position:absolute;top:0;bottom:22px;width:0;border-left:2px dashed}
+.g-vline.green{border-color:#30D158}.g-vline.yellow{border-color:#FFD60A}
+.g-vlabel{position:absolute;top:-2px;font-size:11px;font-weight:700;white-space:nowrap;transform:translateX(6px)}
+.g-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--t60);margin-top:10px;min-width:620px}
+.g-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+/* ---- SVG 图表（全站图表一律 SVG） ---- */
+.svgcard{background:linear-gradient(180deg,#0b1e3a,#081426);border:1px solid rgba(64,156,255,.25);border-radius:14px;padding:14px 14px 10px;margin:0 0 14px}
+.svgcard svg,.c4-svg{display:block;width:100%;height:auto}
+.svgcard svg text{font-family:var(--sans)}
+.c4-svg{margin:2px 0 10px;background:rgba(255,255,255,.03);border-radius:8px}
+[hidden]{display:none !important}
+
+@media (max-width:640px){
+  .topbar-in{padding:0 14px;gap:8px}
+  .topnav a{padding:8px 10px}
+  .wrap{padding:0 14px}
+  .hero{padding:36px 0 4px}
+  .shelf{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:22px 14px}
+  .book-title{font-size:17px}
+  .toc a{font-size:13.5px;padding:8px 13px}
+  /* 表格在手机上改为逐行堆叠卡，不横向滚动 */
+  .tablecard table,.tablecard tbody,.tablecard tr,.tablecard td{display:block;width:100%}
+  .tablecard thead{display:none}
+  .tablecard tr{padding:10px 0;border-bottom:1px solid var(--line2)}
+  .tablecard tr:last-child{border-bottom:none}
+  .tablecard td{border-bottom:none;padding:3px 14px}
+  .tablecard td:first-child{padding-top:2px;font-size:15px}
+  /* 时间线在手机上收缩到屏宽内 */
+  .timeline{overflow-x:visible}
+  .tl-row,.tl-legend{min-width:0}
+  .tl-name{width:74px;font-size:11.5px}
+  .tl-seg{font-size:10px}
+  .concept4{grid-template-columns:1fr}
+  .stair-labels{height:auto;display:flex;flex-direction:column;gap:8px}
+  .stair-tag{position:static;width:100% !important}
+  .g-name{width:150px;font-size:10.5px}
+  .dt-table{min-width:600px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .book-cover{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#/" aria-label="开发文档首页">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z" stroke="#FF9F0A" stroke-width="1.8"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20" stroke="#FF9F0A" stroke-width="1.8"/><path d="M9 8h6M9 11.5h4" stroke="#EBEBF5" stroke-width="1.8" stroke-linecap="round"/></svg>
+      开发文档
+    </a>
+    <nav class="topnav" aria-label="主导航">
+      <a href="#/" id="navHome">首页</a>
+      <a href="#/" id="navAll">全部文档</a>
+    </nav>
+    <span class="sp"></span>
+    <span class="count-badge" id="countBadge">共 0 篇</span>
+  </div>
+</header>
+
+<!-- ============ 首页 ============ -->
+<main id="viewHome">
+  <div class="wrap">
+    <div class="hero">
+      <h1>平时记下的<br /><span class="accent">开发文档</span>与技术笔记</h1>
+      <p>开发中踩过的坑、查清的机制、定下来的口径，都收在这里；一篇一个主题，查的时候直接搜标题就能翻到</p>
+      <div class="hero-meta">
+        <span class="chip">script</span>
+        <span class="chip">link</span>
+        <span class="chip">Network</span>
+        <span class="chip gray">持续更新中</span>
+      </div>
+    </div>
+
+    <div class="filterbar" id="filterbar" role="tablist" aria-label="按分类筛选"></div>
+
+    <div class="searchbox">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="rgba(235,235,245,.4)" stroke-width="2"/><path d="m20 20-3.8-3.8" stroke="rgba(235,235,245,.4)" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="searchInput" type="search" placeholder="搜标题、关键词或标签" autocomplete="off" />
+    </div>
+
+    <div class="shelf" id="shelf"></div>
+    <p class="empty-note" id="emptyNote" hidden>没有匹配的文档；换个关键词或切回全部分类试试</p>
+    <p class="end-note" id="endNote"></p>
+
+    <div class="howto">
+      <b>怎么新增一篇</b>：文档数据集中放在页面源码的 <code>DOCS</code> 数组里，新增一篇只往数组里加一条数据——标题、分类、状态、封面色、正文小节都写在这一条里；首页书架、筛选、搜索与阅读页会自动渲染，不用再改任何视图结构
+    </div>
+  </div>
+  <footer class="site">
+    <div class="wrap">
+      <span>开发文档 · 个人技术笔记</span>
+      <span>数据与视图分离；改数据不动视图</span>
+    </div>
+  </footer>
+</main>
+
+<!-- ============ 阅读页 ============ -->
+<main id="viewDoc" hidden>
+  <div class="wrap" id="docRoot"></div>
+  <footer class="site">
+    <div class="wrap">
+      <span>开发文档 · 个人技术笔记</span>
+    </div>
+  </footer>
+</main>
+
+<script>
+/* ================================================================
+   数据层：所有文档都在 DOCS 里，一条数据 = 一篇文档
+   新增一篇：复制一条，改 id / title / category / status / sections 即可
+   sections 的 blocks 支持：p 段落、code 代码、table 表格、
+   cards 概念卡、timeline 时间线、callout 提示框、ul 列表
+   ================================================================ */
+var DOCS = [
+{
+  id: "script-link-loading",
+  title: "script 与 link 的加载方式：预加载、延迟、按需与懒加载",
+  shortTitle: "script 与 link 的加载方式",
+  category: "前端加载",
+  status: "已完成",
+  date: "2026-11-19",
+  tags: ["script", "link", "preload", "prefetch", "defer", "async", "懒加载", "按需加载"],
+  desc: "把资源加载的时机一次分清：什么往前提、什么往后推、什么等触发；含 script 五种写法、link 预加载家族与 Network 面板分辨法",
+  cover: { bg: "linear-gradient(150deg,#1d3a5f 0%,#0d1b2e 70%)", ink: "#EBEBF5" },
+  chips: ["script", "link", "head"],
+  sections: [
+    { title: "先分清四件事：往前提还是往后推", blocks: [
+      { t: "p", html: "所有加载优化本质上只做一件事——<b>调整资源被发现、被下载、被执行的时机</b>；先按方向分成两组：往前提的是预加载与预取，往后推的是延迟加载与懒加载，按需加载则不排队、等触发" },
+      { t: "staircase" },
+      { t: "concept4" },
+      { t: "table", head: ["方式", "时机", "优先级", "给谁用", "写在哪"], rows: [
+        ["<b>preload</b>", "本页解析早期", "高", "本页关键资源：首屏字体、首屏图、关键脚本", "link 标签写在 head"],
+        ["<b>prefetch</b>", "浏览器空闲时", "最低", "下一页大概率用到的资源", "link 标签写在 head"],
+        ["<b>defer / async</b>", "下载并行；执行推迟", "中", "非首屏必需的脚本", "script 标签属性"],
+        ["<b>loading=lazy</b>", "快进入视口时", "低", "视口外的图片与 iframe", "img / iframe 属性"],
+        ["<b>动态 import()</b>", "触发条件成立时", "触发时才定", "重功能模块、点开才用的库", "JS 代码里手动调用"]
+      ]},
+      { t: "callout", html: "<b>一句话记法</b>：预加载与预取是把时机往前提，延迟与懒加载是往后推，按需加载是等信号；先判断方向，再选具体写法" }
+    ]},
+    { title: "script 的五种加载：普通、async、defer、module、内联", blocks: [
+      { t: "p", html: "脚本的麻烦在于它同时占三件事——<b>下载、执行、挡解析</b>；五种写法的区别，就是这三件事的排布不同" },
+      { t: "timeline2" },
+      { t: "ul", items: [
+        "<b>普通脚本</b>：解析到标签就停下，下载完、执行完才继续解析；放在 head 会白屏，惯例放 body 末尾",
+        "<b>async</b>：与解析并行下载，下完立刻插队执行；多个 async 之间<b>不保证顺序</b>，只适合互不依赖的独立脚本，如统计、广告",
+        "<b>defer</b>：与解析并行下载，等整页解析完再<b>按书写顺序</b>依次执行；业务脚本的默认选择",
+        "<b>type=module</b>：自带 defer 语义，执行前先按 import 把整棵依赖图拉齐；作用域独立，默认严格模式",
+        "<b>内联脚本</b>：没有下载环节，async 与 defer 都<b>不生效</b>；解析到哪执行到哪，想推迟只能靠事件或手动封装"
+      ]},
+      { t: "code", lang: "html", code: "<!-- 普通：阻塞解析 -->\n<script src=\"app.js\"><\/script>\n\n<!-- async：下完即执行，不保证顺序 -->\n<script async src=\"analytics.js\"><\/script>\n\n<!-- defer：解析完按顺序执行，业务脚本默认 -->\n<script defer src=\"main.js\"><\/script>\n\n<!-- module：自带 defer，先拉依赖图 -->\n<script type=\"module\" src=\"entry.js\"><\/script>" }
+    ]},
+    { title: "link 预加载家族：preload、prefetch、preconnect、modulepreload", blocks: [
+      { t: "p", html: "link 的 rel 家族只管<b>提前准备</b>，不负责执行；准备的东西分四种：文件本身、下一页的文件、连接通道、模块依赖图" },
+      { t: "ul", items: [
+        "<b>preload</b>：给本页加急，明确告诉浏览器这个资源马上要用；<code class=\"inl\">as</code> 必须写对类型，浏览器按它定优先级与请求头",
+        "<b>prefetch</b>：空闲时低优先级囤下一页的资源；当前页一点不抢，跳过去时直接命中",
+        "<b>preconnect</b>：只建连不拿货，提前走完 DNS、TCP、TLS 三步握手；跨域接口与字体域名常用",
+        "<b>dns-prefetch</b>：preconnect 的轻量版，只提前解析 DNS；便宜但只省第一步",
+        "<b>modulepreload</b>：顺着 import 把整棵模块依赖图一次拉齐，避免瀑布式逐层发现",
+        "<b>prerender</b>：更激进，连下一页都提前渲染好；跳转瞬间呈现，代价也最大，按场景慎用"
+      ]},
+      { t: "code", lang: "html", code: "<!-- 本页加急：as 必须写对 -->\n<link rel=\"preload\" href=\"font.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"hero.jpg\" as=\"image\" fetchpriority=\"high\">\n\n<!-- 囤下页：空闲低优先级 -->\n<link rel=\"prefetch\" href=\"next-page.js\" as=\"script\">\n\n<!-- 只建连不拿货 -->\n<link rel=\"preconnect\" href=\"https://api.example.com\" crossorigin>\n<link rel=\"dns-prefetch\" href=\"https://cdn.example.com\">\n\n<!-- 模块依赖图一次拉齐 -->\n<link rel=\"modulepreload\" href=\"chunk-a.js\">" },
+      { t: "callout", html: "<b>字体 preload 必须带 crossorigin</b>：字体请求天生走跨域模式，不带这个属性浏览器会把字体下载两遍；另外 preload 的资源若约 3 秒内没被用上，控制台会发出警告——加急了又不用，等于白抢带宽" },
+      { t: "table", head: ["排名（从小到大）", "方式", "实际拿走的东西"], rows: [
+        ["<b>1</b>", "<b>dns-prefetch</b>", "只问一句域名对应哪个 IP；不建连、不拿文件"],
+        ["<b>2</b>", "<b>preconnect</b>", "把 DNS、TCP、TLS 三步握手做完；仍然不拿任何文件"],
+        ["<b>3</b>", "<b>preload / prefetch</b>", "一个具体文件，大小就是文件本身；区别只在时机与优先级"],
+        ["<b>4</b>", "<b>modulepreload</b>", "顺着 import 拉一棵依赖树，是一组文件"],
+        ["<b>5</b>", "<b>prerender</b>", "下一页的全部资源拿齐并整个渲染好，等于提前开好一整页"]
+      ]}
+    ]},
+    { title: "懒加载：快进视口才加载", blocks: [
+      { t: "p", html: "懒加载的判断标准只有一个——<b>用户快要看见了才加载</b>；原生支持最好用，剩下的交给 IntersectionObserver 当哨兵" },
+      { t: "ul", items: [
+        "<b>img / iframe</b> 直接写 <code class=\"inl\">loading=\"lazy\"</code>；浏览器按距离视口的远近自动决定何时发请求",
+        "配 <code class=\"inl\">decoding=\"async\"</code> 让图片解码不占主线程；再写死 <code class=\"inl\">width / height</code> 或宽高比占位，图没到之前版式不跳动",
+        "<b>首屏图禁用 lazy</b>：首屏大图反而要 <code class=\"inl\">fetchpriority=\"high\"</code> 往前提，写了 lazy 等于亲手拖慢首屏",
+        "非图片内容（卡片、评论区、重组件）用 <b>IntersectionObserver</b> 观察哨兵元素，进入预设范围就触发加载"
+      ]},
+      { t: "code", lang: "html + js", code: "<!-- 原生懒加载 -->\n<img src=\"photo.jpg\" loading=\"lazy\" decoding=\"async\" width=\"800\" height=\"600\" alt=\"\">\n<iframe src=\"map.html\" loading=\"lazy\"><\/iframe>\n\n<!-- 首屏图：不懒加载，反而加急 -->\n<img src=\"hero.jpg\" fetchpriority=\"high\" alt=\"\">" },
+      { t: "code", lang: "js", code: "// 哨兵模式：提前 300px 触发，只触发一次\nvar io = new IntersectionObserver(function (entries) {\n  entries.forEach(function (e) {\n    if (e.isIntersecting) {\n      loadMore();           // 加载下一批\n      io.unobserve(e.target);\n    }\n  });\n}, { rootMargin: '300px' });\nio.observe(document.querySelector('#sentinel'));" },
+      { t: "callout", blue: true, html: "<b>rootMargin 就是提前量</b>：设 300px 表示离视口还有 300px 时就开工，用户滚到时内容刚好就位；列表触底加载用的正是这个哨兵模式——底部放一个空元素，哨兵一露头就拉下一页" }
+    ]},
+    { title: "按需加载：行为或条件触发才加载", blocks: [
+      { t: "p", html: "按需加载不看位置看<b>信号</b>；信号没来，资源就不存在——首屏包里不该塞一个用户可能永远点不开的功能" },
+      { t: "table", head: ["触发条件", "典型场景", "常用写法"], rows: [
+        ["<b>点击</b>", "点按钮才用的重库，如导出、生成图片", "事件里动态 import()"],
+        ["<b>路由 / 页签切换</b>", "进了某个页面才需要的代码", "路由懒加载、分包"],
+        ["<b>滚到某区块</b>", "页面下半段的重组件", "IntersectionObserver 触发 import()"],
+        ["<b>浏览器空闲</b>", "不紧急的统计、预热", "requestIdleCallback 里加载"],
+        ["<b>悬停预取</b>", "鼠标悬停链接时大概率会点", "hover 时先 prefetch 目标资源"]
+      ]},
+      { t: "code", lang: "js", code: "// 点「生成图片」才加载 html2canvas，没点就不下载\nbtn.addEventListener('click', async function () {\n  var { default: html2canvas } = await import('html2canvas');\n  var canvas = await html2canvas(node);\n  // ...生成并下载图片\n});\n\n// 手动建 script 标签：动态插入的脚本默认是 async 行为\nfunction loadScript(src) {\n  return new Promise(function (res, rej) {\n    var s = document.createElement('script');\n    s.src = src; s.onload = res; s.onerror = rej;\n    document.head.appendChild(s);\n  });\n}" },
+      { t: "callout", html: "<b>注意动态脚本的顺序</b>：手动 createElement 插入的脚本默认按下完先执行的 async 行为跑；多个之间有依赖时，要把 <code class=\"inl\">s.async = false</code> 显式关掉才会按插入顺序执行" }
+    ]},
+    { title: "样式与字体：别让 CSS 与字体挡住首屏", blocks: [
+      { t: "ul", items: [
+        "<b>stylesheet 是渲染阻塞</b>：CSS 没下完，浏览器不敢画页面；外链样式表放 head 是惯例，但大文件会拖慢首屏",
+        "<b>关键 CSS 内联</b>：首屏用到的那一小撮样式直接写进 HTML 的 style 标签，其余样式再异步补上",
+        "<b>preload 转正写法</b>：先以 preload 把 CSS 当文件下载，下载完成时把它切换成 stylesheet 生效，实现样式异步加载",
+        "<b>字体</b>：首屏字体用 preload 加急；配 <code class=\"inl\">font-display: swap</code>，字体没到先用系统字体顶着，到货再换，避免文字长时间隐形"
+      ]},
+      { t: "code", lang: "html + css", code: "<!-- CSS 异步转正：下完才切换为 stylesheet -->\n<link rel=\"preload\" href=\"app.css\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\">\n<noscript><link rel=\"stylesheet\" href=\"app.css\"><\/noscript>\n\n<!-- 字体：先出字，到货再换 -->\n<style>\n@font-face {\n  font-family: 'MyFont';\n  src: url('font.woff2') format('woff2');\n  font-display: swap;\n}\n<\/style>" }
+    ]},
+    { title: "怎么选：一张决策表", blocks: [
+      { t: "table", head: ["资源", "选什么", "别选什么"], rows: [
+        ["<b>业务主脚本</b>", "defer 或 type=module", "async（顺序不可控）"],
+        ["<b>独立第三方脚本</b>", "async", "defer（会拖住业务顺序队列）"],
+        ["<b>首屏字体</b>", "preload + font-display: swap", "裸 @font-face 等发现"],
+        ["<b>首屏大图</b>", "fetchpriority=high，可配 preload", "loading=lazy"],
+        ["<b>长列表图片</b>", "loading=lazy + 宽高占位", "一次性全量加载"],
+        ["<b>重功能（如生成图片）</b>", "点击触发动态 import()", "打进首屏主包"],
+        ["<b>下一步页面</b>", "prefetch 空闲囤货", "preload（会跟本页抢带宽）"],
+        ["<b>跨域接口 / 字体域名</b>", "preconnect 提前建连", "等请求发出才握手"]
+      ]},
+      { t: "callout", blue: true, html: "<b>判断顺序</b>：先问这个资源本页用不用——不用就 prefetch 囤给下页或干脆按需；再问首屏用不用——首屏要用且发现得晚，才轮到 preload 加急；其余的，能 defer 就 defer、能 lazy 就 lazy" }
+    ]},
+    { title: "常见的坑：八个高频翻车点", blocks: [
+      { t: "ul", items: [
+        "<b>preload 了不用</b>：加急下载完没人用，纯浪费带宽，控制台还会警告",
+        "<b>as / crossorigin 写错</b>：as 写错类型会被下两遍或优先级错乱；字体不带 crossorigin 必然下两遍",
+        "<b>async 互相依赖</b>：两个 async 脚本有先后依赖时，下完顺序随机，迟早翻车",
+        "<b>给内联脚本加 defer</b>：内联脚本没有下载过程，defer 与 async 都不生效",
+        "<b>以为 preload 会执行</b>：preload 只下载不执行，脚本仍需 script 标签正式引入",
+        "<b>把 prefetch 当缓存保险</b>：prefetch 只是低优先级囤货，浏览器可以丢弃，不保证跳转时还在",
+        "<b>懒加载没占位</b>：图片没写宽高，加载瞬间版式跳动，点着点着按钮就跑了",
+        "<b>什么都往前提</b>：全员高优先级等于没有优先级，真正的关键资源反而被堵住"
+      ]}
+    ]},
+    { title: "在 Network 面板怎么分辨", blocks: [
+      { t: "p", html: "判断方法只看两列：<b>Type（类型）</b>和 <b>Initiator（发起者）</b>；写法对不对，不用猜，对照下表一看便知" },
+      { t: "judgeTable" },
+      { t: "mnemonic" },
+      { t: "ul", items: [
+        "<b>Priority 列</b>：preload 的资源显示 High 或 Highest，prefetch 显示 Lowest，懒加载的图在触发前根本不在列表里",
+        "<b>Initiator 列</b>：能看出是谁把请求带起来的——是解析器、是 preload 链接，还是某段 JS 动态发出的",
+        "<b>瀑布图位置</b>：请求条出现得越靠前说明发现得越早；defer 的脚本执行点压在解析完成之后",
+        "<b>重复请求</b>：同一文件出现两条，多半是 as 或 crossorigin 写错导致下两遍，回代码里对那一行",
+        "<b>懒加载验证</b>：停在页面顶部刷新，长列表的图不该出现；慢慢往下滚，图片逐条冒出来，就是懒加载在按预期工作",
+        "<b>按需验证</b>：不点按钮时重库不在列表里；点下按钮的那一刻请求才发出，就是按需加载生效"
+      ]},
+      { t: "callout", html: "<b>排查顺序</b>：先看有没有（不该来的来了没有、该来的来了没有），再看顺序与优先级，最后看有没有重复；三步走完，加载问题基本定位" }
+    ]},
+    { title: "以一次打开 recite 为例：Network 与加载时间线", blocks: [
+      { t: "p", html: "示意图：打开 <code class=\"inl\">/pages/recite</code> 后 Network 面板大致会看到这样（只列代表行）" },
+      { t: "devtools" },
+      { t: "p", html: "同一一次打开，四种策略会同时出现——预加载抢在最前面、按需跟着路由走、延迟把执行推到解析之后、预取与懒加载等到空闲或点击才动" },
+      { t: "gantt" }
+    ]}
+  ]
+},
+{
+  id: "js-request-network",
+  title: "JS 请求类型与 Network 分辨",
+  shortTitle: "JS 请求类型与 Network 分辨",
+  category: "网络调试",
+  status: "整理中",
+  date: "2026-11-18",
+  tags: ["Network", "请求类型", "fetch", "XHR", "Initiator"],
+  desc: "在 Network 面板里分辨 import、fetch、XHR 等请求类型；就是 jpcard 文档里那篇的大纲，全文整理中",
+  cover: { bg: "linear-gradient(150deg,#3d2c5f 0%,#191029 70%)", ink: "#EBEBF5" },
+  chips: ["Network", "jpcard/doc"],
+  sections: [
+    { title: "大纲（全文整理中）", blocks: [
+      { t: "p", html: "这篇源自 jpcard 仓库文档 <b>js-loading-guide</b> 的姊妹篇；目前只有大纲，条目理顺后再补全文" },
+      { t: "ul", items: [
+        "在 Network 面板里怎么分辨 import 拉的模块、fetch 请求与 XHR",
+        "项目里的请求清单：每一类请求分别由哪段代码发起",
+        "Type 列与 Initiator 列的对照读法",
+        "瀑布图里看请求的先后与阻塞关系"
+      ]}
+    ]}
+  ]
+},
+{
+  id: "cache-service-worker",
+  title: "缓存与 Service Worker",
+  shortTitle: "缓存与 Service Worker",
+  category: "网络调试",
+  status: "待写",
+  date: "—",
+  tags: ["缓存", "Service Worker", "Cache-Control", "离线"],
+  desc: "HTTP 缓存头、浏览器缓存分层与 Service Worker 的拦截与更新策略；目前只有大纲",
+  cover: { bg: "linear-gradient(150deg,#14532d 0%,#0a2417 70%)", ink: "#EBEBF5" },
+  chips: ["Cache", "SW"],
+  sections: [
+    { title: "大纲（待写）", blocks: [
+      { t: "p", html: "这篇还没动笔，先把要回答的问题列在这里，写的时候逐条填" },
+      { t: "ul", items: [
+        "强缓存与协商缓存：Cache-Control、ETag、Last-Modified 各管哪一段",
+        "Service Worker 的生命周期：注册、安装、激活与更新",
+        "常见缓存策略：Cache First、Network First、Stale While Revalidate 怎么选",
+        "发版后用户还拿着旧文件，怎么破"
+      ]}
+    ]}
+  ]
+},
+{
+  id: "deploy-release",
+  title: "部署与发布口径",
+  shortTitle: "部署与发布口径",
+  category: "部署发布",
+  status: "已完成",
+  date: "2026-11-19",
+  tags: ["部署", "发布", "H5", "App", "Release"],
+  desc: "部署与发布是两件事：H5 只有部署、发布就是部署；只有打包生产包发 Release 才叫发布",
+  cover: { bg: "linear-gradient(150deg,#7c2d12 0%,#33150a 70%)", ink: "#EBEBF5" },
+  chips: ["jpcard", "口径定版"],
+  sections: [
+    { title: "一句话口径", blocks: [
+      { t: "p", html: "<b>H5 只有部署，没有发布</b>；对 H5 来说发布就是部署——代码推上去、线上生效，事情就完了" },
+      { t: "ul", items: [
+        "<b>H5</b>：只部署；不打包 zip、不建 GitHub Release",
+        "<b>混合 App 与 mobile App</b>：打包生产包、发 GitHub Release，这才叫发布",
+        "汇报时用词照此区分：H5 的动作说「已部署」，App 的动作说「已发布」"
+      ]}
+    ]},
+    { title: "为什么这么分", blocks: [
+      { t: "p", html: "H5 的产物就是网页文件本身，部署到服务器或 Pages 即面向用户，没有独立安装包可发；App 则有可分发的安装包与版本号，需要 Release 承载下载与版本记录，两条线混着说迟早汇报错位" }
+    ]}
+  ]
+}
+];
+
+/* ================= 视图层 ================= */
+var state = { cat: "全部", q: "" };
+var CIRCLED = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩","⑪","⑫"];
+
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+
+/* ---------- 轻量语法高亮：先分词、逐段转义再包 span，尖括号不会被当真标签 ---------- */
+function highlightJS(code){
+  var re = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|('(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`)|\b(var|let|const|function|return|if|else|for|while|do|new|await|async|import|from|export|default|typeof|instanceof|in|of|break|continue|switch|case|try|catch|finally|throw|class|extends|delete|void|yield)\b|\b(true|false|null|undefined|this)\b|(\b\d+(?:\.\d+)?\b)|([A-Za-z_$][\w$]*)(?=\s*\()|([A-Za-z_$][\w$]*)(?=\s*:)/g;
+  var out = "", last = 0, m;
+  while ((m = re.exec(code)) !== null){
+    out += esc(code.slice(last, m.index));
+    var cls = m[1] ? "tk-com" : m[2] ? "tk-str" : m[3] ? "tk-kw" : m[4] ? "tk-kw" : m[5] ? "tk-num" : m[6] ? "tk-fn" : "tk-attr";
+    out += '<span class="' + cls + '">' + esc(m[0]) + "</span>";
+    last = m.index + m[0].length;
+  }
+  return out + esc(code.slice(last));
+}
+function highlightCSS(code){
+  var re = /(\/\*[\s\S]*?\*\/)|('(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*")|(@[\w-]+)|([a-zA-Z-]+)(\s*:)|(\b\d+(?:\.\d+)?(?:px|em|rem|%|ms|s|vh|vw)?\b)|([A-Za-z_-][\w-]*)(?=\s*\()/g;
+  var out = "", last = 0, m;
+  while ((m = re.exec(code)) !== null){
+    out += esc(code.slice(last, m.index));
+    if (m[1]) out += '<span class="tk-com">' + esc(m[0]) + "</span>";
+    else if (m[2]) out += '<span class="tk-str">' + esc(m[0]) + "</span>";
+    else if (m[3]) out += '<span class="tk-kw">' + esc(m[0]) + "</span>";
+    else if (m[4]) out += '<span class="tk-attr">' + esc(m[4]) + "</span>" + esc(m[5] || "");
+    else if (m[6]) out += '<span class="tk-num">' + esc(m[0]) + "</span>";
+    else out += '<span class="tk-fn">' + esc(m[0]) + "</span>";
+    last = m.index + m[0].length;
+  }
+  return out + esc(code.slice(last));
+}
+function highlightHTML(code){
+  var out = "", i = 0, n = code.length, mode = null;
+  while (i < n){
+    if (code.substr(i, 4) === "<!--"){
+      var endC = code.indexOf("-->", i + 4);
+      if (endC < 0) endC = n - 3;
+      out += '<span class="tk-com">' + esc(code.slice(i, endC + 3)) + "</span>";
+      i = endC + 3;
+    } else if (code[i] === "<" && /[\/!a-zA-Z]/.test(code[i + 1] || "")){
+      var j = i + 1, closing = false;
+      var tagHtml = '<span class="tk-punc">&lt;</span>';
+      if (code[j] === "/"){ closing = true; tagHtml += '<span class="tk-punc">/</span>'; j++; }
+      var nameStart = j;
+      while (j < n && /[\w-]/.test(code[j])) j++;
+      var tagName = code.slice(nameStart, j);
+      tagHtml += '<span class="tk-tag">' + esc(tagName) + "</span>";
+      while (j < n && code[j] !== ">"){
+        if (code[j] === "/" && code[j + 1] === ">"){ tagHtml += '<span class="tk-punc">/</span>'; j++; break; }
+        if (/\s/.test(code[j])){ tagHtml += esc(code[j]); j++; continue; }
+        var aStart = j;
+        while (j < n && /[\w-]/.test(code[j])) j++;
+        if (j === aStart){ tagHtml += esc(code[j]); j++; continue; }
+        tagHtml += '<span class="tk-attr">' + esc(code.slice(aStart, j)) + "</span>";
+        var k = j;
+        while (k < n && /\s/.test(code[k])) k++;
+        if (code[k] === "="){
+          tagHtml += esc(code.slice(j, k)) + '<span class="tk-punc">=</span>';
+          k++;
+          var vStart = k;
+          while (vStart < n && /\s/.test(code[vStart])) vStart++;
+          tagHtml += esc(code.slice(k, vStart));
+          var q = code[vStart];
+          if (q === '"' || q === "'"){
+            var vEnd = code.indexOf(q, vStart + 1);
+            if (vEnd < 0) vEnd = n - 1;
+            tagHtml += '<span class="tk-str">' + esc(code.slice(vStart, vEnd + 1)) + "</span>";
+            j = vEnd + 1;
+          } else {
+            var uEnd = vStart;
+            while (uEnd < n && !/[\s>]/.test(code[uEnd])) uEnd++;
+            tagHtml += '<span class="tk-str">' + esc(code.slice(vStart, uEnd)) + "</span>";
+            j = uEnd;
+          }
+        }
+      }
+      if (j < n && code[j] === ">"){ tagHtml += '<span class="tk-punc">&gt;</span>'; j++; }
+      out += tagHtml;
+      var ln = tagName.toLowerCase();
+      if (!closing && ln === "script") mode = "js";
+      else if (!closing && ln === "style") mode = "css";
+      else if (closing && (ln === "script" || ln === "style")) mode = null;
+      i = j;
+    } else {
+      var next = code.indexOf("<", i);
+      if (next < 0) next = n;
+      if (next === i) next = i + 1;
+      var text = code.slice(i, next);
+      out += mode === "js" ? highlightJS(text) : mode === "css" ? highlightCSS(text) : esc(text);
+      i = next;
+    }
+  }
+  return out;
+}
+function highlightCode(code, lang){
+  lang = (lang || "").toLowerCase();
+  if (!lang) lang = /^\s*</.test(code) ? "html" : "js";
+  if (lang.indexOf("html") >= 0) return highlightHTML(code);
+  if (lang.indexOf("css") >= 0) return highlightCSS(code);
+  return highlightJS(code);
+}
+
+function categories(){
+  var seen = [], out = ["全部"];
+  DOCS.forEach(function(d){ if (seen.indexOf(d.category) < 0){ seen.push(d.category); out.push(d.category); } });
+  return out;
+}
+function filtered(){
+  return DOCS.filter(function(d){
+    var okCat = state.cat === "全部" || d.category === state.cat;
+    if (!okCat) return false;
+    if (!state.q) return true;
+    var hay = (d.title + " " + d.desc + " " + d.category + " " + d.tags.join(" ")).toLowerCase();
+    return hay.indexOf(state.q.toLowerCase()) >= 0;
+  });
+}
+
+function renderFilters(){
+  var bar = document.getElementById("filterbar");
+  bar.innerHTML = categories().map(function(c){
+    return '<button class="fbtn' + (c === state.cat ? " on" : "") + '" data-cat="' + c + '">' + c + "</button>";
+  }).join("");
+  bar.querySelectorAll(".fbtn").forEach(function(b){
+    b.addEventListener("click", function(){ state.cat = b.getAttribute("data-cat"); renderHome(); });
+  });
+}
+
+function renderShelf(){
+  var list = filtered();
+  var shelf = document.getElementById("shelf");
+  document.getElementById("countBadge").textContent = "共 " + DOCS.length + " 篇";
+  document.getElementById("emptyNote").hidden = list.length > 0;
+  document.getElementById("endNote").textContent = list.length ? ("已展示全部 " + list.length + " 篇") : "";
+  shelf.innerHTML = list.map(function(d){
+    return '<a class="book" href="#/doc/' + d.id + '" aria-label="' + esc(d.title) + '">' +
+      '<span class="book-cover" style="background:' + d.cover.bg + ';color:' + d.cover.ink + '">' +
+        '<span class="book-cat">' + d.category + '</span>' +
+        '<span class="book-title">' + d.shortTitle + '</span>' +
+        '<span class="book-sub">' + d.desc + '</span>' +
+        '<span class="book-foot"><span class="status">' + d.status + '</span><span class="book-date">' + d.date + '</span></span>' +
+      '</span>' +
+      '<span class="book-meta"><span class="m-title">' + d.title + '</span><span class="m-desc">' + d.desc + '</span></span>' +
+    "</a>";
+  }).join("");
+}
+function renderHome(){ renderFilters(); renderShelf(); }
+
+/* ---------- 阅读页渲染 ---------- */
+function blockHTML(b){
+  if (b.t === "p") return "<p>" + b.html + "</p>";
+  if (b.t === "ul") return "<ul>" + b.items.map(function(i){ return "<li>" + i + "</li>"; }).join("") + "</ul>";
+  if (b.t === "code") return '<div class="codecard"><div class="cc-head"><span class="dot" style="background:#FF5F57"></span><span class="dot" style="background:#FEBC2E"></span><span class="dot" style="background:#28C840"></span><span>' + b.lang + '</span></div><pre>' + highlightCode(b.code, b.lang) + "</pre></div>";
+  if (b.t === "table"){
+    var h = b.head.map(function(x){ return "<th>" + x + "</th>"; }).join("");
+    var r = b.rows.map(function(row){ return "<tr>" + row.map(function(c){ return "<td>" + c + "</td>"; }).join("") + "</tr>"; }).join("");
+    return '<div class="tablecard"><table><thead><tr>' + h + "</tr></thead><tbody>" + r + "</tbody></table></div>";
+  }
+  if (b.t === "cards"){
+    return '<div class="concept-grid">' + b.items.map(function(c){
+      return '<div class="concept"><div class="c-name">' + c.name + '</div><div class="c-en">' + c.en + '</div><p>' + c.desc + "</p></div>";
+    }).join("") + "</div>";
+  }
+  if (b.t === "staircase"){
+    return '<div class="svgcard" role="img" aria-label="阶梯时间轴：预加载、延迟加载、按需加载、懒加载依次往后"><svg viewBox="0 0 800 228" xmlns="http://www.w3.org/2000/svg">' +
+      '<rect x="6" y="6" width="272" height="38" rx="9" fill="rgba(64,156,255,.18)" stroke="#409CFF" stroke-width="1.5"/><text x="20" y="30" font-size="14" font-weight="700" fill="#9ecbff">预加载：提前、并行地下载</text>' +
+      '<rect x="168" y="52" width="330" height="38" rx="9" fill="rgba(255,107,157,.14)" stroke="#ff6b9d" stroke-width="1.5"/><text x="182" y="76" font-size="14" font-weight="700" fill="#ffb3c9">延迟加载：先下载/不阻塞，等解析完或空闲再执行</text>' +
+      '<rect x="356" y="98" width="292" height="38" rx="9" fill="rgba(48,209,88,.14)" stroke="#30D158" stroke-width="1.5"/><text x="370" y="122" font-size="14" font-weight="700" fill="#8be9a8">按需加载：进入哪个功能才加载哪个</text>' +
+      '<rect x="512" y="144" width="282" height="38" rx="9" fill="rgba(255,159,10,.16)" stroke="#FF9F0A" stroke-width="1.5"/><text x="526" y="168" font-size="14" font-weight="700" fill="#ffcf7a">懒加载：真用到/看到那一刻才加载</text>' +
+      '<line x1="10" y1="198" x2="790" y2="198" stroke="rgba(235,235,245,.45)" stroke-width="2"/>' +
+      '<line x1="70" y1="190" x2="70" y2="198" stroke="rgba(235,235,245,.6)" stroke-width="2"/><line x1="300" y1="190" x2="300" y2="198" stroke="rgba(235,235,245,.6)" stroke-width="2"/><line x1="540" y1="190" x2="540" y2="198" stroke="rgba(235,235,245,.6)" stroke-width="2"/><line x1="730" y1="190" x2="730" y2="198" stroke="rgba(235,235,245,.6)" stroke-width="2"/>' +
+      '<text x="70" y="220" font-size="13" fill="rgba(235,235,245,.65)" text-anchor="middle">HTML 解析</text><text x="300" y="220" font-size="13" fill="rgba(235,235,245,.65)" text-anchor="middle">首屏可交互</text><text x="540" y="220" font-size="13" fill="rgba(235,235,245,.65)" text-anchor="middle">浏览器空闲</text><text x="730" y="220" font-size="13" fill="rgba(235,235,245,.65)" text-anchor="middle">用户点击/滚到</text>' +
+      '</svg></div>';
+  }
+  if (b.t === "concept4"){
+    var svgPre = '<svg class="c4-svg" viewBox="0 0 260 54" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="4" y="6" width="150" height="12" rx="6" fill="#409CFF"/><rect x="4" y="24" width="110" height="12" rx="6" fill="#7dd3fc"/><rect x="150" y="40" width="90" height="10" rx="5" fill="rgba(64,156,255,.35)"/><text x="162" y="16" font-size="10" fill="#9ecbff">并行先下</text><text x="246" y="49" font-size="10" fill="rgba(235,235,245,.6)">空闲囤下页</text></svg>';
+    var svgOnd = '<svg class="c4-svg" viewBox="0 0 260 54" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="4" y="20" width="62" height="14" rx="7" fill="#30D158"/><path d="M66 27 H110 M110 27 L150 12 M110 27 H152 M110 27 L150 42" stroke="#30D158" stroke-width="2" fill="none"/><rect x="152" y="5" width="72" height="13" rx="6" fill="rgba(48,209,88,.3)"/><rect x="154" y="21" width="88" height="13" rx="6" fill="#30D158"/><rect x="152" y="37" width="60" height="13" rx="6" fill="rgba(48,209,88,.18)"/><text x="10" y="31" font-size="10" fill="#062b12" font-weight="700">入口</text></svg>';
+    var svgLazy = '<svg class="c4-svg" viewBox="0 0 260 54" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="4" y="4" width="252" height="30" rx="6" fill="none" stroke="rgba(235,235,245,.4)" stroke-dasharray="5 4"/><text x="10" y="22" font-size="10" fill="rgba(235,235,245,.6)">视口</text><rect x="176" y="14" width="66" height="13" rx="6" fill="#FF9F0A"/><path d="M130 48 V34" stroke="#FF9F0A" stroke-width="2"/><path d="M124 40 L130 33 L136 40" stroke="#FF9F0A" stroke-width="2" fill="none"/><text x="10" y="49" font-size="10" fill="#ffcf7a">滚到 / 点到才加载</text></svg>';
+    var svgDefer = '<svg class="c4-svg" viewBox="0 0 260 54" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="4" y="8" width="252" height="12" rx="6" fill="#5b7aa6"/><rect x="60" y="26" width="80" height="10" rx="5" fill="#7dd3fc"/><rect x="216" y="26" width="40" height="16" rx="5" fill="#ff8fab"/><text x="10" y="50" font-size="10" fill="rgba(235,235,245,.6)">解析不中断</text><text x="222" y="50" font-size="10" fill="#ffb3c9">末尾执行</text></svg>';
+    return '<div class="concept4">' +
+      '<div class="c4 blue"><div class="c4-head"><span class="c4-dot" style="background:#409CFF"></span>预加载 Preload / Prefetch</div>' + svgPre + '<p>意思：“马上/以后会用到，先下着，好”。只下、不执行</p><ul><li><code>preload</code> / <code>modulepreload</code>：当前页马上要用，高优先级</li><li><code>prefetch</code>（预取）：下一页可能用，低优先级、空闲时</li></ul><div class="ex">项目里：pages/app.html 21–28 的 8 条 <code>modulepreload</code></div></div>' +
+      '<div class="c4 green"><div class="c4-head"><span class="c4-dot" style="background:#30D158"></span>按需加载 On-demand</div>' + svgOnd + '<p>意思：按功能/路由拆包，进入哪个页面或需要哪个能力才加载那部分代码，核心手段是 <code>import()</code></p><div class="ex">项目里：AppController.js:29 <code>import(entry.module)</code> ——去 Recite 只拉 recite/index.js、不拉 concise；home.js:155 选了日语才 <code>import(\'locales/ja.js\')</code></div></div>' +
+      '<div class="c4 orange"><div class="c4-head"><span class="c4-dot" style="background:#FF9F0A"></span>懒加载 Lazy load</div>' + svgLazy + '<p>意思：按需加载的“更极致”版本——不是进入页面时，而是用户真的点了 / 元素真的滚进视口时才加载</p><div class="ex">项目里：utils/lazy-feature.js 通用懒加载包装，首次调用才 import 并去重并发；配色编辑器、动作池编辑器、音频播放器（AudioPlayer/lazy.js）</div></div>' +
+      '<div class="c4 pink"><div class="c4-head"><span class="c4-dot" style="background:#ff6b9d"></span>延迟加载 Defer</div>' + svgDefer + '<p>意思：资源可以照常下载，但执行/推迟发起，不挡首屏</p><ul><li><code>&lt;script defer&gt;</code>：native-back-button.js、app-viewport.js、algorithm/converter 页脚本（HTML 解析完才执行）</li><li><code>&lt;script async&gt;</code>：html2canvas（下载完立刻执行，不保证顺序）</li><li>app.html:20 CSS <code>media="not all"</code> 推迟转正</li></ul></div>' +
+      '</div>';
+  }
+  if (b.t === "judgeTable"){
+    function jb(cls,label){ return '<span class="type-badge '+cls+'">'+label+'</span>'; }
+    var rows = [
+      ['<code class="inl">&lt;script src&gt;</code> / <code class="inl">&lt;script type="module"&gt;</code>', jb("tb-script","script"), '某个 html 文件（Parser）'],
+      ['静态 <code class="inl">import x from \'./a.js\'</code>', jb("tb-script","script"), '导入它的那个 .js 文件'],
+      ['动态 <code class="inl">import(\'./a.js\')</code>', jb("tb-script","script"), '调用 import() 的那个 .js'],
+      ['<code class="inl">&lt;link rel="modulepreload"&gt;</code>', jb("tb-script","script"), 'html（优先级 High，较早出现）'],
+      ['<code class="inl">fetch(url)</code>', jb("tb-fetch","fetch"), '调用 fetch 的 .js'],
+      ['<code class="inl">new XMLHttpRequest()</code>', jb("tb-xhr","xhr"), '调用 xhr 的脚本'],
+      ['Service Worker 里的 <code class="inl">fetch</code>', '原类型 + ⚙ 齿轮标记', 'sw.js']
+    ];
+    var rr = rows.map(function(r){ return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>'; }).join("");
+    return '<div class="tablecard"><table><thead><tr><th>代码写法</th><th>Network 里的 Type</th><th>Initiator 一般显示</th></tr></thead><tbody>'+rr+'</tbody></table></div>';
+  }
+  if (b.t === "mnemonic"){
+    return '<div class="mnemonic"><b>口诀：</b>import 出来的永远是 script，fetch 出来的永远是 fetch——跟文件后缀无关，所以用 <code>fetch()</code> 去取一个 .js 文件，它会显示为 fetch（项目里就有一个，见下节橙色行）</div>';
+  }
+  if (b.t === "devtools"){
+    var drows = [
+      ['recite','document','Other','SPA Shell（pages/app.html）',''],
+      ['AppController.js','script','recite（modulepreload）','预加载',''],
+      ['bootstrap.js','script','recite（Parser）','&lt;script type=module&gt;',''],
+      ['navigation.js','script','AppController.js','静态 import',''],
+      ['view-scope.js','script','AppController.js:5','动态 import()',''],
+      ['index.js（recite）','script','AppController.js:29','动态 import(entry.module)',''],
+      ['index.html（recite）','fetch','AppController.js:30','fetch 页面模板',''],
+      ['word-data-client.js','script','VocabularyModel.js:8','按需 import()',''],
+      ['manifest / hot（/api/word-data/）','fetch','word-data-client.js','词库 API',''],
+      ['chunk…（/api/word-data/）','fetch','word-data-worker.js','Worker 里发起',''],
+      ['index.js（concise）','fetch','AppController.js:61','⚠ 是 JS、但用 fetch 预取','hl']
+    ];
+    var body = drows.map(function(r){
+      var badge = r[1]==='script' ? '<span class="type-badge tb-script">script</span>' : r[1]==='fetch' ? '<span class="type-badge tb-fetch">fetch</span>' : '<span class="type-badge tb-doc">'+r[1]+'</span>';
+      return '<tr class="'+r[4]+'"><td class="mono">'+r[0]+'</td><td>'+badge+'</td><td class="mono">'+r[2]+'</td><td>'+r[3]+'</td></tr>';
+    }).join("");
+    return '<div class="devtools"><div class="dt-tabs"><span>Elements</span><span>Console</span><span class="on">Network</span><span>Application</span></div><div class="dt-filters"><span class="on">All</span><span>Fetch/XHR</span><span>Doc</span><span>CSS</span><span>JS</span><span>Img</span><span>Media</span><span>Wasm</span></div><div class="dt-scroll"><table class="dt-table"><thead><tr><th>Name</th><th>Type</th><th>Initiator</th><th>说明</th></tr></thead><tbody>'+body+'</tbody></table></div></div>';
+  }
+  if (b.t === "timeline2"){
+    // SVG 对比条形图：viewBox 800×218，行标签 0–118，条区 128–790（宽 662）
+    function R(x,y,w,fill){ return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="22" rx="5" fill="'+fill+'"/>'; }
+    function X(p){ return Math.round(128 + 662 * p / 100); }
+    function W(p){ return Math.round(662 * p / 100); }
+    var svg = '<svg viewBox="0 0 800 282" xmlns="http://www.w3.org/2000/svg">' +
+      '<text x="0" y="18" font-size="16" font-weight="800" fill="#EBEBF5">四者在 defer / async / module 脚本上的区别</text>' +
+      '<rect x="330" y="8" width="12" height="12" rx="3" fill="#5b7aa6"/><text x="348" y="19" font-size="12" fill="rgba(235,235,245,.65)">HTML 解析</text>' +
+      '<rect x="440" y="8" width="12" height="12" rx="3" fill="#7dd3fc"/><text x="458" y="19" font-size="12" fill="rgba(235,235,245,.65)">下载</text>' +
+      '<rect x="512" y="8" width="12" height="12" rx="3" fill="#30D158"/><text x="530" y="19" font-size="12" fill="rgba(235,235,245,.65)">下载 import 依赖</text>' +
+      '<rect x="668" y="8" width="12" height="12" rx="3" fill="#ff8fab"/><text x="686" y="19" font-size="12" fill="rgba(235,235,245,.65)">执行</text>' +
+      '<text x="0" y="56" font-size="13" fill="#EBEBF5" font-family="monospace">普通 &lt;script&gt;</text>' +
+      R(X(0),42,W(34),"#5b7aa6") + R(X(34),42,W(16),"#7dd3fc") + R(X(50),42,W(13),"#ff8fab") + R(X(63),42,W(37),"#5b7aa6") +
+      '<text x="0" y="94" font-size="13" fill="#EBEBF5" font-family="monospace">defer</text>' +
+      R(X(0),80,W(100),"#5b7aa6") + R(X(88),80,W(12),"#ff8fab") + R(X(32),106,W(14),"#7dd3fc") +
+      '<text x="0" y="156" font-size="13" fill="#EBEBF5" font-family="monospace">async</text>' +
+      R(X(0),142,W(100),"#5b7aa6") + R(X(46),142,W(13),"#ff8fab") + R(X(32),168,W(14),"#7dd3fc") +
+      '<text x="0" y="218" font-size="13" fill="#EBEBF5" font-family="monospace">type="module"</text>' +
+      R(X(0),204,W(100),"#5b7aa6") + R(X(88),204,W(12),"#ff8fab") + R(X(34),230,W(14),"#7dd3fc") + R(X(48),230,W(18),"#30D158") +
+      '<text x="'+(X(48)+2)+'" y="268" font-size="11" fill="#30D158">下载 import 依赖</text>' +
+      '</svg>';
+    return '<div class="svgcard" role="img" aria-label="普通、defer、async、module 四种脚本的解析、下载与执行对比条形图">' + svg + '</div>' +
+      '<p class="tl2-note">module 脚本默认是 defer 行为；它的静态 import 依赖要先下载完才能执行，链越深越慢——所以项目用 modulepreload 把依赖提前并行拉下来</p>';
+  }
+  if (b.t === "gantt"){
+    // SVG 甘特图：viewBox 800×392，标签区 0–196，图区 204–792（宽 588）
+    var C = { doc:"#e9a8e9", pre:"#7dd3fc", on:"#30D158", delay:"#ff8fab", prefetch:"#409CFF", click:"#FF9F0A" };
+    function GX(p){ return Math.round(204 + 588 * p / 100); }
+    function GW(p){ return Math.max(8, Math.round(588 * p / 100)); }
+    var rows = [
+      ['app.html (document)', C.doc, 2, 9, ''],
+      ['modulepreload ×8', C.pre, 8, 20, '预加载'],
+      ['bootstrap.js', C.pre, 12, 10, ''],
+      ['import() view-scope.js', C.on, 26, 12, ''],
+      ['import() recite/index.js', C.on, 30, 26, '按需'],
+      ['fetch recite/index.html', C.on, 30, 18, ''],
+      ['import() word-data-client', C.on, 36, 14, ''],
+      ['fetch /api/word-data', C.on, 44, 28, ''],
+      ['注册 sw.js', C.delay, 52, 12, '延迟'],
+      ['fetch concise/index.js', C.prefetch, 80, 14, 'inside:预取（条件满足时）'],
+      ['import() AudioPlayer', C.click, 88, 10, 'left:点播放 →'],
+      ['import() 配色编辑器', C.click, 88, 10, 'left:点设置 →']
+    ];
+    var s = '<svg viewBox="0 0 800 392" xmlns="http://www.w3.org/2000/svg">';
+    s += '<text x="0" y="18" font-size="15" font-weight="800" fill="#EBEBF5">一次打开 /pages/recite 的加载时间线（四种策略同时出现）</text>';
+    var x1 = GX(58), x2 = GX(78);
+    s += '<line x1="'+x1+'" y1="30" x2="'+x1+'" y2="352" stroke="#30D158" stroke-width="2" stroke-dasharray="5 5"/><text x="'+(x1+7)+'" y="42" font-size="12" font-weight="700" fill="#30D158">首屏可交互</text>';
+    s += '<line x1="'+x2+'" y1="30" x2="'+x2+'" y2="352" stroke="#FFD60A" stroke-width="2" stroke-dasharray="5 5"/><text x="'+(x2+7)+'" y="42" font-size="12" font-weight="700" fill="#FFD60A">空闲</text>';
+    rows.forEach(function(r, i){
+      var y = 52 + i * 26;
+      s += '<text x="196" y="'+(y+13)+'" font-size="11.5" fill="#d7d7de" text-anchor="end" font-family="monospace">' + r[0] + '</text>';
+      s += '<rect x="'+GX(r[2])+'" y="'+y+'" width="'+GW(r[3])+'" height="16" rx="5" fill="'+r[1]+'"/>';
+      if (r[4].indexOf('inside:') === 0) s += '<text x="'+(GX(r[2])+6)+'" y="'+(y+13)+'" font-size="11" fill="#fff">' + r[4].slice(7) + '</text>';
+      else if (r[4].indexOf('left:') === 0) s += '<text x="'+(GX(r[2])-7)+'" y="'+(y+13)+'" font-size="11.5" fill="#ffcf7a" text-anchor="end">' + r[4].slice(5) + '</text>';
+      else if (r[4]) s += '<text x="'+(GX(r[2])+GW(r[3])+7)+'" y="'+(y+13)+'" font-size="11.5" fill="rgba(235,235,245,.7)">' + r[4] + '</text>';
+    });
+    var lx = 0;
+    [['预加载',C.pre],['按需',C.on],['延迟',C.delay],['预取',C.prefetch],['点击触发（懒加载）',C.click]].forEach(function(L){
+      s += '<rect x="'+lx+'" y="366" width="12" height="12" rx="3" fill="'+L[1]+'"/><text x="'+(lx+18)+'" y="377" font-size="12" fill="rgba(235,235,245,.65)">'+L[0]+'</text>';
+      lx += 18 + L[0].length * 13 + 26;
+    });
+    s += '</svg>';
+    return '<div class="svgcard" role="img" aria-label="打开 recite 一次的加载甘特图，四种策略同时出现">' + s + '</div>';
+  }
+  if (b.t === "callout") return '<div class="callout' + (b.blue ? " blue" : "") + '">' + b.html + "</div>";
+  if (b.t === "timeline"){
+    function seg(cls, w, label){ return '<span class="tl-seg ' + cls + '" style="width:' + w + '%">' + label + "</span>"; }
+    return '<div class="timeline">' +
+      '<div class="tl-row"><span class="tl-name">普通</span><span class="tl-track">' + seg("seg-parse",18,"解析") + seg("seg-dl",30,"下载") + seg("seg-exec",16,"执行") + seg("seg-parse",36,"继续解析") + "</span></div>" +
+      '<div class="tl-row"><span class="tl-name">async·解析</span><span class="tl-track">' + seg("seg-parse",28,"解析") + seg("seg-exec",17,"插队执行") + seg("seg-parse",55,"继续解析") + "</span></div>" +
+      '<div class="tl-row"><span class="tl-name">async·下载</span><span class="tl-track">' + seg("seg-dl",44,"并行下载") + "</span></div>" +
+      '<div class="tl-row"><span class="tl-name">defer·解析</span><span class="tl-track">' + seg("seg-parse",62,"解析全程不中断") + seg("seg-exec",16,"按序执行") + seg("seg-wait",22,"") + "</span></div>" +
+      '<div class="tl-row"><span class="tl-name">defer·下载</span><span class="tl-track">' + seg("seg-dl",44,"并行下载") + "</span></div>" +
+      '<div class="tl-legend"><span><i style="background:#8E8E93"></i>HTML 解析</span><span><i style="background:#409CFF"></i>下载</span><span><i style="background:#FF9F0A"></i>执行</span></div>' +
+    "</div>";
+  }
+  return "";
+}
+
+var currentDoc = null;
+function renderDoc(id){
+  var d = null;
+  DOCS.forEach(function(x){ if (x.id === id) d = x; });
+  if (!d){ location.hash = "#/"; return; }
+  currentDoc = id;
+  var root = document.getElementById("docRoot");
+  var statusCls = d.status === "已完成" ? " done" : "";
+  var toc = d.sections.map(function(s, i){
+    return '<a href="#/doc/' + d.id + '" data-sec="' + i + '">' + (CIRCLED[i] || (i + 1)) + " " + s.title.split("：")[0].split("，")[0] + "</a>";
+  }).join("");
+  var body = d.sections.map(function(s, i){
+    return '<section class="blk" id="sec-' + i + '"><h2>' + (CIRCLED[i] || (i + 1)) + " " + s.title + "</h2>" +
+      s.blocks.map(blockHTML).join("") + "</section>";
+  }).join("");
+  root.innerHTML =
+    '<div class="doc-head">' +
+      '<button class="backlink" id="backBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>返回书架</button>' +
+      "<h1>" + d.title + "</h1>" +
+      '<div class="doc-sub"><span class="doc-status' + statusCls + '">' + d.status + '</span><span>' + d.category + '</span><span class="sep">·</span><span>' + d.date + "</span>" +
+      d.chips.map(function(c){ return '<span class="chip">' + c + "</span>"; }).join("") + "</div>" +
+      '<nav class="toc">' + toc + "</nav>" +
+    "</div>" + body +
+    '<div class="doc-foot-nav"><button id="backBtn2">返回书架</button></div>';
+  document.getElementById("backBtn").addEventListener("click", goHome);
+  document.getElementById("backBtn2").addEventListener("click", goHome);
+  root.querySelectorAll(".toc a").forEach(function(a){
+    a.addEventListener("click", function(ev){
+      ev.preventDefault();
+      var el = document.getElementById("sec-" + a.getAttribute("data-sec"));
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+  window.scrollTo(0, 0);
+}
+function goHome(){ location.hash = "#/"; }
+
+/* ---------- 路由 ---------- */
+function route(){
+  var h = location.hash || "#/";
+  var m = h.match(/^#\/doc\/(.+)$/);
+  var home = document.getElementById("viewHome");
+  var doc = document.getElementById("viewDoc");
+  document.getElementById("navHome").classList.toggle("on", !m);
+  document.getElementById("navAll").classList.toggle("on", false);
+  if (m){
+    home.hidden = true; doc.hidden = false;
+    var targetId = decodeURIComponent(m[1]);
+    if (targetId !== currentDoc) renderDoc(targetId);
+  } else {
+    currentDoc = null;
+    doc.hidden = true; home.hidden = false;
+    renderHome();
+  }
+}
+document.getElementById("navAll").addEventListener("click", function(ev){
+  ev.preventDefault();
+  state.cat = "全部"; state.q = "";
+  document.getElementById("searchInput").value = "";
+  location.hash = "#/"; route();
+});
+document.getElementById("searchInput").addEventListener("input", function(e){
+  state.q = e.target.value.trim(); renderShelf();
+});
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
