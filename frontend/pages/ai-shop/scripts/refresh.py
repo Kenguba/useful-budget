@@ -1178,14 +1178,15 @@ def main():
     # 本脚本每轮从 /api/reviews 读回合并。引流字段 b 三态（ken 定）：b=1 人工确认拉黑
     # （该详情链接永不进排序、全组生效含接码组）；b=0 低价引流待审（只出现在待审清单
     # bait.json 里）；不填 = 正常。bait 落 b=1；pass = 恢复正常（过地板回看板，也能解开
-    # BLOCKED_URLS 的定点剔除，ken 在页签里改判即生效）；历史 fav 按 pass 兼容。
+    # BLOCKED_URLS 的定点剔除，ken 在页签里改判即生效）；历史 fav 按 pass 兼容；
+    # queue = ken 在主看板左滑加进待审（b=0、不进看板，页签终审的 bait/pass 会覆盖它）。
     # 读不到就按空表走、不拖垮刷新。
     _REVIEWS = {}
     try:
         _rv = json.loads(fetch('https://ai.jpedu.asia/api/reviews').decode('utf-8', 'ignore'))
         if isinstance(_rv, dict):
             _REVIEWS = {str(k).split('?')[0]: v for k, v in _rv.items()
-                        if isinstance(v, dict) and v.get('a') in ('bait', 'pass', 'fav')}
+                        if isinstance(v, dict) and v.get('a') in ('bait', 'pass', 'fav', 'queue')}
         print(f'reviews: {len(_REVIEWS)} verdicts', file=sys.stderr)
     except Exception as e:
         print(f'reviews fetch failed: {e}', file=sys.stderr)
@@ -1310,6 +1311,9 @@ def main():
             _v = _v_of(_u)
             if _v and _v['a'] == 'bait':
                 continue  # ken 已定性引流：全组拉黑，不进看板也不进待审
+            if _v and _v['a'] == 'queue':
+                _q(gid, o, 'pending')  # ken 主看板左滑加进引流待审（2026-11-19）：不进看板，进待审清单等终审
+                continue
             if floor and o['price'] is not None and o['price'] < 1:
                 _cleared = (_v and _v['a'] in ('pass', 'fav')) or _u in LOW_CLEARED
                 if not _cleared:

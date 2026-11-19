@@ -8,7 +8,7 @@
 //   POST /api/review         引流人工终审结论写入（ken 2026-11-18 2b）：须带请求头
 //                            X-Review-Key，命中 Worker secret REVIEW_KEY 里任一口令即可
 //                            （多口令以竖线 | 分隔，ken 2026-11-18 自定 5 条短语 + 系统生成 1 条）；
-//                            体 {u:商品链接, a:'bait'|'pass'|'clear'}，存 KV 键
+//                            体 {u:商品链接, a:'bait'|'pass'|'clear'|'queue'}，存 KV 键
 //                            review:<链接> = {a, t:核查时刻短码（距 2026-01-01 +08
 //                            整小时数、64 进制，字符表 0-9A-Za-z-_）}；clear 为撤销结论。
 //   GET  /api/reviews        给 refresh.py 读回全部终审结论（公开读：只是商品链接与结论）。
@@ -406,7 +406,7 @@ async function handleReviewPost(req, env) {
   try { d = await req.json(); } catch (e) { return json({ ok: false, error: 'bad json' }, 400); }
   const u = String(d.u || '').split('?')[0];
   const a = String(d.a || '');
-  if (!/^https?:\/\//.test(u) || !['bait', 'pass', 'clear'].includes(a)) {
+  if (!/^https?:\/\//.test(u) || !['bait', 'pass', 'clear', 'queue'].includes(a)) {
     return json({ ok: false, error: 'bad args' }, 400);
   }
   const key = 'review:' + u;
