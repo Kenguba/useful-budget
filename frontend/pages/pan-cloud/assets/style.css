@@ -45,6 +45,9 @@ button{font-family:inherit;cursor:pointer}
 .wrap{max-width:1240px;margin:0 auto;padding:0 20px}
 
 /* ---------- 顶栏（Hero 头：光斑层 + 两行结构） ---------- */
+/* 首页头卡包裹层（app.js 首页时把顶栏与 Hero 移入同一层）：默认 display:contents 不生成盒子、桌面与他页布局原样；
+   只有手机首页合并态才生成盒子、由它统一画整卡背景，见下方 max-width:767px 段 */
+.head-card{display:contents}
 .topbar{position:relative;z-index:50;width:min(1240px,calc(100% - 20px));margin:10px auto 0;
   background:var(--hero-bg-base);background-image:radial-gradient(115% 110px at 26% calc(100% - 46px),color-mix(in srgb,var(--orb-color-1) 42%,transparent) 0%,transparent 88%),radial-gradient(115% 110px at 74% calc(100% - 46px),color-mix(in srgb,var(--orb-color-2) 42%,transparent) 0%,transparent 88%);border-radius:28px;
   box-shadow:0 16px 40px -12px rgba(15,23,42,.13),0 4px 14px rgba(15,23,42,.03);
@@ -145,6 +148,14 @@ button{font-family:inherit;cursor:pointer}
   .topbar{width:100%;margin:0;border-radius:0 0 28px 28px}
   body.page-home .topbar{border-radius:0;box-shadow:none}
   body.page-home .hero{margin-top:0;border-radius:0 0 28px 28px;margin-left:0;margin-right:0}
+  /* 手机首页单张整卡（根因修复）：原顶栏与 Hero 各按自己盒子画一层径向渐变，接缝处上层被截断、下层从白重画，必然出断层；
+     改由共同层 .head-card 一次画完四层光斑（上层光斑按顶栏原中心 64px 定位、跨过原接缝继续羽化，下层光斑贴整卡底部），
+     顶栏与 Hero 在此态只出内容、不再自带背景；无包裹层时此组规则不生效、回落原样 */
+  body.page-home .head-card{display:block;background:var(--hero-bg-base);background-image:radial-gradient(115% 110px at 26% 64px,color-mix(in srgb,var(--orb-color-1) 42%,transparent) 0%,transparent 88%),radial-gradient(115% 110px at 74% 64px,color-mix(in srgb,var(--orb-color-2) 42%,transparent) 0%,transparent 88%),radial-gradient(115% 175px at 26% calc(100% - 84px),color-mix(in srgb,var(--orb-color-1) 42%,transparent) 0%,transparent 88%),radial-gradient(115% 175px at 74% calc(100% - 84px),color-mix(in srgb,var(--orb-color-2) 42%,transparent) 0%,transparent 88%);
+    border-radius:0 0 28px 28px;box-shadow:0 16px 40px -12px rgba(15,23,42,.13),0 4px 14px rgba(15,23,42,.03);transition:background-color .55s ease}
+  body.page-home .head-card .topbar{background:transparent;background-image:none}
+  body.page-home .head-card .hero{background:transparent;background-image:none;box-shadow:none;border-radius:0}
+  [data-dark="true"] body.page-home .head-card{background-image:none}
 }
 @media (min-width:768px) and (max-width:860px){
   .topbar{width:calc(100% - 12px);margin-top:6px;border-radius:24px}

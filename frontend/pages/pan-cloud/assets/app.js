@@ -800,6 +800,29 @@
       [{ id: "week", name: "本周热门" }, { id: "day", name: "今日热门" }], "week",
       function () { drawHomeBoard(); });
   }
+  /* 首页头卡包裹：手机首页顶栏与 Hero 视觉上是一张整卡，背景必须只有一个绘制区，
+     故首页渲染后把顶栏与 Hero 移入同一 .head-card 层（样式见 style.css 手机段）；
+     离开首页前由 updateShell 拆回原位，保证顶栏不被 #main 的重挂载清掉 */
+  function wrapHomeHead() {
+    if (!document.body.classList.contains("page-home")) return;
+    var top = document.querySelector(".topbar");
+    var hero = document.querySelector("#main .hero");
+    if (!top || !hero || !hero.parentNode) return;
+    if (top.parentNode && top.parentNode.classList && top.parentNode.classList.contains("head-card")) return;
+    var card = document.createElement("div");
+    card.className = "head-card";
+    hero.parentNode.insertBefore(card, hero);
+    card.appendChild(top);
+    card.appendChild(hero);
+  }
+  function unwrapHomeHead() {
+    var card = document.querySelector(".head-card");
+    if (!card || !card.parentNode) return;
+    var top = card.querySelector(".topbar");
+    if (top) document.body.insertBefore(top, document.body.firstChild);
+    while (card.firstChild) card.parentNode.insertBefore(card.firstChild, card);
+    card.parentNode.removeChild(card);
+  }
   function renderHome() {
     var main = document.getElementById("main");
     var content = (state.site && state.site.content) || {};
@@ -839,6 +862,7 @@
       tmdbNoteHtml() +
       "</div></div>";
     main.innerHTML = html;
+    wrapHomeHead();
     bindSearchbar();
     layoutHotKeywords();
     drawHomeBoard();
@@ -1483,6 +1507,7 @@
     return null;
   }
   function updateShell(key) {
+    if (key !== "home") unwrapHomeHead();
     document.body.setAttribute("data-page", key);
     document.body.classList.toggle("page-home", key === "home");
     document.title = TITLES[key] || "基德盘搜";

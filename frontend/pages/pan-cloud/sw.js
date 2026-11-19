@@ -1,6 +1,6 @@
 // 基德盘搜（pan-cloud）PWA service worker
 // 策略与 skill-board 同口径：页面外壳与数据一律网络优先（保证看到最新版），断网回落缓存
-const CACHE = "pan-v24";
+const CACHE = "pan-v25";
 const SHELL = [
   "./",
   "./index.html",
@@ -11,10 +11,10 @@ const SHELL = [
   "./resource/",
   "./app/",
   "./friend-links/apply/",
-  "./assets/style.css?v=20261118a",
+  "./assets/style.css?v=20261120a",
   "./assets/config.js",
-  "./assets/theme.js?v=20261118a",
-  "./assets/app.js?v=20261118a",
+  "./assets/theme.js?v=20261120a",
+  "./assets/app.js?v=20261120a",
   "./manifest.webmanifest",
   "./favicon.svg",
   "./icons/icon-192.png",
