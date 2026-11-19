@@ -2448,13 +2448,10 @@ $('#plusBtn').onclick=()=>{
     if(g.axis===null){
       if(Math.abs(dy)>9&&Math.abs(dy)>Math.abs(dx)*1.12) return;
       if(Math.abs(dx)<START||Math.abs(dx)<=Math.abs(dy)*1.12) return;
-      if(g.tag&&dx<0&&!g.wasOpen&&!g.wasOpenR){g.axis='tag';g.tagStart=g.tag.scrollLeft;}
-      else {
-        g.axis='x';
-        g.wrap.classList.add('is-dragging');
-        g.row.style.transition='none';
-        try{g.row.setPointerCapture(g.id);}catch(_){}
-      }
+      g.axis='x';
+      g.wrap.classList.add('is-dragging');
+      g.row.style.transition='none';
+      try{g.row.setPointerCapture(g.id);}catch(_){}
     }
     if(g.axis==='tag'){
       if(e.cancelable)e.preventDefault();
