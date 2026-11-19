@@ -410,7 +410,7 @@
       '<a class="logo" href="' + BASE + 'index.html">' + logoGrid() + '<span class="logo-name" id="brandNameText">' + esc(name) + "</span></a>" +
       topSearch +
       '<div class="top-right-widgets">' +
-      '<button class="btn-app' + (active === "app" ? " on" : "") + '" id="btnAppNav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:3px"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M10.8 18.6h2.4"/></svg><span class="app-txt">APP</span></button>' +
+      '<button class="btn-app' + (active === "app" ? " on" : "") + '" id="btnAppNav"><svg viewBox="5.1 0.8 14.4 22.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:9px;height:14px;vertical-align:-2px"><rect x="6.5" y="2" width="11" height="20" rx="3"/><rect x="9.8" y="4.2" width="4.4" height="1.6" rx="0.8" fill="currentColor" stroke="none"/></svg><span class="app-txt">APP</span></button>' +
       '<button class="lang-pill-btn" id="langBtn" type="button" title="切换语言 / Switch Language">' + globeSvg + '<span class="lang-text" id="langText">中文</span></button>' +
       '<button class="theme-mode-btn" id="darkModeBtn" type="button" title="单击切换日夜 / 长按滑动选12色主题" aria-label="切换日夜或选择主题">' +
       '<svg class="sun-moon-svg" id="sunMoonIcon" viewBox="0 0 24 24">' + sunPaths + "</svg></button>" +
