@@ -2448,16 +2448,26 @@ $('#plusBtn').onclick=()=>{
     if(g.axis===null){
       if(Math.abs(dy)>9&&Math.abs(dy)>Math.abs(dx)*1.12) return;
       if(Math.abs(dx)<START||Math.abs(dx)<=Math.abs(dy)*1.12) return;
-      g.axis='x';
-      g.wrap.classList.add('is-dragging');
-      g.row.style.transition='none';
-      try{g.row.setPointerCapture(g.id);}catch(_){}
+      const maxT=g.tag?Math.max(0,g.tag.scrollWidth-g.tag.clientWidth):0;
+      if(g.tag&&!g.wasOpen&&!g.wasOpenR&&((dx<0&&g.tag.scrollLeft<maxT-1)||(dx>0&&g.tag.scrollLeft>0))){g.axis='tag';g.tagStart=g.tag.scrollLeft;}
+      else {
+        g.axis='x';
+        g.wrap.classList.add('is-dragging');
+        g.row.style.transition='none';
+        try{g.row.setPointerCapture(g.id);}catch(_){}
+      }
     }
     if(g.axis==='tag'){
       if(e.cancelable)e.preventDefault();
       const maxS=Math.max(0,g.tag.scrollWidth-g.tag.clientWidth);
       g.tag.scrollLeft=g.tagStart-dx;
       if(dx<0&&g.tag.scrollLeft>=maxS-1){
+        g.axis='x'; g.x=e.clientX; g.base=g.value;
+        g.wrap.classList.add('is-dragging');
+        g.row.style.transition='none';
+        try{g.row.setPointerCapture(g.id);}catch(_){}
+      }
+      if(dx>0&&g.tag.scrollLeft<=0){
         g.axis='x'; g.x=e.clientX; g.base=g.value;
         g.wrap.classList.add('is-dragging');
         g.row.style.transition='none';
