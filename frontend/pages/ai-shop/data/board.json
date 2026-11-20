@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-21 04:17",
+ "updated_at": "2026-11-21 04:24",
  "source": "AI价网 + cardnav + PriceAI + aibijia + 16688/aicdks/catfk 直拉 按商家遍历合并",
  "groups": [
   {
@@ -2652,7 +2652,7 @@
      "price": 18.49,
      "shop": "翻车咩萝",
      "platform": "链动小铺",
-     "stock": 23,
+     "stock": 22,
      "title": "Plus（upi渠道）CPA格式 已接马！ 没有质保！！！",
      "url": "https://wzyp.cn/item/xhip9j",
      "kind": "",
@@ -3274,10 +3274,10 @@
       },
       {
        "price": 20.27,
-       "shop": "牟利ai",
+       "shop": "精选好货AI",
        "platform": "链动小铺",
        "stock": 38,
-       "url": "https://wzyp.cn/item/fbiga5"
+       "url": "https://wzyp.cn/item/25tihz"
       },
       {
        "price": 20.66,
@@ -3295,10 +3295,10 @@
       },
       {
        "price": 20.79,
-       "shop": "精选好货AI",
+       "shop": "牟利ai",
        "platform": "链动小铺",
        "stock": 38,
-       "url": "https://wzyp.cn/item/25tihz"
+       "url": "https://wzyp.cn/item/fbiga5"
       },
       {
        "price": 21.18,
@@ -8042,7 +8042,7 @@
      "price": 18.13,
      "shop": "柠檬茶的小铺",
      "platform": "16688",
-     "stock": 23,
+     "stock": 21,
      "title": "【自营现货】谷歌Gmail｜包反重力 (Antigravity) + 包 GCP｜独家货源 | 2FA+辅助邮箱双重安全 | 新手友好",
      "url": "https://www.16688.com.cn/goods/G86024930",
      "kind": "成品号",
@@ -8059,7 +8059,7 @@
        "price": 18.15,
        "shop": "MAXAI666",
        "platform": "16688",
-       "stock": 23,
+       "stock": 21,
        "url": "https://www.16688.com.cn/goods/G76276237"
       },
       {
@@ -8073,7 +8073,7 @@
        "price": 20.5,
        "shop": "Tcc谷歌邮箱批发-【招代理】",
        "platform": "16688",
-       "stock": 23,
+       "stock": 21,
        "url": "https://www.16688.com.cn/goods/G32764601"
       },
       {
@@ -9680,23 +9680,39 @@
      "price": 41.23,
      "shop": "aicdks",
      "platform": "aicdks",
+     "stock": 16,
+     "title": "11.19老号【反重力成品】 Gemini Pro 带rt凭证 可用4和op5.5 已过Antigravity验证",
+     "url": "https://aicdks.com/product/108786",
+     "kind": "成品号",
+     "same_source": 2,
+     "sources": [
+      {
+       "price": 41.23,
+       "shop": "aicdks",
+       "platform": "aicdks",
+       "stock": 16,
+       "url": "https://aicdks.com/product/108786"
+      },
+      {
+       "price": 60.0,
+       "shop": "Esfine",
+       "platform": "",
+       "stock": 1,
+       "url": "https://blog.esfine.chat/products/gemini-pro"
+      }
+     ],
+     "pc": "2026-11-21"
+    },
+    {
+     "price": 41.23,
+     "shop": "aicdks",
+     "platform": "aicdks",
      "stock": 12,
      "title": "Gemini Pro反重力Antigravity成品号 稳定渠道耐用成品",
      "url": "https://aicdks.com/product/107051",
      "kind": "成品号",
      "same_source": 1,
      "pc": "2026-11-20"
-    },
-    {
-     "price": 41.23,
-     "shop": "aicdks",
-     "platform": "aicdks",
-     "stock": 16,
-     "title": "11.19老号【反重力成品】 Gemini Pro 带rt凭证 可用4和op5.5 已过Antigravity验证",
-     "url": "https://aicdks.com/product/108786",
-     "kind": "成品号",
-     "same_source": 1,
-     "pc": "2026-11-21"
     },
     {
      "price": 41.8,
@@ -12748,7 +12764,7 @@
        "price": 1.39,
        "shop": "ai不源头",
        "platform": "catfk",
-       "stock": 193,
+       "stock": 192,
        "url": "https://catfk.com/item/8b494m"
       },
       {
@@ -13338,7 +13354,7 @@
        "price": 1.0,
        "shop": "快到碗里来",
        "platform": "catfk",
-       "stock": 54,
+       "stock": 53,
        "url": "https://catfk.com/item/glxrbz"
       },
       {
@@ -13872,7 +13888,7 @@
      "price": 2.12,
      "shop": "Maihao AI",
      "platform": "",
-     "stock": 618,
+     "stock": 1,
      "title": "Muse 成品号 10亿 Token（质保1小时）",
      "url": "https://maihao.ai/products/tunvnmmo-97",
      "kind": "10亿·成品号",
@@ -20958,32 +20974,6 @@
    40.0,
    1
   ],
-  "aicdks:107051": [
-   29896150,
-   37.51,
-   1,
-   5293,
-   38.55,
-   1,
-   3659,
-   36.97,
-   1,
-   496,
-   39.0,
-   1,
-   5516,
-   43.33,
-   1,
-   3216,
-   42.25,
-   1,
-   1335,
-   41.17,
-   1,
-   4116,
-   41.23,
-   1
-  ],
   "aicdks:108786": [
    29896150,
    34.0,
@@ -21013,6 +21003,32 @@
    40.3,
    1,
    10182,
+   41.23,
+   1
+  ],
+  "aicdks:107051": [
+   29896150,
+   37.51,
+   1,
+   5293,
+   38.55,
+   1,
+   3659,
+   36.97,
+   1,
+   496,
+   39.0,
+   1,
+   5516,
+   43.33,
+   1,
+   3216,
+   42.25,
+   1,
+   1335,
+   41.17,
+   1,
+   4116,
    41.23,
    1
   ],
