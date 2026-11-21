@@ -51,6 +51,7 @@ frontend/pages/<project>/     # 例：frontend/pages/skill-board/
 | `frontend/pages/wechat-bridge/` | 微信接入可行方案（调研报告页） | 静态页，手动维护 |
 | `frontend/pages/motion-prompt/` | Motion Prompt 动效画廊（192 条命名动效/运镜/UI/网页特效，原画廊原样复刻，署名原作者 Shohei Ohtaki，MIT） | 纯静态站，手动维护（数据随上游原仓同步） |
 | `frontend/pages/blog-posts/` | 实战笔记 · 博客（公开版：模型与工具分工 + 原创系列 + 精选收录，内容脱敏） | 纯静态站，手动维护（加文章只改 `data/articles.js`） |
+| `frontend/pages/ps-notes/` | PS 溶图笔记（灰色观察层调色 + 背景橡皮擦抠纯色底 + 自动混合图层融合 + 三合一提示词） | 纯静态站，手动维护（加文章只改 `index.html` 内文章数据数组） |
 
 ## 子域名（Cloudflare 转发）
 
@@ -71,6 +72,7 @@ frontend/pages/<project>/     # 例：frontend/pages/skill-board/
 | `frontend/pages/wechat-bridge/` | `wechat.xxxxx.asia`（仅子域名，不进总汇） |
 | `frontend/pages/motion-prompt/` | `motion.xxxxx.asia`（仅子域名，不进总汇） |
 | `frontend/pages/blog-posts/` | `blog.xxxxx.asia`（仅子域名，不进总汇） |
+| `frontend/pages/ps-notes/` | `ps.xxxxx.asia`（仅子域名，不进总汇） |
 
 **首页（总汇）收录规则（2026-11-07 ken 定）**：进总汇首页的只有 7 个——ai、skill、phone、pan、ip、2fa、ui。wechat 只开子域名 `wechat.xxxxx.asia`，不进总汇：不加短路径、不上首页卡片。以后新增项目先定类别：进首页的，子域名、总汇短路径、首页卡片三样一起加；不进首页的，只加子域名，并在子域名清单里登记注明，免得误加。
 

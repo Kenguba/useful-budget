@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>PS 溶图笔记</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#f4efe6;
+    --bg-soft:#ece4d4;
+    --surface:#fffdf7;
+    --surface-2:#f8f2e4;
+    --ink:#2b241a;
+    --ink-2:#5c5344;
+    --ink-3:#8a7f6c;
+    --line:#ddd2bc;
+    --accent:#9a3f2c;
+    --accent-soft:#f3ddd2;
+    --shelf:#7a5a3a;
+    --shelf-dark:#5d422a;
+    --shelf-face:#8a6845;
+    --code-bg:#2b241a;
+    --code-ink:#f2e9d8;
+    --shadow:0 10px 30px rgba(60,42,18,.14);
+    --radius:14px;
+  }
+  html[data-theme="dark"]{
+    --bg:#171410;
+    --bg-soft:#1f1a15;
+    --surface:#221d17;
+    --surface-2:#29221b;
+    --ink:#ece3d2;
+    --ink-2:#bcae97;
+    --ink-3:#8d8171;
+    --line:#3a3227;
+    --accent:#e08a6d;
+    --accent-soft:#3d2a22;
+    --shelf:#4a3826;
+    --shelf-dark:#332619;
+    --shelf-face:#57432c;
+    --code-bg:#100d0a;
+    --code-ink:#ece3d2;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Noto Sans SC",system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;font-size:16px;
+    transition:background .25s ease,color .25s ease;
+  }
+  button{font:inherit;cursor:pointer;min-height:44px}
+  a{color:var(--accent)}
+  .wrap{max-width:1020px;margin:0 auto;padding:0 18px}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:30;
+    background:color-mix(in srgb,var(--bg) 88%,transparent);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-in{display:flex;align-items:center;gap:12px;padding:10px 0}
+  .brand{display:flex;align-items:center;gap:10px;font-family:"Noto Serif SC",serif;font-weight:900;font-size:18px;letter-spacing:.04em}
+  .brand svg{flex:none}
+  .topbar .spacer{flex:1}
+  .count-chip{font-size:13px;color:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--surface)}
+  .icon-btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    width:44px;height:44px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface);color:var(--ink);
+  }
+  .icon-btn:active{background:var(--accent-soft)}
+  .icon-btn svg{width:20px;height:20px}
+
+  /* ---------- hero ---------- */
+  .hero{padding:38px 0 8px}
+  .hero h1{
+    font-family:"Noto Serif SC",serif;font-weight:900;
+    font-size:clamp(30px,6vw,44px);line-height:1.25;margin:0 0 10px;letter-spacing:.02em;
+  }
+  .hero p{margin:0;color:var(--ink-2);max-width:34em;font-size:15.5px}
+  .hero .rule{width:56px;height:3px;background:var(--accent);border-radius:2px;margin:18px 0 0}
+
+  /* ---------- shelf ---------- */
+  .shelf-block{margin:26px 0 8px}
+  .shelf-label{display:flex;align-items:baseline;gap:10px;margin:0 2px 14px}
+  .shelf-label h2{font-family:"Noto Serif SC",serif;font-size:19px;margin:0;font-weight:700}
+  .shelf-label span{font-size:13px;color:var(--ink-3)}
+  .shelf{
+    position:relative;padding:26px 18px 0;
+    background:linear-gradient(180deg,var(--bg-soft),transparent 78%);
+    border-radius:18px 18px 0 0;
+  }
+  .books{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap}
+  .book{
+    --c1:#9a3f2c;--c2:#7c2f20;
+    position:relative;border:0;padding:0;text-align:left;background:none;
+    width:148px;flex:0 0 auto;
+    transition:transform .18s ease;
+  }
+  .book:hover{transform:translateY(-6px)}
+  .book:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:6px}
+  .book-cover{
+    height:218px;border-radius:5px 9px 9px 5px;overflow:hidden;position:relative;
+    background:linear-gradient(150deg,var(--c1),var(--c2));
+    box-shadow:inset 5px 0 10px rgba(0,0,0,.28),inset -1px 0 0 rgba(255,255,255,.18),var(--shadow);
+    color:#f7efe0;display:flex;flex-direction:column;
+  }
+  .book-cover::before{
+    content:"";position:absolute;left:9px;top:0;bottom:0;width:1px;background:rgba(255,255,255,.28);
+  }
+  .book-cover::after{
+    content:"";position:absolute;inset:10px 10px 10px 16px;border:1px solid rgba(247,239,224,.4);border-radius:3px;pointer-events:none;
+  }
+  .book-no{font-size:11px;letter-spacing:.28em;padding:16px 14px 0 20px;opacity:.85}
+  .book-title{
+    font-family:"Noto Serif SC",serif;font-weight:900;font-size:19px;line-height:1.5;
+    padding:8px 14px 0 20px;letter-spacing:.03em;
+  }
+  .book-sub{font-size:12px;line-height:1.6;padding:6px 14px 0 20px;opacity:.88}
+  .book-author{margin-top:auto;padding:0 14px 14px 20px;font-size:11.5px;opacity:.85;border-top:0}
+  .book-meta{padding:10px 2px 12px;font-size:12.5px;color:var(--ink-2);line-height:1.55}
+  .book-meta b{display:block;color:var(--ink);font-weight:700;font-size:13px}
+  .shelf-board{
+    height:16px;margin-top:2px;border-radius:3px;
+    background:linear-gradient(180deg,var(--shelf-face),var(--shelf) 55%,var(--shelf-dark));
+    box-shadow:0 12px 18px rgba(50,32,10,.28);
+  }
+  .shelf-shadow{height:22px;background:radial-gradient(60% 100% at 50% 0,rgba(50,32,10,.20),transparent 70%)}
+
+  .tip{
+    margin:22px 0 0;padding:14px 16px;border:1px dashed var(--line);border-radius:var(--radius);
+    background:var(--surface);color:var(--ink-2);font-size:14px;display:flex;gap:10px;align-items:flex-start;
+  }
+  .tip svg{flex:none;margin-top:3px;color:var(--accent)}
+  footer{padding:34px 0 46px;color:var(--ink-3);font-size:13px;text-align:center}
+
+  /* ---------- reader ---------- */
+  .reader{display:none}
+  body.reading .home{display:none}
+  body.reading .reader{display:block}
+  .reader-top{display:flex;align-items:center;gap:10px;padding:16px 0 4px;flex-wrap:wrap}
+  .back-btn{
+    display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);
+    background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 16px 8px 12px;font-weight:500;
+  }
+  .back-btn:active{background:var(--accent-soft)}
+  .back-btn svg{width:18px;height:18px}
+  .reader-nav{margin-left:auto;display:flex;gap:8px}
+  .nav-btn{
+    display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);
+    background:var(--surface);color:var(--ink-2);border-radius:999px;padding:8px 14px;font-size:14px;
+  }
+  .nav-btn:disabled{opacity:.4;cursor:default}
+  .nav-btn svg{width:16px;height:16px}
+  .article-head{padding:18px 0 6px;border-bottom:2px solid var(--ink);margin-bottom:8px}
+  .article-kicker{font-size:12.5px;letter-spacing:.22em;color:var(--accent);font-weight:700;margin-bottom:10px}
+  .article-head h1{font-family:"Noto Serif SC",serif;font-weight:900;font-size:clamp(26px,5.4vw,38px);line-height:1.35;margin:0 0 10px}
+  .article-head .lede{color:var(--ink-2);font-size:16px;margin:0 0 16px;max-width:38em}
+  .meta-row{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:18px}
+  .meta-chip{
+    display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-2);
+    background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;min-height:36px;
+  }
+  .meta-chip svg{width:15px;height:15px;color:var(--accent);flex:none}
+  .article-body{padding:10px 0 6px;max-width:44em}
+  .article-body h2{
+    font-family:"Noto Serif SC",serif;font-size:21px;font-weight:700;margin:30px 0 10px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .article-body h2::before{content:"";width:8px;height:22px;background:var(--accent);border-radius:2px;flex:none}
+  .article-body p{margin:0 0 12px}
+  .steps{margin:0 0 14px;padding:0;list-style:none;counter-reset:step}
+  .steps li{
+    counter-increment:step;position:relative;padding:10px 14px 10px 52px;margin-bottom:8px;
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  }
+  .steps li::before{
+    content:counter(step);position:absolute;left:13px;top:11px;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);color:#fff;font-size:13.5px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  html[data-theme="dark"] .steps li::before{color:#1d1712}
+  .params{width:100%;border-collapse:collapse;margin:4px 0 16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .params th,.params td{padding:10px 14px;text-align:left;font-size:14.5px;vertical-align:top}
+  .params th{width:34%;color:var(--ink-2);font-weight:500;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .params td{border-bottom:1px solid var(--line);font-weight:500}
+  .params tr:last-child th,.params tr:last-child td{border-bottom:0}
+  .callout{
+    border-radius:12px;padding:14px 16px;margin:6px 0 16px;font-size:15px;
+    background:var(--accent-soft);color:var(--ink);
+  }
+  .callout b{color:var(--accent)}
+  html[data-theme="dark"] .callout b{color:var(--accent)}
+  .callout .callout-t{font-weight:700;display:block;margin-bottom:4px;font-size:13px;letter-spacing:.14em;color:var(--accent)}
+  .diagram{
+    margin:8px 0 18px;padding:18px 14px 10px;background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+  }
+  .diagram svg{width:100%;height:auto;display:block}
+  .diagram figcaption{text-align:center;font-size:13px;color:var(--ink-3);padding:8px 0 6px}
+  .prompt-box{margin:8px 0 18px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line)}
+  .prompt-head{
+    display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface-2);border-bottom:1px solid var(--line);
+  }
+  .prompt-head span{font-weight:700;font-size:14.5px}
+  .copy-btn{
+    margin-left:auto;display:inline-flex;align-items:center;gap:7px;border:0;border-radius:999px;
+    background:var(--accent);color:#fff;padding:8px 16px;font-weight:700;font-size:14px;min-height:40px;
+  }
+  html[data-theme="dark"] .copy-btn{color:#1d1712}
+  .copy-btn svg{width:16px;height:16px}
+  .copy-btn.copied{background:#3e7d4e}
+  html[data-theme="dark"] .copy-btn.copied{color:#fff}
+  .prompt-text{
+    margin:0;padding:16px;background:var(--code-bg);color:var(--code-ink);
+    font-size:14.5px;line-height:1.85;white-space:pre-wrap;word-break:break-word;
+    font-family:"Noto Sans SC",system-ui,sans-serif;
+  }
+  .mnemonic{
+    margin:0 0 18px;padding:14px 16px;border-left:4px solid var(--accent);
+    background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);
+    border-right:1px solid var(--line);border-bottom:1px solid var(--line);font-size:15px;
+  }
+  .mnemonic .callout-t{font-weight:700;display:block;margin-bottom:4px;font-size:13px;letter-spacing:.14em;color:var(--accent)}
+  .source-box{
+    margin:26px 0 8px;padding:16px;border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--surface);display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+  }
+  .source-box .sb-t{font-weight:700;font-size:14.5px}
+  .source-box .sb-s{font-size:13px;color:var(--ink-2)}
+  .source-link{
+    margin-left:auto;display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+    background:var(--ink);color:var(--bg);border-radius:999px;padding:10px 18px;font-weight:700;font-size:14.5px;min-height:44px;
+  }
+  .source-link svg{width:16px;height:16px}
+  .next-bar{display:flex;gap:10px;padding:22px 0 44px;flex-wrap:wrap}
+  .next-btn{
+    flex:1;min-width:200px;display:flex;align-items:center;gap:10px;text-align:left;
+    border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--radius);padding:14px 16px;
+  }
+  .next-btn small{display:block;color:var(--ink-3);font-size:12px}
+  .next-btn b{font-family:"Noto Serif SC",serif;font-size:16px}
+  .next-btn svg{width:18px;height:18px;margin-left:auto;flex:none;color:var(--accent)}
+  .next-btn:disabled{opacity:.45;cursor:default}
+
+  @media (max-width:640px){
+    .books{gap:12px}
+    .book{width:calc(50% - 6px)}
+    .book-cover{height:204px}
+    .book-title{font-size:17px}
+    .params th{width:40%}
+    .source-link{margin-left:0;width:100%;justify-content:center}
+    .count-chip{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;scroll-behavior:auto!important}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="13" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 8.5 20 10v10h-4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6.5 9h6M6.5 12.5h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>PS 溶图笔记</span>
+    </div>
+    <div class="spacer"></div>
+    <span class="count-chip" id="countChip"></span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="切换深浅主题"></button>
+  </div>
+</header>
+
+<!-- ======================= 首页 · 书架 ======================= -->
+<div class="home">
+  <div class="wrap">
+    <section class="hero">
+      <h1>把人物放进画面里<br />先要让光和颜色服气</h1>
+      <p>这里收着三招从短视频里扒下来的 PS 溶图手艺，外加一篇把三招拼到一起的提示词；点开任意一本就能读全文，参数和原片出处都在篇里</p>
+      <div class="rule"></div>
+    </section>
+
+    <section class="shelf-block" aria-label="笔记书架">
+      <div class="shelf-label">
+        <h2>书架</h2>
+        <span>按收集顺序排，第四本是前三本的合成版</span>
+      </div>
+      <div class="shelf">
+        <div class="books" id="books"></div>
+        <div class="shelf-board"></div>
+        <div class="shelf-shadow"></div>
+      </div>
+      <div class="tip">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="8" r="1.3" fill="currentColor"/></svg>
+        <span>动手练的时候按流程走：先用第二本的抠图把主体拿干净，再用第三本的自动混合融进去，最后用第一本的灰色观察层验收调色；赶时间就直接翻到第四本抄提示词</span>
+      </div>
+    </section>
+
+    <footer>三篇技法均来自抖音原片拆解，作者与原片链接标注在每篇文末</footer>
+  </div>
+</div>
+
+<!-- ======================= 阅读页 ======================= -->
+<div class="reader">
+  <div class="wrap">
+    <div class="reader-top">
+      <button class="back-btn" id="backBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        回到书架
+      </button>
+      <div class="reader-nav">
+        <button class="nav-btn" id="prevBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          上一篇
+        </button>
+        <button class="nav-btn" id="nextBtn" type="button">
+          下一篇
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+    <article id="articleRoot"></article>
+    <div class="next-bar" id="nextBar"></div>
+  </div>
+</div>
+
+<script>
+/* ==================== 数据层：加新篇只往这里加一条 ==================== */
+var ARTICLES = [
+  {
+    id: "grey-layer",
+    no: "第 一 本",
+    title: "灰色观察层调色",
+    sub: "先看明度，再动饱和",
+    author: "设计师(PS+AI合成教学)",
+    date: "2026-11-15",
+    duration: "原片 39 秒",
+    douyin: "7708278014978991464",
+    colors: ["#8a4b2f", "#6d3820"],
+    lede: "溶图调色不要一上来就拧饱和度；先盖一层中性灰当观察层，只看明度，明度关系顺了再正式调色",
+    diagram: "grey",
+    sections: [
+      {
+        h: "这一招在解决什么",
+        paras: [
+          "人物溶进新背景之后最容易露馅的地方，是主体和背景的亮暗关系对不上，颜色再准也像贴上去的",
+          "灰色观察层的做法，是先把颜色放到一边，只用明度判断衔接是否成立，再回头处理颜色"
+        ]
+      },
+      {
+        h: "操作顺序",
+        steps: [
+          "在图层上方加一层中性灰作为观察层，盖住全图用来观察",
+          "切到观察状态后只看明度：全图有哪些颜色、谁亮谁暗会一下子变得非常明显",
+          "先确认主体与背景的明度关系是否衔接，亮暗顺了再进入正式调色",
+          "正式调色用色相/饱和度、自然饱和度、色彩平衡三个调整层逐项统一",
+          "最后关掉观察层，做一次调色前后的对比收尾"
+        ]
+      },
+      {
+        h: "要记住的点",
+        paras: [
+          "灰层只是用来观察的，它不改变画面原本的颜色，示范里青蓝色块融进灰色后颜色看着并没有变",
+          "原片示范图是一个金发角色站在霓虹街景里，文件名叫精准调色，整套动作都围绕先看清全图颜色分布再下手"
+        ],
+        callout: { t: "口诀", text: "先明度，后饱和；不要盲拧滑块" }
+      }
+    ]
+  },
+  {
+    id: "bg-eraser",
+    no: "第 二 本",
+    title: "背景橡皮擦抠纯色底",
+    sub: "网眼缝隙里的背景也能擦净",
+    author: "琎哥哥探设计",
+    date: "2026-08-28",
+    duration: "原片 33 秒",
+    douyin: "7679055022700629288",
+    colors: ["#2f5d8a", "#214263"],
+    lede: "遇到浑身是孔眼、缝隙里全是背景的图，别一个孔一个孔去抠；背景橡皮擦一次拖过去，连网眼里的背景也能擦净",
+    diagram: "eraser",
+    sections: [
+      {
+        h: "这一招在解决什么",
+        paras: [
+          "示范图是纯蓝底上的一只网兜，装着青苹果、柠檬和橙子，网眼里全是蓝色，常规选区很难把这些零碎背景清干净",
+          "背景橡皮擦的思路是反过来告诉工具：哪个颜色是要删的、哪个颜色是绝对不能动的，剩下的交给它自己分辨"
+        ]
+      },
+      {
+        h: "参数照着这样设",
+        params: [
+          ["工具", "背景橡皮擦工具（在橡皮擦工具组里）"],
+          ["取样方式", "背景色板"],
+          ["背景色", "设成要擦掉的那个颜色，示范里是蓝色"],
+          ["前景色", "设成要保住的主体颜色，示范里是网兜的米色"],
+          ["保护前景色", "勾上，等于告诉工具这个颜色不许动"],
+          ["限制", "不连续，隔着主体在网眼另一边的同色背景也能一起擦掉"],
+          ["容差", "50%"],
+          ["画笔", "大小 500，角度 0 度"]
+        ],
+        steps: [
+          "在橡皮擦工具组里选背景橡皮擦工具",
+          "按左侧参数表把取样、背景色、前景色、限制和容差一次设好",
+          "用大画笔在图上轻轻一拖，背景连网眼里透出的部分一起变成透明棋盘格，网兜和水果完整留下"
+        ]
+      },
+      {
+        h: "前提与延伸",
+        paras: [
+          "这一招成立的前提是背景为纯色，背景一花就不成立，选方法之前先看底色",
+          "同样的办法还能用来去文件背景、去证件照底色，凡是纯色底加主体的组合都适用"
+        ],
+        callout: { t: "口诀", text: "背景色取要删的，前景色取要保的，勾保护前景色，限制不连续，容差 50%，大画笔轻擦" }
+      }
+    ]
+  },
+  {
+    id: "auto-blend",
+    no: "第 三 本",
+    title: "自动混合图层融合",
+    sub: "两步让拼接看不出接缝",
+    author: "PS小虾 · 第 331 集",
+    date: "2026-11-13",
+    duration: "原片 39 秒",
+    douyin: "7707251321929272603",
+    colors: ["#2e6f6a", "#1f4f4b"],
+    lede: "两张环境和光影都不一样的图拼到一起，不用靠蒙版一点点擦；PS 自带的自动混合图层会自己算光影、色调和接缝",
+    diagram: "blend",
+    sections: [
+      {
+        h: "示范里发生了什么",
+        paras: [
+          "示范是把两头鲸鱼融进一张有游艇的海面航拍图里，融合之前鲸鱼图是一个深色长方形硬贴在海面上，边非常假",
+          "走完两步之后，鲸鱼像本来就在同一片海水里游，矩形边和接缝都消失了"
+        ]
+      },
+      {
+        h: "第一步：先把元素隔离出来",
+        steps: [
+          "导入要融入的元素图，先调好大小和位置",
+          "用套索工具大致把主体圈出来，不用描得特别精细",
+          "右键羽化 5 像素，让选区边缘先软下来",
+          "按 Ctrl+J 把选区复制成一个新图层",
+          "删掉元素原图层，只留复制出来的主体层和背景层"
+        ]
+      },
+      {
+        h: "第二步：交给自动混合",
+        steps: [
+          "同时选中主体层和背景层两个图层",
+          "打开顶部菜单：编辑 → 自动混合图层",
+          "模式不要用默认的全景图，要选堆叠图像",
+          "勾上无缝色调和颜色，再勾上内容识别填充透明区域",
+          "点确定，PS 会自己计算两张图的光影、色调和接缝并完成融合"
+        ],
+        callout: { t: "作者提醒", text: "只改混合模式不够，这也是这招要单独成篇的原因；自动混合图层在基本各个版本的 PS 里都有" }
+      }
+    ]
+  },
+  {
+    id: "combo-prompt",
+    no: "第 四 本",
+    title: "三合一提示词",
+    sub: "抠图、融合、调色一次说清",
+    author: "前三篇合成",
+    date: "2026-11-21 整理",
+    duration: "拿来即用",
+    douyin: "",
+    colors: ["#5d4a8a", "#423361"],
+    lede: "前三招拼成一套完整流程：难抠的用背景橡皮擦，普通合成用套索羽化加自动混合，最后用灰色观察层验收调色",
+    diagram: "combo",
+    promptTitle: "AI 改图一键版",
+    prompt: "请完成抠图、融合、调色三步。抠图：背景是纯色时把背景色设为待擦除色、主体色设为受保护的前景色，用不连续擦除、容差约 50% 擦净主体外围和网眼缝隙里的背景；背景不纯时用套索大致圈出主体、边缘羽化约 5 像素再独立成层，删掉原元素图。融合：把主体按正确大小和位置放进新背景，像 PS 自动混合图层的堆叠图像模式那样，自动计算并匹配两张图的光影、色调和接缝，做无缝色调融合和透明区域内容识别填充，不留矩形硬边和拼接痕迹。调色验收：融合后先用中性灰观察层只看明度，检查主体与背景亮暗是否衔接，明度对齐后再用色相/饱和度、自然饱和度、色彩平衡统一色温和环境色，先明度后饱和，最终主体不贴纸、不发灰、不偏色，像原本就在这个场景里拍的",
+    mnemonic: "纯色难抠：背景橡皮擦，保护前景色，不连续，容差 50%；普通溶图：套索圈主体，羽化 5 像素，Ctrl+J 复制，删原图，两层全选，编辑 → 自动混合图层 → 堆叠图像；最后验收：灰色观察层看明度，明度顺了再动饱和度",
+    sections: [
+      {
+        h: "这套流程怎么分工",
+        paras: [
+          "抠图阶段按背景分两种情况：纯色底走背景橡皮擦那一套参数，背景不纯就走套索加大致圈选加羽化的路子",
+          "融合阶段借的是自动混合图层的思路，重点是让工具去算光影和接缝，而不是靠人手擦蒙版硬凑",
+          "调色验收阶段回到第一篇的灰色观察层，先只看明度，确认衔接成立之后再动饱和度那一组滑块"
+        ]
+      },
+      {
+        h: "什么时候用哪一版",
+        paras: [
+          "把图交给 AI 改图工具时，用上面的一键版整段复制过去，三步的顺序和参数都在里面",
+          "自己在 PS 里动手时，用下面的口诀版对着念，一步一步照着做就行"
+        ]
+      }
+    ]
+  }
+];
+
+/* ==================== SVG 图解 ==================== */
+function diagramSVG(kind) {
+  var ink = "currentColor";
+  if (kind === "grey") {
+    return '<svg viewBox="0 0 640 250" role="img" aria-label="灰色观察层图层结构示意">' +
+      '<rect x="30" y="30" width="250" height="150" rx="10" fill="#8f8f8f"/>' +
+      '<circle cx="105" cy="105" r="34" fill="#bdbdbd"/><rect x="165" y="70" width="80" height="70" rx="6" fill="#6f6f6f"/>' +
+      '<text x="155" y="205" font-size="14" fill="var(--ink-2)" text-anchor="middle">盖上灰层后只剩明度关系</text>' +
+      '<path d="M300 105 h44" stroke="var(--accent)" stroke-width="2.5"/><path d="M336 96 l12 9 -12 9" fill="var(--accent)"/>' +
+      '<rect x="368" y="30" width="110" height="150" rx="8" fill="var(--surface-2)" stroke="var(--line)"/>' +
+      '<rect x="380" y="44" width="86" height="26" rx="5" fill="#9a9a9a"/><text x="423" y="62" font-size="12.5" fill="#fff" text-anchor="middle">灰色观察层</text>' +
+      '<rect x="380" y="80" width="86" height="26" rx="5" fill="#c98a5e"/><text x="423" y="98" font-size="12.5" fill="#fff" text-anchor="middle">色相/饱和度</text>' +
+      '<rect x="380" y="116" width="86" height="26" rx="5" fill="#5e8ac9"/><text x="423" y="134" font-size="12.5" fill="#fff" text-anchor="middle">自然饱和度</text>' +
+      '<rect x="380" y="152" width="86" height="20" rx="5" fill="#7a9a5e"/><text x="423" y="166" font-size="12.5" fill="#fff" text-anchor="middle">色彩平衡</text>' +
+      '<text x="423" y="205" font-size="14" fill="var(--ink-2)" text-anchor="middle">观察层在最上方，只看不动色</text>' +
+      '<rect x="510" y="62" width="100" height="86" rx="10" fill="#e8b64c"/>' +
+      '<circle cx="545" cy="92" r="15" fill="#f4e3b2"/><rect x="520" y="118" width="80" height="18" rx="4" fill="#3f7fbf"/>' +
+      '<text x="560" y="205" font-size="14" fill="var(--ink-2)" text-anchor="middle">明度顺后再回到彩色调色</text>' +
+      '</svg>';
+  }
+  if (kind === "eraser") {
+    return '<svg viewBox="0 0 640 240" role="img" aria-label="背景橡皮擦擦除网眼背景示意">' +
+      '<rect x="30" y="25" width="270" height="170" rx="10" fill="#3f7fbf"/>' +
+      '<path d="M60 60 L270 60 M60 105 L270 105 M60 150 L270 150 M85 35 L85 185 M140 35 L140 185 M195 35 L195 185 M245 35 L245 185" stroke="#e8ddc4" stroke-width="5"/>' +
+      '<circle cx="112" cy="82" r="17" fill="#a8c256"/><circle cx="168" cy="128" r="19" fill="#e8a13c"/><circle cx="222" cy="80" r="16" fill="#d9e26a"/>' +
+      '<text x="165" y="222" font-size="14" fill="var(--ink-2)" text-anchor="middle">擦之前：网眼里全是蓝色背景</text>' +
+      '<path d="M318 110 h40" stroke="var(--accent)" stroke-width="2.5"/><path d="M350 101 l12 9 -12 9" fill="var(--accent)"/>' +
+      '<g>' +
+      '<rect x="378" y="25" width="232" height="170" rx="10" fill="var(--surface-2)" stroke="var(--line)"/>' +
+      '<path d="M378 68 h58 M378 111 h58 M378 154 h58 M436 25 v43 M494 25 v43 M552 25 v43 M436 111 v43 M494 111 v43 M552 111 v43 M378 68 M436 154 h58 M494 154 h58 M552 154 h58" stroke="var(--line)" stroke-width="1"/>' +
+      '<path d="M406 60 L578 60 M406 105 L578 105 M406 150 L578 150 M433 35 L433 185 M488 35 L488 185 M543 35 L543 185" stroke="#c9b995" stroke-width="5"/>' +
+      '<circle cx="460" cy="82" r="17" fill="#a8c256"/><circle cx="516" cy="128" r="19" fill="#e8a13c"/><circle cx="556" cy="80" r="15" fill="#d9e26a"/>' +
+      '</g>' +
+      '<text x="494" y="222" font-size="14" fill="var(--ink-2)" text-anchor="middle">擦之后：背景变透明，网兜和水果都在</text>' +
+      '</svg>';
+  }
+  if (kind === "blend") {
+    return '<svg viewBox="0 0 640 240" role="img" aria-label="自动混合图层融合前后对比示意">' +
+      '<rect x="30" y="25" width="250" height="160" rx="10" fill="#7fb3c9"/>' +
+      '<path d="M30 140 q40 -14 80 0 t80 0 t80 0 V185 H30 Z" fill="#5b93ad"/>' +
+      '<rect x="95" y="52" width="120" height="78" fill="#2c3e50"/>' +
+      '<path d="M118 96 q20 -20 44 -6 q22 -12 38 4 q-14 12 -38 10 q-28 4 -44 -8Z" fill="#dfe9ee"/>' +
+      '<text x="155" y="222" font-size="14" fill="var(--ink-2)" text-anchor="middle">融合前：元素是硬贴的长方形</text>' +
+      '<path d="M298 105 h40" stroke="var(--accent)" stroke-width="2.5"/><path d="M330 96 l12 9 -12 9" fill="var(--accent)"/>' +
+      '<rect x="360" y="25" width="250" height="160" rx="10" fill="#7fb3c9"/>' +
+      '<path d="M360 140 q40 -14 80 0 t80 0 t80 0 V185 H360 Z" fill="#5b93ad"/>' +
+      '<path d="M398 100 q22 -22 48 -7 q24 -13 42 5 q-16 13 -42 11 q-30 4 -48 -9Z" fill="#eef5f8" opacity="0.95"/>' +
+      '<path d="M492 76 q16 -16 36 -5 q18 -9 30 4 q-12 9 -30 8 q-22 3 -36 -7Z" fill="#eef5f8" opacity="0.85"/>' +
+      '<rect x="540" y="44" width="34" height="16" rx="2" fill="#f2f2f2"/><rect x="552" y="34" width="8" height="10" fill="#d8d8d8"/>' +
+      '<text x="485" y="222" font-size="14" fill="var(--ink-2)" text-anchor="middle">融合后：接缝消失，像本来就在海里</text>' +
+      '</svg>';
+  }
+  /* combo 流程图 */
+  return '<svg viewBox="0 0 640 300" role="img" aria-label="三合一流程图：抠图到融合再到调色验收">' +
+    '<rect x="20" y="86" width="168" height="118" rx="14" fill="#2f5d8a"/>' +
+    '<text x="104" y="128" font-size="21" font-weight="700" fill="#fff" text-anchor="middle" font-family="Noto Serif SC,serif">抠 图</text>' +
+    '<text x="104" y="156" font-size="13" fill="#dbe7f2" text-anchor="middle">纯色底用背景橡皮擦</text>' +
+    '<text x="104" y="178" font-size="13" fill="#dbe7f2" text-anchor="middle">杂背景用套索加羽化</text>' +
+    '<path d="M196 145 h34" stroke="var(--accent)" stroke-width="3"/><path d="M222 135 l14 10 -14 10" fill="var(--accent)"/>' +
+    '<rect x="244" y="86" width="168" height="118" rx="14" fill="#2e6f6a"/>' +
+    '<text x="328" y="128" font-size="21" font-weight="700" fill="#fff" text-anchor="middle" font-family="Noto Serif SC,serif">融 合</text>' +
+    '<text x="328" y="156" font-size="13" fill="#d8efec" text-anchor="middle">自动混合图层选堆叠图像</text>' +
+    '<text x="328" y="178" font-size="13" fill="#d8efec" text-anchor="middle">让 PS 算光影与接缝</text>' +
+    '<path d="M420 145 h34" stroke="var(--accent)" stroke-width="3"/><path d="M446 135 l14 10 -14 10" fill="var(--accent)"/>' +
+    '<rect x="468" y="86" width="152" height="118" rx="14" fill="#8a4b2f"/>' +
+    '<text x="544" y="128" font-size="21" font-weight="700" fill="#fff" text-anchor="middle" font-family="Noto Serif SC,serif">调色验收</text>' +
+    '<text x="544" y="156" font-size="13" fill="#f2e2d5" text-anchor="middle">灰层先看明度</text>' +
+    '<text x="544" y="178" font-size="13" fill="#f2e2d5" text-anchor="middle">顺了再动饱和度</text>' +
+    '<text x="104" y="52" font-size="14" fill="var(--ink-2)" text-anchor="middle">第 一 步</text>' +
+    '<text x="328" y="52" font-size="14" fill="var(--ink-2)" text-anchor="middle">第 二 步</text>' +
+    '<text x="544" y="52" font-size="14" fill="var(--ink-2)" text-anchor="middle">第 三 步</text>' +
+    '<text x="320" y="248" font-size="14.5" fill="var(--ink)" text-anchor="middle">顺序不能反：先把主体拿干净，再融进去，最后才验收颜色</text>' +
+    '<text x="320" y="274" font-size="13" fill="var(--ink-3)" text-anchor="middle">任何一步跳过，后面都会露出贴纸感</text>' +
+    '</svg>';
+}
+
+/* ==================== 视图层 ==================== */
+var $ = function (s) { return document.querySelector(s); };
+var current = -1;
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+var ICON_USER = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.6" stroke="currentColor" stroke-width="1.8"/><path d="M5 19.5c1.4-3.2 4-4.5 7-4.5s5.6 1.3 7 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+var ICON_CAL = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="6" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M4 10.5h16M8.5 3.5v4M15.5 3.5v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+var ICON_CLOCK = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var ICON_LINK = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 5h5v5M19 5l-8.5 8.5M10 5H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var ICON_COPY = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 0 1 2-2h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+var ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var ICON_NEXT = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var SUN = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+var MOON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+
+function renderShelf() {
+  $("#countChip").textContent = "共 " + ARTICLES.length + " 本";
+  var html = "";
+  ARTICLES.forEach(function (a, i) {
+    html += '<button class="book" type="button" data-open="' + i + '" aria-label="打开《' + esc(a.title) + '》">' +
+      '<span class="book-cover" style="--c1:' + a.colors[0] + ';--c2:' + a.colors[1] + '">' +
+      '<span class="book-no">' + esc(a.no) + '</span>' +
+      '<span class="book-title">' + esc(a.title) + '</span>' +
+      '<span class="book-sub">' + esc(a.sub) + '</span>' +
+      '<span class="book-author">' + esc(a.author) + '</span>' +
+      '</span>' +
+      '<span class="book-meta"><b>' + esc(a.date) + '</b>' + esc(a.duration) + '</span>' +
+      '</button>';
+  });
+  $("#books").innerHTML = html;
+  var btns = document.querySelectorAll("[data-open]");
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].addEventListener("click", function () { openArticle(parseInt(this.getAttribute("data-open"), 10)); });
+  }
+}
+
+function sectionHTML(sec) {
+  var h = '<h2>' + esc(sec.h) + '</h2>';
+  (sec.paras || []).forEach(function (p) { h += '<p>' + esc(p) + '</p>'; });
+  if (sec.params) {
+    h += '<table class="params"><tbody>';
+    sec.params.forEach(function (row) {
+      h += '<tr><th scope="row">' + esc(row[0]) + '</th><td>' + esc(row[1]) + '</td></tr>';
+    });
+    h += '</tbody></table>';
+  }
+  if (sec.steps) {
+    h += '<ol class="steps">';
+    sec.steps.forEach(function (s) { h += '<li>' + esc(s) + '</li>'; });
+    h += '</ol>';
+  }
+  if (sec.callout) {
+    h += '<div class="callout"><span class="callout-t">' + esc(sec.callout.t) + '</span>' + esc(sec.callout.text) + '</div>';
+  }
+  return h;
+}
+
+function renderArticle(i) {
+  var a = ARTICLES[i];
+  var h = '';
+  h += '<div class="article-head">' +
+    '<div class="article-kicker">' + esc(a.no) + ' · PS 溶图笔记</div>' +
+    '<h1>' + esc(a.title) + '</h1>' +
+    '<p class="lede">' + esc(a.lede) + '</p>' +
+    '<div class="meta-row">' +
+    '<span class="meta-chip">' + ICON_USER + esc(a.author) + '</span>' +
+    '<span class="meta-chip">' + ICON_CAL + esc(a.date) + '</span>' +
+    '<span class="meta-chip">' + ICON_CLOCK + esc(a.duration) + '</span>' +
+    '</div></div>';
+
+  h += '<div class="article-body">';
+  if (a.diagram) {
+    var cap = a.id === "combo-prompt" ? "三合一总流程：抠图、融合、调色验收" :
+      a.id === "grey-layer" ? "灰色观察层的图层位置与用法" :
+      a.id === "bg-eraser" ? "背景橡皮擦处理网眼背景的前后对比" : "自动混合前后的画面差别";
+    h += '<figure class="diagram" style="margin-top:14px">' + diagramSVG(a.diagram) + '<figcaption>' + cap + '</figcaption></figure>';
+  }
+  a.sections.forEach(function (sec) { h += sectionHTML(sec); });
+
+  if (a.prompt) {
+    h += '<h2>提示词正文</h2>';
+    h += '<div class="prompt-box"><div class="prompt-head"><span>' + esc(a.promptTitle) + '</span>' +
+      '<button class="copy-btn" id="copyBtn" type="button">' + ICON_COPY + '<span>复制提示词</span></button></div>' +
+      '<p class="prompt-text" id="promptText">' + esc(a.prompt) + '</p></div>';
+    h += '<div class="mnemonic"><span class="callout-t">PS 口诀版</span>' + esc(a.mnemonic) + '</div>';
+    h += '<p>这一篇是前三篇的合成版，没有单独的原片；三条出处分别在前三篇的文末，照着顺序读就能对上每一步的来历</p>';
+  }
+  h += '</div>';
+
+  if (a.douyin) {
+    var url = "https://www.douyin.com/video/" + a.douyin;
+    h += '<div class="source-box"><div><div class="sb-t">原片出处</div>' +
+      '<div class="sb-s">' + esc(a.author) + ' · 抖音视频 ' + esc(a.douyin) + '</div></div>' +
+      '<a class="source-link" href="' + url + '" target="_blank" rel="noopener noreferrer">打开原片 ' + ICON_LINK + '</a></div>';
+  }
+
+  $("#articleRoot").innerHTML = h;
+
+  var copyBtn = $("#copyBtn");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", function () { copyPrompt(a.prompt, copyBtn); });
+  }
+
+  /* 上一篇 / 下一篇 */
+  $("#prevBtn").disabled = i === 0;
+  $("#nextBtn").disabled = i === ARTICLES.length - 1;
+  var nb = "";
+  if (i < ARTICLES.length - 1) {
+    var n = ARTICLES[i + 1];
+    nb = '<button class="next-btn" id="nextCard" type="button"><span><small>接着读下一篇</small><b>《' + esc(n.title) + '》</b></span>' + ICON_NEXT + '</button>';
+  } else {
+    nb = '<button class="next-btn" id="nextCard" type="button"><span><small>已经读到最后一本</small><b>回书架再挑一本</b></span>' + ICON_NEXT + '</button>';
+  }
+  $("#nextBar").innerHTML = nb;
+  $("#nextCard").addEventListener("click", function () {
+    if (i < ARTICLES.length - 1) { openArticle(i + 1); } else { closeArticle(); }
+  });
+}
+
+function copyPrompt(text, btn) {
+  function done() {
+    var label = btn.querySelector("span");
+    var old = label.textContent;
+    btn.classList.add("copied");
+    btn.innerHTML = ICON_CHECK + "<span>已复制，去粘贴吧</span>";
+    setTimeout(function () {
+      btn.classList.remove("copied");
+      btn.innerHTML = ICON_COPY + "<span>" + old + "</span>";
+    }, 2200);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text); done(); });
+  } else { fallbackCopy(text); done(); }
+}
+function fallbackCopy(text) {
+  var ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); } catch (e) {}
+  document.body.removeChild(ta);
+}
+
+function openArticle(i) {
+  current = i;
+  renderArticle(i);
+  document.body.classList.add("reading");
+  window.scrollTo(0, 0);
+  try { history.replaceState(null, "", "#/" + ARTICLES[i].id); } catch (e) {}
+}
+function closeArticle() {
+  current = -1;
+  document.body.classList.remove("reading");
+  window.scrollTo(0, 0);
+  try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+}
+
+$("#backBtn").addEventListener("click", closeArticle);
+$("#prevBtn").addEventListener("click", function () { if (current > 0) openArticle(current - 1); });
+$("#nextBtn").addEventListener("click", function () { if (current < ARTICLES.length - 1) openArticle(current + 1); });
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape" && current >= 0) closeArticle();
+});
+
+/* ---------- 主题：跟随系统，可手动切换 ---------- */
+var themeBtn = $("#themeBtn");
+function applyTheme(t) {
+  document.documentElement.setAttribute("data-theme", t);
+  themeBtn.innerHTML = t === "dark" ? SUN : MOON;
+  themeBtn.setAttribute("aria-label", t === "dark" ? "切换到浅色主题" : "切换到深色主题");
+}
+var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+applyTheme(prefersDark ? "dark" : "light");
+themeBtn.addEventListener("click", function () {
+  var now = document.documentElement.getAttribute("data-theme");
+  applyTheme(now === "dark" ? "light" : "dark");
+});
+
+/* ---------- 启动 ---------- */
+renderShelf();
+(function () {
+  var m = (location.hash || "").match(/^#\/(.+)$/);
+  if (m) {
+    for (var i = 0; i < ARTICLES.length; i++) {
+      if (ARTICLES[i].id === m[1]) { openArticle(i); break; }
+    }
+  }
+})();
+</script>
+</body>
+</html>
