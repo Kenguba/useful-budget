@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <title>实战笔记 · 博客</title>
+  <title>博客笔记</title>
   <style>
     :root {
       --bg-paper: #FBF8F3;
@@ -761,7 +761,7 @@
   <!-- 顶部全局导航栏 -->
   <header class="site-header">
     <div class="header-inner">
-      <!-- 左侧品牌：立体黄色小书本图标 + 实战笔记 + 胶囊 + 文章页桌面面包屑 -->
+      <!-- 左侧品牌：立体黄色小书本图标 + 博客笔记 + 胶囊 + 文章页桌面面包屑 -->
       <div class="header-brand">
         <button type="button" onclick="navigateTo('/')" class="flex items-center gap-2 text-left group focus:outline-none shrink-0">
           <!-- 微倾立体黄色小书本 Logo -->
@@ -779,7 +779,7 @@
               <line x1="16" y1="29.5" x2="24" y2="29.5" stroke="#A16207" stroke-width="1.2" stroke-linecap="round"/>
             </svg>
           </span>
-          <span class="font-bold text-base sm:text-lg tracking-tight text-[var(--text-main)] whitespace-nowrap">实战笔记</span>
+          <span class="font-bold text-base sm:text-lg tracking-tight text-[var(--text-main)] whitespace-nowrap">博客笔记</span>
           <span id="header-domain-badge" class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-[var(--bg-card)] border border-dashed border-[var(--border-strong)] text-[var(--text-secondary)] whitespace-nowrap">
             blog <span class="text-[var(--accent-gold)]">✦</span> jpedu <span class="text-[var(--accent-gold)]">✦</span> asia
           </span>
@@ -837,7 +837,7 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--text-muted)]">
       <div class="flex items-center gap-2">
         <span class="text-[var(--accent-gold)] font-bold">✦</span>
-        <span class="font-medium text-[var(--text-secondary)]">实战笔记 · 博客</span>
+        <span class="font-medium text-[var(--text-secondary)]">博客笔记</span>
         <span>·</span>
         <a href="https://blog.jpedu.asia/" target="_blank" rel="noopener noreferrer" class="underline hover:text-[var(--text-main)]">blog.jpedu.asia ↗</a>
       </div>
@@ -902,7 +902,7 @@
     // 3. 竖版 3:4 实体书封面生成器 (自适应等比缩放 SVG，任何屏幕尺寸零文字溢出)
     // =========================================================================
     function renderVerticalPublicationSVG(art) {
-      const lines = art.coverLines || [art.title.slice(0, 6), art.title.slice(6, 12), "实战笔记"];
+      const lines = art.coverLines || [art.title.slice(0, 6), art.title.slice(6, 12), "博客笔记"];
       const l1 = lines[0] || "";
       const l2 = lines[1] || "";
       const l3 = lines[2] || "";
@@ -913,7 +913,7 @@
           <svg class="w-full h-full block" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="300" height="400" fill="#F5E1A4"/>
             <rect x="20" y="18" width="260" height="364" rx="4" stroke="#785A28" stroke-width="0.9" stroke-opacity="0.35"/>
-            <text x="34" y="44" fill="#5C4018" font-size="9.5" font-weight="700" letter-spacing="0.14em">实战笔记 · FIELD GUIDE</text>
+            <text x="34" y="44" fill="#5C4018" font-size="9.5" font-weight="700" letter-spacing="0.14em">博客笔记 · FIELD GUIDE</text>
             <text x="34" y="102" fill="#1F1916" font-size="25" font-weight="900">${l1}</text>
             <text x="34" y="140" fill="#1F1916" font-size="25" font-weight="900">${l2}</text>
             <path d="M34 154 Q 68 146, 102 154 T 170 154 T 236 154" fill="none" stroke="#D93829" stroke-width="3.6" stroke-linecap="round"/>
@@ -931,7 +931,7 @@
               <line x1="255" y1="252" x2="270" y2="355"/>
             </g>
             <rect x="34" y="352" width="68" height="18" rx="3" fill="#1F1916"/>
-            <text x="43" y="364" fill="#F5E1A4" font-size="9" font-weight="700" letter-spacing="0.12em">实战笔记</text>
+            <text x="43" y="364" fill="#F5E1A4" font-size="9" font-weight="700" letter-spacing="0.12em">博客笔记</text>
           </svg>
         `;
       } else if (style === "charcoal-vintage") {
@@ -950,7 +950,7 @@
             <text x="150" y="236" text-anchor="middle" fill="#FAF8F5" font-size="23" font-weight="900">${l1}</text>
             <text x="150" y="270" text-anchor="middle" fill="#FDE68A" font-size="23" font-weight="900">${l2}</text>
             <text x="150" y="304" text-anchor="middle" fill="#D6D3D1" font-size="14.5" font-weight="600">${l3}</text>
-            <text x="150" y="354" text-anchor="middle" fill="#D4A359" font-size="9.5" font-weight="700" letter-spacing="0.2em">✦ 实战笔记 ✦</text>
+            <text x="150" y="354" text-anchor="middle" fill="#D4A359" font-size="9.5" font-weight="700" letter-spacing="0.2em">✦ 博客笔记 ✦</text>
           </svg>
         `;
       } else if (style === "parchment-blueprint") {
@@ -965,7 +965,7 @@
               <line x1="190" y1="26" x2="210" y2="56"/>
               <line x1="240" y1="26" x2="260" y2="56"/>
             </g>
-            <text x="32" y="84" fill="#78716C" font-size="9.5" font-weight="700" letter-spacing="0.14em">实战笔记 · ARCHITECTURE</text>
+            <text x="32" y="84" fill="#78716C" font-size="9.5" font-weight="700" letter-spacing="0.14em">博客笔记 · ARCHITECTURE</text>
             <text x="32" y="126" fill="#1C1917" font-size="24" font-weight="900">${l1}</text>
             <text x="32" y="162" fill="#1C1917" font-size="24" font-weight="900">${l2}</text>
             <text x="32" y="194" fill="#B45309" font-size="13" font-weight="700" font-family="monospace">${l3}</text>
@@ -977,14 +977,14 @@
               <line x1="68" y1="285" x2="242" y2="285" stroke-dasharray="3 3"/>
               <line x1="155" y1="218" x2="155" y2="352" stroke-dasharray="3 3"/>
             </g>
-            <text x="32" y="372" fill="#44403C" font-size="10" font-weight="700" letter-spacing="0.14em">实战笔记</text>
+            <text x="32" y="372" fill="#44403C" font-size="10" font-weight="700" letter-spacing="0.14em">博客笔记</text>
           </svg>
         `;
       } else if (style === "teal-hyperbolic") {
         return `
           <svg class="w-full h-full block" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="300" height="400" fill="#1F4E4B"/>
-            <text x="32" y="44" fill="#A7F3D0" font-size="9.5" font-weight="700" letter-spacing="0.16em">实战笔记 · PRACTICAL</text>
+            <text x="32" y="44" fill="#A7F3D0" font-size="9.5" font-weight="700" letter-spacing="0.16em">博客笔记 · PRACTICAL</text>
             <text x="32" y="96" fill="#ECFDF5" font-size="24" font-weight="900">${l1}</text>
             <text x="32" y="134" fill="#FDE047" font-size="24" font-weight="900">${l2}</text>
             <text x="32" y="166" fill="#A7F3D0" font-size="13.5" font-weight="700" font-family="monospace">${l3}</text>
@@ -1006,7 +1006,7 @@
         return `
           <svg class="w-full h-full block" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="300" height="400" fill="#3B4D5E"/>
-            <text x="32" y="44" fill="#CBD5E1" font-size="10" font-weight="700" letter-spacing="0.16em">实战笔记</text>
+            <text x="32" y="44" fill="#CBD5E1" font-size="10" font-weight="700" letter-spacing="0.16em">博客笔记</text>
             <text x="32" y="100" fill="#F8FAFC" font-size="24" font-weight="900">${l1}</text>
             <text x="32" y="138" fill="#FDE047" font-size="24" font-weight="900">${l2}</text>
             <path d="M32 152 Q 82 144, 132 152 T 232 152" fill="none" stroke="#FACC15" stroke-width="3" stroke-linecap="round"/>
@@ -1298,7 +1298,7 @@
           <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-6">
             <div>
               <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-main)]">原创</h2>
-              <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">把日常实测和项目经验整理成能直接照着做的实战笔记。</p>
+              <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">把日常实测和项目经验整理成能直接照着做的博客笔记。</p>
             </div>
             <button type="button" onclick="navigateTo('/articles')" class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[var(--accent-gold)] hover:underline self-start sm:self-auto">
               <span>共 ${OIL_BOOK_DATA.articles.filter(a => a.type === 'original').length} 篇</span>
@@ -1418,7 +1418,7 @@
           <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-5 border-b border-[var(--border-subtle)]">
             <div>
               <h1 class="text-2xl sm:text-3xl font-bold text-[var(--text-main)]">原创</h1>
-              <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">把日常实测和项目经验整理成能直接照着做的实战笔记。共 ${allOriginals.length} 篇</p>
+              <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">把日常实测和项目经验整理成能直接照着做的博客笔记。共 ${allOriginals.length} 篇</p>
             </div>
 
             <div class="w-full sm:w-64">
@@ -1789,10 +1789,10 @@
                         <!-- PRO 锁后章节解锁引导卡片 -->
                         <div class="mt-6 p-5 sm:p-8 rounded-2xl paper-card border-2 border-[var(--accent-gold-border)] text-center space-y-4 font-sans-reader">
                           <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold pro-badge">
-                            <span>✦ 实战笔记 Pro 专享章节</span>
+                            <span>✦ 博客笔记 Pro 专享章节</span>
                           </div>
                           <h3 class="text-lg sm:text-xl font-bold text-[var(--text-main)]">
-                            升级实战笔记 Pro 继续阅读余下内容
+                            升级博客笔记 Pro 继续阅读余下内容
                           </h3>
                           <p class="text-xs sm:text-sm text-[var(--text-secondary)] max-w-lg mx-auto">
                             一次开通，永久解锁全站所有 Pro 专享实战长文、全文语音伴读（约 ${art.audioTime}）与后续全部上新内容。
@@ -1807,7 +1807,7 @@
                               onclick="openModal('pro')"
                               class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold gold-btn shadow-sm"
                             >
-                              立即开通实战笔记 Pro · ¥199 永久版
+                              立即开通博客笔记 Pro · ¥199 永久版
                             </button>
                             <button
                               type="button"
@@ -1895,7 +1895,7 @@
     // 渲染全站 8 条同域名子孙路由总表视图 (#/routes)
     function renderRoutesDirectoryView() {
       const staticRoutes = [
-        { path: "/", url: "https://blog.jpedu.asia/", type: "主路由", title: "实战笔记首页（我平时使用的模型 + 原创/收录精选实体书架）" },
+        { path: "/", url: "https://blog.jpedu.asia/", type: "主路由", title: "博客笔记首页（我平时使用的模型 + 原创/收录精选实体书架）" },
         { path: "/articles", url: "https://blog.jpedu.asia/#/articles", type: "一级子路由", title: "原创列表页（1 大分类 · 共 3 册实体书卡片）" },
         { path: "/curated", url: "https://blog.jpedu.asia/#/curated", type: "一级子路由", title: "精选收录列表页（1 大分类 · 共 1 册实体书卡片）" },
         { path: "/routes", url: "https://blog.jpedu.asia/#/routes", type: "一级子路由", title: "全站路由索引页（主导航路由 + 全部文章子路由）" }
@@ -2161,7 +2161,7 @@
     }
 
     // =========================================================================
-    // 7. 全局模态框 (投稿 / 登录 / 订阅实战笔记 Pro)
+    // 7. 全局模态框 (投稿 / 登录 / 订阅博客笔记 Pro)
     // =========================================================================
     function formatCountdown(sec) {
       const d = Math.floor(sec / 86400);
@@ -2272,8 +2272,8 @@
                     <span>LIFETIME EDITION · 限时永久买断</span>
                   </div>
                   <h3 class="text-lg sm:text-2xl font-bold text-[var(--text-main)] flex flex-wrap items-center gap-2">
-                    <span>实战笔记 Pro</span>
-                    <span class="text-xs px-2 py-0.5 rounded border border-[var(--accent-gold-border)] text-[var(--accent-gold)] font-mono">实战笔记 PRO 永久典藏</span>
+                    <span>博客笔记 Pro</span>
+                    <span class="text-xs px-2 py-0.5 rounded border border-[var(--accent-gold-border)] text-[var(--accent-gold)] font-mono">博客笔记 PRO 永久典藏</span>
                   </h3>
                   <p class="text-xs text-[var(--text-secondary)]">把长期用 AI 做项目的经验写成能照着做的文章</p>
                 </div>
@@ -2321,7 +2321,7 @@
                 onclick="activateProInSpa()"
                 class="w-full py-3 rounded-xl text-xs sm:text-sm font-bold gold-btn shadow-md"
               >
-                ${state.proUnlocked ? '✦ 已解锁全站 Pro 永久版权益 (点击关闭)' : '立即开通实战笔记 Pro · ¥199 永久版 (点击解锁全站预览)'}
+                ${state.proUnlocked ? '✦ 已解锁全站 Pro 永久版权益 (点击关闭)' : '立即开通博客笔记 Pro · ¥199 永久版 (点击解锁全站预览)'}
               </button>
               <div class="text-center">
                 <button type="button" onclick="openModal('login')" class="text-xs text-[var(--text-secondary)] hover:text-[var(--text-main)] underline">
@@ -2336,8 +2336,8 @@
           <div class="p-5 sm:p-7 space-y-5">
             <div class="flex items-start justify-between gap-4">
               <div>
-                <div class="text-xs font-bold text-[var(--accent-gold)]">✦ 实战笔记</div>
-                <h3 class="text-xl font-bold text-[var(--text-main)] mt-0.5">登录实战笔记</h3>
+                <div class="text-xs font-bold text-[var(--accent-gold)]">✦ 博客笔记</div>
+                <h3 class="text-xl font-bold text-[var(--text-main)] mt-0.5">登录博客笔记</h3>
                 <p class="text-xs text-[var(--text-secondary)] mt-1">使用 Google 账号，或通过邮箱验证码登录。</p>
               </div>
               <button type="button" onclick="closeModal()" class="text-[var(--text-muted)] hover:text-[var(--text-main)] text-lg leading-none">✕</button>

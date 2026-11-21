@@ -4,17 +4,17 @@
    精选文章只写摘要 + 作者 + 原文链接，不转载全文 */
 window.BLOG_ARTICLES = {
   "siteMeta": {
-    "title": "实战笔记 · 博客",
+    "title": "博客笔记",
     "subtitle": "把长期用 AI 做项目的经验写成能照着做的文章",
     "domain": "https://blog.jpedu.asia",
-    "author": "实战笔记",
+    "author": "博客笔记",
     "authorSite": "https://blog.jpedu.asia"
   },
   "originalCategories": [
     {
       "id": "original-notes",
       "num": "01",
-      "title": "实战笔记 · 原创系列",
+      "title": "博客笔记 · 原创系列",
       "badge": "系列文章 · 共 3 章",
       "count": 3
     }
@@ -39,10 +39,10 @@ window.BLOG_ARTICLES = {
       "coverLines": [
         "小白建站",
         "零基础搭网站",
-        "实战笔记 · 01"
+        "博客笔记 · 01"
       ],
       "coverStyle": "parchment-blueprint",
-      "author": "实战笔记",
+      "author": "博客笔记",
       "date": "2026.11.15",
       "readTime": "约 6 分钟阅读",
       "audioTime": "03:43",
@@ -112,10 +112,10 @@ window.BLOG_ARTICLES = {
       "coverLines": [
         "不打补丁",
         "先复现追根因",
-        "实战笔记 · 02"
+        "博客笔记 · 02"
       ],
       "coverStyle": "charcoal-vintage",
-      "author": "实战笔记",
+      "author": "博客笔记",
       "date": "2026.11.15",
       "readTime": "约 5 分钟阅读",
       "audioTime": "02:45",
@@ -179,10 +179,10 @@ window.BLOG_ARTICLES = {
       "coverLines": [
         "长期陪跑",
         "规则测试发版",
-        "实战笔记 · 03"
+        "博客笔记 · 03"
       ],
       "coverStyle": "teal-hyperbolic",
-      "author": "实战笔记",
+      "author": "博客笔记",
       "date": "2026.11.15",
       "readTime": "约 7 分钟阅读",
       "audioTime": "03:39",

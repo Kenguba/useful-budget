@@ -1,6 +1,6 @@
-# 实战笔记 · 博客（blog）
+# 博客笔记（blog）
 
-公开版博客文档站：https://kenguba.github.io/useful-budget/frontend/pages/blog-posts/
+公开版博客文档站：https://kenguba.github.io/useful-budget/frontend/pages/blog-notes/
 
 - 类别（2026-11-15 ken 点选）：仅子域名 `blog.xxxxx.asia`，不进总汇——不加总汇短路径、不上首页卡片（与 wechat 同类）；子域名经 site-router 转发，留档改动见 `backend/site-router.js.back`
 - 形态（2026-11-17 ken 定）：排版、设计、UI 与逻辑全照 ken 提供的 Oil Book 全站 SPA 新版复刻稿重做，内容换成博客现有的文章与分工数据；SPA 单页，hash 路由 `#/`、`#/articles`、`#/curated`、`#/routes`、`#/articles/<slug>`
