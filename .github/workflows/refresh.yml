@@ -9,6 +9,7 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  actions: write
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -44,3 +45,7 @@ jobs:
           git add frontend/pages/skill-board/data/ frontend/pages/ai-shop/data/ frontend/pages/phone-cloud/data/ frontend/pages/ai-shop/index.html
           git diff --cached --quiet || git commit -m "data: refresh $(date -u +%F)"
           git push
+      - name: Dispatch Deploy Pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run pages.yml --ref main
