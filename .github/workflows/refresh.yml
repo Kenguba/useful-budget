@@ -4,9 +4,6 @@ name: refresh-and-deploy
 on:
   schedule:
     - cron: "23 * * * *"
-  push:
-    branches:
-      - main
   workflow_dispatch:
 permissions:
   contents: write
@@ -47,10 +44,3 @@ jobs:
           git add frontend/pages/skill-board/data/ frontend/pages/ai-shop/data/ frontend/pages/phone-cloud/data/ frontend/pages/ai-shop/index.html
           git diff --cached --quiet || git commit -m "data: refresh $(date -u +%F)"
           git push
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-      - uses: actions/deploy-pages@v4
