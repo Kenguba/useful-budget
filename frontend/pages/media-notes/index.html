@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="light dark" />
 <link rel="icon" href="data:," />
-<title>PS 溶图笔记</title>
+<title>媒体笔记</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -271,7 +271,7 @@
   <div class="wrap topbar-in">
     <div class="brand">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="13" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 8.5 20 10v10h-4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6.5 9h6M6.5 12.5h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <span>PS 溶图笔记</span>
+      <span>媒体笔记</span>
     </div>
     <div class="spacer"></div>
     <span class="count-chip" id="countChip"></span>
@@ -283,28 +283,18 @@
 <div class="home">
   <div class="wrap">
     <section class="hero">
-      <h1>把人物放进画面里<br />先要让光和颜色服气</h1>
-      <p>这里收着三招从短视频里扒下来的 PS 溶图手艺，外加一篇把三招拼到一起的提示词；点开任意一本就能读全文，参数和原片出处都在篇里</p>
+      <h1>把画面、声音和镜头<br />都记成能照着做的笔记</h1>
+      <p>这里收着 PS 溶图手艺、AI 运镜库和代码出片工具的拆解，按组排在下面的书架上；点开任意一本就能读全文，参数和出处都在篇里</p>
       <div class="rule"></div>
     </section>
 
-    <section class="shelf-block" aria-label="笔记书架">
-      <div class="shelf-label">
-        <h2>书架</h2>
-        <span>按收集顺序排，第四本是前三本的合成版</span>
-      </div>
-      <div class="shelf">
-        <div class="books" id="books"></div>
-        <div class="shelf-board"></div>
-        <div class="shelf-shadow"></div>
-      </div>
+    <div id="shelves"></div>
       <div class="tip">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="8" r="1.3" fill="currentColor"/></svg>
-        <span>动手练的时候按流程走：先用第二本的抠图把主体拿干净，再用第三本的自动混合融进去，最后用第一本的灰色观察层验收调色；赶时间就直接翻到第四本抄提示词</span>
+        <span>练 PS 溶图按组内顺序走：先抠图、再融合、最后用灰色观察层验收调色；做视频先翻视频制作组挑工具，再去提示词组抄一条验证过的提示词，配音与配乐各有一组专门讲</span>
       </div>
-    </section>
 
-    <footer>三篇技法均来自抖音原片拆解，作者与原片链接标注在每篇文末</footer>
+    <footer>每篇都标注了作者与出处，链接在篇末</footer>
   </div>
 </div>
 
@@ -337,6 +327,7 @@
 var ARTICLES = [
   {
     id: "grey-layer",
+    group: "PS技巧",
     no: "第 一 本",
     title: "灰色观察层调色",
     sub: "先看明度，再动饱和",
@@ -377,6 +368,7 @@ var ARTICLES = [
   },
   {
     id: "bg-eraser",
+    group: "PS技巧",
     no: "第 二 本",
     title: "背景橡皮擦抠纯色底",
     sub: "网眼缝隙里的背景也能擦净",
@@ -425,6 +417,7 @@ var ARTICLES = [
   },
   {
     id: "auto-blend",
+    group: "PS技巧",
     no: "第 三 本",
     title: "自动混合图层融合",
     sub: "两步让拼接看不出接缝",
@@ -468,6 +461,7 @@ var ARTICLES = [
   },
   {
     id: "combo-prompt",
+    group: "提示词",
     no: "第 四 本",
     title: "三合一提示词",
     sub: "抠图、融合、调色一次说清",
@@ -496,6 +490,385 @@ var ARTICLES = [
           "把图交给 AI 改图工具时，用上面的一键版整段复制过去，三步的顺序和参数都在里面",
           "自己在 PS 里动手时，用下面的口诀版对着念，一步一步照着做就行"
         ]
+      }
+    ]
+  },
+  {
+    "id": "motion-lib",
+    "group": "运镜",
+    "no": "第 五 本",
+    "title": "运镜库",
+    "sub": "192 条命名运镜与动效",
+    "author": "Shohei Ohtaki · Motion Prompt",
+    "date": "2026-11-21 并入",
+    "duration": "192 条效果",
+    "douyin": "",
+    "href": "motion/",
+    "colors": [
+      "#3a6ea8",
+      "#274a73"
+    ],
+    "lede": "原 Motion Prompt 画廊整套并入本站，192 条命名运镜与动效可搜可看，点开这一本直接进入运镜库",
+    "sections": []
+  },
+  {
+    "id": "lemo-opuscar",
+    "group": "视频制作",
+    "no": "第 六 本",
+    "title": "Lemo-Opuscar",
+    "sub": "选风格加故事，代码拍短片",
+    "author": "Lemomo（LemoLab）",
+    "date": "2026-11-21 整理",
+    "duration": "99 种风格",
+    "douyin": "",
+    "colors": [
+      "#a83a5e",
+      "#732747"
+    ],
+    "lede": "一套用代码做片的风格工具箱，选一种现成风格、把故事给它，Agent 导演、绘画、配乐与旁白一条龙做完",
+    "source": {
+      "url": "https://github.com/lemomo-ai/lemo-opuscar",
+      "note": "GitHub 仓库 lemomo-ai/lemo-opuscar，含安装命令与风格画廊"
+    },
+    "sections": [
+      {
+        "h": "它是什么",
+        "paras": [
+          "一套用代码做片的风格工具箱，Agent 负责导演、绘画、配乐与旁白，全程写代码完成，不用视频生成模型，也不用素材库",
+          "每种风格配一份 STYLE.md 风格提示词，写清画面、色彩、字体、运镜、声音与避坑点，再配一支完全用代码做出的示范短片"
+        ]
+      },
+      {
+        "h": "规模与代表作",
+        "paras": [
+          "早期是 43 种风格，2026-11-12 更新后扩到 99 种风格、15 个大类，举例有水彩笔刷、中国水墨、油画厚涂、皮影戏、浮世绘、瑞士动态排版、数据叙事、等距信息图、像素 RPG 与 1920s 默片",
+          "代表作 OPUSCAR 98 让一个角色走过 1927 至 2025 年的 98 部奥斯卡最佳影片，全长 6 分 31 秒，每部片换一种贴合它的风格重画"
+        ]
+      },
+      {
+        "h": "怎么上手",
+        "steps": [
+          "在 Claude Code 里加插件市场 lemomo-ai/lemo-opuscar，再装 lemo-opuscar@lemolab，也可以克隆仓库后在仓内运行",
+          "先在画廊里挑一种风格，中英文名都能认",
+          "把故事给它，Agent 按风格规范出片，默认 1920×1080、24fps，Canvas 与 WebGL 逐帧渲染，配乐取自免费采样库，旁白走文字转语音"
+        ]
+      },
+      {
+        "h": "适合与不适合",
+        "paras": [
+          "适合科普讲解、历史速览、产品发布与带强视觉识别的短片",
+          "不适合真人实拍质感与复杂真人表演"
+        ],
+        "callout": {
+          "t": "注意",
+          "text": "风格专为 Claude Opus 5.5 调校，其他模型可能复现不出效果；许可证是混合制，代码、文档与示范片各有其许可证，商用前须单独核对，不能只写 MIT"
+        }
+      }
+    ]
+  },
+  {
+    "id": "animation-base",
+    "group": "视频制作",
+    "no": "第 七 本",
+    "title": "Animation Base 与 PDoomVideo",
+    "sub": "手绘水彩卡通的脚手架与成品源码",
+    "author": "John Heibel",
+    "date": "2026-11-21 整理",
+    "duration": "脚手架加成品源码",
+    "douyin": "",
+    "colors": [
+      "#c96a2e",
+      "#8f4517"
+    ],
+    "lede": "一个是音乐视频的完整成品源码，一个是把成品经验抽出来的通用脚手架，两个仓库一起看才是完整的一套",
+    "source": {
+      "url": "https://github.com/JohnHeibel/ClaudeAnimationBase",
+      "note": "脚手架仓库 JohnHeibel/ClaudeAnimationBase，成品源码在 JohnHeibel/PDoomVideo"
+    },
+    "sections": [
+      {
+        "h": "先纠正出处",
+        "paras": [
+          "网上常传的 lemomo-ai/opus-animation-base 并不存在，这套东西的真身是 JohnHeibel 名下的两个仓库",
+          "成品是 PDoomVideo，音乐视频《I'm Upping My P(doom)》的完整源码，含故事版、动画指南与渲染脚本；脚手架是 Claude Animation Base，把成品的经验抽成通用底座"
+        ]
+      },
+      {
+        "h": "成品是怎么做出来的",
+        "paras": [
+          "人类只给两个大方向：用 Clawd 这个角色、每句歌词都要有画面变化，剩下的场景创意、分镜、指南与代码由 Opus 5.5 在 Claude Code 里两轮生成",
+          "技术上用 p5.js 加 p5.brush 在网页里逐帧作画，render.mjs 用无头 Chrome 截帧，再与歌曲合成 MP4，全片九个章节一章一个文件"
+        ]
+      },
+      {
+        "h": "脚手架里有什么",
+        "paras": [
+          "自带 Clawd 角色的多视角、31 种表演情绪、眼睛与嘴型、帽子与舞蹈，还有绘画与镜头辅助和无头渲染器"
+        ],
+        "steps": [
+          "克隆仓库并在 Claude Code 里打开",
+          "先让 Agent 读 ANIMATION_GUIDE.md",
+          "再用一句话下单，Agent 先分镜、逐镜作画、渲染检查表自查，最后导出 MP4"
+        ]
+      },
+      {
+        "h": "适合",
+        "paras": [
+          "适合固定角色连载、吉祥物讲解与手绘水彩风短片"
+        ],
+        "callout": {
+          "t": "注意",
+          "text": "它不是两条命令装完的插件，是克隆后包成自有 skill 的底座；无独立显卡时水彩填充渲染较慢，量产前先算渲染时间"
+        }
+      }
+    ]
+  },
+  {
+    "id": "heygen",
+    "group": "视频制作",
+    "no": "第 八 本",
+    "title": "HeyGen",
+    "sub": "不用出镜的数字人口播",
+    "author": "HeyGen 官方",
+    "date": "2026-11-21 整理",
+    "duration": "在线平台",
+    "douyin": "",
+    "colors": [
+      "#5e5aa8",
+      "#3c3a73"
+    ],
+    "lede": "选现成数字人或定制自己的分身，输入文案后由音频驱动口型同步，不用出镜也能拍口播",
+    "source": {
+      "url": "https://www.heygen.com",
+      "note": "官网 heygen.com，中文工具页在官网的 zh-hk 工具目录下"
+    },
+    "sections": [
+      {
+        "h": "它是什么",
+        "paras": [
+          "AI 数字分身平台，选现成数字人或定制自己的分身，输入文案后由音频驱动口型同步，不用出镜也能拍口播",
+          "最强项是多语言：一次录制生成多语言版本，视频翻译与口型同步覆盖 175 种以上语言，适合多语言出海与课程分发",
+          "还带声音克隆、Video Agent 自动成片，以及 API 与 Zapier、Make、n8n 等自动化接入"
+        ]
+      },
+      {
+        "h": "价格照官网口径",
+        "params": [
+          [
+            "免费版",
+            "每月 3 支，每支最长 1 分钟，带水印"
+          ],
+          [
+            "Creator",
+            "29 美元一个月，年付约 24 美元一个月，含 600 积分与 1080p 去水印"
+          ],
+          [
+            "Pro",
+            "49 美元起，支持 4K 与更高积分档"
+          ]
+        ]
+      },
+      {
+        "h": "适合与不适合",
+        "paras": [
+          "适合固定口播栏目、企业培训与多语言版本分发",
+          "不适合追求电影感叙事的短片，那类片子走代码出片那一组"
+        ],
+        "callout": {
+          "t": "注意",
+          "text": "付费后按积分消耗，高画质引擎每分钟烧的积分远高于旧引擎，量大时成本涨得快，月费不等于总成本"
+        }
+      }
+    ]
+  },
+  {
+    "id": "awesome-opus-videos",
+    "group": "提示词",
+    "no": "第 九 本",
+    "title": "Awesome Opus 5.5 Videos",
+    "sub": "703 条爆款视频的原始提示词库",
+    "author": "yihui-dev 整理",
+    "date": "2026-11-21 整理",
+    "duration": "703 条提示词",
+    "douyin": "",
+    "colors": [
+      "#2e7d6e",
+      "#1d554b"
+    ],
+    "lede": "收全网用 Opus 5.5 写代码做出的热门视频，每条都附创作者公开的原始提示词，抄一条就能练手",
+    "source": {
+      "url": "https://github.com/yihui-dev/awesome-opus5-5-videos",
+      "note": "GitHub 仓库 yihui-dev/awesome-opus5-5-videos，配套画廊在 skillry.dev"
+    },
+    "sections": [
+      {
+        "h": "它是什么",
+        "paras": [
+          "持续更新的案例库，收全网用 Claude Opus 5.5 写代码做出的热门视频，每条附创作者公开的原始提示词，没有公开提示词的附原帖链接",
+          "703 条提示词存于 prompts 与 data/videos.json，其中 418 条在 Skillry 有复刻版，可以与原视频并排对比",
+          "分类现成：动态图形 58 条、讲解类 16 条、3D 场景 14 条，另有游戏与互动类"
+        ]
+      },
+      {
+        "h": "怎么用",
+        "steps": [
+          "打开一条提示词，复制其中的 Prompt 段",
+          "粘进 Opus 5.5，让 Agent 用 HTML、Canvas、SVG 或 Three.js 写出动画代码",
+          "拿不准怎么写指令时，先对比一句话出片与完整分镜写法的差距再动手"
+        ]
+      },
+      {
+        "h": "定位",
+        "paras": [
+          "在本机只作提示词参考库，不当工具装"
+        ],
+        "callout": {
+          "t": "注意",
+          "text": "仓库本身是 MIT，但每条视频与提示词的权利属于原作者，借鉴写法与搬运成片要分开看"
+        }
+      }
+    ]
+  },
+  {
+    "id": "opus-video-prompts",
+    "group": "提示词",
+    "no": "第 十 本",
+    "title": "Opus Video Prompts",
+    "sub": "54 个案例精选 18 份中文提示词",
+    "author": "joeseesun 整理",
+    "date": "2026-11-21 整理",
+    "duration": "18 份完整提示词",
+    "douyin": "",
+    "colors": [
+      "#7a5aa0",
+      "#513a70"
+    ],
+    "lede": "Opus 5.5 发布第一周公开案例的中文精选包，只收作者本人公开的提示词原文，小而精、上手快",
+    "source": {
+      "url": "https://github.com/joeseesun/opus-video-prompts",
+      "note": "GitHub 仓库 joeseesun/opus-video-prompts，每条提示词附原帖链接"
+    },
+    "sections": [
+      {
+        "h": "它是什么",
+        "paras": [
+          "54 个公开案例里精选出 18 份完整提示词，覆盖 9 种技术路线",
+          "类型分得细：一句话出片、填空模板、参考图出片、Remotion 产品宣传片、专业动态设计模板、像素与 Three.js 规格型提示词"
+        ]
+      },
+      {
+        "h": "新手先试",
+        "paras": [
+          "推理创业公司发布视频是一句话提示词，作者称约 1 分钟与 2 美元做完",
+          "中华五千年历史速览是中文线稿动画加音乐要求，适合当第一条练手",
+          "进阶的有带 TTS 旁白与双语字幕的大气环流科普、真人口播改线稿讲解、4 到 5 分钟历史电影长提示词"
+        ]
+      },
+      {
+        "h": "与上一本的区别",
+        "paras": [
+          "Awesome 那个库大而全，这一包小而精、中文上手快，两者互补"
+        ],
+        "callout": {
+          "t": "注意",
+          "text": "此仓未见许可证文件，整段搬去商用或二次发布前先问作者"
+        }
+      }
+    ]
+  },
+  {
+    "id": "fish-audio",
+    "group": "配音",
+    "no": "第 十一 本",
+    "title": "Fish Audio",
+    "sub": "短样本克隆音色做旁白",
+    "author": "Fish Audio 官方",
+    "date": "2026-11-21 整理",
+    "duration": "在线平台加 API",
+    "douyin": "",
+    "colors": [
+      "#2e6ea8",
+      "#1d4a73"
+    ],
+    "lede": "约 10 到 30 秒参考音频就能克隆一个音色，专做口播与旁白，正好补上代码出片的声音短板",
+    "source": {
+      "url": "https://fish.audio",
+      "note": "官网 fish.audio，有官方 API 与 Python、JavaScript 套件"
+    },
+    "sections": [
+      {
+        "h": "它是什么",
+        "paras": [
+          "AI 语音克隆与生成平台，把文字变成指定音色的口播与旁白，降低录音与重录成本",
+          "克隆分两种：即时克隆与保存为 Voice ID 的持久克隆，后者建好一次反复用"
+        ]
+      },
+      {
+        "h": "模型与接入",
+        "paras": [
+          "S2.1 Pro 支持 83 种语言与多人对话，可在文本中用自然语言写表演指示；Drama 3 偏表演导向，可按说明调整情绪、停顿与语气，适合有声剧与多角色场景",
+          "网页端可直接生成，也可走官方 API，输出 MP3、WAV、PCM 与 Opus，支持流式生成"
+        ]
+      },
+      {
+        "h": "推荐搭配",
+        "paras": [
+          "用 Lemo-Opuscar 或 Animation Base 出画面，用 Fish Audio 出本人音色旁白，再合成成片，辨识度高于默认合成音"
+        ],
+        "callout": {
+          "t": "注意",
+          "text": "只克隆本人或已获授权的声音"
+        }
+      }
+    ]
+  },
+  {
+    "id": "daw-bgm",
+    "group": "配乐",
+    "no": "第 十二 本",
+    "title": "AI 调用 DAW 生成 BGM",
+    "sub": "大模型写谱，专业软件出声",
+    "author": "方法整理",
+    "date": "2026-11-21 整理",
+    "duration": "方法篇",
+    "douyin": "",
+    "colors": [
+      "#8a7a2e",
+      "#5f541d"
+    ],
+    "lede": "让大模型把描述译成 MIDI 编曲，再导入 Logic Pro 或 Cubase 用官方音色渲染成分轨工程，配乐从抽卡变成可编辑",
+    "sections": [
+      {
+        "h": "软件定位",
+        "paras": [
+          "Logic Pro 是 Mac 平台的专业音乐制作工作站，自带海量音色与乐器库；Cubase 是跨平台的专业数字音频工作站，音色与编曲功能强大",
+          "核心用途是让 Claude 这类大模型调用两款软件的官方音色，自动编排生成背景音乐，用专业音乐工作站完成配乐创作"
+        ]
+      },
+      {
+        "h": "实际链路",
+        "steps": [
+          "先用自然语言描述风格、速度、调性、时长、乐器编制与情绪走向",
+          "再由模型把描述译成和弦、鼓型、贝斯与旋律，生成标准 MIDI",
+          "最后导入 Logic Pro 或 Cubase，指定官方音色渲染成分轨工程"
+        ]
+      },
+      {
+        "h": "现成中间层",
+        "paras": [
+          "DAW MIDI Generator MCP 可生成和弦、鼓、贝斯与旋律的完整 MIDI，兼容所有支持 MIDI 的工作站；Logic Pro MCP 可直接操控 Logic 的轨道、混音与 MIDI",
+          "优势是分轨可改：不满意只改对应小节重渲染，不用整首重抽"
+        ]
+      },
+      {
+        "h": "定位",
+        "paras": [
+          "与 Lemo-Opuscar 自带的免费采样配乐形成高低两档，先用哪档看片子的正式程度"
+        ],
+        "callout": {
+          "t": "短板",
+          "text": "Logic Pro 仅 Mac 且软件付费，Cubase 学习成本高，MCP 连接环节偏极客；新手先用一键 AI 音乐，要可商用、可反复改的定制 BGM 再走这条路线"
+        }
       }
     ]
   }
@@ -595,21 +968,33 @@ var ICON_NEXT = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d
 var SUN = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 var MOON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
 
+var GROUPS = ["PS技巧", "运镜", "提示词", "视频制作", "配音", "配乐"];
+
 function renderShelf() {
   $("#countChip").textContent = "共 " + ARTICLES.length + " 本";
   var html = "";
-  ARTICLES.forEach(function (a, i) {
-    html += '<button class="book" type="button" data-open="' + i + '" aria-label="打开《' + esc(a.title) + '》">' +
-      '<span class="book-cover" style="--c1:' + a.colors[0] + ';--c2:' + a.colors[1] + '">' +
-      '<span class="book-no">' + esc(a.no) + '</span>' +
-      '<span class="book-title">' + esc(a.title) + '</span>' +
-      '<span class="book-sub">' + esc(a.sub) + '</span>' +
-      '<span class="book-author">' + esc(a.author) + '</span>' +
-      '</span>' +
-      '<span class="book-meta"><b>' + esc(a.date) + '</b>' + esc(a.duration) + '</span>' +
-      '</button>';
+  GROUPS.forEach(function (g) {
+    var idxs = [];
+    ARTICLES.forEach(function (a, i) { if (a.group === g) idxs.push(i); });
+    if (!idxs.length) return;
+    html += '<section class="shelf-block" aria-label="' + esc(g) + '">' +
+      '<div class="shelf-label"><h2>' + esc(g) + '</h2><span>' + idxs.length + ' 本</span></div>' +
+      '<div class="shelf"><div class="books">';
+    idxs.forEach(function (i) {
+      var a = ARTICLES[i];
+      html += '<button class="book" type="button" data-open="' + i + '" aria-label="打开《' + esc(a.title) + '》">' +
+        '<span class="book-cover" style="--c1:' + a.colors[0] + ';--c2:' + a.colors[1] + '">' +
+        '<span class="book-no">' + esc(a.no) + '</span>' +
+        '<span class="book-title">' + esc(a.title) + '</span>' +
+        '<span class="book-sub">' + esc(a.sub) + '</span>' +
+        '<span class="book-author">' + esc(a.author) + '</span>' +
+        '</span>' +
+        '<span class="book-meta"><b>' + esc(a.date) + '</b>' + esc(a.duration) + '</span>' +
+        '</button>';
+    });
+    html += '</div><div class="shelf-board"></div><div class="shelf-shadow"></div></div></section>';
   });
-  $("#books").innerHTML = html;
+  $("#shelves").innerHTML = html;
   var btns = document.querySelectorAll("[data-open]");
   for (var i = 0; i < btns.length; i++) {
     btns[i].addEventListener("click", function () { openArticle(parseInt(this.getAttribute("data-open"), 10)); });
@@ -641,7 +1026,7 @@ function renderArticle(i) {
   var a = ARTICLES[i];
   var h = '';
   h += '<div class="article-head">' +
-    '<div class="article-kicker">' + esc(a.no) + ' · PS 溶图笔记</div>' +
+    '<div class="article-kicker">' + esc(a.no) + ' · 媒体笔记</div>' +
     '<h1>' + esc(a.title) + '</h1>' +
     '<p class="lede">' + esc(a.lede) + '</p>' +
     '<div class="meta-row">' +
@@ -674,6 +1059,12 @@ function renderArticle(i) {
     h += '<div class="source-box"><div><div class="sb-t">原片出处</div>' +
       '<div class="sb-s">' + esc(a.author) + ' · 抖音视频 ' + esc(a.douyin) + '</div></div>' +
       '<a class="source-link" href="' + url + '" target="_blank" rel="noopener noreferrer">打开原片 ' + ICON_LINK + '</a></div>';
+  }
+
+  if (a.source) {
+    h += '<div class="source-box"><div><div class="sb-t">出处</div>' +
+      '<div class="sb-s">' + esc(a.source.note) + '</div></div>' +
+      '<a class="source-link" href="' + a.source.url + '" target="_blank" rel="noopener noreferrer">打开出处 ' + ICON_LINK + '</a></div>';
   }
 
   $("#articleRoot").innerHTML = h;
@@ -725,6 +1116,7 @@ function fallbackCopy(text) {
 }
 
 function openArticle(i) {
+  if (ARTICLES[i].href) { window.location.href = ARTICLES[i].href; return; }
   current = i;
   renderArticle(i);
   document.body.classList.add("reading");

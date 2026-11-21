@@ -5,6 +5,7 @@
 // 2026-11-15 留档更新：ROUTES 新增 blog 子域名（实战笔记博客，仅子域名、不进总汇，HUB_SHORT 未动）；2026-11-18 已部署到 Cloudflare（site-router 版本 f8237c9f），blog.jpedu.asia 实测 200、与 Pages 最新版逐字节一致
 // 2026-11-18 留档更新：ROUTES 新增 pc 子域名（云电脑，仅子域名、不进总汇，HUB_SHORT 未动）；同日已部署到 Cloudflare（site-router 版本 564c9f21），pc.jpedu.asia 实测 200、与 Pages 最新版逐字节一致
 // 2026-11-21 留档更新：补 tech 子域名一行（2026-11-19 已随子域名修复部署到 Cloudflare、四子域名实测 200，但当时漏同步回本留档，本次按「以线上为准」补齐）；同日新增 ps 子域名（PS 溶图笔记，仅子域名、不进总汇，HUB_SHORT 未动），ps 行待 Cloudflare 部署生效
+// 2026-11-21 改名留档更新：blog 改指 blog-notes、tech 改指 tech-notes、删 motion 行（运镜库并入媒体笔记）、ps 行改为 media 改指 media-notes（媒体笔记，仅子域名、不进总汇，HUB_SHORT 未动）；本留档已同步仓库改名，Cloudflare 侧部署另行处理
 // 与主域名路由 xxxxx.asia/* 上，按子域名前缀把七个项目分发到
 // GitHub Pages 对应目录；主域名（无前缀）分发到仓库根导航页（总体预览页）。
 // 把副本放在仓库里，是为了迁移时直接拿这一份部署，不用去控制台翻。
@@ -30,11 +31,10 @@ ip: "frontend/pages/ip-check",
 "2fa": "frontend/pages/2fa-auth",
 ui: "frontend/pages/ui-design",
 wechat: "frontend/pages/wechat-bridge",
-motion: "frontend/pages/motion-prompt",
 blog: "frontend/pages/blog-notes",
 pc: "frontend/pages/cloud-computer",
 tech: "frontend/pages/tech-notes",
-ps: "frontend/pages/ps-notes",
+media: "frontend/pages/media-notes",
 };
 
 const HUB_SHORT = { ai: 1, phone: 1, skill: 1, ip: 1, pan: 1, '2fa': 1, ui: 1 };

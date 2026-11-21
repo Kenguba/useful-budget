@@ -49,10 +49,10 @@ frontend/pages/<project>/     # 例：frontend/pages/skill-board/
 | `frontend/pages/2fa-auth/` | 2FA 验证码工具（2fa.fun 1:1 复刻）：谷歌验证器网页版，批量粘贴 2FA 密钥生成 6 位 TOTP 动态验证码，30 秒自动刷新、一键复制，毛玻璃侧边栏 + 深浅主题 + 中英切换 | 纯静态单文件，浏览器端本地计算（Web Crypto HMAC-SHA1），密钥不上传，无后端、无定时刷新 |
 | `frontend/pages/ui-design/` | Designeer 设计目录复刻站（设计资源目录 + Finds 海报，署名 Designeer 并链回原页） | 手动跑 `scripts/refresh.py` 重拉官方目录数据，页面纯静态渲染 |
 | `frontend/pages/wechat-bridge/` | 微信接入可行方案（调研报告页） | 静态页，手动维护 |
-| `frontend/pages/motion-prompt/` | Motion Prompt 动效画廊（192 条命名动效/运镜/UI/网页特效，原画廊原样复刻，署名原作者 Shohei Ohtaki，MIT） | 纯静态站，手动维护（数据随上游原仓同步） |
+| `frontend/pages/media-notes/motion/` | 运镜库（原 Motion Prompt 动效画廊，192 条命名动效/运镜/UI/网页特效，原画廊原样复刻，署名原作者 Shohei Ohtaki，MIT；2026-11-21 随改名并入媒体笔记） | 纯静态站，手动维护（数据随上游原仓同步） |
 | `frontend/pages/blog-notes/` | 博客笔记（公开版：模型与工具分工 + 原创系列 + 精选收录，内容脱敏；原名实战笔记 · 博客，2026-11-21 改名） | 纯静态站，手动维护（加文章只改 `data/articles.js`） |
 | `frontend/pages/tech-notes/` | 技术开发文档（个人技术笔记；原名开发文档，2026-11-21 改名） | 纯静态站，手动维护（加文章只改 `index.html` 内文章数据数组） |
-| `frontend/pages/ps-notes/` | PS 溶图笔记（灰色观察层调色 + 背景橡皮擦抠纯色底 + 自动混合图层融合 + 三合一提示词） | 纯静态站，手动维护（加文章只改 `index.html` 内文章数据数组） |
+| `frontend/pages/media-notes/` | 媒体笔记（PS 技巧 + 运镜 + 提示词 + 视频制作 + 配音 + 配乐六组，含 PS 溶图三招与三合一提示词、AI 代码出片工具拆解、运镜库子目录；原名 PS 溶图笔记，2026-11-21 改名） | 纯静态站，手动维护（加文章只改 `index.html` 内文章数据数组） |
 
 ## 子域名（Cloudflare 转发）
 
@@ -71,10 +71,9 @@ frontend/pages/<project>/     # 例：frontend/pages/skill-board/
 | `frontend/pages/2fa-auth/` | `2fa.xxxxx.asia` |
 | `frontend/pages/ui-design/` | `ui.xxxxx.asia` |
 | `frontend/pages/wechat-bridge/` | `wechat.xxxxx.asia`（仅子域名，不进总汇） |
-| `frontend/pages/motion-prompt/` | `motion.xxxxx.asia`（仅子域名，不进总汇） |
 | `frontend/pages/blog-notes/` | `blog.xxxxx.asia`（仅子域名，不进总汇） |
 | `frontend/pages/tech-notes/` | `tech.xxxxx.asia`（仅子域名，不进总汇） |
-| `frontend/pages/ps-notes/` | `ps.xxxxx.asia`（仅子域名，不进总汇） |
+| `frontend/pages/media-notes/` | `media.xxxxx.asia`（仅子域名，不进总汇） |
 
 **首页（总汇）收录规则（2026-11-07 ken 定）**：进总汇首页的只有 7 个——ai、skill、phone、pan、ip、2fa、ui。wechat 只开子域名 `wechat.xxxxx.asia`，不进总汇：不加短路径、不上首页卡片。以后新增项目先定类别：进首页的，子域名、总汇短路径、首页卡片三样一起加；不进首页的，只加子域名，并在子域名清单里登记注明，免得误加。
 
