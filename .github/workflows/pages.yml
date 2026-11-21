@@ -29,6 +29,15 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
+      - name: Wait for artifact to settle
+        run: sleep 60
       - name: Deploy to GitHub Pages
         id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Wait before retry
+        if: failure()
+        run: sleep 60
+      - name: Retry deploy to GitHub Pages
+        if: failure()
+        id: deployment-retry
         uses: actions/deploy-pages@v4
