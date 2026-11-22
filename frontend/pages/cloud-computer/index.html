@@ -2274,6 +2274,7 @@
       if (typeof window.__aiYunMatrixSetTheme === 'function') window.__aiYunMatrixSetTheme(effectiveDark() ? 'dark' : 'light');
     }
     if (typeof window.__aiYunThemeColor === 'function') window.__aiYunThemeColor(effectiveDark());
+    window.__aiYunApplyMainTheme = applyMode;
     function toggleTheme(){
       applyMode(effectiveDark() ? 'light' : 'dark');
       rot += 360;
@@ -4971,7 +4972,8 @@
       state.theme = state.theme === "dark" ? "light" : "dark";
       MX_ROOT.setAttribute("data-mtheme", state.theme);
       updateToolbarLabels();
-      if (typeof window.__aiYunThemeColor === 'function') window.__aiYunThemeColor(state.theme === "dark");
+      if (typeof window.__aiYunApplyMainTheme === 'function') window.__aiYunApplyMainTheme(state.theme);
+      else if (typeof window.__aiYunThemeColor === 'function') window.__aiYunThemeColor(state.theme === "dark");
     });
 
     window.__aiYunMatrixSetTheme = function(mode){
