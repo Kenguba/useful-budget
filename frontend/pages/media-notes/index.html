@@ -871,6 +871,76 @@ var ARTICLES = [
         }
       }
     ]
+  },
+  {
+    id: "lamp-light",
+    group: "PS技巧",
+    no: "第 十三 本",
+    title: "PS 做开灯效果，只用这几步",
+    sub: "颜色减淡点亮一盏灯",
+    author: "琎哥哥探设计",
+    date: "2026-10-16",
+    duration: "原片 41 秒",
+    douyin: "7697259088622701875",
+    colors: ["#b06a1e", "#7a4210"],
+    lede: "一张暗调照片里灯没亮，不用重拍也不用贴素材；空白图层上用暖黄色点两下，改成颜色减淡，再用蒙版把光收回到主体上，灯就像真的点着了",
+    diagram: "lamp",
+    sections: [
+      {
+        h: "示范里发生了什么",
+        paras: [
+          "示范图是一张暗调照片：一个女孩手里提着一盏没点亮的油灯，整张图几乎全黑，要做的是把这盏灯真实地点亮",
+          "原片由作者标注为 AI 生成内容，点赞约 4.93 万、收藏约 3.35 万，整套动作只有十步出头，难点不在画光，而在让光只落在该亮的地方"
+        ]
+      },
+      {
+        h: "第一步：在空白图层上点出光",
+        params: [
+          ["图层", "新建空白图层（图层 1），放在背景图层之上"],
+          ["工具", "画笔工具，选柔边画笔"],
+          ["选项栏", "模式 正常，流量 100%，平滑 10%"],
+          ["前景色", "暖浅黄 #FFE79E（H 45，S 38%，B 100%；R 255，G 231，B 158）"],
+          ["画笔不透明度", "降到 80 左右（画面实测 82%）"]
+        ],
+        steps: [
+          "新建一个空白图层，放在背景图层之上，后面所有光都画在这一层上",
+          "选左侧画笔工具，用柔边画笔，选项栏模式正常、流量 100%、平滑 10%，画笔先开到约 1300 px",
+          "把前景色改成光的颜色：暖浅黄 #FFE79E",
+          "把画笔不透明度降到 80 左右",
+          "用 [ ] 键先把画笔缩小到约 430 px，在灯的位置点一下",
+          "再把画笔调大到约 1300 px，在同一个位置再点一下，两点都落在灯上"
+        ]
+      },
+      {
+        h: "第二步：颜色减淡，再取消透明形状图层",
+        paras: [
+          "混合模式一改颜色减淡，灯是亮了，但效果还很假：黄光平铺、糊满全图，像蒙了一层黄色滤镜",
+          "真正让它变真实的是下一步，藏在图层样式的高级混合里"
+        ],
+        steps: [
+          "把光效图层的混合模式改为颜色减淡",
+          "双击图层打开图层样式，进混合选项",
+          "在高级混合里取消勾选「透明形状图层」，让透明部分也参与计算",
+          "其余保持默认：填充不透明度 100%，挖空选无，混合颜色带不动"
+        ],
+        callout: { t: "关键一步", text: "取消勾选「透明形状图层」是这招成立的核心；不取消，黄光就会平铺糊满全图" }
+      },
+      {
+        h: "第三步：把光收回到主体上",
+        steps: [
+          "按 Ctrl+T 自由变换，适当调整光效图层的大小和位置（视频未给具体数值）",
+          "用对象选择工具，对人物和灯的主体建立选区",
+          "保持选区，给光效图层添加图层蒙版，效果完成"
+        ]
+      },
+      {
+        h: "完成后的效果",
+        paras: [
+          "灯亮起暖橙色的火焰，光落在人物的脸、头发和衣服上，背景保持暗，整张图像在夜里真的点了一盏灯"
+        ],
+        callout: { t: "评论区反馈", text: "有人反馈对象选择工具框选时只选到人物、选不到灯；这是评论区反馈，不是作者说明，遇到时留意把灯也框进选区" }
+      }
+    ]
   }
 ];
 
@@ -924,6 +994,24 @@ function diagramSVG(kind) {
       '<path d="M492 76 q16 -16 36 -5 q18 -9 30 4 q-12 9 -30 8 q-22 3 -36 -7Z" fill="#eef5f8" opacity="0.85"/>' +
       '<rect x="540" y="44" width="34" height="16" rx="2" fill="#f2f2f2"/><rect x="552" y="34" width="8" height="10" fill="#d8d8d8"/>' +
       '<text x="485" y="222" font-size="14" fill="var(--ink-2)" text-anchor="middle">融合后：接缝消失，像本来就在海里</text>' +
+      '</svg>';
+  }
+  if (kind === "lamp") {
+    return '<svg viewBox="0 0 640 240" role="img" aria-label="开灯效果点光前后对比示意">' +
+      '<rect x="30" y="25" width="250" height="160" rx="10" fill="#26262b"/>' +
+      '<circle cx="120" cy="92" r="26" fill="#3a3a41"/>' +
+      '<rect x="182" y="66" width="34" height="52" rx="8" fill="none" stroke="#8a8a92" stroke-width="3"/>' +
+      '<path d="M199 52 v14 M186 118 h26 l4 14 h-34 Z" fill="#55555e"/>' +
+      '<text x="155" y="222" font-size="14" fill="var(--ink-2)" text-anchor="middle">点光之前：灯是灭的，画面全暗</text>' +
+      '<path d="M298 105 h40" stroke="var(--accent)" stroke-width="2.5"/><path d="M330 96 l12 9 -12 9" fill="var(--accent)"/>' +
+      '<rect x="360" y="25" width="250" height="160" rx="10" fill="#26262b"/>' +
+      '<circle cx="528" cy="92" r="58" fill="#ffe79e" opacity="0.28"/>' +
+      '<circle cx="528" cy="92" r="34" fill="#ffd76e" opacity="0.45"/>' +
+      '<circle cx="450" cy="92" r="26" fill="#6b5636"/>' +
+      '<rect x="512" y="66" width="34" height="52" rx="8" fill="#ffdf8e" stroke="#e8a13c" stroke-width="3"/>' +
+      '<path d="M529 82 q8 12 0 22 q-8 -10 0 -22Z" fill="#ff8c2e"/>' +
+      '<path d="M529 52 v14 M516 118 h26 l4 14 h-34 Z" fill="#8a6a30"/>' +
+      '<text x="485" y="222" font-size="14" fill="var(--ink-2)" text-anchor="middle">点光之后：灯亮了，光只落在主体上</text>' +
       '</svg>';
   }
   /* combo 流程图 */
@@ -1039,7 +1127,8 @@ function renderArticle(i) {
   if (a.diagram) {
     var cap = a.id === "combo-prompt" ? "三合一总流程：抠图、融合、调色验收" :
       a.id === "grey-layer" ? "灰色观察层的图层位置与用法" :
-      a.id === "bg-eraser" ? "背景橡皮擦处理网眼背景的前后对比" : "自动混合前后的画面差别";
+      a.id === "bg-eraser" ? "背景橡皮擦处理网眼背景的前后对比" :
+      a.id === "lamp-light" ? "开灯效果点光前后的画面差别" : "自动混合前后的画面差别";
     h += '<figure class="diagram" style="margin-top:14px">' + diagramSVG(a.diagram) + '<figcaption>' + cap + '</figcaption></figure>';
   }
   a.sections.forEach(function (sec) { h += sectionHTML(sec); });
