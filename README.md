@@ -5,7 +5,7 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 - 仓库：https://github.com/Kenguba/useful-budget
 - 网站：https://kenguba.github.io/useful-budget/
 
-**读取口径（先看这条）**：本文件是索引，不是全文。每次先读「目录规范」与「约定」；其余各节按任务读——「新增项目规范」只在新建或下线项目时读，「子域名」只在动域名、路由、首页收录时读，页面规范（即 UI 规范，在 frontend/README.md）只在做页面时读，后端规范（在 backend/README.md）只在动 Worker、路由、迁移时读，「现有项目」只查当前项目那一行。各子目录文档（如 backend 与各项目 README）按需沿链接只读一层，读到能办事为止，不逐个打开、不链式通读
+**读取口径（先看这条）**：本文件是索引，不是全文。每次先读「目录规范」与「约定」；其余按需内容按任务读——「新增项目规范」（在 规范/新增项目规范.md）只在新建或下线项目时读，「子域名」（在 规范/子域名.md）只在动域名、路由、首页收录时读，页面规范（即 UI 规范，在 frontend/README.md）只在做页面时读，后端规范（在 backend/README.md）只在动 Worker、路由、迁移时读，「现有项目」（在 规范/现有项目.md）只查当前项目那一行。各子目录文档（如 backend 与各项目 README）按需沿链接只读一层，读到能办事为止，不逐个打开、不链式通读
 
 ## 目录规范
 
@@ -18,6 +18,7 @@ ken 的个人站点仓库：收集便宜、有用的技能与资源。GitHub Pag
 | `README.md` | 本规范文件 |
 | `frontend/` | 全部前端项目与 UI 规范（入口 [frontend/README.md](frontend/README.md)） |
 | `backend/` | 后端 Worker 源码留档与后端规范（入口 [backend/README.md](backend/README.md)） |
+| `规范/` | 根 README 拆出的按需规范（新增项目规范、现有项目、子域名） |
 
 每个项目 = 一级目录一个，自带全套文件（页面、数据、脚本、图标等），互不引用、互不依赖：
 
@@ -31,53 +32,15 @@ frontend/pages/<project>/     # 例：frontend/pages/skill-board/
 
 ## 新增项目规范
 
-1. 目录名：全小写英文 + 连字符（如 `ai-links`），不使用中文、空格、下划线。
-2. 在根 `index.html` 导航页加一张卡片：项目名、一句话说明、状态标签，链接指向 `frontend/pages/<project>/`（相对路径）。
-3. 项目需要定时更新的，在 `.github/workflows/` 里处理：脚本路径写全（含项目目录前缀，如 `frontend/pages/skill-board/scripts/refresh.py`），数据提交范围写明项目目录（如 `git add frontend/pages/skill-board/data/`）。
-4. 发布方式全局统一：workflow 用 `actions/upload-pages-artifact` 上传仓库根目录（`path: .`），根导航与所有项目一次发布，不给单个项目单独建发布流程。
-5. 项目下线：删其目录 + 删导航页对应卡片，两处缺一不可。
+**新增项目规范（按需）**：只在新建或下线项目时读，见 → [规范/新增项目规范.md](规范/新增项目规范.md)
 
 ## 现有项目
 
-| 目录 | 内容 | 更新方式 |
-| --- | --- | --- |
-| `frontend/pages/skill-board/` | 全球 Skills 使用量排行榜（安装量双榜 + GitHub 星标榜） | workflow 每 12 小时跑 `scripts/refresh.py` 自动刷新数据并发布；自带 PWA，可添加到手机主屏幕 |
-| `frontend/pages/ai-shop/` | AI账号商铺（AI 账号比价 7 分组 + 店铺目录） | workflow 每 12 小时跑 `scripts/refresh.py` 自动刷新数据并发布 |
-| `frontend/pages/phone-cloud/` | 云手机横向对比（30 家资费/改机/底层真机核查） | 脚本每周两次（周一/周四）刷甘甘官网价（`scripts/refresh.py`）+ 每周一 agent 全量复核 30 家更新正文 |
-| `frontend/pages/pan-cloud/` | 基德盘搜（pan）1:1 复刻：搜索首页 / 热播榜 / 每日更新 / 热搜榜 / APP / 申请友链 / 资源详情 | 手动跑 `scripts/refresh.py` 拉原站公开接口快照（`data/`），页面纯静态渲染 |
-| `frontend/pages/ip-check/` | IP 纯净度检测（IPPure 风格 1:1 复刻，融合 ping0 字段）：ASN / 多源位置 / 人机流量比 / 来源 / 属性 / 纯净度系数 + 风控值 / 原生 IP / 大模型检测 / 共享人数 / 适用场景 | 纯静态单文件，浏览器端直查公开 IP 情报接口，无后端、无定时刷新 |
-| `frontend/pages/2fa-auth/` | 2FA 验证码工具（2fa.fun 1:1 复刻）：谷歌验证器网页版，批量粘贴 2FA 密钥生成 6 位 TOTP 动态验证码，30 秒自动刷新、一键复制，毛玻璃侧边栏 + 深浅主题 + 中英切换 | 纯静态单文件，浏览器端本地计算（Web Crypto HMAC-SHA1），密钥不上传，无后端、无定时刷新 |
-| `frontend/pages/ui-design/` | Designeer 设计目录复刻站（设计资源目录 + Finds 海报，署名 Designeer 并链回原页） | 手动跑 `scripts/refresh.py` 重拉官方目录数据，页面纯静态渲染 |
-| `frontend/pages/wechat-bridge/` | 微信接入可行方案（调研报告页） | 静态页，手动维护 |
-| `frontend/pages/media-notes/motion/` | 运镜库（原 Motion Prompt 动效画廊，192 条命名动效/运镜/UI/网页特效，原画廊原样复刻，署名原作者 Shohei Ohtaki，MIT；2026-11-21 随改名并入媒体笔记） | 纯静态站，手动维护（数据随上游原仓同步） |
-| `frontend/pages/blog-notes/` | 博客笔记（公开版：模型与工具分工 + 原创系列 + 精选收录，内容脱敏；原名实战笔记 · 博客，2026-11-21 改名） | 纯静态站，手动维护（加文章只改 `data/articles.js`） |
-| `frontend/pages/tech-notes/` | 技术开发文档（个人技术笔记；原名开发文档，2026-11-21 改名） | 纯静态站，手动维护（加文章只改 `index.html` 内文章数据数组） |
-| `frontend/pages/media-notes/` | 媒体笔记（PS 技巧 + 运镜 + 提示词 + 视频制作 + 配音 + 配乐六组，含 PS 溶图三招与三合一提示词、AI 代码出片工具拆解、运镜库子目录；原名 PS 溶图笔记，2026-11-21 改名） | 纯静态站，手动维护（加文章只改 `index.html` 内文章数据数组） |
+**现有项目（按需）**：只查当前项目那一行，见 → [规范/现有项目.md](规范/现有项目.md)
 
 ## 子域名（Cloudflare 转发）
 
-**主域名（`xxxxx.asia`，无前缀）= 全站总体预览页**：打开主域名就是根目录导航页 `index.html`（「便宜、有用的，都在这」），与 `kenguba.github.io/useful-budget/` 内容一致，不给任何单个项目占用。主域名不走通配，须单独配 DNS 与路由（见 [backend/README.md](backend/README.md) 迁移清单）。
-
-各项目各有一个子域名入口，经 Cloudflare Worker 转发到本仓库对应的 Pages 目录，与 `kenguba.github.io/useful-budget/frontend/<project>/` 内容一致：
-
-| 项目 | 子域名 |
-| --- | --- |
-| （全站入口）`index.html` | `xxxxx.asia`（主域名） |
-| `frontend/pages/skill-board/` | `skill.xxxxx.asia` |
-| `frontend/pages/ai-shop/` | `ai.xxxxx.asia` |
-| `frontend/pages/phone-cloud/` | `phone.xxxxx.asia` |
-| `frontend/pages/pan-cloud/` | `pan.xxxxx.asia` |
-| `frontend/pages/ip-check/` | `ip.xxxxx.asia` |
-| `frontend/pages/2fa-auth/` | `2fa.xxxxx.asia` |
-| `frontend/pages/ui-design/` | `ui.xxxxx.asia` |
-| `frontend/pages/wechat-bridge/` | `wechat.xxxxx.asia`（仅子域名，不进总汇） |
-| `frontend/pages/blog-notes/` | `blog.xxxxx.asia`（仅子域名，不进总汇） |
-| `frontend/pages/tech-notes/` | `tech.xxxxx.asia`（仅子域名，不进总汇） |
-| `frontend/pages/media-notes/` | `media.xxxxx.asia`（仅子域名，不进总汇） |
-
-**首页（总汇）收录规则（2026-11-07 ken 定）**：进总汇首页的只有 7 个——ai、skill、phone、pan、ip、2fa、ui。wechat 只开子域名 `wechat.xxxxx.asia`，不进总汇：不加短路径、不上首页卡片。以后新增项目先定类别：进首页的，子域名、总汇短路径、首页卡片三样一起加；不进首页的，只加子域名，并在子域名清单里登记注明，免得误加。
-
-完整域名不写入本仓库（公开仓库，避免暴露站长域名）；解析与 Worker 配置在站长的 Cloudflare 账号里维护。后端 Worker 的留档、迁移与配置清单统一见 [backend/README.md](backend/README.md)
+**子域名（按需）**：只在动域名、路由、首页收录时读，见 → [规范/子域名.md](规范/子域名.md)
 
 ## 约定
 
