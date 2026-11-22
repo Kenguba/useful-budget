@@ -703,7 +703,7 @@ def fetch_aicdks_direct():
     page, pages = 1, None
     while page <= 100:
         req = urllib.request.Request(
-            f'https://aicdks.com/api/products?page={page}&pageSize=200', headers=HEADERS)
+            f'https://staging.aicdks.com/api/products?page={page}&pageSize=200', headers=HEADERS)
         with urllib.request.urlopen(req, timeout=30) as r:
             d = json.loads(r.read().decode('utf-8'))
         if pages is None:
