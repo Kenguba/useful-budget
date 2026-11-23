@@ -251,7 +251,7 @@
   .next-btn svg{width:18px;height:18px;margin-left:auto;flex:none;color:var(--accent)}
   .next-btn:disabled{opacity:.45;cursor:default}
 
-.layout{display:grid;grid-template-columns:104px 1fr;gap:16px;align-items:start}#side{position:sticky;top:64px}#side a{display:block;padding:7px 10px;text-decoration:none}#sideBtn{display:none}@media(max-width:760px){#side{position:fixed;inset:0 auto 0 0;width:180px;z-index:60;background:var(--surface);padding:70px 14px;transform:translateX(-105%);transition:transform .25s}#side.open{transform:none}#sideBtn{display:flex;position:fixed;left:12px;bottom:16px;z-index:61}}
+.layout{display:grid;grid-template-columns:118px 1fr;gap:16px;align-items:start}#side{position:sticky;top:64px}#side a{display:block;padding:10px 12px;margin-bottom:6px;border-radius:10px;background:var(--surface-2);color:var(--ink);font-size:15px;text-decoration:none;font-variant-numeric:tabular-nums}#side a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.side-t{display:block;font-family:"Noto Serif SC",serif;font-weight:700;margin:2px 2px 12px}#sideBtn,#sideBg{display:none}@media(max-width:760px){.layout{grid-template-columns:1fr}#side{position:fixed;inset:0 auto 0 0;width:200px;z-index:60;background:var(--surface);padding:70px 14px;transform:translateX(-105%);transition:transform .25s;box-shadow:10px 0 30px rgba(0,0,0,.22)}#side.open{transform:none}#sideBg.open{display:block;position:fixed;inset:0;z-index:59;background:rgba(0,0,0,.38)}#sideBtn{display:flex;position:fixed;left:12px;bottom:16px;z-index:61}}
   @media (max-width:640px){
     .books{gap:12px}
     .book{width:calc(50% - 6px)}
@@ -289,7 +289,7 @@
       <div class="rule"></div>
     </section>
 
-    <button class="icon-btn" id="sideBtn" aria-label="分组导航"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><div class="layout"><nav id="side"></nav><div id="shelves"></div></div>
+    <button class="icon-btn" id="sideBtn" aria-label="分组导航"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><div id="sideBg"></div><div class="layout"><nav id="side"></nav><div id="shelves"></div></div>
       <div class="tip">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="8" r="1.3" fill="currentColor"/></svg>
         <span>练 PS 溶图按组内顺序走：先抠图、再融合、最后用灰色观察层验收调色；做视频先翻视频制作组挑工具，再去提示词组抄一条验证过的提示词，配音与配乐各有一组专门讲</span>
@@ -1061,7 +1061,7 @@ var GROUPS = ["PS技巧", "运镜", "提示词", "视频制作", "配音", "配�
 
 function renderShelf() {
   $("#countChip").textContent = "共 " + ARTICLES.length + " 本";
-  var html = "", nav = "";
+  var html = "", nav = '<b class="side-t">分组</b>';
   GROUPS.forEach(function (g, gi) {
     var idxs = [];
     ARTICLES.forEach(function (a, i) { if (a.group === g) idxs.push(i); });
@@ -1092,8 +1092,9 @@ function renderShelf() {
   }
 }
 
-$("#sideBtn").onclick=function(){$("#side").classList.toggle("open")};
-$("#side").onclick=function(){$("#side").classList.remove("open")};
+function closeSide(){$("#side").classList.remove("open");$("#sideBg").classList.remove("open")}
+$("#sideBtn").onclick=function(){$("#side").classList.toggle("open");$("#sideBg").classList.toggle("open")};
+$("#sideBg").onclick=$("#side").onclick=closeSide;
 
 function sectionHTML(sec) {
   var h = '<h2>' + esc(sec.h) + '</h2>';
