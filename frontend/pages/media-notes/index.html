@@ -67,7 +67,7 @@
     border-bottom:1px solid var(--line);
   }
   .topbar-in{display:flex;align-items:center;gap:12px;padding:10px 18px}
-  .brand{display:flex;align-items:center;gap:10px;font-family:"Noto Serif SC",serif;font-weight:900;font-size:18px;letter-spacing:.04em;background:none;border:0;padding:0;color:inherit;cursor:pointer}
+  .brand{display:flex;align-items:center;gap:10px;font-family:"Noto Serif SC",serif;font-weight:900;font-size:18px;letter-spacing:.04em;background:none;border:0;padding:0;color:inherit}
   .brand svg{flex:none}
   .topbar .spacer{flex:1}
   .count-chip{font-size:13px;color:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--surface)}
@@ -251,7 +251,7 @@
   .next-btn svg{width:18px;height:18px;margin-left:auto;flex:none;color:var(--accent)}
   .next-btn:disabled{opacity:.45;cursor:default}
 
-.layout{display:grid;grid-template-columns:104px 1fr;align-items:start}#side{position:sticky;top:64px}#side a{display:block;padding:10px;margin-bottom:6px;border-radius:10px;background:var(--surface-2);text-decoration:none}@media(max-width:760px){body{touch-action:pan-y}.layout{grid-template-columns:1fr}#side{position:fixed;inset:0 auto 0 0;width:180px;z-index:60;background:var(--surface);padding:70px 14px;transform:translateX(-105%)}#side.open{transform:none}#side.open::after{content:"";position:fixed;inset:0 0 0 180px;background:#0006}}
+.layout{display:grid;grid-template-columns:104px 1fr;align-items:start}#side{position:sticky;top:64px}#side a{display:block;padding:10px;margin-bottom:6px;border-radius:10px;background:var(--surface-2);text-decoration:none}@media(max-width:760px){body{touch-action:pan-y}.layout{grid-template-columns:1fr}#side{position:fixed;inset:0 auto 0 0;width:180px;z-index:60;background:var(--surface);padding:70px 14px;transform:translateX(-105%)}#side.open{transform:none;--p:1;--pe:auto}#side::after{content:"";position:fixed;top:0;left:180px;width:100vw;height:100vh;background:#0006;opacity:var(--p,0);pointer-events:var(--pe,none)}}
   @media (max-width:640px){
     .books{gap:12px}
     .book{width:calc(50% - 6px)}
@@ -270,7 +270,7 @@
 
 <header class="topbar">
   <div class="wrap topbar-in">
-    <button class="brand" id="brandBtn" type="button" aria-label="分组导航">
+    <button class="brand" id="brandBtn" aria-label="分组导航">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="13" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 8.5 20 10v10h-4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6.5 9h6M6.5 12.5h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       <span>媒体笔记</span>
     </button>
@@ -1096,12 +1096,12 @@ var sideEl=$("#side");
 $("#brandBtn").onclick=function(){sideEl.classList.toggle("open")};
 sideEl.onclick=function(){sideEl.classList.remove("open")};
 var swX=null,swY=null,swOpen=false,swOn=false;
-addEventListener("touchstart",function(e){
+ontouchstart=function(e){
   swOpen=sideEl.classList.contains("open");
   swX=e.touches[0].clientX;swY=e.touches[0].clientY;swOn=false;
   if(!swOpen&&swX>24)swX=null;
-},{passive:true});
-addEventListener("touchmove",function(e){
+};
+ontouchmove=function(e){
   if(swX===null)return;
   var dx=e.touches[0].clientX-swX,dy=e.touches[0].clientY-swY;
   if(!swOn){
@@ -1112,17 +1112,18 @@ addEventListener("touchmove",function(e){
   var p=swOpen?1+dx/180:dx/180;
   p=Math.max(0,Math.min(1,p));
   sideEl.style.transform="translateX("+(-(1-p)*105)+"%)";
-},{passive:true});
-addEventListener("touchend",function(e){
+  sideEl.style.setProperty("--p",p);
+};
+ontouchend=ontouchcancel=function(e){
   if(swX===null)return;
   if(swOn){
     var dx=e.changedTouches[0].clientX-swX;
     var p=swOpen?1+dx/180:dx/180;
     if(p<=0.5)sideEl.classList.remove("open");
-    sideEl.style.transform="";
+    sideEl.style.cssText="";
   }
   swX=null;
-});
+};
 
 function sectionHTML(sec) {
   var h = '<h2>' + esc(sec.h) + '</h2>';
@@ -1268,15 +1269,14 @@ function applyTheme(t) {
   themeBtn.innerHTML = t === "dark" ? SUN : MOON;
   themeBtn.setAttribute("aria-label", t === "dark" ? "切换到浅色主题" : "切换到深色主题");
 }
-var savedTheme = null;
-try { savedTheme = localStorage.getItem("mp-theme"); } catch (e) {}
+var savedTheme;try{savedTheme=localStorage.getItem("mp-theme")}catch(e){}
 var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-applyTheme(savedTheme === "dark" || savedTheme === "light" ? savedTheme : (prefersDark ? "dark" : "light"));
+applyTheme(savedTheme||(prefersDark?"dark":"light"));
 themeBtn.addEventListener("click", function () {
   var now = document.documentElement.getAttribute("data-theme");
   var next = now === "dark" ? "light" : "dark";
   applyTheme(next);
-  try { localStorage.setItem("mp-theme", next); } catch (e) {}
+  try{localStorage.setItem("mp-theme",next)}catch(e){}
 });
 
 /* ---------- 启动 ---------- */
