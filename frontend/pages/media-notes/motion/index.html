@@ -23,7 +23,9 @@
 <script>
 /* Apply the saved theme and language before first paint.
    Cookie A (shared across jpedu.asia: language / day-night / theme 1-12) wins
-   over this site's localStorage, language digit included: 0 = Chinese,
+   over this site's localStorage, except day/night: a saved mp-theme (shared
+   with the media-notes home page) wins for dark/light. Language digit
+   included: 0 = Chinese,
    1 = English. This site ships Chinese and English only; a saved 'ja'
    preference from the old three-language build resolves to Chinese. */
 (function () {
@@ -36,11 +38,9 @@
   if (m) l = m[1] === 'en' ? 'en' : 'zh'; /* ?lang= (set when an agent opens the gallery) wins for this visit */
   else if (a && a.lang) l = a.lang;
   var dark, idx = 11;
-  if (a) { dark = a.dark; idx = a.idx; }
-  else {
-    dark = t === 'dark';
-    if (ti !== null) { var n = parseInt(ti, 10); if (n >= 0 && n < 12) idx = n; }
-  }
+  if (a) idx = a.idx;
+  else if (ti !== null) { var n = parseInt(ti, 10); if (n >= 0 && n < 12) idx = n; }
+  dark = t !== null ? t === 'dark' : (a ? a.dark : false);
   d.setAttribute('data-theme', dark ? 'dark' : 'light');
   d.setAttribute('data-tidx', String(idx));
   if (idx === 11) d.setAttribute('data-holo', 'true');

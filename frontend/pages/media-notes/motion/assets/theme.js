@@ -78,11 +78,13 @@
   }
 
   /* Day/night: site.js / found.js own the #theme button and flip data-theme
-     first (their listener was registered earlier); mirror the result into A. */
+     first (their listener was registered earlier); mirror the result into A and mp-theme
+     (shared with the media-notes home page). */
   var themeBtn = $('#theme');
   if (themeBtn) themeBtn.addEventListener('click', function () {
     state.dark = root.getAttribute('data-theme') === 'dark';
     applyVisual(state.idx);
+    store('mp-theme', state.dark ? 'dark' : 'light');
     writeA();
   });
 
