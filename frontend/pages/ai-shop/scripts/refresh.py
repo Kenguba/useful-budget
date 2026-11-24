@@ -1330,6 +1330,10 @@ def main():
     g2 = _apply_floor(g2, 'gpt-bound')
     g3 = _apply_floor(g3, 'gpt-weekly')
     g4 = _apply_floor(g4, 'ag-cheapest')
+    # 定点加入（ken 2026-11-24 定）：聚合库未收录、ken 指定进此组（不进已过验证组）；价为当日链动实抓
+    g4.append(dict(title='Gemini pro 协议6个月（随机掉订阅 3小时到6个月 随机掉订阅 ）会掉订阅 体验版pro',
+                   price=4.5, shop='pptv', platform='链动小铺', stock=None,
+                   url='https://wzyp.cn/item/8gs79w'))
     g5 = _apply_floor(g5, 'ag-verified')
     g7 = _apply_floor(g7, 'grok-heavy')
     g6 = _apply_floor(g6, 'codex-sms', floor=False)  # 接码组照旧挂板（ken 2026-11-18 定）：只拦 ken 定性的引流
@@ -1376,11 +1380,15 @@ def main():
                 _baitq[-1]['t'] = _v['t']
             _bq_seen.add(_u)
 
+    _agc = top30(g4, ag_type, 45)
+    for _o in _agc:  # 定点件 kind 覆盖为协议CDK
+        if _o['url'].split('?')[0] == 'https://wzyp.cn/item/8gs79w':
+            _o['kind'] = '协议CDK'
     groups = [
         dict(id='gpt-unbound', name='GPT 日抛/Plus 成品号 — 未接马', items=slim(top30(g1, None, 45))),
         dict(id='gpt-bound', name='GPT 日抛/Plus 成品号 — 已接马', items=slim(top30(g2, None, 45))),
         dict(id='gpt-weekly', name='GPT 周限号', items=slim(top30(g3, lambda t: '已接马' if is_bound(t) else ('未接马' if has(t, '未接马', '未绑定') else '未注明'), 45))),
-        dict(id='ag-cheapest', name='Antigravity 反重力 — 最便宜', items=slim(top30(g4, ag_type, 45))),
+        dict(id='ag-cheapest', name='Antigravity 反重力 — 最便宜', items=slim(_agc)),
         dict(id='ag-verified', name='Antigravity 反重力 — 已过验证成品号', items=slim(top30(g5, ag_type, 45))),
         dict(id='grok-heavy', name='Grok Heavy（SuperGrok Heavy/Ultra）', items=slim(top30(g7, lambda t: '代充' if has(t, '代充', '直充') else '成品号', 45))),
         dict(id='claude', name='Claude — 最便宜', items=slim(top30(_claude, claude_kind, 45))),
