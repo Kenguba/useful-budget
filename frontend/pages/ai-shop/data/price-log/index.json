@@ -1,31 +1,31 @@
 {
  "v": 1,
- "updated_at": "2026-11-24 10:06",
- "total": 236956,
+ "updated_at": "2026-11-24 10:18",
+ "total": 237181,
  "shards": {
   "16688": {
-   "keys": 20018,
-   "bytes": 1284726
+   "keys": 20026,
+   "bytes": 1285898
   },
   "aicdks": {
    "keys": 5837,
-   "bytes": 339060
+   "bytes": 339240
   },
   "catfk": {
    "keys": 3583,
-   "bytes": 136755
+   "bytes": 136768
   },
   "huabf": {
    "keys": 110148,
    "bytes": 4177750
   },
   "web": {
-   "keys": 20444,
-   "bytes": 1560761
+   "keys": 20661,
+   "bytes": 1575791
   },
   "wzyp": {
    "keys": 76926,
-   "bytes": 4494409
+   "bytes": 4494548
   }
  }
 }
