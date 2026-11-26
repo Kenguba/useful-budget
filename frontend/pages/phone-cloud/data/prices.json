@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-26T16:50:44+08:00",
+  "updated_at": "2026-11-26T17:08:35+08:00",
   "source_note": "脚本抓取甘甘云官网公开套餐数据；其余品牌仅做官网可用性检查，价格以每周一全量复核为准。",
   "gangan": {
     "site": "https://www.ggyphone.com/",
@@ -57,7 +57,8 @@
     {
       "name": "VMOS国内",
       "url": "https://shouji.vmos.cn/",
-      "http": 200
+      "http": null,
+      "error": "URLError"
     },
     {
       "name": "多多云",
