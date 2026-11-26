@@ -17,6 +17,12 @@ window.BLOG_ARTICLES = {
       "title": "博客笔记 · 原创系列",
       "badge": "系列文章 · 共 3 章",
       "count": 3
+    },
+    {
+      "id": "english",
+      "num": "02",
+      "title": "英语",
+      "count": 1
     }
   ],
   "curatedCategories": [
@@ -301,6 +307,148 @@ window.BLOG_ARTICLES = {
         }
       ],
       "oilNote": "精选说明：本文是本站对这篇原创长文的摘要与借鉴点整理，不转载全文；完整内容见原文链接"
+    },
+    {
+      "slug": "irregular-verbs-evolution",
+      "type": "original",
+      "categoryId": "english",
+      "chapter": "第 01 篇",
+      "isPro": false,
+      "homeFeatured": false,
+      "title": "英语不规则动词的演变",
+      "coverLines": [
+        "不规则动词",
+        "从强变化说起",
+        "英语 · 01"
+      ],
+      "coverStyle": "sage-nodes",
+      "author": "博客笔记",
+      "date": "2026.11.27",
+      "readTime": "约 8 分钟阅读",
+      "audioTime": "10:55",
+      "themeHue": "emerald",
+      "summary": "不规则动词不是例外，而是更古老的正统：97% 的动词靠加 -ed 表过去，100 多个高频词却靠改元音；这一篇按原视频顺序讲清强弱变化的源头、频率决定生死的规律，以及四大家族的分组记法；核心结论是，不规则不是例外，而是更古老的正统，加 -ed 反而是后来才出现的办法",
+      "toc": [
+        "引言",
+        "格林的发现",
+        "强变化动词",
+        "弱变化动词",
+        "规则化洗牌",
+        "使用频率与淘汰速度",
+        "go 和 be 的特殊情况",
+        "不规则动词的分类",
+        "结语"
+      ],
+      "sections": [
+        {
+          "heading": "§ 01 引言",
+          "paragraphs": [
+            "英语词典里收录了几万个动词，其中超过 97% 在变成过去式和过去分词时都是词尾直接加 -ed；唯独有 100 多个日常动词偏偏不按套路出牌，它们的变形是不规则的",
+            "按理说越是每天高频使用的基础词应该越简单、越守规矩；先把问题摆出来：为什么偏偏是最常用的词最不规则"
+          ],
+          "bullets": [
+            "eat → ate（吃）",
+            "see → saw（看见）",
+            "take → took（拿）",
+            "sing → sang / sung（唱歌）",
+            "go → went（去）"
+          ]
+        },
+        {
+          "heading": "§ 02 格林的发现",
+          "paragraphs": [
+            "把英语的历史往前倒推一千二百年，翻开古英语时期的档案，会发现真相正好反过来：不规则不是例外，而是当年的正统",
+            "十九世纪德国学者雅各布·格林除了与弟弟合编格林童话，本职是顶尖的历史语言学家；他研究古英语、古德语这一整个语族之后，挖出了强弱变化的源头"
+          ]
+        },
+        {
+          "heading": "§ 03 强变化动词",
+          "paragraphs": [
+            "在古英语时代，不加词尾、直接改变单词内部元音的做法是最正统、最主流的变形方式，格林给这类词起名叫强变化动词",
+            "强在自带切换时间的能力：不需要借助外部的尾巴，只要把内部元音换个音调，听者立刻就能听出是正在干、过去干了还是已经干完了；最典型的是 i 到 a 再到 u，舌位从高到低再向后"
+          ],
+          "bullets": [
+            "sing → sang → sung",
+            "drive → drove → driven"
+          ]
+        },
+        {
+          "heading": "§ 04 弱变化动词",
+          "paragraphs": [
+            "今天觉得天经地义的 -ed 来自弱变化动词：后来新造出来的动词已经失去了靠内部元音变调表达时间的能力，格林把加 -ed 的词叫做弱变化动词",
+            "实在没办法，古人把表示做的那个词的过去式 did 绑在这些词的词尾；早期的 walked 拼接逻辑就是 walk 加 did，loved 就是 love 加 did；念得快了，后面的 did 被慢慢磨平，才变成今天看到的 -ed"
+          ]
+        },
+        {
+          "heading": "§ 05 规则化洗牌",
+          "paragraphs": [
+            "古英语时期靠改元音变形的强动词足有 300 多个，到了今天大半消失，只剩 100 多个；很多今天看着老实的词当年其实全是不规则动词",
+            "公元 8 到 11 世纪，先是维京人打过来定居，接着是讲古法语的诺曼人征服英国；大批成年外来者要赶紧学英语，让他们背 300 多个词各自不同的元音变化实在太难，于是一代代口耳相传中，统一加 -ed 的规则化洗牌开始了"
+          ],
+          "bullets": [
+            "help 当年的过去式是 holp、过去分词是 holpen",
+            "laugh 当年的过去式是 lough",
+            "walk、climb、wash 当年都靠改变内部元音表过去"
+          ]
+        },
+        {
+          "heading": "§ 06 使用频率与淘汰速度",
+          "paragraphs": [
+            "2007 年哈佛大学演化动力学实验室在《自然》上发表研究：他们追踪了 177 个古英语不规则动词整整一千二百年的文献记录，这批词到中世纪剩 145 个，到今天只剩 98 个",
+            "规律是：一个不规则动词被磨平的半衰期，与它日常使用频率的平方根成正比；频率高一百倍，被改造成加 -ed 的速度就慢十倍；说得少的词印象不深，先被同化；吃、喝、睡、看、去、拿这类底层核心动作每天念几十遍，在几代人的大脑里形成极其坚固的肌肉记忆，硬生生扛住了一千多年的同化压力",
+            "顺着这个公式推算，幸存词里频率排在末尾的 wed、dive、light 正在慢慢被 -ed 吞噬；排在最顶端的词按目前的演化速度，哪怕再过上万年也不会变成加 -ed 的样子"
+          ],
+          "bullets": [
+            "最高频档 be、have：被规则化 0%",
+            "高频档 come、do、go、say、see、take 等：被规则化 0%",
+            "中频档 begin、eat、write 等：被规则化 10%，help、walk、work 已在这一档被洗成规则动词",
+            "中低频档 ride、sing、swim 等：被规则化 43%",
+            "低频档 dive、grip、heave 等：被规则化 72%",
+            "最罕见档 bide、chide、hew 等：被规则化 91%"
+          ]
+        },
+        {
+          "heading": "§ 07 go 和 be 的特殊情况",
+          "paragraphs": [
+            "go 的过去式变成完全不沾边的 went，语言学上叫异干互补；古英语里 go 原本有自己的过去式，拼作 ēode，元音挨着元音，语速一快就含糊不好发音",
+            "当时还有一个意思相近的动词 wend，本意是顺着路往前走，它的过去式正好是 went；中世纪的人嫌 go 原来的过去式拗口，顺嘴借 went 来用，到 15 世纪左右 went 彻底成了 go 的正式过去式，而 wend 只好给自己新造一个加 -ed 的规则过去式 wended",
+            "be 更夸张：am、is、are 来自第一个古老词根，本义是存在；was、were 来自第二个词根，本义是居住、停留；been 来自第三个词根，本义是生长、变成；三个完全不同的词各拆几个零件拼成一套，能完整流传到今天，全靠 be 的使用频率高居榜首"
+          ]
+        },
+        {
+          "heading": "§ 08 不规则动词的分类",
+          "paragraphs": [
+            "按词典的字母顺序背之所以头疼，是因为长得毫无关系的词被硬凑在一起；按当年的语音演变规律分，超过 80% 的词只归四个家族",
+            "第一个是古英语元音阶梯家族，纯正的强动词，共有三条路线；第二个是中世纪元音挤压家族，本想守规则加 -t 或 -d，长元音却被挤压成短元音；第三个是古英语喉音化石家族，gh 在古英语里真发喉音，后来喉音脱落，印刷术又把拼写固定下来，只留下 -ought 与 -aught 的化石外壳；第四个是词尾撞车不变家族，原形、过去式、过去分词三态相同，全以 t 或 d 结尾，再加 -ed 就是两个舌尖爆破音连撞，嘴巴实在太累，后面的词尾直接和单词本身的尾巴融为一体"
+          ],
+          "bullets": [
+            "元音阶梯 · i-a-u：sing sang sung；drink drank drunk；swim swam swum；begin began begun；ring rang rung；sink sank sunk",
+            "元音阶梯 · 长 i 变 o 加 -en：drive drove driven；write wrote written；ride rode ridden",
+            "元音阶梯 · -ew 与 -own：know knew known；grow grew grown；blow blew blown；throw threw thrown；fly flew flown",
+            "元音挤压：keep kept；sleep slept；feel felt；leave left；meet met；feed fed；bleed bled；lead led；read 拼写不变、读音变短；send sent；spend spent；lend lent；build built；bend bent",
+            "喉音化石：buy bought；think thought；bring brought；fight fought；seek sought；teach taught；catch caught",
+            "词尾撞车不变：cut；put；hit；hurt；shut；cost；let；set；split；spread"
+          ]
+        },
+        {
+          "heading": "§ 09 结语",
+          "paragraphs": [
+            "这 100 多个看似杂乱无章的不规则动词，其实是一座浓缩了一千多年历史的语言博物馆：高频的日常使用帮它们抵御了被 -ed 流水线同化的命运",
+            "古印欧语系的元音变调、中世纪的元音缩短、古英语的喉音脱落与词尾辅音的省力合并，塑造了它们今天的四大家族；看懂这层来龙去脉，这些词就不再是一串死板的字母，而是语言在时间长河里留下的真实印记",
+            "读取说明：本篇按原视频 00:00 到 15:29 的顺序全程整理，时间戳为约值，前后差约 15 秒；约 12:15 处有一句过渡句音频含糊，只确认它在引出 meet、feed、bleed、lead 一组"
+          ]
+        }
+      ],
+      "relatedSlugs": [
+        "oil-long-project",
+        "beginner-site"
+      ],
+      "externalLinks": [
+        {
+          "label": "原视频 ↗",
+          "url": "https://www.douyin.com/video/7709374469269130538"
+        }
+      ]
     }
   ]
 };
