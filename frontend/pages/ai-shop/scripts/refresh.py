@@ -1330,10 +1330,17 @@ def main():
     g2 = _apply_floor(g2, 'gpt-bound')
     g3 = _apply_floor(g3, 'gpt-weekly')
     g4 = _apply_floor(g4, 'ag-cheapest')
-    # 定点加入（ken 2026-11-24 定）：聚合库未收录、ken 指定进此组（不进已过验证组）；价为当日链动实抓
-    g4.append(dict(title='Gemini pro 协议6个月（随机掉订阅 3小时到6个月 随机掉订阅 ）会掉订阅 体验版pro',
-                   price=4.5, shop='pptv', platform='链动小铺', stock=None,
-                   url='https://wzyp.cn/item/8gs79w'))
+    # 定点加入（ken 2026-11-24 定 pptv 一件、2026-11-27 扩到同源 5 件）：聚合库未收录、ken 指定进此组
+    # （不进已过验证组）；价为链动实抓；同标题 4 件由 top30 自动合并为一条多源，och5a7 标题不同单列
+    _AG_PINS = [
+        ('Gemini pro 协议6个月（随机掉订阅 3小时到6个月 随机掉订阅 ）会掉订阅 体验版pro', 4.5, '还没想好', 'https://wzyp.cn/item/vczg1b'),
+        ('Gemini pro 协议6个月（随机掉订阅 3小时到6个月 随机掉订阅 ）会掉订阅 体验版pro', 5.0, '超级码少', 'https://wzyp.cn/item/1rlg9v'),
+        ('Gemini pro 协议6个月（随机掉订阅 3小时到6个月 随机掉订阅 ）会掉订阅 体验版pro', 5.0, 'Ai供销社-源头供货-招代理-分销码：000000001', 'https://wzyp.cn/item/5qimi2'),
+        ('Gemini pro 协议6个月（随机掉订阅 3小时到6个月 随机掉订阅 ）会掉订阅 体验版pro', 5.5, 'pptv', 'https://wzyp.cn/item/8gs79w'),
+        ('Gemini Pro 兑换｜6个月CDK自助开通｜会掉订阅 体验版', 5.6, '纵享丝滑', 'https://wzyp.cn/item/och5a7'),
+    ]
+    for _t, _p, _s, _u in _AG_PINS:
+        g4.append(dict(title=_t, price=_p, shop=_s, platform='链动小铺', stock=None, url=_u))
     g5 = _apply_floor(g5, 'ag-verified')
     g7 = _apply_floor(g7, 'grok-heavy')
     g6 = _apply_floor(g6, 'codex-sms', floor=False)  # 接码组照旧挂板（ken 2026-11-18 定）：只拦 ken 定性的引流
@@ -1381,9 +1388,14 @@ def main():
             _bq_seen.add(_u)
 
     _agc = top30(g4, ag_type, 45)
-    for _o in _agc:  # 定点件 kind 覆盖为协议CDK
-        if _o['url'].split('?')[0] == 'https://wzyp.cn/item/8gs79w':
+    _PIN_URLS = {p[3] for p in _AG_PINS}
+    for _o in _agc:  # 定点件：kind 覆盖为协议CDK；整条渠道 CDK 池已空（ken 2026-11-27 实测各家均库存不足、定照挂标注），stock 标 0
+        if _o['url'].split('?')[0] in _PIN_URLS:
             _o['kind'] = '协议CDK'
+            _o['stock'] = 0
+            for _s in _o.get('sources') or []:
+                if _s['url'].split('?')[0] in _PIN_URLS:
+                    _s['stock'] = 0
     groups = [
         dict(id='gpt-unbound', name='GPT 日抛/Plus 成品号 — 未接马', items=slim(top30(g1, None, 45))),
         dict(id='gpt-bound', name='GPT 日抛/Plus 成品号 — 已接马', items=slim(top30(g2, None, 45))),
